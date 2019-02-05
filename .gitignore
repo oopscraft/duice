@@ -1,3 +1,4 @@
+/.project
 /dist/
 /node_modules/
 *.log
