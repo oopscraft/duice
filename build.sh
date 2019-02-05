@@ -9,6 +9,7 @@ function update() {
 
 # generates document
 function doc() {
+	rm -rf ./doc/*
 	jsdoc --configure ./jsdoc.json
 }
 
