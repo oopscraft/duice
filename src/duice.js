@@ -284,7 +284,7 @@ duice.data = {};
 
 /**
  * Super prototype of duice.data
- * @class
+ * @abstract
  * @constructor
  */
 duice.data.__ = function(){
@@ -808,9 +808,11 @@ duice.data.List.prototype.afterChange = function(afterChangeListener){
 	// TODO
 }
 
-//-----------------------------------------------------------------------------
-// duice.data.Tree prototype
-//-----------------------------------------------------------------------------
+/**
+ * duice.data.Tree prototype
+ * @class
+ * @classdesc
+ */
 duice.data.Tree = function(json,linkNodeName) {
 	duice.data.__.call(this);
 	this.index = [];
@@ -1076,11 +1078,26 @@ duice.data.Tree.prototype.afterIndexChange = function(listener){
 }
 
 
-//-----------------------------------------------------------------------------
-// duice.ui package
-//-----------------------------------------------------------------------------
+/**
+ * UI Component package
+ * @namespace
+ */
 duice.ui = {};
+
+/**
+ *  UI Component abstract class
+ *  @abstract
+ *  @constructor
+ */
 duice.ui.__ = function(){}
+
+/**
+ * Executes expression
+ * @method
+ * @param {HTMLElement} element - target container element
+ * @param {Object} $context - context parameter object
+ * @return {HTMLElement} result container element
+ */
 duice.ui.__.prototype.executeExpression = function(element,$context) {
 	var string = element.outerHTML;
 	string = string.replace(/\{\{(.*?)\}\}/mgi,function(match, command){
@@ -1100,6 +1117,12 @@ duice.ui.__.prototype.executeExpression = function(element,$context) {
 	console.debug('executeExpression', template.content.firstChild);
 	return template.content.firstChild;
 }
+
+/**
+ * Removes all child elements
+ * @method
+ * @param {HTMLElement} element - target parent element
+ */
 duice.ui.__.prototype.removeChildNodes = function(element){
 	// Remove element nodes and prevent memory leaks
     var node, nodes = element.childNodes, i = 0;
@@ -1119,12 +1142,24 @@ duice.ui.__.prototype.removeChildNodes = function(element){
     	element.options.length = 0;
     }
 }
+
+/**
+ * Converts string to HTML element
+ * @method 
+ * @param {string} string - HTML string to convert
+ * @return {HTMLElement} converted HTML element
+ */
 duice.ui.__.prototype.createHtml = function(string){
 	var template = document.createElement('template');
 	template.innerHTML = string;
 	return template.content;
 }
-// returns current window
+
+/**
+ * Returns current window
+ * @method
+ * @return {HTMLWindowElement} window element
+ */
 duice.ui.__.prototype.getWindow = function() {
 	if(window.frameElement){
 		return window.parent;
@@ -1132,6 +1167,12 @@ duice.ui.__.prototype.getWindow = function() {
 		return window;
 	}
 }
+
+/**
+ * Sets position to be centered.
+ * @method
+ * @param {HTMLElement} element - element to be centered.
+ */
 duice.ui.__.prototype.setPosition = function(element){
 	var window = this.getWindow();
 	var computedStyle = window.getComputedStyle(element);
@@ -1142,12 +1183,25 @@ duice.ui.__.prototype.setPosition = function(element){
 	element.style.left = Math.max(10,window.innerWidth/2 - computedWidth/2) + 'px';
 	element.style.top = Math.max(0,window.innerHeight/2 - computedHeight/2) + 'px';
 }
+
+/**
+ * Parses format string to format type and format body
+ * @method
+ * @param {string} format - format string (type + ":" + body)
+ * @return {Object} converted formatType and formatBody values
+ */
 duice.ui.__.prototype.parseFormat = function(format){
 	var splitedFormat = format.split(':');
 	var formatType = splitedFormat.shift();
 	var formatBody = splitedFormat.join(':');
 	return { type: formatType, body: formatBody };
 }
+
+/**
+ * Delays execution
+ * @method
+ * @param {function} callback - function to defer
+ */
 duice.ui.__.prototype.delay = function(callback){
 	var interval = setInterval(function() {
 		try {
@@ -1159,14 +1213,32 @@ duice.ui.__.prototype.delay = function(callback){
 		}
 	},400);	
 }
+
+/**
+ * Executes fade in animation.
+ * @method
+ * @param {HTMLElement} element - HTML element to animate fade in
+ */
 duice.ui.__.prototype.fadeIn = function(element){
 	element.classList.remove('duice-ui-fadeOut');
 	element.classList.add('duice-ui-fadeIn');
 }
+
+/**
+ * Executes fade out animation.
+ * @method
+ * @param {HTMLElement} element - HTML element to animate fade out
+ */
 duice.ui.__.prototype.fadeOut = function(element) {
 	element.classList.remove('duice-ui-fadeIn');
 	element.classList.add('duice-ui-fadeOut');
 }
+
+/**
+ * Gets current max z-index value
+ * @method
+ * @return {number} current max z-index
+ */
 duice.ui.__.prototype.getMaxZIndex = function(){
 	var zIndex,
 	z = 0,
@@ -1178,7 +1250,13 @@ duice.ui.__.prototype.getMaxZIndex = function(){
 	}
 	return z;
 }
-// blocking specified element 
+
+/**
+ * Blocks specified element
+ * @method
+ * @param {HTMLElement} element - HTML element to block
+ * @return {Object} block handler
+ */
 duice.ui.__.prototype.block = function(element){
 	var $this = this;
 	
@@ -1229,6 +1307,13 @@ duice.ui.__.prototype.block = function(element){
 		}
 	}
 }
+
+/**
+ * Does loading effect.
+ * @method
+ * @param {HTMLElement} element - target HTML element to block.
+ * @return {Object} release handler object
+ */
 // progress
 duice.ui.__.prototype.load = function(element){
 	var $this = this;
@@ -1274,25 +1359,15 @@ Object.freeze(duice.ui.__.prototype);
  * @class
  * @classdesc
  * Prints the value of the binded data map object on the screen.
- * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/ogtf6vh9/embedded/js,html,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
- * 
  * ## HTML5 Tag and Attribute
- * 
- * | HTML Tag   	| data-duice* Attribute 								| Description  							|
+ * | HTML Tag   	| data-* Attribute 										| Description  							|
  * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
- * | Label  	   	| data-duice="Label" 									| component Type						|
- * | Label		    | data-duice-bind="[duice.data.Map].[column name]    	| specify binding Map and column name	|
- * 
- * @example 
- * <caption>Javascript</caption>
- * var user = new duice.data.Map({
- * 	name:'james'
- * });
- * @example
- * <caption>HTML</caption>
- * <label data-duice="Label" data-duice-bind="user.name"></label>
+ * | label  	   	| data-duice="Label" 									| component Type						|
+ * | label		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
+ * | label		    | data-duice-format="{type}:{format}"    				| defines display type and format		|
+ * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/ogtf6vh9/embedded/js,html,css,result/dark" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
- * @param {HTMLLabelElement} label - Label HTML Element
+ * @param {HTMLLabelElement} label - label HTML element
  */
 duice.ui.Label = function(label) {
 	duice.ui.__.call(this);
@@ -1335,24 +1410,61 @@ duice.ui.Label.prototype.update = function() {
 	}
 	this.label.appendChild(this.createHtml(value));
 }
+
+/**
+ * Sets display format
+ * @method
+ * @param {string} format - display format {type:format}
+ * @example
+ * // number format
+ * <label data-juice="Label" data-juice-bind="user.point" data-juice-format="number:0,0"></label>
+ * 
+ * // date format
+ * <label data-duice="Label" data-juice-bind="user.birthDate" data-juice-format="date:yyyy-MM-dd hh:mm:ss"></label>
+ */
 duice.ui.Label.prototype.setFormat = function(format) {
 	this.format = format;
 }
 
-//-----------------------------------------------------------------------------
-//duice.ui.Text prototype
-//-----------------------------------------------------------------------------
+/**
+ * duice.ui.Text prototype
+ * @class
+ * @classdesc
+ * Prints text in pre element.
+ * ## HTML5 Tag and Attribute
+ * | HTML Tag   	| data-* Attribute 										| Description  							|
+ * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
+ * | pre	  	   	| data-duice="Text" 									| component Type						|
+ * | pre		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
+ * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/adouxg1q/embedded/js,html,css,result/dark" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+ * @constructor
+ * @param {HTMLPrelElement} pre - pre HTML element
+ */
 duice.ui.Text = function(pre) {
 	duice.ui.__.call(this);
 	this.pre = pre;
 	this.pre.classList.add('duice-ui-text');
 }
+
+// Freezes prototype
 duice.ui.Text.prototype = Object.create(duice.ui.__.prototype);
+
+/**
+ * Binds element to data object
+ * @method
+ * @param {string} name of map - map name to bind.
+ * @param {string} column name of map - column name of map to bind.
+ */
 duice.ui.Text.prototype.bind = function(map, name) {
 	this.map = map;
 	this.name = name;
 	this.map.addObserver(this);
 }
+
+/**
+ * Updates and redraw element from data object
+ * @method
+ */
 duice.ui.Text.prototype.update = function() {
 	var value = '';
 	if(this.map.get(this.name) !== null && this.map.get(this.name) !== undefined){
@@ -1361,15 +1473,37 @@ duice.ui.Text.prototype.update = function() {
 	this.pre.innerHTML = value;
 }
 
-//-----------------------------------------------------------------------------
-// duice.ui.TextField prototype
-//-----------------------------------------------------------------------------
+/**
+ * duice.ui.TextField prototype
+ * @class
+ * @classdesc
+ * Prints value in input text element.
+ *
+ * ## HTML5 Tag and Attribute
+ * | HTML Tag   	| data-* Attribute 										| Description  							|
+ * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
+ * | input  	   	| data-duice="TextField" 									| component Type					|
+ * | input		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
+ * 
+ * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/0hpgvzy5/embedded/dark" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+ * @constructor
+ * @param {HTMLInputElement} input - input HTML element.
+ */
 duice.ui.TextField = function(input){
 	duice.ui.__.call(this);
 	this.input = input;
 	this.input.classList.add('duice-ui-textField');
 }
+
+// Extends super class
 duice.ui.TextField.prototype = Object.create(duice.ui.TextField.prototype);
+
+/**
+ * Binds element to data object
+ * @method
+ * @param {string} name of map - map name to bind.
+ * @param {string} column name of map - column name of map to bind. 
+ */
 duice.ui.TextField.prototype.bind = function(map, name) {
 	var $this = this;
 	this.map = map;
@@ -1378,8 +1512,12 @@ duice.ui.TextField.prototype.bind = function(map, name) {
 	this.input.addEventListener('change',function(){
 		map.set(name, this.value);
 	});
-	
 }
+
+/**
+ * Updates and redraw element from data object
+ * @method
+ */
 duice.ui.TextField.prototype.update = function() {
 	var value = this.map.get(this.name) == undefined ? '' : this.map.get(this.name);
 	this.input.value = value;
@@ -1389,6 +1527,12 @@ duice.ui.TextField.prototype.update = function() {
 		this.setReadonly(this.map.readonly[this.name]);	
 	}
 }
+
+/**
+ * Sets read-only attribute
+ * @method
+ * @param {boolean} readonly - whether element readonly or not
+ */
 duice.ui.TextField.prototype.setReadonly = function(readonly){
 	if(readonly){
 		this.input.setAttribute('readOnly',true);
@@ -1397,9 +1541,25 @@ duice.ui.TextField.prototype.setReadonly = function(readonly){
 	}
 }
 
-//-----------------------------------------------------------------------------
-//duice.ui.ComboBox prototype
-//-----------------------------------------------------------------------------
+/**
+ * duice.ui.ComboBox prototype
+ * @class
+ * @classdesc
+ * Creates ComboBox UI element binded with data object.
+ * 
+ * ## HTML5 Tag and Attribute
+ * | HTML Tag   	| data-* Attribute 																| Description  							|
+ * | ------------- 	| ---------------------------------------------------------------------			| -----------------------------------	|
+ * | select  	   	| data-duice="ComboBox" 														| component Type						|
+ * | select		    | data-duice-bind="(map).(column)"    											| specify binding Map and column name	|
+ * | select		    | data-duice-options="(duice.data.List or Array(Object) or Array(string))"  	| options data							|
+ * | select		    | data-duice-option-value="(column of value)"  									| column name of option value			|
+ * | select		    | data-duice-option-text="(column of text)"										| column name of option text			|
+ * 
+ * <iframe width="100%" height="600" src="http://jsfiddle.net/chomookun/5dta4vub/29/embedded/js,html,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+ * @constructor
+ * @param {HTMLInputElement} select - select HTML element.
+ */
 duice.ui.ComboBox = function(select) {
 	duice.ui.__.call(this);
 	this.select = select;
@@ -1409,7 +1569,16 @@ duice.ui.ComboBox = function(select) {
 	this.optionText = 'text';
 	this.optionDisabled = null;
 }
+
+// Freezes ComboBox prototype
 duice.ui.ComboBox.prototype = Object.create(duice.ui.__.prototype);
+
+/**
+ * Binds UI component to data object
+ * @method
+ * @param {duice.data.Map} map - data map object to bind
+ * @param {string} name - column name to bind
+ */
 duice.ui.ComboBox.prototype.bind = function(map, name) {
 	this.map = map;
 	this.name = name;
@@ -1418,6 +1587,11 @@ duice.ui.ComboBox.prototype.bind = function(map, name) {
 		map.set(name, this.value);	
 	});
 }
+
+/**
+ * Updates UI component and redraw.
+ * @method
+ */
 duice.ui.ComboBox.prototype.update = function() {
 	// removes all options
 	this.removeChildNodes(this.select);
@@ -1464,15 +1638,39 @@ duice.ui.ComboBox.prototype.update = function() {
 		this.setReadonly(this.map.readonly[this.name]);	
 	}
 }
+
+/**
+ * Sets options data object
+ * @method
+ * @param {duice.data.List|Array(Object)|Array} options data
+ */
 duice.ui.ComboBox.prototype.setOptions = function(options){
 	this.options = options;
 }
+
+/**
+ * Sets option value name
+ * @method
+ * @param {string} optionValue - column name of value in options data object
+ */
 duice.ui.ComboBox.prototype.setOptionValue = function(optionValue){
 	this.optionValue = optionValue;
 }
+
+/**
+ * Sets column name of text
+ * @method
+ * @param {string} optionText - column name of text in options data object
+ */
 duice.ui.ComboBox.prototype.setOptionText = function(optionText){
 	this.optionText = optionText;
 }
+
+/**
+ * Sets read-only
+ * @method
+ * @param {boolean} readonly - whether read-only or not 
+ */
 duice.ui.ComboBox.prototype.setReadonly = function(readonly){
 	if(readonly){
 		this.select.setAttribute('disabled',true);
