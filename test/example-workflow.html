@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>JUICE - Workflow Example</title>
+
+		<!-- polyfill -->
+		<script src="lib/polyfill/dataset.js"></script>
+		<script src="lib/polyfill/classList.js"></script>
+		
+		<!-- juice library -->		
+		<script src="../src/juice.js"></script>
+		<link rel="stylesheet" href="../src/juice.css">
+		
+		<!-- javascript library -->
+		<script src="lib/jquery.js"></script>
+		<script src="lib/popper.js"></script>
+		
+		<!-- example commons -->
+		<script src="example.js"></script>
+		
+		<script type="text/javascript">
+		// on document load
+		$(document).ready(function(ev) {
+
+		});
+
+		/**
+		 * defines data object
+		 */
+		// defines data structure
+		var nodeList = new juice.data.List();
+		var linkList = new juice.data.List();
+		var nodeMap = new juice.data.Map();
+		var linkMap = new juice.data.Map();
+
+		nodeList.fromJson(
+			[{jobId:"step1",name:"Step 1",x: 200, y: 50}
+			,{jobId:"step2",name:"Step 2",x: 200, y: 200}
+			,{jobId:"step3",name:"Step 3",x: 50, y: 350}
+			,{jobId:"step4",name:"Step 4",x: 350, y: 350}
+			,{jobId:"step5",name:"Step 5",x: 200, y: 500}]
+		);
+		
+		linkList.fromJson(
+			[{jobId:"step1",nextJobId:"step2", onStatus:'COMPLETED' }
+			,{jobId:"step2",nextJobId:"step3", onStatus:'COMPLETED' }
+			,{jobId:"step2",nextJobId:"step4", onStatus:'FAILED' }
+			,{jobId:"step3",nextJobId:"step5", onStatus:'COMPLETED' }
+			,{jobId:"step4",nextJobId:"step5", onStatus:'COMPLETED' }]
+		);
+		
+		/**
+		 * add node
+		 */
+		function addNode() {
+			var nodeMap = new juice.data.Map();
+			nodeList.addRow(nodeMap);
+		}
+		
+		/**
+		 * add link
+		 */
+		function addLink() {
+			var linkMap = new juice.data.Map();
+			linkList.addRow(linkMap);
+		}
+		</script>
+		<style type="text/css">
+		* {
+			font-family: sans-serif, Dotum;
+			font-size: 0.9375rem;
+		}
+		header {
+			display: flex;
+    		justify-content: center;
+		}
+		main {
+			width: 100%;
+		}
+		h1 {
+			font-size: 1.5rem;
+		}
+		h2 {
+			font-size: 1.25rem;
+		}
+		table.node {
+			width: 100%;
+			border-collapse: collapse;
+			border: solid 1px #cccccc;
+			background-color: white;
+		}
+		table.node > tbody > tr > th {
+			border: solid 1px #cccccc;
+			background-color: #fafafa;
+		}
+		table.node > tbody > tr > td {
+			border: solid 1px #cccccc;
+		}
+		</style>
+	</head>
+	<body>
+	
+		<!--  header -->
+		<header>
+		<div class="header">
+			<h1>Workflow Example</h1>
+		</div>
+		</header>
+		
+		<!-- Start of Main -->
+		<main>
+			<div style="width:100%; display:flex; justify-content:space-between;">
+				<div style="width:50%; height:100vh; overflow:scroll;">
+					<ul data-juice="Workflow" data-juice-bind="nodeList,linkList" data-juice-item="node" data-juice-node-id="jobId" data-juice-node-x="x" data-juice-node-y="y" data-juice-link-from="jobId" data-juice-link-to="nextJobId" data-juice-link-text="onStatus">
+						<li style="width:200px; height:100px; border:solid 1px black; background-color:#efefef;">
+							<div onclick="javascript:console.log('node');">
+							[{{$context.node.get('jobId')}}]{{$context.node.get('name')}}
+							</div>
+							<button onclick="javascript:alert('click');">click</button>
+							<button data-job-id="{{$context.node.get('jobId')}}" onclick="javascript:alert(this.dataset.jobId);"> add job </button>
+						</li>
+					</ul>
+				</div>
+				<div style="width:50%;">
+					<div style="width:100%; display:flex; justify-content:space-between;">
+						<div>
+							<b>Node List</b>
+						</div>
+						<div>
+							<button onclick="javascript:addNode();">+</button>
+						</div>
+					</div>
+					<table data-juice="Grid" data-juice-bind="nodeList" data-juice-item="node" data-juice-editable="true">
+						<thead>
+							<tr>
+								<th>index</th>
+								<th>id</th>
+								<th>name</th>
+								<th>x</th>
+								<th>y</th>
+								<th>-</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>{{$context.index+1}}</td>
+								<td><input data-juice="TextField" data-juice-bind="node.jobId"/></td>
+								<td><input data-juice="TextField" data-juice-bind="node.name"/></td>
+								<td><input data-juice="TextField" data-juice-bind="node.x"/></td>
+								<td><input data-juice="TextField" data-juice-bind="node.y"/></td>
+								<td><button data-index="{{$context.index}}" onclick="javascript:nodeList.removeRow(this.data.index);">-</button></td>
+							</tr>
+						</tbody>
+					</table>
+					<br/>
+					<div style="width:100%; display:flex; justify-content:space-between;">
+						<div>
+							<b>Link List</b>
+						</div>
+						<div>
+							<button onclick="javascript:addLink();">+</button>
+						</div>
+					</div>
+					<table data-juice="Grid" data-juice-bind="linkList" data-juice-item="link" data-juice-editable="true">
+						<thead>
+							<tr>
+								<th>index</th>
+								<th>from</th>
+								<th>to</th>
+								<th>text</th>
+								<th>-</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>{{$context.index+1}}</td>
+								<td><input data-juice="TextField" data-juice-bind="link.jobId"/></td>
+								<td><input data-juice="TextField" data-juice-bind="link.nextJobId"/></td>
+								<td><input data-juice="TextField" data-juice-bind="link.onStatus"/></td>
+								<td><button data-index="{{$context.index}}" onclick="javascript:linkList.removeRow(this.data.index);">-</button></td>
+							</tr>
+						</tbody>
+					</table>
+					<br/>
+					<!-- node detail -->
+					<div style="width:100%; display:flex; justify-content:space-between;">
+						<div>
+							<b>Node Detail</b>
+						</div>
+						<div>
+							<button onclick="javascript:addLink();">+</button>
+						</div>
+					</div>
+					<script type="text/javascript">
+					/**
+					 * filterNodeList
+					 */
+					function filterNodeList(){
+						if(this.index == nodeList.getIndex()){
+							return true;
+						}else{
+							return false;
+						}
+					}
+					</script>
+					<table data-juice="Grid" data-juice-bind="nodeList" data-juice-item="node" data-juice-filter="filterNodeList">
+						<tbody>
+							<tr>
+								<td>
+									<table class="node">
+										<colgroup>
+											<col width="150px" />
+											<col width="*" />
+										</colgroup>
+										<tbody>
+											<tr>
+										    	<th>index</th>
+										    	<td><label>{{$context.index+1}}</label></td>
+											</tr>
+											<tr>
+										    	<th>id</th>
+										    	<td><input data-juice="TextField" data-juice-bind="node.jobId"/></td>
+											</tr>
+											<tr>
+										    	<th>name</th>
+										    	<td><input data-juice="TextField" data-juice-bind="node.name"/></td>
+											</tr>
+											<tr>
+										    	<th>x</th>
+										    	<td><input data-juice="TextField" data-juice-bind="node.x"/></td>
+											</tr>
+											<tr>
+										    	<th>y</th>
+										    	<td><input data-juice="TextField" data-juice-bind="node.y"/></td>
+											</tr>
+										</tbody>
+									</table>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<script type="text/javascript">
+					/**
+					 * filterLinkList
+					 */
+					function filterLinkList(){
+						if(nodeList.getIndex() < 0){
+							return false;
+						}
+						var map = nodeList.getRow(nodeList.getIndex());
+						var jobId = map.get('jobId');
+						console.log(this.index);
+						if(this.link.get('jobId') != jobId){
+							return false;
+						}
+					}
+					</script>
+					<table data-juice="Grid" data-juice-bind="linkList" data-juice-item="link" data-juice-filter="filterLinkList">
+						<colgroup>
+							<col width="100px" />
+							<col width="100px" />
+							<col width="100px" />
+							<col width="*" />
+							<col width="*" />
+						</colgroup>
+						<tbody>
+							<tr>
+								<td style="font-weight:bold;text-align:center;">Next Job ID</td>
+								<td><input data-juice="TextField" data-juice-bind="link.nextJobId"/></td>
+								<td style="font-weight:bold;text-align:center;">Condition</td>
+								<td><input data-juice="TextField" data-juice-bind="link.condition"/></td>
+								<td><button data-index="{{$context.index}}" onclick="javascript:linkList.removeRow(this.data.index);">-</button></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</main>
+		
+		<!-- footer -->
+		<footer>
+		</footer>
+
+
+	</body>
+</html>
+
+		

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>JUICE - SPA(Single Page Application) Example</title>
+
+		<!-- polyfill -->
+		<script src="lib/polyfill/dataset.js"></script>
+		<script src="lib/polyfill/classList.js"></script>
+
+		<!-- juice library -->		
+		<script src="../src/juice.js"></script>
+		<link rel="stylesheet" href="../src/juice.css">
+		
+		<!-- javascript library -->
+		<script src="lib/jquery.js"></script>
+		<script src="lib/popper.js"></script>
+		
+		<!-- example commons -->
+		<script src="example.js"></script>
+		
+		<script type="text/javascript">
+		/**
+		 * defines data object
+		 */
+		// defines data structure
+		var groupList = new juice.data.List();
+		var groupMap = new juice.data.Map();
+		var groupUserList = new juice.data.List();
+		var userMap = new juice.data.Map();
+		
+		// defines search parameter object
+		var searchMap = new juice.data.Map();
+		searchMap.fromJson({key:null,value:null, rownum:30, page:1});
+		var searchKeyOptions = [
+			{value:null,text:'-'},
+			{value:'group',text:'group'},
+			{value:'name',text:'name'}
+		];
+		
+		// code
+		var useYn = [{value:'Y',text:'Use'},{value:'N',text:'Not Use'}];
+		
+		/**
+		 * retrieves group list
+		 */
+		function getGroupList(page) {
+			// check keyword
+			if(searchMap.get('key')){
+				if(!searchMap.get('value')){
+					juice.alert('Please, enter search keyword.').open();
+					return false;
+				}
+			}
+
+			// retrieves
+			searchMap.set('page', page);
+			var groups = DataSource.getGroups(searchMap.get('key'),searchMap.get('value'),searchMap.get('rownum'),searchMap.get('page'));
+			groupList.fromJson(groups);
+			
+			if(page <= 1) {
+				$('#searchPrev').attr('disabled',true);
+			}else{
+				$('#searchPrev').attr('disabled',false);
+			}
+			if(page >= 1) {
+				if(groupList.getRowCount() < searchMap.get('rownum')) {
+					$('#searchNext').attr('disabled',true);
+				}else{
+					$('#searchNext').attr('disabled',false);
+				}
+			}
+		}
+		
+		/**
+		 * getting group detail
+		 */
+		function getGroupDetail(group) {
+			// getting group info
+			var groupJson = DataSource.getGroup(group);
+			groupMap.fromJson(groupJson);
+			
+			// getting group users
+			var groupUsers = DataSource.getGroupUsers(group);
+			groupUserList.fromJson(groupUsers);
+		}
+		
+		/**
+		 * save group
+		 */
+		function saveGroup() {
+			juice.confirm('Do you want to save group?')
+			.onConfirm(function(){
+				var group = groupMap.toJson();
+				DataSource.saveGroup(group);
+				getGroupList(searchMap.get('page'));
+			})
+			.open();
+		}
+		
+		/**
+		 * view user dialog
+		 */
+		function getUserDetail(id) {
+			
+			// getting user info
+			var user = DataSource.getUser(id);
+			userMap.fromJson(user);
+			
+			// open dialog
+			userDetailDialog = juice.dialog($('#userDetailDialog')[0])
+				.setTitle('User Detail')
+				.open();
+		}
+		
+		/**
+		 * saveUser
+		 */
+		function saveUser() {
+			juice.confirm('Do you want to save user?')
+			.onConfirm(function(){
+				// save user
+				var user = userMap.toJson();
+				DataSource.saveUser(user);
+
+				// fire message
+				juice.alert('Save OK')
+				.onConfirm(function(){
+					userDetailDialog.close();					
+					getGroupDetail(groupMap.get('group'));
+				})
+				.open();
+			})
+			.open();
+		}
+		
+		
+		// on document load
+		$(document).ready(function(ev) {
+			getGroupList(1);
+		});
+		</script>
+		<style type="text/css">
+		* {
+			font-family: sans-serif, Dotum;
+			font-size: 0.9375rem;
+		}
+		.header {
+			display: flex;
+    		justify-content: center;
+		}
+		.main {
+			width: 100%;
+			display: flex;
+			justify-content: center;
+		}
+		h1 {
+			font-size: 1.5rem;
+		}
+		.title {
+			display:flex; 
+			justify-content:space-between;
+			align-items: flex-end;
+			height: 2rem;
+			font-weight: bold;
+		}
+		.groupDetail {
+			width: 100%;
+			border-collapse: collapse;
+			border: solid 1px #efefef;
+		}
+		.groupDetail th {
+			border: solid 1px #efefef;
+			background-color: #fafafa;
+		}
+		.groupDetail td {
+			border: solid 1px #efefef;
+		}
+		</style>
+	</head>
+	<body>
+		<!--  header -->
+		<header>
+		<div class="header">
+			<h1>SPA(Single Page Application) Example with 
+			<select onchange="javascript:setLibrary(this.value);" style="background-color:#efefef;">
+				<option value="">N/A</option>
+				<option value="bootstrap">bootstrap</option>
+			</select>
+			</h1>
+		</div>
+		</header>
+		
+		<!-- Start of Main -->
+		<main>
+		<div class="main">
+			<!-- group list -->
+			<div style="margin:10px; width:600px;">
+				<div class="title form-inline">
+					<span style="display:flex;" class="form-group">
+						<label class="form-label">Find</label>
+						<select data-juice="ComboBox" data-juice-bind="searchMap.key" data-juice-options="searchKeyOptions" class="form-control form-control-sm">
+						</select>
+						<input data-juice="TextField" data-juice-bind="searchMap.value" class="form-control form-control-sm" style="width:100px;"/>
+						<button class="btn btn-secondary btn-sm" onclick="javascript: getGroupList(1);">FIND</button>
+					</span>
+					<span style="display:flex;">
+						<button id="searchPrev" class="btn btn-secondary btn-sm" onclick="javascript:getGroupList(searchMap.get('page')-1);"><</button>
+						<input data-juice="TextField" data-juice-bind="searchMap.page" class="form-control form-control-sm" style="width:30px;text-align:center;" readonly/>
+						<button id="searchNext" class="btn btn-secondary btn-sm" onclick="javascript:getGroupList(searchMap.get('page')+1);">></button>
+					</span>
+				</div>
+				<div>
+					<table class="table table-sm table-bordered" data-juice="Grid" data-juice-bind="groupList" data-juice-item="group">
+						<thead>
+							<tr>
+								<th>No</th>
+								<th>Group</th>
+								<th>Name</th>
+								<th>UseYn</th>
+								<th>Delete</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr data-group="{{$context.group.get('group')}}" onclick="javascript: getGroupDetail(this.dataset.group);">
+								<td align="center">{{($context.index+1) + searchMap.get('rownum')*(searchMap.get('page')-1)}}</td>
+								<td><label data-juice="Label" data-juice-bind="group.group" class="form-label"></label></td>
+								<td><label data-juice="Label" data-juice-bind="group.name" class="form-label"></label></td>
+								<td align="center"><select data-juice="ComboBox" data-juice-bind="group.useYn" data-juice-options="useYn" class="form-control form-control-sm" disabled></select></td>
+								<td align="center"><input data-juice="CheckBox" data-juice-bind="group.delete" disabled/></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div style="margin:10px; width:600px;">
+				<!-- group detail -->
+				<div class="title">
+					<span>Group Detail</span>
+				</div>
+				<div>
+					<table class="groupDetail">
+						<tr>
+					    	<th>Group</th>
+					    	<td><label data-juice="Label" data-juice-bind="groupMap.group"/></td>
+					    	<th>Name</th>
+					    	<td><input data-juice="TextField" data-juice-bind="groupMap.name" class="form-control form-control-sm"/></td>
+						</tr>
+						<tr>
+					    	<th>UseYn</th>
+					    	<td><select data-juice="ComboBox" data-juice-bind="groupMap.useYn" data-juice-options="useYn" class="form-control form-control-sm"/></td>
+					    	<th>Delete</th>
+					    	<td><input data-juice="CheckBox" data-juice-bind="groupMap.delete"/></td>
+						</tr>
+						<tr>
+							<th>Description</th>
+							<td colspan="3">
+								<div data-juice="HtmlEditor" data-juice-bind="groupMap.description" style="height:200px;"></div>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="4" align="right" style="padding:5px;">
+								<button class="btn btn-secondary btn-sm" onclick="javascript:saveGroup();">SAVE</button>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<!-- user list -->
+				<div class="title">
+					<span>Group List</span>
+				</div>
+				<div>
+					<table class="table table-sm table-bordered" data-juice="Grid" data-juice-bind="groupUserList" data-juice-item="user">
+						<thead>
+							<tr>
+								<th>No</th>
+								<th>ID</th>
+								<th>Name</th>
+								<th>Email</th>
+								<th>UseYn</th>
+								<th>Delete</th>
+								<th>-</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>{{$context.index+1}}</td>
+								<td><label data-juice="Label" data-juice-bind="user.id" class="form-label"/></td>
+								<td><label data-juice="Label" data-juice-bind="user.name" class="form-label"/></td>
+								<td><label data-juice="Label" data-juice-bind="user.email" class="form-label"/></td>
+								<td><select data-juice="ComboBox" data-juice-bind="user.useYn" data-juice-options="useYn" class="form-control form-control-sm" disabled/></td>
+								<td align="center"><input data-juice="CheckBox" data-juice-bind="user.delete" disabled/></td>
+								<td><button data-id="{{$context.user.get('id')}}" onclick="javascript:getUserDetail(this.dataset.id);">View</button></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		</main>
+		
+		<!-- footer -->
+		<footer>
+		</footer>
+		
+		<!-------------------------------------------------------------------->
+		<!-- user detail dialog												-->
+		<!-------------------------------------------------------------------->
+		<dialog style="display:none;">
+			<div id="userDetailDialog" style="width:800px;">
+				<div>
+					<table class="groupDetail">
+						<tr>
+					    	<th>ID</th>
+					    	<td><label data-juice="Label" data-juice-bind="userMap.id"/></td>
+					    	<th>Name</th>
+					    	<td><input data-juice="TextField" data-juice-bind="userMap.email" class="form-control form-control-sm"/></td>
+						</tr>
+						<tr>
+					    	<th>Name</th>
+					    	<td><input data-juice="TextField" data-juice-bind="userMap.name" class="form-control form-control-sm"/></td>
+					    	<th>Nickname</th>
+					    	<td><input data-juice="TextField" data-juice-bind="userMap.nickname" class="form-control form-control-sm"/></td>
+						</tr>
+						<tr>
+					    	<th>UseYn</th>
+					    	<td><select data-juice="ComboBox" data-juice-bind="userMap.useYn" data-juice-options="useYn" class="form-control form-control-sm"/></td>
+					    	<th>Delete</th>
+					    	<td><input data-juice="CheckBox" data-juice-bind="userMap.delete"/></td>
+						</tr>
+						<tr>
+							<th>Description</th>
+							<td colspan="3">
+								<div data-juice="HtmlEditor" data-juice-bind="userMap.description" style="height:200px;"></div>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div style="display:flex; justify-content: flex-end;"> 
+					<button class="btn btn-secondary btn-sm" onclick="javascript:saveUser();">SAVE</button>
+				</div>
+			</div>
+		</dialog>
+		
+	</body>
+</html>
+
+		
