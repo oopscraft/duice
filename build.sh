@@ -10,7 +10,6 @@ function update() {
 # generates document
 function doc() {
 	npm list jsdoc || npm install jsdoc
-	npm list docdash || npm install docdash
 	rm -rf ./doc/*
 	jsdoc --configure ./jsdoc.json
 }
