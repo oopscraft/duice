@@ -62,7 +62,7 @@ h1, h2, h3, h4, h5, h6 {
 
 h1 {
   font-weight: 300;
-  font-size: 36px;
+  font-size: 30px;
   margin: 1em 0 .5em;
 }
 
@@ -78,11 +78,11 @@ h2 {
 }
 
 h3 {
-  font-size: 24px;
+  font-size: 18px;
 }
 
 h4 {
-  font-size: 18px;
+  font-size: 14px;
   margin: 1em 0 .2em;
   color: #345975;
 }

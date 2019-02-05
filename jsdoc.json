@@ -20,19 +20,23 @@
     "cleverLinks": false,
     "monospaceLinks": false,
     "default": {
-      "outputSourceFiles": true
+      "outputSourceFiles": true,
+      "useLongnameInNav": true
     }
   }, 
   "docdash": {
-    "static": false,
-    "sort": false,
-    "openGraph": {                 
-        "title": "DUICE",               
-        "type": "website",         
-        "image": "",               
-        "site_name": "DUICE",           
-        "url": "http://duice.oopscraft.net"
-    },
-    "collapse": false
-  }
+	    "static": false,
+	    "sort": false,
+	    "sectionOrder": [
+	         "Namespaces",
+	         "Classes",
+	         "Modules",
+	         "Externals",
+	         "Events",
+	         "Mixins",
+	         "Tutorials",
+	         "Interfaces"
+	    ],
+	    "collapse": true
+  	}
 }

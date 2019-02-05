@@ -1482,7 +1482,7 @@ duice.ui.Text.prototype.update = function() {
  * ## HTML5 Tag and Attribute
  * | HTML Tag   	| data-* Attribute 										| Description  							|
  * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
- * | input  	   	| data-duice="TextField" 									| component Type					|
+ * | input  	   	| data-duice="TextField" 								| component Type					|
  * | input		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
  * 
  * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/0hpgvzy5/embedded/dark" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
@@ -1682,13 +1682,39 @@ duice.ui.ComboBox.prototype.setReadonly = function(readonly){
 //-----------------------------------------------------------------------------
 // duice.ui.CheckBox prototype
 //-----------------------------------------------------------------------------
+/**
+ * duice.ui.CheckBox prototype
+ * @class
+ * @classdesc
+ * CheckBox UI component
+ * 
+ * ## HTML5 Tag and Attribute
+ * | HTML Tag   	| data-* Attribute 										| Description  							|
+ * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
+ * | input  	   	| data-duice="CheckBox"									| component Type						|
+ * | input		    | data-duice-bind="(duice.data.Map).(column name)"    	| specify binding Map and column name	|
+ * 
+ * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/yftexL63/embedded/js,html,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+ *
+ * @constructor
+ * @param {HTMLInputElement} input - input HTML element
+ */
 duice.ui.CheckBox = function(input) {
 	duice.ui.__.call(this);
 	this.input = input;
 	this.input.type = 'checkbox';
 	this.input.classList.add('duice-ui-checkBox');
 }
+
+// Freezes CheckBox prototype
 duice.ui.CheckBox.prototype = Object.create(duice.ui.__.prototype);
+
+/**
+ * Binds component to data object
+ * @method
+ * @param {string} map - name of map object
+ * @param {string} name - name of column in map
+ */
 duice.ui.CheckBox.prototype.bind = function(map,name) {
 	this.map = map;
 	this.name = name;
@@ -1697,6 +1723,11 @@ duice.ui.CheckBox.prototype.bind = function(map,name) {
 		map.set(name, this.checked);
 	});
 }
+
+/**
+ * Updates and redraw element
+ * @method
+ */
 duice.ui.CheckBox.prototype.update = function() {
 	if(this.map.get(this.name) == true) {
 		this.input.checked = true;
@@ -1708,6 +1739,12 @@ duice.ui.CheckBox.prototype.update = function() {
 		this.setReadonly(true);
 	}
 }
+
+/**
+ * Sets read-only or not
+ * @method
+ * @param {boolean} readonly - whether readonly or not
+ */
 duice.ui.CheckBox.prototype.setReadonly = function(readonly){
 	if(readonly == true){
 		this.input.disabled = true;
@@ -1719,13 +1756,38 @@ duice.ui.CheckBox.prototype.setReadonly = function(readonly){
 //-----------------------------------------------------------------------------
 // duice.ui.Radio prototype
 //-----------------------------------------------------------------------------
+/**
+ * duice.ui.Radio prototype
+ * @class
+ * @classdesc
+ * Radio UI Component
+ *
+ * ## HTML5 Tag and Attribute
+ * | HTML Tag   	| data-* Attribute 										| Description  							|
+ * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
+ * | input  	   	| data-duice="Radio" 									| Radio component Type					|
+ * | input		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
+ * 
+ * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/zfyh83dn/embedded/js,html,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+ * @constructor
+ * @param {HTMLInputElement} input - input HTML element.
+ */
 duice.ui.Radio = function(input) {
 	duice.ui.__.call(this);
 	this.input = input;
 	this.input.type = 'radio';
 	this.input.classList.add('duice-ui-radio');
 }
+
+// Freezes Radio prototype
 duice.ui.Radio.prototype = Object.create(duice.ui.__.prototype);
+
+/**
+ * Binds component to data object
+ * @method
+ * @param {string} name of map - map name to bind.
+ * @param {string} column name of map - column name of map to bind. 
+ */
 duice.ui.Radio.prototype.bind = function(map,name) {
 	this.map = map;
 	this.name = name;
@@ -1734,6 +1796,11 @@ duice.ui.Radio.prototype.bind = function(map,name) {
 		map.set(name, this.value);
 	});
 }
+
+/**
+ * Updates and redraw element from data object
+ * @method
+ */
 duice.ui.Radio.prototype.update = function(){
 	if(this.map.get(this.name) == this.input.value) {
 		this.input.checked = true;
@@ -1741,9 +1808,16 @@ duice.ui.Radio.prototype.update = function(){
 		this.input.checked = false;
 	}
 }
+
+/**
+ * Sets read-only attribute
+ * @method
+ * @param {boolean} readonly - whether element readonly or not
+ */
 duice.ui.Radio.prototype.setReadonly = function(readonly){
 	// TODO
 }
+
 
 //-----------------------------------------------------------------------------
 // duice.ui.TextArea prototype
