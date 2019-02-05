@@ -12,7 +12,7 @@ function start() {
 		status
 		exit -1
 	fi
-	nohup http-server ./doc -p 10002 -c-1 > ${APP_NAME}.log &
+	nohup http-server ./ -p 10002 -c-1 > ${APP_NAME}.log &
 	echo $! > ${PID_FILE}
 }
 
