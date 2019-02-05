@@ -9,14 +9,14 @@ function update() {
 
 # generates document
 function doc() {
+	npm list jsdoc || npm install jsdoc
+	npm list docdash || npm install docdash
 	rm -rf ./doc/*
 	jsdoc --configure ./jsdoc.json
 }
 
 # gradle build
 function build() {
-	npm list jsdoc || npm install jsdoc
-	npm list docdash || npm install docdash
 	npm list gulp || npm install gulp
 	npm list gulp-strip-debug || npm install gulp-strip-debug
 	npm list gulp-uglify || npm install gulp-uglify
