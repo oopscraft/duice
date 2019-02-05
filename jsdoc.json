@@ -3,7 +3,7 @@
     "allowUnknownTags": false
   },
   "source": {
-    "include": ["./src/juice.js"]
+    "include": ["./src/duice.js"]
   },
   "plugins": [
     "plugins/markdown"

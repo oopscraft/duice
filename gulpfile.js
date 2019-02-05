@@ -25,7 +25,7 @@ gulp.task('build', function() {
 	
 	// compress ZIP file
 	gulp.src(['dist/*.js','dist/*.css','dist/*.html'])
-		.pipe(zip('juice.zip'))
+		.pipe(zip('duice.zip'))
 		.pipe(gulp.dest('dist'));
 	
 	console.log('complete build.');

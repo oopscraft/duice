@@ -1,8 +1,8 @@
 {
-  "name": "juice",
-  "version": "1.0.0",
-  "description": "Javascript UI Component Engine",
-  "main": "index.js",
+  "name": "duice",
+  "version": "0.1.0",
+  "description": "Data UI Component Engine",
+  "main": "index.html",
   "dependencies": {
     "docdash": "^1.0.2",
     "gulp": "^3.9.1",
@@ -19,12 +19,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/oopscraft/juice.git"
+    "url": "git+https://github.com/oopscraft/duice.git"
   },
   "author": "chomookun@gmail.ocm",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/oopscraft/juice/issues"
+    "url": "https://github.com/oopscraft/duice/issues"
   },
-  "homepage": "https://github.com/oopscraft/juice#readme"
+  "homepage": "https://github.com/oopscraft/duice#readme"
 }

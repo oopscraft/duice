@@ -299,7 +299,7 @@ dataStorage.setItem('USER_GROUP_INFO', JSON.stringify([
 		
 var DataSource = {
 	getGroups: function(key, value, rownum, page) {
-		juice.progress.start();
+		duice.progress.start();
 		try {
 			console.log('key:' + key + '|value:' + value);
 			var groups = [];
@@ -330,11 +330,11 @@ var DataSource = {
 		}catch(exception){
 			throw exception;
 		}finally{
-			juice.progress.end();
+			duice.progress.end();
 		}
 	},
 	getGroup: function(group){
-		juice.progress.start();
+		duice.progress.start();
 		try {
 			var groups = JSON.parse(dataStorage.getItem('GROUP_INFO'));
 			for(var i = 0; i < groups.length; i ++ ) {
@@ -345,12 +345,12 @@ var DataSource = {
 		}catch(exception){
 			throw exception;
 		}finally{
-			juice.progress.end();
+			duice.progress.end();
 		}
 	},
 	getGroupUsers: function(group){
 		console.log(group);
-		juice.progress.start();
+		duice.progress.start();
 		try {
 			var groupUsers = [];
 			var userGroups = JSON.parse(dataStorage.getItem('USER_GROUP_INFO'));
@@ -364,11 +364,11 @@ var DataSource = {
 		}catch(exception){
 			throw exception;
 		}finally{
-			juice.progress.end();
+			duice.progress.end();
 		}
 	},
 	saveGroup: function(group) {
-		juice.progress.start();
+		duice.progress.start();
 		try {
 			var groups = JSON.parse(dataStorage.getItem('GROUP_INFO'));
 			for(var i = 0; i < groups.length; i ++ ) {
@@ -381,11 +381,11 @@ var DataSource = {
 		}catch(exception){
 			throw exception;
 		}finally{
-			juice.progress.end();
+			duice.progress.end();
 		}
 	},
 	getUser: function(id){
-		juice.progress.start();
+		duice.progress.start();
 		try {
 			var users = JSON.parse(dataStorage.getItem('USER_INFO'));
 			for(var i = 0; i < users.length; i ++ ) {
@@ -396,11 +396,11 @@ var DataSource = {
 		}catch(exception){
 			throw exception;
 		}finally{
-			juice.progress.end();
+			duice.progress.end();
 		}
 	},
 	saveUser: function(user){
-		juice.progress.start();
+		duice.progress.start();
 		try {
 			var users = JSON.parse(dataStorage.getItem('USER_INFO'));
 			for(var i = 0; i < users.length; i ++ ) {
@@ -413,7 +413,7 @@ var DataSource = {
 		}catch(exception){
 			throw exception;
 		}finally{
-			juice.progress.end();
+			duice.progress.end();
 		}
 	}
 }

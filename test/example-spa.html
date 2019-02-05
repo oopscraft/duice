@@ -3,15 +3,15 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<title>JUICE - SPA(Single Page Application) Example</title>
+		<title>duice - SPA(Single Page Application) Example</title>
 
 		<!-- polyfill -->
 		<script src="lib/polyfill/dataset.js"></script>
 		<script src="lib/polyfill/classList.js"></script>
 
-		<!-- juice library -->		
-		<script src="../src/juice.js"></script>
-		<link rel="stylesheet" href="../src/juice.css">
+		<!-- duice library -->		
+		<script src="../src/duice.js"></script>
+		<link rel="stylesheet" href="../src/duice.css">
 		
 		<!-- javascript library -->
 		<script src="lib/jquery.js"></script>
@@ -25,13 +25,13 @@
 		 * defines data object
 		 */
 		// defines data structure
-		var groupList = new juice.data.List();
-		var groupMap = new juice.data.Map();
-		var groupUserList = new juice.data.List();
-		var userMap = new juice.data.Map();
+		var groupList = new duice.data.List();
+		var groupMap = new duice.data.Map();
+		var groupUserList = new duice.data.List();
+		var userMap = new duice.data.Map();
 		
 		// defines search parameter object
-		var searchMap = new juice.data.Map();
+		var searchMap = new duice.data.Map();
 		searchMap.fromJson({key:null,value:null, rownum:30, page:1});
 		var searchKeyOptions = [
 			{value:null,text:'-'},
@@ -49,7 +49,7 @@
 			// check keyword
 			if(searchMap.get('key')){
 				if(!searchMap.get('value')){
-					juice.alert('Please, enter search keyword.').open();
+					duice.alert('Please, enter search keyword.').open();
 					return false;
 				}
 			}
@@ -90,7 +90,7 @@
 		 * save group
 		 */
 		function saveGroup() {
-			juice.confirm('Do you want to save group?')
+			duice.confirm('Do you want to save group?')
 			.onConfirm(function(){
 				var group = groupMap.toJson();
 				DataSource.saveGroup(group);
@@ -109,7 +109,7 @@
 			userMap.fromJson(user);
 			
 			// open dialog
-			userDetailDialog = juice.dialog($('#userDetailDialog')[0])
+			userDetailDialog = duice.dialog($('#userDetailDialog')[0])
 				.setTitle('User Detail')
 				.open();
 		}
@@ -118,14 +118,14 @@
 		 * saveUser
 		 */
 		function saveUser() {
-			juice.confirm('Do you want to save user?')
+			duice.confirm('Do you want to save user?')
 			.onConfirm(function(){
 				// save user
 				var user = userMap.toJson();
 				DataSource.saveUser(user);
 
 				// fire message
-				juice.alert('Save OK')
+				duice.alert('Save OK')
 				.onConfirm(function(){
 					userDetailDialog.close();					
 					getGroupDetail(groupMap.get('group'));
@@ -200,19 +200,19 @@
 				<div class="title form-inline">
 					<span style="display:flex;" class="form-group">
 						<label class="form-label">Find</label>
-						<select data-juice="ComboBox" data-juice-bind="searchMap.key" data-juice-options="searchKeyOptions" class="form-control form-control-sm">
+						<select data-duice="ComboBox" data-duice-bind="searchMap.key" data-duice-options="searchKeyOptions" class="form-control form-control-sm">
 						</select>
-						<input data-juice="TextField" data-juice-bind="searchMap.value" class="form-control form-control-sm" style="width:100px;"/>
+						<input data-duice="TextField" data-duice-bind="searchMap.value" class="form-control form-control-sm" style="width:100px;"/>
 						<button class="btn btn-secondary btn-sm" onclick="javascript: getGroupList(1);">FIND</button>
 					</span>
 					<span style="display:flex;">
 						<button id="searchPrev" class="btn btn-secondary btn-sm" onclick="javascript:getGroupList(searchMap.get('page')-1);"><</button>
-						<input data-juice="TextField" data-juice-bind="searchMap.page" class="form-control form-control-sm" style="width:30px;text-align:center;" readonly/>
+						<input data-duice="TextField" data-duice-bind="searchMap.page" class="form-control form-control-sm" style="width:30px;text-align:center;" readonly/>
 						<button id="searchNext" class="btn btn-secondary btn-sm" onclick="javascript:getGroupList(searchMap.get('page')+1);">></button>
 					</span>
 				</div>
 				<div>
-					<table class="table table-sm table-bordered" data-juice="Grid" data-juice-bind="groupList" data-juice-item="group">
+					<table class="table table-sm table-bordered" data-duice="Grid" data-duice-bind="groupList" data-duice-item="group">
 						<thead>
 							<tr>
 								<th>No</th>
@@ -225,10 +225,10 @@
 						<tbody>
 							<tr data-group="{{$context.group.get('group')}}" onclick="javascript: getGroupDetail(this.dataset.group);">
 								<td align="center">{{($context.index+1) + searchMap.get('rownum')*(searchMap.get('page')-1)}}</td>
-								<td><label data-juice="Label" data-juice-bind="group.group" class="form-label"></label></td>
-								<td><label data-juice="Label" data-juice-bind="group.name" class="form-label"></label></td>
-								<td align="center"><select data-juice="ComboBox" data-juice-bind="group.useYn" data-juice-options="useYn" class="form-control form-control-sm" disabled></select></td>
-								<td align="center"><input data-juice="CheckBox" data-juice-bind="group.delete" disabled/></td>
+								<td><label data-duice="Label" data-duice-bind="group.group" class="form-label"></label></td>
+								<td><label data-duice="Label" data-duice-bind="group.name" class="form-label"></label></td>
+								<td align="center"><select data-duice="ComboBox" data-duice-bind="group.useYn" data-duice-options="useYn" class="form-control form-control-sm" disabled></select></td>
+								<td align="center"><input data-duice="CheckBox" data-duice-bind="group.delete" disabled/></td>
 							</tr>
 						</tbody>
 					</table>
@@ -243,20 +243,20 @@
 					<table class="groupDetail">
 						<tr>
 					    	<th>Group</th>
-					    	<td><label data-juice="Label" data-juice-bind="groupMap.group"/></td>
+					    	<td><label data-duice="Label" data-duice-bind="groupMap.group"/></td>
 					    	<th>Name</th>
-					    	<td><input data-juice="TextField" data-juice-bind="groupMap.name" class="form-control form-control-sm"/></td>
+					    	<td><input data-duice="TextField" data-duice-bind="groupMap.name" class="form-control form-control-sm"/></td>
 						</tr>
 						<tr>
 					    	<th>UseYn</th>
-					    	<td><select data-juice="ComboBox" data-juice-bind="groupMap.useYn" data-juice-options="useYn" class="form-control form-control-sm"/></td>
+					    	<td><select data-duice="ComboBox" data-duice-bind="groupMap.useYn" data-duice-options="useYn" class="form-control form-control-sm"/></td>
 					    	<th>Delete</th>
-					    	<td><input data-juice="CheckBox" data-juice-bind="groupMap.delete"/></td>
+					    	<td><input data-duice="CheckBox" data-duice-bind="groupMap.delete"/></td>
 						</tr>
 						<tr>
 							<th>Description</th>
 							<td colspan="3">
-								<div data-juice="HtmlEditor" data-juice-bind="groupMap.description" style="height:200px;"></div>
+								<div data-duice="HtmlEditor" data-duice-bind="groupMap.description" style="height:200px;"></div>
 							</td>
 						</tr>
 						<tr>
@@ -271,7 +271,7 @@
 					<span>Group List</span>
 				</div>
 				<div>
-					<table class="table table-sm table-bordered" data-juice="Grid" data-juice-bind="groupUserList" data-juice-item="user">
+					<table class="table table-sm table-bordered" data-duice="Grid" data-duice-bind="groupUserList" data-duice-item="user">
 						<thead>
 							<tr>
 								<th>No</th>
@@ -286,11 +286,11 @@
 						<tbody>
 							<tr>
 								<td>{{$context.index+1}}</td>
-								<td><label data-juice="Label" data-juice-bind="user.id" class="form-label"/></td>
-								<td><label data-juice="Label" data-juice-bind="user.name" class="form-label"/></td>
-								<td><label data-juice="Label" data-juice-bind="user.email" class="form-label"/></td>
-								<td><select data-juice="ComboBox" data-juice-bind="user.useYn" data-juice-options="useYn" class="form-control form-control-sm" disabled/></td>
-								<td align="center"><input data-juice="CheckBox" data-juice-bind="user.delete" disabled/></td>
+								<td><label data-duice="Label" data-duice-bind="user.id" class="form-label"/></td>
+								<td><label data-duice="Label" data-duice-bind="user.name" class="form-label"/></td>
+								<td><label data-duice="Label" data-duice-bind="user.email" class="form-label"/></td>
+								<td><select data-duice="ComboBox" data-duice-bind="user.useYn" data-duice-options="useYn" class="form-control form-control-sm" disabled/></td>
+								<td align="center"><input data-duice="CheckBox" data-duice-bind="user.delete" disabled/></td>
 								<td><button data-id="{{$context.user.get('id')}}" onclick="javascript:getUserDetail(this.dataset.id);">View</button></td>
 							</tr>
 						</tbody>
@@ -313,26 +313,26 @@
 					<table class="groupDetail">
 						<tr>
 					    	<th>ID</th>
-					    	<td><label data-juice="Label" data-juice-bind="userMap.id"/></td>
+					    	<td><label data-duice="Label" data-duice-bind="userMap.id"/></td>
 					    	<th>Name</th>
-					    	<td><input data-juice="TextField" data-juice-bind="userMap.email" class="form-control form-control-sm"/></td>
+					    	<td><input data-duice="TextField" data-duice-bind="userMap.email" class="form-control form-control-sm"/></td>
 						</tr>
 						<tr>
 					    	<th>Name</th>
-					    	<td><input data-juice="TextField" data-juice-bind="userMap.name" class="form-control form-control-sm"/></td>
+					    	<td><input data-duice="TextField" data-duice-bind="userMap.name" class="form-control form-control-sm"/></td>
 					    	<th>Nickname</th>
-					    	<td><input data-juice="TextField" data-juice-bind="userMap.nickname" class="form-control form-control-sm"/></td>
+					    	<td><input data-duice="TextField" data-duice-bind="userMap.nickname" class="form-control form-control-sm"/></td>
 						</tr>
 						<tr>
 					    	<th>UseYn</th>
-					    	<td><select data-juice="ComboBox" data-juice-bind="userMap.useYn" data-juice-options="useYn" class="form-control form-control-sm"/></td>
+					    	<td><select data-duice="ComboBox" data-duice-bind="userMap.useYn" data-duice-options="useYn" class="form-control form-control-sm"/></td>
 					    	<th>Delete</th>
-					    	<td><input data-juice="CheckBox" data-juice-bind="userMap.delete"/></td>
+					    	<td><input data-duice="CheckBox" data-duice-bind="userMap.delete"/></td>
 						</tr>
 						<tr>
 							<th>Description</th>
 							<td colspan="3">
-								<div data-juice="HtmlEditor" data-juice-bind="userMap.description" style="height:200px;"></div>
+								<div data-duice="HtmlEditor" data-duice-bind="userMap.description" style="height:200px;"></div>
 							</td>
 						</tr>
 					</table>

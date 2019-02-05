@@ -4,9 +4,9 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-		<title>JUICE(Javascript UI Component Engine)</title>
-		<script src="juice.js"></script>
-		<link rel="stylesheet" href="juice.css">
+		<title>duice(Javascript UI Component Engine)</title>
+		<script src="duice.js"></script>
+		<link rel="stylesheet" href="duice.css">
 		<script type="text/javascript">
 		/**
 		 * DOMContentLoaded
@@ -58,16 +58,16 @@
 			var codeHtml = sectionObj.querySelector('textarea[name=codeHtml]').value;
 			resultDoc.write('<p></p>' + codeHtml);
 
-			var juiceCss = document.createElement("link");
-			juiceCss.href = "juice.css"; 
-			juiceCss.rel = "stylesheet"; 
-			juiceCss.type = "text/css"; 
-			resultDoc.head.appendChild(juiceCss);
+			var duiceCss = document.createElement("link");
+			duiceCss.href = "duice.css"; 
+			duiceCss.rel = "stylesheet"; 
+			duiceCss.type = "text/css"; 
+			resultDoc.head.appendChild(duiceCss);
 			
-			var juiceScript = document.createElement('script');
-			juiceScript.src = 'juice.js';
-			resultDoc.head.appendChild(juiceScript);
-			juiceScript.addEventListener('load', function(){
+			var duiceScript = document.createElement('script');
+			duiceScript.src = 'duice.js';
+			resultDoc.head.appendChild(duiceScript);
+			duiceScript.addEventListener('load', function(){
 				var codeScript = sectionObj.querySelector('textarea[name=codeScript]').value;
 				var scriptObj = document.createElement('script');
 				scriptObj.type="text/javascript";
@@ -291,14 +291,14 @@ Therefore you can use it with another javascript library together.
 You can use it with JQuery, AngularJS and so on, also Responsive UI framework like Bootstrap.
 </pre>
 		<h2>Official Website</h2>
-		<a href="http://juice.oopscraft.net" target="_blank">
-			http://juice.oopscraft.net
+		<a href="http://duice.oopscraft.net" target="_blank">
+			http://duice.oopscraft.net
 		</a>
 
 		<!-------------------------------------------------------------------->
-		<!-- juice.data.Map 		 										-->
+		<!-- duice.data.Map 		 										-->
 		<!-------------------------------------------------------------------->
-		<h1 id="juice.data">juice.data (DataSet)</h1>
+		<h1 id="duice.data">duice.data (DataSet)</h1>
 		<pre>
 데이터 관련 클래스들의 집합이다.
 Map - Object 및 단일 레코드 형식의 데이터 구조체
@@ -307,11 +307,11 @@ Tree - Tree 형태의 Hierarchy 데이터 구조체
 		</pre>
 
 		<!-------------------------------------------------------------------->
-		<!-- juice.data.Map 		 										-->
+		<!-- duice.data.Map 		 										-->
 		<!-------------------------------------------------------------------->
-		<section id="juice.data.Map">
-			<iframe style="width:100%;" scrolling="no" src="../doc/juice.data.Map.html"></iframe>
-			<h2>juice.data.Map</h2>
+		<section id="duice.data.Map">
+			<iframe style="width:100%;" scrolling="no" src="../doc/duice.data.Map.html"></iframe>
+			<h2>duice.data.Map</h2>
 			<pre class="text">
 It is a Map data structure for binding to UI Component.
 			</pre>
@@ -358,8 +358,8 @@ It is a Map data structure for binding to UI Component.
 					<tbody>
 						<tr>
 							<td>void</td>
-							<td>new juice.data.Map()</td>
-							<td>constructor of Juice.DataMap</td>
+							<td>new duice.data.Map()</td>
+							<td>constructor of duice.DataMap</td>
 						</tr>
 						<tr>
 							<td>void</td>
@@ -403,7 +403,7 @@ It is a Map data structure for binding to UI Component.
 			</div>
 			<h3>Javascript</h3>
 			<textarea name="codeScript" id="test1">
-var userMap = new juice.data.Map();
+var userMap = new duice.data.Map();
 
 
 // testFromJson
@@ -462,7 +462,7 @@ function testOnChange() {
 <button onclick="javascript:testGetNames();">testGetNames</button>
 <button onclick="javascript:testOnChange();">testOnChange</button>
 			</textarea>
-			<input type="button" value="Run" onclick="javascript:doTest('juice.data.Map');"/>
+			<input type="button" value="Run" onclick="javascript:doTest('duice.data.Map');"/>
 			<iframe name="result"></iframe>
 		</section>
 				
@@ -477,10 +477,10 @@ function testOnChange() {
 		
 		
 			<!-------------------------------------------------------------------->
-			<!-- juice.data.List Example 										-->
+			<!-- duice.data.List Example 										-->
 			<!-------------------------------------------------------------------->
-			<section id="juice.data.List">
-				<h2>juice.data.List</h2>
+			<section id="duice.data.List">
+				<h2>duice.data.List</h2>
 				<pre>
 It is a List data structure for binding to UI Component.
 				</pre>
@@ -497,8 +497,8 @@ It is a List data structure for binding to UI Component.
 						<tbody>
 							<tr>
 								<td>void</td>
-								<td>new juice.data.List()</td>
-								<td>constructor of Juice.DataList</td>
+								<td>new duice.data.List()</td>
+								<td>constructor of duice.DataList</td>
 							</tr>
 							<tr>
 								<td>void</td>
@@ -525,7 +525,7 @@ It is a List data structure for binding to UI Component.
 								</td>
 							</tr>
 							<tr>
-								<td>row[juice.data.Map]</td>
+								<td>row[duice.data.Map]</td>
 								<td>getRow(index)</td>
 								<td>
 									returns specified row map.
@@ -533,7 +533,7 @@ It is a List data structure for binding to UI Component.
 							</tr>
 							<tr>
 								<td>void</td>
-								<td>addRow(map[juice.data.Map])</td>
+								<td>addRow(map[duice.data.Map])</td>
 								<td>
 									add row data into last index.
 								</td>
@@ -547,7 +547,7 @@ It is a List data structure for binding to UI Component.
 							</tr>
 							<tr>
 								<td>void</td>
-								<td>insertRow (index,map[juice.data.Map])</td>
+								<td>insertRow (index,map[duice.data.Map])</td>
 								<td>
 									insert row data into specific index.
 								</td>
@@ -565,7 +565,7 @@ It is a List data structure for binding to UI Component.
 				<h3>Javascript</h3>
 				<textarea name="codeScript">
 // defines data structure
-var userList = new juice.data.List();
+var userList = new duice.data.List();
 
 // testFromJson
 function testFromJson() {
@@ -590,7 +590,7 @@ function testGetRow() {
 
 // test addRow
 function testAddRow() {
-	var row = new juice.data.Map();
+	var row = new duice.data.Map();
 	row.set('id','new id');
 	row.set('name', 'new name');
 	userList.addRow(row);
@@ -610,15 +610,15 @@ function testGetRowCount() {
 <button onclick="javascript:testAddRow();">testAddRow</button>
 <button onclick="javascript:testGetRowCount();">testGetRowCount</button>
 				</textarea>
-				<input type="button" value="Run" onclick="javascript:doTest('juice.data.List');"/>
+				<input type="button" value="Run" onclick="javascript:doTest('duice.data.List');"/>
 				<iframe name="result" scrolling="no"></iframe>
 			</section>
 			
 			<!-------------------------------------------------------------------->
-			<!-- juice.data.Tree Example 										-->
+			<!-- duice.data.Tree Example 										-->
 			<!-------------------------------------------------------------------->
-			<section id="juice.data.Tree">
-				<h2>juice.data.Tree</h2>
+			<section id="duice.data.Tree">
+				<h2>duice.data.Tree</h2>
 				<pre class="text">
 Tree data structure for binding to UI Component.
 				</pre>
@@ -635,8 +635,8 @@ Tree data structure for binding to UI Component.
 						<tbody>
 							<tr>
 								<td>void</td>
-								<td>new juice.data.Tree()</td>
-								<td>constructor of Juice.Tree</td>
+								<td>new duice.data.Tree()</td>
+								<td>constructor of duice.Tree</td>
 							</tr>
 							<tr>
 								<td>void</td>
@@ -649,21 +649,21 @@ Tree data structure for binding to UI Component.
 								<td>converts list into JSON array</td>
 							</tr>
 							<tr>
-								<td>node[juice.data.Map]</td>
+								<td>node[duice.data.Map]</td>
 								<td>getNode(index[Array]</td>
-								<td>Returns specified node(juice.data.Map)</td>
+								<td>Returns specified node(duice.data.Map)</td>
 							</tr>
 							<tr>
 								<td>void</td>
 								<td>removeNode(index[Array]</td>
-								<td>Deletes specified node(juice.data.Map)</td>
+								<td>Deletes specified node(duice.data.Map)</td>
 							</tr>
 						</tbody>
 					</table>
 				</div>
 				<h3>Javascript</h3>
 				<textarea name="codeScript" id="test1">
-var tree = new juice.data.Tree();
+var tree = new duice.data.Tree();
 tree.fromJson([{	
 	id:'A',
 	name:'A name',
@@ -733,15 +733,15 @@ function testGetNode() {
 <button onclick="javascript:testToJson();">testToJson</button>
 <button onclick="javascript:testGetNode();">testGetNode</button>
 				</textarea>
-				<input type="button" value="Run" onclick="javascript:doTest('juice.data.Tree');"/>
+				<input type="button" value="Run" onclick="javascript:doTest('duice.data.Tree');"/>
 				<iframe name="result"></iframe>
 			</section>
 
 			<!-------------------------------------------------------------------->
-			<!-- juice.ui.Label Example 										-->
+			<!-- duice.ui.Label Example 										-->
 			<!-------------------------------------------------------------------->
-			<section id="juice.ui.Label">
-				<h2>juice.ui.Label</h2>
+			<section id="duice.ui.Label">
+				<h2>duice.ui.Label</h2>
 				<h3>Tag Attribute</h3>
 				<div class="api">
 					<table>
@@ -755,12 +755,12 @@ function testGetNode() {
 						<tbody>
 							<tr>
 								<td>input</td>
-								<td>data-juice="Label"</td>
+								<td>data-duice="Label"</td>
 								<td>component type</td>
 							</tr>
 							<tr>
 								<td>input</td>
-								<td>data-juice-bind="[map].[column]"</td>
+								<td>data-duice-bind="[map].[column]"</td>
 								<td>specify binding Map and column name.</td>
 							</tr>
 						</tbody>
@@ -768,24 +768,24 @@ function testGetNode() {
 				</div>
 				<h3>Javascript</h3>
 				<textarea name="codeScript">
-var userMap = new juice.data.Map();
+var userMap = new duice.data.Map();
 userMap.fromJson({	
 	name:'James Anderson',
 });
 				</textarea>
 				<h3>HTML</h3>
 				<textarea name="codeHtml">
-<label data-juice="Label" data-juice-bind="userMap.name"/>
+<label data-duice="Label" data-duice-bind="userMap.name"/>
 				</textarea>
-				<input type="button" value="Run" onclick="javascript:doTest('juice.ui.Label');"/>
+				<input type="button" value="Run" onclick="javascript:doTest('duice.ui.Label');"/>
 				<iframe name="result" scrolling="no"></iframe>
 			</section>
 			
 			<!-------------------------------------------------------------------->
-			<!-- juice.ui.TextField Example 												-->
+			<!-- duice.ui.TextField Example 												-->
 			<!-------------------------------------------------------------------->
-			<section id="juice.ui.TextField">
-				<h2>juice.ui.TextField</h2>
+			<section id="duice.ui.TextField">
+				<h2>duice.ui.TextField</h2>
 				<h3>Tag Attribute</h3>
 				<div class="api">
 					<table>
@@ -799,12 +799,12 @@ userMap.fromJson({
 						<tbody>
 							<tr>
 								<td>input</td>
-								<td>data-juice="TextField"</td>
+								<td>data-duice="TextField"</td>
 								<td>component type</td>
 							</tr>
 							<tr>
 								<td>input</td>
-								<td>data-juice-bind="[map].[column]"</td>
+								<td>data-duice-bind="[map].[column]"</td>
 								<td>specify binding map and column name.</td>
 							</tr>
 						</tbody>
@@ -812,7 +812,7 @@ userMap.fromJson({
 				</div>
 				<h3>Javascript</h3>
 				<textarea name="codeScript">
-var userMap = new juice.data.Map();
+var userMap = new duice.data.Map();
 userMap.fromJson({
 	id:'apple',
 	name:'James Anderson',
@@ -829,22 +829,22 @@ function printUser() {
 				</textarea>
 				<h3>HTML</h3>
 				<textarea name="codeHtml">
-<input type="text" data-juice="TextField" data-juice-bind="userMap.id"/>
-<input type="text" data-juice="TextField" data-juice-bind="userMap.name"/>
-<input type="email" data-juice="TextField" data-juice-bind="userMap.email"/>
-<input type="password" data-juice="TextField" data-juice-bind="userMap.password"/>
-<input type="text" data-juice="TextField" data-juice-bind="userMap.date" data-juice-mask="####-##-##"/>
+<input type="text" data-duice="TextField" data-duice-bind="userMap.id"/>
+<input type="text" data-duice="TextField" data-duice-bind="userMap.name"/>
+<input type="email" data-duice="TextField" data-duice-bind="userMap.email"/>
+<input type="password" data-duice="TextField" data-duice-bind="userMap.password"/>
+<input type="text" data-duice="TextField" data-duice-bind="userMap.date" data-duice-mask="####-##-##"/>
 <button onclick="javascript:printUser();">print user</button>
 				</textarea>
-				<input type="button" value="Run" onclick="javascript:doTest('juice.ui.TextField');"/>
+				<input type="button" value="Run" onclick="javascript:doTest('duice.ui.TextField');"/>
 				<iframe name="result" scrolling="no"></iframe>
 			</section>
 			
 			<!-------------------------------------------------------------------->
-			<!-- juice.ui.ComboBox Example 										-->
+			<!-- duice.ui.ComboBox Example 										-->
 			<!-------------------------------------------------------------------->
-			<section id="juice.ui.ComboBox">
-				<h2>juice.ui.ComboBox</h2>
+			<section id="duice.ui.ComboBox">
+				<h2>duice.ui.ComboBox</h2>
 				<h3>Tag Attribute</h3>
 				<div class="api">
 					<table>
@@ -858,17 +858,17 @@ function printUser() {
 						<tbody>
 							<tr>
 								<td>select</td>
-								<td>data-juice="ComboBox"</td>
+								<td>data-duice="ComboBox"</td>
 								<td>component type </td>
 							</tr>
 							<tr>
 								<td>select</td>
-								<td>data-juice-bind="[map].[column]"</td>
+								<td>data-duice-bind="[map].[column]"</td>
 								<td>specify binding dataMap and column name.</td>
 							</tr>
 							<tr>
 								<td>select</td>
-								<td>data-juice-options="[{value:'value',text:'text'}]"</td>
+								<td>data-duice-options="[{value:'value',text:'text'}]"</td>
 								<td>specify binding dataMap and column name.</td>
 							</tr>
 						</tbody>
@@ -877,7 +877,7 @@ function printUser() {
 				<h3>Javascript</h3>
 				<textarea name="codeScript">
 // define user map
-var userMap = new juice.data.Map();
+var userMap = new duice.data.Map();
 userMap.fromJson({
 	useYn:'Y'
 });
@@ -892,18 +892,18 @@ function printUser() {
 				</textarea>
 				<h3>HTML</h3>
 				<textarea name="codeHtml">
-<select data-juice="ComboBox" data-juice-bind="userMap.useYn" data-juice-options="useYnCode"></select>
+<select data-duice="ComboBox" data-duice-bind="userMap.useYn" data-duice-options="useYnCode"></select>
 <button onclick="javascript:printUser();">print user</button>
 				</textarea>
-				<input type="button" value="Run" onclick="javascript:doTest('juice.ui.ComboBox');"/>
+				<input type="button" value="Run" onclick="javascript:doTest('duice.ui.ComboBox');"/>
 				<iframe name="result"></iframe>
 			</section>
 
 			<!-------------------------------------------------------------------->
-			<!-- juice.ui.CheckBox Example 										-->
+			<!-- duice.ui.CheckBox Example 										-->
 			<!-------------------------------------------------------------------->
-			<section id="juice.ui.CheckBox">
-				<h2>juice.ui.CheckBox</h2>
+			<section id="duice.ui.CheckBox">
+				<h2>duice.ui.CheckBox</h2>
 				<h3>Tag Attribute</h3>
 				<div class="api">
 					<table>
@@ -917,12 +917,12 @@ function printUser() {
 						<tbody>
 							<tr>
 								<td>input</td>
-								<td>data-juice="CheckBox"</td>
+								<td>data-duice="CheckBox"</td>
 								<td>component type </td>
 							</tr>
 							<tr>
 								<td>input</td>
-								<td>data-juice-bind="[map].[column]"</td>
+								<td>data-duice-bind="[map].[column]"</td>
 								<td>specify binding dataMap and column name.</td>
 							</tr>
 						</tbody>
@@ -931,7 +931,7 @@ function printUser() {
 				<h3>Javascript</h3>
 				<textarea name="codeScript">
 // define data
-var userMap = new juice.data.Map();
+var userMap = new duice.data.Map();
 userMap.fromJson({
 	delete:true
 });
@@ -943,18 +943,18 @@ function printUser() {
 				</textarea>
 				<h3>HTML</h3>
 				<textarea name="codeHtml">
-<input data-juice="CheckBox" data-juice-bind="userMap.delete">
+<input data-duice="CheckBox" data-duice-bind="userMap.delete">
 <button onclick="javascript:printUser();">print user</button>
 				</textarea>
-				<input type="button" value="Run" onclick="javascript:doTest('juice.ui.CheckBox');"/>
+				<input type="button" value="Run" onclick="javascript:doTest('duice.ui.CheckBox');"/>
 				<iframe name="result"></iframe>
 			</section>
 
 			<!-------------------------------------------------------------------->
-			<!-- juice.ui.Radio Example 										-->
+			<!-- duice.ui.Radio Example 										-->
 			<!-------------------------------------------------------------------->
-			<section id="juice.ui.Radio">
-				<h2>juice.ui.Radio</h2>
+			<section id="duice.ui.Radio">
+				<h2>duice.ui.Radio</h2>
 				<pre>
  Radio type input tag component.
  				</pre>
@@ -971,12 +971,12 @@ function printUser() {
 						<tbody>
 							<tr>
 								<td>input</td>
-								<td>data-juice="Radio"</td>
+								<td>data-duice="Radio"</td>
 								<td>component type </td>
 							</tr>
 							<tr>
 								<td>input</td>
-								<td>data-juice-bind="[map].[column]"</td>
+								<td>data-duice-bind="[map].[column]"</td>
 								<td>specify binding map and column name.</td>
 							</tr>
 						</tbody>
@@ -985,7 +985,7 @@ function printUser() {
 				<h3>Javascript</h3>
 				<textarea name="codeScript">
 // define data
-var userMap = new juice.data.Map();
+var userMap = new duice.data.Map();
 userMap.fromJson({
 	gender: 'M'
 });
@@ -997,19 +997,19 @@ function printUser() {
 				</textarea>
 				<h3>HTML</h3>
 				<textarea name="codeHtml">
-<input type="radio" data-juice="Radio" data-juice-bind="userMap.gender" value="F"/> Female
-<input type="radio" data-juice="Radio" data-juice-bind="userMap.gender" value="M"/> Male
+<input type="radio" data-duice="Radio" data-duice-bind="userMap.gender" value="F"/> Female
+<input type="radio" data-duice="Radio" data-duice-bind="userMap.gender" value="M"/> Male
 <button onclick="javascript:printUser();">Print User</button>
 				</textarea>
-				<input type="button" value="Run" onclick="javascript:doTest('juice.ui.Radio');"/>
+				<input type="button" value="Run" onclick="javascript:doTest('duice.ui.Radio');"/>
 				<iframe name="result"></iframe>
 			</section>
 			
 			<!-------------------------------------------------------------------->
-			<!-- juice.ui.TextArea Example 										-->
+			<!-- duice.ui.TextArea Example 										-->
 			<!-------------------------------------------------------------------->
-			<section id="juice.ui.TextArea">
-				<h2>juice.ui.TextArea</h2>
+			<section id="duice.ui.TextArea">
+				<h2>duice.ui.TextArea</h2>
 				<pre>
 TextArea tag component.
 				</pre>
@@ -1026,12 +1026,12 @@ TextArea tag component.
 						<tbody>
 							<tr>
 								<td>input</td>
-								<td>data-juice="TextArea"</td>
+								<td>data-duice="TextArea"</td>
 								<td>component type </td>
 							</tr>
 							<tr>
 								<td>input</td>
-								<td>data-juice-bind="[map].[column]"</td>
+								<td>data-duice-bind="[map].[column]"</td>
 								<td>specify binding map and column name.</td>
 							</tr>
 						</tbody>
@@ -1040,7 +1040,7 @@ TextArea tag component.
 				<h3>Javascript</h3>
 				<textarea name="codeScript">
 // define data
-var userMap = new juice.data.Map();
+var userMap = new duice.data.Map();
 userMap.fromJson({
 	description:'I am generous.\nI am generous.\nI am generous.\n'
 });
@@ -1052,18 +1052,18 @@ function printUser() {
 				</textarea>
 				<h3>HTML</h3>
 				<textarea name="codeHtml">
-&lt;textarea data-juice="TextArea" data-juice-bind="userMap.description"&gt;&lt;/textarea&gt;
+&lt;textarea data-duice="TextArea" data-duice-bind="userMap.description"&gt;&lt;/textarea&gt;
 <button onclick="javascript:printUser();">print user</button>
 				</textarea>
-				<input type="button" value="Run" onclick="javascript:doTest('juice.ui.TextArea');"/>
+				<input type="button" value="Run" onclick="javascript:doTest('duice.ui.TextArea');"/>
 				<iframe name="result"></iframe>
 			</section>
 
 			<!-------------------------------------------------------------------->
-			<!-- juice.ui.HtmlEditor Example 										-->
+			<!-- duice.ui.HtmlEditor Example 										-->
 			<!-------------------------------------------------------------------->
-			<section id="juice.ui.HtmlEditor">
-				<h2>juice.ui.HtmlEditor</h2>
+			<section id="duice.ui.HtmlEditor">
+				<h2>duice.ui.HtmlEditor</h2>
 				<pre>
 Texatarea based HTML editor component.
 				</pre>
@@ -1080,12 +1080,12 @@ Texatarea based HTML editor component.
 						<tbody>
 							<tr>
 								<td>input</td>
-								<td>data-juice="Editor"</td>
+								<td>data-duice="Editor"</td>
 								<td>component type </td>
 							</tr>
 							<tr>
 								<td>input</td>
-								<td>data-juice-bind="[map].[column]"</td>
+								<td>data-duice-bind="[map].[column]"</td>
 								<td>specify binding map and column name.</td>
 							</tr>
 						</tbody>
@@ -1094,7 +1094,7 @@ Texatarea based HTML editor component.
 				<h3>Javascript</h3>
 				<textarea name="codeScript">
 // define data
-var userMap = new juice.data.Map();
+var userMap = new duice.data.Map();
 userMap.fromJson({
 	description:'I am generous.\nI am generous.\nI am generous.\n'
 });
@@ -1106,18 +1106,18 @@ function printUser() {
 				</textarea>
 				<h3>HTML</h3>
 				<textarea name="codeHtml">
-<div data-juice="HtmlEditor" data-juice-bind="userMap.description"></div>
+<div data-duice="HtmlEditor" data-duice-bind="userMap.description"></div>
 <input type="button" value="print User" onclick="javascript:printUser();"/>
 				</textarea>
-				<input type="button" value="Run" onclick="javascript:doTest('juice.ui.HtmlEditor');"/>
+				<input type="button" value="Run" onclick="javascript:doTest('duice.ui.HtmlEditor');"/>
 				<iframe name="result" designMode="true"></iframe>
 			</section>
 			
 			<!-------------------------------------------------------------------->
-			<!-- juice.ui.CronExpression Example 										-->
+			<!-- duice.ui.CronExpression Example 										-->
 			<!-------------------------------------------------------------------->
-			<section id="juice.ui.CronExpression">
-				<h2>juice.ui.CronExpression</h2>
+			<section id="duice.ui.CronExpression">
+				<h2>duice.ui.CronExpression</h2>
 				<h3>Attribute</h3>
 				<div class="api">
 					<table>
@@ -1131,7 +1131,7 @@ function printUser() {
 						<tbody>
 							<tr>
 								<td>input</td>
-								<td>data-juice="CronExpression"</td>
+								<td>data-duice="CronExpression"</td>
 								<td>Defines the component type as a TreeView.</td>
 							</tr>
 						</tbody>
@@ -1139,23 +1139,23 @@ function printUser() {
 				</div>
 				<h3>Javascript</h3>
 				<textarea name="codeScript">
-var scheduleMap = new juice.data.Map();
+var scheduleMap = new duice.data.Map();
 scheduleMap.fromJson({ cronExpression:'0 0 12 * 1 ?' });
 
 				</textarea>
 				<h3>HTML</h3>
 				<textarea name="codeHtml">
-<input type="text" data-juice="CronExpression" data-juice-bind="scheduleMap.cronExpression"/>
+<input type="text" data-duice="CronExpression" data-duice-bind="scheduleMap.cronExpression"/>
 				</textarea>
-				<input type="button" value="Run" onclick="javascript:doTest('juice.ui.CronExpression');"/>
+				<input type="button" value="Run" onclick="javascript:doTest('duice.ui.CronExpression');"/>
 				<iframe name="result"></iframe>
 			</section>	
 			
 			<!-------------------------------------------------------------------->
-			<!-- juice.ui.Grid Example 											-->
+			<!-- duice.ui.Grid Example 											-->
 			<!-------------------------------------------------------------------->
-			<section id="juice.ui.Grid">
-				<h2>juice.ui.Grid</h2>
+			<section id="duice.ui.Grid">
+				<h2>duice.ui.Grid</h2>
 				<h3>Attribute</h3>
 				<div class="api">
 					<table>
@@ -1169,17 +1169,17 @@ scheduleMap.fromJson({ cronExpression:'0 0 12 * 1 ?' });
 						<tbody>
 							<tr>
 								<td>table</td>
-								<td>data-juice="Grid"</td>
+								<td>data-duice="Grid"</td>
 								<td>component type</td>
 							</tr>
 							<tr>
 								<td>table</td>
-								<td>data-juice-bind="[dataList]"</td>
+								<td>data-duice-bind="[dataList]"</td>
 								<td>specify binding dataList</td>
 							</tr>
 							<tr>
 								<td>table</td>
-								<td>data-juice-item="[item name]"</td>
+								<td>data-duice-item="[item name]"</td>
 								<td>defines alias of each row item</td>
 							</tr>
 							<tr>
@@ -1203,7 +1203,7 @@ scheduleMap.fromJson({ cronExpression:'0 0 12 * 1 ?' });
 				<h3>Javascript</h3>
 				<textarea name="codeScript">
 // creates DataList object
-var userList = new juice.data.List();
+var userList = new duice.data.List();
 
 // userYn code
 var useYn = [{ value:'Y',text:'Use'},{value:'N',text:'Not Use'}];
@@ -1232,14 +1232,14 @@ function printUserList() {
 
 // add new user
 function addUser() {
-	var user = new juice.data.Map();
+	var user = new duice.data.Map();
 	user.set('id','new');
 	userList.addRow(user);
 }
 
 // insert new user
 function insertUser() {
-	var user = new juice.data.Map();
+	var user = new duice.data.Map();
 	user.set('id','new');
 	userList.insertRow(3,user);
 }
@@ -1251,7 +1251,7 @@ function removeUser(index) {
 				</textarea>
 				<h3>HTML</h3>
 				<textarea name="codeHtml">
-<table data-juice="Grid" data-juice-bind="userList" data-juice-item="user" data-juice-editable="true">
+<table data-duice="Grid" data-duice-bind="userList" data-duice-item="user" data-duice-editable="true">
 	<thead>
 		<tr>
 			<th>No</th>
@@ -1264,17 +1264,17 @@ function removeUser(index) {
 			<th>-</th>
 		</tr>
 	</thead>
-	<tbody data-juice-draggable="true" data-juice-droppable="true">
+	<tbody data-duice-draggable="true" data-duice-droppable="true">
 		<tr>
 			<td>{{$context.index+1}}</td>
-			<td><label data-juice="Label" data-juice-bind="user.id"/></td>
-			<td><input data-juice="TextField" data-juice-bind="user.name"/></td>
-			<td><input data-juice="TextField" data-juice-bind="user.email"/></td>
-			<td><select data-juice="ComboBox" data-juice-options="useYn" data-juice-bind="user.useYn"/></td>
-			<td><input data-juice="CheckBox" data-juice-bind="user.delete"/></td>
+			<td><label data-duice="Label" data-duice-bind="user.id"/></td>
+			<td><input data-duice="TextField" data-duice-bind="user.name"/></td>
+			<td><input data-duice="TextField" data-duice-bind="user.email"/></td>
+			<td><select data-duice="ComboBox" data-duice-options="useYn" data-duice-bind="user.useYn"/></td>
+			<td><input data-duice="CheckBox" data-duice-bind="user.delete"/></td>
 			<td>
-				<input data-juice="Radio" data-juice-bind="user.gender" value="F"/> Female
-				<input data-juice="Radio" data-juice-bind="user.gender" value="M"/> Male
+				<input data-duice="Radio" data-duice-bind="user.gender" value="F"/> Female
+				<input data-duice="Radio" data-duice-bind="user.gender" value="M"/> Male
 			</td>
 			<td>
 				<input type="button" value="Remove" onclick="removeUser({{$context.index}});"/>
@@ -1287,15 +1287,15 @@ function removeUser(index) {
 <input type="button" value="addUser" onclick="javascript:addUser();"/>
 <input type="button" value="insertUser" onclick="javascript:insertUser();"/>
 				</textarea>
-				<input type="button" value="Run" onclick="javascript:doTest('juice.ui.Grid');"/>
+				<input type="button" value="Run" onclick="javascript:doTest('duice.ui.Grid');"/>
 				<iframe name="result"></iframe>
 			</section>
 			
 			<!-------------------------------------------------------------------->
-			<!-- juice.ui.TreeView Example 										-->
+			<!-- duice.ui.TreeView Example 										-->
 			<!-------------------------------------------------------------------->
-			<section id="juice.ui.TreeView">
-				<h2>juice.ui.TreeView</h2>
+			<section id="duice.ui.TreeView">
+				<h2>duice.ui.TreeView</h2>
 				<h3>Attribute</h3>
 				<div class="api">
 					<table>
@@ -1309,37 +1309,37 @@ function removeUser(index) {
 						<tbody>
 							<tr>
 								<td>ul</td>
-								<td>data-juice="TreeView"</td>
+								<td>data-duice="TreeView"</td>
 								<td>Defines the component type as a TreeView.</td>
 							</tr>
 							<tr>
 								<td>ul</td>
-								<td>data-juice-bind="[juice.data.Tree]"</td>
+								<td>data-duice-bind="[duice.data.Tree]"</td>
 								<td>Defines Tree data structure to bind.</td>
 							</tr>
 							<tr>
 								<td>ul</td>
-								<td>data-juice-item="[item alias]"</td>
+								<td>data-duice-item="[item alias]"</td>
 								<td>Defines the alias name of each node.</td>
 							</tr>
 							<tr>
 								<td>ul</td>
-								<td>data-juice-editable="[true|false]"</td>
+								<td>data-duice-editable="[true|false]"</td>
 								<td>Set whether or not it can be modified.</td>
 							</tr>
 							<tr>
 								<td>li</td>
-								<td>data-juice-draggable="[true|false]"</td>
+								<td>data-duice-draggable="[true|false]"</td>
 								<td>Sets whether to drag the node item</td>
 							</tr>
 							<tr>
 								<td>li</td>
-								<td>data-juice-droppable="[true|false]"</td>
+								<td>data-duice-droppable="[true|false]"</td>
 								<td>Sets whether to drop the node item</td>
 							</tr>
 							<tr>
 								<td>li</td>
-								<td>data-juice-containable="[true|false]"</td>
+								<td>data-duice-containable="[true|false]"</td>
 								<td>Sets whether child nodes can be included.</td>
 							</tr>
 							<tr>
@@ -1354,15 +1354,15 @@ function removeUser(index) {
 							</tr>
 							<tr>
 								<td>built-in variables</td>
-								<td>$context.[data-juice-item]</td>
-								<td>Data[juice.data.Map] of each node.</td>
+								<td>$context.[data-duice-item]</td>
+								<td>Data[duice.data.Map] of each node.</td>
 							</tr>
 						</tbody>
 					</table>
 				</div>
 				<h3>Javascript</h3>
 				<textarea name="codeScript">
-var tree = new juice.data.Tree();
+var tree = new duice.data.Tree();
 tree.fromJson([{	
 	id:'A',
 	type:'dir',
@@ -1444,26 +1444,26 @@ function removeNode(index){
 				</textarea>
 				<h3>HTML</h3>
 				<textarea name="codeHtml">
-<ul data-juice="TreeView" data-juice-bind="tree" data-juice-item="node" data-juice-editable="true">
-	<li data-juice-draggable="{{$context.depth==0?false:true}}" data-juice-droppable="true" data-juice-containable="{{$context.node.get('type')=='dir'?true:false}}">
+<ul data-duice="TreeView" data-duice-bind="tree" data-duice-item="node" data-duice-editable="true">
+	<li data-duice-draggable="{{$context.depth==0?false:true}}" data-duice-droppable="true" data-duice-containable="{{$context.node.get('type')=='dir'?true:false}}">
 		{{$context.node.get('type')=='dir'?'▼ ':'▷'}}
-		<label data-juice="Label" data-juice-bind="node.id"></label>
-		<input data-juice="TextField" data-juice-bind="node.name"/>
+		<label data-duice="Label" data-duice-bind="node.id"></label>
+		<input data-duice="TextField" data-duice-bind="node.name"/>
 		{{$context.index}}
 		<button onclick="javascript:removeNode({{$context.index}});">X</button>
 	</li>
 </ul>
 <button onclick="javascript:printTreeData();">printTreeData</button>
 				</textarea>
-				<input type="button" value="Run" onclick="javascript:doTest('juice.ui.TreeView');"/>
+				<input type="button" value="Run" onclick="javascript:doTest('duice.ui.TreeView');"/>
 				<iframe name="result"></iframe>
 			</section>		
 			
 			<!-------------------------------------------------------------------->
-			<!-- juice.ui.Workflow Example 										-->
+			<!-- duice.ui.Workflow Example 										-->
 			<!-------------------------------------------------------------------->
-			<section id="juice.ui.Workflow">
-				<h2>juice.ui.Workflow</h2>
+			<section id="duice.ui.Workflow">
+				<h2>duice.ui.Workflow</h2>
 				<h3>Attribute</h3>
 				<div class="api">
 					<table>
@@ -1477,37 +1477,37 @@ function removeNode(index){
 						<tbody>
 							<tr>
 								<td>ul</td>
-								<td>data-juice="TreeView"</td>
+								<td>data-duice="TreeView"</td>
 								<td>Defines the component type as a TreeView.</td>
 							</tr>
 							<tr>
 								<td>ul</td>
-								<td>data-juice-bind="[juice.data.Tree]"</td>
+								<td>data-duice-bind="[duice.data.Tree]"</td>
 								<td>Defines Tree data structure to bind.</td>
 							</tr>
 							<tr>
 								<td>ul</td>
-								<td>data-juice-item="[item alias]"</td>
+								<td>data-duice-item="[item alias]"</td>
 								<td>Defines the alias name of each node.</td>
 							</tr>
 							<tr>
 								<td>ul</td>
-								<td>data-juice-editable="[true|false]"</td>
+								<td>data-duice-editable="[true|false]"</td>
 								<td>Set whether or not it can be modified.</td>
 							</tr>
 							<tr>
 								<td>li</td>
-								<td>data-juice-draggable="[true|false]"</td>
+								<td>data-duice-draggable="[true|false]"</td>
 								<td>Sets whether to drag the node item</td>
 							</tr>
 							<tr>
 								<td>li</td>
-								<td>data-juice-droppable="[true|false]"</td>
+								<td>data-duice-droppable="[true|false]"</td>
 								<td>Sets whether to drop the node item</td>
 							</tr>
 							<tr>
 								<td>li</td>
-								<td>data-juice-containable="[true|false]"</td>
+								<td>data-duice-containable="[true|false]"</td>
 								<td>Sets whether child nodes can be included.</td>
 							</tr>
 							<tr>
@@ -1522,8 +1522,8 @@ function removeNode(index){
 							</tr>
 							<tr>
 								<td>built-in variables</td>
-								<td>$context.[data-juice-item]</td>
-								<td>Data[juice.data.Map] of each node.</td>
+								<td>$context.[data-duice-item]</td>
+								<td>Data[duice.data.Map] of each node.</td>
 							</tr>
 						</tbody>
 					</table>
@@ -1531,8 +1531,8 @@ function removeNode(index){
 				<h3>Javascript</h3>
 				<textarea name="codeScript">
 // defines data structure
-var nodeList = new juice.data.List();
-var linkList = new juice.data.List();
+var nodeList = new duice.data.List();
+var linkList = new duice.data.List();
 
 nodeList.fromJson(
 	[{jobId:"step1",name:"Step 1",x: 200, y: 50}
@@ -1553,7 +1553,7 @@ linkList.fromJson(
 				<h3>HTML</h3>
 				<textarea name="codeHtml">
 <div style="width:600px; height:100vh; overflow:scroll;">
-	<ul data-juice="Workflow" data-juice-bind="nodeList,linkList" data-juice-node-id="jobId" data-juice-link-from="jobId" data-juice-link-to="nextJobId" data-juice-item="node">
+	<ul data-duice="Workflow" data-duice-bind="nodeList,linkList" data-duice-node-id="jobId" data-duice-link-from="jobId" data-duice-link-to="nextJobId" data-duice-item="node">
 		<li style="width:200px; height:100px; border:solid 1px black; background-color:#efefef;">
 			<div onclick="javascript:console.log('node');">
 			[{{$context.node.get('jobId')}}]{{$context.node.get('name')}}
@@ -1565,15 +1565,15 @@ linkList.fromJson(
 	</ul>
 </div>
 				</textarea>
-				<input type="button" value="Run" onclick="javascript:doTest('juice.ui.Workflow');"/>
+				<input type="button" value="Run" onclick="javascript:doTest('duice.ui.Workflow');"/>
 				<iframe name="result"></iframe>
 			</section>		
 
 			<!-------------------------------------------------------------------->
-			<!-- juice.ui.Animator Example 											-->
+			<!-- duice.ui.Animator Example 											-->
 			<!-------------------------------------------------------------------->
-			<section id="juice.ui.Animator">
-				<h2>juice.ui.Animator</h2>
+			<section id="duice.ui.Animator">
+				<h2>duice.ui.Animator</h2>
 				<pre class="text">
 Class for animation effect. 
 				</pre>
@@ -1590,7 +1590,7 @@ Class for animation effect.
 						<tbody>
 							<tr>
 								<td>-</td>
-								<td>new juice.ui.Animator(element)</td>
+								<td>new duice.ui.Animator(element)</td>
 								<td>Creates Animator instance</td>
 							</tr>
 							<tr>
@@ -1608,7 +1608,7 @@ Class for animation effect.
 				</div>
 				<h4>Javascript</h4>
 				<textarea name="codeScript">
-var animator = new juice.ui.Animator(document.getElementById('myElement'));
+var animator = new duice.ui.Animator(document.getElementById('myElement'));
 function testFadeIn() {
 	animator.fadeIn(function() {
 		alert('fadeIn completed.');
@@ -1626,15 +1626,15 @@ function testFadeOut() {
 <button onclick="javascript:testFadeIn();">testFadeIn</button>
 <button onclick="javascript:testFadeOut();">testFadeOut</button>
 				</textarea>
-				<input type="button" value="Run" onclick="javascript:doTest('juice.ui.Animator');"/>
+				<input type="button" value="Run" onclick="javascript:doTest('duice.ui.Animator');"/>
 				<iframe name="result"></iframe>
 			</section>
 			
 			<!-------------------------------------------------------------------->
-			<!-- juice.ui.Blocker Example 										-->
+			<!-- duice.ui.Blocker Example 										-->
 			<!-------------------------------------------------------------------->
-			<section id="juice.ui.Blocker">
-				<h2>juice.ui.Blocker</h2>
+			<section id="duice.ui.Blocker">
+				<h2>duice.ui.Blocker</h2>
 				<pre class="text">
 Blocking UI element component 
 				</pre>
@@ -1651,7 +1651,7 @@ Blocking UI element component
 						<tbody>
 							<tr>
 								<td>-</td>
-								<td>new juice.ui.Blocker(element)</td>
+								<td>new duice.ui.Blocker(element)</td>
 								<td>Creates Blocker instance</td>
 							</tr>
 							<tr>
@@ -1669,7 +1669,7 @@ Blocking UI element component
 				</div>
 				<h3>Javascript</h3>
 				<textarea name="codeScript">
-var blocker = new juice.ui.Blocker(document.getElementById('myElement'));
+var blocker = new duice.ui.Blocker(document.getElementById('myElement'));
 function testBlock() {
 	blocker.block();
 }
@@ -1683,15 +1683,15 @@ function testUnblock() {
 <button onclick="javascript:testBlock();">testBlock</button>
 <button onclick="javascript:testUnblock();">testUnblock</button>
 				</textarea>
-				<input type="button" value="Run" onclick="javascript:doTest('juice.ui.Blocker');"/>
+				<input type="button" value="Run" onclick="javascript:doTest('duice.ui.Blocker');"/>
 				<iframe name="result"></iframe>
 			</section>
 			
 			<!-------------------------------------------------------------------->
-			<!-- juice.ui.Dailog Example 											-->
+			<!-- duice.ui.Dailog Example 											-->
 			<!-------------------------------------------------------------------->
-			<section id="juice.ui.Dialog">
-				<h2>juice.ui.Dialog</h2>
+			<section id="duice.ui.Dialog">
+				<h2>duice.ui.Dialog</h2>
 				<pre class="text">
 It's custom dialog window component. It is based on Alert,Confirm,Prompt window.
 				</pre>
@@ -1708,7 +1708,7 @@ It's custom dialog window component. It is based on Alert,Confirm,Prompt window.
 						<tbody>
 							<tr>
 								<td>-</td>
-								<td>new juice.ui.Dialog([DOMElement])</td>
+								<td>new duice.ui.Dialog([DOMElement])</td>
 								<td>create Dialog instance with content</td>
 							</tr>
 							<tr>
@@ -1732,7 +1732,7 @@ It's custom dialog window component. It is based on Alert,Confirm,Prompt window.
 				<h3>Javascript</h3>
 				<textarea name="codeScript">
 function openDialogModal() {
-	var dialog = new juice.ui.Dialog(document.getElementById('myDialog'));
+	var dialog = new duice.ui.Dialog(document.getElementById('myDialog'));
 	dialog.setTitle('Title');
 	dialog.onClose(function(){
 		alert('Close');
@@ -1761,15 +1761,15 @@ function openDialogModal() {
 	</div>
 </dialog>
 				</textarea>
-				<input type="button" value="Run" onclick="javascript:doTest('juice.ui.Dialog');"/>
+				<input type="button" value="Run" onclick="javascript:doTest('duice.ui.Dialog');"/>
 				<iframe name="result"></iframe>
 			</section>
 			
 			<!-------------------------------------------------------------------->
-			<!-- juice.ui.Alert Example											-->
+			<!-- duice.ui.Alert Example											-->
 			<!-------------------------------------------------------------------->
-			<section id="juice.ui.Alert">
-				<h2>juice.ui.Alert</h2>
+			<section id="duice.ui.Alert">
+				<h2>duice.ui.Alert</h2>
 				<pre>
 Custom alert dialog component.
 				</pre>
@@ -1786,7 +1786,7 @@ Custom alert dialog component.
 						<tbody>
 							<tr>
 								<td>-</td>
-								<td>new juice.ui.Alert(message)</td>
+								<td>new duice.ui.Alert(message)</td>
 								<td>Constructor of Alert dialog with information message.</td>
 							</tr>
 							<tr>
@@ -1809,7 +1809,7 @@ Custom alert dialog component.
 				</div>
 				<h3>Javascript</h3>
 				<textarea name="codeScript">
-var alertObj = new juice.ui.Alert('Profile is saved.');
+var alertObj = new duice.ui.Alert('Profile is saved.');
 alertObj.setTitle('title');
 alertObj.onConfirm(function(){
 	alert('confirm');
@@ -1819,15 +1819,15 @@ alertObj.open();
 				<h3>HTML</h3>
 				<textarea name="codeHtml">
 				</textarea>
-				<input type="button" value="Run" onclick="javascript:doTest('juice.ui.Alert');"/>
+				<input type="button" value="Run" onclick="javascript:doTest('duice.ui.Alert');"/>
 				<iframe name="result"></iframe>
 			</section>
 			
 			<!-------------------------------------------------------------------->
-			<!-- juice.ui.Confirm Example 										-->
+			<!-- duice.ui.Confirm Example 										-->
 			<!-------------------------------------------------------------------->
-			<section id="juice.ui.Confirm">
-				<h2>juice.ui.Confirm</h2>
+			<section id="duice.ui.Confirm">
+				<h2>duice.ui.Confirm</h2>
 				<pre>
 Custom confirm dialog component.
 				</pre>
@@ -1844,7 +1844,7 @@ Custom confirm dialog component.
 						<tbody>
 							<tr>
 								<td>-</td>
-								<td>new juice.ui.Confirm(message)</td>
+								<td>new duice.ui.Confirm(message)</td>
 								<td>constructor of Confirm dialog with message</td>
 							</tr>
 							<tr>
@@ -1872,7 +1872,7 @@ Custom confirm dialog component.
 				</div>
 				<h3>Javascript</h3>
 				<textarea name="codeScript">
-var confirmObj = new juice.ui.Confirm('Do you want to save profile?');
+var confirmObj = new duice.ui.Confirm('Do you want to save profile?');
 confirmObj.setTitle('title');
 confirmObj.onConfirm(function(){
 	alert('confirm');
@@ -1885,15 +1885,15 @@ confirmObj.open();
 				<h3>HTML</h3>
 				<textarea name="codeHtml">
 				</textarea>
-				<input type="button" value="Run" onclick="javascript:doTest('juice.ui.Confirm');"/>
+				<input type="button" value="Run" onclick="javascript:doTest('duice.ui.Confirm');"/>
 				<iframe name="result"></iframe>
 			</section>
 			
 			<!-------------------------------------------------------------------->
-			<!-- juice.ui.Promt Example 											-->
+			<!-- duice.ui.Promt Example 											-->
 			<!-------------------------------------------------------------------->
-			<section id="juice.ui.Prompt">
-				<h2>juice.ui.Prompt</h2>
+			<section id="duice.ui.Prompt">
+				<h2>duice.ui.Prompt</h2>
 				<pre>
 Custom prompt dialog component.
 				</pre>
@@ -1910,7 +1910,7 @@ Custom prompt dialog component.
 						<tbody>
 							<tr>
 								<td>-</td>
-								<td>new juice.ui.Prompt(message)</td>
+								<td>new duice.ui.Prompt(message)</td>
 								<td>Constructor of prompt dialog with message</td>
 							</tr>
 							<tr>
@@ -1944,7 +1944,7 @@ Custom prompt dialog component.
 				</div>
 				<h3>Javascript</h3>
 				<textarea name="codeScript">
-var promptObj = new juice.ui.Prompt('Do you want to save profile?');
+var promptObj = new duice.ui.Prompt('Do you want to save profile?');
 promptObj.setTitle('title');
 promptObj.onConfirm(function(){
 	if(!this.getValue()){
@@ -1962,15 +1962,15 @@ promptObj.open();
 				<h3>HTML</h3>
 				<textarea name="codeHtml">
 				</textarea>
-				<input type="button" value="Run" onclick="javascript:doTest('juice.ui.Prompt');"/>
+				<input type="button" value="Run" onclick="javascript:doTest('duice.ui.Prompt');"/>
 				<iframe name="result"></iframe>
 			</section>
 			
 			<!-------------------------------------------------------------------->
-			<!-- juice.ui.Progress Example 							-->
+			<!-- duice.ui.Progress Example 							-->
 			<!-------------------------------------------------------------------->
-			<section id="juice.ui.Progress">
-				<h2>juice.ui.Progress</h2>
+			<section id="duice.ui.Progress">
+				<h2>duice.ui.Progress</h2>
 				<pre>
 Progress Loading Dialog
 				</pre>
@@ -1987,7 +1987,7 @@ Progress Loading Dialog
 						<tbody>
 							<tr>
 								<td>-</td>
-								<td>new juice.ui.Progress()</td>
+								<td>new duice.ui.Progress()</td>
 								<td>Constructor of progress dialog</td>
 							</tr>
 							<tr>
@@ -2005,7 +2005,7 @@ Progress Loading Dialog
 				</div>
 				<h3>Javascript</h3>
 				<textarea name="codeScript">
-var progress = new juice.ui.Progress();
+var progress = new duice.ui.Progress();
 function testStart() {
 	progress.start();
 }
@@ -2018,15 +2018,15 @@ function testEnd(){
 <button onclick="javascript:testStart();">testStart</button>
 <button onclick="javascript:testEnd();">testEnd</button>
 				</textarea>
-				<input type="button" value="Run" onclick="javascript:doTest('juice.ui.Progress');"/>
+				<input type="button" value="Run" onclick="javascript:doTest('duice.ui.Progress');"/>
 				<iframe name="result" scrolling="no"></iframe>
 			</section>
 		
 			<!-------------------------------------------------------------------->
-			<!-- juice.util.MaskFormatter Example 							-->
+			<!-- duice.util.MaskFormatter Example 							-->
 			<!-------------------------------------------------------------------->
-			<section id="juice.util.MaskFormatter">
-				<h2>juice.util.MaskFormatter</h2>
+			<section id="duice.util.MaskFormatter">
+				<h2>duice.util.MaskFormatter</h2>
 				<pre>
 Utility for String manipulations.
 				</pre>
@@ -2053,24 +2053,24 @@ Utility for String manipulations.
 				<textarea name="codeScript">
 var format = '###-###-###';
 var value = '12345';
-var maskedValue = juice.util.MaskFormatter.mask(format, value);
+var maskedValue = duice.util.MaskFormatter.mask(format, value);
 console.log(maskedValue);
-var unmaskedValue = juice.util.MaskFormatter.unmask(format, maskedValue);
+var unmaskedValue = duice.util.MaskFormatter.unmask(format, maskedValue);
 console.log(unmaskedValue);
 				</textarea>
 				<h3>HTML</h3>
 				<textarea name="codeHtml">
 
 				</textarea>
-				<input type="button" value="Run" onclick="javascript:doTest('juice.util.MaskFormatter');"/>
+				<input type="button" value="Run" onclick="javascript:doTest('duice.util.MaskFormatter');"/>
 				<iframe name="result" scrolling="no"></iframe>
 			</section>
 			
 			<!-------------------------------------------------------------------->
-			<!-- juice.util.WebSocketClient Example 							-->
+			<!-- duice.util.WebSocketClient Example 							-->
 			<!-------------------------------------------------------------------->
-			<section id="juice.util.WebSocketClient">
-				<h2>juice.util.WebSocketClient</h2>
+			<section id="duice.util.WebSocketClient">
+				<h2>duice.util.WebSocketClient</h2>
 				<pre>
 WebSocket client class with auto reconnecting functionality.
 				</pre>
@@ -2087,7 +2087,7 @@ WebSocket client class with auto reconnecting functionality.
 						<tbody>
 							<tr>
 								<td>-</td>
-								<td>new juice.net.WebSocketClient (url)</td>
+								<td>new duice.net.WebSocketClient (url)</td>
 								<td>constructor</td>
 							</tr>
 							<tr>
@@ -2126,7 +2126,7 @@ WebSocket client class with auto reconnecting functionality.
 				<h3>Javascript</h3>
 				<textarea name="codeScript">
 var url = "wss://echo.websocket.org";
-var webSocketClient = new juice.util.WebSocketClient(url);
+var webSocketClient = new duice.util.WebSocketClient(url);
 webSocketClient.onMessage(function(event){
 	console.log("message recieved:" + JSON.stringify(event));
 });
@@ -2145,7 +2145,7 @@ function testSend() {
 <button onclick="javascript:testOpen();">testOpen</button>
 <button onclick="javascript:testSend();">testSend</button>
 				</textarea>
-				<input type="button" value="Run" onclick="javascript:doTest('juice.util.WebSocketClient');"/>
+				<input type="button" value="Run" onclick="javascript:doTest('duice.util.WebSocketClient');"/>
 				<iframe name="result" scrolling="no"></iframe>
 			</section>
 

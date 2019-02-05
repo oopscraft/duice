@@ -1,46 +1,46 @@
 // =============================================================================
-// JUICE (Javascript UI Component Engine)
+// duice (Javascript UI Component Engine)
 // - Anyone can use it freely.
 // - Modify the source or allow re-creation. However, you must state that you have the original creator.
 // - However, we can not grant patents or licenses for reproductives. (Modifications or reproductions must be shared with the public.)
 // Licence: LGPL(GNU Lesser General Public License version 3)
-// Copyright (C) 2017 juice.oopscraft.net
+// Copyright (C) 2017 duice.oopscraft.net
 // -------------------------
-// juice
-// juice.initialize
+// duice
+// duice.initialize
 // -------------------------
-// juice.data
-// juice.data.__
-// juice.data.Map
-// juice.data.List
-// juice.data.Tree
+// duice.data
+// duice.data.__
+// duice.data.Map
+// duice.data.List
+// duice.data.Tree
 // -------------------------
-// juice.ui
-// juice.ui.__
-// juice.ui.Label
-// juice.ui.Text
-// juice.ui.TextField
-// juice.ui.ComboBox
-// juice.ui.CheckBox
-// juice.ui.Radio
-// juice.ui.TextArea
-// juice.ui.HtmlEditor
-// juice.ui.CronExpression
-// juice.ui.Image
-// juice.ui.ListView
-// juice.ui.TreeView
-// juice.ui.Grid
-// juice.ui.Workflow
-// juice.ui.Pagination
-// juice.ui.Dialog
-// juice.ui.Alert
-// juice.ui.Confirm
-// juice.ui.Prompt
+// duice.ui
+// duice.ui.__
+// duice.ui.Label
+// duice.ui.Text
+// duice.ui.TextField
+// duice.ui.ComboBox
+// duice.ui.CheckBox
+// duice.ui.Radio
+// duice.ui.TextArea
+// duice.ui.HtmlEditor
+// duice.ui.CronExpression
+// duice.ui.Image
+// duice.ui.ListView
+// duice.ui.TreeView
+// duice.ui.Grid
+// duice.ui.Workflow
+// duice.ui.Pagination
+// duice.ui.Dialog
+// duice.ui.Alert
+// duice.ui.Confirm
+// duice.ui.Prompt
 // -------------------------
-// juice.util.StringUtils
-// juice.util.FormatUtils
-// juice.util.RandomUtils
-// juice.util.WebSocketClient
+// duice.util.StringUtils
+// duice.util.FormatUtils
+// duice.util.RandomUtils
+// duice.util.WebSocketClient
 // =============================================================================
 "use strict";
 if(!console.debug){
@@ -48,18 +48,18 @@ if(!console.debug){
 }
 
 /**
- * juice component package package.
+ * duice component package package.
  * @namespace
  */
-var juice = {};
+var duice = {};
 
 /**
- * initialize juice component
+ * initialize duice component
  * @method
  * @param {HTMLElement} - container
  * @param {Object} - context
  */
-juice.initialize = function(container, $context) {
+duice.initialize = function(container, $context) {
 	
 	// getObject
 	function getObject($context, name) {
@@ -76,18 +76,18 @@ juice.initialize = function(container, $context) {
 	};
 	
 	// creates ListView 
-	var listViewElements = container.querySelectorAll('ul[data-juice="ListView"]');
+	var listViewElements = container.querySelectorAll('ul[data-duice="ListView"]');
 	for(var i = 0; i < listViewElements.length; i++ ) {
 		try {
 			var element = listViewElements[i];
-			var listView = new juice.ui.ListView(element);
-			var bind = element.dataset.juiceBind;
+			var listView = new duice.ui.ListView(element);
+			var bind = element.dataset.duiceBind;
 			var list = getObject($context,bind);
 			listView.bind(list);
-			listView.setItem(element.dataset.juiceItem);
+			listView.setItem(element.dataset.duiceItem);
 			listView.update();
-			var id = juice.util.RandomUtils.generateUUID();
-			element.dataset.juice += id;
+			var id = duice.util.RandomUtils.generateUUID();
+			element.dataset.duice += id;
 		}catch(e){
 			console.error(e,listViewElements[i]);
 			throw e;
@@ -95,19 +95,19 @@ juice.initialize = function(container, $context) {
 	}
 
 	// creates TreeView 
-	var treeViewElements = container.querySelectorAll('ul[data-juice="TreeView"]');
+	var treeViewElements = container.querySelectorAll('ul[data-duice="TreeView"]');
 	for(var i = 0; i < treeViewElements.length; i++ ) {
 		try {
 			var element = treeViewElements[i];
-			var treeView = new juice.ui.TreeView(element);
-			var bind = element.dataset.juiceBind;
+			var treeView = new duice.ui.TreeView(element);
+			var bind = element.dataset.duiceBind;
 			var list = getObject($context,bind);
 			treeView.bind(list);
-			treeView.setItem(element.dataset.juiceItem);
-			element.dataset.juiceEditable && treeView.setEditable(eval(element.dataset.juiceEditable));
+			treeView.setItem(element.dataset.duiceItem);
+			element.dataset.duiceEditable && treeView.setEditable(eval(element.dataset.duiceEditable));
 			treeView.update();
-			var id = juice.util.RandomUtils.generateUUID();
-			element.dataset.juice += id;
+			var id = duice.util.RandomUtils.generateUUID();
+			element.dataset.duice += id;
 		}catch(e){
 			console.error(e,treeViewElements[i]);
 			throw e;
@@ -115,20 +115,20 @@ juice.initialize = function(container, $context) {
 	}
 	
 	// creates Grid
-	var gridElements = container.querySelectorAll('table[data-juice="Grid"]');
+	var gridElements = container.querySelectorAll('table[data-duice="Grid"]');
 	for(var i = 0; i < gridElements.length; i++ ) {
 		try {
 			var element = gridElements[i];
-			var grid = new juice.ui.Grid(element);
-			var bind = element.dataset.juiceBind;
+			var grid = new duice.ui.Grid(element);
+			var bind = element.dataset.duiceBind;
 			var list = getObject($context,bind);
 			grid.bind(list);
-			grid.setItem(element.dataset.juiceItem);
-			element.dataset.juiceEditable && grid.setEditable(eval(element.dataset.juiceEditable));
-			element.dataset.juiceFilter && grid.setFilter(eval(element.dataset.juiceFilter));
+			grid.setItem(element.dataset.duiceItem);
+			element.dataset.duiceEditable && grid.setEditable(eval(element.dataset.duiceEditable));
+			element.dataset.duiceFilter && grid.setFilter(eval(element.dataset.duiceFilter));
 			grid.update();
-			var id = juice.util.RandomUtils.generateUUID();
-			element.dataset.juice += id;
+			var id = duice.util.RandomUtils.generateUUID();
+			element.dataset.duice += id;
 		}catch(e){
 			console.error(e,gridElements[i]);
 			throw e;
@@ -136,24 +136,24 @@ juice.initialize = function(container, $context) {
 	}
 	
 	// creates Workflow
-	var workflowElements = container.querySelectorAll('ul[data-juice="Workflow"]');
+	var workflowElements = container.querySelectorAll('ul[data-duice="Workflow"]');
 	for(var i = 0; i < workflowElements.length; i++ ) {
 		try {
 			var element = workflowElements[i];
-			var workflow = new juice.ui.Workflow(element);
-			var bind = element.dataset.juiceBind.split(',');
+			var workflow = new duice.ui.Workflow(element);
+			var bind = element.dataset.duiceBind.split(',');
 			var nodeList = getObject($context,bind[0]);
 			var linkList = getObject($context,bind[1]);
 			workflow.bind(nodeList, linkList);
-			workflow.setNodeId(element.dataset.juiceNodeId);
-			workflow.setNodeX(element.dataset.juiceNodeX);
-			workflow.setNodeY(element.dataset.juiceNodeY);
-			workflow.setLinkFrom(element.dataset.juiceLinkFrom);
-			workflow.setLinkTo(element.dataset.juiceLinkTo);
-			element.dataset.juiceLinkText && workflow.setLinkText(element.dataset.juiceLinkText);
+			workflow.setNodeId(element.dataset.duiceNodeId);
+			workflow.setNodeX(element.dataset.duiceNodeX);
+			workflow.setNodeY(element.dataset.duiceNodeY);
+			workflow.setLinkFrom(element.dataset.duiceLinkFrom);
+			workflow.setLinkTo(element.dataset.duiceLinkTo);
+			element.dataset.duiceLinkText && workflow.setLinkText(element.dataset.duiceLinkText);
 			workflow.update();
-			var id = juice.util.RandomUtils.generateUUID();
-			element.dataset.juice = +id;
+			var id = duice.util.RandomUtils.generateUUID();
+			element.dataset.duice = +id;
 		}catch(e){
 			console.error(e,workflowElements[i]);
 			throw e;
@@ -161,19 +161,19 @@ juice.initialize = function(container, $context) {
 	}
 
 	// creates Pagination
-	var paginationElements = container.querySelectorAll('ul[data-juice="Pagination"]');
+	var paginationElements = container.querySelectorAll('ul[data-duice="Pagination"]');
 	for(var i = 0; i < paginationElements.length; i++ ) {
 		try {
 			var element = paginationElements[i];
-			var pagination = new juice.ui.Pagination(element);
-			pagination.bind(getObject($context,element.dataset.juiceBind));
-			pagination.setRows(element.dataset.juiceRows);
-			pagination.setPage(element.dataset.juicePage);
-			pagination.setTotalCount(element.dataset.juiceTotalCount);
-			pagination.setPageSize(element.dataset.juicePageSize);
+			var pagination = new duice.ui.Pagination(element);
+			pagination.bind(getObject($context,element.dataset.duiceBind));
+			pagination.setRows(element.dataset.duiceRows);
+			pagination.setPage(element.dataset.duicePage);
+			pagination.setTotalCount(element.dataset.duiceTotalCount);
+			pagination.setPageSize(element.dataset.duicePageSize);
 			pagination.update();
-			var id = juice.util.RandomUtils.generateUUID();
-			element.dataset.juice += id;
+			var id = duice.util.RandomUtils.generateUUID();
+			element.dataset.duice += id;
 		}catch(e){
 			console.error(e,paginationElements[i]);
 			throw e;
@@ -182,49 +182,49 @@ juice.initialize = function(container, $context) {
 		
 	// creates unit elements
 	var elementTags = [
-		 '[data-juice="Label"]'
-		,'[data-juice="Text"]'
-		,'[data-juice="TextField"]'
-		,'[data-juice="ComboBox"]'
-		,'[data-juice="CheckBox"]'
-		,'[data-juice="Radio"]'
-		,'[data-juice="TextArea"]'
-		,'[data-juice="HtmlEditor"]'
-		,'[data-juice="CronExpression"]'
-		,'[data-juice="Image"]'
+		 '[data-duice="Label"]'
+		,'[data-duice="Text"]'
+		,'[data-duice="TextField"]'
+		,'[data-duice="ComboBox"]'
+		,'[data-duice="CheckBox"]'
+		,'[data-duice="Radio"]'
+		,'[data-duice="TextArea"]'
+		,'[data-duice="HtmlEditor"]'
+		,'[data-duice="CronExpression"]'
+		,'[data-duice="Image"]'
 	];
 	var elements = container.querySelectorAll(elementTags.join(','));
 	for(var i = 0; i < elements.length; i ++ ) {
 		try {
 			var element = elements[i];
-			var type = element.dataset.juice;
-			var bind = element.dataset.juiceBind.split('.');
+			var type = element.dataset.duice;
+			var bind = element.dataset.duiceBind.split('.');
 			var name = bind.pop();
 			var map = getObject($context,bind.join('.'));
-			var id = juice.util.RandomUtils.generateUUID();
+			var id = duice.util.RandomUtils.generateUUID();
 			switch(type) {
 				case 'Label':
-					var label = new juice.ui.Label(element);
-					var format = element.dataset.juiceFormat;
+					var label = new duice.ui.Label(element);
+					var format = element.dataset.duiceFormat;
 					format && label.setFormat(format);
 					label.bind(map,name);
 					label.update();
 				break;
 				case 'Text':
-					var contents = new juice.ui.Text(element);
+					var contents = new duice.ui.Text(element);
 					contents.bind(map,name);
 					contents.update();
 				break;
 				case 'TextField':
-					var textField = new juice.ui.TextField(element);
+					var textField = new duice.ui.TextField(element);
 					textField.bind(map,name);
 					textField.update();
 				break;
 				case 'ComboBox':
-					var comboBox = new juice.ui.ComboBox(element);
-					var options = element.dataset.juiceOptions;
-					var optionValue = element.dataset.juiceOptionValue;
-					var optionText = element.dataset.juiceOptionText;
+					var comboBox = new duice.ui.ComboBox(element);
+					var options = element.dataset.duiceOptions;
+					var optionValue = element.dataset.duiceOptionValue;
+					var optionText = element.dataset.duiceOptionText;
 					comboBox.bind(map, name);
 					comboBox.setOptions(getObject($context,options));
 					optionValue && comboBox.setOptionValue(optionValue);
@@ -232,35 +232,35 @@ juice.initialize = function(container, $context) {
 					comboBox.update();
 				break;
 				case 'CheckBox':
-					var checkBox = new juice.ui.CheckBox(element);
+					var checkBox = new duice.ui.CheckBox(element);
 					checkBox.bind(map, name);
 					checkBox.update();
 				break;
 				case 'Radio':
-					var radio = new juice.ui.Radio(element);
+					var radio = new duice.ui.Radio(element);
 					radio.bind(map, name);
 					radio.update();
 				break;
 				case 'TextArea':
-					var textArea = new juice.ui.TextArea(element);
+					var textArea = new duice.ui.TextArea(element);
 					textArea.bind(map, name);
 					textArea.update();
 				break;
 				case 'HtmlEditor':
-					var htmlEditor = new juice.ui.HtmlEditor(element);
+					var htmlEditor = new duice.ui.HtmlEditor(element);
 					htmlEditor.bind(map, name);
 					htmlEditor.update();
 				break;
 				case 'CronExpression':
-					var cronExpression = new juice.ui.CronExpression(element);
+					var cronExpression = new duice.ui.CronExpression(element);
 					cronExpression.bind(map, name);
 					cronExpression.update();				
 				break;
 				case 'Image':
-					var thumbnail = new juice.ui.Image(element);
-					var width = element.dataset.juiceWidth;
-					var height = element.dataset.juiceHeight;
-					var readonly = element.dataset.juiceReadonly;
+					var thumbnail = new duice.ui.Image(element);
+					var width = element.dataset.duiceWidth;
+					var height = element.dataset.duiceHeight;
+					var readonly = element.dataset.duiceReadonly;
 					thumbnail.bind(map, name);
 					thumbnail.setWidth(width);
 					thumbnail.setHeight(height);
@@ -268,7 +268,7 @@ juice.initialize = function(container, $context) {
 					thumbnail.update();
 				break;
 			}
-			element.dataset.juice += id;
+			element.dataset.duice += id;
 		}catch(e){
 			console.error(e, elements[i]);
 			throw e;
@@ -280,14 +280,14 @@ juice.initialize = function(container, $context) {
  * data structure package
  * @namespace
  */
-juice.data = {};
+duice.data = {};
 
 /**
- * Super prototype of juice.data
+ * Super prototype of duice.data
  * @class
  * @constructor
  */
-juice.data.__ = function(){
+duice.data.__ = function(){
 	this.observers = new Array();
 	this.fireEvent = true;
 }
@@ -297,7 +297,7 @@ juice.data.__ = function(){
  * @param {Object} observer for adding
  * @return {void}
  */
-juice.data.__.prototype.addObserver = function(observer){
+duice.data.__.prototype.addObserver = function(observer){
 	for(var i = 0, size=this.observers.length; i < size; i++){
 		if(this.observers[i] === observer){
 			return;
@@ -311,7 +311,7 @@ juice.data.__.prototype.addObserver = function(observer){
  * @param {Object} caller observer
  * @return {void}
  */
-juice.data.__.prototype.notifyObservers = function(observer) {
+duice.data.__.prototype.notifyObservers = function(observer) {
 	if(this.fireEvent = false){
 		return;
 	}
@@ -327,7 +327,7 @@ juice.data.__.prototype.notifyObservers = function(observer) {
  * @method
  * @return {void}
  */
-juice.data.__.prototype.update = function() {
+duice.data.__.prototype.update = function() {
 	if(this.fireEvent == true){
 		this.notifyObservers(this);
 	}
@@ -338,7 +338,7 @@ juice.data.__.prototype.update = function() {
  * @param {boolean} fire event or not
  * @return {void}
  */
-juice.data.__.prototype.setFireEvent = function(fireEvent) {
+duice.data.__.prototype.setFireEvent = function(fireEvent) {
 	this.fireEvent = fireEvent;
 	if(fireEvent == true){
 		this.notifyObservers(this);
@@ -346,7 +346,7 @@ juice.data.__.prototype.setFireEvent = function(fireEvent) {
 }
 
 // Prevents prototype changed.
-Object.freeze(juice.data.__.prototype);
+Object.freeze(duice.data.__.prototype);
 
 /**
  * Map data structure
@@ -357,15 +357,15 @@ Object.freeze(juice.data.__.prototype);
  * @param {Object} JSON data
  * @example
  * // creates map object 
- * var user = new juice.data.Map({
+ * var user = new duice.data.Map({
  * 	name:'James'
  * });
  * 
  * // prints name
  * alert(user);
  */
-juice.data.Map = function(json) {
-	juice.data.__.call(this);
+duice.data.Map = function(json) {
+	duice.data.__.call(this);
 	this.data = {};
 	this.listener = {};
 	this.parentNode = null;
@@ -376,7 +376,7 @@ juice.data.Map = function(json) {
 	this.enable = true;
 	this.readonly = {};
 }
-juice.data.Map.prototype = Object.create(juice.data.__.prototype);
+duice.data.Map.prototype = Object.create(duice.data.__.prototype);
 
 /**
  * Creates data from JSON object
@@ -384,7 +384,7 @@ juice.data.Map.prototype = Object.create(juice.data.__.prototype);
  * @param {Object} JSON data
  * @example
  * // creates empty map.
- * var user = new juice.data.Map();
+ * var user = new duice.data.Map();
  * 
  * // sets data to map 
  * user.fromJson({
@@ -394,7 +394,7 @@ juice.data.Map.prototype = Object.create(juice.data.__.prototype);
  * // print user name
  * alert(user); 
  */
-juice.data.Map.prototype.fromJson = function(json) {
+duice.data.Map.prototype.fromJson = function(json) {
 	this.data = {};
 	for(var name in json){
 		var value = json[name];
@@ -408,14 +408,14 @@ juice.data.Map.prototype.fromJson = function(json) {
  * @return {Object} JSON data
  * @example
  * // creates map object
- * var user = new juice.data.Map({
+ * var user = new duice.data.Map({
  * 	name:'james'
  * });
  * 
  * // prints user as JSON object 
  * alert(user.toJson());
  */
-juice.data.Map.prototype.toJson = function() {
+duice.data.Map.prototype.toJson = function() {
 	var json = {};
 	for(var name in this.data){
 		var value = this.data[name];
@@ -430,7 +430,7 @@ juice.data.Map.prototype.toJson = function() {
  * @param {String} value - map value for setting
  * @example
  * // creates map
- * var user = new juice.data.Map({name:'james'});
+ * var user = new duice.data.Map({name:'james'});
  * 
  * // sets new name 
  * user.set('name', 'scott');
@@ -438,7 +438,7 @@ juice.data.Map.prototype.toJson = function() {
  * // prints name
  * alert(user.toJson());
  */
-juice.data.Map.prototype.set = function(name,value) {
+duice.data.Map.prototype.set = function(name,value) {
 	if(this.listener.beforeChange){
 		if(this.listener.beforeChange.call(this,{name:name, value:value}) == false){
 			this.notifyObservers();
@@ -458,7 +458,7 @@ juice.data.Map.prototype.set = function(name,value) {
  * @param {String} name - key name
  * @return {String} value - map value
  */ 
-juice.data.Map.prototype.get = function(name){
+duice.data.Map.prototype.get = function(name){
 	return this.data[name];
 }
 
@@ -467,7 +467,7 @@ juice.data.Map.prototype.get = function(name){
  * @method
  * @return {Array} names of columns as string array.
  */
-juice.data.Map.prototype.getNames = function() {
+duice.data.Map.prototype.getNames = function() {
 	var names = new Array();
 	for(var name in this.data){
 		names.push(name);
@@ -478,18 +478,18 @@ juice.data.Map.prototype.getNames = function() {
 /**
  * Gets parent node for tree map
  * @method
- * @return {juice.data.Map} parent node.
+ * @return {duice.data.Map} parent node.
  */
-juice.data.Map.prototype.getParentNode = function(){
+duice.data.Map.prototype.getParentNode = function(){
 	return this.parentNode;
 }
 
 /**
  * Gets child node list
  * @method
- * @return {Array(juice.data.Map)} child node array.
+ * @return {Array(duice.data.Map)} child node array.
  */
-juice.data.Map.prototype.getChildNodes = function(){
+duice.data.Map.prototype.getChildNodes = function(){
 	return this.childNodes;
 }
 
@@ -497,18 +497,18 @@ juice.data.Map.prototype.getChildNodes = function(){
  * Returns specified child node
  * @method
  * @param {number} index - index number of child node array.
- * @return {juice.data.Map} specified indexed node
+ * @return {duice.data.Map} specified indexed node
  */
-juice.data.Map.prototype.getChildNode = function(index){
+duice.data.Map.prototype.getChildNode = function(index){
 	return this.childNodes[index];
 }
 
 /**
  * Adds node into child nodes
  * @method
- * @param {juice.data.Map} map - juice.data.Map Object to insert into child nodes.
+ * @param {duice.data.Map} map - duice.data.Map Object to insert into child nodes.
  */
-juice.data.Map.prototype.addChildNode = function(map){
+duice.data.Map.prototype.addChildNode = function(map){
 	map.parentNode = this;
 	this.childNodes.push(map);
 	map.addObserver(this);
@@ -520,7 +520,7 @@ juice.data.Map.prototype.addChildNode = function(map){
  * @param {number} index - inserting index position in child node array.
  * @param {juicd.data.Map} map - child node object to insert.
  */
-juice.data.Map.prototype.insertChildNode = function(index,map){
+duice.data.Map.prototype.insertChildNode = function(index,map){
 	map.parentNode = this;
 	this.childNodes.splice(index,0,map);
 	map.addObserver(this);
@@ -531,7 +531,7 @@ juice.data.Map.prototype.insertChildNode = function(index,map){
  * @method
  * @param {number} index - child array index to remove.
  */
-juice.data.Map.prototype.removeChildNode = function(index){
+duice.data.Map.prototype.removeChildNode = function(index){
 	this.childNodes.splice(index,1);
 }
 
@@ -541,7 +541,7 @@ juice.data.Map.prototype.removeChildNode = function(index){
  * @method
  * @param {boolean} enable or not
  */
-juice.data.Map.prototype.setEnable = function(enable){
+duice.data.Map.prototype.setEnable = function(enable){
 	this.enable = enable;
 	this.notifyObservers();
 }
@@ -551,7 +551,7 @@ juice.data.Map.prototype.setEnable = function(enable){
  * @method
  * @return {boolean} change of data is enable or not
  */
-juice.data.Map.prototype.isEnable = function() {
+duice.data.Map.prototype.isEnable = function() {
 	return this.enable;
 }
 
@@ -563,7 +563,7 @@ juice.data.Map.prototype.isEnable = function() {
  * @param {string} name - Name of the column to disable.
  * @param {string} readonly - Whether or not to use
  */
-juice.data.Map.prototype.setReadonly = function(name, readonly){
+duice.data.Map.prototype.setReadonly = function(name, readonly){
 	this.readonly[name] = readonly;
 	this.notifyObservers();
 }
@@ -574,7 +574,7 @@ juice.data.Map.prototype.setReadonly = function(name, readonly){
  * @param {string} name - column name to check.
  * @Return {boolean} whether the column is read-only 
  */
-juice.data.Map.prototype.isReadonly = function(name){
+duice.data.Map.prototype.isReadonly = function(name){
 	return this.readonly[name] || false;
 }
 
@@ -583,7 +583,7 @@ juice.data.Map.prototype.isReadonly = function(name){
  * @method
  * @param {function} listener - Event listener function before data change
  */
-juice.data.Map.prototype.beforeChange = function(listener){
+duice.data.Map.prototype.beforeChange = function(listener){
 	this.listener.beforeChange = listener;
 }
 
@@ -592,12 +592,12 @@ juice.data.Map.prototype.beforeChange = function(listener){
  * @method
  * @param {function} listener - Event listener function after data change
  */
-juice.data.Map.prototype.afterChange = function(listener){
+duice.data.Map.prototype.afterChange = function(listener){
 	this.listener.afterChange = listener;
 }
 
 //Prevents prototype changed.
-Object.freeze(juice.data.Map.prototype);
+Object.freeze(duice.data.Map.prototype);
 
 /**
  * List data structure
@@ -607,8 +607,8 @@ Object.freeze(juice.data.Map.prototype);
  * @constructor
  * @param {Object[]} jsonArray - JSON Array data
  */
-juice.data.List = function(jsonArray) {
-	juice.data.__.call(this);
+duice.data.List = function(jsonArray) {
+	duice.data.__.call(this);
 	this.mapList = new Array();
 	this.index = -1;
 	if(jsonArray) {
@@ -617,17 +617,17 @@ juice.data.List = function(jsonArray) {
 	this.enable = true;
 	this.readonly = {};
 }
-juice.data.List.prototype = Object.create(juice.data.__.prototype);
+duice.data.List.prototype = Object.create(duice.data.__.prototype);
 
 /**
  * Sets data from JSON Array 
  * @method
  * @param {Object[]} jsonArray - JSON Array data
  */
-juice.data.List.prototype.fromJson = function(jsonArray){
+duice.data.List.prototype.fromJson = function(jsonArray){
 	this.mapList = new Array();
 	for(var i = 0; i < jsonArray.length; i ++ ) {
-		var map = new juice.data.Map();
+		var map = new duice.data.Map();
 		map.fromJson(jsonArray[i]);
 		map.enable = this.enable;
 		map.readonly = this.readonly;
@@ -643,7 +643,7 @@ juice.data.List.prototype.fromJson = function(jsonArray){
  * @method
  * @return {Object[]} JSON Array
  */
-juice.data.List.prototype.toJson = function() {
+duice.data.List.prototype.toJson = function() {
 	var json = new Array();
 	for(var i = 0; i < this.mapList.length; i ++){
 		json.push(this.mapList[i].toJson());
@@ -656,7 +656,7 @@ juice.data.List.prototype.toJson = function() {
  * @method
  * @param {number[]} index - current positioned index
  */
-juice.data.List.prototype.setIndex = function(index) {
+duice.data.List.prototype.setIndex = function(index) {
 	this.index = index;
 	this.notifyObservers();
 }
@@ -666,24 +666,24 @@ juice.data.List.prototype.setIndex = function(index) {
  * @method
  * @return {number[]} current positioned index.
  */
-juice.data.List.prototype.getIndex = function() {
+duice.data.List.prototype.getIndex = function() {
 	return this.index;
 }
 // clear current select row index 
-juice.data.List.prototype.clearIndex = function() {
+duice.data.List.prototype.clearIndex = function() {
 	this.index = -1;
 	this.notifyObservers();
 }
 // returns current row count
-juice.data.List.prototype.getRowCount = function() {
+duice.data.List.prototype.getRowCount = function() {
 	return this.mapList.length;
 }
 // returns specified row
-juice.data.List.prototype.getRow = function(index) {
+duice.data.List.prototype.getRow = function(index) {
 	return this.mapList[index];
 }
 // adds new row map into list
-juice.data.List.prototype.addRow = function(map){
+duice.data.List.prototype.addRow = function(map){
 	map.addObserver(this);
 	this.mapList.push(map);
 	this.index = this.getRowCount();
@@ -691,10 +691,10 @@ juice.data.List.prototype.addRow = function(map){
 }
 /**
  * Adds all rows
- * @Param {juice.data.List}
+ * @Param {duice.data.List}
  * @Return {void}
  */
-juice.data.List.prototype.addRows = function(list){
+duice.data.List.prototype.addRows = function(list){
 	for(var i = 0, size = list.getRowCount(); i < size; i ++){
 		var map = list.getRow(i);
 		this.addRow(map);
@@ -702,28 +702,28 @@ juice.data.List.prototype.addRows = function(list){
 	this.notifyObservers();
 }
 // moves from row into to row
-juice.data.List.prototype.moveRow = function(from, to) {
+duice.data.List.prototype.moveRow = function(from, to) {
 	this.index = from;
 	this.mapList.splice(to, 0, this.mapList.splice(from, 1)[0]);
 	this.index = to;
 	this.notifyObservers();
 }
 // insert row map into specified position 
-juice.data.List.prototype.insertRow = function(index, map){
+duice.data.List.prototype.insertRow = function(index, map){
 	map.addObserver(this);
 	this.mapList.splice(index, 0, map);
 	this.index = index;
 	this.notifyObservers();
 }
 // removes specified row map
-juice.data.List.prototype.removeRow = function(index){
+duice.data.List.prototype.removeRow = function(index){
 	this.mapList.splice(index, 1);
 	this.notifyObservers();
 }
 /**
  * Loop forEach function
  */
-juice.data.List.prototype.forEach = function(handler) {
+duice.data.List.prototype.forEach = function(handler) {
 	this.setFireEvent(false);
 	for(var i = 0, size = this.mapList.length; i < size; i ++){
 		handler.call(this, this.mapList[i]);
@@ -735,7 +735,7 @@ juice.data.List.prototype.forEach = function(handler) {
  * @Param {function}	handler - searching handler function
  * @Return {Number}	-  first index of searching
  */
-juice.data.List.prototype.indexOf = function(handler){
+duice.data.List.prototype.indexOf = function(handler){
 	for(var i = 0, size = this.mapList.length; i < size; i ++){
 		if(handler.call(this, this.mapList[i]) == true){
 			return i;
@@ -748,7 +748,7 @@ juice.data.List.prototype.indexOf = function(handler){
  * @Param {function} handler - handler function for searching.
  * @return {Array} - founded indexes array.
  */
-juice.data.List.prototype.findIndexes = function(handler){
+duice.data.List.prototype.findIndexes = function(handler){
 	var indexes = [];
 	for(var i = 0, size = this.mapList.length; i < size; i ++){
 		if(handler.call(this, this.mapList[i]) == true){
@@ -762,25 +762,25 @@ juice.data.List.prototype.findIndexes = function(handler){
  * @Param {function} handler
  * @Return {Boolean}
  */
-juice.data.List.prototype.contains = function(handler){
+duice.data.List.prototype.contains = function(handler){
 	var index = this.indexOf(handler);
 	return (index > -1);
 }
 /**
  * Finds row with handler
  * @Param {function} handler
- * @Return {juice.data.Map}
+ * @Return {duice.data.Map}
  */
-juice.data.List.prototype.findRow = function(handler) {
+duice.data.List.prototype.findRow = function(handler) {
 	var index = this.indexOf(handler);
 	return this.getRow(index);
 }
 /**
  * Finds rows with handler
  * @Param {function} handler
- * @Return {Array<juice.data.Map>}
+ * @Return {Array<duice.data.Map>}
  */
-juice.data.List.prototype.findRows = function(handler) {
+duice.data.List.prototype.findRows = function(handler) {
 	var indexes = this.findIndexes(handler);
 	var rows = new Array();
 	for(var i = 0, size = indexes.length; i < size; i ++){
@@ -789,46 +789,46 @@ juice.data.List.prototype.findRows = function(handler) {
 	}
 	return rows;
 }
-juice.data.List.prototype.setEnable = function(enable){
+duice.data.List.prototype.setEnable = function(enable){
 	this.enable = enable;
 	this.mapList.forEach(function(element){
 		element.setEnable(enable);
 	})
 	this.notifyObservers();
 }
-juice.data.List.prototype.isEnable = function(){
+duice.data.List.prototype.isEnable = function(){
 	return this.enable;
 }
 /* beforeChange */
-juice.data.List.prototype.beforeChange = function(beforeChangeListener){
+duice.data.List.prototype.beforeChange = function(beforeChangeListener){
 	// TODO
 }
 /* afterChange */
-juice.data.List.prototype.afterChange = function(afterChangeListener){
+duice.data.List.prototype.afterChange = function(afterChangeListener){
 	// TODO
 }
 
 //-----------------------------------------------------------------------------
-// juice.data.Tree prototype
+// duice.data.Tree prototype
 //-----------------------------------------------------------------------------
-juice.data.Tree = function(json,linkNodeName) {
-	juice.data.__.call(this);
+duice.data.Tree = function(json,linkNodeName) {
+	duice.data.__.call(this);
 	this.index = [];
-	this.rootNode = new juice.data.Map();
+	this.rootNode = new duice.data.Map();
 	if(json) {
 		this.fromJson(json,linkNodeName);
 	}
 	this.enable = true;
 	this.readonly = {};
 }
-juice.data.Tree.prototype = Object.create(juice.data.__.prototype);
+duice.data.Tree.prototype = Object.create(duice.data.__.prototype);
 // load data from JSON Array  
-juice.data.Tree.prototype.fromJson = function(json,linkNodeName){
+duice.data.Tree.prototype.fromJson = function(json,linkNodeName){
 	var $this = this;
-	this.rootNode = new juice.data.Map();
+	this.rootNode = new duice.data.Map();
 	this.rootNode.addObserver(this);
 	for(var i = 0; i < json.length; i ++){
-		var node = new juice.data.Map();
+		var node = new duice.data.Map();
 		node.fromJson(json[i]);
 		node.enable = this.enable;
 		node.readonly = this.readonly;
@@ -839,7 +839,7 @@ juice.data.Tree.prototype.fromJson = function(json,linkNodeName){
 		var childNodes = node.get(linkNodeName);
 		if(childNodes){
 			for(var i = 0; i < childNodes.length; i ++){
-				var childNode = new juice.data.Map();
+				var childNode = new duice.data.Map();
 				childNode.fromJson(childNodes[i]);
 				childNode.enable = node.enable;
 				childNode.readonly = node.readonly;
@@ -852,7 +852,7 @@ juice.data.Tree.prototype.fromJson = function(json,linkNodeName){
 	this.notifyObservers();
 }
 // convert into JSON Array 
-juice.data.Tree.prototype.toJson = function(linkNodeName){
+duice.data.Tree.prototype.toJson = function(linkNodeName){
 	var json = new Array();
 	var childNodes = this.rootNode.getChildNodes();
 	for(var i = 0; i < childNodes.length; i ++){
@@ -876,25 +876,25 @@ juice.data.Tree.prototype.toJson = function(linkNodeName){
 	return json;
 }
 /* set index */
-juice.data.Tree.prototype.setIndex = function(index) {
+duice.data.Tree.prototype.setIndex = function(index) {
 	this.index = index;
 	this.notifyObservers();
 }
 /* get current select row index */
-juice.data.Tree.prototype.getIndex = function() {
+duice.data.Tree.prototype.getIndex = function() {
 	return this.index;
 }
 /* clear current select row index */
-juice.data.Tree.prototype.clearIndex = function() {
+duice.data.Tree.prototype.clearIndex = function() {
 	this.index = [];
 	this.notifyObservers();
 }
 /* get rootNode */
-juice.data.Tree.prototype.getRootNode = function() {
+duice.data.Tree.prototype.getRootNode = function() {
 	return this.rootNode;
 }
 /* get tree node */
-juice.data.Tree.prototype.getNode = function(index){
+duice.data.Tree.prototype.getNode = function(index){
 	var node = this.rootNode;
 	for(var i = 0; i < index.length; i ++){
 		var childNodes = node.getChildNodes();
@@ -902,21 +902,21 @@ juice.data.Tree.prototype.getNode = function(index){
 	}
 	return node;
 }
-juice.data.Tree.prototype.removeNode = function(index){
+duice.data.Tree.prototype.removeNode = function(index){
 	var node = this.getNode(index);
 	var parentNode = node.getParentNode();
 	parentNode.removeChildNode(index[index.length-1]);
 	this.index = -1;
 	this.notifyObservers();
 }
-juice.data.Tree.prototype.insertNode = function(index, map){
+duice.data.Tree.prototype.insertNode = function(index, map){
 	var node = this.getNode(index);
 	var parentNode = node.getParentNode();
 	parentNode.insertChildNode(index[index.length-1], map);
 	this.index = index;
 	this.notifyObservers();
 }
-juice.data.Tree.prototype.moveNode = function(fromIndex, toIndex){
+duice.data.Tree.prototype.moveNode = function(fromIndex, toIndex){
 	var fromNode = this.getNode(fromIndex);
 	var toNode = this.getNode(toIndex);
 	
@@ -936,7 +936,7 @@ juice.data.Tree.prototype.moveNode = function(fromIndex, toIndex){
  * Loop forEach
  * @Param {function} handler
  */
-juice.data.Tree.prototype.forEach = function(handler) {
+duice.data.Tree.prototype.forEach = function(handler) {
 	this.setFireEvent(false);
 	findChild(this.rootNode);
 	var $this = this;
@@ -955,7 +955,7 @@ juice.data.Tree.prototype.forEach = function(handler) {
  * @Param {function} handler
  * @Return {Array} - result of finding as array containing index.
  */
-juice.data.Tree.prototype.findIndexes = function(handler){
+duice.data.Tree.prototype.findIndexes = function(handler){
 	var indexes = [];
 	var depth = -1;
 	var cursor = [];
@@ -983,7 +983,7 @@ juice.data.Tree.prototype.findIndexes = function(handler){
  * @Param {function} handler - function(node){...}
  * @Return {Array} - result of finding result
  */
-juice.data.Tree.prototype.indexOf = function(handler){
+duice.data.Tree.prototype.indexOf = function(handler){
 	var indexes = this.findIndexes(handler);
 	if(indexes.length > 0){
 		return indexes[0];
@@ -996,25 +996,25 @@ juice.data.Tree.prototype.indexOf = function(handler){
  * @Param {function} handler - function(node){...}
  * @Return {Boolean}
  */
-juice.data.Tree.prototype.contains = function(handler) {
+duice.data.Tree.prototype.contains = function(handler) {
 	var indexes = this.findIndexes(handler);
 	return (indexes.length > 0);
 }
 /**
  * Find node
  * @Param {function} handler - function(node){...}
- * @Return {juice.data.Node}
+ * @Return {duice.data.Node}
  */
-juice.data.Tree.prototype.findNode = function(handler) {
+duice.data.Tree.prototype.findNode = function(handler) {
 	var index = this.indexOf(handler);
 	return this.getNode(index);
 }
 /**
  * Finds nodes
  * @Param {function} handler - function(node){...}
- * @Return {Array<juice.data.Map>}
+ * @Return {Array<duice.data.Map>}
  */
-juice.data.Tree.prototype.findNodes = function(handler){
+duice.data.Tree.prototype.findNodes = function(handler){
 	var indexes = this.findIndexes(handler);
 	var nodes = new Array();
 	for(var i = 0, size = indexes.length; i < size; i ++){
@@ -1028,7 +1028,7 @@ juice.data.Tree.prototype.findNodes = function(handler){
  * @Param {boolean} enable - true or false
  * @Return void
  */
-juice.data.Tree.prototype.setEnable = function(enable){
+duice.data.Tree.prototype.setEnable = function(enable){
 	this.enable = enable;
 	this.forEach(function(node){
 		node.setEnable(enable);
@@ -1039,7 +1039,7 @@ juice.data.Tree.prototype.setEnable = function(enable){
  * Gets enable flag
  * @Return {boolean} enable or not
  */
-juice.data.Tree.prototype.isEnable = function(){
+duice.data.Tree.prototype.isEnable = function(){
 	return this.enable;
 }
 /**
@@ -1048,7 +1048,7 @@ juice.data.Tree.prototype.isEnable = function(){
  * @Param {boolean} read only - read only or not flag
  * @Return {void}
  */
-juice.data.Tree.prototype.setReadonly = function(name, readonly){
+duice.data.Tree.prototype.setReadonly = function(name, readonly){
 	this.readonly[name] = readonly;
 	this.forEach(function(node){
 		node.setReadonly(name, readonly);
@@ -1059,29 +1059,29 @@ juice.data.Tree.prototype.setReadonly = function(name, readonly){
  * @Param {string] name - column name to checks
  * @Return {boolean} read only or not
  */
-juice.data.Tree.prototype.isReadonly = function(name){
+duice.data.Tree.prototype.isReadonly = function(name){
 	return this.readonly[name] || false;
 }
-juice.data.Tree.prototype.beforeNodeChange = function(listener){
+duice.data.Tree.prototype.beforeNodeChange = function(listener){
 	// TODO
 }
-juice.data.Tree.prototype.afterNodeChange = function(listener){
+duice.data.Tree.prototype.afterNodeChange = function(listener){
 	// TODO
 }
-juice.data.Tree.prototype.beforeIndexChange = function(listener){
+duice.data.Tree.prototype.beforeIndexChange = function(listener){
 	// TODO
 }
-juice.data.Tree.prototype.afterIndexChange = function(listener){
+duice.data.Tree.prototype.afterIndexChange = function(listener){
 	// TODO
 }
 
 
 //-----------------------------------------------------------------------------
-// juice.ui package
+// duice.ui package
 //-----------------------------------------------------------------------------
-juice.ui = {};
-juice.ui.__ = function(){}
-juice.ui.__.prototype.executeExpression = function(element,$context) {
+duice.ui = {};
+duice.ui.__ = function(){}
+duice.ui.__.prototype.executeExpression = function(element,$context) {
 	var string = element.outerHTML;
 	string = string.replace(/\{\{(.*?)\}\}/mgi,function(match, command){
 		try {
@@ -1100,7 +1100,7 @@ juice.ui.__.prototype.executeExpression = function(element,$context) {
 	console.debug('executeExpression', template.content.firstChild);
 	return template.content.firstChild;
 }
-juice.ui.__.prototype.removeChildNodes = function(element){
+duice.ui.__.prototype.removeChildNodes = function(element){
 	// Remove element nodes and prevent memory leaks
     var node, nodes = element.childNodes, i = 0;
     while (node = nodes[i++]) {
@@ -1119,20 +1119,20 @@ juice.ui.__.prototype.removeChildNodes = function(element){
     	element.options.length = 0;
     }
 }
-juice.ui.__.prototype.createHtml = function(string){
+duice.ui.__.prototype.createHtml = function(string){
 	var template = document.createElement('template');
 	template.innerHTML = string;
 	return template.content;
 }
 // returns current window
-juice.ui.__.prototype.getWindow = function() {
+duice.ui.__.prototype.getWindow = function() {
 	if(window.frameElement){
 		return window.parent;
 	}else{
 		return window;
 	}
 }
-juice.ui.__.prototype.setPosition = function(element){
+duice.ui.__.prototype.setPosition = function(element){
 	var window = this.getWindow();
 	var computedStyle = window.getComputedStyle(element);
 	var computedWidth = computedStyle.getPropertyValue('width').replace(/px/gi, '');
@@ -1142,13 +1142,13 @@ juice.ui.__.prototype.setPosition = function(element){
 	element.style.left = Math.max(10,window.innerWidth/2 - computedWidth/2) + 'px';
 	element.style.top = Math.max(0,window.innerHeight/2 - computedHeight/2) + 'px';
 }
-juice.ui.__.prototype.parseFormat = function(format){
+duice.ui.__.prototype.parseFormat = function(format){
 	var splitedFormat = format.split(':');
 	var formatType = splitedFormat.shift();
 	var formatBody = splitedFormat.join(':');
 	return { type: formatType, body: formatBody };
 }
-juice.ui.__.prototype.delay = function(callback){
+duice.ui.__.prototype.delay = function(callback){
 	var interval = setInterval(function() {
 		try {
 			callback.call();
@@ -1159,15 +1159,15 @@ juice.ui.__.prototype.delay = function(callback){
 		}
 	},400);	
 }
-juice.ui.__.prototype.fadeIn = function(element){
-	element.classList.remove('juice-ui-fadeOut');
-	element.classList.add('juice-ui-fadeIn');
+duice.ui.__.prototype.fadeIn = function(element){
+	element.classList.remove('duice-ui-fadeOut');
+	element.classList.add('duice-ui-fadeIn');
 }
-juice.ui.__.prototype.fadeOut = function(element) {
-	element.classList.remove('juice-ui-fadeIn');
-	element.classList.add('juice-ui-fadeOut');
+duice.ui.__.prototype.fadeOut = function(element) {
+	element.classList.remove('duice-ui-fadeIn');
+	element.classList.add('duice-ui-fadeOut');
 }
-juice.ui.__.prototype.getMaxZIndex = function(){
+duice.ui.__.prototype.getMaxZIndex = function(){
 	var zIndex,
 	z = 0,
 	all = document.getElementsByTagName('*');
@@ -1179,11 +1179,11 @@ juice.ui.__.prototype.getMaxZIndex = function(){
 	return z;
 }
 // blocking specified element 
-juice.ui.__.prototype.block = function(element){
+duice.ui.__.prototype.block = function(element){
 	var $this = this;
 	
 	var div = document.createElement('div');
-	div.classList.add('juice-ui-block');
+	div.classList.add('duice-ui-block');
 	
 	// defines maxZIndex
 	var zIndex = this.getMaxZIndex() + 1;
@@ -1230,12 +1230,12 @@ juice.ui.__.prototype.block = function(element){
 	}
 }
 // progress
-juice.ui.__.prototype.load = function(element){
+duice.ui.__.prototype.load = function(element){
 	var $this = this;
 	
 	// creates div
 	var div = document.createElement('div');
-	div.classList.add('juice-ui-load');
+	div.classList.add('duice-ui-load');
 	div.style.position = 'fixed';
 	div.style.opacity = 0;
 	div.style.zIndex = this.getMaxZIndex() + 1;
@@ -1266,11 +1266,11 @@ juice.ui.__.prototype.load = function(element){
 }
 
 // Freezes prototype of super class.
-Object.freeze(juice.ui.__.prototype);
+Object.freeze(duice.ui.__.prototype);
 
 
 /**
- * juice.ui.Label prototype
+ * duice.ui.Label prototype
  * @class
  * @classdesc
  * Prints the value of the binded data map object on the screen.
@@ -1278,30 +1278,30 @@ Object.freeze(juice.ui.__.prototype);
  * 
  * ## HTML5 Tag and Attribute
  * 
- * | HTML Tag   	| data-juice* Attribute 								| Description  							|
+ * | HTML Tag   	| data-duice* Attribute 								| Description  							|
  * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
- * | Label  	   	| data-juice="Label" 									| component Type						|
- * | Label		    | data-juice-bind="[juice.data.Map].[column name]    	| specify binding Map and column name	|
+ * | Label  	   	| data-duice="Label" 									| component Type						|
+ * | Label		    | data-duice-bind="[duice.data.Map].[column name]    	| specify binding Map and column name	|
  * 
  * @example 
  * <caption>Javascript</caption>
- * var user = new juice.data.Map({
+ * var user = new duice.data.Map({
  * 	name:'james'
  * });
  * @example
  * <caption>HTML</caption>
- * <label data-juice="Label" data-juice-bind="user.name"></label>
+ * <label data-duice="Label" data-duice-bind="user.name"></label>
  * @constructor
  * @param {HTMLLabelElement} label - Label HTML Element
  */
-juice.ui.Label = function(label) {
-	juice.ui.__.call(this);
+duice.ui.Label = function(label) {
+	duice.ui.__.call(this);
 	this.label = label;
-	this.label.classList.add('juice-ui-label');
+	this.label.classList.add('duice-ui-label');
 }
 
 // extends __ prototype
-juice.ui.Label.prototype = Object.create(juice.ui.__.prototype);
+duice.ui.Label.prototype = Object.create(duice.ui.__.prototype);
 
 /**
  * Binds with specified column in map
@@ -1309,7 +1309,7 @@ juice.ui.Label.prototype = Object.create(juice.ui.__.prototype);
  * @param {string} map - map name to bind
  * @param {string} name - column name to bind
  */
-juice.ui.Label.prototype.bind = function(map, name) {
+duice.ui.Label.prototype.bind = function(map, name) {
 	this.map = map;
 	this.name = name;
 	this.map.addObserver(this);
@@ -1319,7 +1319,7 @@ juice.ui.Label.prototype.bind = function(map, name) {
  * Updates self from binded data map.
  * @method
  */
-juice.ui.Label.prototype.update = function() {
+duice.ui.Label.prototype.update = function() {
 	this.removeChildNodes(this.label);
 	var value = '';
 	if(this.map.get(this.name) !== null && this.map.get(this.name) !== undefined){
@@ -1328,32 +1328,32 @@ juice.ui.Label.prototype.update = function() {
 	if(this.format){
 		var parsedFormat = this.parseFormat(this.format);
 		if(parsedFormat.type == 'date'){
-			value = juice.util.FormatUtils.toDateFormat(value, parsedFormat.body);
+			value = duice.util.FormatUtils.toDateFormat(value, parsedFormat.body);
 		}else if(parsedFormat.type == 'number'){
-			value = juice.util.FormatUtils.toNumberFormat(value, parsedFormat.body);
+			value = duice.util.FormatUtils.toNumberFormat(value, parsedFormat.body);
 		}
 	}
 	this.label.appendChild(this.createHtml(value));
 }
-juice.ui.Label.prototype.setFormat = function(format) {
+duice.ui.Label.prototype.setFormat = function(format) {
 	this.format = format;
 }
 
 //-----------------------------------------------------------------------------
-//juice.ui.Text prototype
+//duice.ui.Text prototype
 //-----------------------------------------------------------------------------
-juice.ui.Text = function(pre) {
-	juice.ui.__.call(this);
+duice.ui.Text = function(pre) {
+	duice.ui.__.call(this);
 	this.pre = pre;
-	this.pre.classList.add('juice-ui-text');
+	this.pre.classList.add('duice-ui-text');
 }
-juice.ui.Text.prototype = Object.create(juice.ui.__.prototype);
-juice.ui.Text.prototype.bind = function(map, name) {
+duice.ui.Text.prototype = Object.create(duice.ui.__.prototype);
+duice.ui.Text.prototype.bind = function(map, name) {
 	this.map = map;
 	this.name = name;
 	this.map.addObserver(this);
 }
-juice.ui.Text.prototype.update = function() {
+duice.ui.Text.prototype.update = function() {
 	var value = '';
 	if(this.map.get(this.name) !== null && this.map.get(this.name) !== undefined){
 		value = this.map.get(this.name);
@@ -1362,15 +1362,15 @@ juice.ui.Text.prototype.update = function() {
 }
 
 //-----------------------------------------------------------------------------
-// juice.ui.TextField prototype
+// duice.ui.TextField prototype
 //-----------------------------------------------------------------------------
-juice.ui.TextField = function(input){
-	juice.ui.__.call(this);
+duice.ui.TextField = function(input){
+	duice.ui.__.call(this);
 	this.input = input;
-	this.input.classList.add('juice-ui-textField');
+	this.input.classList.add('duice-ui-textField');
 }
-juice.ui.TextField.prototype = Object.create(juice.ui.TextField.prototype);
-juice.ui.TextField.prototype.bind = function(map, name) {
+duice.ui.TextField.prototype = Object.create(duice.ui.TextField.prototype);
+duice.ui.TextField.prototype.bind = function(map, name) {
 	var $this = this;
 	this.map = map;
 	this.name = name;
@@ -1380,7 +1380,7 @@ juice.ui.TextField.prototype.bind = function(map, name) {
 	});
 	
 }
-juice.ui.TextField.prototype.update = function() {
+duice.ui.TextField.prototype.update = function() {
 	var value = this.map.get(this.name) == undefined ? '' : this.map.get(this.name);
 	this.input.value = value;
 	if(this.map.enable == false){
@@ -1389,7 +1389,7 @@ juice.ui.TextField.prototype.update = function() {
 		this.setReadonly(this.map.readonly[this.name]);	
 	}
 }
-juice.ui.TextField.prototype.setReadonly = function(readonly){
+duice.ui.TextField.prototype.setReadonly = function(readonly){
 	if(readonly){
 		this.input.setAttribute('readOnly',true);
 	}else{
@@ -1398,19 +1398,19 @@ juice.ui.TextField.prototype.setReadonly = function(readonly){
 }
 
 //-----------------------------------------------------------------------------
-//juice.ui.ComboBox prototype
+//duice.ui.ComboBox prototype
 //-----------------------------------------------------------------------------
-juice.ui.ComboBox = function(select) {
-	juice.ui.__.call(this);
+duice.ui.ComboBox = function(select) {
+	duice.ui.__.call(this);
 	this.select = select;
-	this.select.classList.add('juice-ui-comboBox');
+	this.select.classList.add('duice-ui-comboBox');
 	this.options = [];
 	this.optionValue = 'value';
 	this.optionText = 'text';
 	this.optionDisabled = null;
 }
-juice.ui.ComboBox.prototype = Object.create(juice.ui.__.prototype);
-juice.ui.ComboBox.prototype.bind = function(map, name) {
+duice.ui.ComboBox.prototype = Object.create(duice.ui.__.prototype);
+duice.ui.ComboBox.prototype.bind = function(map, name) {
 	this.map = map;
 	this.name = name;
 	this.map.addObserver(this);
@@ -1418,7 +1418,7 @@ juice.ui.ComboBox.prototype.bind = function(map, name) {
 		map.set(name, this.value);	
 	});
 }
-juice.ui.ComboBox.prototype.update = function() {
+duice.ui.ComboBox.prototype.update = function() {
 	// removes all options
 	this.removeChildNodes(this.select);
 	
@@ -1464,16 +1464,16 @@ juice.ui.ComboBox.prototype.update = function() {
 		this.setReadonly(this.map.readonly[this.name]);	
 	}
 }
-juice.ui.ComboBox.prototype.setOptions = function(options){
+duice.ui.ComboBox.prototype.setOptions = function(options){
 	this.options = options;
 }
-juice.ui.ComboBox.prototype.setOptionValue = function(optionValue){
+duice.ui.ComboBox.prototype.setOptionValue = function(optionValue){
 	this.optionValue = optionValue;
 }
-juice.ui.ComboBox.prototype.setOptionText = function(optionText){
+duice.ui.ComboBox.prototype.setOptionText = function(optionText){
 	this.optionText = optionText;
 }
-juice.ui.ComboBox.prototype.setReadonly = function(readonly){
+duice.ui.ComboBox.prototype.setReadonly = function(readonly){
 	if(readonly){
 		this.select.setAttribute('disabled',true);
 	}else{
@@ -1482,16 +1482,16 @@ juice.ui.ComboBox.prototype.setReadonly = function(readonly){
 }
 
 //-----------------------------------------------------------------------------
-// juice.ui.CheckBox prototype
+// duice.ui.CheckBox prototype
 //-----------------------------------------------------------------------------
-juice.ui.CheckBox = function(input) {
-	juice.ui.__.call(this);
+duice.ui.CheckBox = function(input) {
+	duice.ui.__.call(this);
 	this.input = input;
 	this.input.type = 'checkbox';
-	this.input.classList.add('juice-ui-checkBox');
+	this.input.classList.add('duice-ui-checkBox');
 }
-juice.ui.CheckBox.prototype = Object.create(juice.ui.__.prototype);
-juice.ui.CheckBox.prototype.bind = function(map,name) {
+duice.ui.CheckBox.prototype = Object.create(duice.ui.__.prototype);
+duice.ui.CheckBox.prototype.bind = function(map,name) {
 	this.map = map;
 	this.name = name;
 	this.map.addObserver(this);
@@ -1499,7 +1499,7 @@ juice.ui.CheckBox.prototype.bind = function(map,name) {
 		map.set(name, this.checked);
 	});
 }
-juice.ui.CheckBox.prototype.update = function() {
+duice.ui.CheckBox.prototype.update = function() {
 	if(this.map.get(this.name) == true) {
 		this.input.checked = true;
 	}else{
@@ -1510,7 +1510,7 @@ juice.ui.CheckBox.prototype.update = function() {
 		this.setReadonly(true);
 	}
 }
-juice.ui.CheckBox.prototype.setReadonly = function(readonly){
+duice.ui.CheckBox.prototype.setReadonly = function(readonly){
 	if(readonly == true){
 		this.input.disabled = true;
 	}else{
@@ -1519,16 +1519,16 @@ juice.ui.CheckBox.prototype.setReadonly = function(readonly){
 }
 
 //-----------------------------------------------------------------------------
-// juice.ui.Radio prototype
+// duice.ui.Radio prototype
 //-----------------------------------------------------------------------------
-juice.ui.Radio = function(input) {
-	juice.ui.__.call(this);
+duice.ui.Radio = function(input) {
+	duice.ui.__.call(this);
 	this.input = input;
 	this.input.type = 'radio';
-	this.input.classList.add('juice-ui-radio');
+	this.input.classList.add('duice-ui-radio');
 }
-juice.ui.Radio.prototype = Object.create(juice.ui.__.prototype);
-juice.ui.Radio.prototype.bind = function(map,name) {
+duice.ui.Radio.prototype = Object.create(duice.ui.__.prototype);
+duice.ui.Radio.prototype.bind = function(map,name) {
 	this.map = map;
 	this.name = name;
 	this.map.addObserver(this);
@@ -1536,27 +1536,27 @@ juice.ui.Radio.prototype.bind = function(map,name) {
 		map.set(name, this.value);
 	});
 }
-juice.ui.Radio.prototype.update = function(){
+duice.ui.Radio.prototype.update = function(){
 	if(this.map.get(this.name) == this.input.value) {
 		this.input.checked = true;
 	}else{
 		this.input.checked = false;
 	}
 }
-juice.ui.Radio.prototype.setReadonly = function(readonly){
+duice.ui.Radio.prototype.setReadonly = function(readonly){
 	// TODO
 }
 
 //-----------------------------------------------------------------------------
-// juice.ui.TextArea prototype
+// duice.ui.TextArea prototype
 //-----------------------------------------------------------------------------
-juice.ui.TextArea = function(textarea) {
-	juice.ui.__.call(this);
+duice.ui.TextArea = function(textarea) {
+	duice.ui.__.call(this);
 	this.textarea = textarea;
-	this.textarea.classList.add('juice-ui-textArea');
+	this.textarea.classList.add('duice-ui-textArea');
 }
-juice.ui.TextArea.prototype = Object.create(juice.ui.__.prototype);
-juice.ui.TextArea.prototype.bind = function(map,name) {
+duice.ui.TextArea.prototype = Object.create(duice.ui.__.prototype);
+duice.ui.TextArea.prototype.bind = function(map,name) {
 	this.map = map;
 	this.name = name;
 	this.map.addObserver(this);
@@ -1567,7 +1567,7 @@ juice.ui.TextArea.prototype.bind = function(map,name) {
 		map.set(this.name, this.value);
 	});
 }
-juice.ui.TextArea.prototype.update = function() {
+duice.ui.TextArea.prototype.update = function() {
 	this.textarea.value = this.map.get(this.name) || '';
 	
 	// sets enable and read only
@@ -1577,7 +1577,7 @@ juice.ui.TextArea.prototype.update = function() {
 		this.setReadonly(this.map.readonly[this.name]);	
 	}
 }
-juice.ui.TextArea.prototype.setReadonly = function(readonly){
+duice.ui.TextArea.prototype.setReadonly = function(readonly){
 	if(readonly){
 		this.textarea.setAttribute('readonly','readonly');
 	}else{
@@ -1586,22 +1586,22 @@ juice.ui.TextArea.prototype.setReadonly = function(readonly){
 }
 
 //-----------------------------------------------------------------------------
-// juice.ui.HtmlEditor prototype
+// duice.ui.HtmlEditor prototype
 //-----------------------------------------------------------------------------
-juice.ui.HtmlEditor = function(div) {
-	juice.ui.__.call(this);
+duice.ui.HtmlEditor = function(div) {
+	duice.ui.__.call(this);
 	var $this = this;
 	this.div = div;
-	this.div.classList.add('juice-ui-htmlEditor');
+	this.div.classList.add('duice-ui-htmlEditor');
 	
 	// create toolbar
 	this.toolbar = this.createToolbar();
-	this.toolbar.classList.add('juice-ui-htmlEditor-toolbar');
+	this.toolbar.classList.add('duice-ui-htmlEditor-toolbar');
 	this.div.appendChild(this.toolbar);
 	
 	// create content
 	this.content = document.createElement('div');
-	this.content.classList.add('juice-ui-htmlEditor-content');
+	this.content.classList.add('duice-ui-htmlEditor-content');
 	this.pre = document.createElement('pre');
 	this.content.appendChild(this.pre);
 	this.textarea = document.createElement('textarea');
@@ -1612,8 +1612,8 @@ juice.ui.HtmlEditor = function(div) {
 	// pre element designMode 
 	this.pre.contentEditable = 'true';
 }
-juice.ui.HtmlEditor.prototype = Object.create(juice.ui.__.prototype);
-juice.ui.HtmlEditor.prototype.bind = function(map,name) {
+duice.ui.HtmlEditor.prototype = Object.create(duice.ui.__.prototype);
+duice.ui.HtmlEditor.prototype.bind = function(map,name) {
 	var $this = this;
 	this.map = map;
 	this.name = name;
@@ -1631,7 +1631,7 @@ juice.ui.HtmlEditor.prototype.bind = function(map,name) {
 		map.set(name, this.value);
 	});
 }
-juice.ui.HtmlEditor.prototype.update = function() {
+duice.ui.HtmlEditor.prototype.update = function() {
 	if(this.pre.innerHTML != this.map.get(this.name)) {
 		this.pre.innerHTML = this.map.get(this.name) || '';
 	}
@@ -1639,13 +1639,13 @@ juice.ui.HtmlEditor.prototype.update = function() {
 		this.textarea.value = this.map.get(this.name) || '';
 	}
 }
-juice.ui.HtmlEditor.prototype.createToolbar = function() {
+duice.ui.HtmlEditor.prototype.createToolbar = function() {
 	var editor = this;
 	var toolbar = document.createElement('div');
 	
 	// font family
 	var fontfamily = document.createElement('select');
-	fontfamily.classList.add('juice-ui-htmlEditor-toolbar-fontfamily');
+	fontfamily.classList.add('duice-ui-htmlEditor-toolbar-fontfamily');
 	var defaultFont = window.getComputedStyle(this.div,null).getPropertyValue('font-family');
 	defaultFont = defaultFont.replace(/"/gi, '');
 	var fonts = defaultFont.split(',');
@@ -1669,7 +1669,7 @@ juice.ui.HtmlEditor.prototype.createToolbar = function() {
 	
 	// font size
 	var fontsize = document.createElement('select');
-	fontsize.classList.add('juice-ui-htmlEditor-toolbar-fontsize');
+	fontsize.classList.add('duice-ui-htmlEditor-toolbar-fontsize');
 	for(var i = 1; i <= 7; i++){
 		var option = document.createElement('option');
 		option.value = i;
@@ -1686,7 +1686,7 @@ juice.ui.HtmlEditor.prototype.createToolbar = function() {
 
 	// bold
 	var bold = document.createElement('button');
-	bold.classList.add('juice-ui-htmlEditor-toolbar-bold');
+	bold.classList.add('duice-ui-htmlEditor-toolbar-bold');
 	bold.addEventListener('click', function(){
 		editor.execCommand('bold',null,null);
 	});
@@ -1694,7 +1694,7 @@ juice.ui.HtmlEditor.prototype.createToolbar = function() {
 	
 	// italic
 	var italic = document.createElement('button');
-	italic.classList.add('juice-ui-htmlEditor-toolbar-italic');
+	italic.classList.add('duice-ui-htmlEditor-toolbar-italic');
 	italic.addEventListener('click',function(){
 		editor.execCommand('italic',null,null);
 	});
@@ -1702,7 +1702,7 @@ juice.ui.HtmlEditor.prototype.createToolbar = function() {
 	
 	// underline
 	var underline = document.createElement('button');
-	underline.classList.add('juice-ui-htmlEditor-toolbar-underline');
+	underline.classList.add('duice-ui-htmlEditor-toolbar-underline');
 	toolbar.appendChild(underline);
 	underline.addEventListener('click',function() {
 		editor.execCommand('underline',null,null);
@@ -1710,7 +1710,7 @@ juice.ui.HtmlEditor.prototype.createToolbar = function() {
 
 	// align left
 	var alignleft = document.createElement('button');
-	alignleft.classList.add('juice-ui-htmlEditor-toolbar-alignleft');
+	alignleft.classList.add('duice-ui-htmlEditor-toolbar-alignleft');
 	alignleft.addEventListener('click',function() {
 		editor.execCommand('justifyLeft',null,null);
 	});
@@ -1718,7 +1718,7 @@ juice.ui.HtmlEditor.prototype.createToolbar = function() {
 	
 	// align center
 	var aligncenter = document.createElement('button');
-	aligncenter.classList.add('juice-ui-htmlEditor-toolbar-aligncenter');
+	aligncenter.classList.add('duice-ui-htmlEditor-toolbar-aligncenter');
 	aligncenter.addEventListener('click',function() {
 		editor.execCommand('justifyCenter',null,null);
 	});
@@ -1726,7 +1726,7 @@ juice.ui.HtmlEditor.prototype.createToolbar = function() {
 	
 	// align right
 	var alignright = document.createElement('button');
-	alignright.classList.add('juice-ui-htmlEditor-toolbar-alignright');
+	alignright.classList.add('duice-ui-htmlEditor-toolbar-alignright');
 	alignright.addEventListener('click',function() {
 		editor.execCommand('justifyRight',null,null);
 	});
@@ -1734,7 +1734,7 @@ juice.ui.HtmlEditor.prototype.createToolbar = function() {
 	
 	// indent increase
 	var indentincrease = document.createElement('button');
-	indentincrease.classList.add('juice-ui-htmlEditor-toolbar-indentincrease');
+	indentincrease.classList.add('duice-ui-htmlEditor-toolbar-indentincrease');
 	indentincrease.addEventListener('click',function() {
 		editor.execCommand('indent',null,null);
 	});
@@ -1742,7 +1742,7 @@ juice.ui.HtmlEditor.prototype.createToolbar = function() {
 	
 	// indent decrease
 	var indentdecrease = document.createElement('button');
-	indentdecrease.classList.add('juice-ui-htmlEditor-toolbar-indentdecrease');
+	indentdecrease.classList.add('duice-ui-htmlEditor-toolbar-indentdecrease');
 	indentdecrease.addEventListener('click',function() {
 		editor.execCommand('outdent',null,null);
 	});
@@ -1750,7 +1750,7 @@ juice.ui.HtmlEditor.prototype.createToolbar = function() {
 	
 	// list order
 	var listorder = document.createElement('button');
-	listorder.classList.add('juice-ui-htmlEditor-toolbar-listorder');
+	listorder.classList.add('duice-ui-htmlEditor-toolbar-listorder');
 	listorder.addEventListener('click',function() {
 		editor.execCommand('insertorderedlist',null,null);
 	});
@@ -1758,7 +1758,7 @@ juice.ui.HtmlEditor.prototype.createToolbar = function() {
 	
 	// list unorder
 	var listunorder = document.createElement('button');
-	listunorder.classList.add('juice-ui-htmlEditor-toolbar-listunorder');
+	listunorder.classList.add('duice-ui-htmlEditor-toolbar-listunorder');
 	listunorder.addEventListener('click',function() {
 		editor.execCommand('insertUnorderedList',null,null);
 	});
@@ -1766,7 +1766,7 @@ juice.ui.HtmlEditor.prototype.createToolbar = function() {
 	
 	// html
 	var html = document.createElement('button');
-	html.classList.add('juice-ui-htmlEditor-toolbar-html');
+	html.classList.add('duice-ui-htmlEditor-toolbar-html');
 	html.addEventListener('click', function() {
 		editor.toggleHtml();
 	});
@@ -1774,10 +1774,10 @@ juice.ui.HtmlEditor.prototype.createToolbar = function() {
 	
 	return toolbar;
 }
-juice.ui.HtmlEditor.prototype.execCommand = function(commandName, showDefaultUI, valueArgument) {
+duice.ui.HtmlEditor.prototype.execCommand = function(commandName, showDefaultUI, valueArgument) {
 	document.execCommand(commandName, showDefaultUI, valueArgument);
 }
-juice.ui.HtmlEditor.prototype.toggleHtml = function() {
+duice.ui.HtmlEditor.prototype.toggleHtml = function() {
 	if(this.html == true){
 		this.html = false;
 		this.pre.style.display = 'block';
@@ -1790,10 +1790,10 @@ juice.ui.HtmlEditor.prototype.toggleHtml = function() {
 }
 
 //-----------------------------------------------------------------------------
-// juice.ui.CronExpression prototype
+// duice.ui.CronExpression prototype
 //-----------------------------------------------------------------------------
-juice.ui.CronExpression = function(input) {
-	juice.ui.__.call(this);
+duice.ui.CronExpression = function(input) {
+	duice.ui.__.call(this);
 	this.input = input;
 	
 	this.second = this.createSelectSecond();
@@ -1804,49 +1804,49 @@ juice.ui.CronExpression = function(input) {
 	this.week = this.createSelectWeek();
 	
 	this.editor = document.createElement('span');
-	this.editor.classList.add('juice-ui-cronExpression-editor');
+	this.editor.classList.add('duice-ui-cronExpression-editor');
 	
 	// seconds
 	var secondSpan = document.createElement('span');
-	secondSpan.classList.add('juice-ui-cronExpression-editor-second');
+	secondSpan.classList.add('duice-ui-cronExpression-editor-second');
 	secondSpan.appendChild(this.second);
 	this.editor.appendChild(secondSpan);
 	
 	// minute
 	var minuteSpan = document.createElement('span');
-	minuteSpan.classList.add('juice-ui-cronExpression-editor-minute');
+	minuteSpan.classList.add('duice-ui-cronExpression-editor-minute');
 	minuteSpan.appendChild(this.minute);
 	this.editor.appendChild(minuteSpan);
 	
 	// hour
 	var hourSpan = document.createElement('span');
-	hourSpan.classList.add('juice-ui-cronExpression-editor-hour');
+	hourSpan.classList.add('duice-ui-cronExpression-editor-hour');
 	hourSpan.appendChild(this.hour);
 	this.editor.appendChild(hourSpan);
 	
 	// day
 	var daySpan = document.createElement('span');
-	daySpan.classList.add('juice-ui-cronExpression-editor-day');
+	daySpan.classList.add('duice-ui-cronExpression-editor-day');
 	daySpan.appendChild(this.day);
 	this.editor.appendChild(daySpan);
 	
 	// month
 	var monthSpan = document.createElement('span');
-	monthSpan.classList.add('juice-ui-cronExpression-editor-month');
+	monthSpan.classList.add('duice-ui-cronExpression-editor-month');
 	monthSpan.appendChild(this.month);
 	this.editor.appendChild(monthSpan);
 	
 	// week
 	var weekSpan = document.createElement('span');
-	weekSpan.classList.add('juice-ui-cronExpression-editor-week');
+	weekSpan.classList.add('duice-ui-cronExpression-editor-week');
 	weekSpan.appendChild(this.week);
 	this.editor.appendChild(weekSpan);
 	
 	// append editor span to input parent
 	this.input.parentNode.appendChild(this.editor);
 }
-juice.ui.CronExpression.prototype = Object.create(juice.ui.__.prototype);
-juice.ui.CronExpression.prototype.text = {
+duice.ui.CronExpression.prototype = Object.create(duice.ui.__.prototype);
+duice.ui.CronExpression.prototype.text = {
 	EVERY:'Every',
 	LAST_DAY: 'Last Day',
 	LAST_WEEKDAY: 'Last Weekday',
@@ -1860,7 +1860,7 @@ juice.ui.CronExpression.prototype.text = {
 	SAT: 'Saturday',
 	SUN: 'Sunday'
 }
-juice.ui.CronExpression.prototype.bind = function(map, name) {
+duice.ui.CronExpression.prototype.bind = function(map, name) {
 	this.map = map;
 	this.name = name;
 	this.map.addObserver(this);
@@ -1869,10 +1869,10 @@ juice.ui.CronExpression.prototype.bind = function(map, name) {
 	});
 }
 /* update */
-juice.ui.CronExpression.prototype.update = function() {
+duice.ui.CronExpression.prototype.update = function() {
 	var $this = this;
 	this.input.value = this.map.get(this.name) || '';
-	this.input.classList.add('juice-ui-cronExpression');
+	this.input.classList.add('duice-ui-cronExpression');
 	
 	// parse cron expression
 	var cronExpressionArray = this.input.value.split(' ');
@@ -1883,7 +1883,7 @@ juice.ui.CronExpression.prototype.update = function() {
 	this.month.value = cronExpressionArray[4];
 	this.week.value = cronExpressionArray[5];
 }
-juice.ui.CronExpression.prototype.setReadonly = function(readonly) {
+duice.ui.CronExpression.prototype.setReadonly = function(readonly) {
 	if(readonly == true) {
 		this.input.setAttribute('readonly',true);
 		this.second.setAttribute('disabled',true);
@@ -1902,11 +1902,11 @@ juice.ui.CronExpression.prototype.setReadonly = function(readonly) {
 		this.week.removeAttribute('disabled');
 	}
 }
-juice.ui.CronExpression.prototype.isSupprotCronExpression = function() {
+duice.ui.CronExpression.prototype.isSupprotCronExpression = function() {
 	var pattern = /([\d]{1,2}) ([\d]{1,2}) ([\d|\*]{1,2}) ([\d|\*]{1,2}) ([\d|\*]{1,2}) ([\?]{1})$/gi;
 	return pattern.test(this.input.value);
 }
-juice.ui.CronExpression.prototype.generateCronExpression = function() {
+duice.ui.CronExpression.prototype.generateCronExpression = function() {
 	var cronExpression = this.second.value 
 					+ ' ' + this.minute.value 
 					+ ' ' + this.hour.value
@@ -1915,7 +1915,7 @@ juice.ui.CronExpression.prototype.generateCronExpression = function() {
 					+ ' ' + this.week.value;
 	this.map.set(this.name, cronExpression);
 }
-juice.ui.CronExpression.prototype.createSelectSecond = function() {
+duice.ui.CronExpression.prototype.createSelectSecond = function() {
 	var selectSecond = document.createElement('select');
 	for(var i = 0; i < 59; i ++){
 		var option = document.createElement('option');
@@ -1934,7 +1934,7 @@ juice.ui.CronExpression.prototype.createSelectSecond = function() {
 	}
 	return selectSecond;
 }
-juice.ui.CronExpression.prototype.createSelectMinute = function() {
+duice.ui.CronExpression.prototype.createSelectMinute = function() {
 	var selectMinute = document.createElement('select');
 	for(var i = 0; i <= 59; i ++){
 		var option = document.createElement('option');
@@ -1955,7 +1955,7 @@ juice.ui.CronExpression.prototype.createSelectMinute = function() {
 	}
 	return selectMinute;
 }
-juice.ui.CronExpression.prototype.createSelectHour = function() {
+duice.ui.CronExpression.prototype.createSelectHour = function() {
 	var selectHour = document.createElement('select');
 	var defaultOption = document.createElement('option');
 	defaultOption.value = '*';
@@ -1980,7 +1980,7 @@ juice.ui.CronExpression.prototype.createSelectHour = function() {
 	}
 	return selectHour;
 }
-juice.ui.CronExpression.prototype.createSelectDay = function() {
+duice.ui.CronExpression.prototype.createSelectDay = function() {
 	var selectDay = document.createElement('select');
 	
 	// default option
@@ -2029,7 +2029,7 @@ juice.ui.CronExpression.prototype.createSelectDay = function() {
 	}
 	return selectDay;
 }
-juice.ui.CronExpression.prototype.createSelectMonth = function() {
+duice.ui.CronExpression.prototype.createSelectMonth = function() {
 	var selectMonth = document.createElement('select');
 	var defaultOption = document.createElement('option');
 	defaultOption.value = '*';
@@ -2054,7 +2054,7 @@ juice.ui.CronExpression.prototype.createSelectMonth = function() {
 	}
 	return selectMonth;
 }
-juice.ui.CronExpression.prototype.createSelectWeek = function() {
+duice.ui.CronExpression.prototype.createSelectWeek = function() {
 	var selectWeek = document.createElement('select');
 	var defaultOption = document.createElement('option');
 	defaultOption.value = '?';
@@ -2095,12 +2095,12 @@ juice.ui.CronExpression.prototype.createSelectWeek = function() {
 }
 
 //-----------------------------------------------------------------------------
-// juice.ui.Image prototype
+// duice.ui.Image prototype
 //-----------------------------------------------------------------------------
-juice.ui.Image = function(img) {
-	juice.ui.__.call(this);
+duice.ui.Image = function(img) {
+	duice.ui.__.call(this);
 	this.img = img;
-	this.img.classList.add('juice-ui-thumbnail');
+	this.img.classList.add('duice-ui-thumbnail');
 	this.input = document.createElement('input');
 	this.input.setAttribute("type", "file");
 	this.input.setAttribute("accept", "image/gif, image/jpeg, image/png");
@@ -2109,8 +2109,8 @@ juice.ui.Image = function(img) {
 	this.height = 128;
 	this.readonly = false;
 }
-juice.ui.Image.prototype = Object.create(juice.ui.__.prototype);
-juice.ui.Image.prototype.bind = function(map, name) {
+duice.ui.Image.prototype = Object.create(duice.ui.__.prototype);
+duice.ui.Image.prototype.bind = function(map, name) {
 	var $this = this;
 	this.map = map;
 	this.name = name;
@@ -2154,7 +2154,7 @@ juice.ui.Image.prototype.bind = function(map, name) {
 	});
 	
 }
-juice.ui.Image.prototype.update = function() {
+duice.ui.Image.prototype.update = function() {
 	var $this = this;
 	if(this.map.get(this.name)) {
 		var src = this.map.get(this.name);
@@ -2172,43 +2172,43 @@ juice.ui.Image.prototype.update = function() {
 		}
 	}
 }
-juice.ui.Image.prototype.setWidth = function(width){
+duice.ui.Image.prototype.setWidth = function(width){
 	if(width){
 		this.width = width;
 	}
 }
-juice.ui.Image.prototype.setHeight = function(height){
+duice.ui.Image.prototype.setHeight = function(height){
 	if(height){
 		this.height = height;
 	}
 }
-juice.ui.Image.prototype.setReadonly = function(readonly){
+duice.ui.Image.prototype.setReadonly = function(readonly){
 	this.readonly = readonly;
 }
 
 //-----------------------------------------------------------------------------
-// juice.ui.ListView prototype
+// duice.ui.ListView prototype
 //-----------------------------------------------------------------------------
-juice.ui.ListView = function(ul){
-	juice.ui.__.call(this);
+duice.ui.ListView = function(ul){
+	duice.ui.__.call(this);
 	this.ul = ul;
-	this.ul.classList.add('juice-ui-listView');
+	this.ul.classList.add('duice-ui-listView');
 	this.li = this.ul.querySelector('li');
 	this.ul.removeChild(this.li);
 	this.rows = new Array();
 }
-juice.ui.ListView.prototype = Object.create(juice.ui.__.prototype);
+duice.ui.ListView.prototype = Object.create(duice.ui.__.prototype);
 // bind data
-juice.ui.ListView.prototype.bind = function(list){
+duice.ui.ListView.prototype.bind = function(list){
 	this.list = list;
 	this.list.addObserver(this);
 }
 // sets item
-juice.ui.ListView.prototype.setItem = function(item){
+duice.ui.ListView.prototype.setItem = function(item){
 	this.item = item;
 }
 // update
-juice.ui.ListView.prototype.update = function(){
+duice.ui.ListView.prototype.update = function(){
 	
 	// remove previous rows
 	for(var i = 0; i < this.rows.length; i ++ ) {
@@ -2225,13 +2225,13 @@ juice.ui.ListView.prototype.update = function(){
 	}
 }
 // creates row
-juice.ui.ListView.prototype.createRow = function(index, map){
+duice.ui.ListView.prototype.createRow = function(index, map){
 	var $this = this;
 	var ul = this.ul;
 	var li = this.li.cloneNode(true);
 	
 	// setting index
-	li.dataset.juiceIndex = index;
+	li.dataset.duiceIndex = index;
 	
 	// executes expression
 	var $context = {};
@@ -2239,39 +2239,39 @@ juice.ui.ListView.prototype.createRow = function(index, map){
 	$context[this.item] = map;
 	li = this.executeExpression(li, $context);
 	
-	// creates juice element.
-	juice.initialize(li, $context);
+	// creates duice element.
+	duice.initialize(li, $context);
 	
 	// returns
 	return li;
 }
 
 //-----------------------------------------------------------------------------
-// juice.ui.TreeView prototype
+// duice.ui.TreeView prototype
 //-----------------------------------------------------------------------------
-juice.ui.TreeView = function(ul){
-	juice.ui.__.call(this);
+duice.ui.TreeView = function(ul){
+	duice.ui.__.call(this);
 	this.ul = ul;
-	this.ul.classList.add('juice-ui-treeView');
+	this.ul.classList.add('duice-ui-treeView');
 	this.li = this.ul.querySelector('li');
 	this.ul.removeChild(this.li);
 }
-juice.ui.TreeView.prototype = Object.create(juice.ui.__.prototype);
+duice.ui.TreeView.prototype = Object.create(duice.ui.__.prototype);
 //bind data 
-juice.ui.TreeView.prototype.bind = function(tree) {
+duice.ui.TreeView.prototype.bind = function(tree) {
 	this.tree = tree;
 	this.tree.addObserver(this);
 }
 //set item 
-juice.ui.TreeView.prototype.setItem = function(item){
+duice.ui.TreeView.prototype.setItem = function(item){
 	this.item = item;
 }
 //setting editable 
-juice.ui.TreeView.prototype.setEditable = function(editable) {
+duice.ui.TreeView.prototype.setEditable = function(editable) {
 	this.editable = editable;
 }
 //update
-juice.ui.TreeView.prototype.update = function() {
+duice.ui.TreeView.prototype.update = function() {
 
 	// remove previous li
 	while (this.ul.hasChildNodes()) {
@@ -2292,23 +2292,23 @@ juice.ui.TreeView.prototype.update = function() {
 	treeIndex = treeIndex.substring(1, treeIndex.length-1);
 	var lis = this.ul.querySelectorAll('li');
 	for(var i = 0, size = lis.length; i < size; i++ ){
-		var liIndex = lis[i].dataset.juiceIndex;
+		var liIndex = lis[i].dataset.duiceIndex;
 		liIndex = liIndex.substring(1, liIndex.length-1);
 		if(treeIndex.indexOf(liIndex) == 0 && treeIndex != liIndex){
-			lis[i].classList.remove('juice-ui-treeView-fold');
-			lis[i].classList.add('juice-ui-treeView-unfold');
+			lis[i].classList.remove('duice-ui-treeView-fold');
+			lis[i].classList.add('duice-ui-treeView-unfold');
 		} 
 	}
 }
 
 //creates node 
-juice.ui.TreeView.prototype.createNode = function(index, node){
+duice.ui.TreeView.prototype.createNode = function(index, node){
 	var $this = this;
 	var li = this.li.cloneNode(true);
 	var index = JSON.parse(JSON.stringify(index)); 	// deep copy
 	
 	// setting index
-	li.dataset.juiceIndex = JSON.stringify(index);
+	li.dataset.duiceIndex = JSON.stringify(index);
 	
 	// executes expression
 	var $context = {};
@@ -2317,22 +2317,22 @@ juice.ui.TreeView.prototype.createNode = function(index, node){
 	$context[this.item] = node;
 	li = this.executeExpression(li, $context);
 	
-	// creates juice element.
-	juice.initialize(li,$context);
+	// creates duice element.
+	duice.initialize(li,$context);
 	
 	// active index item
 	if(JSON.stringify(index) == JSON.stringify(this.tree.index)){
-		li.classList.add('juice-ui-treeView-index');
+		li.classList.add('duice-ui-treeView-index');
 	}
 	
 	// on click event
 	li.addEventListener('click', function(event){
-		var prevIndexLi = $this.ul.querySelector('li.juice-ui-treeView-index');
+		var prevIndexLi = $this.ul.querySelector('li.duice-ui-treeView-index');
 		if(prevIndexLi){
-			prevIndexLi.classList.remove('juice-ui-treeView-index');
+			prevIndexLi.classList.remove('duice-ui-treeView-index');
 		}
-		li.classList.add('juice-ui-treeView-index');
-		$this.tree.index = eval(this.dataset.juiceIndex);
+		li.classList.add('duice-ui-treeView-index');
+		$this.tree.index = eval(this.dataset.duiceIndex);
 	});
 
 	// child node
@@ -2340,11 +2340,11 @@ juice.ui.TreeView.prototype.createNode = function(index, node){
 	if(childNodes && childNodes.length > 0){
 		
 		// fold & unfold class
-		li.classList.add('juice-ui-treeView-unfold');
+		li.classList.add('duice-ui-treeView-unfold');
 		li.addEventListener('click', function(event){
 			if(event.target == this){
-				this.classList.toggle('juice-ui-treeView-fold');
-				this.classList.toggle('juice-ui-treeView-unfold');
+				this.classList.toggle('duice-ui-treeView-fold');
+				this.classList.toggle('duice-ui-treeView-unfold');
 			}
 		});
 		
@@ -2368,28 +2368,28 @@ juice.ui.TreeView.prototype.createNode = function(index, node){
 		var $li = li;
 		
 		// disable drag
-		if(li.dataset.juiceDraggable && eval(li.dataset.juiceDraggable) == false){
+		if(li.dataset.duiceDraggable && eval(li.dataset.duiceDraggable) == false){
 			li.setAttribute('draggable', false);
-			li.classList.remove('juice-ui-treeView-draggable');
+			li.classList.remove('duice-ui-treeView-draggable');
 		}
 		// enable drag
 		else{
 			li.setAttribute('draggable', true);
-			li.classList.add('juice-ui-treeView-draggable');
+			li.classList.add('duice-ui-treeView-draggable');
 			// setting row drag and drop
 			li.addEventListener('dragstart', function(ev) {
 				ev.stopPropagation();
 				ev.target.id = new Date().getMilliseconds();
 				ev.dataTransfer.setData("id", ev.target.id);
-				this.classList.add('juice-ui-treeView-dragstart');
+				this.classList.add('duice-ui-treeView-dragstart');
 			});
 			li.addEventListener('dragend', function(ev){
-				this.classList.remove('juice-ui-treeView-dragstart');
+				this.classList.remove('duice-ui-treeView-dragstart');
 			});
 		}
 
 		// disable drop
-		if(li.dataset.juiceDroppable && eval(li.dataset.juiceDroppable) == false){
+		if(li.dataset.duiceDroppable && eval(li.dataset.duiceDroppable) == false){
 			li.addEventListener('drop', function(ev) {
 			    ev.preventDefault();
 			    ev.stopPropagation();
@@ -2414,8 +2414,8 @@ juice.ui.TreeView.prototype.createNode = function(index, node){
 			    	}
 			    	dropedLi = dropedLi.parentElement;
 			    }
-			    var fromIndex = eval(dragedLi.dataset.juiceIndex);
-			    var toIndex = eval(dropedLi.dataset.juiceIndex);
+			    var fromIndex = eval(dragedLi.dataset.duiceIndex);
+			    var toIndex = eval(dropedLi.dataset.duiceIndex);
 			    if(fromIndex.toString() == toIndex.toString()) {
 			    	return false;
 			    }
@@ -2435,36 +2435,36 @@ juice.ui.TreeView.prototype.createNode = function(index, node){
 }
 
 //-----------------------------------------------------------------------------
-// juice.ui.Grid prototype
+// duice.ui.Grid prototype
 //-----------------------------------------------------------------------------
-juice.ui.Grid = function(table) {
-	juice.ui.__.call(this);
+duice.ui.Grid = function(table) {
+	duice.ui.__.call(this);
 	this.table = table;
-	this.table.classList.add('juice-ui-grid');
+	this.table.classList.add('duice-ui-grid');
 	this.tbody = table.querySelector('tbody');
 	this.table.removeChild(this.tbody);
 	this.rows = new Array();
 }
-juice.ui.Grid.prototype = Object.create(juice.ui.__.prototype);
+duice.ui.Grid.prototype = Object.create(duice.ui.__.prototype);
 // bind data structure 
-juice.ui.Grid.prototype.bind = function(list) {
+duice.ui.Grid.prototype.bind = function(list) {
 	this.list = list;
 	this.list.addObserver(this);
 }
 // set item
-juice.ui.Grid.prototype.setItem = function(item) {
+duice.ui.Grid.prototype.setItem = function(item) {
 	this.item = item;
 }
 // sets editable
-juice.ui.Grid.prototype.setEditable = function(editable){
+duice.ui.Grid.prototype.setEditable = function(editable){
 	this.editable = editable;
 }
 // sets filter 
-juice.ui.Grid.prototype.setFilter = function(filter){
+duice.ui.Grid.prototype.setFilter = function(filter){
 	this.filter = filter;
 }
 // update 
-juice.ui.Grid.prototype.update = function() {
+duice.ui.Grid.prototype.update = function() {
 	
 	// remove previous rows
 	for(var i = 0; i < this.rows.length; i ++ ) {
@@ -2488,13 +2488,13 @@ juice.ui.Grid.prototype.update = function() {
 	}
 }
 // creates row 
-juice.ui.Grid.prototype.createRow = function(index,map) {
+duice.ui.Grid.prototype.createRow = function(index,map) {
 	var $this = this;
 	var table = this.table;
 	var tbody = this.tbody.cloneNode(true);
 	
 	// setting index
-	tbody.dataset.juiceIndex = index;
+	tbody.dataset.duiceIndex = index;
 	
 	// executes expression
 	var $context = {};
@@ -2502,36 +2502,36 @@ juice.ui.Grid.prototype.createRow = function(index,map) {
 	$context[this.item] = map;
 	tbody = this.executeExpression(tbody, $context);
 	
-	// creates juice element.
-	juice.initialize(tbody,$context);
+	// creates duice element.
+	duice.initialize(tbody,$context);
 	
 	// add current row index event listener
 	tbody.addEventListener('mousedown', function(){
-		$this.list.index = this.dataset.juiceIndex;
+		$this.list.index = this.dataset.duiceIndex;
 		var elements = table.querySelectorAll('tbody');
 		for(var i = 0; i < elements.length; i ++ ) {
-			elements[i].classList.remove('juice-ui-grid-index');
+			elements[i].classList.remove('duice-ui-grid-index');
 		}
-		tbody.classList.add('juice-ui-grid-index');
+		tbody.classList.add('duice-ui-grid-index');
 		$this.list.index = index;
 		$this.list.notifyObservers($this);
 	});
 	if(index == this.list.index){
-		tbody.classList.add('juice-ui-grid-index');
+		tbody.classList.add('duice-ui-grid-index');
 	}
 	
 	// Editable 
 	if(this.editable){
 		
 		// disable drag
-		if(tbody.dataset.juiceDraggable && eval(tbody.dataset.juiceDraggable) == false){
+		if(tbody.dataset.duiceDraggable && eval(tbody.dataset.duiceDraggable) == false){
 			tbody.setAttribute('graggable',false);
-			tbody.classList.remove('juice-ui-grid-draggable');
+			tbody.classList.remove('duice-ui-grid-draggable');
 		}
 		// enable drag
 		else{
 			tbody.setAttribute('draggable', true);
-			tbody.classList.add('juice-ui-grid-draggable');
+			tbody.classList.add('duice-ui-grid-draggable');
 			
 			// setting row drag and drop
 			tbody.addEventListener('dragstart', function(ev) {
@@ -2541,7 +2541,7 @@ juice.ui.Grid.prototype.createRow = function(index,map) {
 		}
 			
 		// disable drop
-		if(tbody.dataset.juiceDroppable && eval(tbody.dataset.juiceDroppable) == false){
+		if(tbody.dataset.duiceDroppable && eval(tbody.dataset.duiceDroppable) == false){
 			tbody.addEventListener('drop',function(ev){
 			    ev.preventDefault();
 			    ev.stopPropagation();
@@ -2565,7 +2565,7 @@ juice.ui.Grid.prototype.createRow = function(index,map) {
 					}
 					dropedTbody = dropedTbody.parentElement;
 				}
-				$this.list.moveRow(dragedTbody.dataset.juiceIndex, dropedTbody.dataset.juiceIndex);
+				$this.list.moveRow(dragedTbody.dataset.duiceIndex, dropedTbody.dataset.duiceIndex);
 			});
 			tbody.addEventListener('dragover', function(ev){
 				ev.preventDefault();
@@ -2584,7 +2584,7 @@ juice.ui.Grid.prototype.createRow = function(index,map) {
 	return tbody;
 }
 // creates not found row 
-juice.ui.Grid.prototype.createEmptyRow = function() {
+duice.ui.Grid.prototype.createEmptyRow = function() {
 	var tbody = this.tbody.cloneNode(true);
 	this.removeChildNodes(tbody);
 	/*
@@ -2593,14 +2593,14 @@ juice.ui.Grid.prototype.createEmptyRow = function() {
 	}
 	*/
 	
-	tbody.dataset.juiceIndex = -1;
-	tbody.classList.add('juice-ui-grid-empty')
+	tbody.dataset.duiceIndex = -1;
+	tbody.classList.add('duice-ui-grid-empty')
 	var tr = document.createElement('tr');
 	var td = document.createElement('td');
 	var colspan = this.tbody.querySelectorAll('tr > td').length;
 	td.setAttribute('colspan',colspan);
 	var emptyMessage = document.createElement('div');
-	emptyMessage.classList.add('juice-ui-grid-empty-message');
+	emptyMessage.classList.add('duice-ui-grid-empty-message');
 	td.appendChild(emptyMessage);
 	tr.appendChild(td);
 	tbody.appendChild(tr);
@@ -2608,12 +2608,12 @@ juice.ui.Grid.prototype.createEmptyRow = function() {
 }
 
 //-----------------------------------------------------------------------------
-// juice.data.Workflow prototype
+// duice.data.Workflow prototype
 //-----------------------------------------------------------------------------
-juice.ui.Workflow = function(ul){
-	juice.ui.__.call(this);
+duice.ui.Workflow = function(ul){
+	duice.ui.__.call(this);
 	this.ul = ul;
-	this.ul.classList.add('juice-ui-workflow');
+	this.ul.classList.add('duice-ui-workflow');
 	this.ul.style.listStyleType = 'none';
 	this.li = this.ul.querySelector('li');
 	this.ul.removeChild(this.li);
@@ -2629,43 +2629,43 @@ juice.ui.Workflow = function(ul){
 	this.linkTo = 'linkTo';
 	this.linkText = null;
 }
-juice.ui.Workflow.prototype = Object.create(juice.ui.__.prototype);
+duice.ui.Workflow.prototype = Object.create(duice.ui.__.prototype);
 // bind data structure
-juice.ui.Workflow.prototype.bind = function(nodeList,linkList) {
+duice.ui.Workflow.prototype.bind = function(nodeList,linkList) {
 	this.nodeList = nodeList;
 	this.linkList = linkList;
 	this.nodeList.addObserver(this);
 	this.linkList.addObserver(this);
 }
 // setting node id 
-juice.ui.Workflow.prototype.setNodeId = function(value) {
+duice.ui.Workflow.prototype.setNodeId = function(value) {
 	this.nodeId = value;
 }
-juice.ui.Workflow.prototype.setNodeX = function(value) {
+duice.ui.Workflow.prototype.setNodeX = function(value) {
 	this.nodeX = value;
 }
-juice.ui.Workflow.prototype.setNodeY = function(value) {
+duice.ui.Workflow.prototype.setNodeY = function(value) {
 	this.nodeY = value;
 }
 // setting link from 
-juice.ui.Workflow.prototype.setLinkFrom = function(value) {
+duice.ui.Workflow.prototype.setLinkFrom = function(value) {
 	this.linkFrom = value;
 }
 // setting link to 
-juice.ui.Workflow.prototype.setLinkTo = function(value) {
+duice.ui.Workflow.prototype.setLinkTo = function(value) {
 	this.linkTo = value;
 }
 // setting link text
-juice.ui.Workflow.prototype.setLinkText = function(value) {
+duice.ui.Workflow.prototype.setLinkText = function(value) {
 	this.linkText = value;
 }
 // update 
-juice.ui.Workflow.prototype.update = function() {
+duice.ui.Workflow.prototype.update = function() {
 	var $this = this;
 	var ul = this.ul;
 	
 	// remove previous node
-	var elements = this.ul.querySelectorAll('.juice-ui-workflow-node');
+	var elements = this.ul.querySelectorAll('.duice-ui-workflow-node');
 	for(var i = 0; i < elements.length; i ++ ) {
 		this.ul.removeChild(elements[i]);
 	}
@@ -2674,12 +2674,12 @@ juice.ui.Workflow.prototype.update = function() {
 	for(var index = 0; index < this.nodeList.getRowCount(); index ++ ) {
 		var map = this.nodeList.getRow(index);
 		var li = this.createNode(index,map);
-		li.dataset.juiceNodeId = map.get(this.nodeId);
+		li.dataset.duiceNodeId = map.get(this.nodeId);
 		this.ul.appendChild(li);
 	}
 	
 	// remove previous link
-	var elements = this.ul.querySelectorAll('.juice-ui-workflow-link');
+	var elements = this.ul.querySelectorAll('.duice-ui-workflow-link');
 	for(var i = 0; i < elements.length; i ++ ) {
 		this.ul.removeChild(elements[i]);
 	}
@@ -2692,24 +2692,24 @@ juice.ui.Workflow.prototype.update = function() {
 	}
 }
 // create ndoe
-juice.ui.Workflow.prototype.createNode = function(index, map){
+duice.ui.Workflow.prototype.createNode = function(index, map){
 	var $this = this;
 	var li = this.li.cloneNode(true);
-	li.classList.add('juice-ui-workflow-node');
+	li.classList.add('duice-ui-workflow-node');
 
 	var $context = {};
 	$context['node'] = map;
 	li = this.executeExpression(li, $context);
-	li.dataset.juiceIndex = index;
-	li.dataset.juiceId = map.get(this.nodeId);
+	li.dataset.duiceIndex = index;
+	li.dataset.duiceId = map.get(this.nodeId);
 	
 	// setting index class
 	if(index == this.nodeList.index){
-		li.classList.add('juice-ui-workflow-node-index');
+		li.classList.add('duice-ui-workflow-node-index');
 	}
 	
-	// creates juice element.
-	juice.initialize(li,$context);
+	// creates duice element.
+	duice.initialize(li,$context);
 	
 	// drag
 	li.style.position = 'absolute';
@@ -2721,11 +2721,11 @@ juice.ui.Workflow.prototype.createNode = function(index, map){
 		
 		// setting current index
 		$this.nodeList.index = index;
-		var elements = $this.ul.querySelectorAll('.juice-ui-workflow-node');
+		var elements = $this.ul.querySelectorAll('.duice-ui-workflow-node');
 		for(var i = 0; i < elements.length; i ++ ) {
-			elements[i].classList.remove('juice-ui-workflow-node-index');
+			elements[i].classList.remove('duice-ui-workflow-node-index');
 		}
-		li.classList.add('juice-ui-workflow-node-index');
+		li.classList.add('duice-ui-workflow-node-index');
 
 		// mouse move
 		var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
@@ -2764,32 +2764,32 @@ juice.ui.Workflow.prototype.createNode = function(index, map){
 	return li;
 }
 // create link 
-juice.ui.Workflow.prototype.createLink = function(index, map) {
+duice.ui.Workflow.prototype.createLink = function(index, map) {
 	var $this = this;
 	var line = document.createElement('div');
 	line.style.position = 'absolute';
-	line.classList.add('juice-ui-workflow-link');
-	line.dataset.juiceIndex = index;
+	line.classList.add('duice-ui-workflow-link');
+	line.dataset.duiceIndex = index;
 	
 	// setting current index
 	if(index == this.linkList.index){
-		line.classList.add('juice-ui-workflow-link-index');
+		line.classList.add('duice-ui-workflow-link-index');
 	}
 	line.addEventListener('mousedown', function() {
 		$this.linkList.index = index;
-		var elements = $this.ul.querySelectorAll('.juice-ui-workflow-link');
+		var elements = $this.ul.querySelectorAll('.duice-ui-workflow-link');
 		for(var i = 0; i < elements.length; i ++ ) {
-			elements[i].classList.remove('juice-ui-workflow-link-index');
+			elements[i].classList.remove('duice-ui-workflow-link-index');
 		}
-		line.classList.add('juice-ui-workflow-link-index');
+		line.classList.add('duice-ui-workflow-link-index');
 		$this.linkList.notifyObservers($this);
 	});
 
 	
 	// defines line position
 	try {
-		var from = this.ul.querySelector('[data-juice-node-id="' + map.get(this.linkFrom) + '"]');
-		var to = this.ul.querySelector('[data-juice-node-id="' + map.get(this.linkTo) + '"]');
+		var from = this.ul.querySelector('[data-duice-node-id="' + map.get(this.linkFrom) + '"]');
+		var to = this.ul.querySelector('[data-duice-node-id="' + map.get(this.linkTo) + '"]');
 
 		var fromTop = from.offsetTop  + from.offsetHeight/2;
 		var fromLeft = from.offsetLeft + from.offsetWidth/2;
@@ -2838,7 +2838,7 @@ juice.ui.Workflow.prototype.createLink = function(index, map) {
 		// creates link text
 		if(this.linkText){
 			var span = document.createElement('span');
-			span.classList.add('juice-ui-workflow-link-text');
+			span.classList.add('duice-ui-workflow-link-text');
 			line.appendChild(span);	
 			
 			var text = map.get(this.linkText);
@@ -2869,40 +2869,40 @@ juice.ui.Workflow.prototype.createLink = function(index, map) {
 }
 
 /**
- * juice.ui.Pagination prototype
+ * duice.ui.Pagination prototype
  */
-juice.ui.Pagination = function(ul){
-	juice.ui.__.call(this);
+duice.ui.Pagination = function(ul){
+	duice.ui.__.call(this);
 	this.ul = ul;
-	this.ul.classList.add('juice-ui-pagination');
+	this.ul.classList.add('duice-ui-pagination');
 	this.ul.style.listStyleType = 'none';
 	this.li = this.ul.querySelector('li');
 	this.ul.removeChild(this.li);
 	this.pageSize = 1;
 }
-juice.ui.Pagination.prototype = Object.create(juice.ui.__.prototype);
+duice.ui.Pagination.prototype = Object.create(duice.ui.__.prototype);
 // bind 
-juice.ui.Pagination.prototype.bind = function(map) {
+duice.ui.Pagination.prototype.bind = function(map) {
 	this.map = map;
 	this.map.addObserver(this);
 }
 // setting column name specified rows value
-juice.ui.Pagination.prototype.setRows = function(value){
+duice.ui.Pagination.prototype.setRows = function(value){
 	this.rows = value;
 }
 // setting column name specified page value
-juice.ui.Pagination.prototype.setPage = function(value){
+duice.ui.Pagination.prototype.setPage = function(value){
 	this.page = value;
 }
 // setting column name specified total rows value 
-juice.ui.Pagination.prototype.setTotalCount = function(value){
+duice.ui.Pagination.prototype.setTotalCount = function(value){
 	this.totalCount = value;
 }
-juice.ui.Pagination.prototype.setPageSize = function(value) {
+duice.ui.Pagination.prototype.setPageSize = function(value) {
 	this.pageSize = parseInt(value);
 }
 // update 
-juice.ui.Pagination.prototype.update = function() {
+duice.ui.Pagination.prototype.update = function() {
 
 	// remove all li element
 	while (this.ul.hasChildNodes()) {
@@ -2932,7 +2932,7 @@ juice.ui.Pagination.prototype.update = function() {
 		for(var i = startPage; i <= endPage; i ++){
 			var itemPage = this.createItemPage(i);
 			if(i == page){
-				itemPage.classList.add('juice-ui-pagination-item-page-index');
+				itemPage.classList.add('duice-ui-pagination-item-page-index');
 				itemPage.onclick = null;
 				itemPage.style.pointerEvents = 'none';
 			}
@@ -2950,7 +2950,7 @@ juice.ui.Pagination.prototype.update = function() {
 	}else{
 		// creates page item
 		var itemPage = this.createItemPage(page);
-		itemPage.classList.add('juice-ui-pagination-item-page-index');
+		itemPage.classList.add('duice-ui-pagination-item-page-index');
 		itemPage.onclick = null;
 		itemPage.style.pointerEvents = 'none';
 		this.ul.appendChild(itemPage);
@@ -2965,11 +2965,11 @@ juice.ui.Pagination.prototype.update = function() {
 	}
 }
 // create page item 
-juice.ui.Pagination.prototype.createItemPage = function(page) {
+duice.ui.Pagination.prototype.createItemPage = function(page) {
 	var $this = this;
 	var ul = this.ul;
 	var li = this.li.cloneNode(true);
-	li.classList.add('juice-ui-pagination-item-page');
+	li.classList.add('duice-ui-pagination-item-page');
 	
 	// executes expression
 	var $context = {};
@@ -2977,11 +2977,11 @@ juice.ui.Pagination.prototype.createItemPage = function(page) {
 	li = this.executeExpression(li, $context);
 	return li;
 }
-juice.ui.Pagination.prototype.createItemPrev = function(page) {
+duice.ui.Pagination.prototype.createItemPrev = function(page) {
 	var $this = this;
 	var ul = this.ul;
 	var li = this.li.cloneNode(true);
-	li.classList.add('juice-ui-pagination-item-prev');
+	li.classList.add('duice-ui-pagination-item-prev');
 	
 	// remove child element
 	while (li.hasChildNodes()) {
@@ -2993,11 +2993,11 @@ juice.ui.Pagination.prototype.createItemPrev = function(page) {
 	li = this.executeExpression(li, $context);
 	return li;
 }
-juice.ui.Pagination.prototype.createItemNext = function(page) {
+duice.ui.Pagination.prototype.createItemNext = function(page) {
 	var $this = this;
 	var ul = this.ul;
 	var li = this.li.cloneNode(true);
-	li.classList.add('juice-ui-pagination-item-next');
+	li.classList.add('duice-ui-pagination-item-next');
 	
 	// remove child element
 	while (li.hasChildNodes()) {
@@ -3011,10 +3011,10 @@ juice.ui.Pagination.prototype.createItemNext = function(page) {
 }
 
 //-----------------------------------------------------------------------------
-// juice.ui Dialog
+// duice.ui Dialog
 //-----------------------------------------------------------------------------
-juice.ui.Dialog = function(content) {
-	juice.ui.__.call(this);
+duice.ui.Dialog = function(content) {
+	duice.ui.__.call(this);
 	var $this = this;
 	
 	// defines content
@@ -3028,11 +3028,11 @@ juice.ui.Dialog = function(content) {
 	
 	// creates div
 	this.div = document.createElement('div');
-	this.div.classList.add('juice-ui-dialog');
+	this.div.classList.add('duice-ui-dialog');
 	
 	// creates header
 	this.header = document.createElement('div');
-	this.header.classList.add('juice-ui-dialog-header');
+	this.header.classList.add('duice-ui-dialog-header');
 	this.header.style.cursor = 'move';
 	this.div.appendChild(this.header);
 	
@@ -3058,12 +3058,12 @@ juice.ui.Dialog = function(content) {
 	
 	// create title
 	this.title = document.createElement('span');
-	this.title.classList.add('juice-ui-dialog-header-title');
+	this.title.classList.add('duice-ui-dialog-header-title');
 	this.header.appendChild(this.title);
 	
 	// creates exit
 	this.closeButton = document.createElement('span');
-	this.closeButton.classList.add('juice-ui-dialog-header-close');
+	this.closeButton.classList.add('duice-ui-dialog-header-close');
 	this.closeButton.addEventListener('click',function(ev){
 		$this.close();
 	});
@@ -3071,7 +3071,7 @@ juice.ui.Dialog = function(content) {
 
 	// creates body
 	this.body = document.createElement('div');
-	this.body.classList.add('juice-ui-dialog-body');
+	this.body.classList.add('duice-ui-dialog-body');
 	this.body.appendChild(this.content);
 	this.div.appendChild(this.body);
 	
@@ -3081,13 +3081,13 @@ juice.ui.Dialog = function(content) {
 		this.div.style.top = '20vh';	// adjust top
 	});
 }
-juice.ui.Dialog.prototype = Object.create(juice.ui.__.prototype);
+duice.ui.Dialog.prototype = Object.create(duice.ui.__.prototype);
 // sets title 
-juice.ui.Dialog.prototype.setTitle = function(title){
+duice.ui.Dialog.prototype.setTitle = function(title){
 	this.title.appendChild(this.createHtml(title));
 }
 // open dialog window 
-juice.ui.Dialog.prototype.open = function(){
+duice.ui.Dialog.prototype.open = function(){
 	
 	// blocker
 	this.blocker = this.block(this.getWindow().document.body);
@@ -3113,7 +3113,7 @@ juice.ui.Dialog.prototype.open = function(){
 	}
 }
 // close dialog window 
-juice.ui.Dialog.prototype.close = function() {
+duice.ui.Dialog.prototype.close = function() {
 	var $this = this;
 
 	// fires close listener
@@ -3142,20 +3142,20 @@ juice.ui.Dialog.prototype.close = function() {
 
 	});
 }
-juice.ui.Dialog.prototype.beforeClose = function(listener){
+duice.ui.Dialog.prototype.beforeClose = function(listener){
 	this.listener.beforeClose = listener;
 	return this;
 }
-juice.ui.Dialog.prototype.afterClose = function(listener){
+duice.ui.Dialog.prototype.afterClose = function(listener){
 	this.listener.afterClose = listener;
 	return this;
 }
 
 /**
- * juice.ui.Alert prototype
+ * duice.ui.Alert prototype
  */
-juice.ui.Alert = function(message){
-	juice.ui.__.call(this);
+duice.ui.Alert = function(message){
+	duice.ui.__.call(this);
 	var $this = this;
 	
 	// listener
@@ -3163,47 +3163,47 @@ juice.ui.Alert = function(message){
 
 	// contents
 	this.content = document.createElement('div');
-	this.content.classList.add('juice-ui-alert');
+	this.content.classList.add('duice-ui-alert');
 	
 	// message
 	this.message = document.createElement('div');
-	this.message.classList.add('juice-ui-alert-message');
+	this.message.classList.add('duice-ui-alert-message');
 	this.message.appendChild(document.createTextNode(message));
 	this.content.appendChild(this.message);
 	
 	// button
 	this.button = document.createElement('div');
-	this.button.classList.add('juice-ui-alert-button');
+	this.button.classList.add('duice-ui-alert-button');
 	this.content.appendChild(this.button);
 	
 	// confirm button
 	this.buttonConfirm = document.createElement('button');
-	this.buttonConfirm.classList.add('juice-ui-alert-button-confirm');
+	this.buttonConfirm.classList.add('duice-ui-alert-button-confirm');
 	this.buttonConfirm.addEventListener('click', function(){
 		$this.confirm();
 	});
 	this.button.appendChild(this.buttonConfirm);
 
 	// creates dialog
-	this.dialog = new juice.ui.Dialog(this.content);
+	this.dialog = new duice.ui.Dialog(this.content);
 	
 	// return self
 	return this;
 }
-juice.ui.Alert.prototype = Object.create(juice.ui.__.prototype);
+duice.ui.Alert.prototype = Object.create(duice.ui.__.prototype);
 // setting title 
-juice.ui.Alert.prototype.setTitle = function(title){
+duice.ui.Alert.prototype.setTitle = function(title){
 	this.dialog.setTitle(title);
 	return this;
 }
 // opens alert message box 
-juice.ui.Alert.prototype.open = function(){
+duice.ui.Alert.prototype.open = function(){
 	this.dialog.open();
 	this.buttonConfirm.focus();
 	return this;
 }
 // confirm 
-juice.ui.Alert.prototype.confirm = function(){
+duice.ui.Alert.prototype.confirm = function(){
 	var $this = this;
 	
 	// calls beforeConfirm
@@ -3224,21 +3224,21 @@ juice.ui.Alert.prototype.confirm = function(){
 	}
 }
 // defines before confirm event listener
-juice.ui.Alert.prototype.beforeConfirm = function(listener){
+duice.ui.Alert.prototype.beforeConfirm = function(listener){
 	this.listener.beforeConfirm = listener;
 	return this;
 }
 // defines after confirm event listener.
-juice.ui.Alert.prototype.afterConfirm = function(listener){
+duice.ui.Alert.prototype.afterConfirm = function(listener){
 	this.listener.afterConfirm = listener;
 	return this;
 }
 
 //-----------------------------------------------------------------------------
-// juice.ui.Confirm prototype
+// duice.ui.Confirm prototype
 //-----------------------------------------------------------------------------
-juice.ui.Confirm = function(message){
-	juice.ui.__.call(this);
+duice.ui.Confirm = function(message){
+	duice.ui.__.call(this);
 	var $this = this;
 	
 	// event property
@@ -3246,22 +3246,22 @@ juice.ui.Confirm = function(message){
 
 	// contents
 	this.content = document.createElement('div');
-	this.content.classList.add('juice-ui-confirm');
+	this.content.classList.add('duice-ui-confirm');
 	
 	// message
 	this.message = document.createElement('div');
-	this.message.classList.add('juice-ui-confirm-message');
+	this.message.classList.add('duice-ui-confirm-message');
 	this.message.appendChild(document.createTextNode(message));
 	this.content.appendChild(this.message);
 	
 	// button
 	this.button = document.createElement('div');
-	this.button.classList.add('juice-ui-confirm-button');
+	this.button.classList.add('duice-ui-confirm-button');
 	this.content.appendChild(this.button);
 	
 	// confirm button
 	this.buttonConfirm = document.createElement('button');
-	this.buttonConfirm.classList.add('juice-ui-confirm-button-confirm');
+	this.buttonConfirm.classList.add('duice-ui-confirm-button-confirm');
 	this.buttonConfirm.addEventListener('click', function(){
 		$this.confirm();
 	});
@@ -3269,32 +3269,32 @@ juice.ui.Confirm = function(message){
 	
 	// confirm button
 	this.buttonCancel = document.createElement('button');
-	this.buttonCancel.classList.add('juice-ui-confirm-button-cancel');
+	this.buttonCancel.classList.add('duice-ui-confirm-button-cancel');
 	this.buttonCancel.addEventListener('click', function(){
 		$this.cancel();
 	});
 	this.button.appendChild(this.buttonCancel);
 
 	// creates dialog
-	this.dialog = new juice.ui.Dialog(this.content);
+	this.dialog = new duice.ui.Dialog(this.content);
 	
 	// return self
 	return this;
 }
-juice.ui.Confirm.prototype = Object.create(juice.ui.__.prototype);
+duice.ui.Confirm.prototype = Object.create(duice.ui.__.prototype);
 // setting title 
-juice.ui.Confirm.prototype.setTitle = function(title){
+duice.ui.Confirm.prototype.setTitle = function(title){
 	this.dialog.setTitle(title);
 	return this;
 }
 // opens alert message box 
-juice.ui.Confirm.prototype.open = function(){
+duice.ui.Confirm.prototype.open = function(){
 	this.dialog.open();
 	this.buttonCancel.focus();
 	return this;
 }
 // confirm 
-juice.ui.Confirm.prototype.confirm = function(){
+duice.ui.Confirm.prototype.confirm = function(){
 	var $this = this;
 	
 	// executes beforeConfirm listener
@@ -3315,7 +3315,7 @@ juice.ui.Confirm.prototype.confirm = function(){
 	}
 }
 // cancel 
-juice.ui.Confirm.prototype.cancel = function(){
+duice.ui.Confirm.prototype.cancel = function(){
 	var $this = this;
 	
 	// executes beforeCancel
@@ -3336,31 +3336,31 @@ juice.ui.Confirm.prototype.cancel = function(){
 	}
 }
 // defines before confirm event listener
-juice.ui.Confirm.prototype.beforeConfirm = function(listener){
+duice.ui.Confirm.prototype.beforeConfirm = function(listener){
 	this.listener.beforeConfirm = listener;
 	return this;
 }
 // defines after confirm event listener.
-juice.ui.Confirm.prototype.afterConfirm = function(listener){
+duice.ui.Confirm.prototype.afterConfirm = function(listener){
 	this.listener.afterConfirm = listener;
 	return this;
 }
 // defines before cancel event listener.
-juice.ui.Confirm.prototype.beforeCancel = function(listener){
+duice.ui.Confirm.prototype.beforeCancel = function(listener){
 	this.listener.beforeCancel = listener;
 	return this;
 }
 // defines after cancel event listener.
-juice.ui.Confirm.prototype.afterCancel = function(listener){
+duice.ui.Confirm.prototype.afterCancel = function(listener){
 	this.listener.afterCancel = listener;
 	return this;
 }
 
 //-----------------------------------------------------------------------------
-// juice.ui.Prompt prototype
+// duice.ui.Prompt prototype
 //-----------------------------------------------------------------------------
-juice.ui.Prompt = function(message){
-	juice.ui.__.call(this);
+duice.ui.Prompt = function(message){
+	duice.ui.__.call(this);
 	var $this = this;
 
 	// event property
@@ -3368,28 +3368,28 @@ juice.ui.Prompt = function(message){
 
 	// contents
 	this.content = document.createElement('div');
-	this.content.classList.add('juice-ui-prompt');
+	this.content.classList.add('duice-ui-prompt');
 	
 	// message
 	this.message = document.createElement('div');
-	this.message.classList.add('juice-ui-prompt-message');
+	this.message.classList.add('duice-ui-prompt-message');
 	this.message.appendChild(document.createTextNode(message));
 	this.content.appendChild(this.message);
 
 	// input
 	this.input = document.createElement('input');
-	this.input.classList.add('juice-ui-prompt-input');
+	this.input.classList.add('duice-ui-prompt-input');
 	this.input.type = 'text'
 	this.content.appendChild(this.input);
 
 	// button
 	this.button = document.createElement('div');
-	this.button.classList.add('juice-ui-prompt-button');
+	this.button.classList.add('duice-ui-prompt-button');
 	this.content.appendChild(this.button);
 	
 	// confirm button
 	this.buttonConfirm = document.createElement('button');
-	this.buttonConfirm.classList.add('juice-ui-prompt-button-confirm');
+	this.buttonConfirm.classList.add('duice-ui-prompt-button-confirm');
 	this.buttonConfirm.addEventListener('click', function(){
 		$this.confirm();
 	});
@@ -3397,31 +3397,31 @@ juice.ui.Prompt = function(message){
 	
 	// confirm button
 	this.buttonCancel = document.createElement('button');
-	this.buttonCancel.classList.add('juice-ui-prompt-button-cancel');
+	this.buttonCancel.classList.add('duice-ui-prompt-button-cancel');
 	this.buttonCancel.addEventListener('click', function(){
 		$this.cancel();
 	});
 	this.button.appendChild(this.buttonCancel);
 
 	// creates dialog
-	this.dialog = new juice.ui.Dialog(this.content);
+	this.dialog = new duice.ui.Dialog(this.content);
 	
 	return this;
 }
-juice.ui.Prompt.prototype = Object.create(juice.ui.__.prototype);
+duice.ui.Prompt.prototype = Object.create(duice.ui.__.prototype);
 // sets title
-juice.ui.Prompt.prototype.setTitle = function(title){
+duice.ui.Prompt.prototype.setTitle = function(title){
 	this.dialog.setTitle(title);
 	return this;
 }
 // open prompt message dialog
-juice.ui.Prompt.prototype.open = function(){
+duice.ui.Prompt.prototype.open = function(){
 	this.dialog.open();
 	this.input.focus();
 	return this;
 }
 // confirm
-juice.ui.Prompt.prototype.confirm = function() {
+duice.ui.Prompt.prototype.confirm = function() {
 	var $this = this;
 	
 	// executes before cancel
@@ -3442,7 +3442,7 @@ juice.ui.Prompt.prototype.confirm = function() {
 	}
 }
 // cancel
-juice.ui.Prompt.prototype.cancel = function() {
+duice.ui.Prompt.prototype.cancel = function() {
 	var $this = this;
 	
 	// executes before cancel
@@ -3463,26 +3463,26 @@ juice.ui.Prompt.prototype.cancel = function() {
 	}
 }
 // return input value
-juice.ui.Prompt.prototype.getValue = function() {
+duice.ui.Prompt.prototype.getValue = function() {
 	return this.input.value;
 }
 // defines before confirm event listener
-juice.ui.Prompt.prototype.beforeConfirm = function(listener){
+duice.ui.Prompt.prototype.beforeConfirm = function(listener){
 	this.listener.beforeConfirm = listener;
 	return this;
 }
 // defines after confirm event listener.
-juice.ui.Prompt.prototype.afterConfirm = function(listener){
+duice.ui.Prompt.prototype.afterConfirm = function(listener){
 	this.listener.afterConfirm = listener;
 	return this;
 }
 // defines before cancel event listener.
-juice.ui.Prompt.prototype.beforeCancel = function(listener){
+duice.ui.Prompt.prototype.beforeCancel = function(listener){
 	this.listener.beforeCancel = listener;
 	return this;
 }
 // defines after cancel event listener.
-juice.ui.Prompt.prototype.afterCancel = function(listener){
+duice.ui.Prompt.prototype.afterCancel = function(listener){
 	this.listener.afterCancel = listener;
 	return this;
 }
@@ -3491,12 +3491,12 @@ juice.ui.Prompt.prototype.afterCancel = function(listener){
 //-----------------------------------------------------------------------------
 // Utilities structure package
 //-----------------------------------------------------------------------------
-juice.util = {};
+duice.util = {};
 
 //-----------------------------------------------------------------------------
-// juice.util.stringUtils
+// duice.util.stringUtils
 //-----------------------------------------------------------------------------
-juice.util.StringUtils = {
+duice.util.StringUtils = {
 	isEmpty: function(value) {
 		if(value === null || value === undefined || value.trim().length < 1){
 			return true;
@@ -3567,9 +3567,9 @@ juice.util.StringUtils = {
 }
 
 //-----------------------------------------------------------------------------
-//juice.util.formatUtils
+//duice.util.formatUtils
 //-----------------------------------------------------------------------------
-juice.util.FormatUtils = {
+duice.util.FormatUtils = {
 	toDateFormat: function(date, format){
 		String.prototype.string = function(len){var s = '', i = 0; while (i++ < len) { s += this; } return s;};
 		String.prototype.zf = function(len){return "0".string(len - this.length) + this;};
@@ -3612,9 +3612,9 @@ juice.util.FormatUtils = {
 }
 
 //-----------------------------------------------------------------------------
-//juice.util.formatUtils
+//duice.util.formatUtils
 //-----------------------------------------------------------------------------
-juice.util.RandomUtils = {
+duice.util.RandomUtils = {
 	generateUUID: function() {
 		var dt = new Date().getTime();
 		var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -3627,15 +3627,15 @@ juice.util.RandomUtils = {
 }
 
 //-----------------------------------------------------------------------------
-// juice.util.WebSocketClient prototype
+// duice.util.WebSocketClient prototype
 //-----------------------------------------------------------------------------
-juice.util.WebSocketClient = function(url) {
+duice.util.WebSocketClient = function(url) {
 	this.url = url;
 	this.listener = {};
 	this.reconnectInterval = 3*1000;	// ms
 	this.messageHandlers = [];
 }
-juice.util.WebSocketClient.prototype = {
+duice.util.WebSocketClient.prototype = {
 	open: function() {
 		this.webSocket = new WebSocket(this.url);
 		var $this = this;
@@ -3698,6 +3698,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 					typeof self !== 'undefined' ? self : 
 					typeof window !== 'undefined' ? window :
 					{};
-	juice.initialize(document,$context);
+	duice.initialize(document,$context);
 });
 

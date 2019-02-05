@@ -3,15 +3,15 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<title>JUICE - Workflow Example</title>
+		<title>duice - Workflow Example</title>
 
 		<!-- polyfill -->
 		<script src="lib/polyfill/dataset.js"></script>
 		<script src="lib/polyfill/classList.js"></script>
 		
-		<!-- juice library -->		
-		<script src="../src/juice.js"></script>
-		<link rel="stylesheet" href="../src/juice.css">
+		<!-- duice library -->		
+		<script src="../src/duice.js"></script>
+		<link rel="stylesheet" href="../src/duice.css">
 		
 		<!-- javascript library -->
 		<script src="lib/jquery.js"></script>
@@ -30,10 +30,10 @@
 		 * defines data object
 		 */
 		// defines data structure
-		var nodeList = new juice.data.List();
-		var linkList = new juice.data.List();
-		var nodeMap = new juice.data.Map();
-		var linkMap = new juice.data.Map();
+		var nodeList = new duice.data.List();
+		var linkList = new duice.data.List();
+		var nodeMap = new duice.data.Map();
+		var linkMap = new duice.data.Map();
 
 		nodeList.fromJson(
 			[{jobId:"step1",name:"Step 1",x: 200, y: 50}
@@ -55,7 +55,7 @@
 		 * add node
 		 */
 		function addNode() {
-			var nodeMap = new juice.data.Map();
+			var nodeMap = new duice.data.Map();
 			nodeList.addRow(nodeMap);
 		}
 		
@@ -63,7 +63,7 @@
 		 * add link
 		 */
 		function addLink() {
-			var linkMap = new juice.data.Map();
+			var linkMap = new duice.data.Map();
 			linkList.addRow(linkMap);
 		}
 		</script>
@@ -113,7 +113,7 @@
 		<main>
 			<div style="width:100%; display:flex; justify-content:space-between;">
 				<div style="width:50%; height:100vh; overflow:scroll;">
-					<ul data-juice="Workflow" data-juice-bind="nodeList,linkList" data-juice-item="node" data-juice-node-id="jobId" data-juice-node-x="x" data-juice-node-y="y" data-juice-link-from="jobId" data-juice-link-to="nextJobId" data-juice-link-text="onStatus">
+					<ul data-duice="Workflow" data-duice-bind="nodeList,linkList" data-duice-item="node" data-duice-node-id="jobId" data-duice-node-x="x" data-duice-node-y="y" data-duice-link-from="jobId" data-duice-link-to="nextJobId" data-duice-link-text="onStatus">
 						<li style="width:200px; height:100px; border:solid 1px black; background-color:#efefef;">
 							<div onclick="javascript:console.log('node');">
 							[{{$context.node.get('jobId')}}]{{$context.node.get('name')}}
@@ -132,7 +132,7 @@
 							<button onclick="javascript:addNode();">+</button>
 						</div>
 					</div>
-					<table data-juice="Grid" data-juice-bind="nodeList" data-juice-item="node" data-juice-editable="true">
+					<table data-duice="Grid" data-duice-bind="nodeList" data-duice-item="node" data-duice-editable="true">
 						<thead>
 							<tr>
 								<th>index</th>
@@ -146,10 +146,10 @@
 						<tbody>
 							<tr>
 								<td>{{$context.index+1}}</td>
-								<td><input data-juice="TextField" data-juice-bind="node.jobId"/></td>
-								<td><input data-juice="TextField" data-juice-bind="node.name"/></td>
-								<td><input data-juice="TextField" data-juice-bind="node.x"/></td>
-								<td><input data-juice="TextField" data-juice-bind="node.y"/></td>
+								<td><input data-duice="TextField" data-duice-bind="node.jobId"/></td>
+								<td><input data-duice="TextField" data-duice-bind="node.name"/></td>
+								<td><input data-duice="TextField" data-duice-bind="node.x"/></td>
+								<td><input data-duice="TextField" data-duice-bind="node.y"/></td>
 								<td><button data-index="{{$context.index}}" onclick="javascript:nodeList.removeRow(this.data.index);">-</button></td>
 							</tr>
 						</tbody>
@@ -163,7 +163,7 @@
 							<button onclick="javascript:addLink();">+</button>
 						</div>
 					</div>
-					<table data-juice="Grid" data-juice-bind="linkList" data-juice-item="link" data-juice-editable="true">
+					<table data-duice="Grid" data-duice-bind="linkList" data-duice-item="link" data-duice-editable="true">
 						<thead>
 							<tr>
 								<th>index</th>
@@ -176,9 +176,9 @@
 						<tbody>
 							<tr>
 								<td>{{$context.index+1}}</td>
-								<td><input data-juice="TextField" data-juice-bind="link.jobId"/></td>
-								<td><input data-juice="TextField" data-juice-bind="link.nextJobId"/></td>
-								<td><input data-juice="TextField" data-juice-bind="link.onStatus"/></td>
+								<td><input data-duice="TextField" data-duice-bind="link.jobId"/></td>
+								<td><input data-duice="TextField" data-duice-bind="link.nextJobId"/></td>
+								<td><input data-duice="TextField" data-duice-bind="link.onStatus"/></td>
 								<td><button data-index="{{$context.index}}" onclick="javascript:linkList.removeRow(this.data.index);">-</button></td>
 							</tr>
 						</tbody>
@@ -205,7 +205,7 @@
 						}
 					}
 					</script>
-					<table data-juice="Grid" data-juice-bind="nodeList" data-juice-item="node" data-juice-filter="filterNodeList">
+					<table data-duice="Grid" data-duice-bind="nodeList" data-duice-item="node" data-duice-filter="filterNodeList">
 						<tbody>
 							<tr>
 								<td>
@@ -221,19 +221,19 @@
 											</tr>
 											<tr>
 										    	<th>id</th>
-										    	<td><input data-juice="TextField" data-juice-bind="node.jobId"/></td>
+										    	<td><input data-duice="TextField" data-duice-bind="node.jobId"/></td>
 											</tr>
 											<tr>
 										    	<th>name</th>
-										    	<td><input data-juice="TextField" data-juice-bind="node.name"/></td>
+										    	<td><input data-duice="TextField" data-duice-bind="node.name"/></td>
 											</tr>
 											<tr>
 										    	<th>x</th>
-										    	<td><input data-juice="TextField" data-juice-bind="node.x"/></td>
+										    	<td><input data-duice="TextField" data-duice-bind="node.x"/></td>
 											</tr>
 											<tr>
 										    	<th>y</th>
-										    	<td><input data-juice="TextField" data-juice-bind="node.y"/></td>
+										    	<td><input data-duice="TextField" data-duice-bind="node.y"/></td>
 											</tr>
 										</tbody>
 									</table>
@@ -257,7 +257,7 @@
 						}
 					}
 					</script>
-					<table data-juice="Grid" data-juice-bind="linkList" data-juice-item="link" data-juice-filter="filterLinkList">
+					<table data-duice="Grid" data-duice-bind="linkList" data-duice-item="link" data-duice-filter="filterLinkList">
 						<colgroup>
 							<col width="100px" />
 							<col width="100px" />
@@ -268,9 +268,9 @@
 						<tbody>
 							<tr>
 								<td style="font-weight:bold;text-align:center;">Next Job ID</td>
-								<td><input data-juice="TextField" data-juice-bind="link.nextJobId"/></td>
+								<td><input data-duice="TextField" data-duice-bind="link.nextJobId"/></td>
 								<td style="font-weight:bold;text-align:center;">Condition</td>
-								<td><input data-juice="TextField" data-juice-bind="link.condition"/></td>
+								<td><input data-duice="TextField" data-duice-bind="link.condition"/></td>
 								<td><button data-index="{{$context.index}}" onclick="javascript:linkList.removeRow(this.data.index);">-</button></td>
 							</tr>
 						</tbody>
