@@ -260,11 +260,9 @@ duice.initialize = function(container, $context) {
 					var thumbnail = new duice.ui.Image(element);
 					var width = element.dataset.duiceWidth;
 					var height = element.dataset.duiceHeight;
-					var readonly = element.dataset.duiceReadonly;
 					thumbnail.bind(map, name);
 					thumbnail.setWidth(width);
 					thumbnail.setHeight(height);
-					readonly && thumbnail.setReadonly(readonly);
 					thumbnail.update();
 				break;
 			}
@@ -1534,6 +1532,7 @@ duice.ui.TextField.prototype.update = function() {
  * @param {boolean} readonly - whether element readonly or not
  */
 duice.ui.TextField.prototype.setReadonly = function(readonly){
+	super.setReadonly(readonly);
 	if(readonly){
 		this.input.setAttribute('readOnly',true);
 	}else{
@@ -1819,15 +1818,37 @@ duice.ui.Radio.prototype.setReadonly = function(readonly){
 }
 
 
-//-----------------------------------------------------------------------------
-// duice.ui.TextArea prototype
-//-----------------------------------------------------------------------------
+/**
+ * duice.ui.TextArea prototype
+ * @class
+ * @classdesc
+ * Textarea UI component
+ *
+ * ## HTML5 Tag and Attribute
+ * | HTML Tag   	| data-* Attribute 										| Description  							|
+ * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
+ * | label  	   	| data-duice="Textarea" 								| component Type						|
+ * | label		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
+ * 
+ * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/4zs6o3kv/embedded/js,html,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+ * @constructor
+ * @param {HTMLTextareaElement} textarea - textarea HTML element
+ */
 duice.ui.TextArea = function(textarea) {
 	duice.ui.__.call(this);
 	this.textarea = textarea;
 	this.textarea.classList.add('duice-ui-textArea');
 }
+
+// Freezes prototype
 duice.ui.TextArea.prototype = Object.create(duice.ui.__.prototype);
+
+/**
+ * Binds component to data object
+ * @method
+ * @param {duice.data.Map} map - name of data object
+ * @param {string} name - name of column in data object
+ */
 duice.ui.TextArea.prototype.bind = function(map,name) {
 	this.map = map;
 	this.name = name;
@@ -1839,6 +1860,11 @@ duice.ui.TextArea.prototype.bind = function(map,name) {
 		map.set(this.name, this.value);
 	});
 }
+
+/**
+ * Updates and redraws component
+ * @method
+ */
 duice.ui.TextArea.prototype.update = function() {
 	this.textarea.value = this.map.get(this.name) || '';
 	
@@ -1849,6 +1875,13 @@ duice.ui.TextArea.prototype.update = function() {
 		this.setReadonly(this.map.readonly[this.name]);	
 	}
 }
+
+/**
+ * Sets read-only
+ * @method
+ * @private
+ * @param {boolean} readonly - whether read-only or not
+ */
 duice.ui.TextArea.prototype.setReadonly = function(readonly){
 	if(readonly){
 		this.textarea.setAttribute('readonly','readonly');
@@ -1860,6 +1893,9 @@ duice.ui.TextArea.prototype.setReadonly = function(readonly){
 //-----------------------------------------------------------------------------
 // duice.ui.HtmlEditor prototype
 //-----------------------------------------------------------------------------
+/**
+ * 
+ */
 duice.ui.HtmlEditor = function(div) {
 	duice.ui.__.call(this);
 	var $this = this;
