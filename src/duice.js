@@ -30,7 +30,7 @@
 // duice.ui.ListView
 // duice.ui.TreeView
 // duice.ui.Grid
-// duice.ui.Workflow
+// duice.ui.Flow
 // duice.ui.Pagination
 // duice.ui.Dialog
 // duice.ui.Alert
@@ -135,27 +135,28 @@ duice.initialize = function(container, $context) {
 		}
 	}
 	
-	// creates Workflow
-	var workflowElements = container.querySelectorAll('ul[data-duice="Workflow"]');
-	for(var i = 0; i < workflowElements.length; i++ ) {
+	// creates Flow
+	var flowElements = container.querySelectorAll('ul[data-duice="Flow"]');
+	for(var i = 0; i < flowElements.length; i++ ) {
 		try {
-			var element = workflowElements[i];
-			var workflow = new duice.ui.Workflow(element);
+			var element = flowElements[i];
+			var flow = new duice.ui.Flow(element);
 			var bind = element.dataset.duiceBind.split(',');
 			var nodeList = getObject($context,bind[0]);
 			var linkList = getObject($context,bind[1]);
-			workflow.bind(nodeList, linkList);
-			workflow.setNodeId(element.dataset.duiceNodeId);
-			workflow.setNodeX(element.dataset.duiceNodeX);
-			workflow.setNodeY(element.dataset.duiceNodeY);
-			workflow.setLinkFrom(element.dataset.duiceLinkFrom);
-			workflow.setLinkTo(element.dataset.duiceLinkTo);
-			element.dataset.duiceLinkText && workflow.setLinkText(element.dataset.duiceLinkText);
-			workflow.update();
+			flow.bind(nodeList,linkList);
+			flow.setItem(element.dataset.duiceItem);
+			flow.setNodeId(element.dataset.duiceNodeId);
+			flow.setNodeX(element.dataset.duiceNodeX);
+			flow.setNodeY(element.dataset.duiceNodeY);
+			flow.setLinkFrom(element.dataset.duiceLinkFrom);
+			flow.setLinkTo(element.dataset.duiceLinkTo);
+			element.dataset.duiceLinkText && flow.setLinkText(element.dataset.duiceLinkText);
+			flow.update();
 			var id = duice.util.RandomUtils.generateUUID();
 			element.dataset.duice = +id;
 		}catch(e){
-			console.error(e,workflowElements[i]);
+			console.error(e,flowElements[i]);
 			throw e;
 		}
 	}
@@ -211,9 +212,9 @@ duice.initialize = function(container, $context) {
 					label.update();
 				break;
 				case 'Text':
-					var contents = new duice.ui.Text(element);
-					contents.bind(map,name);
-					contents.update();
+					var text = new duice.ui.Text(element);
+					text.bind(map,name);
+					text.update();
 				break;
 				case 'TextField':
 					var textField = new duice.ui.TextField(element);
@@ -609,11 +610,11 @@ duice.data.List = function(jsonArray) {
 	duice.data.__.call(this);
 	this.mapList = new Array();
 	this.index = -1;
+	this.enable = true;
+	this.readonly = {};
 	if(jsonArray) {
 		this.fromJson(jsonArray);
 	}
-	this.enable = true;
-	this.readonly = {};
 }
 duice.data.List.prototype = Object.create(duice.data.__.prototype);
 
@@ -1519,10 +1520,12 @@ duice.ui.TextField.prototype.bind = function(map, name) {
 duice.ui.TextField.prototype.update = function() {
 	var value = this.map.get(this.name) == undefined ? '' : this.map.get(this.name);
 	this.input.value = value;
-	if(this.map.enable == false){
+
+	// checks read-only
+	if(this.map.isEnable() == false || this.map.isReadonly(this.name) == true){
 		this.setReadonly(true);
 	}else{
-		this.setReadonly(this.map.readonly[this.name]);	
+		this.setReadonly(false);
 	}
 }
 
@@ -1532,7 +1535,6 @@ duice.ui.TextField.prototype.update = function() {
  * @param {boolean} readonly - whether element readonly or not
  */
 duice.ui.TextField.prototype.setReadonly = function(readonly){
-	super.setReadonly(readonly);
 	if(readonly){
 		this.input.setAttribute('readOnly',true);
 	}else{
@@ -1879,7 +1881,6 @@ duice.ui.TextArea.prototype.update = function() {
 /**
  * Sets read-only
  * @method
- * @private
  * @param {boolean} readonly - whether read-only or not
  */
 duice.ui.TextArea.prototype.setReadonly = function(readonly){
@@ -1894,7 +1895,17 @@ duice.ui.TextArea.prototype.setReadonly = function(readonly){
 // duice.ui.HtmlEditor prototype
 //-----------------------------------------------------------------------------
 /**
- * 
+ * duice.ui.HtmlEditor prototype
+ * @class
+ * @classdesc
+ * ## HTML5 Tag and Attribute
+ * | HTML Tag   	| data-* Attribute 										| Description  							|
+ * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
+ * | label  	   	| data-duice="HtmlEditor" 								| component Type						|
+ * | label		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
+ * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/329r5jw8/embedded/html,js,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe> 
+ * @constructor
+ * @param {HTMLDivElement} div - div HTML element
  */
 duice.ui.HtmlEditor = function(div) {
 	duice.ui.__.call(this);
@@ -1920,7 +1931,16 @@ duice.ui.HtmlEditor = function(div) {
 	// pre element designMode 
 	this.pre.contentEditable = 'true';
 }
+
+// Freezes component prototype
 duice.ui.HtmlEditor.prototype = Object.create(duice.ui.__.prototype);
+
+/**
+ * Binds component to data object
+ * @method
+ * @param {duice.data.Map} map - name of data object to bind
+ * @param {string} name - name of column to bind 
+ */
 duice.ui.HtmlEditor.prototype.bind = function(map,name) {
 	var $this = this;
 	this.map = map;
@@ -1939,6 +1959,11 @@ duice.ui.HtmlEditor.prototype.bind = function(map,name) {
 		map.set(name, this.value);
 	});
 }
+
+/**
+ * Updates component
+ * @method
+ */
 duice.ui.HtmlEditor.prototype.update = function() {
 	if(this.pre.innerHTML != this.map.get(this.name)) {
 		this.pre.innerHTML = this.map.get(this.name) || '';
@@ -1947,6 +1972,11 @@ duice.ui.HtmlEditor.prototype.update = function() {
 		this.textarea.value = this.map.get(this.name) || '';
 	}
 }
+
+/**
+ * Creates toolbar
+ * @method
+ */
 duice.ui.HtmlEditor.prototype.createToolbar = function() {
 	var editor = this;
 	var toolbar = document.createElement('div');
@@ -2082,9 +2112,22 @@ duice.ui.HtmlEditor.prototype.createToolbar = function() {
 	
 	return toolbar;
 }
+
+/**
+ * Executes commands
+ * @method
+ * @param {string} commandName - name of command to execute
+ * @param {boolean} showDefaultUI - A Boolean indicating whether the default user interface should be shown. This is not implemented in Mozilla.
+ * @param {string} valueArgument - For commands which require an input argument
+ */
 duice.ui.HtmlEditor.prototype.execCommand = function(commandName, showDefaultUI, valueArgument) {
 	document.execCommand(commandName, showDefaultUI, valueArgument);
 }
+
+/**
+ * ToggleHtml
+ * @method
+ */
 duice.ui.HtmlEditor.prototype.toggleHtml = function() {
 	if(this.html == true){
 		this.html = false;
@@ -2097,9 +2140,20 @@ duice.ui.HtmlEditor.prototype.toggleHtml = function() {
 	}
 }
 
-//-----------------------------------------------------------------------------
-// duice.ui.CronExpression prototype
-//-----------------------------------------------------------------------------
+/**
+ * duice.ui.CronExpression prototype
+ * @class
+ * @classdesc
+ * ## HTML5 Tag and Attribute
+ * | HTML Tag   	| data-* Attribute 										| Description  							|
+ * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
+ * | label  	   	| data-duice="CronExpression" 							| component Type						|
+ * | label		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
+ *
+ * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/k4dsxywm/embedded/js,html,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe> 
+ * @constructor
+ * @param {HTMLInputElement} input - input HTML element
+ */
 duice.ui.CronExpression = function(input) {
 	duice.ui.__.call(this);
 	this.input = input;
@@ -2153,7 +2207,13 @@ duice.ui.CronExpression = function(input) {
 	// append editor span to input parent
 	this.input.parentNode.appendChild(this.editor);
 }
+
+// extends component prototype
 duice.ui.CronExpression.prototype = Object.create(duice.ui.__.prototype);
+
+/**
+ * Text property
+ */
 duice.ui.CronExpression.prototype.text = {
 	EVERY:'Every',
 	LAST_DAY: 'Last Day',
@@ -2168,6 +2228,13 @@ duice.ui.CronExpression.prototype.text = {
 	SAT: 'Saturday',
 	SUN: 'Sunday'
 }
+
+/**
+ * Binds component to data object
+ * @method
+ * @param {duice.data.Map} map - Map object to bind
+ * @param {string} name - column name of Map to bind
+ */
 duice.ui.CronExpression.prototype.bind = function(map, name) {
 	this.map = map;
 	this.name = name;
@@ -2176,7 +2243,11 @@ duice.ui.CronExpression.prototype.bind = function(map, name) {
 		map.set(name, this.value);
 	});
 }
-/* update */
+
+/**
+ * Updates component
+ * @method
+ */
 duice.ui.CronExpression.prototype.update = function() {
 	var $this = this;
 	this.input.value = this.map.get(this.name) || '';
@@ -2191,6 +2262,12 @@ duice.ui.CronExpression.prototype.update = function() {
 	this.month.value = cronExpressionArray[4];
 	this.week.value = cronExpressionArray[5];
 }
+
+/**
+ * Sets read-only
+ * @method
+ * @param {boolean} readonly - whether read-only or not
+ */
 duice.ui.CronExpression.prototype.setReadonly = function(readonly) {
 	if(readonly == true) {
 		this.input.setAttribute('readonly',true);
@@ -2210,10 +2287,20 @@ duice.ui.CronExpression.prototype.setReadonly = function(readonly) {
 		this.week.removeAttribute('disabled');
 	}
 }
+
+/**
+ * Checks is valid cron expression
+ * @method
+ */
 duice.ui.CronExpression.prototype.isSupprotCronExpression = function() {
 	var pattern = /([\d]{1,2}) ([\d]{1,2}) ([\d|\*]{1,2}) ([\d|\*]{1,2}) ([\d|\*]{1,2}) ([\?]{1})$/gi;
 	return pattern.test(this.input.value);
 }
+
+/**
+ * Generates and Sets cron expression
+ * @method
+ */
 duice.ui.CronExpression.prototype.generateCronExpression = function() {
 	var cronExpression = this.second.value 
 					+ ' ' + this.minute.value 
@@ -2223,6 +2310,12 @@ duice.ui.CronExpression.prototype.generateCronExpression = function() {
 					+ ' ' + this.week.value;
 	this.map.set(this.name, cronExpression);
 }
+
+/**
+ * Creates select element of second
+ * @method
+ * @return {HTMLSelectElement} second select element
+ */
 duice.ui.CronExpression.prototype.createSelectSecond = function() {
 	var selectSecond = document.createElement('select');
 	for(var i = 0; i < 59; i ++){
@@ -2242,6 +2335,12 @@ duice.ui.CronExpression.prototype.createSelectSecond = function() {
 	}
 	return selectSecond;
 }
+
+/**
+ * Creates select element of minite
+ * @method
+ * @return {HTMLSelectElement} minute select element
+ */
 duice.ui.CronExpression.prototype.createSelectMinute = function() {
 	var selectMinute = document.createElement('select');
 	for(var i = 0; i <= 59; i ++){
@@ -2263,6 +2362,12 @@ duice.ui.CronExpression.prototype.createSelectMinute = function() {
 	}
 	return selectMinute;
 }
+
+/**
+ * Creates select element of hour
+ * @method
+ * @return {HTMLSelectElement} hour select element
+ */
 duice.ui.CronExpression.prototype.createSelectHour = function() {
 	var selectHour = document.createElement('select');
 	var defaultOption = document.createElement('option');
@@ -2288,6 +2393,12 @@ duice.ui.CronExpression.prototype.createSelectHour = function() {
 	}
 	return selectHour;
 }
+
+/**
+ * Creates select element of day
+ * @method
+ * @return {HTMLSelectElement} day select element
+ */
 duice.ui.CronExpression.prototype.createSelectDay = function() {
 	var selectDay = document.createElement('select');
 	
@@ -2337,6 +2448,12 @@ duice.ui.CronExpression.prototype.createSelectDay = function() {
 	}
 	return selectDay;
 }
+
+/**
+ * Creates select element of month
+ * @method
+ * @return {HTMLSelectElement} month select element
+ */
 duice.ui.CronExpression.prototype.createSelectMonth = function() {
 	var selectMonth = document.createElement('select');
 	var defaultOption = document.createElement('option');
@@ -2362,6 +2479,12 @@ duice.ui.CronExpression.prototype.createSelectMonth = function() {
 	}
 	return selectMonth;
 }
+
+/**
+ * Creates week select element
+ * @method
+ * @return {HTMLSelectElement} week select element
+ */
 duice.ui.CronExpression.prototype.createSelectWeek = function() {
 	var selectWeek = document.createElement('select');
 	var defaultOption = document.createElement('option');
@@ -2402,9 +2525,19 @@ duice.ui.CronExpression.prototype.createSelectWeek = function() {
 	return selectWeek;
 }
 
-//-----------------------------------------------------------------------------
-// duice.ui.Image prototype
-//-----------------------------------------------------------------------------
+/**
+ * duice.ui.Image prototype
+ * @class
+ * @classdesc
+ * ## HTML5 Tag and Attribute
+ * | HTML Tag   	| data-* Attribute 										| Description  							|
+ * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
+ * | img	  	   	| data-duice="Text" 									| component Type						|
+ * | img			| data-duice-width="{width pixel}						| pixel of img width					|
+ * | img 			| data-juice-height="{height pixel}"					| pixel of img height					|
+ * | img		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
+ * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/bzce5097/embedded/js,html,result/dark" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+ */
 duice.ui.Image = function(img) {
 	duice.ui.__.call(this);
 	this.img = img;
@@ -2417,7 +2550,16 @@ duice.ui.Image = function(img) {
 	this.height = 128;
 	this.readonly = false;
 }
+
+// Extends prototypes
 duice.ui.Image.prototype = Object.create(duice.ui.__.prototype);
+
+/**
+ * Binds component to data object
+ * @method
+ * @param {duice.data.Map} map - map object to bind
+ * @param {string} name - name of column to bind
+ */
 duice.ui.Image.prototype.bind = function(map, name) {
 	var $this = this;
 	this.map = map;
@@ -2462,6 +2604,11 @@ duice.ui.Image.prototype.bind = function(map, name) {
 	});
 	
 }
+
+/**
+ * Updates component
+ * @method
+ */
 duice.ui.Image.prototype.update = function() {
 	var $this = this;
 	if(this.map.get(this.name)) {
@@ -2480,23 +2627,53 @@ duice.ui.Image.prototype.update = function() {
 		}
 	}
 }
+
+/**
+ * Sets image width
+ * @method
+ * @param {number} width - image width pixel
+ */
 duice.ui.Image.prototype.setWidth = function(width){
 	if(width){
 		this.width = width;
 	}
 }
+
+/**
+ * Sets image height
+ * @method
+ * @param {number} height - image height pixel
+ */
 duice.ui.Image.prototype.setHeight = function(height){
 	if(height){
 		this.height = height;
 	}
 }
+
+/**
+ * Sets read-only
+ * @method 
+ * @param {boolean} readonly - whether read-only or not
+ */
 duice.ui.Image.prototype.setReadonly = function(readonly){
 	this.readonly = readonly;
 }
 
-//-----------------------------------------------------------------------------
-// duice.ui.ListView prototype
-//-----------------------------------------------------------------------------
+/**
+ * duice.ui.ListView prototype
+ * @class
+ * @classdesc
+ * ListView component
+ * ## HTML Tag and Attribute
+ * | HTML Tag   	| data-* Attribute 										| Description  							|
+ * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
+ * | ul		  	   	| data-duice="ListView"									| component Type						|
+ * | ul			    | data-duice-bind="{duice.data.List}"    				| specify binding List 					|
+ * | ul			    | data-duice-item="(name of row object)"    			| defines name of row object			|
+ * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/nhe60foq/embedded/html,js,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+ * @constructor
+ * @param {HTMLUlElement} ul - ul HTML element
+ */
 duice.ui.ListView = function(ul){
 	duice.ui.__.call(this);
 	this.ul = ul;
@@ -2505,17 +2682,33 @@ duice.ui.ListView = function(ul){
 	this.ul.removeChild(this.li);
 	this.rows = new Array();
 }
+
+// Extends prototype
 duice.ui.ListView.prototype = Object.create(duice.ui.__.prototype);
-// bind data
+
+/**
+ * Binds component to data object
+ * @method
+ * @param {duice.data.List} list - list data object to bind
+ */
 duice.ui.ListView.prototype.bind = function(list){
 	this.list = list;
 	this.list.addObserver(this);
 }
-// sets item
+
+/**
+ * Defines row element name
+ * @method
+ * @param {string} item - name of row element
+ */
 duice.ui.ListView.prototype.setItem = function(item){
 	this.item = item;
 }
-// update
+
+/**
+ * Updates component
+ * @method
+ */
 duice.ui.ListView.prototype.update = function(){
 	
 	// remove previous rows
@@ -2532,7 +2725,13 @@ duice.ui.ListView.prototype.update = function(){
 		this.rows.push(li);
 	}
 }
-// creates row
+
+/**
+ * Creates row li element
+ * @method
+ * @param {number} index - row index
+ * @param {duice.data.Map} map - current row Map data object
+ */
 duice.ui.ListView.prototype.createRow = function(index, map){
 	var $this = this;
 	var ul = this.ul;
@@ -2554,9 +2753,20 @@ duice.ui.ListView.prototype.createRow = function(index, map){
 	return li;
 }
 
-//-----------------------------------------------------------------------------
-// duice.ui.TreeView prototype
-//-----------------------------------------------------------------------------
+/**
+ * duice.ui.TreeView prototype
+ * @class
+ * @classdesc
+ * ## HTML5 Tag and Attribute
+ * | HTML Tag   	| data-* Attribute 														| Description  								|
+ * | ------------- 	| ---------------------------------------------------------------------	| -----------------------------------		|
+ * | ul 	 	   	| data-duice="TreeView" 												| component Type							|
+ * | ul			    | data-duice-bind="(duice.data.Tree)"									| specify name of duice.data.List object	|
+ * | ul			    | data-duice-item="(node alias)"  										| defines row map object name				|
+ * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/z8djn946/embedded/html,js,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe> 
+ * @constructor
+ * @param {HTMLUlElement} ul - ul HTML element
+ */
 duice.ui.TreeView = function(ul){
 	duice.ui.__.call(this);
 	this.ul = ul;
@@ -2564,21 +2774,42 @@ duice.ui.TreeView = function(ul){
 	this.li = this.ul.querySelector('li');
 	this.ul.removeChild(this.li);
 }
+
+// Extends prototype
 duice.ui.TreeView.prototype = Object.create(duice.ui.__.prototype);
-//bind data 
+
+/**
+ * Binds component to tree data object
+ * @method
+ * @param {duice.data.Tree} tree - duice.data.Tree data object to bind
+ */
 duice.ui.TreeView.prototype.bind = function(tree) {
 	this.tree = tree;
 	this.tree.addObserver(this);
 }
-//set item 
+
+/**
+ * Sets each item(node) name
+ * @method
+ * @param {string} item - alias name of each tree node
+ */
 duice.ui.TreeView.prototype.setItem = function(item){
 	this.item = item;
 }
-//setting editable 
+
+/**
+ * Sets editable
+ * @method
+ * @param {boolean} editable - whether editable or not
+ */
 duice.ui.TreeView.prototype.setEditable = function(editable) {
 	this.editable = editable;
 }
-//update
+
+/**
+ * Updates component
+ * @method
+ */
 duice.ui.TreeView.prototype.update = function() {
 
 	// remove previous li
@@ -2609,7 +2840,12 @@ duice.ui.TreeView.prototype.update = function() {
 	}
 }
 
-//creates node 
+/**
+ * Creates node
+ * @method
+ * @param {number} index - tree index array ex)[0,1,3]...
+ * @param {duice.data.Map} node - node element map data object
+ */
 duice.ui.TreeView.prototype.createNode = function(index, node){
 	var $this = this;
 	var li = this.li.cloneNode(true);
@@ -2742,9 +2978,20 @@ duice.ui.TreeView.prototype.createNode = function(index, node){
 	return li;
 }
 
-//-----------------------------------------------------------------------------
-// duice.ui.Grid prototype
-//-----------------------------------------------------------------------------
+/**
+ * duice.ui.Grid prototype
+ * @class
+ * @classdesc
+ * ## HTML Tag and Attribute
+ * | HTML Tag   	| data-* Attribute 										| Description  							|
+ * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
+ * | table	  	   	| data-duice="Grid"										| component Type is "Grid"				|
+ * | table		    | data-duice-bind="{duice.data.List}"    				| defines binding List 					|
+ * | table		    | data-duice-item="(alias of each item)"    			| defines name of row object			|
+ * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/cxp4unka/embedded/html,js,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>                                                                                                                      
+ * @constructor
+ * @param {HTMLTableElement} table - table HTML element
+ */
 duice.ui.Grid = function(table) {
 	duice.ui.__.call(this);
 	this.table = table;
@@ -2753,25 +3000,42 @@ duice.ui.Grid = function(table) {
 	this.table.removeChild(this.tbody);
 	this.rows = new Array();
 }
+
+// Extends prototype
 duice.ui.Grid.prototype = Object.create(duice.ui.__.prototype);
-// bind data structure 
+
+/**
+ * Binds component to list data object
+ * @method
+ * @param {duice.data.List} list - name of list data object to bind
+ */
 duice.ui.Grid.prototype.bind = function(list) {
 	this.list = list;
 	this.list.addObserver(this);
 }
-// set item
+
+/**
+ * Sets item map alias
+ * @method
+ * @param {string} item - alias of item map
+ */
 duice.ui.Grid.prototype.setItem = function(item) {
 	this.item = item;
 }
-// sets editable
+
+/**
+ * Sets whether editable or not
+ * @method
+ * @param {boolean} editable - whether editable or not
+ */
 duice.ui.Grid.prototype.setEditable = function(editable){
 	this.editable = editable;
 }
-// sets filter 
-duice.ui.Grid.prototype.setFilter = function(filter){
-	this.filter = filter;
-}
-// update 
+
+/**
+ * Updates component
+ * @method
+ */
 duice.ui.Grid.prototype.update = function() {
 	
 	// remove previous rows
@@ -2795,7 +3059,13 @@ duice.ui.Grid.prototype.update = function() {
 		this.rows.push(emptyRow);
 	}
 }
-// creates row 
+
+/**
+ * Creates row tbody
+ * @method
+ * @param {number} index - row index
+ * @param {duice.data.map} map - row map data object
+ */
 duice.ui.Grid.prototype.createRow = function(index,map) {
 	var $this = this;
 	var table = this.table;
@@ -2881,25 +3151,17 @@ duice.ui.Grid.prototype.createRow = function(index,map) {
 		}
 	}
 	
-	// Adjust filter
-	if(this.filter){
-		if(this.filter.call($context) == false) {
-			tbody.style.display = 'none';
-		}
-	}
-	
 	// return
 	return tbody;
 }
-// creates not found row 
+
+/**
+ * Creates empty data message row
+ * @method 
+ */
 duice.ui.Grid.prototype.createEmptyRow = function() {
 	var tbody = this.tbody.cloneNode(true);
 	this.removeChildNodes(tbody);
-	/*
-	while (tbody.firstChild) {
-		tbody.removeChild(tbody.firstChild);
-	}
-	*/
 	
 	tbody.dataset.duiceIndex = -1;
 	tbody.classList.add('duice-ui-grid-empty')
@@ -2915,68 +3177,141 @@ duice.ui.Grid.prototype.createEmptyRow = function() {
 	return tbody;
 }
 
-//-----------------------------------------------------------------------------
-// duice.data.Workflow prototype
-//-----------------------------------------------------------------------------
-duice.ui.Workflow = function(ul){
+/**
+ * duice.ui.Flow prototype
+ * @class
+ * @classdesc
+ * ## HTML Tag and Attribute
+ * | HTML Tag   	| data-* Attribute 										| Description  							|
+ * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
+ * | ul	  		   	| data-duice="Flow"										| component Type is "Flow"				|
+ * | ul			    | data-duice-bind="(node list),(link list)" 			| defines binding node nad link list	|
+ * | ul			    | data-duice-item="(alias of node item)"    			| defines name of node object			|
+ * | ul 			| data-duice-node-id="(node id column)"					| defines name of node ID				|
+ * | ul 			| data-duice-node-x="(node x-position column)"			| defiens x-position column in node		|
+ * | ul 			| data-duice-node-y="(node y-position column)"			| defines y-position column in node		|
+ * | ul 			| data-duice-link-from="(link from column)"				| defines link from column in link		|
+ * | ul 			| data-duice-link-to="(link to column)"					| defines link to column in link		|
+ * | ul 			| data-duice-link-text="(link text column)"				| defines link text column in link 		|
+ *
+ * <iframe width="100%" height="600" src="http://jsfiddle.net/chomookun/4t5783ch/embedded/html,js,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe> 
+ * @constructor
+ * @param {HTMLUlElement} ul - ul HTML element
+ */
+duice.ui.Flow = function(ul){
 	duice.ui.__.call(this);
 	this.ul = ul;
-	this.ul.classList.add('duice-ui-workflow');
-	this.ul.style.listStyleType = 'none';
+	this.ul.classList.add('duice-ui-flow');
+	this.ul.style.listStyleType = 'one';
 	this.li = this.ul.querySelector('li');
 	this.ul.removeChild(this.li);
-	if(this.ul.parentElement){
-		this.ul.parentElement.style.position = 'relative';
-	}
+	this.ul.style.position = 'relative';
+	this.ul.style.overflow = 'scroll';
 	
-	// default option
-	this.nodeId = 'nodeId';
-	this.nodeX = 'nodeX';
-	this.nodeY = 'nodeY';
-	this.linkFrom = 'linkFrom';
-	this.linkTo = 'linkTo';
+	// option
+	this.item = null;
+	this.nodeId = null;
+	this.nodeX = null;
+	this.nodeY = null;
+	this.linkItem = null;
+	this.linkFrom = null;
+	this.linkTo = null;
 	this.linkText = null;
 }
-duice.ui.Workflow.prototype = Object.create(duice.ui.__.prototype);
-// bind data structure
-duice.ui.Workflow.prototype.bind = function(nodeList,linkList) {
+
+// Extends UI component prototype
+duice.ui.Flow.prototype = Object.create(duice.ui.__.prototype);
+
+/**
+ * Binds component to node,link list data object
+ * @method
+ * @param {duice.data.List} nodeList - list of node data object to bind
+ * @param {duice.data.List> linkList - list of link data object to bind
+ */
+duice.ui.Flow.prototype.bind = function(nodeList,linkList) {
 	this.nodeList = nodeList;
 	this.linkList = linkList;
 	this.nodeList.addObserver(this);
 	this.linkList.addObserver(this);
 }
-// setting node id 
-duice.ui.Workflow.prototype.setNodeId = function(value) {
-	this.nodeId = value;
+
+/**
+ * Sets node item alias
+ * @method
+ * @param {string} nodeItem - alias of child node items.
+ */
+duice.ui.Flow.prototype.setItem = function(item){
+	this.item = item;
 }
-duice.ui.Workflow.prototype.setNodeX = function(value) {
-	this.nodeX = value;
+
+/**
+ * Sets node id column
+ * @method
+ * @param {string} nodeId - column name of node id
+ */
+duice.ui.Flow.prototype.setNodeId = function(nodeId) {
+	this.nodeId = nodeId;
 }
-duice.ui.Workflow.prototype.setNodeY = function(value) {
-	this.nodeY = value;
+
+/**
+ * Sets node x position column name
+ * @method
+ * @param {string} nodeX - column name of x position
+ */
+duice.ui.Flow.prototype.setNodeX = function(nodeX) {
+	this.nodeX = nodeX;
 }
-// setting link from 
-duice.ui.Workflow.prototype.setLinkFrom = function(value) {
-	this.linkFrom = value;
+
+/**
+ * Sets node y position column name
+ * @method
+ * @param {string} nodeY - column name of y position
+ */
+duice.ui.Flow.prototype.setNodeY = function(nodeY) {
+	this.nodeY = nodeY;
 }
-// setting link to 
-duice.ui.Workflow.prototype.setLinkTo = function(value) {
-	this.linkTo = value;
+
+/**
+ * Sets link from column name
+ * @method
+ * @param {string} linkFrom - column name of link from column
+ */
+duice.ui.Flow.prototype.setLinkFrom = function(linkFrom) {
+	this.linkFrom = linkFrom;
 }
+
+/**
+ * Sets link to column name
+ * @method
+ * @param {string} linkTo - column name of link to
+ */
+duice.ui.Flow.prototype.setLinkTo = function(linkTo) {
+	this.linkTo = linkTo;
+}
+
+/**
+ * Sets link text column name
+ * @method
+ * @param {string} linkText - column name of link text
+ */
 // setting link text
-duice.ui.Workflow.prototype.setLinkText = function(value) {
-	this.linkText = value;
+duice.ui.Flow.prototype.setLinkText = function(linkText) {
+	this.linkText = linkText;
 }
-// update 
-duice.ui.Workflow.prototype.update = function() {
+
+/**
+ * Updates component
+ * @method
+ */
+duice.ui.Flow.prototype.update = function() {
 	var $this = this;
 	var ul = this.ul;
 	
 	// remove previous node
-	var elements = this.ul.querySelectorAll('.duice-ui-workflow-node');
-	for(var i = 0; i < elements.length; i ++ ) {
+	var elements = this.ul.querySelectorAll('.duice-ui-flow-node');
+	for(var i = 0; i < elements.length; i ++ ) 
 		this.ul.removeChild(elements[i]);
-	}
+	
 	
 	// creates node list
 	for(var index = 0; index < this.nodeList.getRowCount(); index ++ ) {
@@ -2987,7 +3322,7 @@ duice.ui.Workflow.prototype.update = function() {
 	}
 	
 	// remove previous link
-	var elements = this.ul.querySelectorAll('.duice-ui-workflow-link');
+	var elements = this.ul.querySelectorAll('.duice-ui-flow-link');
 	for(var i = 0; i < elements.length; i ++ ) {
 		this.ul.removeChild(elements[i]);
 	}
@@ -2999,21 +3334,28 @@ duice.ui.Workflow.prototype.update = function() {
 		this.ul.appendChild(line);
 	}
 }
-// create ndoe
-duice.ui.Workflow.prototype.createNode = function(index, map){
+
+/**
+ * Creates node
+ * @method
+ * @param {number} index - node index to create
+ * @param {duice.data.Map} map - node map to create
+ * @return {HTMLLiElement} node li HTML element
+ */
+duice.ui.Flow.prototype.createNode = function(index, map){
 	var $this = this;
 	var li = this.li.cloneNode(true);
-	li.classList.add('duice-ui-workflow-node');
+	li.classList.add('duice-ui-flow-node');
 
 	var $context = {};
-	$context['node'] = map;
+	$context[this.item] = map;
 	li = this.executeExpression(li, $context);
 	li.dataset.duiceIndex = index;
 	li.dataset.duiceId = map.get(this.nodeId);
 	
 	// setting index class
 	if(index == this.nodeList.index){
-		li.classList.add('duice-ui-workflow-node-index');
+		li.classList.add('duice-ui-flow-node-index');
 	}
 	
 	// creates duice element.
@@ -3029,11 +3371,11 @@ duice.ui.Workflow.prototype.createNode = function(index, map){
 		
 		// setting current index
 		$this.nodeList.index = index;
-		var elements = $this.ul.querySelectorAll('.duice-ui-workflow-node');
+		var elements = $this.ul.querySelectorAll('.duice-ui-flow-node');
 		for(var i = 0; i < elements.length; i ++ ) {
-			elements[i].classList.remove('duice-ui-workflow-node-index');
+			elements[i].classList.remove('duice-ui-flow-node-index');
 		}
-		li.classList.add('duice-ui-workflow-node-index');
+		li.classList.add('duice-ui-flow-node-index');
 
 		// mouse move
 		var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
@@ -3071,25 +3413,31 @@ duice.ui.Workflow.prototype.createNode = function(index, map){
 	});
 	return li;
 }
-// create link 
-duice.ui.Workflow.prototype.createLink = function(index, map) {
+
+/**
+ * Creates link element and connect to node element
+ * @method
+ * @param {number} index - index to create
+ * @param {duice.data.Map} map - link node to create
+ */
+duice.ui.Flow.prototype.createLink = function(index, map) {
 	var $this = this;
 	var line = document.createElement('div');
 	line.style.position = 'absolute';
-	line.classList.add('duice-ui-workflow-link');
+	line.classList.add('duice-ui-flow-link');
 	line.dataset.duiceIndex = index;
 	
 	// setting current index
 	if(index == this.linkList.index){
-		line.classList.add('duice-ui-workflow-link-index');
+		line.classList.add('duice-ui-flow-link-index');
 	}
 	line.addEventListener('mousedown', function() {
 		$this.linkList.index = index;
-		var elements = $this.ul.querySelectorAll('.duice-ui-workflow-link');
+		var elements = $this.ul.querySelectorAll('.duice-ui-flow-link');
 		for(var i = 0; i < elements.length; i ++ ) {
-			elements[i].classList.remove('duice-ui-workflow-link-index');
+			elements[i].classList.remove('duice-ui-flow-link-index');
 		}
-		line.classList.add('duice-ui-workflow-link-index');
+		line.classList.add('duice-ui-flow-link-index');
 		$this.linkList.notifyObservers($this);
 	});
 
@@ -3146,7 +3494,7 @@ duice.ui.Workflow.prototype.createLink = function(index, map) {
 		// creates link text
 		if(this.linkText){
 			var span = document.createElement('span');
-			span.classList.add('duice-ui-workflow-link-text');
+			span.classList.add('duice-ui-flow-link-text');
 			line.appendChild(span);	
 			
 			var text = map.get(this.linkText);

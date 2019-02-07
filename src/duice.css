@@ -419,7 +419,7 @@
 /**
  * duice.ui.Workflow
  */
-.duice-ui-workflow {
+.duice-ui-flow {
 	list-style-type: none;
 	width: 100%;
 	height: 100%;
@@ -430,18 +430,18 @@
 					  linear-gradient(rgba(255,255,255,.3) 2px, transparent 1px),
              	      linear-gradient(90deg, rgba(255,255,255,.3) 2px, transparent 1px);
 }
-.duice-ui-workflow .duice-ui-workflow-node {
+.duice-ui-flow .duice-ui-flow-node {
 	background-color: white;
 }
-.duice-ui-workflow .duice-ui-workflow-node:hover {
+.duice-ui-flow .duice-ui-flow-node:hover {
 	cursor: hand;
 	cursor: pointer;
 }
-.duice-ui-workflow .duice-ui-workflow-node-index {
+.duice-ui-flow .duice-ui-flow-node-index {
 	background-color: #efefef;
 	box-shadow: 3px 3px #999;
 }
-.duice-ui-workflow .duice-ui-workflow-link {
+.duice-ui-flow .duice-ui-flow-link {
 	width: 10px;
 	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAA9SURBVChTY2RgYPgPxAQB0///hNWB1DDBGLgATA6sEASwKUYWgysEAWQJdI2MQAFMo7AAFBPxgQFTyMAAAKbuHPZYHowEAAAAAElFTkSuQmCC') 0 0 repeat;
 	border: solid 0px;
@@ -452,15 +452,15 @@
 	opacity: 0.5;
 	
 }
-.duice-ui-workflow .duice-ui-workflow-link:hover {
+.duice-ui-flow .duice-ui-flow-link:hover {
 	cursor: hand;
 	cursor: pointer;
 }
-.duice-ui-workflow .duice-ui-workflow-link-index {
+.duice-ui-flow .duice-ui-flow-link-index {
 	opacity:1;
 }
 
-.duice-ui-workflow .duice-ui-workflow-link .duice-ui-workflow-link-text {
+.duice-ui-flow .duice-ui-flow-link .duice-ui-flow-link-text {
 	font-weight:bold;
 	text-shadow:-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,1px 1px 0 #fff;  
 }
