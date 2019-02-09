@@ -31,6 +31,19 @@ You can use it with JQuery, AngularJS and so on, also Responsive UI framework li
 
 --------------------------------------------------------------------------------------------------------------------
 
+## Examples
+
+### Grid Example
+<iframe height="300" style="width: 100%;" scrolling="no" src="//codepen.io/chomookun/embed/exVXPV/?height=265&theme-id=dark&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+
+### TreeView Example
+<iframe height="300" style="width: 100%;" scrolling="no" src="//codepen.io/chomookun/embed/YBeMzz/?height=265&theme-id=dark&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+
+### Flow Example
+<iframe height="300" style="width: 100%;" scrolling="no" src="//codepen.io/chomookun/embed/MLQRWV/?height=265&theme-id=dark&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+
+--------------------------------------------------------------------------------------------------------------------
+
 ## More Information
 
 ### Official Website

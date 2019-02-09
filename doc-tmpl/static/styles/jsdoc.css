@@ -602,6 +602,17 @@ span.param-type, .params td .param-type, .param-type dd {
 .level-hide {
     display: none;
 }
+
+li.private a {
+	opacity:0.5;
+	font-style:italic;
+}
+
+li.protected a {
+	opacity:0.5;
+	font-style:italic;
+}
+
 html[data-search-mode] .level-hide {
     display: block;
 }

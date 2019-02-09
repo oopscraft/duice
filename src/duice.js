@@ -284,6 +284,7 @@ duice.data = {};
 /**
  * Super prototype of duice.data
  * @abstract
+ * @protected
  * @constructor
  */
 duice.data.__ = function(){
@@ -293,6 +294,7 @@ duice.data.__ = function(){
 /**
  * Adds observer
  * @method
+ * @protected
  * @param {Object} observer for adding
  * @return {void}
  */
@@ -307,6 +309,7 @@ duice.data.__.prototype.addObserver = function(observer){
 /**
  * Notifies all observer
  * @method
+ * @protected
  * @param {Object} caller observer
  * @return {void}
  */
@@ -324,6 +327,7 @@ duice.data.__.prototype.notifyObservers = function(observer) {
 /**
  * Updates
  * @method
+ * @protected
  * @return {void}
  */
 duice.data.__.prototype.update = function() {
@@ -334,6 +338,7 @@ duice.data.__.prototype.update = function() {
 /**
  * Sets fireEvent flag
  * @method
+ * @protected
  * @param {boolean} fire event or not
  * @return {void}
  */
@@ -352,16 +357,9 @@ Object.freeze(duice.data.__.prototype);
  * @class
  * @classdesc
  * Key-Value Map data structure.
+ * <iframe height="300" style="width: 100%;" scrolling="no" title="duice.data.Map" src="//codepen.io/chomookun/embed/jdZeVR/?height=300&theme-id=36063&default-tab=js,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
  * @constructor
  * @param {Object} JSON data
- * @example
- * // creates map object 
- * var user = new duice.data.Map({
- * 	name:'James'
- * });
- * 
- * // prints name
- * alert(user);
  */
 duice.data.Map = function(json) {
 	duice.data.__.call(this);
@@ -381,17 +379,6 @@ duice.data.Map.prototype = Object.create(duice.data.__.prototype);
  * Creates data from JSON object
  * @method
  * @param {Object} JSON data
- * @example
- * // creates empty map.
- * var user = new duice.data.Map();
- * 
- * // sets data to map 
- * user.fromJson({
- * 	name:'james'
- * });
- * 
- * // print user name
- * alert(user); 
  */
 duice.data.Map.prototype.fromJson = function(json) {
 	this.data = {};
@@ -401,18 +388,11 @@ duice.data.Map.prototype.fromJson = function(json) {
 	}
 	this.notifyObservers();
 }
+
 /**
  * Convert map to JSON object
  * @method
  * @return {Object} JSON data
- * @example
- * // creates map object
- * var user = new duice.data.Map({
- * 	name:'james'
- * });
- * 
- * // prints user as JSON object 
- * alert(user.toJson());
  */
 duice.data.Map.prototype.toJson = function() {
 	var json = {};
@@ -422,20 +402,12 @@ duice.data.Map.prototype.toJson = function() {
 	}
 	return json;
 }
+
 /**
  * Sets value by name
  * @method
  * @param {String} name - map key name
  * @param {String} value - map value for setting
- * @example
- * // creates map
- * var user = new duice.data.Map({name:'james'});
- * 
- * // sets new name 
- * user.set('name', 'scott');
- * 
- * // prints name
- * alert(user.toJson());
  */
 duice.data.Map.prototype.set = function(name,value) {
 	if(this.listener.beforeChange){
@@ -603,6 +575,7 @@ Object.freeze(duice.data.Map.prototype);
  * @class
  * @classdesc
  * List data structure.
+ * <iframe height="265" style="width: 100%;" scrolling="no" title="duice.data.List(jsonArray)" src="//codepen.io/chomookun/embed/rPJoyo/?height=265&theme-id=dark&default-tab=js,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
  * @constructor
  * @param {Object[]} jsonArray - JSON Array data
  */
@@ -811,34 +784,45 @@ duice.data.List.prototype.afterChange = function(afterChangeListener){
  * duice.data.Tree prototype
  * @class
  * @classdesc
- * <iframe height="500" style="width: 100%;" scrolling="no" title="duice.ui.Tree" src="//codepen.io/chomookun/embed/WPMpoM/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+ * <iframe height="265" style="width: 100%;" scrolling="no" title="duice.data.Tree(jsonArray,childNodeName)" src="//codepen.io/chomookun/embed/yZvZoB/?height=265&theme-id=dark&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+ * @constructor
+ * @param {Array<Object>} jsonArray - JSON Array data has tree nodes.
+ * @param {string} childNodeName - name of child node elements.
  */
-duice.data.Tree = function(json,linkNodeName) {
+duice.data.Tree = function(jsonArray,childNodeName) {
 	duice.data.__.call(this);
 	this.index = [];
 	this.rootNode = new duice.data.Map();
-	if(json) {
-		this.fromJson(json,linkNodeName);
+	if(jsonArray) {
+		this.fromJson(jsonArray,childNodeName);
 	}
 	this.enable = true;
 	this.readonly = {};
 }
+
+// Extends data prototype
 duice.data.Tree.prototype = Object.create(duice.data.__.prototype);
-// load data from JSON Array  
-duice.data.Tree.prototype.fromJson = function(json,linkNodeName){
+
+/**
+ * Loads data from JSON Array 
+ * @method
+ * @param {Array<Object>} jsonArray - JSON Array data has tree nodes.
+ * @param {string} childNodeName - name of child node elements.
+ */
+duice.data.Tree.prototype.fromJson = function(jsonArray,childNodeName){
 	var $this = this;
 	this.rootNode = new duice.data.Map();
 	this.rootNode.addObserver(this);
-	for(var i = 0; i < json.length; i ++){
+	for(var i = 0; i < jsonArray.length; i ++){
 		var node = new duice.data.Map();
-		node.fromJson(json[i]);
+		node.fromJson(jsonArray[i]);
 		node.enable = this.enable;
 		node.readonly = this.readonly;
 		makeTree(node);
 		this.rootNode.addChildNode(node);
 	}
 	function makeTree(node) {
-		var childNodes = node.get(linkNodeName);
+		var childNodes = node.get(childNodeName);
 		if(childNodes){
 			for(var i = 0; i < childNodes.length; i ++){
 				var childNode = new duice.data.Map();
@@ -853,8 +837,14 @@ duice.data.Tree.prototype.fromJson = function(json,linkNodeName){
 	this.index = [];
 	this.notifyObservers();
 }
-// convert into JSON Array 
-duice.data.Tree.prototype.toJson = function(linkNodeName){
+
+/**
+ * Converts into JSON Array 
+ * @method
+ * @param {string} childNodeName
+ * @return {Array<Object>} returns converted tree object array.
+ */
+duice.data.Tree.prototype.toJson = function(childNodeName){
 	var json = new Array();
 	var childNodes = this.rootNode.getChildNodes();
 	for(var i = 0; i < childNodes.length; i ++){
@@ -866,36 +856,61 @@ duice.data.Tree.prototype.toJson = function(linkNodeName){
 		var json = node.toJson();
 		var childNodes = node.getChildNodes();
 		if(childNodes){
-			json[linkNodeName] = new Array();
+			json[childNodeName] = new Array();
 			for(var i = 0; i < childNodes.length; i ++){
 				var childNode = childNodes[i];
 				var childJson = makeJson(childNode);
-				json[linkNodeName].push(childJson);
+				json[childNodeName].push(childJson);
 			}
 		}
 		return json;
 	}
 	return json;
 }
-/* set index */
+
+/**
+ * Sets index 
+ * @method
+ * @param {Array<number>} index - index array to set. ex)[0,1],[0,2]...
+ */
 duice.data.Tree.prototype.setIndex = function(index) {
 	this.index = index;
 	this.notifyObservers();
 }
-/* get current select row index */
+
+/**
+ * Gets current select row index 
+ * @method
+ * @return {Array<number>} returns current index array ex) [0,1],[0,2]...
+ */
 duice.data.Tree.prototype.getIndex = function() {
 	return this.index;
 }
-/* clear current select row index */
+
+/**
+ * Clears current select row index 
+ * @method
+ */
 duice.data.Tree.prototype.clearIndex = function() {
 	this.index = [];
 	this.notifyObservers();
 }
-/* get rootNode */
+
+/**
+ * Gets rootNode 
+ * @method
+ * @return {Object} returns root node.
+ */
 duice.data.Tree.prototype.getRootNode = function() {
 	return this.rootNode;
 }
-/* get tree node */
+
+/**
+ * Gets tree node specified.
+ * @method
+ * @param {Array<number>} index - index array of node to get
+ * @return {duice.data.Map} return specifed index node.
+ */
 duice.data.Tree.prototype.getNode = function(index){
 	var node = this.rootNode;
 	for(var i = 0; i < index.length; i ++){
@@ -904,6 +919,12 @@ duice.data.Tree.prototype.getNode = function(index){
 	}
 	return node;
 }
+
+/**
+ * Removes specifed node.
+ * @method
+ * @param {Array<number>} index - index array to remove.
+ */
 duice.data.Tree.prototype.removeNode = function(index){
 	var node = this.getNode(index);
 	var parentNode = node.getParentNode();
@@ -911,6 +932,13 @@ duice.data.Tree.prototype.removeNode = function(index){
 	this.index = -1;
 	this.notifyObservers();
 }
+
+/**
+ * Inserts node into specified index postion.
+ * @method
+ * @param {number} index - index array positon to insert node.
+ * @param {duice.data.Map} map - node map to insert.
+ */
 duice.data.Tree.prototype.insertNode = function(index, map){
 	var node = this.getNode(index);
 	var parentNode = node.getParentNode();
@@ -918,6 +946,13 @@ duice.data.Tree.prototype.insertNode = function(index, map){
 	this.index = index;
 	this.notifyObservers();
 }
+
+/**
+ * Moves node from index1 to index2
+ * @method
+ * @param {Array<number>} fromIndex - node index array to move
+ * @param {Array<number>} toIndex - target index array to move
+ */
 duice.data.Tree.prototype.moveNode = function(fromIndex, toIndex){
 	var fromNode = this.getNode(fromIndex);
 	var toNode = this.getNode(toIndex);
@@ -934,9 +969,11 @@ duice.data.Tree.prototype.moveNode = function(fromIndex, toIndex){
 	this.index = toIndex;
 	this.notifyObservers();
 }
+
 /**
  * Loop forEach
- * @Param {function} handler
+ * @method
+ * @param {function} handler
  */
 duice.data.Tree.prototype.forEach = function(handler) {
 	this.setFireEvent(false);
@@ -952,10 +989,12 @@ duice.data.Tree.prototype.forEach = function(handler) {
 	}
 	this.setFireEvent(true);
 }
+
 /**
  * Finds indexes by handler
- * @Param {function} handler
- * @Return {Array} - result of finding as array containing index.
+ * @method
+ * @param {function} handler
+ * @return {Array<Array<number>>} - result of finding as array containing index.
  */
 duice.data.Tree.prototype.findIndexes = function(handler){
 	var indexes = [];
@@ -980,10 +1019,11 @@ duice.data.Tree.prototype.findIndexes = function(handler){
 	}
 	return indexes;
 }
+
 /**
  * Find first index by handler
- * @Param {function} handler - function(node){...}
- * @Return {Array} - result of finding result
+ * @param {function} handler - function(node){...}
+ * @return {Array<number>} - result of finding result index
  */
 duice.data.Tree.prototype.indexOf = function(handler){
 	var indexes = this.findIndexes(handler);
@@ -993,28 +1033,31 @@ duice.data.Tree.prototype.indexOf = function(handler){
 		return [];
 	}
 }
+
 /**
  * Checks contains node by handler
- * @Param {function} handler - function(node){...}
- * @Return {Boolean}
+ * @param {function} handler - function(node){...}
+ * @return {boolean} returns matching node is exists.
  */
 duice.data.Tree.prototype.contains = function(handler) {
 	var indexes = this.findIndexes(handler);
 	return (indexes.length > 0);
 }
+
 /**
  * Find node
- * @Param {function} handler - function(node){...}
- * @Return {duice.data.Node}
+ * @param {function} handler - function(node){...}
+ * @return {duice.data.Map} returns matched node with handler function
  */
 duice.data.Tree.prototype.findNode = function(handler) {
 	var index = this.indexOf(handler);
 	return this.getNode(index);
 }
+
 /**
  * Finds nodes
- * @Param {function} handler - function(node){...}
- * @Return {Array<duice.data.Map>}
+ * @param {function} handler - function(node){...}
+ * @return {Array<duice.data.Map>} returns mated node map array
  */
 duice.data.Tree.prototype.findNodes = function(handler){
 	var indexes = this.findIndexes(handler);
@@ -1025,10 +1068,10 @@ duice.data.Tree.prototype.findNodes = function(handler){
 	}
 	return nodes;
 }
+
 /**
  * Sets enable flag
- * @Param {boolean} enable - true or false
- * @Return void
+ * @param {boolean} enable - whether enable or nott
  */
 duice.data.Tree.prototype.setEnable = function(enable){
 	this.enable = enable;
@@ -1037,18 +1080,19 @@ duice.data.Tree.prototype.setEnable = function(enable){
 	});
 	this.notifyObservers();
 }
+
 /**
  * Gets enable flag
- * @Return {boolean} enable or not
+ * @return {boolean} returns whether enable or not.
  */
 duice.data.Tree.prototype.isEnable = function(){
 	return this.enable;
 }
+
 /**
  * Sets read only in child node by name
- * @Param {string} name - column name
- * @Param {boolean} read only - read only or not flag
- * @Return {void}
+ * @param {string} name - column name
+ * @param {boolean} readonly - read-only or not flag
  */
 duice.data.Tree.prototype.setReadonly = function(name, readonly){
 	this.readonly[name] = readonly;
@@ -1056,23 +1100,28 @@ duice.data.Tree.prototype.setReadonly = function(name, readonly){
 		node.setReadonly(name, readonly);
 	});
 }
+
 /**
  * Returns current name of column is read only or not.
- * @Param {string] name - column name to checks
- * @Return {boolean} read only or not
+ * @param {string] name - column name to checks
+ * @return {boolean} returns whether read-only or not
  */
 duice.data.Tree.prototype.isReadonly = function(name){
 	return this.readonly[name] || false;
 }
+
 duice.data.Tree.prototype.beforeNodeChange = function(listener){
 	// TODO
 }
+
 duice.data.Tree.prototype.afterNodeChange = function(listener){
 	// TODO
 }
+
 duice.data.Tree.prototype.beforeIndexChange = function(listener){
 	// TODO
 }
+
 duice.data.Tree.prototype.afterIndexChange = function(listener){
 	// TODO
 }
@@ -1087,6 +1136,7 @@ duice.ui = {};
 /**
  *  UI Component abstract class
  *  @abstract
+ *  @protected
  *  @constructor
  */
 duice.ui.__ = function(){}
@@ -1094,6 +1144,7 @@ duice.ui.__ = function(){}
 /**
  * Executes expression
  * @method
+ * @protected
  * @param {HTMLElement} element - target container element
  * @param {Object} $context - context parameter object
  * @return {HTMLElement} result container element
@@ -1121,6 +1172,7 @@ duice.ui.__.prototype.executeExpression = function(element,$context) {
 /**
  * Removes all child elements
  * @method
+ * @protected
  * @param {HTMLElement} element - target parent element
  */
 duice.ui.__.prototype.removeChildNodes = function(element){
@@ -1146,6 +1198,7 @@ duice.ui.__.prototype.removeChildNodes = function(element){
 /**
  * Converts string to HTML element
  * @method 
+ * @protected
  * @param {string} string - HTML string to convert
  * @return {HTMLElement} converted HTML element
  */
@@ -1158,6 +1211,7 @@ duice.ui.__.prototype.createHtml = function(string){
 /**
  * Returns current window
  * @method
+ * @protected
  * @return {HTMLWindowElement} window element
  */
 duice.ui.__.prototype.getWindow = function() {
@@ -1171,6 +1225,7 @@ duice.ui.__.prototype.getWindow = function() {
 /**
  * Gets parent node
  * @method
+ * @protected
  * @param {HTMLElement} element
  */
 duice.ui.__.prototype.getParentNode = function(element){
@@ -1181,6 +1236,7 @@ duice.ui.__.prototype.getParentNode = function(element){
 /**
  * Sets position to be centered.
  * @method
+ * @protected
  * @param {HTMLElement} element - element to be centered.
  */
 duice.ui.__.prototype.setPosition = function(element){
@@ -1197,6 +1253,7 @@ duice.ui.__.prototype.setPosition = function(element){
 /**
  * Parses format string to format type and format body
  * @method
+ * @protected
  * @param {string} format - format string (type + ":" + body)
  * @return {Object} converted formatType and formatBody values
  */
@@ -1210,6 +1267,7 @@ duice.ui.__.prototype.parseFormat = function(format){
 /**
  * Delays execution
  * @method
+ * @protected
  * @param {function} callback - function to defer
  */
 duice.ui.__.prototype.delay = function(callback){
@@ -1227,6 +1285,7 @@ duice.ui.__.prototype.delay = function(callback){
 /**
  * Executes fade in animation.
  * @method
+ * @protected
  * @param {HTMLElement} element - HTML element to animate fade in
  */
 duice.ui.__.prototype.fadeIn = function(element){
@@ -1237,6 +1296,7 @@ duice.ui.__.prototype.fadeIn = function(element){
 /**
  * Executes fade out animation.
  * @method
+ * @protected
  * @param {HTMLElement} element - HTML element to animate fade out
  */
 duice.ui.__.prototype.fadeOut = function(element) {
@@ -1247,6 +1307,7 @@ duice.ui.__.prototype.fadeOut = function(element) {
 /**
  * Gets current max z-index value
  * @method
+ * @protected
  * @return {number} current max z-index
  */
 duice.ui.__.prototype.getMaxZIndex = function(){
@@ -1264,6 +1325,7 @@ duice.ui.__.prototype.getMaxZIndex = function(){
 /**
  * Blocks specified element
  * @method
+ * @protected
  * @param {HTMLElement} element - HTML element to block
  * @return {Object} block handler
  */
@@ -1321,6 +1383,7 @@ duice.ui.__.prototype.block = function(element){
 /**
  * Does loading effect.
  * @method
+ * @protected
  * @param {HTMLElement} element - target HTML element to block.
  * @return {Object} release handler object
  */
@@ -1707,7 +1770,7 @@ duice.ui.CheckBox = function(input) {
 	this.input.classList.add('duice-ui-checkBox');
 }
 
-// Freezes CheckBox prototype
+// Extends UI prototype
 duice.ui.CheckBox.prototype = Object.create(duice.ui.__.prototype);
 
 /**
@@ -1726,7 +1789,7 @@ duice.ui.CheckBox.prototype.bind = function(map,name) {
 }
 
 /**
- * Updates and redraw element
+ * Updates component
  * @method
  */
 duice.ui.CheckBox.prototype.update = function() {
@@ -1969,6 +2032,7 @@ duice.ui.HtmlEditor.prototype.update = function() {
 /**
  * Creates toolbar
  * @method
+ * @protected
  */
 duice.ui.HtmlEditor.prototype.createToolbar = function() {
 	var editor = this;
@@ -2109,6 +2173,7 @@ duice.ui.HtmlEditor.prototype.createToolbar = function() {
 /**
  * Executes commands
  * @method
+ * @protected
  * @param {string} commandName - name of command to execute
  * @param {boolean} showDefaultUI - A Boolean indicating whether the default user interface should be shown. This is not implemented in Mozilla.
  * @param {string} valueArgument - For commands which require an input argument
@@ -2120,6 +2185,7 @@ duice.ui.HtmlEditor.prototype.execCommand = function(commandName, showDefaultUI,
 /**
  * ToggleHtml
  * @method
+ * @protected
  */
 duice.ui.HtmlEditor.prototype.toggleHtml = function() {
 	if(this.html == true){
@@ -2283,6 +2349,7 @@ duice.ui.CronExpression.prototype.setReadonly = function(readonly) {
 /**
  * Checks is valid cron expression
  * @method
+ * @protected
  */
 duice.ui.CronExpression.prototype.isSupprotCronExpression = function() {
 	var pattern = /([\d]{1,2}) ([\d]{1,2}) ([\d|\*]{1,2}) ([\d|\*]{1,2}) ([\d|\*]{1,2}) ([\?]{1})$/gi;
@@ -2292,6 +2359,7 @@ duice.ui.CronExpression.prototype.isSupprotCronExpression = function() {
 /**
  * Generates and Sets cron expression
  * @method
+ * @protected
  */
 duice.ui.CronExpression.prototype.generateCronExpression = function() {
 	var cronExpression = this.second.value 
@@ -2306,6 +2374,7 @@ duice.ui.CronExpression.prototype.generateCronExpression = function() {
 /**
  * Creates select element of second
  * @method
+ * @protected
  * @return {HTMLSelectElement} second select element
  */
 duice.ui.CronExpression.prototype.createSelectSecond = function() {
@@ -2331,6 +2400,7 @@ duice.ui.CronExpression.prototype.createSelectSecond = function() {
 /**
  * Creates select element of minite
  * @method
+ * @protected
  * @return {HTMLSelectElement} minute select element
  */
 duice.ui.CronExpression.prototype.createSelectMinute = function() {
@@ -2358,6 +2428,7 @@ duice.ui.CronExpression.prototype.createSelectMinute = function() {
 /**
  * Creates select element of hour
  * @method
+ * @protected
  * @return {HTMLSelectElement} hour select element
  */
 duice.ui.CronExpression.prototype.createSelectHour = function() {
@@ -2389,6 +2460,7 @@ duice.ui.CronExpression.prototype.createSelectHour = function() {
 /**
  * Creates select element of day
  * @method
+ * @protected
  * @return {HTMLSelectElement} day select element
  */
 duice.ui.CronExpression.prototype.createSelectDay = function() {
@@ -2444,6 +2516,7 @@ duice.ui.CronExpression.prototype.createSelectDay = function() {
 /**
  * Creates select element of month
  * @method
+ * @protected
  * @return {HTMLSelectElement} month select element
  */
 duice.ui.CronExpression.prototype.createSelectMonth = function() {
@@ -2475,6 +2548,7 @@ duice.ui.CronExpression.prototype.createSelectMonth = function() {
 /**
  * Creates week select element
  * @method
+ * @protected
  * @return {HTMLSelectElement} week select element
  */
 duice.ui.CronExpression.prototype.createSelectWeek = function() {
@@ -2722,6 +2796,7 @@ duice.ui.ListView.prototype.update = function(){
 /**
  * Creates row li element
  * @method
+ * @protected
  * @param {number} index - row index
  * @param {duice.data.Map} map - current row Map data object
  */
@@ -2836,6 +2911,7 @@ duice.ui.TreeView.prototype.update = function() {
 /**
  * Creates node
  * @method
+ * @protected
  * @param {number} index - tree index array ex)[0,1,3]...
  * @param {duice.data.Map} node - node element map data object
  */
@@ -3057,6 +3133,7 @@ duice.ui.Grid.prototype.update = function() {
 /**
  * Creates row tbody
  * @method
+ * @protected
  * @param {number} index - row index
  * @param {duice.data.map} map - row map data object
  */
@@ -3152,6 +3229,7 @@ duice.ui.Grid.prototype.createRow = function(index,map) {
 /**
  * Creates empty data message row
  * @method 
+ * @protected
  */
 duice.ui.Grid.prototype.createEmptyRow = function() {
 	var tbody = this.tbody.cloneNode(true);
@@ -3332,6 +3410,7 @@ duice.ui.Flow.prototype.update = function() {
 /**
  * Creates node
  * @method
+ * @protected
  * @param {number} index - node index to create
  * @param {duice.data.Map} map - node map to create
  * @return {HTMLLiElement} node li HTML element
@@ -3411,6 +3490,7 @@ duice.ui.Flow.prototype.createNode = function(index, map){
 /**
  * Creates link element and connect to node element
  * @method
+ * @protected
  * @param {number} index - index to create
  * @param {duice.data.Map} map - link node to create
  */
@@ -3653,6 +3733,7 @@ duice.ui.Pagination.prototype.update = function() {
 /**
  * Creates item page
  * @method 
+ * @protected
  * @param {number} page - page number to create
  */
 duice.ui.Pagination.prototype.createItemPage = function(page) {
@@ -3671,6 +3752,7 @@ duice.ui.Pagination.prototype.createItemPage = function(page) {
 /**
  * Creates previous page item
  * @method
+ * @protected
  * @param {number} page - previous page number
  */
 duice.ui.Pagination.prototype.createItemPrev = function(page) {
@@ -3693,6 +3775,7 @@ duice.ui.Pagination.prototype.createItemPrev = function(page) {
 /**
  * Creates next page item
  * @method
+ * @protected
  * @param {number} page - next page number
  */
 duice.ui.Pagination.prototype.createItemNext = function(page) {

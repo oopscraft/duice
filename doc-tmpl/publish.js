@@ -331,6 +331,9 @@ function buildMemberNav(items, itemHeading, itemsSeen, linktoFn) {
             // show private class?
             if (docdash.private === false && item.access === 'private') return;
 
+			// if item is private, add specific class
+			classes += (item.access ? item.access : '');
+
             // depth to show?
             if (item.ancestors.length > level) {
                 classes += 'level-hide';
@@ -369,6 +372,7 @@ function buildMemberNav(items, itemHeading, itemsSeen, linktoFn) {
 
                     methods.forEach(function (method) {
                         itemsNav += "<li data-type='method'";
+						itemsNav += " class='" + (method.access ? method.access : '') + "' ";
                         if(docdash.collapse)
                             itemsNav += " style='display: none;'";
                         itemsNav += ">";
