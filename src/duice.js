@@ -811,6 +811,7 @@ duice.data.List.prototype.afterChange = function(afterChangeListener){
  * duice.data.Tree prototype
  * @class
  * @classdesc
+ * <iframe height="500" style="width: 100%;" scrolling="no" title="duice.ui.Tree" src="//codepen.io/chomookun/embed/WPMpoM/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
  */
 duice.data.Tree = function(json,linkNodeName) {
 	duice.data.__.call(this);
@@ -1099,7 +1100,7 @@ duice.ui.__ = function(){}
  */
 duice.ui.__.prototype.executeExpression = function(element,$context) {
 	var string = element.outerHTML;
-	string = string.replace(/\{\{(.*?)\}\}/mgi,function(match, command){
+	string = string.replace(/\[\[(.*?)\]\]/mgi,function(match, command){
 		try {
 			command = command.replace('&amp;', '&');
 			command = command.replace('&lt;', '<');
@@ -1165,6 +1166,16 @@ duice.ui.__.prototype.getWindow = function() {
 	}else{
 		return window;
 	}
+}
+
+/**
+ * Gets parent node
+ * @method
+ * @param {HTMLElement} element
+ */
+duice.ui.__.prototype.getParentNode = function(element){
+	var parentNode = element.parentNode;
+	return parentNode;
 }
 
 /**
@@ -1352,7 +1363,6 @@ duice.ui.__.prototype.load = function(element){
 // Freezes prototype of super class.
 Object.freeze(duice.ui.__.prototype);
 
-
 /**
  * duice.ui.Label prototype
  * @class
@@ -1364,7 +1374,7 @@ Object.freeze(duice.ui.__.prototype);
  * | label  	   	| data-duice="Label" 									| component Type						|
  * | label		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
  * | label		    | data-duice-format="{type}:{format}"    				| defines display type and format		|
- * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/ogtf6vh9/embedded/js,html,css,result/dark" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+ * <iframe height="300" style="width: 100%;" scrolling="no" title="duice.ui.Label" src="//codepen.io/chomookun/embed/PVQBpY/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
  * @constructor
  * @param {HTMLLabelElement} label - label HTML element
  */
@@ -1435,7 +1445,7 @@ duice.ui.Label.prototype.setFormat = function(format) {
  * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
  * | pre	  	   	| data-duice="Text" 									| component Type						|
  * | pre		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
- * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/adouxg1q/embedded/js,html,css,result/dark" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+ * <iframe height="300" style="width: 100%;" scrolling="no" title="duice.ui.Text" src="//codepen.io/chomookun/embed/XOZBNz/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
  * @constructor
  * @param {HTMLPrelElement} pre - pre HTML element
  */
@@ -1477,14 +1487,12 @@ duice.ui.Text.prototype.update = function() {
  * @class
  * @classdesc
  * Prints value in input text element.
- *
  * ## HTML5 Tag and Attribute
  * | HTML Tag   	| data-* Attribute 										| Description  							|
  * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
  * | input  	   	| data-duice="TextField" 								| component Type					|
  * | input		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
- * 
- * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/0hpgvzy5/embedded/dark" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+ * <iframe height="300" style="width: 100%;" scrolling="no" title="duice.ui.TextField" src="//codepen.io/chomookun/embed/LqQBRB/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe> 
  * @constructor
  * @param {HTMLInputElement} input - input HTML element.
  */
@@ -1547,7 +1555,6 @@ duice.ui.TextField.prototype.setReadonly = function(readonly){
  * @class
  * @classdesc
  * Creates ComboBox UI element binded with data object.
- * 
  * ## HTML5 Tag and Attribute
  * | HTML Tag   	| data-* Attribute 																| Description  							|
  * | ------------- 	| ---------------------------------------------------------------------			| -----------------------------------	|
@@ -1556,8 +1563,7 @@ duice.ui.TextField.prototype.setReadonly = function(readonly){
  * | select		    | data-duice-options="(duice.data.List or Array(Object) or Array(string))"  	| options data							|
  * | select		    | data-duice-option-value="(column of value)"  									| column name of option value			|
  * | select		    | data-duice-option-text="(column of text)"										| column name of option text			|
- * 
- * <iframe width="100%" height="600" src="http://jsfiddle.net/chomookun/5dta4vub/29/embedded/js,html,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+ * <iframe height="300" style="width: 100%;" scrolling="no" title="duice.ui.ComboBox" src="//codepen.io/chomookun/embed/pGaZbN/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe> 
  * @constructor
  * @param {HTMLInputElement} select - select HTML element.
  */
@@ -1680,23 +1686,17 @@ duice.ui.ComboBox.prototype.setReadonly = function(readonly){
 	}
 }
 
-//-----------------------------------------------------------------------------
-// duice.ui.CheckBox prototype
-//-----------------------------------------------------------------------------
 /**
  * duice.ui.CheckBox prototype
  * @class
  * @classdesc
  * CheckBox UI component
- * 
  * ## HTML5 Tag and Attribute
  * | HTML Tag   	| data-* Attribute 										| Description  							|
  * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
  * | input  	   	| data-duice="CheckBox"									| component Type						|
  * | input		    | data-duice-bind="(duice.data.Map).(column name)"    	| specify binding Map and column name	|
- * 
- * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/yftexL63/embedded/js,html,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
- *
+ * <iframe height="300" style="width: 100%;" scrolling="no" title="duice.ui.CheckBox" src="//codepen.io/chomookun/embed/zeRLqP/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
  * @constructor
  * @param {HTMLInputElement} input - input HTML element
  */
@@ -1754,22 +1754,17 @@ duice.ui.CheckBox.prototype.setReadonly = function(readonly){
 	}
 }
 
-//-----------------------------------------------------------------------------
-// duice.ui.Radio prototype
-//-----------------------------------------------------------------------------
 /**
  * duice.ui.Radio prototype
  * @class
  * @classdesc
  * Radio UI Component
- *
  * ## HTML5 Tag and Attribute
  * | HTML Tag   	| data-* Attribute 										| Description  							|
  * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
  * | input  	   	| data-duice="Radio" 									| Radio component Type					|
  * | input		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
- * 
- * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/zfyh83dn/embedded/js,html,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+ * <iframe height="300" style="width: 100%;" scrolling="no" title="duice.ui.Radio" src="//codepen.io/chomookun/embed/pGaZgE/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe> 
  * @constructor
  * @param {HTMLInputElement} input - input HTML element.
  */
@@ -1825,14 +1820,12 @@ duice.ui.Radio.prototype.setReadonly = function(readonly){
  * @class
  * @classdesc
  * Textarea UI component
- *
  * ## HTML5 Tag and Attribute
  * | HTML Tag   	| data-* Attribute 										| Description  							|
  * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
  * | label  	   	| data-duice="Textarea" 								| component Type						|
  * | label		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
- * 
- * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/4zs6o3kv/embedded/js,html,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+ * <iframe height="300" style="width: 100%;" scrolling="no" title="duice.ui.TextArea" src="//codepen.io/chomookun/embed/MLQBgb/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
  * @constructor
  * @param {HTMLTextareaElement} textarea - textarea HTML element
  */
@@ -1903,7 +1896,7 @@ duice.ui.TextArea.prototype.setReadonly = function(readonly){
  * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
  * | label  	   	| data-duice="HtmlEditor" 								| component Type						|
  * | label		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
- * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/329r5jw8/embedded/html,js,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe> 
+ * i<iframe height="300" style="width: 100%;" scrolling="no" title="duice.ui.HtmlEditor" src="//codepen.io/chomookun/embed/RvQJOe/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
  * @constructor
  * @param {HTMLDivElement} div - div HTML element
  */
@@ -2149,8 +2142,7 @@ duice.ui.HtmlEditor.prototype.toggleHtml = function() {
  * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
  * | label  	   	| data-duice="CronExpression" 							| component Type						|
  * | label		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
- *
- * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/k4dsxywm/embedded/js,html,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe> 
+ * <iframe height="300" style="width: 100%;" scrolling="no" title="duice.ui.CronExpression" src="//codepen.io/chomookun/embed/pGaKYg/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
  * @constructor
  * @param {HTMLInputElement} input - input HTML element
  */
@@ -2529,14 +2521,15 @@ duice.ui.CronExpression.prototype.createSelectWeek = function() {
  * duice.ui.Image prototype
  * @class
  * @classdesc
+ * Image component with base64 encoded data. 
  * ## HTML5 Tag and Attribute
  * | HTML Tag   	| data-* Attribute 										| Description  							|
  * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
  * | img	  	   	| data-duice="Text" 									| component Type						|
+ * | img		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
  * | img			| data-duice-width="{width pixel}						| pixel of img width					|
  * | img 			| data-juice-height="{height pixel}"					| pixel of img height					|
- * | img		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
- * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/bzce5097/embedded/js,html,result/dark" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+ * <iframe height="300" style="width: 100%;" scrolling="no" title="duice.ui.Image" src="//codepen.io/chomookun/embed/NoyzLZ/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
  */
 duice.ui.Image = function(img) {
 	duice.ui.__.call(this);
@@ -2670,7 +2663,7 @@ duice.ui.Image.prototype.setReadonly = function(readonly){
  * | ul		  	   	| data-duice="ListView"									| component Type						|
  * | ul			    | data-duice-bind="{duice.data.List}"    				| specify binding List 					|
  * | ul			    | data-duice-item="(name of row object)"    			| defines name of row object			|
- * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/nhe60foq/embedded/html,js,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+ * <iframe height="500" style="width: 100%;" scrolling="no" title="duice.ui.ListView" src="//codepen.io/chomookun/embed/ZwrRab/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
  * @constructor
  * @param {HTMLUlElement} ul - ul HTML element
  */
@@ -2763,7 +2756,7 @@ duice.ui.ListView.prototype.createRow = function(index, map){
  * | ul 	 	   	| data-duice="TreeView" 												| component Type							|
  * | ul			    | data-duice-bind="(duice.data.Tree)"									| specify name of duice.data.List object	|
  * | ul			    | data-duice-item="(node alias)"  										| defines row map object name				|
- * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/z8djn946/embedded/html,js,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe> 
+ * <iframe height="500" style="width: 100%;" scrolling="no" title="duice.ui.Tree" src="//codepen.io/chomookun/embed/WPMpoM/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
  * @constructor
  * @param {HTMLUlElement} ul - ul HTML element
  */
@@ -2982,13 +2975,14 @@ duice.ui.TreeView.prototype.createNode = function(index, node){
  * duice.ui.Grid prototype
  * @class
  * @classdesc
+ * Grid based on <Table> element.
  * ## HTML Tag and Attribute
  * | HTML Tag   	| data-* Attribute 										| Description  							|
  * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
  * | table	  	   	| data-duice="Grid"										| component Type is "Grid"				|
  * | table		    | data-duice-bind="{duice.data.List}"    				| defines binding List 					|
  * | table		    | data-duice-item="(alias of each item)"    			| defines name of row object			|
- * <iframe width="100%" height="300" src="http://jsfiddle.net/chomookun/cxp4unka/embedded/html,js,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>                                                                                                                      
+ * <iframe height="500" style="width:100%;" scrolling="yes" title="duice.ui.Grid" src="//codepen.io/chomookun/embed/jdZPBg/?&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
  * @constructor
  * @param {HTMLTableElement} table - table HTML element
  */
@@ -3181,6 +3175,7 @@ duice.ui.Grid.prototype.createEmptyRow = function() {
  * duice.ui.Flow prototype
  * @class
  * @classdesc
+ * Flow diagram component
  * ## HTML Tag and Attribute
  * | HTML Tag   	| data-* Attribute 										| Description  							|
  * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
@@ -3193,8 +3188,7 @@ duice.ui.Grid.prototype.createEmptyRow = function() {
  * | ul 			| data-duice-link-from="(link from column)"				| defines link from column in link		|
  * | ul 			| data-duice-link-to="(link to column)"					| defines link to column in link		|
  * | ul 			| data-duice-link-text="(link text column)"				| defines link text column in link 		|
- *
- * <iframe width="100%" height="600" src="http://jsfiddle.net/chomookun/4t5783ch/embedded/html,js,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe> 
+ * <iframe height="500" style="width: 100%;" scrolling="no" title="duice.ui.Flow" src="//codepen.io/chomookun/embed/zeRZve/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
  * @constructor
  * @param {HTMLUlElement} ul - ul HTML element
  */
@@ -3526,6 +3520,10 @@ duice.ui.Flow.prototype.createLink = function(index, map) {
 
 /**
  * duice.ui.Pagination prototype
+ * @class
+ * @classdesc
+ * @constructor
+ * @param {HTMLUlElement} ul - ul HTML element
  */
 duice.ui.Pagination = function(ul){
 	duice.ui.__.call(this);
@@ -3536,28 +3534,59 @@ duice.ui.Pagination = function(ul){
 	this.ul.removeChild(this.li);
 	this.pageSize = 1;
 }
+
+// Extends UI prototype
 duice.ui.Pagination.prototype = Object.create(duice.ui.__.prototype);
-// bind 
+
+/**
+ * Binds component to map data object
+ * @method 
+ * @param {duice.data.Map} map - map data object to bind
+ */
 duice.ui.Pagination.prototype.bind = function(map) {
 	this.map = map;
 	this.map.addObserver(this);
 }
-// setting column name specified rows value
-duice.ui.Pagination.prototype.setRows = function(value){
-	this.rows = value;
+/**
+ * setting column name specified rows value
+ * @method
+ * @param {number} rows - number of rows per page
+ */
+duice.ui.Pagination.prototype.setRows = function(rows){
+	this.rows = rows;
 }
-// setting column name specified page value
-duice.ui.Pagination.prototype.setPage = function(value){
-	this.page = value;
+
+/**
+ * Sets current page
+ * @method
+ * @param {number} page - current page
+ */
+duice.ui.Pagination.prototype.setPage = function(page){
+	this.page = page;
 }
-// setting column name specified total rows value 
-duice.ui.Pagination.prototype.setTotalCount = function(value){
-	this.totalCount = value;
+
+/**
+ * Sets number of total row count
+ * @method
+ * @param {number} totalCount - number of total row count
+ */
+duice.ui.Pagination.prototype.setTotalCount = function(totalCount){
+	this.totalCount = totalCount;
 }
-duice.ui.Pagination.prototype.setPageSize = function(value) {
-	this.pageSize = parseInt(value);
+
+/**
+ * Sets display page size
+ * @method
+ * @param {number} pageSize - page size to display
+ */
+duice.ui.Pagination.prototype.setPageSize = function(pageSize) {
+	this.pageSize = parseInt(pageSize);
 }
-// update 
+
+/**
+ * Updates component
+ * @method
+ */
 duice.ui.Pagination.prototype.update = function() {
 
 	// remove all li element
@@ -3620,7 +3649,12 @@ duice.ui.Pagination.prototype.update = function() {
 		}
 	}
 }
-// create page item 
+
+/**
+ * Creates item page
+ * @method 
+ * @param {number} page - page number to create
+ */
 duice.ui.Pagination.prototype.createItemPage = function(page) {
 	var $this = this;
 	var ul = this.ul;
@@ -3633,6 +3667,12 @@ duice.ui.Pagination.prototype.createItemPage = function(page) {
 	li = this.executeExpression(li, $context);
 	return li;
 }
+
+/**
+ * Creates previous page item
+ * @method
+ * @param {number} page - previous page number
+ */
 duice.ui.Pagination.prototype.createItemPrev = function(page) {
 	var $this = this;
 	var ul = this.ul;
@@ -3649,6 +3689,12 @@ duice.ui.Pagination.prototype.createItemPrev = function(page) {
 	li = this.executeExpression(li, $context);
 	return li;
 }
+
+/**
+ * Creates next page item
+ * @method
+ * @param {number} page - next page number
+ */
 duice.ui.Pagination.prototype.createItemNext = function(page) {
 	var $this = this;
 	var ul = this.ul;
@@ -3666,17 +3712,21 @@ duice.ui.Pagination.prototype.createItemNext = function(page) {
 	return li;
 }
 
-//-----------------------------------------------------------------------------
-// duice.ui Dialog
-//-----------------------------------------------------------------------------
-duice.ui.Dialog = function(content) {
+/**
+ * duice.ui.Dialog prototype
+ * @class
+ * @classdesc
+ * Custom dialog message box. 
+ * <iframe height="500" style="width:100%;" scrolling="no" title="duice.ui.Dialog" src="//codepen.io/chomookun/embed/MLQbVK/?height=446&theme-id=0&default-tab=js,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+ * @constructor
+ * @param {string} title - dialog title
+ * @param {HTMLElement} content - dialog contents element
+ */
+duice.ui.Dialog = function(title, content) {
 	duice.ui.__.call(this);
 	var $this = this;
 	
 	// defines content
-	if(content.parentNode){
-		this.parentNode = content.parentNode;
-	}
 	this.content = content;
 	
 	// event listener
@@ -3714,6 +3764,7 @@ duice.ui.Dialog = function(content) {
 	
 	// create title
 	this.title = document.createElement('span');
+	this.title.appendChild(this.createHtml(title));
 	this.title.classList.add('duice-ui-dialog-header-title');
 	this.header.appendChild(this.title);
 	
@@ -3728,7 +3779,6 @@ duice.ui.Dialog = function(content) {
 	// creates body
 	this.body = document.createElement('div');
 	this.body.classList.add('duice-ui-dialog-body');
-	this.body.appendChild(this.content);
 	this.div.appendChild(this.body);
 	
 	// on resize event
@@ -3737,14 +3787,27 @@ duice.ui.Dialog = function(content) {
 		this.div.style.top = '20vh';	// adjust top
 	});
 }
+
+// Extends UI prototype
 duice.ui.Dialog.prototype = Object.create(duice.ui.__.prototype);
-// sets title 
-duice.ui.Dialog.prototype.setTitle = function(title){
-	this.title.appendChild(this.createHtml(title));
-}
-// open dialog window 
+
+/**
+ * Opens dialog window 
+ * @method
+ */
 duice.ui.Dialog.prototype.open = function(){
-	
+
+	// check before open listener
+	if(this.listener.beforeOpen){
+		if(this.listener.beforeOpen.call(this) == false){
+			return false;
+		}
+	}
+
+	// detach content from parent and append to dialog body
+	this.parentNode = this.getParentNode(this.content);
+	this.body.appendChild(this.content);
+
 	// blocker
 	this.blocker = this.block(this.getWindow().document.body);
 	
@@ -3754,6 +3817,7 @@ duice.ui.Dialog.prototype.open = function(){
 	
 	// adds into document
 	this.getWindow().document.body.appendChild(this.div);
+	this.content.style.display = 'block';
 
 	// adjust top
 	this.setPosition(this.div);
@@ -3767,8 +3831,20 @@ duice.ui.Dialog.prototype.open = function(){
 		this.getWindow().document.activeElement.blur();
 	}catch(ignore){
 	}
+
+	// call after close event listener
+	var $this = this;
+	this.delay(function() {
+		if($this.listener.afterOpen){
+			$this.listener.afterOpen.call($this);
+		}
+	});
 }
-// close dialog window 
+
+/**
+ * Closes dialog window 
+ * @method
+ */
 duice.ui.Dialog.prototype.close = function() {
 	var $this = this;
 
@@ -3783,6 +3859,7 @@ duice.ui.Dialog.prototype.close = function() {
 	this.blocker.release();
 	
 	this.delay(function(){
+		
 		// restore content element into parent node
 		if($this.parentNode){
 			$this.parentNode.appendChild($this.content);
@@ -3790,18 +3867,52 @@ duice.ui.Dialog.prototype.close = function() {
 		
 		// removes dialog from screen
 		$this.getWindow().document.body.removeChild($this.div);
+		$this.content.style.display = 'none';
 
 		// calls callback function
-		if($this.afterClose){
-			$this.afterClose.call($this);
+		if($this.listener.afterClose){
+			$this.listener.afterClose.call($this);
 		}
-
 	});
 }
+
+/**
+ * Sets listener before open
+ * @method
+ * @param {function} listener -listener function before open
+ * @return {this} returns this
+ */
+duice.ui.Dialog.prototype.beforeOpen = function(listener) {
+	this.listener.beforeOpen = listener;
+	return this;
+}
+
+/**
+ * Sets listener after open
+ * @method
+ * @param {function} listener - listener function after open
+ * @return {this} returns this.
+ */
+duice.ui.Dialog.prototype.afterOpen = function(listener) {
+	this.listener.afterOpen = listener;
+	return this;
+}
+
+/**
+ * Sets listener before close
+ * @method
+ * @param {function} listener - listener function before dialog closed
+ */
 duice.ui.Dialog.prototype.beforeClose = function(listener){
 	this.listener.beforeClose = listener;
 	return this;
 }
+
+/**
+ * Sets listener after close
+ * @method
+ * @param {function} listener - listener function after dialog closed
+ */
 duice.ui.Dialog.prototype.afterClose = function(listener){
 	this.listener.afterClose = listener;
 	return this;
@@ -3809,8 +3920,16 @@ duice.ui.Dialog.prototype.afterClose = function(listener){
 
 /**
  * duice.ui.Alert prototype
+ * @class
+ * @classdesc
+ * Custom alert dialog
+ * <iframe height="500" style="width: 100%;" scrolling="no" title="duice.ui.Alert" src="//codepen.io/chomookun/embed/JxpEMe/?height=300&theme-id=36063&default-tab=js,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+ * @constructor
+ * @param {string} title - alert dialog title
+ * @param {string} message - alert message
+ * @return {this} returns this
  */
-duice.ui.Alert = function(message){
+duice.ui.Alert = function(title,message){
 	duice.ui.__.call(this);
 	var $this = this;
 	
@@ -3841,26 +3960,34 @@ duice.ui.Alert = function(message){
 	this.button.appendChild(this.buttonConfirm);
 
 	// creates dialog
-	this.dialog = new duice.ui.Dialog(this.content);
+	this.dialog = new duice.ui.Dialog(title,this.content);
 	
 	// return self
 	return this;
 }
+
+// Extends UI prototype
 duice.ui.Alert.prototype = Object.create(duice.ui.__.prototype);
-// setting title 
-duice.ui.Alert.prototype.setTitle = function(title){
-	this.dialog.setTitle(title);
-	return this;
-}
-// opens alert message box 
+
+/**
+ * Opens alert message box 
+ * @method
+ */
 duice.ui.Alert.prototype.open = function(){
 	this.dialog.open();
 	this.buttonConfirm.focus();
-	return this;
 }
-// confirm 
+
+/**
+ * Confirms
+ * @method
+ */
 duice.ui.Alert.prototype.confirm = function(){
 	var $this = this;
+
+	// removes dialog close event
+	this.dialog.beforeClose(null);
+	this.dialog.afterClose(null);
 	
 	// calls beforeConfirm
 	if(this.listener.beforeConfirm){
@@ -3879,21 +4006,41 @@ duice.ui.Alert.prototype.confirm = function(){
 		});
 	}
 }
-// defines before confirm event listener
+
+/**
+ * Defines before confirm event listener
+ * @method
+ * @param {function} listener - listener function before confirm
+ * @return {this} returns this
+ */
 duice.ui.Alert.prototype.beforeConfirm = function(listener){
 	this.listener.beforeConfirm = listener;
+	this.dialog.beforeConfirm(listener);
 	return this;
 }
-// defines after confirm event listener.
+/**
+ * Defines after confirm event listener.
+ * @method
+ * @param {function} listener - listener function after confirm
+ * @return {this} return this
+ */
 duice.ui.Alert.prototype.afterConfirm = function(listener){
 	this.listener.afterConfirm = listener;
+	this.dialog.afterClose(listener);
 	return this;
 }
 
-//-----------------------------------------------------------------------------
-// duice.ui.Confirm prototype
-//-----------------------------------------------------------------------------
-duice.ui.Confirm = function(message){
+/**
+ * duice.ui.Confirm prototype
+ * @class
+ * @classdesc
+ * <iframe height="500" style="width: 100%;" scrolling="no" title="duice.ui.Confirm" src="//codepen.io/chomookun/embed/NoypWv/?height=300&theme-id=36063&default-tab=js,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+ * @constructor
+ * @param {string} title - confirm title
+ * @param {string} message - confirm message
+ * @return {this} returns this
+ */
+duice.ui.Confirm = function(title, message){
 	duice.ui.__.call(this);
 	var $this = this;
 	
@@ -3932,24 +4079,28 @@ duice.ui.Confirm = function(message){
 	this.button.appendChild(this.buttonCancel);
 
 	// creates dialog
-	this.dialog = new duice.ui.Dialog(this.content);
+	this.dialog = new duice.ui.Dialog(title, this.content);
 	
 	// return self
 	return this;
 }
+
+// Extends UI component prototype
 duice.ui.Confirm.prototype = Object.create(duice.ui.__.prototype);
-// setting title 
-duice.ui.Confirm.prototype.setTitle = function(title){
-	this.dialog.setTitle(title);
-	return this;
-}
-// opens alert message box 
+
+/**
+ * Opens confirm dialog
+ * @method
+ */
 duice.ui.Confirm.prototype.open = function(){
 	this.dialog.open();
 	this.buttonCancel.focus();
-	return this;
 }
-// confirm 
+
+/**
+ * Confirm
+ * @method
+ */
 duice.ui.Confirm.prototype.confirm = function(){
 	var $this = this;
 	
@@ -3970,9 +4121,17 @@ duice.ui.Confirm.prototype.confirm = function(){
 		});
 	}
 }
-// cancel 
+
+/**
+ * Cancel
+ * @method
+ */
 duice.ui.Confirm.prototype.cancel = function(){
 	var $this = this;
+
+	// clear dialog close event
+	this.dialog.beforeClose(null);
+	this.dialog.afterClose(null);
 	
 	// executes beforeCancel
 	if(this.listener.beforeCancel){
@@ -3991,31 +4150,62 @@ duice.ui.Confirm.prototype.cancel = function(){
 		});
 	}
 }
-// defines before confirm event listener
+
+/**
+ * Defines before confirm event listener
+ * @method
+ * @param {function} listener - listener functon before confirm
+ */
 duice.ui.Confirm.prototype.beforeConfirm = function(listener){
 	this.listener.beforeConfirm = listener;
 	return this;
 }
-// defines after confirm event listener.
+
+/**
+ * Defines after confirm event listener.
+ * @method
+ * @param {function} listener - listener function before confirm
+ * @return {this} returns this
+ */
 duice.ui.Confirm.prototype.afterConfirm = function(listener){
 	this.listener.afterConfirm = listener;
 	return this;
 }
-// defines before cancel event listener.
+
+/**
+ * Defines before cancel event listener.
+ * @method
+ * @param {function} listener - listener function before cancel.
+ * @return {this} returns this.
+ */
 duice.ui.Confirm.prototype.beforeCancel = function(listener){
 	this.listener.beforeCancel = listener;
-	return this;
-}
-// defines after cancel event listener.
-duice.ui.Confirm.prototype.afterCancel = function(listener){
-	this.listener.afterCancel = listener;
+	this.dialog.beforeClose(listener);
 	return this;
 }
 
-//-----------------------------------------------------------------------------
-// duice.ui.Prompt prototype
-//-----------------------------------------------------------------------------
-duice.ui.Prompt = function(message){
+/**
+ * Defines after cancel event listener.
+ * @method
+ * @param {function} listener - listener function after cancel
+ * @return {this} returns this
+ */
+duice.ui.Confirm.prototype.afterCancel = function(listener){
+	this.listener.afterCancel = listener;
+	this.dialog.afterClose(listener);
+	return this;
+}
+
+/**
+ * duice.ui.Prompt prototype
+ * @class
+ * @classdesc
+ * Custom prompt message box
+ * <iframe height="500" style="width:100%;" scrolling="no" title="duice.ui.Prompt" src="//codepen.io/chomookun/embed/zeRaOG/?height=300&theme-id=36063&default-tab=js,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+ * @constructor
+ * @param {string} message - prompt dialog message
+ */
+duice.ui.Prompt = function(title, message){
 	duice.ui.__.call(this);
 	var $this = this;
 
@@ -4060,26 +4250,35 @@ duice.ui.Prompt = function(message){
 	this.button.appendChild(this.buttonCancel);
 
 	// creates dialog
-	this.dialog = new duice.ui.Dialog(this.content);
+	this.dialog = new duice.ui.Dialog(title,this.content);
 	
 	return this;
 }
+
+// Extends UI component prototype
 duice.ui.Prompt.prototype = Object.create(duice.ui.__.prototype);
-// sets title
-duice.ui.Prompt.prototype.setTitle = function(title){
-	this.dialog.setTitle(title);
-	return this;
-}
-// open prompt message dialog
+
+/**
+ * Opens prompt message dialog
+ * @method
+ */
 duice.ui.Prompt.prototype.open = function(){
 	this.dialog.open();
 	this.input.focus();
 	return this;
 }
-// confirm
+
+/**
+ * Confirm
+ * @method
+ */
 duice.ui.Prompt.prototype.confirm = function() {
 	var $this = this;
 	
+	// removes dialog close event
+	this.dialog.beforeClose(null);
+	this.dialog.afterClose(null);
+
 	// executes before cancel
 	if(this.listener.beforeConfirm){
 		if(this.listener.beforeConfirm.call(this, { value: this.input.value }) == false){
@@ -4097,12 +4296,20 @@ duice.ui.Prompt.prototype.confirm = function() {
 		});
 	}
 }
-// cancel
+
+/**
+ * Cancel
+ * @method
+ */
 duice.ui.Prompt.prototype.cancel = function() {
 	var $this = this;
+
+	// removes dialog close event
+	this.dialog.beforeClose(null);
+	this.dialog.afterClose(null);
 	
 	// executes before cancel
-	if(this.listener.cancel){
+	if(this.listener.beforeCancel){
 		if(this.listener.beforeCancel.call(this, { value: this.input.value }) == false){
 			return false;
 		}
@@ -4118,41 +4325,80 @@ duice.ui.Prompt.prototype.cancel = function() {
 		});
 	}
 }
-// return input value
+
+/**
+ * Returns input value
+ * @method
+ * @return {string} input value
+ */
 duice.ui.Prompt.prototype.getValue = function() {
 	return this.input.value;
 }
-// defines before confirm event listener
+
+/**
+ * Defines before confirm event listener
+ * @method
+ * @param {function} listener - listener function before confirm
+ * @return {this} returns this
+ */
 duice.ui.Prompt.prototype.beforeConfirm = function(listener){
 	this.listener.beforeConfirm = listener;
 	return this;
 }
-// defines after confirm event listener.
+
+/**
+ * Defines after confirm event listener.
+ * @method
+ * @param {function} listener - listener function after confirm
+ * @return {this} returns this
+ */
 duice.ui.Prompt.prototype.afterConfirm = function(listener){
 	this.listener.afterConfirm = listener;
 	return this;
 }
-// defines before cancel event listener.
+
+/**
+ * Defines before cancel event listener.
+ * @method
+ * @param {function} listener - listener function before cancel
+ * @return {this} returns this
+ */
 duice.ui.Prompt.prototype.beforeCancel = function(listener){
 	this.listener.beforeCancel = listener;
+	this.dialog.beforeClose(listener);
 	return this;
 }
-// defines after cancel event listener.
+
+/**
+ * Defines after cancel event listener.
+ * @method
+ * @param {function} listener - listener function after cancel
+ * @return {this} returns this
+ */
 duice.ui.Prompt.prototype.afterCancel = function(listener){
 	this.listener.afterCancel = listener;
+	this.dialog.afterClose(listener);
 	return this;
 }
 
-
-//-----------------------------------------------------------------------------
-// Utilities structure package
-//-----------------------------------------------------------------------------
+/**
+ * Utilities package
+ * @namespace
+ */
 duice.util = {};
 
-//-----------------------------------------------------------------------------
-// duice.util.stringUtils
-//-----------------------------------------------------------------------------
+/**
+ * duice.util.StringUtils
+ * @class
+ * @classdesc
+ */
 duice.util.StringUtils = {
+	/**
+	 * Checks empty
+	 * @method
+	 * @param {string} value - value to check
+	 * @return {boolean} returns whether emtpry or not
+	 */
 	isEmpty: function(value) {
 		if(value === null || value === undefined || value.trim().length < 1){
 			return true;
@@ -4160,27 +4406,52 @@ duice.util.StringUtils = {
 			return false;
 		}
 	},
+	/**
+	 * Checks value is number
+	 * @method
+	 * @param {string} value - value to check
+	 * @return {boolean} returns result of check
+	 */
 	isNumber: function(value){
 		var pattern = /^[0-9]{1,}$/;
 		return pattern.test(value);
 	},
+	/**
+	 * Checks value is alphabet
+	 * @method
+	 * @param {string} value - value to check
+	 * @return {boolean} returns result of checking
+	 */
 	isAlphabet: function(value){
 		var pattern = /^[a-zA-Z]{1,}$/;
 		return pattern.test(value);
 	},
+	/**
+	 * Checks value is alphabet and number
+	 * @method
+	 * @param {string} value - value to check
+	 * @return {boolean} returns result of checking
+	 */
 	isAlphabetNumber: function(value){
 		var pattern = /^[a-zA-Z0-9]{1,}$/;
 		return pattern.test(value);
 	},
+	/**
+	 * Checks value string is decimal type
+	 * @method
+	 * @param {string} value - value to check
+	 * @return {boolean} returns whether value is decimal format or not
+	 */
 	isDecimal: function(value){
 		var pattern = /^[0-9\,\.]{1,}$/;
 		return pattern.test(value);
 	},
 	/**
 	 * Checks value size
-	 * @Param {String} value for checking
-	 * @Param {Number} valid minimum length
-	 * @Param {Number} valid maximum length
+	 * @method
+	 * @param {string} value for checking
+	 * @param {number} valid minimum length
+	 * @param {number} valid maximum length
 	 */
 	isLengthBetween: function(value, min, max) {
 		if(!value) {
@@ -4195,7 +4466,8 @@ duice.util.StringUtils = {
 	},
 	/**
 	 * Checks generic ID (alphabet + number + -,_), but does not check length.
-	 * @Param {String} value for checking.
+	 * @method
+	 * @param {string} value for checking.
 	 */
 	isGenericId: function(value){
 		var pattern = /^[a-zA-Z0-9\-\_]{1,}$/;
@@ -4203,29 +4475,59 @@ duice.util.StringUtils = {
 	},
 	/**
 	 * Checks generic password (At least 1 alphabet, 1 number, 1 special char)
+	 * @method
+	 * @param {string} value - value to check
+	 * @return {boolean} returns value is generic password format
 	 */
 	isGenericPassword: function(value){
 		var pattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$/;
 		return pattern.test(value);
 	},
+	/**
+	 * Checks if value is email format
+	 * @method
+	 * @param {string} value - value to check
+	 * @return {boolean} return value is email format.
+	 */
 	isEmailAddress: function(value){
 		var pattern = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 		return pattern.test(value);
 	},
+	/**
+	 * Check if value is phone number format
+	 * @method
+	 * @param {string} value - value to check
+	 * @return {boolean} return value is phone number format.
+	 */
 	isPhoneNumber: function(value){
 		var pattern =/^[0-9\-]{11,}$/; 
 		return pattern.test(value);
 	},
+	/**
+	 * Checks if value is URL address format
+	 * @method
+	 * @param {string} value - value to check
+	 * @return {boolean} return value is URL address format.
+	 */
 	isUrlAddress: function(value){
 		var pattern = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
 		return pattern.test(value);
 	}
 }
 
-//-----------------------------------------------------------------------------
-//duice.util.formatUtils
-//-----------------------------------------------------------------------------
+/**
+ * duice.util.FormatUtils
+ * @class
+ * @classdesc
+ */
 duice.util.FormatUtils = {
+	/**
+	 * Converts date to formatted string.
+	 * @method
+	 * @param {Date} date - date object to convert.
+	 * @param {string} format - date format to convert
+	 * @return {string} Returns converted formatted date string.
+	 */
 	toDateFormat: function(date, format){
 		String.prototype.string = function(len){var s = '', i = 0; while (i++ < len) { s += this; } return s;};
 		String.prototype.zf = function(len){return "0".string(len - this.length) + this;};
@@ -4257,6 +4559,13 @@ duice.util.FormatUtils = {
 		});
 		return dateString;
 	},
+	/**
+	 * Converts number to formatted number string
+	 * @method
+	 * @param {number} number - number to convert
+	 * @param {string} format - number format
+	 * @return {string} returns formatted number string.
+	 */
 	toNumberFormat: function(number, format){
 	    var reg = /(^[+-]?\d+)(\d{3})/;
 	    var n = (number + '');
@@ -4267,10 +4576,17 @@ duice.util.FormatUtils = {
 	}
 }
 
-//-----------------------------------------------------------------------------
-//duice.util.formatUtils
-//-----------------------------------------------------------------------------
+/**
+ * duice.util.RandomUtils
+ * @class
+ * @classdesc
+ */
 duice.util.RandomUtils = {
+	/**
+	 * Generates UUID
+	 * @method
+	 * @return {string} returns random UUID
+	 */
 	generateUUID: function() {
 		var dt = new Date().getTime();
 		var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -4285,13 +4601,27 @@ duice.util.RandomUtils = {
 //-----------------------------------------------------------------------------
 // duice.util.WebSocketClient prototype
 //-----------------------------------------------------------------------------
+/**
+ * duice.util.WebSocketClient
+ * @class
+ * @classdesc
+ * 
+ * @constructor
+ * @param {string} url - websocket connect URL
+ */
 duice.util.WebSocketClient = function(url) {
 	this.url = url;
 	this.listener = {};
 	this.reconnectInterval = 3*1000;	// ms
 	this.messageHandlers = [];
+	return this;
 }
 duice.util.WebSocketClient.prototype = {
+	/**
+	 * open 
+	 * @method
+	 * 
+	 */
 	open: function() {
 		this.webSocket = new WebSocket(this.url);
 		var $this = this;
