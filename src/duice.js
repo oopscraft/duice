@@ -1588,7 +1588,7 @@ duice.ui.TextField.prototype.setReadonly = function(readonly){
  * | ------------- 	| ---------------------------------------------------------------------			| -----------------------------------	|
  * | select  	   	| data-duice="ComboBox" 														| component Type						|
  * | select		    | data-duice-bind="(map).(column)"    											| specify binding Map and column name	|
- * | select		    | data-duice-options="(duice.data.List or Array(Object) or Array(string))"  	| options data							|
+ * | select		    | data-duice-options="(name of options array)"  								| options data array					|
  * | select		    | data-duice-option-value="(column of value)"  									| column name of option value			|
  * | select		    | data-duice-option-text="(column of text)"										| column name of option text			|
  * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/5dta4vub/embedded/html,js,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
@@ -1677,7 +1677,7 @@ duice.ui.ComboBox.prototype.update = function() {
 /**
  * Sets options data object
  * @method
- * @param {duice.data.List|Array(Object)|Array} options data
+ * @param {Array<Object>|Array<string>} options data
  */
 duice.ui.ComboBox.prototype.setOptions = function(options){
 	this.options = options;
