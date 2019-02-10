@@ -1,5 +1,16 @@
 #!/bin/bash
 
+# prepare
+function prepare() {
+	npm list gulp || npm install gulp
+	npm list gulp-strip-debug || npm install gulp-strip-debug
+	npm list gulp-uglify || npm install gulp-uglify
+	npm list gulp-sass || npm install gulp-sass
+	npm list gulp-minify-html || npm install gulp-minify-html
+	npm list gulp-zip || npm install gulp-zip
+	npm list jsdoc || npm install jsdoc
+}
+
 # git update source
 function update() {
 	git stash
@@ -9,37 +20,34 @@ function update() {
 
 # generates document
 function doc() {
-	npm list jsdoc || npm install jsdoc
 	rm -rf ./doc/*
 	jsdoc --configure ./jsdoc.json
 }
 
-# gradle build
-function build() {
-	npm list gulp || npm install gulp
-	npm list gulp-strip-debug || npm install gulp-strip-debug
-	npm list gulp-uglify || npm install gulp-uglify
-	npm list gulp-sass || npm install gulp-sass
-	npm list gulp-minify-html || npm install gulp-minify-html
-	npm list gulp-zip || npm install gulp-zip
+# gulp compile
+function compile() {
 	gulp build
 }
 
 # main
 case ${1} in
+	prepare)
+		prepare
+		;;
 	update)
 		update
 		;;
 	doc)
 		doc
 		;;
-	build)
-		build
+	compile)
+		compile
 		;;
 	*)
+		prepare
 		update
 		doc
-		build
+		compile
 		;;
 esac
 

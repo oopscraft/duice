@@ -470,6 +470,7 @@ function buildNav(members) {
         }
     }
 
+	nav += '<div style="height:2em;"></div>';
     return nav;
 }
 

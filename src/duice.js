@@ -357,7 +357,7 @@ Object.freeze(duice.data.__.prototype);
  * @class
  * @classdesc
  * Key-Value Map data structure.
- * <iframe height="300" style="width: 100%;" scrolling="no" title="duice.data.Map" src="//codepen.io/chomookun/embed/jdZeVR/?height=300&theme-id=36063&default-tab=js,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/486o0ewf/embedded/js,html,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
  * @param {Object} JSON data
  */
@@ -575,7 +575,7 @@ Object.freeze(duice.data.Map.prototype);
  * @class
  * @classdesc
  * List data structure.
- * <iframe height="265" style="width: 100%;" scrolling="no" title="duice.data.List(jsonArray)" src="//codepen.io/chomookun/embed/rPJoyo/?height=265&theme-id=dark&default-tab=js,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/6snkq5dw/embedded/js,html,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
  * @param {Object[]} jsonArray - JSON Array data
  */
@@ -784,7 +784,7 @@ duice.data.List.prototype.afterChange = function(afterChangeListener){
  * duice.data.Tree prototype
  * @class
  * @classdesc
- * <iframe height="265" style="width: 100%;" scrolling="no" title="duice.data.Tree(jsonArray,childNodeName)" src="//codepen.io/chomookun/embed/yZvZoB/?height=265&theme-id=dark&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/v9cx57hz/embedded/js,html,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
  * @param {Array<Object>} jsonArray - JSON Array data has tree nodes.
  * @param {string} childNodeName - name of child node elements.
@@ -793,11 +793,11 @@ duice.data.Tree = function(jsonArray,childNodeName) {
 	duice.data.__.call(this);
 	this.index = [];
 	this.rootNode = new duice.data.Map();
+	this.enable = true;
+	this.readonly = {};
 	if(jsonArray) {
 		this.fromJson(jsonArray,childNodeName);
 	}
-	this.enable = true;
-	this.readonly = {};
 }
 
 // Extends data prototype
@@ -934,16 +934,16 @@ duice.data.Tree.prototype.removeNode = function(index){
 }
 
 /**
- * Inserts node into specified index postion.
+ * Adds new child node
  * @method
- * @param {number} index - index array positon to insert node.
- * @param {duice.data.Map} map - node map to insert.
+ * @param {number} parentIndex - parent index to add
+ * @param {duice.data.Map} map - node map to insert
  */
-duice.data.Tree.prototype.insertNode = function(index, map){
-	var node = this.getNode(index);
-	var parentNode = node.getParentNode();
-	parentNode.insertChildNode(index[index.length-1], map);
-	this.index = index;
+duice.data.Tree.prototype.addChildNode = function(parentIndex, map){
+	var parentNode = this.getNode(parentIndex);
+	parentNode.addChildNode(map);
+	this.index = parentIndex;
+	this.index.push(parentNode.getChildNodes().length-1);
 	this.notifyObservers();
 }
 
@@ -1259,9 +1259,9 @@ duice.ui.__.prototype.setPosition = function(element){
  */
 duice.ui.__.prototype.parseFormat = function(format){
 	var splitedFormat = format.split(':');
-	var formatType = splitedFormat.shift();
-	var formatBody = splitedFormat.join(':');
-	return { type: formatType, body: formatBody };
+	var type = splitedFormat.shift();
+	var option = splitedFormat.join(':');
+	return { type: type, option: option };
 }
 
 /**
@@ -1435,9 +1435,9 @@ Object.freeze(duice.ui.__.prototype);
  * | HTML Tag   	| data-* Attribute 										| Description  							|
  * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
  * | label  	   	| data-duice="Label" 									| component Type						|
- * | label		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
- * | label		    | data-duice-format="{type}:{format}"    				| defines display type and format		|
- * <iframe height="300" style="width: 100%;" scrolling="no" title="duice.ui.Label" src="//codepen.io/chomookun/embed/PVQBpY/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+ * | label		    | data-duice-bind="(duice.data.Map).(column name)"    	| specify binding Map and column name	|
+ * | label		    | data-duice-format="(type):(options)"    				| defines display type and options		|
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/ogtf6vh9/embedded/html,js,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
  * @param {HTMLLabelElement} label - label HTML element
  */
@@ -1467,19 +1467,24 @@ duice.ui.Label.prototype.bind = function(map, name) {
  * @method
  */
 duice.ui.Label.prototype.update = function() {
+	
+	// removes child nodes
 	this.removeChildNodes(this.label);
-	var value = '';
-	if(this.map.get(this.name) !== null && this.map.get(this.name) !== undefined){
-		value = this.map.get(this.name);
-	}
+
+	// defines value
+	var value = this.map.get(this.name) ? this.map.get(this.name) : '';
+
+	// converted formatted value.
 	if(this.format){
 		var parsedFormat = this.parseFormat(this.format);
-		if(parsedFormat.type == 'date'){
-			value = duice.util.FormatUtils.toDateFormat(value, parsedFormat.body);
-		}else if(parsedFormat.type == 'number'){
-			value = duice.util.FormatUtils.toNumberFormat(value, parsedFormat.body);
+		if(parsedFormat.type === 'date'){
+			value = duice.util.FormatUtils.toDateFormat(value, parsedFormat.option);
+		}else if(parsedFormat.type === 'number'){
+			value = duice.util.FormatUtils.toNumberFormat(value, parsedFormat.option);
 		}
 	}
+
+	// append value.
 	this.label.appendChild(this.createHtml(value));
 }
 
@@ -1488,10 +1493,9 @@ duice.ui.Label.prototype.update = function() {
  * @method
  * @param {string} format - display format {type:format}
  * @example
- * // number format
- * <label data-juice="Label" data-juice-bind="user.point" data-juice-format="number:0,0"></label>
- * 
- * // date format
+ * // number format - number:(scale)
+ * <label data-juice="Label" data-juice-bind="user.point" data-juice-format="number:2"></label>
+ * // date format - date:(format)
  * <label data-duice="Label" data-juice-bind="user.birthDate" data-juice-format="date:yyyy-MM-dd hh:mm:ss"></label>
  */
 duice.ui.Label.prototype.setFormat = function(format) {
@@ -1508,7 +1512,7 @@ duice.ui.Label.prototype.setFormat = function(format) {
  * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
  * | pre	  	   	| data-duice="Text" 									| component Type						|
  * | pre		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
- * <iframe height="300" style="width: 100%;" scrolling="no" title="duice.ui.Text" src="//codepen.io/chomookun/embed/XOZBNz/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/adouxg1q/embedded/html,js,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
  * @param {HTMLPrelElement} pre - pre HTML element
  */
@@ -1555,7 +1559,7 @@ duice.ui.Text.prototype.update = function() {
  * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
  * | input  	   	| data-duice="TextField" 								| component Type					|
  * | input		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
- * <iframe height="300" style="width: 100%;" scrolling="no" title="duice.ui.TextField" src="//codepen.io/chomookun/embed/LqQBRB/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe> 
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/0hpgvzy5/embedded/html,js,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
  * @param {HTMLInputElement} input - input HTML element.
  */
@@ -1589,7 +1593,9 @@ duice.ui.TextField.prototype.bind = function(map, name) {
  * @method
  */
 duice.ui.TextField.prototype.update = function() {
-	var value = this.map.get(this.name) == undefined ? '' : this.map.get(this.name);
+	
+	// sets value
+	var value = this.map.get(this.name) ? this.map.get(this.name) : '';
 	this.input.value = value;
 
 	// checks read-only
@@ -1626,7 +1632,7 @@ duice.ui.TextField.prototype.setReadonly = function(readonly){
  * | select		    | data-duice-options="(duice.data.List or Array(Object) or Array(string))"  	| options data							|
  * | select		    | data-duice-option-value="(column of value)"  									| column name of option value			|
  * | select		    | data-duice-option-text="(column of text)"										| column name of option text			|
- * <iframe height="300" style="width: 100%;" scrolling="no" title="duice.ui.ComboBox" src="//codepen.io/chomookun/embed/pGaZbN/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe> 
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/5dta4vub/embedded/html,js,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
  * @param {HTMLInputElement} select - select HTML element.
  */
@@ -1759,7 +1765,7 @@ duice.ui.ComboBox.prototype.setReadonly = function(readonly){
  * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
  * | input  	   	| data-duice="CheckBox"									| component Type						|
  * | input		    | data-duice-bind="(duice.data.Map).(column name)"    	| specify binding Map and column name	|
- * <iframe height="300" style="width: 100%;" scrolling="no" title="duice.ui.CheckBox" src="//codepen.io/chomookun/embed/zeRLqP/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/yftexL63/embedded/html,js,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
  * @param {HTMLInputElement} input - input HTML element
  */
@@ -1827,7 +1833,7 @@ duice.ui.CheckBox.prototype.setReadonly = function(readonly){
  * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
  * | input  	   	| data-duice="Radio" 									| Radio component Type					|
  * | input		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
- * <iframe height="300" style="width: 100%;" scrolling="no" title="duice.ui.Radio" src="//codepen.io/chomookun/embed/pGaZgE/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe> 
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/zfyh83dn/embedded/html,js,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
  * @param {HTMLInputElement} input - input HTML element.
  */
@@ -1888,7 +1894,7 @@ duice.ui.Radio.prototype.setReadonly = function(readonly){
  * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
  * | label  	   	| data-duice="Textarea" 								| component Type						|
  * | label		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
- * <iframe height="300" style="width: 100%;" scrolling="no" title="duice.ui.TextArea" src="//codepen.io/chomookun/embed/MLQBgb/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/4zs6o3kv/embedded/html,js,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
  * @param {HTMLTextareaElement} textarea - textarea HTML element
  */
@@ -1959,7 +1965,7 @@ duice.ui.TextArea.prototype.setReadonly = function(readonly){
  * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
  * | label  	   	| data-duice="HtmlEditor" 								| component Type						|
  * | label		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
- * i<iframe height="300" style="width: 100%;" scrolling="no" title="duice.ui.HtmlEditor" src="//codepen.io/chomookun/embed/RvQJOe/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/329r5jw8/embedded/html,js,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
  * @param {HTMLDivElement} div - div HTML element
  */
@@ -2208,7 +2214,7 @@ duice.ui.HtmlEditor.prototype.toggleHtml = function() {
  * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
  * | label  	   	| data-duice="CronExpression" 							| component Type						|
  * | label		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
- * <iframe height="300" style="width: 100%;" scrolling="no" title="duice.ui.CronExpression" src="//codepen.io/chomookun/embed/pGaKYg/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/k4dsxywm/embedded/html,js,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
  * @param {HTMLInputElement} input - input HTML element
  */
@@ -2603,7 +2609,7 @@ duice.ui.CronExpression.prototype.createSelectWeek = function() {
  * | img		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
  * | img			| data-duice-width="{width pixel}						| pixel of img width					|
  * | img 			| data-juice-height="{height pixel}"					| pixel of img height					|
- * <iframe height="300" style="width: 100%;" scrolling="no" title="duice.ui.Image" src="//codepen.io/chomookun/embed/NoyzLZ/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/bzce5097/embedded/js,html,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  */
 duice.ui.Image = function(img) {
 	duice.ui.__.call(this);
@@ -2737,7 +2743,7 @@ duice.ui.Image.prototype.setReadonly = function(readonly){
  * | ul		  	   	| data-duice="ListView"									| component Type						|
  * | ul			    | data-duice-bind="{duice.data.List}"    				| specify binding List 					|
  * | ul			    | data-duice-item="(name of row object)"    			| defines name of row object			|
- * <iframe height="500" style="width: 100%;" scrolling="no" title="duice.ui.ListView" src="//codepen.io/chomookun/embed/ZwrRab/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/nhe60foq/embedded/html,js,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe> 
  * @constructor
  * @param {HTMLUlElement} ul - ul HTML element
  */
@@ -2831,7 +2837,7 @@ duice.ui.ListView.prototype.createRow = function(index, map){
  * | ul 	 	   	| data-duice="TreeView" 												| component Type							|
  * | ul			    | data-duice-bind="(duice.data.Tree)"									| specify name of duice.data.List object	|
  * | ul			    | data-duice-item="(node alias)"  										| defines row map object name				|
- * <iframe height="500" style="width: 100%;" scrolling="no" title="duice.ui.Tree" src="//codepen.io/chomookun/embed/WPMpoM/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/z8djn946/embedded/html,js,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
  * @param {HTMLUlElement} ul - ul HTML element
  */
@@ -3058,7 +3064,7 @@ duice.ui.TreeView.prototype.createNode = function(index, node){
  * | table	  	   	| data-duice="Grid"										| component Type is "Grid"				|
  * | table		    | data-duice-bind="{duice.data.List}"    				| defines binding List 					|
  * | table		    | data-duice-item="(alias of each item)"    			| defines name of row object			|
- * <iframe height="500" style="width:100%;" scrolling="yes" title="duice.ui.Grid" src="//codepen.io/chomookun/embed/jdZPBg/?&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/cxp4unka/embedded/html,js,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
  * @param {HTMLTableElement} table - table HTML element
  */
@@ -3266,7 +3272,7 @@ duice.ui.Grid.prototype.createEmptyRow = function() {
  * | ul 			| data-duice-link-from="(link from column)"				| defines link from column in link		|
  * | ul 			| data-duice-link-to="(link to column)"					| defines link to column in link		|
  * | ul 			| data-duice-link-text="(link text column)"				| defines link text column in link 		|
- * <iframe height="500" style="width: 100%;" scrolling="no" title="duice.ui.Flow" src="//codepen.io/chomookun/embed/zeRZve/?height=300&theme-id=36063&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/0L8ubpwm/embedded/html,js,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
  * @param {HTMLUlElement} ul - ul HTML element
  */
@@ -3602,6 +3608,7 @@ duice.ui.Flow.prototype.createLink = function(index, map) {
  * duice.ui.Pagination prototype
  * @class
  * @classdesc
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/78o4pejk/embedded/html,js,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
  * @param {HTMLUlElement} ul - ul HTML element
  */
@@ -3800,7 +3807,7 @@ duice.ui.Pagination.prototype.createItemNext = function(page) {
  * @class
  * @classdesc
  * Custom dialog message box. 
- * <iframe height="500" style="width:100%;" scrolling="no" title="duice.ui.Dialog" src="//codepen.io/chomookun/embed/MLQbVK/?height=446&theme-id=0&default-tab=js,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/xphr26bz/embedded/js,html,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
  * @param {string} title - dialog title
  * @param {HTMLElement} content - dialog contents element
@@ -4006,7 +4013,7 @@ duice.ui.Dialog.prototype.afterClose = function(listener){
  * @class
  * @classdesc
  * Custom alert dialog
- * <iframe height="500" style="width: 100%;" scrolling="no" title="duice.ui.Alert" src="//codepen.io/chomookun/embed/JxpEMe/?height=300&theme-id=36063&default-tab=js,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/zmf6ubn4/embedded/js,html,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
  * @param {string} title - alert dialog title
  * @param {string} message - alert message
@@ -4098,7 +4105,7 @@ duice.ui.Alert.prototype.confirm = function(){
  */
 duice.ui.Alert.prototype.beforeConfirm = function(listener){
 	this.listener.beforeConfirm = listener;
-	this.dialog.beforeConfirm(listener);
+	this.dialog.beforeClose(listener);
 	return this;
 }
 /**
@@ -4117,7 +4124,7 @@ duice.ui.Alert.prototype.afterConfirm = function(listener){
  * duice.ui.Confirm prototype
  * @class
  * @classdesc
- * <iframe height="500" style="width: 100%;" scrolling="no" title="duice.ui.Confirm" src="//codepen.io/chomookun/embed/NoypWv/?height=300&theme-id=36063&default-tab=js,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/Lzd9xs8r/embedded/js,html,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
  * @param {string} title - confirm title
  * @param {string} message - confirm message
@@ -4284,7 +4291,7 @@ duice.ui.Confirm.prototype.afterCancel = function(listener){
  * @class
  * @classdesc
  * Custom prompt message box
- * <iframe height="500" style="width:100%;" scrolling="no" title="duice.ui.Prompt" src="//codepen.io/chomookun/embed/zeRaOG/?height=300&theme-id=36063&default-tab=js,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/75t8kfxs/embedded/js,html,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
  * @param {string} message - prompt dialog message
  */
@@ -4474,6 +4481,8 @@ duice.util = {};
  * duice.util.StringUtils
  * @class
  * @classdesc
+ * String utiltity object
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/2mds7zw1/embedded/js,html,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  */
 duice.util.StringUtils = {
 	/**
@@ -4602,6 +4611,7 @@ duice.util.StringUtils = {
  * duice.util.FormatUtils
  * @class
  * @classdesc
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/7wrzgvd0/embedded/js,html,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  */
 duice.util.FormatUtils = {
 	/**
@@ -4616,7 +4626,7 @@ duice.util.FormatUtils = {
 		String.prototype.zf = function(len){return "0".string(len - this.length) + this;};
 		Number.prototype.zf = function(len){return this.toString().zf(len);};
 		
-		var weekName = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
+		var weekName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat'];
 		var d = date instanceof Date ? d : new Date(date);
 	
 		// check date
@@ -4636,7 +4646,7 @@ duice.util.FormatUtils = {
 				case "hh": return (d.getHours() <= 12 ? d.getHours() : d.getHours()%12).zf(2);
 				case "mm": return d.getMinutes().zf(2);
 				case "ss": return d.getSeconds().zf(2);
-				case "ap": return d.getHours() < 12 ? "오전" : "오후";
+				case "ap": return d.getHours() < 12 ? 'AM' : 'PM';
 				default: return $1;
 			}
 		});
@@ -4646,12 +4656,12 @@ duice.util.FormatUtils = {
 	 * Converts number to formatted number string
 	 * @method
 	 * @param {number} number - number to convert
-	 * @param {string} format - number format
+	 * @param {string} scale - number scale
 	 * @return {string} returns formatted number string.
 	 */
-	toNumberFormat: function(number, format){
+	toNumberFormat: function(number, scale){
 	    var reg = /(^[+-]?\d+)(\d{3})/;
-	    var n = (number + '');
+	    var n = (number.toFixed(scale));
 	    while (reg.test(n)) {
 	    	n = n.replace(reg, '$1' + ',' + '$2');
 	    }
@@ -4663,6 +4673,7 @@ duice.util.FormatUtils = {
  * duice.util.RandomUtils
  * @class
  * @classdesc
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/qL459fxa/embedded/js,html,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  */
 duice.util.RandomUtils = {
 	/**
@@ -4681,14 +4692,11 @@ duice.util.RandomUtils = {
 	}
 }
 
-//-----------------------------------------------------------------------------
-// duice.util.WebSocketClient prototype
-//-----------------------------------------------------------------------------
 /**
  * duice.util.WebSocketClient
  * @class
  * @classdesc
- * 
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/5p79wkcu/embedded/js,html,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe> 
  * @constructor
  * @param {string} url - websocket connect URL
  */
@@ -4703,7 +4711,6 @@ duice.util.WebSocketClient.prototype = {
 	/**
 	 * open 
 	 * @method
-	 * 
 	 */
 	open: function() {
 		this.webSocket = new WebSocket(this.url);
@@ -4736,24 +4743,59 @@ duice.util.WebSocketClient.prototype = {
 			}
 		}
 	},
+	/**
+	 * Sends message
+	 * @method
+	 * @param {string} message - message string to send
+	 */
 	send: function(message) {
 		this.webSocket.send(message);
 	},
+	/**
+	 * Sets open event listener function
+	 * @method
+	 * @param {function} listener - event listener function on open
+	 */
 	onOpen: function(listener) {
 		this.listener.onOpen = listener;
 	},
+	/**
+	 * Sets on message listener function
+	 * @method
+	 * @param {function} listener - event listener function on message received.
+	 */
 	onMessage: function(listener) {
 		this.listener.onMessage = listener;
 	},
+	/**
+	 * Sets socket closed event listener function
+	 * @method
+	 * @param {function} listener - event listener functon on socket closed.
+	 */
 	onClose: function(listener) {
 		this.listener.onClose = listener;
 	},
+	/**
+	 * Sets error event listener function
+	 * @method
+	 * @param {function} listener - event listener function on error occured.
+	 */
 	onError: function(listener){
 		this.listener.onError = listener;
 	},
+	/**
+	 * Sets re-connect interval(milliseconds)
+	 * @method 
+	 * @param {number} value - reconnect interval milliseconds
+	 */
 	setReconnectInterval: function(value){
 		this.reconnectInterval = value;
 	},
+	/**
+	 * Adds handler function when message received.
+	 * @method
+	 * @param {function} handler - message listener function when message is received.
+	 */
 	addMessageHandler: function(handler){
 		this.messageHandlers.push(handler);
 	}
