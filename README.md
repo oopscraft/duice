@@ -34,13 +34,13 @@ You can use it with JQuery, AngularJS and so on, also Responsive UI framework li
 ## Examples
 
 ### Grid Example
-<iframe height="300" style="width: 100%;" scrolling="no" src="//codepen.io/chomookun/embed/exVXPV/?height=265&theme-id=dark&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+<iframe width="100%" height="300" src="//jsfiddle.net/chomookun/kv1yaz7p/embedded/result,js,html,css,resources/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0" style="border:solid 1px #ccc;"></iframe>
 
 ### TreeView Example
-<iframe height="300" style="width: 100%;" scrolling="no" src="//codepen.io/chomookun/embed/YBeMzz/?height=265&theme-id=dark&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+<iframe width="100%" height="300" src="//jsfiddle.net/chomookun/zb9vLt6s/embedded/result,js,html,css,resources/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0" style="border:solid 1px #ccc;"></iframe>
 
 ### Flow Example
-<iframe height="300" style="width: 100%;" scrolling="no" src="//codepen.io/chomookun/embed/MLQRWV/?height=265&theme-id=dark&default-tab=html,result" frameborder="no" allowtransparency="true" allowfullscreen="true"></iframe>
+<iframe width="100%" height="300" src="//jsfiddle.net/chomookun/0L8ubpwm/embedded/result,js,html,css,resources/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0" style="border:solid 1px #ccc;"></iframe>
 
 --------------------------------------------------------------------------------------------------------------------
 
