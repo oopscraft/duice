@@ -17,12 +17,12 @@
 // -------------------------
 // duice.ui
 // duice.ui.__
-// duice.ui.Label
 // duice.ui.Text
 // duice.ui.TextField
 // duice.ui.ComboBox
 // duice.ui.CheckBox
 // duice.ui.Radio
+// duice.ui.TextView
 // duice.ui.TextArea
 // duice.ui.HtmlEditor
 // duice.ui.CronExpression
@@ -183,16 +183,16 @@ duice.initialize = function(container, $context) {
 		
 	// creates unit elements
 	var elementTags = [
-		 '[data-duice="Label"]'
-		,'[data-duice="Text"]'
-		,'[data-duice="TextField"]'
-		,'[data-duice="ComboBox"]'
-		,'[data-duice="CheckBox"]'
-		,'[data-duice="Radio"]'
-		,'[data-duice="TextArea"]'
-		,'[data-duice="HtmlEditor"]'
-		,'[data-duice="CronExpression"]'
-		,'[data-duice="Image"]'
+		 'span[data-duice="Text"]'
+		,'input[data-duice="TextField"]'
+		,'select[data-duice="ComboBox"]'
+		,'input[data-duice="CheckBox"]'
+		,'input[data-duice="Radio"]'
+		,'div[data-duice="TextView"]'
+		,'textarea[data-duice="TextArea"]'
+		,'div[data-duice="HtmlEditor"]'
+		,'input[data-duice="CronExpression"]'
+		,'img[data-duice="Image"]'
 	];
 	var elements = container.querySelectorAll(elementTags.join(','));
 	for(var i = 0; i < elements.length; i ++ ) {
@@ -204,15 +204,10 @@ duice.initialize = function(container, $context) {
 			var map = getObject($context,bind.join('.'));
 			var id = duice.util.RandomUtils.generateUUID();
 			switch(type) {
-				case 'Label':
-					var label = new duice.ui.Label(element);
-					var format = element.dataset.duiceFormat;
-					format && label.setFormat(format);
-					label.bind(map,name);
-					label.update();
-				break;
 				case 'Text':
 					var text = new duice.ui.Text(element);
+					var format = element.dataset.duiceFormat;
+					format && text.setFormat(format);
 					text.bind(map,name);
 					text.update();
 				break;
@@ -241,6 +236,11 @@ duice.initialize = function(container, $context) {
 					var radio = new duice.ui.Radio(element);
 					radio.bind(map, name);
 					radio.update();
+				break;
+				case 'TextView':
+					var textView = new duice.ui.TextView(element);
+					textView.bind(map,name);
+					textView.update();
 				break;
 				case 'TextArea':
 					var textArea = new duice.ui.TextArea(element);
@@ -449,6 +449,7 @@ duice.data.Map.prototype.getNames = function() {
 /**
  * Gets parent node for tree map
  * @method
+ * @protected
  * @return {duice.data.Map} parent node.
  */
 duice.data.Map.prototype.getParentNode = function(){
@@ -458,6 +459,7 @@ duice.data.Map.prototype.getParentNode = function(){
 /**
  * Gets child node list
  * @method
+ * @protected
  * @return {Array(duice.data.Map)} child node array.
  */
 duice.data.Map.prototype.getChildNodes = function(){
@@ -467,6 +469,7 @@ duice.data.Map.prototype.getChildNodes = function(){
 /**
  * Returns specified child node
  * @method
+ * @protected
  * @param {number} index - index number of child node array.
  * @return {duice.data.Map} specified indexed node
  */
@@ -477,6 +480,7 @@ duice.data.Map.prototype.getChildNode = function(index){
 /**
  * Adds node into child nodes
  * @method
+ * @protected
  * @param {duice.data.Map} map - duice.data.Map Object to insert into child nodes.
  */
 duice.data.Map.prototype.addChildNode = function(map){
@@ -488,6 +492,7 @@ duice.data.Map.prototype.addChildNode = function(map){
 /**
  * Inserts child node into specified child index.
  * @method
+ * @protected
  * @param {number} index - inserting index position in child node array.
  * @param {juicd.data.Map} map - child node object to insert.
  */
@@ -500,6 +505,7 @@ duice.data.Map.prototype.insertChildNode = function(index,map){
 /**
  * Remove specified child node
  * @method
+ * @protected
  * @param {number} index - child array index to remove.
  */
 duice.data.Map.prototype.removeChildNode = function(index){
@@ -1427,28 +1433,28 @@ duice.ui.__.prototype.load = function(element){
 Object.freeze(duice.ui.__.prototype);
 
 /**
- * duice.ui.Label prototype
+ * duice.ui.Text prototype
  * @class
  * @classdesc
  * Prints the value of the binded data map object on the screen.
  * ## HTML5 Tag and Attribute
  * | HTML Tag   	| data-* Attribute 										| Description  							|
  * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
- * | label  	   	| data-duice="Label" 									| component Type						|
- * | label		    | data-duice-bind="(duice.data.Map).(column name)"    	| specify binding Map and column name	|
- * | label		    | data-duice-format="(type):(options)"    				| defines display type and options		|
+ * | span  	   		| data-duice="Text" 									| component Type						|
+ * | span		    | data-duice-bind="(duice.data.Map).(column name)"    	| specify binding Map and column name	|
+ * | span		    | data-duice-format="(type):(options)"    				| defines display type and options		|
  * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/ogtf6vh9/embedded/html,js,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
- * @param {HTMLLabelElement} label - label HTML element
+ * @param {HTMLTextElement} span - span HTML element
  */
-duice.ui.Label = function(label) {
+duice.ui.Text = function(span) {
 	duice.ui.__.call(this);
-	this.label = label;
-	this.label.classList.add('duice-ui-label');
+	this.span = span;
+	this.span.classList.add('duice-ui-text');
 }
 
 // extends __ prototype
-duice.ui.Label.prototype = Object.create(duice.ui.__.prototype);
+duice.ui.Text.prototype = Object.create(duice.ui.__.prototype);
 
 /**
  * Binds with specified column in map
@@ -1456,7 +1462,7 @@ duice.ui.Label.prototype = Object.create(duice.ui.__.prototype);
  * @param {string} map - map name to bind
  * @param {string} name - column name to bind
  */
-duice.ui.Label.prototype.bind = function(map, name) {
+duice.ui.Text.prototype.bind = function(map, name) {
 	this.map = map;
 	this.name = name;
 	this.map.addObserver(this);
@@ -1466,10 +1472,10 @@ duice.ui.Label.prototype.bind = function(map, name) {
  * Updates self from binded data map.
  * @method
  */
-duice.ui.Label.prototype.update = function() {
+duice.ui.Text.prototype.update = function() {
 	
 	// removes child nodes
-	this.removeChildNodes(this.label);
+	this.removeChildNodes(this.span);
 
 	// defines value
 	var value = this.map.get(this.name) ? this.map.get(this.name) : '';
@@ -1485,7 +1491,7 @@ duice.ui.Label.prototype.update = function() {
 	}
 
 	// append value.
-	this.label.appendChild(this.createHtml(value));
+	this.span.appendChild(this.createHtml(value));
 }
 
 /**
@@ -1494,59 +1500,12 @@ duice.ui.Label.prototype.update = function() {
  * @param {string} format - display format {type:format}
  * @example
  * // number format - number:(scale)
- * <label data-juice="Label" data-juice-bind="user.point" data-juice-format="number:2"></label>
+ * <span data-juice="Text" data-juice-bind="user.point" data-juice-format="number:2"></span>
  * // date format - date:(format)
- * <label data-duice="Label" data-juice-bind="user.birthDate" data-juice-format="date:yyyy-MM-dd hh:mm:ss"></label>
+ * <span data-duice="Text" data-juice-bind="user.birthDate" data-juice-format="date:yyyy-MM-dd hh:mm:ss"></span>
  */
-duice.ui.Label.prototype.setFormat = function(format) {
+duice.ui.Text.prototype.setFormat = function(format) {
 	this.format = format;
-}
-
-/**
- * duice.ui.Text prototype
- * @class
- * @classdesc
- * Prints text in pre element.
- * ## HTML5 Tag and Attribute
- * | HTML Tag   	| data-* Attribute 										| Description  							|
- * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
- * | pre	  	   	| data-duice="Text" 									| component Type						|
- * | pre		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
- * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/adouxg1q/embedded/html,js,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
- * @constructor
- * @param {HTMLPrelElement} pre - pre HTML element
- */
-duice.ui.Text = function(pre) {
-	duice.ui.__.call(this);
-	this.pre = pre;
-	this.pre.classList.add('duice-ui-text');
-}
-
-// Freezes prototype
-duice.ui.Text.prototype = Object.create(duice.ui.__.prototype);
-
-/**
- * Binds element to data object
- * @method
- * @param {string} name of map - map name to bind.
- * @param {string} column name of map - column name of map to bind.
- */
-duice.ui.Text.prototype.bind = function(map, name) {
-	this.map = map;
-	this.name = name;
-	this.map.addObserver(this);
-}
-
-/**
- * Updates and redraw element from data object
- * @method
- */
-duice.ui.Text.prototype.update = function() {
-	var value = '';
-	if(this.map.get(this.name) !== null && this.map.get(this.name) !== undefined){
-		value = this.map.get(this.name);
-	}
-	this.pre.innerHTML = value;
 }
 
 /**
@@ -1883,6 +1842,49 @@ duice.ui.Radio.prototype.setReadonly = function(readonly){
 	// TODO
 }
 
+/**
+ * duice.ui.TextView prototype
+ * @class
+ * @classdesc
+ * Prints text in pre element.
+ * ## HTML Tag and Attribute
+ * | HTML Tag   	| data-* Attribute 										| Description  							|
+ * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
+ * | div	  	   	| data-duice="TextView" 								| component Type						|
+ * | div		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
+ * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/adouxg1q/embedded/html,js,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+ * @constructor
+ * @param {HTMLDivElement} div - div HTML element
+ */
+duice.ui.TextView = function(div) {
+	duice.ui.__.call(this);
+	this.div = div;
+	this.div.classList.add('duice-ui-textView');
+}
+
+// Freezes prototype
+duice.ui.TextView.prototype = Object.create(duice.ui.__.prototype);
+
+/**
+ * Binds element to data object
+ * @method
+ * @param {string} name of map - map name to bind.
+ * @param {string} column name of map - column name of map to bind.
+ */
+duice.ui.TextView.prototype.bind = function(map, name) {
+	this.map = map;
+	this.name = name;
+	this.map.addObserver(this);
+}
+
+/**
+ * Updates and redraw element from data object
+ * @method
+ */
+duice.ui.TextView.prototype.update = function() {
+	var value = this.map.get(this.name) ? this.map.get(this.name) : '';
+	this.div.innerHTML = value;
+}
 
 /**
  * duice.ui.TextArea prototype

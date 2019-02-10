@@ -1,22 +1,10 @@
 /**
  * duice.ui.Label
  */
-.duice-ui-label {
-	margin: 0px;
-	padding-left: 0.5rem;
-	padding-right: 0.5rem;
-    font-weight: inherit;
-    cursor: inherit;
-}
-
-/**
- * duice.ui.Text
- */
 .duice-ui-text {
 	margin: 0px;
 	padding-left: 0.5rem;
 	padding-right: 0.5rem;
-	white-space: pre-wrap;
     font-weight: inherit;
     cursor: inherit;
 }
@@ -43,7 +31,6 @@
 	outline: none;
 	border: solid 1px gray;
 }
-
 
 /**
  * duice.ui.ComboBox
@@ -88,6 +75,18 @@
 	width: 20px;
 	height: 20px;
 	vertical-align: middle;
+}
+
+/**
+ * duice.ui.TextView
+ */
+.duice-ui-textView {
+	margin: 0px;
+	padding-left: 0.5rem;
+	padding-right: 0.5rem;
+	white-space: pre-wrap;
+    font-weight: inherit;
+    cursor: inherit;
 }
 
 /**
