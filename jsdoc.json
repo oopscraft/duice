@@ -38,9 +38,9 @@
 	         "Interfaces"
 	    ],
         "meta": {  
-            "title": "DUICE(Data-oriented UI Compnent Engin",
-            "description": "Data oriented javascript UI Component Library",
-            "keyword": "javascript UI Component"
+            "title": "DUICE (Data-oriented javascript UI Compnent Engine)",
+            "description": "Data-oriented javascript UI Component Library",
+            "keyword": "javascript UI Component Library"
         },
 		"private": true,
 	    "collapse": true
