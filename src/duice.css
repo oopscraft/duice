@@ -47,10 +47,11 @@
 .duice-ui-comboBox {
 	margin: 0px;
 	padding-left: 0.5rem;
-    padding-right: 0.5rem;
     width: 100%;
     color: #495057;
-    -webkit-appearance: none;
+	-webkit-appearance: none; 
+	-moz-appearance: none;    
+    appearance: none;
     border-radius: 2px;
     border: 1px solid #cccccc;
     background-clip: padding-box;
@@ -59,6 +60,7 @@
 	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAzElEQVQ4T6XTsQqDMBAG4HPywUJEjCJm65apz5WtmyJqECVv0FexewaxpK3RcrQEkjn35e4nF0HgiQLr4QVIKbdfkBDi7yMO4Jwjo65r8AaqqkJA0zT+gDEGAXEc+wNFUSCg67o3cL3jjNYHwLocITLGwM68H5vJMAxHB2fkUwzyErkQsyxDHSilvkewyKnYFjggTVNo29YhZVnCOI44A3Hb7Mv7RQckSYI6mKbJP0RKKfR975A8z2GeZ3+AEII60Fr7A0FfOWShgrfxCahjbhcIp6k5AAAAAElFTkSuQmCC);
 	background-repeat: no-repeat;
 	background-position: right 0.5rem center;
+	padding-right:2em;
 }
 .duice-ui-comboBox:disabled { 
     background-color: #fafafa;
@@ -299,6 +301,9 @@
 	content: 'Week';
 }
 .duice-ui-cronExpression-editor select {
+	-webkit-appearance: none; 
+	-moz-appearance: none;    
+    appearance: none;
 	margin: 0px;
 	padding-left: 1%;
     padding-right: 1%;
@@ -308,6 +313,10 @@
     background-color: #fff;
     background-clip: padding-box;
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAzElEQVQ4T6XTsQqDMBAG4HPywUJEjCJm65apz5WtmyJqECVv0FexewaxpK3RcrQEkjn35e4nF0HgiQLr4QVIKbdfkBDi7yMO4Jwjo65r8AaqqkJA0zT+gDEGAXEc+wNFUSCg67o3cL3jjNYHwLocITLGwM68H5vJMAxHB2fkUwzyErkQsyxDHSilvkewyKnYFjggTVNo29YhZVnCOI44A3Hb7Mv7RQckSYI6mKbJP0RKKfR975A8z2GeZ3+AEII60Fr7A0FfOWShgrfxCahjbhcIp6k5AAAAAElFTkSuQmCC);
+	background-repeat: no-repeat;
+	background-position: right 0.5rem center;
+	padding-right:2em;
 }
 
 /**
