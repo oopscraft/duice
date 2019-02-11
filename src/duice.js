@@ -1249,7 +1249,7 @@ duice.ui.__.prototype.delay = function(callback){
 		}finally{
 			clearInterval(interval);
 		}
-	},400);	
+	},200);	
 }
 
 /**
@@ -3775,7 +3775,6 @@ duice.ui.Pagination.prototype.createItemNext = function(page) {
  * Custom dialog message box. 
  * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/xphr26bz/embedded/js,html,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
- * @param {string} title - dialog title
  * @param {HTMLElement} content - dialog contents element
  */
 duice.ui.Dialog = function(title, content) {
@@ -3817,7 +3816,7 @@ duice.ui.Dialog = function(title, content) {
 		    $this.div.style.top = ($this.div.offsetTop - pos2) + 'px';
 	    };
 	};
-	
+
 	// create title
 	this.title = document.createElement('span');
 	this.title.appendChild(this.createHtml(title));
@@ -3981,11 +3980,10 @@ duice.ui.Dialog.prototype.afterClose = function(listener){
  * Custom alert dialog
  * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/zmf6ubn4/embedded/js,html,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
- * @param {string} title - alert dialog title
  * @param {string} message - alert message
  * @return {this} returns this
  */
-duice.ui.Alert = function(title,message){
+duice.ui.Alert = function(message){
 	duice.ui.__.call(this);
 	var $this = this;
 	
@@ -4016,7 +4014,7 @@ duice.ui.Alert = function(title,message){
 	this.button.appendChild(this.buttonConfirm);
 
 	// creates dialog
-	this.dialog = new duice.ui.Dialog(title,this.content);
+	this.dialog = new duice.ui.Dialog('', this.content);
 	
 	// return self
 	return this;
@@ -4096,7 +4094,7 @@ duice.ui.Alert.prototype.afterConfirm = function(listener){
  * @param {string} message - confirm message
  * @return {this} returns this
  */
-duice.ui.Confirm = function(title, message){
+duice.ui.Confirm = function(message){
 	duice.ui.__.call(this);
 	var $this = this;
 	
@@ -4135,7 +4133,7 @@ duice.ui.Confirm = function(title, message){
 	this.button.appendChild(this.buttonCancel);
 
 	// creates dialog
-	this.dialog = new duice.ui.Dialog(title, this.content);
+	this.dialog = new duice.ui.Dialog('', this.content);
 	
 	// return self
 	return this;
@@ -4261,7 +4259,7 @@ duice.ui.Confirm.prototype.afterCancel = function(listener){
  * @constructor
  * @param {string} message - prompt dialog message
  */
-duice.ui.Prompt = function(title, message){
+duice.ui.Prompt = function(message){
 	duice.ui.__.call(this);
 	var $this = this;
 
@@ -4306,7 +4304,7 @@ duice.ui.Prompt = function(title, message){
 	this.button.appendChild(this.buttonCancel);
 
 	// creates dialog
-	this.dialog = new duice.ui.Dialog(title,this.content);
+	this.dialog = new duice.ui.Dialog('',this.content);
 	
 	return this;
 }
