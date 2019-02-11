@@ -44,6 +44,15 @@ You can use it with JQuery, AngularJS and so on, also Responsive UI framework li
 
 --------------------------------------------------------------------------------------------------------------------
 
+## References 
+
+### application.oopscraft.net (Standalone Application Platform)
+<a href ="http://application.oopscraft.net/admin" target="_blank">
+	http://application.oopscraft.net/admin
+</a>
+
+--------------------------------------------------------------------------------------------------------------------
+
 ## More Information
 
 ### Official Website
