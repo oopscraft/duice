@@ -4626,8 +4626,11 @@ duice.util.FormatUtils = {
 	 * @return {string} returns formatted number string.
 	 */
 	toNumberFormat: function(number, scale){
+		if(typeof number !== 'number'){
+			number = new Number(0);
+		}
 	    var reg = /(^[+-]?\d+)(\d{3})/;
-	    var n = (number.toFixed(scale));
+	    var n = number.toFixed(scale);
 	    while (reg.test(n)) {
 	    	n = n.replace(reg, '$1' + ',' + '$2');
 	    }
