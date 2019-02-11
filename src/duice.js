@@ -4090,7 +4090,6 @@ duice.ui.Alert.prototype.afterConfirm = function(listener){
  * @classdesc
  * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/Lzd9xs8r/embedded/js,html,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
- * @param {string} title - confirm title
  * @param {string} message - confirm message
  * @return {this} returns this
  */
