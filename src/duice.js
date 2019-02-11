@@ -3777,25 +3777,28 @@ duice.ui.Pagination.prototype.createItemNext = function(page) {
  * @constructor
  * @param {HTMLElement} content - dialog contents element
  */
-duice.ui.Dialog = function(title, content) {
+duice.ui.Dialog = function(content) {
 	duice.ui.__.call(this);
 	var $this = this;
 	
-	// defines content
-	this.content = content;
-	
 	// event listener
 	this.listener = {};
+
+	// defines content
+	this.content = content;
+	this.parentNode = this.getParentNode(this.content);
 	
-	// creates div
-	this.div = document.createElement('div');
-	this.div.classList.add('duice-ui-dialog');
+	// creates dialog 
+	this.dialog = document.createElement('div');
+	this.dialog.classList.add('duice-ui-dialog');
+
+	// gets parent node of content element
 	
 	// creates header
 	this.header = document.createElement('div');
 	this.header.classList.add('duice-ui-dialog-header');
 	this.header.style.cursor = 'move';
-	this.div.appendChild(this.header);
+	this.dialog.appendChild(this.header);
 	
 	// drag
 	this.header.onmousedown = function(ev){
@@ -3812,14 +3815,18 @@ duice.ui.Dialog = function(title, content) {
 		    pos2 = pos4 - ev.clientY;
 		    pos3 = ev.clientX;
 		    pos4 = ev.clientY;
-		    $this.div.style.left = ($this.div.offsetLeft - pos1) + 'px';
-		    $this.div.style.top = ($this.div.offsetTop - pos2) + 'px';
+		    $this.dialog.style.left = ($this.dialog.offsetLeft - pos1) + 'px';
+		    $this.dialog.style.top = ($this.dialog.offsetTop - pos2) + 'px';
 	    };
 	};
 
+	// creates icon
+	this.icon = document.createElement('span');
+	this.icon.classList.add('duice-ui-dialog-header-icon');
+	this.header.appendChild(this.icon);
+
 	// create title
 	this.title = document.createElement('span');
-	this.title.appendChild(this.createHtml(title));
 	this.title.classList.add('duice-ui-dialog-header-title');
 	this.header.appendChild(this.title);
 	
@@ -3834,17 +3841,35 @@ duice.ui.Dialog = function(title, content) {
 	// creates body
 	this.body = document.createElement('div');
 	this.body.classList.add('duice-ui-dialog-body');
-	this.div.appendChild(this.body);
+	this.dialog.appendChild(this.body);
 	
-	// on resize event
-	this.getWindow().addEventListener('resize', function(ev) {
-		$this.setPosition($this.div);
-		this.div.style.top = '20vh';	// adjust top
-	});
 }
 
 // Extends UI prototype
 duice.ui.Dialog.prototype = Object.create(duice.ui.__.prototype);
+
+/**
+ * Sets dialog icon
+ * @method
+ * @param {string} src - image source path
+ */
+duice.ui.Dialog.prototype.setIcon = function(src) {
+	var img  = document.createElement('img');
+	img.src = src;
+	this.header.insertBefore(img,this.title);
+	this.icon.remove();
+	return this;
+}
+
+/**
+ * Sets dialog title
+ * @method
+ * @param {string} title - dialog title
+ */
+duice.ui.Dialog.prototype.setTitle = function(title){
+	this.title.appendChild(this.createHtml(title));
+	return this;
+}
 
 /**
  * Opens dialog window 
@@ -3860,26 +3885,25 @@ duice.ui.Dialog.prototype.open = function(){
 	}
 
 	// detach content from parent and append to dialog body
-	this.parentNode = this.getParentNode(this.content);
 	this.body.appendChild(this.content);
 
 	// blocker
 	this.blocker = this.block(this.getWindow().document.body);
 	
 	// setting position
-	this.div.style.position = 'fixed';
-	this.div.style.zIndex = this.blocker.getZIndex() + 1;
+	this.dialog.style.position = 'fixed';
+	this.dialog.style.zIndex = this.blocker.getZIndex() + 1;
 	
 	// adds into document
-	this.getWindow().document.body.appendChild(this.div);
+	this.getWindow().document.body.appendChild(this.dialog);
 	this.content.style.display = 'block';
 
 	// adjust top
-	this.setPosition(this.div);
-	this.div.style.top = '20vh';
+	this.setPosition(this.dialog);
+	this.dialog.style.top = '20vh';
 
 	// display
-	this.fadeIn(this.div);
+	this.fadeIn(this.dialog);
 	
 	// let current active element to be blur.
 	try {
@@ -3894,6 +3918,12 @@ duice.ui.Dialog.prototype.open = function(){
 			$this.listener.afterOpen.call($this);
 		}
 	});
+
+	// on resize event
+	this.getWindow().addEventListener('resize', function(ev) {
+		$this.setPosition($this.dialog);
+		$this.dialog.style.top = '20vh';	// adjust top
+	});
 }
 
 /**
@@ -3902,7 +3932,7 @@ duice.ui.Dialog.prototype.open = function(){
  */
 duice.ui.Dialog.prototype.close = function() {
 	var $this = this;
-
+		
 	// fires close listener
 	if(this.listener.beforeClose){
 		if(this.listener.beforeClose.call(this) == false){
@@ -3910,7 +3940,7 @@ duice.ui.Dialog.prototype.close = function() {
 		}
 	}
 	
-	this.fadeOut(this.div);
+	this.fadeOut(this.dialog);
 	this.blocker.release();
 	
 	this.delay(function(){
@@ -3919,9 +3949,9 @@ duice.ui.Dialog.prototype.close = function() {
 		if($this.parentNode){
 			$this.parentNode.appendChild($this.content);
 		}
-		
+	
 		// removes dialog from screen
-		$this.getWindow().document.body.removeChild($this.div);
+		$this.getWindow().document.body.removeChild($this.dialog);
 		$this.content.style.display = 'none';
 
 		// calls callback function
@@ -4014,7 +4044,7 @@ duice.ui.Alert = function(message){
 	this.button.appendChild(this.buttonConfirm);
 
 	// creates dialog
-	this.dialog = new duice.ui.Dialog('', this.content);
+	this.dialog = new duice.ui.Dialog(this.content);
 	
 	// return self
 	return this;
@@ -4132,7 +4162,7 @@ duice.ui.Confirm = function(message){
 	this.button.appendChild(this.buttonCancel);
 
 	// creates dialog
-	this.dialog = new duice.ui.Dialog('', this.content);
+	this.dialog = new duice.ui.Dialog(this.content);
 	
 	// return self
 	return this;
@@ -4303,7 +4333,7 @@ duice.ui.Prompt = function(message){
 	this.button.appendChild(this.buttonCancel);
 
 	// creates dialog
-	this.dialog = new duice.ui.Dialog('',this.content);
+	this.dialog = new duice.ui.Dialog(this.content);
 	
 	return this;
 }
