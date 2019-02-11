@@ -1,5 +1,5 @@
 // =============================================================================
-// duice (Javascript UI Component Engine)
+// DUICE (Javascript UI Component Engine)
 // - Anyone can use it freely.
 // - Modify the source or allow re-creation. However, you must state that you have the original creator.
 // - However, we can not grant patents or licenses for reproductives. (Modifications or reproductions must be shared with the public.)
