@@ -5,42 +5,6 @@
 // - However, we can not grant patents or licenses for reproductives. (Modifications or reproductions must be shared with the public.)
 // Licence: LGPL(GNU Lesser General Public License version 3)
 // Copyright (C) 2017 duice.oopscraft.net
-// -------------------------
-// duice
-// duice.initialize
-// -------------------------
-// duice.data
-// duice.data.__
-// duice.data.Map
-// duice.data.List
-// duice.data.Tree
-// -------------------------
-// duice.ui
-// duice.ui.__
-// duice.ui.Text
-// duice.ui.TextField
-// duice.ui.ComboBox
-// duice.ui.CheckBox
-// duice.ui.Radio
-// duice.ui.TextView
-// duice.ui.TextArea
-// duice.ui.HtmlEditor
-// duice.ui.CronExpression
-// duice.ui.Image
-// duice.ui.ListView
-// duice.ui.TreeView
-// duice.ui.Grid
-// duice.ui.Flow
-// duice.ui.Pagination
-// duice.ui.Dialog
-// duice.ui.Alert
-// duice.ui.Confirm
-// duice.ui.Prompt
-// -------------------------
-// duice.util.StringUtils
-// duice.util.FormatUtils
-// duice.util.RandomUtils
-// duice.util.WebSocketClient
 // =============================================================================
 "use strict";
 if(!console.debug){
