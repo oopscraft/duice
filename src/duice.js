@@ -4662,6 +4662,68 @@ duice.util.FormatUtils = {
 	    	n = n.replace(reg, '$1' + ',' + '$2');
 	    }
 	    return n;
+	},
+	/**
+	 * Parses simple markdown value to HTML
+	 * @method
+	 * @param {string} value - markdown string
+	 * @return {string} parsed HTML markdown string
+	 */
+	parseMarkdown: function(value) {
+
+		//h
+		value = value.replace(/[\#]{6}(.+)/g, '<h6>$1</h6>');
+		value = value.replace(/[\#]{5}(.+)/g, '<h5>$1</h5>');
+		value = value.replace(/[\#]{4}(.+)/g, '<h4>$1</h4>');
+		value = value.replace(/[\#]{3}(.+)/g, '<h3>$1</h3>');
+		value = value.replace(/[\#]{2}(.+)/g, '<h2>$1</h2>');
+		value = value.replace(/[\#]{1}(.+)/g, '<h1>$1</h1>');
+
+		//ul
+		value = value.replace(/^\s*\n\*/gm, '<ul>\n*');
+		value = value.replace(/^(\*.+)\s*\n([^\*])/gm, '$1\n</ul>\n\n$2');
+		value = value.replace(/^\*(.+)/gm, '<li>$1</li>');
+
+		//ol
+		value = value.replace(/^\s*\n\d\./gm, '<ol>\n1.');
+		value = value.replace(/^(\d\..+)\s*\n([^\d\.])/gm, '$1\n</ol>\n\n$2');
+		value = value.replace(/^\d\.(.+)/gm, '<li>$1</li>');
+
+		//blockquote
+		value = value.replace(/^\>(.+)/gm, '<blockquote>$1</blockquote>');
+
+
+		//alt h
+		value = value.replace(/^(.+)\n\=+/gm, '<h1>$1</h1>');
+		value = value.replace(/^(.+)\n\-+/gm, '<h2>$1</h2>');
+
+		//images
+		value = value.replace(/\!\[([^\]]+)\]\(([^\)]+)\)/g, '<img src="$2" alt="$1" />');
+
+		//links
+		value = value.replace(/[\[]{1}([^\]]+)[\]]{1}[\(]{1}([^\)\"]+)(\"(.+)\")?[\)]{1}/g, '<a href="$2" title="$4">$1</a>');
+
+		//font styles
+		value = value.replace(/[\*\_]{2}([^\*\_]+)[\*\_]{2}/g, '<b>$1</b>');
+		value = value.replace(/[\*\_]{1}([^\*\_]+)[\*\_]{1}/g, '<i>$1</i>');
+		value = value.replace(/[\~]{2}([^\~]+)[\~]{2}/g, '<del>$1</del>');
+
+		//pre
+		value = value.replace(/^\s*\n\`\`\`(([^\s]+))?/gm, '<pre class="$2">');
+		value = value.replace(/^\`\`\`\s*\n/gm, '</pre>\n\n');
+
+		//code
+		value = value.replace(/[\`]{1}([^\`]+)[\`]{1}/g, '<code>$1</code>');
+
+		//p
+		value = value.replace(/^\s*(\n)?(.+)/gm, function(m){
+		return  /\<(\/)?(h\d|ul|ol|li|blockquote|pre|img)/.test(m) ? m : '<p>'+m+'</p>';
+		});
+
+		//strip p from pre
+		value = value.replace(/(\<pre.+\>)\s*\n\<p\>(.+)\<\/p\>/gm, '$1$2');
+
+		return value;
 	}
 }
 
