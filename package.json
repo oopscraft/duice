@@ -1,7 +1,8 @@
 {
   "name": "duice",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Data UI Component Engine",
+  "homepage": "http://duice.oopscraft.net",
   "main": "index.html",
   "dependencies": {
     "docdash": "^1.0.2",
