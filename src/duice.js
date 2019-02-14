@@ -203,6 +203,8 @@ duice.initialize = function(container, $context) {
 				break;
 				case 'TextView':
 					var textView = new duice.ui.TextView(element);
+					var format = element.dataset.duiceFormat;
+					format && textView.setFormat(format);	
 					textView.bind(map,name);
 					textView.update();
 				break;
@@ -1815,7 +1817,8 @@ duice.ui.Radio.prototype.setReadonly = function(readonly){
  * | HTML Tag   	| data-* Attribute 										| Description  							|
  * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
  * | div	  	   	| data-duice="TextView" 								| component Type						|
- * | div		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
+ * | div		    | data-duice-bind="(duice.data.Map).(column name)"    	| specify binding Map and column name	|
+ * | div 			| data-duice-format="(html,markdown,text)"				| specify text format(defualt is html)	|
  * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/adouxg1q/embedded/html,js,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
  * @param {HTMLDivElement} div - div HTML element
@@ -1847,7 +1850,22 @@ duice.ui.TextView.prototype.bind = function(map, name) {
  */
 duice.ui.TextView.prototype.update = function() {
 	var value = this.map.get(this.name) ? this.map.get(this.name) : '';
+	if(this.format){
+		switch(this.format){
+			case "markdown":
+				value = duice.util.FormatUtils.parseMarkdown(value);
+			break;
+			case "text":
+				// TODO stripHtml or spcializeeHtml
+				value = value;
+			break;
+		}
+	}
 	this.div.innerHTML = value;
+}
+
+duice.ui.TextView.prototype.setFormat = function(format) {
+	this.format = format;
 }
 
 /**
@@ -4672,12 +4690,20 @@ duice.util.FormatUtils = {
 	parseMarkdown: function(value) {
 
 		//h
-		value = value.replace(/[\#]{6}(.+)/g, '<h6>$1</h6>');
-		value = value.replace(/[\#]{5}(.+)/g, '<h5>$1</h5>');
-		value = value.replace(/[\#]{4}(.+)/g, '<h4>$1</h4>');
-		value = value.replace(/[\#]{3}(.+)/g, '<h3>$1</h3>');
-		value = value.replace(/[\#]{2}(.+)/g, '<h2>$1</h2>');
-		value = value.replace(/[\#]{1}(.+)/g, '<h1>$1</h1>');
+		value = value.replace(/^[\#]{6}\s(.+)/gm, '<h6>$1</h6>');
+		value = value.replace(/^[\#]{5}\s(.+)/gm, '<h5>$1</h5>');
+		value = value.replace(/^[\#]{4}\s(.+)/gm, '<h4>$1</h4>');
+		value = value.replace(/^[\#]{3}\s(.+)/gm, '<h3>$1</h3>');
+		value = value.replace(/^[\#]{2}\s(.+)/gm, '<h2>$1</h2>');
+		value = value.replace(/^[\#]{1}\s(.+)/gm, '<h1>$1</h1>');
+
+		// hr
+		value = value.replace(/(^[\-\=]{5,}\n)/gm, '<hr/>');
+
+		//font styles
+		value = value.replace(/\*{2}(.+)\*{2}/gm, '<b>$1</b>');
+		value = value.replace(/\_{2}(.+)\_{2}/gm, '<em>$1</em>');
+		value = value.replace(/\~{2}(.+)\~{2}/gm, '<del>$1</del>');
 
 		//ul
 		value = value.replace(/^\s*\n\*/gm, '<ul>\n*');
@@ -4692,21 +4718,11 @@ duice.util.FormatUtils = {
 		//blockquote
 		value = value.replace(/^\>(.+)/gm, '<blockquote>$1</blockquote>');
 
-
-		//alt h
-		value = value.replace(/^(.+)\n\=+/gm, '<h1>$1</h1>');
-		value = value.replace(/^(.+)\n\-+/gm, '<h2>$1</h2>');
-
 		//images
 		value = value.replace(/\!\[([^\]]+)\]\(([^\)]+)\)/g, '<img src="$2" alt="$1" />');
 
 		//links
 		value = value.replace(/[\[]{1}([^\]]+)[\]]{1}[\(]{1}([^\)\"]+)(\"(.+)\")?[\)]{1}/g, '<a href="$2" title="$4">$1</a>');
-
-		//font styles
-		value = value.replace(/[\*\_]{2}([^\*\_]+)[\*\_]{2}/g, '<b>$1</b>');
-		value = value.replace(/[\*\_]{1}([^\*\_]+)[\*\_]{1}/g, '<i>$1</i>');
-		value = value.replace(/[\~]{2}([^\~]+)[\~]{2}/g, '<del>$1</del>');
 
 		//pre
 		value = value.replace(/^\s*\n\`\`\`(([^\s]+))?/gm, '<pre class="$2">');
@@ -4715,14 +4731,63 @@ duice.util.FormatUtils = {
 		//code
 		value = value.replace(/[\`]{1}([^\`]+)[\`]{1}/g, '<code>$1</code>');
 
-		//p
-		value = value.replace(/^\s*(\n)?(.+)/gm, function(m){
-		return  /\<(\/)?(h\d|ul|ol|li|blockquote|pre|img)/.test(m) ? m : '<p>'+m+'</p>';
+		// creates table
+		var tableRegx = /(^\|.+\|\n)+/gm
+		value = value.replace(tableRegx, function(match){
+			return buildTable(match);
 		});
+		
+		function buildTable(value){
+			var tableHtml = new Array();
+			tableHtml.push('<table>');
+			var lines = value.split('\n');
+			var isHeader = true;
+			for(var i = 0; i < lines.length; i ++){
+				var line = lines[i];
+				if(isRow(line) == false){
+						continue;
+				}
+				console.log(i, line, isSplitRow(line));
+				if(isSplitRow(line)){
+						isHeader = false;
+						continue;
+				}
+				if(isHeader == true){
+						line = convertHeader(line);
+				}else{
+						line = convertRow(line);
+				}
+				tableHtml.push(line);
+			}
+			tableHtml.push('</table>');
+			return tableHtml.join('\n') + '\n';
+		}
 
-		//strip p from pre
-		value = value.replace(/(\<pre.+\>)\s*\n\<p\>(.+)\<\/p\>/gm, '$1$2');
+		function isRow(line){
+			var regx = /^\|.+\|$/gm;
+			return regx.test(line);
+		}
 
+		function isSplitRow(line){
+			return /^\|[ \t-:\|]*\|/.test(line);
+		}
+
+		function convertHeader(line){
+			line = line.replace(/\|/gm,'</th><th>');
+			line = line.replace(/^<\/th>/gm,'<tr>').replace(/<th>$/gm,'</tr>');
+			return line;
+		}
+
+		function convertRow(line){
+			line = line.replace(/\|/gm,'</td><td>');
+			line = line.replace(/^<\/td>/gm,'<tr>').replace(/<td>$/gm,'</tr>');
+			return line;
+		}
+		
+		// line break(at last)
+		value = value.replace(/^\n$/gm,'<br/>');
+
+		// return converted markdown html
 		return value;
 	}
 }
