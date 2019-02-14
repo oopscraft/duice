@@ -102,6 +102,24 @@
 	margin:0px;
 	padding:0px;
 }
+.duice-ui-textView h1 {
+	font-size:2.0em;
+}
+.duice-ui-textView h2 {
+	font-size:1.8em;
+}
+.duice-ui-textView h3 {
+	font-size:1.6em;
+}
+.duice-ui-textView h4 {
+	font-size:1.4em;
+}
+.duice-ui-textView h5 {
+	font-size:1.2em;
+}
+.duice-ui-textView h6 {
+	font-size:1em;
+}
 .duice-ui-textView hr {
 	border:none;
 	border-top:solid 1px #ccc;
