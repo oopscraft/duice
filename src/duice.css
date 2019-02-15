@@ -156,17 +156,22 @@
 	margin:0px;
 	padding:0.5em 1em;
 	padding-bottom:1.5em;
-	border:solid 1px #ccc;
+	border:solid 1px #000;
 	border-radius:0.2em;
-	background-color:#eee;
+	background-color:#000;
+	color:#fff;
+	font-family: Consolas,'Courier New',Courier,monospace;
 	overflow:auto;
 	white-space: pre;
 	page-break-inside: avoid;
 	line-height: 1.2;
-	font-family: Consolas,'Courier New',Courier,monospace;
-	color:#555;
 }
-
+.duice-ui-textView code .comment {
+	color:gray;
+}
+.duice-ui-textView code .string {
+	color:red;
+}
 /**
  * duice.ui.TextArea
  */

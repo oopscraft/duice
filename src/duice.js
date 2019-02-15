@@ -4701,9 +4701,9 @@ duice.util.FormatUtils = {
 		value = value.replace(/(^[\-\=]{5,}\n)/gm, '<hr/>');
 
 		//font styles
-		value = value.replace(/\*{2}(.+)\*{2}/gm, '<b>$1</b>');
-		value = value.replace(/\_{2}(.+)\_{2}/gm, '<em>$1</em>');
-		value = value.replace(/\~{2}(.+)\~{2}/gm, '<del>$1</del>');
+		value = value.replace(/\*{2}([^\*].+)\*{2}/gm, '<b>$1</b>');
+		value = value.replace(/\_{2}([^\_].+)\_{2}/gm, '<em>$1</em>');
+		value = value.replace(/\~{2}([^\~].+)\~{2}/gm, '<del>$1</del>');
 
 		//ul
 		value = value.replace(/^\s*\n\*/gm, '<ul>\n*');
@@ -4729,7 +4729,22 @@ duice.util.FormatUtils = {
 		value = value.replace(/^\`\`\`\s*\n/gm, '</pre>\n\n');
 
 		//code
-		value = value.replace(/[\`]{1}([^\`]+)[\`]{1}/g, '<code>$1</code>');
+		value = value.replace(/[\`]{1}([^\`]+)[\`]{1}/g, function(match,$1){
+			return buildCode($1);
+		});
+
+		function buildCode(value){
+			var lines = value.split('\n');
+			for(var i = 0; i < lines.length; i++){
+				// string 
+				lines[i] = lines[i].replace(/(['"].+['"])/gm,'<span class="string">$1</span>');
+				// comment
+				lines[i] = lines[i].replace(/(\/\/[\s]*.+)/gm,'<span class="comment">$1</span>');
+				lines[i] = lines[i].replace(/(\/\*)/gm,'<span class="comment">$1');
+				lines[i] = lines[i].replace(/(\*\/)/gm,'$1</span>');
+			}
+			return '<code>\n' + lines.join('\n') + '\n</code>';
+		}
 
 		// creates table
 		var tableRegx = /(^\|.+\|\n)+/gm
@@ -4747,7 +4762,6 @@ duice.util.FormatUtils = {
 				if(isRow(line) == false){
 						continue;
 				}
-				console.log(i, line, isSplitRow(line));
 				if(isSplitRow(line)){
 						isHeader = false;
 						continue;
