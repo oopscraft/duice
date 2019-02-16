@@ -1853,7 +1853,7 @@ duice.ui.TextView.prototype.update = function() {
 	if(this.format){
 		switch(this.format){
 			case "markdown":
-				value = duice.util.FormatUtils.parseMarkdown(value);
+				value = duice.util.MarkdownParser.parse(value);
 			break;
 			case "text":
 				// TODO stripHtml or spcializeeHtml
@@ -1873,7 +1873,7 @@ duice.ui.TextView.prototype.setFormat = function(format) {
  * @class
  * @classdesc
  * Textarea UI component
- * ## HTML5 Tag and Attribute
+ * ## HTML Tag and Attribute
  * | HTML Tag   	| data-* Attribute 										| Description  							|
  * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
  * | label  	   	| data-duice="Textarea" 								| component Type						|
@@ -4680,129 +4680,6 @@ duice.util.FormatUtils = {
 	    	n = n.replace(reg, '$1' + ',' + '$2');
 	    }
 	    return n;
-	},
-	/**
-	 * Parses simple markdown value to HTML
-	 * @method
-	 * @param {string} value - markdown string
-	 * @return {string} parsed HTML markdown string
-	 */
-	parseMarkdown: function(value) {
-
-		//h
-		value = value.replace(/^[\#]{6}\s(.+)/gm, '<h6>$1</h6>');
-		value = value.replace(/^[\#]{5}\s(.+)/gm, '<h5>$1</h5>');
-		value = value.replace(/^[\#]{4}\s(.+)/gm, '<h4>$1</h4>');
-		value = value.replace(/^[\#]{3}\s(.+)/gm, '<h3>$1</h3>');
-		value = value.replace(/^[\#]{2}\s(.+)/gm, '<h2>$1</h2>');
-		value = value.replace(/^[\#]{1}\s(.+)/gm, '<h1>$1</h1>');
-
-		// hr
-		value = value.replace(/(^[\-\=]{5,}\n)/gm, '<hr/>');
-
-		//font styles
-		value = value.replace(/\*{2}([^\*].+)\*{2}/gm, '<b>$1</b>');
-		value = value.replace(/\_{2}([^\_].+)\_{2}/gm, '<em>$1</em>');
-		value = value.replace(/\~{2}([^\~].+)\~{2}/gm, '<del>$1</del>');
-
-		//ul
-		value = value.replace(/^\s*\n\*/gm, '<ul>\n*');
-		value = value.replace(/^(\*.+)\s*\n([^\*])/gm, '$1\n</ul>\n\n$2');
-		value = value.replace(/^\*(.+)/gm, '<li>$1</li>');
-
-		//ol
-		value = value.replace(/^\s*\n\d\./gm, '<ol>\n1.');
-		value = value.replace(/^(\d\..+)\s*\n([^\d\.])/gm, '$1\n</ol>\n\n$2');
-		value = value.replace(/^\d\.(.+)/gm, '<li>$1</li>');
-
-		//blockquote
-		value = value.replace(/^\>(.+)/gm, '<blockquote>$1</blockquote>');
-
-		//images
-		value = value.replace(/\!\[([^\]]+)\]\(([^\)]+)\)/g, '<img src="$2" alt="$1" />');
-
-		//links
-		value = value.replace(/[\[]{1}([^\]]+)[\]]{1}[\(]{1}([^\)\"]+)(\"(.+)\")?[\)]{1}/g, '<a href="$2" title="$4">$1</a>');
-
-		//pre
-		value = value.replace(/^\s*\n\`\`\`(([^\s]+))?/gm, '<pre class="$2">');
-		value = value.replace(/^\`\`\`\s*\n/gm, '</pre>\n\n');
-
-		//code
-		value = value.replace(/[\`]{1}([^\`]+)[\`]{1}/g, function(match,$1){
-			return buildCode($1);
-		});
-
-		function buildCode(value){
-			var lines = value.split('\n');
-			for(var i = 0; i < lines.length; i++){
-				// string 
-				lines[i] = lines[i].replace(/(['"].+['"])/gm,'<span class="string">$1</span>');
-				// comment
-				lines[i] = lines[i].replace(/(\/\/[\s]*.+)/gm,'<span class="comment">$1</span>');
-				lines[i] = lines[i].replace(/(\/\*)/gm,'<span class="comment">$1');
-				lines[i] = lines[i].replace(/(\*\/)/gm,'$1</span>');
-			}
-			return '<code>\n' + lines.join('\n') + '\n</code>';
-		}
-
-		// creates table
-		var tableRegx = /(^\|.+\|\n)+/gm
-		value = value.replace(tableRegx, function(match){
-			return buildTable(match);
-		});
-		
-		function buildTable(value){
-			var tableHtml = new Array();
-			tableHtml.push('<table>');
-			var lines = value.split('\n');
-			var isHeader = true;
-			for(var i = 0; i < lines.length; i ++){
-				var line = lines[i];
-				if(isRow(line) == false){
-						continue;
-				}
-				if(isSplitRow(line)){
-						isHeader = false;
-						continue;
-				}
-				if(isHeader == true){
-						line = convertHeader(line);
-				}else{
-						line = convertRow(line);
-				}
-				tableHtml.push(line);
-			}
-			tableHtml.push('</table>');
-			return tableHtml.join('\n') + '\n';
-		}
-
-		function isRow(line){
-			var regx = /^\|.+\|$/gm;
-			return regx.test(line);
-		}
-
-		function isSplitRow(line){
-			return /^\|[ \t-:\|]*\|/.test(line);
-		}
-
-		function convertHeader(line){
-			line = line.replace(/\|/gm,'</th><th>');
-			line = line.replace(/^<\/th>/gm,'<tr>').replace(/<th>$/gm,'</tr>');
-			return line;
-		}
-
-		function convertRow(line){
-			line = line.replace(/\|/gm,'</td><td>');
-			line = line.replace(/^<\/td>/gm,'<tr>').replace(/<td>$/gm,'</tr>');
-			return line;
-		}
-		
-		// line break(at last)
-		value = value.replace(/^\n$/gm,'<br/>');
-
-		// return converted markdown html
-		return value;
 	}
 }
 
@@ -4826,6 +4703,185 @@ duice.util.RandomUtils = {
 			return (c=='x' ? r :(r&0x3|0x8)).toString(16);
 		});
 		return uuid;
+	}
+}
+
+/**
+ * duice.util.MarkdownParser
+ * @class
+ * @classdesc
+ * <iframe width="100%" height="600" src="//jsfiddle.net/chomookun/oy8tp094/embedded/js,html,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+ */
+duice.util.MarkdownParser = {
+	COMPLETE_MARK: "<!--COMPLETE-->",
+	/**
+	 * parse
+	 * @method
+	 * @param {string} value - original markdown text
+	 * @return {string} HTML string to be parsed
+	 */
+	parse: function(value) {
+
+		// parses block element
+		value = this.parseBlock(value);
+		
+		// parses in-line element
+		var lines = value.split('\n');
+		for(var i = 0, size = lines.length; i < size; i ++){
+
+			// line break
+			if(lines[i].trim().length < 1){
+				lines[i] = '<br/>';
+				continue;
+			}
+
+			// parses inline	
+			lines[i] = this.parseInline(lines[i]);
+
+			// paragraph
+			if(lines[i].startsWith(this.COMPLETE_MARK) === false){
+				lines[i] = '<p>' + lines[i] + '</p>';
+			}
+			lines[i] = lines[i].replace(this.COMPLETE_MARK,'');
+		}
+		value = lines.join('\n');
+
+		// return parsed value
+		return value;
+	},
+	/**
+	 * Pasres block
+	 * @method
+	 * @param {string) value - markdown text
+	 * @return {string) markdown HTML with parsed table
+	 */
+	parseBlock: function(value){
+		var $this = this;
+
+		// table
+		var tableRegx = /(^\|.+\|\n)+/gm;
+		value = value.replace(tableRegx, function(match){
+			var tableHtml = new Array();
+			tableHtml.push($this.COMPLETE_MARK + '<table>');
+			var lines = match.split('\n');
+			var isHeader = true;
+			for(var i = 0; i < lines.length; i ++){
+				var line = lines[i];
+
+				// checks valid row
+				if(/^\|.+\|$/gm.test(line) == false){
+					continue;
+				}
+
+				// checks if split row between header and body
+				if(/^\|[ \t-:\|]*\|/.test(line) == true){
+					isHeader = false;
+					continue;
+				}
+
+				// repleace header and body
+				if(isHeader == true){
+					line = $this.COMPLETE_MARK + line.replace(/\|/gm,'</th><th>').replace(/^<\/th>/gm,'<tr>').replace(/<th>$/gm,'</tr>');
+				}else{
+					line = $this.COMPLETE_MARK + line.replace(/\|/gm,'</td><td>').replace(/^<\/td>/gm,'<tr>').replace(/<td>$/gm,'</tr>');
+				}
+				tableHtml.push(line);
+			}
+			tableHtml.push($this.COMPLETE_MARK + '</table>');
+			return tableHtml.join('\n') + '\n';
+		});
+
+		// code
+		value = value.replace(/[\`]{3}([\w]*)\n([^\`]+)\n[\`]{3}/g, function(match,language,code){
+			var codeHtml = new Array();
+			codeHtml.push($this.COMPLETE_MARK + '<code data-langhage="' + language + '">');
+			var lines = code.split('\n');
+			for(var i = 0; i < lines.length; i++){
+				var line = lines[i];
+
+				// replace tag
+				line = line.replace(/\</g, '&lt');
+				line = line.replace(/\>/g, '&gt');
+
+				// comment
+				line = line.replace(/(^|[\s])(\/\/[\s]*.+)/gm,'<span class="comment">$2</span>');
+				line = line.replace(/(\/\*)/gm,'<span class="comment">$1');
+				line = line.replace(/(\*\/)/gm,'$1</span>');
+				line = line.replace(/(\s*)(#+.*)/gm,'$1<span class="comment">$2</span>');
+
+				// append 
+				codeHtml.push($this.COMPLETE_MARK + line);
+			}
+			codeHtml.push($this.COMPLETE_MARK + '</code>');
+			return codeHtml.join('\n') + '\n';
+		});
+		
+		//ul
+		value = value.replace(/(^[ \t]*[\*\-]\s+.+\n)+/gm, function(match) {
+			var ulHtml = new Array();
+			ulHtml.push($this.COMPLETE_MARK + '<ul>');
+			var lines = match.split('\n');
+			for(var i = 0; i < lines.length; i++){
+				var line = lines[i];
+				if(line.trim().length < 1){
+					continue;
+				}
+				line = line.replace(/^[ \t]*[\*\-]\s+(.+)/gm,'<li>$1</li>');
+				ulHtml.push($this.COMPLETE_MARK + line);
+			}
+			ulHtml.push($this.COMPLETE_MARK + '</ul>');
+			return ulHtml.join('\n') + '\n';
+		});
+		
+		//ol
+		value = value.replace(/(^[ \t]*[\d]+[\.]?\s+.+\n)+/gm, function(match) {
+			var olHtml = new Array();
+			olHtml.push($this.COMPLETE_MARK + '<ol>');
+			var lines = match.split('\n');
+			for(var i = 0; i < lines.length; i++){
+				var line = lines[i];
+				if(line.trim().length < 1){
+					continue;
+				}
+				line = line.replace(/^[ \t]*[\d]+[\.]?\s+(.+)/gm,'<li>$1</li>');
+				olHtml.push($this.COMPLETE_MARK + line);
+			}
+			olHtml.push($this.COMPLETE_MARK + '</ol>');
+			return olHtml.join('\n') + '\n';
+		});
+
+		// title
+		value = value.replace(/^[\#]{6}\s(.+)/gm, this.COMPLETE_MARK + '<h6>$1</h6>');
+		value = value.replace(/^[\#]{5}\s(.+)/gm, this.COMPLETE_MARK + '<h5>$1</h5>');
+		value = value.replace(/^[\#]{4}\s(.+)/gm, this.COMPLETE_MARK + '<h4>$1</h4>');
+		value = value.replace(/^[\#]{3}\s(.+)/gm, this.COMPLETE_MARK + '<h3>$1</h3>');
+		value = value.replace(/^[\#]{2}\s(.+)/gm, this.COMPLETE_MARK + '<h2>$1</h2>');
+		value = value.replace(/^[\#]{1}\s(.+)/gm, this.COMPLETE_MARK + '<h1>$1</h1>');
+
+		// return
+		return value;	
+	},
+	/**
+	 * parses inline
+	 * @method 
+	 * @param {string} value - value
+	 * @return {string} 
+	 */
+	parseInline: function(value){
+	
+		// font style
+		value = value.replace(/\*{2}([^\*].+)\*{2}/gm, '<b>$1</b>');
+		value = value.replace(/\_{2}([^\_].+)\_{2}/gm, '<em>$1</em>');
+		value = value.replace(/\~{2}([^\~].+)\~{2}/gm, '<del>$1</del>');
+
+		// image
+		value = value.replace(/\!\[([^\]]+)\]\(([^\)]+)\)/g, '<img src="$2" alt="$1" />');
+
+		// link
+		value = value.replace(/[\[]{1}([^\]]+)[\]]{1}[\(]{1}([^\)\"]+)(\"(.+)\")?[\)]{1}/g, '<a href="$2" title="$4">$1</a>');
+
+		// return
+		return value;	
 	}
 }
 

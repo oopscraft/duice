@@ -92,6 +92,7 @@
  * duice.ui.TextView
  */
 .duice-ui-textView {
+	width:100%;
 	margin: 0px;
 	padding-left: 0.5rem;
 	padding-right: 0.5rem;
@@ -99,26 +100,29 @@
     cursor: inherit;
 }
 .duice-ui-textView h1,h2,h3,h4,h5,h6 {
-	margin:0px;
-	padding:0px;
+	margin:0em;
+	padding:0em;
+	font-weight:normal;
 }
 .duice-ui-textView h1 {
-	font-size:2.0em;
+	font-size:2.5em;
+	font-weight:bold;
+	border-bottom:solid 1px #ccc;
 }
 .duice-ui-textView h2 {
-	font-size:1.8em;
+	font-size:2.0em;
 }
 .duice-ui-textView h3 {
-	font-size:1.6em;
+	font-size:1.5em;
 }
 .duice-ui-textView h4 {
-	font-size:1.4em;
+	font-size:1.0em;
 }
 .duice-ui-textView h5 {
-	font-size:1.2em;
+	font-size:1.0em;
 }
 .duice-ui-textView h6 {
-	font-size:1em;
+	font-size:1.0em;
 }
 .duice-ui-textView hr {
 	border:none;
@@ -153,18 +157,19 @@
 }
 .duice-ui-textView code {
 	display:block;
-	margin:0px;
-	padding:0.5em 1em;
+	margin:1px;
+	padding:0em 1em;
 	padding-bottom:1.5em;
 	border:solid 1px #000;
 	border-radius:0.2em;
-	background-color:#000;
-	color:#fff;
-	font-family: Consolas,'Courier New',Courier,monospace;
+	background-color:#111;
+	color:#eee;
+	font-family: "SF Mono","Monaco","Andale Mono","Lucida Console","Bitstream Vera Sans Mono","Courier New",Courier,monospace;
 	overflow:auto;
 	white-space: pre;
 	page-break-inside: avoid;
-	line-height: 1.2;
+	font-size: 12px;
+	line-height: 1.55em;
 }
 .duice-ui-textView code .comment {
 	color:gray;
