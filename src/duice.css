@@ -96,12 +96,14 @@
 	margin: 0px;
 	padding-left: 0.5rem;
 	padding-right: 0.5rem;
+	white-space:pre;
     font-weight: inherit;
     cursor: inherit;
 }
 .duice-ui-textView h1,h2,h3,h4,h5,h6 {
 	margin:0em;
 	padding:0em;
+	display:inline;
 	font-weight:normal;
 }
 .duice-ui-textView h1 {

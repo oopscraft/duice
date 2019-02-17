@@ -4729,19 +4729,10 @@ duice.util.MarkdownParser = {
 		var lines = value.split('\n');
 		for(var i = 0, size = lines.length; i < size; i ++){
 
-			// line break
-			if(lines[i].trim().length < 1){
-				lines[i] = '<br/>';
-				continue;
-			}
-
 			// parses inline	
 			lines[i] = this.parseInline(lines[i]);
-
-			// paragraph
-			if(lines[i].startsWith(this.COMPLETE_MARK) === false){
-				lines[i] = '<p>' + lines[i] + '</p>';
-			}
+			
+			// removes compplte mark
 			lines[i] = lines[i].replace(this.COMPLETE_MARK,'');
 		}
 		value = lines.join('\n');
