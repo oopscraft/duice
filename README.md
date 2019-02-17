@@ -2,6 +2,9 @@
 ------------------------------------------------------------------------------------------
 
 ## Concept
+
+
+<img src="images/duice.png"/>
 Laziness and Chronic Stress from Complexity of UI Development have been developed to the following purpose.
 <img style="width:50%;" src="http://www.plantuml.com/plantuml/png/VLDBJnin4BxxLupW0jia1N6f445G7YrLK948dBWuzh0PyDfRUyoZlxvhBpMRz769rlCzPloDSnHOUewD4U6HR2kzR60fhNxsn8mMs4SSG5STcHIrqlALr9fi3Nix0rmP6SAvitnDFn4-3P20Fo9QXSVUk-VvajIZnH1Wzo-KomwGDHuRgYqej8n-mF8kMgsSj-XXRr1lv4lJ2qFglRkp8vQa4UwTuuLx4OA93OA0qvkBaxEjKybox3nrzeGQ7kIJ3CfJot1p0IUkQPtj83YpDLdS5cWrP0CXf6BdOUCceDy06I1s7w9z3mOs3XQ7N-UNC_W0tuhjmSV5uPtTqgcjZgHmNC4niwT5P0pRlHE9RbBOH4G1AuvLbQUkggsidLJRTxR_UWXPcWy0cpEgb_pPH8G_76x9SvHcvNx5C5BsdECBZzBFEQ7HeybaClhYIO_c7l6MyBahb7P9zD-6AMAuPXyLHu-bLOeWDxkKxMX6WKU9M9mBP-YTyyzRd4x1MT1EnIRjnpYPN-5qAYB1U7muDDW7vL4oGZwvnGCgJkkZfrmin1LffxedZm6-srbddg92mmZuX7PTBNf5qaRQ1uzI1tXVSGMoRFYTMi8hyuMq4vLtCknHYA8eaZmBPTkQLs07-Q6XmIOfkn1_9vHU9QYbj3N2aXi3hQmnnPI1Vk0tF6H2COaq7BB4qT-_bDUZBbxfE1mamnJUy6wBhz3_8z8msU4VLhtJ05WRAxPT5TUpsL-vz32O8xGwDkON"/>
 

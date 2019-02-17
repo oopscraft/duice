@@ -8,7 +8,8 @@ function prepare() {
 	npm list gulp-sass || npm install gulp-sass
 	npm list gulp-minify-html || npm install gulp-minify-html
 	npm list gulp-zip || npm install gulp-zip
-	npm list jsdoc || npm install jsdoc
+	npm list jsdoc || npm install jsdoc 
+	npm list jsdoc-plantuml || npm install jsdoc-plantuml	
 }
 
 # git update source

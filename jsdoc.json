@@ -6,7 +6,8 @@
     "include": ["./src/duice.js"]
   },
   "plugins": [
-    "plugins/markdown"
+    "plugins/markdown",
+	"node_modules/jsdoc-plantuml"
   ],
   "opts": {
     "template": "doc-tmpl",
@@ -23,7 +24,18 @@
       "outputSourceFiles": true,
       "useLongnameInNav": true
     }
-  }, 
+  },
+  "plantuml":{
+	"puml":{
+		"create":true,
+   		"destination":"./doc/puml"
+	},
+	"images":{
+		"create":true,
+		"destination":"./doc/images",
+		"defaultFormat":"png"
+	}
+  },
   "docdash": {
 	    "static": false,
 	    "sort": false,

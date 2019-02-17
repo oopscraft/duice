@@ -14,6 +14,9 @@ if(!console.debug){
 /**
  * duice component package package.
  * @namespace
+ * @startuml duice.png
+ * Alice -> Bob
+ * @enduml
  */
 var duice = {};
 
