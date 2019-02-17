@@ -3,6 +3,11 @@
 
 ## Concept
 
+<img uml="
+Bob->Alice : dummy
+Bob<--Alice : dummy
+">
+
 
 <img src="images/duice.png"/>
 Laziness and Chronic Stress from Complexity of UI Development have been developed to the following purpose.

@@ -2,7 +2,7 @@
   "name": "duice",
   "version": "0.1.1",
   "description": "Data UI Component Engine",
-  "homepage": "http://duice.oopscraft.net",
+  "homepage": "https://github.com/oopscraft/duice#readme",
   "main": "index.html",
   "dependencies": {
     "gulp": "^3.9.1",
@@ -12,7 +12,7 @@
     "gulp-strip-debug": "^2.0.0",
     "gulp-uglify": "^3.0.0",
     "jsdoc": "^3.5.5",
-	"jsdoc-plantuml": "^1.0.1"
+    "jsdoc-plantuml": "^1.0.1"
   },
   "devDependencies": {},
   "scripts": {
@@ -26,6 +26,5 @@
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/oopscraft/duice/issues"
-  },
-  "homepage": "https://github.com/oopscraft/duice#readme"
+  }
 }
