@@ -14,11 +14,48 @@ if(!console.debug){
 /**
  * duice component package package.
  * @namespace
-@startuml duice.png
-
-
-Bob -> Alice : hello
-@enduml
+ * @startuml duice.png
+   skinparam handwritten true
+   skinparam ParticipantPadding 30
+   skinparam classFontSize 8
+   skinparam sequenceArrowThickness 1
+   skinparam sequenceMessageAlign center
+   skinparam roundcorner 3
+   skinparam maxmessagesize 100
+   hide footbox
+   
+   title 
+    DUICE(Data-orientied javascript UI Component Engine)
+   end title
+   
+   actor "User" as user
+   participant "<b>HTML + Javascript</b>\n(data-duice-* Attributes)" as ui
+   box #eee
+    participant "**DUICE**(duice.*)\nduice.js" as duice  #LightBlue 
+    participant "**Virtual UI Component**(duice.ui.*)\nText,TextField,...,Grid,TreeView..." as duice.ui #LightBlue 
+    participant "**Data Structure**(duice.data.*)\nMap,List,Data..." as duice.data #LightBlue 
+   end box
+   
+   == on document loading ==
+   ui --> duice.data : create data object
+   activate duice.data
+   ui --> duice : fires OnLoadCompelte event
+   activate duice
+   duice --> ui: reads data-duice* attributes
+   duice --> duice.ui : creates UI component
+   activate duice.ui
+   duice.ui --> ui : apply to HTML element
+   
+   == on user change html page ==
+   user -> ui: changes html element
+   ui--> duice.ui : fires event
+   duice.ui --> duice.data : changes data
+   
+   == on data is changed by script ==
+   duice--> duice.data : change data
+   duice.data --> duice.ui : update
+   duice.ui --> ui: change html element
+ * @enduml
  */
 var duice = {};
 
