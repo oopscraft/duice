@@ -4,7 +4,7 @@
 ## Concept
 Laziness and Chronic Stress from Complexity of UI Development have been developed to the following purpose.
 
-<img src="images/duice.png" style="width:50%;"/>
+<img src="images/duice.png" style="width:60%;"/>
 
 ### MVC Auto-Binding (between Data Structure and HTML DOM Element)
 By using the installed DataMap and DataList Data Structure, bidirectional binding processing is performed with Element in charge of presentation of the screen. (Internally it is Observer Pattern)
@@ -57,8 +57,8 @@ You can use it with JQuery, AngularJS and so on, also Responsive UI framework li
 	https://github.com/oopscraft/duice
 </a>
 ### Distribution Download
-<a href="http://duice.oopscraft.net/dist/duice.zip" target="_blank">
-	http://duice.oopscraft.net/dist/duice.zip
+<a href="http://duice.oopscraft.net/dist/duice-0.1.2.zip" target="_blank">
+	http://duice.oopscraft.net/dist/duice-0.1.2.zip
 </a>
 ### Licence
 Anyone can use it freely.

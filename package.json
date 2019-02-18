@@ -1,19 +1,10 @@
 {
   "name": "duice",
-  "version": "0.1.1",
-  "description": "Data UI Component Engine",
-  "homepage": "https://github.com/oopscraft/duice#readme",
-  "main": "index.html",
-  "dependencies": {
-    "gulp": "^3.9.1",
-    "gulp-concat": "^2.6.1",
-    "gulp-minify-html": "^1.0.6",
-    "gulp-sass": "^3.1.0",
-    "gulp-strip-debug": "^2.0.0",
-    "gulp-uglify": "^3.0.0",
-    "jsdoc": "^3.5.5",
-    "jsdoc-plantuml": "^1.0.1"
-  },
+  "version": "0.1.2",
+  "description": "DUICE(Data-oriented javascript UI Component Engine)",
+  "homepage": "http://duice.oopscraft.net",
+  "main": "duice",
+  "dependencies": {},
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
