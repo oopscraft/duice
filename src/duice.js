@@ -4900,7 +4900,7 @@ duice.util.MarkdownParser = {
 
 		// plantuml extention
 		if(deflate && encode64){
-			value = value.replace(/^@startuml\s*(.+)\n((.|\n)*?)^@enduml\n/gm, function(match,attr){
+			value = value.replace(/^@startuml[ \t]*(.*)\n((.|\n)*?)^@enduml\n/gm, function(match,attr){
 				var s = unescape(encodeURIComponent(match));
 				s = deflate(s);
 				s = encode64(s);	
