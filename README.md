@@ -4,7 +4,7 @@
 ## Concept
 Laziness and Chronic Stress from Complexity of UI Development have been developed to the following purpose.
 
-<img src="images/duice.png" style="width:60%;"/>
+<img src="images/duice.png"/>
 
 ### MVC Auto-Binding (between Data Structure and HTML DOM Element)
 By using the installed DataMap and DataList Data Structure, bidirectional binding processing is performed with Element in charge of presentation of the screen. (Internally it is Observer Pattern)

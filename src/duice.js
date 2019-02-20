@@ -15,7 +15,9 @@ if(!console.debug){
  * duice component package package.
  * @namespace
  * @startuml duice.png
-   skinparam handwritten true
+   scale 900 width
+   skinparam handwritten true 
+   skinparam monochrome true
    skinparam ParticipantPadding 30
    skinparam classFontSize 8
    skinparam sequenceArrowThickness 1
@@ -4890,6 +4892,21 @@ duice.util.MarkdownParser = {
 		value = value.replace(/^[\#]{3}\s(.+)/gm, this.COMPLETE_MARK + '<h3>$1</h3>');
 		value = value.replace(/^[\#]{2}\s(.+)/gm, this.COMPLETE_MARK + '<h2>$1</h2>');
 		value = value.replace(/^[\#]{1}\s(.+)/gm, this.COMPLETE_MARK + '<h1>$1</h1>');
+
+		// hr
+		value = value.replace(/(^[\-\=]{5,}\n)/gm, function(match){
+			return $this.COMPLETE_MARK + '<hr/>';
+		});
+
+		// plantuml extention
+		if(deflate && encode64){
+			value = value.replace(/^@startuml\s*(.+)\n((.|\n)*?)^@enduml\n/gm, function(match,attr){
+				var s = unescape(encodeURIComponent(match));
+				s = deflate(s);
+				s = encode64(s);	
+				return '<img src="http://www.plantuml.com/plantuml/img/' + s +'" ' + attr + '/>';
+			});
+		}
 
 		// return
 		return value;	
