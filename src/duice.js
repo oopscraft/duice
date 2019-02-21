@@ -1801,7 +1801,7 @@ duice.ui.CheckBox.prototype.setReadonly = function(readonly){
  * | HTML Tag   	| data-* Attribute 										| Description  							|
  * | ------------- 	| -----------------------------------------------------	| -----------------------------------	|
  * | input  	   	| data-duice="Radio" 									| Radio component Type					|
- * | input		    | data-duice-bind="{duice.data.Map}.{column name}"    	| specify binding Map and column name	|
+ * | input		    | data-duice-bind="(duice.data.Map).(column name)"    	| specify binding Map and column name	|
  * <iframe width="100%" height="300" src="//jsfiddle.net/chomookun/zfyh83dn/embedded/html,js,css,result/dark/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
  * @constructor
  * @param {HTMLInputElement} input - input HTML element.
@@ -1836,10 +1836,19 @@ duice.ui.Radio.prototype.bind = function(map,name) {
  * @method
  */
 duice.ui.Radio.prototype.update = function(){
+
+	// sets value
 	if(this.map.get(this.name) == this.input.value) {
 		this.input.checked = true;
 	}else{
 		this.input.checked = false;
+	}
+
+	// checks readonly
+	if(this.map.readonly[this.name] || this.map.isEnable() == false){
+		this.setReadonly(true);
+	}else{
+		this.setReadonly(false);
 	}
 }
 
@@ -1849,7 +1858,11 @@ duice.ui.Radio.prototype.update = function(){
  * @param {boolean} readonly - whether element readonly or not
  */
 duice.ui.Radio.prototype.setReadonly = function(readonly){
-	// TODO
+	if(readonly){
+		this.input.setAttribute('disabled',true);
+	}else{
+		this.input.removeAttribute('disabled');
+	}
 }
 
 /**
