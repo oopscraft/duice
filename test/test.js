@@ -27,80 +27,83 @@ function setLibrary(library){
 	console.log(libraries);
 }
 
-var dataStorage = {
-	item: {},
-	setItem: function(name,value) {
-		this.item[name] = value;
+// repository for test data
+var repository = {
+	entities : {},
+	setEntity : function(name, entity) {
+		this.entities[name] = entity;
 	},
-	getItem: function(name){
-		return this.item[name];
+	getEntity : function(name) {
+		return this.entities[name];
+	},
+	indexOf : function(name, where) {
+		var entity = this.getEntity(name);
+		for (var i = 0, size = entity.length; i < size; i++) {
+			var item = entity[i];
+			if (this.compare(item, where)) {
+				return i;
+			}
+		}
+		return -1;
+	},
+	compare : function(item, where) {
+		for ( var column in where) {
+			if (where[column] !== item[column]) {
+				return false;
+			}
+		}
+		return true;
+	},
+	compareLike : function(item, where) {
+		for ( var column in where) {
+			if (item[column].indexOf(where[column]) == -1) {
+				return false;
+			}
+		}
+		return true;
+	},
+	find : function(name, rows, page, where) {
+		var list = new Array();
+		var entity = this.getEntity(name);
+		var offset = rows * (page - 1);
+		for (var i = 0, size = entity.length; i < size; i++) {
+			if (i < offset) {
+				continue;
+			}
+			var item = entity[i];
+			if (where) {
+				if (this.compareLike(item, where) == true) {
+					list.push(item);
+				}
+			} else {
+				list.push(item);
+			}
+			if (list.length >= rows) {
+				break;
+			}
+		}
+		return list;
+	},
+	findOne : function(name, where) {
+		var index = this.indexOf(name, key, value);
+		return this.getEntity(name)[index];
+	},
+	saveOne : function(name, key, where, item) {
+		var index = this.indexOf(name, where);
+		if (index > -1) {
+			this.getEntity(name).splice(index, 1, item);
+		} else {
+			this.getEntity(name).splice(0, 0, item);
+		}
+	},
+	deleteOne : function(name, where) {
+		var index = this.indexOf(name, where);
+		this.getEntity(name).splice(index, 1);
 	}
 }
-// Group Table
-dataStorage.setItem('GROUP_INFO', JSON.stringify([
-	 {group:'mgm1',name:'Management',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'dev1',name:'Development',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'sal1',name:'Sales',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'mkt1',name:'Marketing',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'spt1',name:'Support',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'mgm2',name:'Management',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'dev2',name:'Development',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'sal2',name:'Sales',useYn:'Y',delete:true,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'mkt2',name:'Marketing',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'spt2',name:'Support',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'mgm3',name:'Management',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'dev3',name:'Development',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'sal3',name:'Sales',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'mkt3',name:'Marketing',useYn:'Y',delete:true,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'spt3',name:'Support',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'mgm4',name:'Management',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'dev4',name:'Development',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'sal4',name:'Sales',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'mkt4',name:'Marketing',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'spt4',name:'Support',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'mgm5',name:'Management',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'dev5',name:'Development',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'sal5',name:'Sales',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'mkt5',name:'Marketing',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'spt5',name:'Support',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'mgm6',name:'Management',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'dev6',name:'Development',useYn:'Y',delete:true,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'sal6',name:'Sales',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'mkt6',name:'Marketing',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'spt6',name:'Support',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'mgm11',name:'Management',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'dev11',name:'Development',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'sal11',name:'Sales',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'mkt11',name:'Marketing',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'spt11',name:'Support',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'mgm21',name:'Management',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'dev21',name:'Development',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'sal21',name:'Sales',useYn:'Y',delete:true,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'mkt21',name:'Marketing',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'spt21',name:'Support',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'mgm31',name:'Management',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'dev31',name:'Development',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'sal31',name:'Sales',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'mkt31',name:'Marketing',useYn:'Y',delete:true,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'spt31',name:'Support',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'mgm41',name:'Management',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'dev41',name:'Development',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'sal41',name:'Sales',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'mkt41',name:'Marketing',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'spt41',name:'Support',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'mgm51',name:'Management',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'dev51',name:'Development',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'sal51',name:'Sales',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'mkt51',name:'Marketing',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'spt51',name:'Support',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'mgm61',name:'Management',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'dev61',name:'Development',useYn:'Y',delete:true,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'sal61',name:'Sales',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'mkt61',name:'Marketing',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-	,{group:'spt61',name:'Support',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
-]));
-// User Table
-dataStorage.setItem('USER_INFO', JSON.stringify([
+
+// add users
+repository.setEntity('users',[
 	 {id:'apple',email:'apple@gmail.com',name:'James Anderson',nickname:'Apple',gender: 'M',password:'abcd1234!@',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
 	,{id:'orange',email:'orange@gmail.com',name:'Olivia Brown',nickname:'Orange',gender: 'F',password:'abcd1234!@',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
 	,{id:'grape',email:'grape@gmail.com',name:'David Johnson',nickname:'Grape',gender: 'M',password:'abcd1234!@',useYn:'Y',delete:true,description:'I am generous.\nI am generous.\nI am generous.\n'}
@@ -165,8 +168,73 @@ dataStorage.setItem('USER_INFO', JSON.stringify([
 	,{id:'mango6',email:'mango@gmail.com',name:'David Johnson',nickname:'Mango',gender: 'M',password:'abcd1234!@',useYn:'Y',delete:true,description:'I am generous.\nI am generous.\nI am generous.\n'}
 	,{id:'lemon6',email:'lemon@gmail.com',name:'Olivia Brown',nickname:'Lemon',gender: 'F',password:'abcd1234!@',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
 	,{id:'potato6',email:'potato@gmail.com',name:'David Johnson',nickname:'Potato',gender: 'M',password:'abcd1234!@',useYn:'Y',delete:true,description:'I am generous.\nI am generous.\nI am generous.\n'}
+]);
+
+// adds groups
+repository.setEntity('groups', JSON.stringify([
+	 {group:'mgm1',name:'Management',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'dev1',name:'Development',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'sal1',name:'Sales',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'mkt1',name:'Marketing',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'spt1',name:'Support',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'mgm2',name:'Management',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'dev2',name:'Development',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'sal2',name:'Sales',useYn:'Y',delete:true,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'mkt2',name:'Marketing',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'spt2',name:'Support',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'mgm3',name:'Management',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'dev3',name:'Development',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'sal3',name:'Sales',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'mkt3',name:'Marketing',useYn:'Y',delete:true,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'spt3',name:'Support',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'mgm4',name:'Management',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'dev4',name:'Development',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'sal4',name:'Sales',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'mkt4',name:'Marketing',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'spt4',name:'Support',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'mgm5',name:'Management',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'dev5',name:'Development',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'sal5',name:'Sales',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'mkt5',name:'Marketing',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'spt5',name:'Support',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'mgm6',name:'Management',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'dev6',name:'Development',useYn:'Y',delete:true,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'sal6',name:'Sales',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'mkt6',name:'Marketing',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'spt6',name:'Support',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'mgm11',name:'Management',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'dev11',name:'Development',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'sal11',name:'Sales',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'mkt11',name:'Marketing',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'spt11',name:'Support',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'mgm21',name:'Management',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'dev21',name:'Development',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'sal21',name:'Sales',useYn:'Y',delete:true,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'mkt21',name:'Marketing',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'spt21',name:'Support',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'mgm31',name:'Management',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'dev31',name:'Development',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'sal31',name:'Sales',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'mkt31',name:'Marketing',useYn:'Y',delete:true,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'spt31',name:'Support',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'mgm41',name:'Management',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'dev41',name:'Development',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'sal41',name:'Sales',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'mkt41',name:'Marketing',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'spt41',name:'Support',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'mgm51',name:'Management',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'dev51',name:'Development',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'sal51',name:'Sales',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'mkt51',name:'Marketing',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'spt51',name:'Support',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'mgm61',name:'Management',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'dev61',name:'Development',useYn:'Y',delete:true,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'sal61',name:'Sales',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'mkt61',name:'Marketing',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
+	,{group:'spt61',name:'Support',useYn:'Y',delete:false,description:'I am generous.\nI am generous.\nI am generous.\n'}
 ]));
-dataStorage.setItem('USER_GROUP_INFO', JSON.stringify([
+
+repository.setEntity('userGroups', JSON.stringify([
 	 {id:'apple',group:"mgm1"}
 	,{id:'orange',group:"dev2"}
 	,{id:'grape',group:"sal3"}
@@ -296,130 +364,4 @@ dataStorage.setItem('USER_GROUP_INFO', JSON.stringify([
 	,{id:'lemon6',group:"spt51"}
 	,{id:'potato6',group:"sal21"}
 ]));	
-		
-var DataSource = {
-	getGroups: function(key, value, rownum, page) {
-		duice.progress.start();
-		try {
-			console.log('key:' + key + '|value:' + value);
-			var groups = [];
-			var originalGroups = JSON.parse(dataStorage.getItem('GROUP_INFO'));
-			if(key && key != 'null') {
-				for(var i = 0; i < originalGroups.length; i ++ ) {
-					var group = originalGroups[i];
-					if(group[key].includes(value)) {
-						groups.push(group);
-					}
-				}
-			}else{
-				groups = originalGroups;
-			}
-			
-			// paging
-			var pagedGroups = [];
-			var offset = rownum * (page-1);
-			for(var i = 0; i < groups.length; i++){
-				if(i >= offset) {
-					pagedGroups.push(groups[i]);
-				}
-				if(pagedGroups.length >= rownum) {
-					break;
-				}
-			}
-			return pagedGroups;
-		}catch(exception){
-			throw exception;
-		}finally{
-			duice.progress.end();
-		}
-	},
-	getGroup: function(group){
-		duice.progress.start();
-		try {
-			var groups = JSON.parse(dataStorage.getItem('GROUP_INFO'));
-			for(var i = 0; i < groups.length; i ++ ) {
-				if(groups[i].group == group){
-					return groups[i];
-				}
-			}
-		}catch(exception){
-			throw exception;
-		}finally{
-			duice.progress.end();
-		}
-	},
-	getGroupUsers: function(group){
-		console.log(group);
-		duice.progress.start();
-		try {
-			var groupUsers = [];
-			var userGroups = JSON.parse(dataStorage.getItem('USER_GROUP_INFO'));
-			for(var i = 0; i < userGroups.length; i ++ ) {
-				if(userGroups[i].group == group){
-					var groupUser = this.getUser(userGroups[i].id);
-					groupUsers.push(groupUser);
-				}
-			}
-			return groupUsers;
-		}catch(exception){
-			throw exception;
-		}finally{
-			duice.progress.end();
-		}
-	},
-	saveGroup: function(group) {
-		duice.progress.start();
-		try {
-			var groups = JSON.parse(dataStorage.getItem('GROUP_INFO'));
-			for(var i = 0; i < groups.length; i ++ ) {
-				if(groups[i].group == group.group){
-					groups[i] = group;
-					window.dataStorage.setItem('GROUP_INFO', JSON.stringify(groups));
-					break;
-				}
-			}
-		}catch(exception){
-			throw exception;
-		}finally{
-			duice.progress.end();
-		}
-	},
-	getUser: function(id){
-		duice.progress.start();
-		try {
-			var users = JSON.parse(dataStorage.getItem('USER_INFO'));
-			for(var i = 0; i < users.length; i ++ ) {
-				if(users[i].id == id){
-					return users[i];
-				}
-			}
-		}catch(exception){
-			throw exception;
-		}finally{
-			duice.progress.end();
-		}
-	},
-	saveUser: function(user){
-		duice.progress.start();
-		try {
-			var users = JSON.parse(dataStorage.getItem('USER_INFO'));
-			for(var i = 0; i < users.length; i ++ ) {
-				if(users[i].id == user.id){
-					users[i] = user;
-					window.dataStorage.setItem('USER_INFO', JSON.stringify(users));
-					break;
-				}
-			}
-		}catch(exception){
-			throw exception;
-		}finally{
-			duice.progress.end();
-		}
-	}
-}
-
-
-
-
-
 
