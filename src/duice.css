@@ -421,8 +421,7 @@
 .duice-ui-treeView li {
 	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAKUlEQVR42mNgGAWjYGiDhoaG/4QwxRZQIj9qwagFdLKApvlgFIyCEQIA955P4Z4Rh8AAAAAASUVORK5CYII=);
 	background-repeat: no-repeat;
-	background-size: 24pxrem 24rem;
-	background-position: 0rem 0.1rem;
+	background-position: left top 5px;
 	background-color: transparent;
 	list-style-type: none;
 	padding: 0 0 0 2em;

@@ -2684,39 +2684,38 @@ duice.ui.Image.prototype.bind = function(map, name) {
 		console.log('error');
 	});
 	
-	// add click event
-	this.img.addEventListener('click', function() {
-		if(!$this.readonly){
-			if($this.map.isEnable() && $this.map.isReadonly(this.name) != true){
-				$this.input.click();
+	// if editable 
+	if(this.map.isReadonly(this.name) === false && this.map.isEnable() === true){
+
+		// adds click event
+		this.img.addEventListener('click', function() {
+			$this.input.click();
+		});
+	
+		// add change event listener
+		this.input.addEventListener('change', function(e){
+			var fileReader = new FileReader();
+			if (this.files && this.files[0]) {
+				fileReader.addEventListener("load", function(e) {
+					var value = e.target.result;
+					var width = $this.width;
+					var height = $this.height;
+				    var canvas = document.createElement("canvas");
+				    var ctx = canvas.getContext("2d");
+		            canvas.width = width;
+		            canvas.height = height;
+				    var image = document.createElement('img');
+				    image.onload = function(){
+						ctx.drawImage(image, 0, 0, width, height);
+						value = canvas.toDataURL("image/png");
+				    	$this.map.set($this.name, value);
+				    };
+				    image.src = value;
+			    }); 
+				fileReader.readAsDataURL(this.files[0]);
 			}
-		}
-	});
-	
-	// add change event listener
-	this.input.addEventListener('change', function(e){
-		var fileReader = new FileReader();
-		if (this.files && this.files[0]) {
-			fileReader.addEventListener("load", function(e) {
-				var value = e.target.result;
-				var width = $this.width;
-				var height = $this.height;
-			    var canvas = document.createElement("canvas");
-			    var ctx = canvas.getContext("2d");
-	            canvas.width = width;
-	            canvas.height = height;
-			    var image = document.createElement('img');
-			    image.onload = function(){
-					ctx.drawImage(image, 0, 0, width, height);
-					value = canvas.toDataURL("image/png");
-			    	$this.map.set($this.name, value);
-			    };
-			    image.src = value;
-		    }); 
-			fileReader.readAsDataURL(this.files[0]);
-		}
-	});
-	
+		});
+	}
 }
 
 /**
@@ -2984,7 +2983,7 @@ duice.ui.TreeView.prototype.createNode = function(index, node){
 	if(JSON.stringify(index) == JSON.stringify(this.tree.index)){
 		li.classList.add('duice-ui-treeView-index');
 	}
-	
+
 	// on click event
 	li.addEventListener('click', function(event){
 		var prevIndexLi = $this.ul.querySelector('li.duice-ui-treeView-index');
@@ -2998,7 +2997,7 @@ duice.ui.TreeView.prototype.createNode = function(index, node){
 	// child node
 	var childNodes = node.getChildNodes();
 	if(childNodes && childNodes.length > 0){
-		
+	
 		// fold & unfold class
 		li.classList.add('duice-ui-treeView-unfold');
 		li.addEventListener('click', function(event){
