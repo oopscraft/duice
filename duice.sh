@@ -1,38 +1,31 @@
 #!/bin/bash
 APP_FILE=$(basename ${0})
 APP_NAME=${APP_FILE%.*}
-PID_FILE=${APP_NAME}.pid
-touch ${PID_FILE}
-PID=$(cat ${PID_FILE})
 
 # start
 function start() {
-	if [ -f /proc/${PID}/status ]; then
-		echo "Application is already running."
-		status
-		exit -1
-	fi
-	nohup http-server ./ -p 10002 -c-1 > ${APP_NAME}.log &
-	echo $! > ${PID_FILE}
+	echo "start"
+	pm2 start ./app.js \
+	--name $(realpath ./app.js) \
+	--log ./log/${APP_NAME}.log \
+	--watch ./modules
 }
 
 # status
 function status() {
-	ps -f ${PID} | grep http-server | grep 10002
+	echo "status"
+	pm2 list
 }
 
 # stop
 function stop() {
-	if [ ! -f /proc/${PID}/status ]; then
-		echo "Application is not running."
-		exit -1
-	fi
-	kill ${PID}
+	echo "stop"
+	pm2 delete $(realpath ./app.js)
 }
 
 # log
 function log() {
-	tail -F ./${APP_NAME}.log
+	tail -F ./log/${APP_NAME}.log
 }
 
 # main
@@ -55,4 +48,3 @@ case ${1} in
 esac
 
 exit 0
-			
