@@ -8,7 +8,7 @@ function start() {
 	pm2 start ./app.js \
 	--name $(realpath ./app.js) \
 	--log ./log/${APP_NAME}.log \
-	--watch ./modules
+	--watch ./app.js
 }
 
 # status

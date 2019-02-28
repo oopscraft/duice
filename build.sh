@@ -12,6 +12,8 @@ function prepare() {
 	npm list del || npm install del@3.0.0
 	npm list jsdoc || npm install jsdoc 
 	npm list jsdoc-plantuml || npm install jsdoc-plantuml	
+	npm list express || npm install express
+	npm list mysql || npm install mysql
 }
 
 # git update source

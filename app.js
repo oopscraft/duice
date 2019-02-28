@@ -18,6 +18,9 @@ global.dataSource = mysql.createPool(global.config.dataSource);
 // routes doc
 app.use('/doc', express.static(path.join(__dirname,'doc')));
 
+// routes src
+app.use('/src', express.static(path.join(__dirname,'src')));
+
 // routes test
 app.use('/test', express.static(path.join(__dirname,'test')));
 var test = require('./test/test.js');
