@@ -15,6 +15,11 @@ global.config = {
 // creates dataSource
 global.dataSource = mysql.createPool(global.config.dataSource);
 
+// routes root 
+app.get('/', function(req, res){
+	res.redirect('/doc');
+});
+
 // routes doc
 app.use('/doc', express.static(path.join(__dirname,'doc')));
 
