@@ -1,0 +1,33 @@
+################################################################################
+# MYSQL Installation
+################################################################################
+-- Creating Database
+create database ${database};
+ 
+-- Creating User
+INSERT INTO user 
+(Host,User,Password, Select_priv, Insert_priv, Update_priv, Delete_priv, Create_priv, Drop_priv, Index_priv, Alter_priv, ssl_cipher,x509_issuer,x509_subject,authentication_string)
+values
+('%', '${username}', PASSWORD('${password}'),'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y','','','','')
+;
+
+INSERT INTO db 
+(Host, Db, User, Select_priv, Insert_priv, Update_priv, Delete_priv, Create_priv, Drop_priv, Index_priv, Alter_priv)
+VALUES
+('%', '${database}', '${username}', 'Y', 'Y', 'Y', 'Y','Y','Y','Y','Y')
+;
+
+flush privileges;
+
+
+################################################################################
+# Oracle Installation
+################################################################################
+# create user
+CREATE USER ${username} 
+IDENTIFIED BY ${password};
+
+# grant privileges
+GRANT CONNECT,RESOURCE TO ${username};
+
+
