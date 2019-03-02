@@ -38,12 +38,12 @@ router.get('/employers',function(req,res){
 					totalCount = rows[0].CNT;
 					resolve();
 				});
+				connection.release();
 			});
 		})
 	]).then(function(){
 		res.set('X-Total-Count', totalCount);
 		res.json(employers);
-		console.log(totalCount);
 	}).catch(console.err);
 });
 
