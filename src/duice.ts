@@ -159,6 +159,7 @@ namespace duice {
                 for(var name in json){
                     this.data[name] = json[name];
                 }
+                this.notifyObservers(this);
             }
             toJson():object {
                 var json: any = new Object();
@@ -665,13 +666,15 @@ namespace duice {
             tbody:HTMLTableSectionElement;
             bindList:duice.data.List;
             item:string;
-            rows:Array<any> = new Array<HTMLElement>();
+            rows:Array<HTMLTableSectionElement> = new Array<HTMLTableSectionElement>();
             constructor(table:HTMLTableElement) {
                 super();
                 this.table = table;
                 this.table.classList.add('duice-ui-grid');
                 this.thead = <HTMLTableSectionElement>this.table.querySelector('thead').cloneNode(true);
-                this.tbody = <HTMLTableSectionElement>this.table.querySelector('tbody').cloneNode(true);
+                var tbody = this.table.querySelector('tbody');
+                this.tbody = <HTMLTableSectionElement>tbody.cloneNode(true);
+                this.table.removeChild(tbody);
             }
             setBind(list:duice.data.List):void {
                 this.bindList = list;
@@ -702,6 +705,19 @@ namespace duice {
                 $context[this.item] = map;
                 row = this.executeExpression(<HTMLElement>row, $context);
                 duice.initialize(row,$context);
+                var $this = this;
+                row.addEventListener('mousedown', function(event){
+                    $this.bindList.index = index;
+                    console.log($this.bindList.getIndex());
+                    for(var i = 0; i < $this.rows.length; i ++ ) {
+                        var row = $this.rows[i];
+                        if(i === index){
+                            row.classList.add('duice-ui-grid-index');
+                        }else{
+                            row.classList.remove('duice-ui-grid-index');
+                        }
+                    }
+                });
                 return row;
             }
         }

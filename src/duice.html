@@ -12,12 +12,7 @@ var users = new duice.data.List([
 	{id:"cat", name:"Cat", groupId:'animal', isAlive:'Y'},
 	{id:"orange", name:"Orange", groupId:'fruit', isAlive:'N'}
 ]);
-var user = new duice.data.Map({
-	id:'dog',
-	name:'Dog',
-	groupId:'animal',
-	isAlive:'Y'
-});
+var user = new duice.data.Map({});
 var groups = new duice.data.List([
 	{id:"animal", name:"Animal"},
 	{id:"fruit", name:"Fruit"}
@@ -29,18 +24,20 @@ var groups = new duice.data.List([
 <button type="button" onclick="alert(JSON.stringify(users.toJson()));">users</button>
 <button type="button" onclick="alert(JSON.stringify(groups.toJson()));">groups</button>
 <div>
-	<table data-duice="Grid" data-duice-bind="users" data-duice-item="user">
+	<table data-duice="Grid" data-duice-bind="users" data-duice-item="user" data-duice-drag="" data-duice-drop="">
 		<thead>
 			<tr>
+				<th>No</th>
 				<th>ID</th>
 				<th>Name</th>
 				<th>Group</th>
 				<th>Alive</th>
 			</tr>
 		</thead>
-		<tbody>
+		<tbody onclick="user.fromJson(users.getRow(users.getIndex()).toJson());">
 			<tr>
-				<td><input type="text" data-duice="TextField" data-duice-bind="user,id"/></td>
+				<td>[[$context.index+1]]</td>
+				<td><span data-duice="Text" data-duice-bind="user,name"></span></td>
 				<td><input type="text" data-duice="TextField" data-duice-bind="user,name"/></td>
 				<td><select data-duice="ComboBox" data-duice-bind="user,groupId" data-duice-option="groups,id,name"></select></td>
 				<td><input type="checkbox" data-duice="CheckBox" data-duice-bind="user,isAlive" data-duice-option="Y,N"/></td>
@@ -48,13 +45,25 @@ var groups = new duice.data.List([
 		</tbody>
 	</table>
 </div>
-<div>
-	<span data-duice="Text" data-duice-bind="user,name"></span>
-	<input type="text" data-duice="TextField" data-duice-bind="user,name"/>
-	<select data-duice="ComboBox" data-duice-bind="user,groupId" data-duice-option="groups,id,name"></select>
-</div>
-<div>
-	<input type="checkbox" data-duice="CheckBox" data-duice-bind="user,isAlive" data-duice-option="Y,N"/>
+<div style="border:solid 2px #efefef;">
+	<table>
+		<tr>
+			<th>ID</th>
+			<td><span data-duice="Text" data-duice-bind="user,name"></span></td>
+		</tr>
+		<tr>
+			<th>Name</th>
+			<td><input type="text" data-duice="TextField" data-duice-bind="user,name"/></td>
+		</tr>
+		<tr>
+			<th>Group</th>
+			<td><select data-duice="ComboBox" data-duice-bind="user,groupId" data-duice-option="groups,id,name"></select></td>
+		</tr>
+		<tr>
+			<th>isAlive</th>
+			<td><input type="checkbox" data-duice="CheckBox" data-duice-bind="user,isAlive" data-duice-option="Y,N"/></select></td>
+		</tr>
+	</table>
 </div>
 </body>
 </html>

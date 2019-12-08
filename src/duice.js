@@ -174,6 +174,7 @@ var duice;
                 for (var name in json) {
                     this.data[name] = json[name];
                 }
+                this.notifyObservers(this);
             };
             Map.prototype.toJson = function () {
                 var json = new Object();
@@ -679,7 +680,9 @@ var duice;
                 _this.table = table;
                 _this.table.classList.add('duice-ui-grid');
                 _this.thead = _this.table.querySelector('thead').cloneNode(true);
-                _this.tbody = _this.table.querySelector('tbody').cloneNode(true);
+                var tbody = _this.table.querySelector('tbody');
+                _this.tbody = tbody.cloneNode(true);
+                _this.table.removeChild(tbody);
                 return _this;
             }
             Grid.prototype.setBind = function (list) {
@@ -710,6 +713,20 @@ var duice;
                 $context[this.item] = map;
                 row = this.executeExpression(row, $context);
                 duice.initialize(row, $context);
+                var $this = this;
+                row.addEventListener('mousedown', function (event) {
+                    $this.bindList.index = index;
+                    console.log($this.bindList.getIndex());
+                    for (var i = 0; i < $this.rows.length; i++) {
+                        var row = $this.rows[i];
+                        if (i === index) {
+                            row.classList.add('duice-ui-grid-index');
+                        }
+                        else {
+                            row.classList.remove('duice-ui-grid-index');
+                        }
+                    }
+                });
                 return row;
             };
             return Grid;
