@@ -20,12 +20,14 @@ namespace duice {
         
         // getObject
         function getObject($context:any, name:string) {
+            if($context.hasOwnProperty(name)){
+                return $context[name];
+            }
+            if((<any>window).hasOwnProperty(name)){
+                return (<any>window)[name];
+            }
             try {
-                var obj = eval("$context." + name);
-                if(!obj) {
-                    obj = eval(name);
-                }
-                return obj;
+                return eval(name);
             }catch(e){
                 console.error(e,$context, name);
                 throw e;
@@ -42,8 +44,10 @@ namespace duice {
                 grid.setBind(getObject($context,bind));
                 var item = gridElement.dataset.duiceItem;
                 grid.setItem(item);
+                grid.setEditable((gridElement.dataset.duiceEditable === 'true'));
                 grid.update();
                 gridElement.dataset.duice += generateUUID();
+                console.log(grid);
             }catch(e){
                 console.error(e,gridElement);
                 throw e;
@@ -114,7 +118,6 @@ namespace duice {
          */
         export abstract class __ {
             observers:Array<any> = new Array<any>();
-            enable:boolean = true;
             addObserver(observer:any): void {
                 for(var i = 0, size = this.observers.length; i < size; i++){
                     if(this.observers[i] === observer){
@@ -133,13 +136,6 @@ namespace duice {
             }
             update():void {
                 this.notifyObservers(this);
-            }
-            setEnable(enable:boolean):void {
-                this.enable = enable;
-                this.notifyObservers(this);
-            }
-            isEnable():boolean {
-                return this.enable;
             }
         }
         
@@ -214,8 +210,6 @@ namespace duice {
         export class List extends __ {
             mapList:Array<Map> = new Array<Map>();
             index:number = -1;
-            enable:boolean = true;
-            readonly:any = new Object();
             constructor(jsonArray:Array<any>) {
                 super();
                 this.fromJson(jsonArray);
@@ -224,7 +218,6 @@ namespace duice {
                 this.mapList = new Array<Map>();
                 for(var i = 0; i < jsonArray.length; i ++ ) {
                     var map = new duice.data.Map(jsonArray[i]);
-                    map.setEnable(this.enable);
                     map.addObserver(this);
                     this.mapList.push(map);
                 }
@@ -277,6 +270,13 @@ namespace duice {
                 this.index = toIndex;
                 this.notifyObservers(this);
             }
+            sortRow(name:string, ascending:boolean):void {
+                this.mapList.sort(function(a:duice.data.Map,b:duice.data.Map):number {
+                    var aValue = a.get(name);
+                    var bValue = b.get(name);
+                    return (aValue > bValue ? 1 : aValue < bValue ? -1 : 0) * (ascending == false ? -1 : 1);
+                });
+            }
             forEach(handler:Function):void {
                 for(var i = 0, size = this.mapList.length; i < size; i ++){
                     handler.call(this, this.mapList[i]);
@@ -284,7 +284,7 @@ namespace duice {
             }
             findIndex(handler:Function):number {
                 for(var i = 0, size = this.mapList.length; i < size; i ++){
-                    if(handler.call(this, this.mapList[i]) == true){
+                    if(handler.call(this, this.mapList[i]) === true){
                         return i;
                     }
                 }
@@ -293,7 +293,7 @@ namespace duice {
             findIndexes(handler:Function):Array<number> {
                 var indexes = [];
                 for(var i = 0, size = this.mapList.length; i < size; i ++){
-                    if(handler.call(this, this.mapList[i]) == true){
+                    if(handler.call(this, this.mapList[i]) === true){
                         indexes.push(i);
                     }
                 }
@@ -667,11 +667,12 @@ namespace duice {
             bindList:duice.data.List;
             item:string;
             rows:Array<HTMLTableSectionElement> = new Array<HTMLTableSectionElement>();
+            editable:boolean;
             constructor(table:HTMLTableElement) {
                 super();
                 this.table = table;
                 this.table.classList.add('duice-ui-grid');
-                this.thead = <HTMLTableSectionElement>this.table.querySelector('thead').cloneNode(true);
+                this.thead = <HTMLTableSectionElement>this.table.querySelector('thead');
                 var tbody = this.table.querySelector('tbody');
                 this.tbody = <HTMLTableSectionElement>tbody.cloneNode(true);
                 this.table.removeChild(tbody);
@@ -683,7 +684,12 @@ namespace duice {
             setItem(item:string):void {
                 this.item = item;
             }
+            setEditable(editable:boolean):void {
+                this.editable = editable;
+            }
             update():void {
+                var $this = this;
+
                 // remove previous rows
                 for(var i = 0; i < this.rows.length; i ++ ) {
                     this.table.removeChild(this.rows[i]);
@@ -698,26 +704,53 @@ namespace duice {
                     this.rows.push(row);
                 }
             }
-            createRow(index:number, map:duice.data.Map):HTMLTableSectionElement {
+            createRow(index:number, bindMap:duice.data.Map):HTMLTableSectionElement {
+                var $this = this;
                 var row:HTMLTableSectionElement = <HTMLTableSectionElement>this.tbody.cloneNode(true);
                 var $context:any = new Object;
                 $context['index'] = index;
-                $context[this.item] = map;
+                $context[this.item] = bindMap;
                 row = this.executeExpression(<HTMLElement>row, $context);
                 duice.initialize(row,$context);
-                var $this = this;
-                row.addEventListener('mousedown', function(event){
-                    $this.bindList.index = index;
-                    console.log($this.bindList.getIndex());
+                
+                // select index
+                if(index == this.bindList.index){
+                    row.classList.add('duice-ui-grid-index');
+                }
+                row.addEventListener('mouseup', function(event){
                     for(var i = 0; i < $this.rows.length; i ++ ) {
-                        var row = $this.rows[i];
-                        if(i === index){
-                            row.classList.add('duice-ui-grid-index');
-                        }else{
-                            row.classList.remove('duice-ui-grid-index');
-                        }
+                        $this.rows[i].classList.remove('duice-ui-grid-index');
                     }
+                    row.classList.add('duice-ui-grid-index');
+                    $this.bindList.index = index;
                 });
+                
+                // drag and drop event
+                if(this.editable === true) {
+                    row.setAttribute('draggable', 'true');
+                    row.addEventListener('dragstart', function(event){
+                        console.log('dragstart',index);
+                        event.dataTransfer.setData("index", String(index));
+                    });
+                    row.addEventListener('dragover', function(event){
+                        event.preventDefault();
+                        console.log('dragover');
+                    });
+                    
+                    row.addEventListener('drop', function(event){
+                        event.preventDefault();
+                        console.log('drop',index,event);
+                        console.log();
+                        var fromIndex = parseInt(event.dataTransfer.getData('index'));
+                        var toIndex = index;
+                        $this.bindList.moveRow(fromIndex, toIndex);
+                        $this.bindList.index = toIndex;
+                        $this.update();
+                        row.click();
+                    });
+                }
+                
+                // return
                 return row;
             }
         }

@@ -10,21 +10,37 @@ var users = new duice.data.List([
 	{id:"dog", name:"Dog", groupId:'animal', isAlive:'Y'},
 	{id:"apple", name:"Apple", groupId:'fruit', isAlive:'N'},
 	{id:"cat", name:"Cat", groupId:'animal', isAlive:'Y'},
-	{id:"orange", name:"Orange", groupId:'fruit', isAlive:'N'}
+	{id:"orange", name:"Orange", groupId:'fruit', isAlive:'N'},
+	{id:"dog1", name:"Dog1", groupId:'animal', isAlive:'Y'},
+	{id:"apple1", name:"Apple1", groupId:'fruit', isAlive:'N'},
+	{id:"cat1", name:"Cat1", groupId:'animal', isAlive:'Y'},
+	{id:"orange1", name:"Orange1", groupId:'fruit', isAlive:'N'},
+	{id:"dog2", name:"Dog2", groupId:'animal', isAlive:'Y'},
+	{id:"apple2", name:"Apple2", groupId:'fruit', isAlive:'N'},
+	{id:"cat2", name:"Cat2", groupId:'animal', isAlive:'Y'},
+	{id:"orange2", name:"Orange2", groupId:'fruit', isAlive:'N'}
 ]);
 var user = new duice.data.Map({});
 var groups = new duice.data.List([
 	{id:"animal", name:"Animal"},
 	{id:"fruit", name:"Fruit"}
 ]);
-
+function getUser(id){
+	var item = users.findRow(function(item){
+		if(item.get('id') === id){
+			return true;
+		}
+	});
+	console.log(id, item);
+	user.fromJson(item.toJson());
+}
 </script>
 </head>
 <body>
 <button type="button" onclick="alert(JSON.stringify(users.toJson()));">users</button>
 <button type="button" onclick="alert(JSON.stringify(groups.toJson()));">groups</button>
 <div>
-	<table data-duice="Grid" data-duice-bind="users" data-duice-item="user" data-duice-drag="" data-duice-drop="">
+	<table data-duice="Grid" data-duice-bind="users" data-duice-item="user" data-duice-editable="true">
 		<thead>
 			<tr>
 				<th>No</th>
@@ -34,7 +50,7 @@ var groups = new duice.data.List([
 				<th>Alive</th>
 			</tr>
 		</thead>
-		<tbody onclick="user.fromJson(users.getRow(users.getIndex()).toJson());">
+		<tbody data-id="[[$context.user.get('id')]]" onclick="getUser(this.dataset.id);">
 			<tr>
 				<td>[[$context.index+1]]</td>
 				<td><span data-duice="Text" data-duice-bind="user,name"></span></td>
@@ -61,7 +77,7 @@ var groups = new duice.data.List([
 		</tr>
 		<tr>
 			<th>isAlive</th>
-			<td><input type="checkbox" data-duice="CheckBox" data-duice-bind="user,isAlive" data-duice-option="Y,N"/></select></td>
+			<td><input type="checkbox" data-duice="CheckBox" data-duice-bind="user,isAlive" data-duice-option="Y,N"/></td>
 		</tr>
 	</table>
 </div>

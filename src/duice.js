@@ -29,12 +29,14 @@ var duice;
         }
         // getObject
         function getObject($context, name) {
+            if ($context.hasOwnProperty(name)) {
+                return $context[name];
+            }
+            if (window.hasOwnProperty(name)) {
+                return window[name];
+            }
             try {
-                var obj = eval("$context." + name);
-                if (!obj) {
-                    obj = eval(name);
-                }
-                return obj;
+                return eval(name);
             }
             catch (e) {
                 console.error(e, $context, name);
@@ -52,8 +54,10 @@ var duice;
                 grid.setBind(getObject($context, bind));
                 var item = gridElement.dataset.duiceItem;
                 grid.setItem(item);
+                grid.setEditable((gridElement.dataset.duiceEditable === 'true'));
                 grid.update();
                 gridElement.dataset.duice += generateUUID();
+                console.log(grid);
             }
             catch (e) {
                 console.error(e, gridElement);
@@ -126,7 +130,6 @@ var duice;
         var __ = (function () {
             function __() {
                 this.observers = new Array();
-                this.enable = true;
             }
             __.prototype.addObserver = function (observer) {
                 for (var i = 0, size = this.observers.length; i < size; i++) {
@@ -146,13 +149,6 @@ var duice;
             };
             __.prototype.update = function () {
                 this.notifyObservers(this);
-            };
-            __.prototype.setEnable = function (enable) {
-                this.enable = enable;
-                this.notifyObservers(this);
-            };
-            __.prototype.isEnable = function () {
-                return this.enable;
             };
             return __;
         }());
@@ -233,8 +229,6 @@ var duice;
                 var _this = _super.call(this) || this;
                 _this.mapList = new Array();
                 _this.index = -1;
-                _this.enable = true;
-                _this.readonly = new Object();
                 _this.fromJson(jsonArray);
                 return _this;
             }
@@ -242,7 +236,6 @@ var duice;
                 this.mapList = new Array();
                 for (var i = 0; i < jsonArray.length; i++) {
                     var map = new duice.data.Map(jsonArray[i]);
-                    map.setEnable(this.enable);
                     map.addObserver(this);
                     this.mapList.push(map);
                 }
@@ -295,6 +288,13 @@ var duice;
                 this.index = toIndex;
                 this.notifyObservers(this);
             };
+            List.prototype.sortRow = function (name, ascending) {
+                this.mapList.sort(function (a, b) {
+                    var aValue = a.get(name);
+                    var bValue = b.get(name);
+                    return (aValue > bValue ? 1 : aValue < bValue ? -1 : 0) * (ascending == false ? -1 : 1);
+                });
+            };
             List.prototype.forEach = function (handler) {
                 for (var i = 0, size = this.mapList.length; i < size; i++) {
                     handler.call(this, this.mapList[i]);
@@ -302,7 +302,7 @@ var duice;
             };
             List.prototype.findIndex = function (handler) {
                 for (var i = 0, size = this.mapList.length; i < size; i++) {
-                    if (handler.call(this, this.mapList[i]) == true) {
+                    if (handler.call(this, this.mapList[i]) === true) {
                         return i;
                     }
                 }
@@ -311,7 +311,7 @@ var duice;
             List.prototype.findIndexes = function (handler) {
                 var indexes = [];
                 for (var i = 0, size = this.mapList.length; i < size; i++) {
-                    if (handler.call(this, this.mapList[i]) == true) {
+                    if (handler.call(this, this.mapList[i]) === true) {
                         indexes.push(i);
                     }
                 }
@@ -679,7 +679,7 @@ var duice;
                 _this.rows = new Array();
                 _this.table = table;
                 _this.table.classList.add('duice-ui-grid');
-                _this.thead = _this.table.querySelector('thead').cloneNode(true);
+                _this.thead = _this.table.querySelector('thead');
                 var tbody = _this.table.querySelector('tbody');
                 _this.tbody = tbody.cloneNode(true);
                 _this.table.removeChild(tbody);
@@ -692,7 +692,11 @@ var duice;
             Grid.prototype.setItem = function (item) {
                 this.item = item;
             };
+            Grid.prototype.setEditable = function (editable) {
+                this.editable = editable;
+            };
             Grid.prototype.update = function () {
+                var $this = this;
                 // remove previous rows
                 for (var i = 0; i < this.rows.length; i++) {
                     this.table.removeChild(this.rows[i]);
@@ -706,27 +710,49 @@ var duice;
                     this.rows.push(row);
                 }
             };
-            Grid.prototype.createRow = function (index, map) {
+            Grid.prototype.createRow = function (index, bindMap) {
+                var $this = this;
                 var row = this.tbody.cloneNode(true);
                 var $context = new Object;
                 $context['index'] = index;
-                $context[this.item] = map;
+                $context[this.item] = bindMap;
                 row = this.executeExpression(row, $context);
                 duice.initialize(row, $context);
-                var $this = this;
-                row.addEventListener('mousedown', function (event) {
-                    $this.bindList.index = index;
-                    console.log($this.bindList.getIndex());
+                // select index
+                if (index == this.bindList.index) {
+                    row.classList.add('duice-ui-grid-index');
+                }
+                row.addEventListener('mouseup', function (event) {
                     for (var i = 0; i < $this.rows.length; i++) {
-                        var row = $this.rows[i];
-                        if (i === index) {
-                            row.classList.add('duice-ui-grid-index');
-                        }
-                        else {
-                            row.classList.remove('duice-ui-grid-index');
-                        }
+                        $this.rows[i].classList.remove('duice-ui-grid-index');
                     }
+                    row.classList.add('duice-ui-grid-index');
+                    $this.bindList.index = index;
                 });
+                // drag and drop event
+                if (this.editable === true) {
+                    row.setAttribute('draggable', 'true');
+                    row.addEventListener('dragstart', function (event) {
+                        console.log('dragstart', index);
+                        event.dataTransfer.setData("index", String(index));
+                    });
+                    row.addEventListener('dragover', function (event) {
+                        event.preventDefault();
+                        console.log('dragover');
+                    });
+                    row.addEventListener('drop', function (event) {
+                        event.preventDefault();
+                        console.log('drop', index, event);
+                        console.log();
+                        var fromIndex = parseInt(event.dataTransfer.getData('index'));
+                        var toIndex = index;
+                        $this.bindList.moveRow(fromIndex, toIndex);
+                        $this.bindList.index = toIndex;
+                        $this.update();
+                        row.click();
+                    });
+                }
+                // return
                 return row;
             };
             return Grid;
