@@ -1,13 +1,14 @@
 {
+	"compileOnSave": true,
 	"compilerOptions": {
 	    "target": "es3",
-	    "strictNullChecks": false,
 	    "strict": true,
+	    "strictNullChecks": false,
+	    "noImplicitThis": false,
 	    "module":"none",
 	    "watch":true
 	},
-	"compileOnSave": true,
-	"include": [
-		"./src/**/*"
+	"files":[
+		"./src/duice.ts"
 	]
 }

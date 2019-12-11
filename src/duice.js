@@ -12,113 +12,40 @@ var __extends = (this && this.__extends) || (function () {
 var duice;
 (function (duice) {
     /**
-     * duice.initialize
-     * @param container
-     * @param $context
+     * duice.generateUUID
      */
-    function initialize(container, $context) {
-        // generateUUID
-        function generateUUID() {
-            var dt = new Date().getTime();
-            var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-                var r = (dt + Math.random() * 16) % 16 | 0;
-                dt = Math.floor(dt / 16);
-                return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-            });
-            return uuid;
+    function generateUUID() {
+        var dt = new Date().getTime();
+        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = (dt + Math.random() * 16) % 16 | 0;
+            dt = Math.floor(dt / 16);
+            return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+        });
+        return uuid;
+    }
+    duice.generateUUID = generateUUID;
+    /**
+     * duice.getObject
+     * @param $context
+     * @param name
+     */
+    function getObject($context, name) {
+        if ($context.hasOwnProperty(name)) {
+            return $context[name];
         }
-        // getObject
-        function getObject($context, name) {
-            if ($context.hasOwnProperty(name)) {
-                return $context[name];
-            }
-            if (window.hasOwnProperty(name)) {
-                return window[name];
-            }
-            try {
-                return eval(name);
-            }
-            catch (e) {
-                console.error(e, $context, name);
-                throw e;
-            }
+        if (window.hasOwnProperty(name)) {
+            return window[name];
         }
-        ;
-        // creates Grid
-        var gridElements = container.querySelectorAll('table[data-duice="Grid"]');
-        for (var i = 0; i < gridElements.length; i++) {
-            try {
-                var gridElement = gridElements[i];
-                var grid = new duice.ui.Grid(gridElement);
-                var bind = gridElement.dataset.duiceBind;
-                grid.setBind(getObject($context, bind));
-                var item = gridElement.dataset.duiceItem;
-                grid.setItem(item);
-                grid.setEditable((gridElement.dataset.duiceEditable === 'true'));
-                grid.update();
-                gridElement.dataset.duice += generateUUID();
-                console.log(grid);
-            }
-            catch (e) {
-                console.error(e, gridElement);
-                throw e;
-            }
+        try {
+            return eval(name);
         }
-        // creates unit elements
-        var elementTags = [
-            'span[data-duice="Text"]',
-            'input[data-duice="TextField"]',
-            'select[data-duice="ComboBox"]',
-            'input[data-duice="CheckBox"]',
-            'input[data-duice="Radio"]',
-            'div[data-duice="TextView"]',
-            'textarea[data-duice="TextArea"]',
-            'div[data-duice="HtmlEditor"]',
-            'input[data-duice="CronExpression"]',
-            'img[data-duice="Image"]'
-        ];
-        var elements = container.querySelectorAll(elementTags.join(','));
-        for (var i = 0; i < elements.length; i++) {
-            try {
-                var element = elements[i];
-                var type = element.dataset.duice;
-                var bind = element.dataset.duiceBind.split(',');
-                switch (type) {
-                    case 'Text':
-                        var text = new duice.ui.Text(element);
-                        var format = element.dataset.duiceFormat;
-                        text.setBind(getObject($context, bind[0]), bind[1]);
-                        text.update();
-                        break;
-                    case 'TextField':
-                        var textField = new duice.ui.TextField(element);
-                        textField.setBind(getObject($context, bind[0]), bind[1]);
-                        textField.update();
-                        break;
-                    case 'ComboBox':
-                        var comboBox = new duice.ui.ComboBox(element);
-                        comboBox.setBind(getObject($context, bind[0]), bind[1]);
-                        var option = element.dataset.duiceOption.split(',');
-                        comboBox.setOption(getObject($context, option[0]), option[1], option[2]);
-                        comboBox.update();
-                        break;
-                    case 'CheckBox':
-                        var checkBox = new duice.ui.CheckBox(element);
-                        checkBox.setBind($context[bind[0]], bind[1]);
-                        var option = element.dataset.duiceOption.split(',');
-                        checkBox.setOption(option[0], option[1]);
-                        checkBox.update();
-                        break;
-                }
-                element.dataset.duice += generateUUID();
-            }
-            catch (e) {
-                console.error(e, elements[i]);
-                throw e;
-            }
+        catch (e) {
+            console.error(e, $context, name);
+            throw e;
         }
     }
-    duice.initialize = initialize;
+    duice.getObject = getObject;
+    ;
     /**
      * duice.data
      */
@@ -363,6 +290,111 @@ var duice;
     var ui;
     (function (ui) {
         /**
+         * duice.initialize
+         * @param container
+         * @param $context
+         */
+        function initialize(container, $context) {
+            // creates TableViewer
+            var tableViewerElements = container.querySelectorAll('table[data-duice="TableView"]');
+            for (var i = 0; i < tableViewerElements.length; i++) {
+                try {
+                    var tableViewerElement = tableViewerElements[i];
+                    var tableViewer = new duice.ui.TableViewer(tableViewerElement);
+                    var bind = tableViewerElement.dataset.duiceBind;
+                    tableViewer.setBind(getObject($context, bind));
+                    var item = tableViewerElement.dataset.duiceItem;
+                    tableViewer.setItem(item);
+                    tableViewer.setEditable((tableViewerElement.dataset.duiceEditable === 'true'));
+                    tableViewer.update();
+                    tableViewerElement.dataset.duice += generateUUID();
+                    console.log(tableViewer);
+                }
+                catch (e) {
+                    console.error(e, tableViewerElement);
+                    throw e;
+                }
+            }
+            // creates unit elements
+            var elementTags = [
+                'div[data-duice="Text"]',
+                'input[data-duice="TextField"]',
+                'textarea[data-duice="TextArea"]',
+                'select[data-duice="ComboBox"]',
+                'input[data-duice="CheckBox"]',
+                'input[data-duice="Radio"]',
+                'div[data-duice="HtmlEditor"]',
+                'div[data-duice="MarkdownEditor"]'
+                // --
+                ,
+                'img[data-duice="Image"]',
+                'input[data-duice="CronExpression"]'
+            ];
+            var elements = container.querySelectorAll(elementTags.join(','));
+            for (var i = 0; i < elements.length; i++) {
+                try {
+                    var element = elements[i];
+                    var type = element.dataset.duice;
+                    var bind = element.dataset.duiceBind.split(',');
+                    switch (type) {
+                        case 'Text':
+                            var text = new duice.ui.Text(element);
+                            var format = element.dataset.duiceFormat;
+                            text.setBind(getObject($context, bind[0]), bind[1]);
+                            text.setMode(element.dataset.duiceMode);
+                            text.update();
+                            break;
+                        case 'TextField':
+                            var textField = new duice.ui.TextField(element);
+                            textField.setBind(getObject($context, bind[0]), bind[1]);
+                            textField.update();
+                            break;
+                        case 'TextArea':
+                            console.log("fdsafdsafdsa");
+                            var textArea = new duice.ui.TextArea(element);
+                            textArea.setBind(getObject($context, bind[0]), bind[1]);
+                            textArea.update();
+                            break;
+                        case 'ComboBox':
+                            var comboBox = new duice.ui.ComboBox(element);
+                            comboBox.setBind(getObject($context, bind[0]), bind[1]);
+                            var option = element.dataset.duiceOption.split(',');
+                            comboBox.setOption(getObject($context, option[0]), option[1], option[2]);
+                            comboBox.update();
+                            break;
+                        case 'CheckBox':
+                            var checkBox = new duice.ui.CheckBox(element);
+                            checkBox.setBind($context[bind[0]], bind[1]);
+                            var option = element.dataset.duiceOption.split(',');
+                            checkBox.setOption(option[0], option[1]);
+                            checkBox.update();
+                            break;
+                        case 'Radio':
+                            var radio = new duice.ui.Radio(element);
+                            radio.setBind($context[bind[0]], bind[1]);
+                            radio.update();
+                            break;
+                        case 'HtmlEditor':
+                            var htmlEditor = new duice.ui.HtmlEditor(element);
+                            htmlEditor.setBind($context[bind[0]], bind[1]);
+                            htmlEditor.update();
+                            break;
+                        case 'MarkdownEditor':
+                            var markdownEditor = new duice.ui.MarkdownEditor(element);
+                            markdownEditor.setBind($context[bind[0]], bind[1]);
+                            markdownEditor.update();
+                            break;
+                    }
+                    element.dataset.duice += generateUUID();
+                }
+                catch (e) {
+                    console.error(e, elements[i]);
+                    throw e;
+                }
+            }
+        }
+        ui.initialize = initialize;
+        /**
          * Super prototype of duice.ui
          */
         var __ = (function () {
@@ -386,6 +418,24 @@ var duice;
                 var template = document.createElement('template');
                 template.innerHTML = string;
                 return template.content.firstChild;
+            };
+            __.prototype.escapeHtml = function (value) {
+                if (value) {
+                    var htmlMap = {
+                        '&': '&amp;',
+                        '<': '&lt;',
+                        '>': '&gt;',
+                        '"': '&quot;',
+                        "'": '&#039;'
+                    };
+                    return value.replace(/[&<>"']/g, function (m) { return htmlMap[m]; });
+                }
+                else {
+                    return value;
+                }
+            };
+            __.prototype.parseMarkdown = function (value) {
+                return null;
             };
             __.prototype.removeChildNodes = function (element) {
                 // Remove element nodes and prevent memory leaks
@@ -549,8 +599,8 @@ var duice;
             __extends(Text, _super);
             function Text(span) {
                 var _this = _super.call(this) || this;
-                _this.span = span;
-                _this.span.classList.add('duice-ui-text');
+                _this.div = span;
+                _this.div.classList.add('duice-ui-text');
                 return _this;
             }
             Text.prototype.setBind = function (map, name) {
@@ -558,10 +608,23 @@ var duice;
                 this.bindName = name;
                 this.bindMap.addObserver(this);
             };
+            Text.prototype.setMode = function (mode) {
+                this.mode = mode;
+            };
             Text.prototype.update = function () {
-                this.removeChildNodes(this.span);
+                this.removeChildNodes(this.div);
                 var value = this.bindMap.get(this.bindName);
-                this.span.appendChild(this.createDocumentFragment(value));
+                if (this.mode === 'html') {
+                    value = value;
+                }
+                else if (this.mode === 'markdown') {
+                    // TODO 
+                    // value = this.parseMarkdown(value);
+                }
+                else {
+                    value = this.escapeHtml(value);
+                }
+                this.div.appendChild(this.createDocumentFragment(value));
             };
             return Text;
         }(__));
@@ -593,6 +656,33 @@ var duice;
             return TextField;
         }(__));
         ui.TextField = TextField;
+        /**
+         * duice.ui.TextArea
+         */
+        var TextArea = (function (_super) {
+            __extends(TextArea, _super);
+            function TextArea(textarea) {
+                var _this = _super.call(this) || this;
+                _this.textarea = textarea;
+                _this.textarea.classList.add('duice-ui-textArea');
+                return _this;
+            }
+            TextArea.prototype.setBind = function (map, name) {
+                this.bindMap = map;
+                this.bindName = name;
+                this.bindMap.addObserver(this);
+                var $this = this;
+                this.textarea.addEventListener('change', function () {
+                    $this.bindMap.set($this.bindName, this.value);
+                });
+            };
+            TextArea.prototype.update = function () {
+                var value = this.bindMap.get(this.bindName);
+                this.textarea.value = value;
+            };
+            return TextArea;
+        }(__));
+        ui.TextArea = TextArea;
         /**
          * duice.ui.ComboBox
          */
@@ -670,32 +760,420 @@ var duice;
         }(__));
         ui.CheckBox = CheckBox;
         /**
-         * duice.ui.Grid
+         * duice.ui.Radio
          */
-        var Grid = (function (_super) {
-            __extends(Grid, _super);
-            function Grid(table) {
+        var Radio = (function (_super) {
+            __extends(Radio, _super);
+            function Radio(input) {
+                var _this = _super.call(this) || this;
+                _this.input = input;
+                _this.input.classList.add('duice-ui-radio');
+                return _this;
+            }
+            Radio.prototype.setBind = function (map, name) {
+                this.bindMap = map;
+                this.bindName = name;
+                this.bindMap.addObserver(this);
+                var $this = this;
+                this.input.addEventListener('change', function () {
+                    $this.bindMap.set($this.bindName, this.value);
+                });
+            };
+            Radio.prototype.update = function () {
+                var value = this.bindMap.get(this.bindName);
+                if (value === this.input.value) {
+                    this.input.checked = true;
+                }
+                else {
+                    this.input.checked = false;
+                }
+            };
+            return Radio;
+        }(__));
+        ui.Radio = Radio;
+        /**
+         * duice.ui.HtmlEditor
+         */
+        var HtmlEditor = (function (_super) {
+            __extends(HtmlEditor, _super);
+            function HtmlEditor(div) {
+                var _this = _super.call(this) || this;
+                _this.mode = 'html';
+                _this.div = div;
+                _this.div.classList.add('duice-ui-htmlEditor');
+                // create tool bar
+                _this.toolbar = document.createElement('div');
+                _this.toolbar.classList.add('duice-ui-htmlEditor-toolbar');
+                _this.div.appendChild(_this.toolbar);
+                // font family
+                var fontfamily = document.createElement('select');
+                fontfamily.classList.add('duice-ui-htmlEditor-toolbar-fontfamily');
+                var defaultFont = window.getComputedStyle(_this.div, null).getPropertyValue('font-family');
+                defaultFont = defaultFont.replace(/"/gi, '');
+                var fonts = defaultFont.split(',');
+                var additionalFonts = ['Arial', 'Arial Black', 'Times New Roman', 'Courier New', 'Impact'];
+                for (var i = 0; i < additionalFonts.length; i++) {
+                    var font = additionalFonts[i];
+                    if (fonts.indexOf(font) < 0) {
+                        fonts.push(font);
+                    }
+                }
+                for (var i = 0; i < fonts.length; i++) {
+                    var option = document.createElement('option');
+                    option.value = fonts[i];
+                    option.appendChild(document.createTextNode(fonts[i]));
+                    fontfamily.appendChild(option);
+                }
+                fontfamily.addEventListener('change', function () {
+                    document.execCommand('fontName', null, this.value);
+                });
+                _this.toolbar.appendChild(fontfamily);
+                // font size
+                var fontsize = document.createElement('select');
+                fontsize.classList.add('duice-ui-htmlEditor-toolbar-fontsize');
+                for (var i = 1; i <= 7; i++) {
+                    var option = document.createElement('option');
+                    option.value = String(i);
+                    if (i == 3) {
+                        option.selected = true; //  default font size
+                    }
+                    option.appendChild(document.createTextNode(String(i)));
+                    fontsize.appendChild(option);
+                }
+                fontsize.addEventListener('change', function () {
+                    document.execCommand('fontSize', null, this.value);
+                });
+                _this.toolbar.appendChild(fontsize);
+                // bold
+                var bold = document.createElement('button');
+                bold.title = 'Bold';
+                bold.classList.add('duice-ui-htmlEditor-toolbar-bold');
+                bold.addEventListener('click', function () {
+                    document.execCommand('bold', null, null);
+                });
+                _this.toolbar.appendChild(bold);
+                // italic
+                var italic = document.createElement('button');
+                italic.title = 'Italic';
+                italic.classList.add('duice-ui-htmlEditor-toolbar-italic');
+                italic.addEventListener('click', function () {
+                    document.execCommand('italic', null, null);
+                });
+                _this.toolbar.appendChild(italic);
+                // underline
+                var underline = document.createElement('button');
+                underline.title = 'Underline';
+                underline.classList.add('duice-ui-htmlEditor-toolbar-underline');
+                underline.addEventListener('click', function () {
+                    document.execCommand('underline', null, null);
+                });
+                _this.toolbar.appendChild(underline);
+                // align left
+                var alignleft = document.createElement('button');
+                alignleft.title = 'Align Left';
+                alignleft.classList.add('duice-ui-htmlEditor-toolbar-alignleft');
+                alignleft.addEventListener('click', function () {
+                    document.execCommand('justifyLeft', null, null);
+                });
+                _this.toolbar.appendChild(alignleft);
+                // align center
+                var aligncenter = document.createElement('button');
+                aligncenter.title = 'Align Center';
+                aligncenter.classList.add('duice-ui-htmlEditor-toolbar-aligncenter');
+                aligncenter.addEventListener('click', function () {
+                    document.execCommand('justifyCenter', null, null);
+                });
+                _this.toolbar.appendChild(aligncenter);
+                // align right
+                var alignright = document.createElement('button');
+                alignright.title = 'Align Right';
+                alignright.classList.add('duice-ui-htmlEditor-toolbar-alignright');
+                alignright.addEventListener('click', function () {
+                    document.execCommand('justifyRight', null, null);
+                });
+                _this.toolbar.appendChild(alignright);
+                // indent increase
+                var indentincrease = document.createElement('button');
+                indentincrease.title = 'Indent';
+                indentincrease.classList.add('duice-ui-htmlEditor-toolbar-indentincrease');
+                indentincrease.addEventListener('click', function () {
+                    document.execCommand('indent', null, null);
+                });
+                _this.toolbar.appendChild(indentincrease);
+                // indent decrease
+                var indentdecrease = document.createElement('button');
+                indentdecrease.title = 'Outdent';
+                indentdecrease.classList.add('duice-ui-htmlEditor-toolbar-indentdecrease');
+                indentdecrease.addEventListener('click', function () {
+                    document.execCommand('outdent', null, null);
+                });
+                _this.toolbar.appendChild(indentdecrease);
+                // list order
+                var listorder = document.createElement('button');
+                listorder.title = 'Orderd List';
+                listorder.classList.add('duice-ui-htmlEditor-toolbar-listorder');
+                listorder.addEventListener('click', function () {
+                    document.execCommand('insertorderedlist', null, null);
+                });
+                _this.toolbar.appendChild(listorder);
+                // list unorder
+                var listunorder = document.createElement('button');
+                listunorder.title = 'Unorderd List';
+                listunorder.classList.add('duice-ui-htmlEditor-toolbar-listunorder');
+                listunorder.addEventListener('click', function () {
+                    document.execCommand('insertUnorderedList', null, null);
+                });
+                _this.toolbar.appendChild(listunorder);
+                // mode
+                var mode = document.createElement('button');
+                mode.title = 'Change Mode';
+                mode.classList.add('duice-ui-htmlEditor-toolbar-mode');
+                var $this = _this;
+                mode.addEventListener('click', function () {
+                    $this.toggleMode();
+                });
+                _this.toolbar.appendChild(mode);
+                // create content
+                _this.content = document.createElement('div');
+                _this.content.classList.add('duice-ui-htmlEditor-content');
+                _this.contentHtml = document.createElement('pre');
+                _this.contentHtml.contentEditable = 'true';
+                _this.content.appendChild(_this.contentHtml);
+                _this.contentText = document.createElement('textarea');
+                _this.contentText.style.display = 'none';
+                _this.content.appendChild(_this.contentText);
+                _this.div.appendChild(_this.content);
+                return _this;
+            }
+            HtmlEditor.prototype.setBind = function (map, name) {
+                this.bindMap = map;
+                this.bindName = name;
+                this.bindMap.addObserver(this);
+                var $this = this;
+                this.contentHtml.addEventListener('DOMSubtreeModified', function () {
+                    console.log(this.innerHTML);
+                    if (map.get(name) !== this.innerHTML) {
+                        map.set(name, this.innerHTML);
+                    }
+                });
+                this.contentText.addEventListener('change', function () {
+                    console.log(this);
+                    map.set(name, this.value);
+                });
+            };
+            HtmlEditor.prototype.update = function () {
+                if (this.contentHtml.innerHTML !== this.bindMap.get(this.bindName)) {
+                    this.contentHtml.innerHTML = this.bindMap.get(this.bindName);
+                }
+                if (this.contentText.value !== this.bindMap.get(this.bindName)) {
+                    this.contentText.value = this.bindMap.get(this.bindName);
+                }
+            };
+            HtmlEditor.prototype.toggleMode = function () {
+                if (this.mode === 'html') {
+                    this.mode = 'text';
+                    this.contentHtml.style.display = 'none';
+                    this.contentText.style.display = 'block';
+                }
+                else {
+                    this.mode = 'html';
+                    this.contentText.style.display = 'none';
+                    this.contentHtml.style.display = 'block';
+                }
+            };
+            return HtmlEditor;
+        }(__));
+        ui.HtmlEditor = HtmlEditor;
+        var MarkdownEditor = (function (_super) {
+            __extends(MarkdownEditor, _super);
+            function MarkdownEditor(div) {
+                var _this = _super.call(this) || this;
+                _this.mode = 'markdown';
+                _this.div = div;
+                _this.div.classList.add('duice-ui-markdownEditor');
+                // create tool bar
+                _this.toolbar = document.createElement('div');
+                _this.toolbar.classList.add('duice-ui-markdownEditor-toolbar');
+                _this.div.appendChild(_this.toolbar);
+                // header
+                var header = document.createElement('button');
+                header.title = 'Header';
+                header.classList.add('duice-ui-markdownEditor-toolbar-header');
+                header.addEventListener('click', function () {
+                    //
+                });
+                _this.toolbar.appendChild(header);
+                // bold
+                var bold = document.createElement('button');
+                bold.title = 'Bold';
+                bold.classList.add('duice-ui-markdownEditor-toolbar-bold');
+                bold.addEventListener('click', function () {
+                    //
+                });
+                _this.toolbar.appendChild(bold);
+                // italic
+                var italic = document.createElement('button');
+                italic.title = 'Italic';
+                italic.classList.add('duice-ui-markdownEditor-toolbar-italic');
+                italic.addEventListener('click', function () {
+                    //
+                });
+                _this.toolbar.appendChild(italic);
+                // cancel
+                var cancel = document.createElement('button');
+                cancel.title = 'Cancel';
+                cancel.classList.add('duice-ui-markdownEditor-toolbar-cancel');
+                cancel.addEventListener('click', function () {
+                    //
+                });
+                _this.toolbar.appendChild(cancel);
+                // list order
+                var listorder = document.createElement('button');
+                listorder.title = 'Orderd List';
+                listorder.classList.add('duice-ui-markdownEditor-toolbar-listorder');
+                listorder.addEventListener('click', function () {
+                    //
+                });
+                _this.toolbar.appendChild(listorder);
+                // list unorder
+                var listunorder = document.createElement('button');
+                listunorder.title = 'Unorderd List';
+                listunorder.classList.add('duice-ui-markdownEditor-toolbar-listunorder');
+                listunorder.addEventListener('click', function () {
+                    //
+                });
+                _this.toolbar.appendChild(listunorder);
+                // line
+                var line = document.createElement('button');
+                line.title = 'Line';
+                line.classList.add('duice-ui-markdownEditor-toolbar-line');
+                line.addEventListener('click', function () {
+                    //
+                });
+                _this.toolbar.appendChild(line);
+                // code
+                var code = document.createElement('button');
+                code.title = 'Image';
+                code.classList.add('duice-ui-markdownEditor-toolbar-code');
+                code.addEventListener('click', function () {
+                    //
+                });
+                _this.toolbar.appendChild(code);
+                // image
+                var image = document.createElement('button');
+                image.title = 'Image';
+                image.classList.add('duice-ui-markdownEditor-toolbar-image');
+                image.addEventListener('click', function () {
+                    //
+                });
+                _this.toolbar.appendChild(image);
+                // link
+                var link = document.createElement('button');
+                link.title = 'Image';
+                link.classList.add('duice-ui-markdownEditor-toolbar-link');
+                link.addEventListener('click', function () {
+                    //
+                });
+                _this.toolbar.appendChild(link);
+                // mode
+                var mode = document.createElement('button');
+                mode.title = 'Change Mode';
+                mode.classList.add('duice-ui-markdownEditor-toolbar-mode');
+                mode.addEventListener('click', function () {
+                    //
+                });
+                _this.toolbar.appendChild(mode);
+                // create content
+                _this.content = document.createElement('div');
+                _this.content.classList.add('duice-ui-htmlEditor-content');
+                _this.contentHtml = document.createElement('pre');
+                _this.contentHtml.contentEditable = 'true';
+                _this.content.appendChild(_this.contentHtml);
+                _this.contentText = document.createElement('textarea');
+                _this.contentText.style.display = 'none';
+                _this.content.appendChild(_this.contentText);
+                _this.div.appendChild(_this.content);
+                return _this;
+            }
+            MarkdownEditor.prototype.setBind = function (map, name) {
+            };
+            MarkdownEditor.prototype.update = function () {
+            };
+            return MarkdownEditor;
+        }(__));
+        ui.MarkdownEditor = MarkdownEditor;
+        /**
+         * duice.ui.Calendar
+         */
+        var Calendar = (function (_super) {
+            __extends(Calendar, _super);
+            function Calendar(input) {
+                return _super.call(this) || this;
+            }
+            Calendar.prototype.setBind = function (list) {
+            };
+            Calendar.prototype.update = function () {
+            };
+            return Calendar;
+        }(__));
+        ui.Calendar = Calendar;
+        /**
+         * duice.ui.CronExpression
+         */
+        var CronExpression = (function (_super) {
+            __extends(CronExpression, _super);
+            function CronExpression(input) {
+                return _super.call(this) || this;
+            }
+            CronExpression.prototype.setBind = function (list) {
+            };
+            CronExpression.prototype.update = function () {
+            };
+            return CronExpression;
+        }(__));
+        ui.CronExpression = CronExpression;
+        /**
+         * duice.ui.ListViewer
+         */
+        var ListViewer = (function (_super) {
+            __extends(ListViewer, _super);
+            function ListViewer() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            ListViewer.prototype.setBind = function (list) {
+            };
+            ListViewer.prototype.update = function () {
+            };
+            return ListViewer;
+        }(__));
+        ui.ListViewer = ListViewer;
+        /**
+         * duice.ui.TableViewer
+         */
+        var TableViewer = (function (_super) {
+            __extends(TableViewer, _super);
+            function TableViewer(table) {
                 var _this = _super.call(this) || this;
                 _this.rows = new Array();
                 _this.table = table;
-                _this.table.classList.add('duice-ui-grid');
+                _this.table.classList.add('duice-ui-tableViewer');
                 _this.thead = _this.table.querySelector('thead');
                 var tbody = _this.table.querySelector('tbody');
                 _this.tbody = tbody.cloneNode(true);
                 _this.table.removeChild(tbody);
                 return _this;
             }
-            Grid.prototype.setBind = function (list) {
+            TableViewer.prototype.setBind = function (list) {
                 this.bindList = list;
                 this.bindList.addObserver(this);
             };
-            Grid.prototype.setItem = function (item) {
+            TableViewer.prototype.setItem = function (item) {
                 this.item = item;
             };
-            Grid.prototype.setEditable = function (editable) {
+            TableViewer.prototype.setEditable = function (editable) {
                 this.editable = editable;
             };
-            Grid.prototype.update = function () {
+            TableViewer.prototype.update = function () {
                 var $this = this;
                 // remove previous rows
                 for (var i = 0; i < this.rows.length; i++) {
@@ -709,24 +1187,30 @@ var duice;
                     this.table.appendChild(row);
                     this.rows.push(row);
                 }
+                // not found row
+                if (this.bindList.getRowCount() < 1) {
+                    var emptyRow = this.createEmptyRow();
+                    this.table.appendChild(emptyRow);
+                    this.rows.push(emptyRow);
+                }
             };
-            Grid.prototype.createRow = function (index, bindMap) {
+            TableViewer.prototype.createRow = function (index, bindMap) {
                 var $this = this;
                 var row = this.tbody.cloneNode(true);
                 var $context = new Object;
                 $context['index'] = index;
                 $context[this.item] = bindMap;
                 row = this.executeExpression(row, $context);
-                duice.initialize(row, $context);
+                initialize(row, $context);
                 // select index
                 if (index == this.bindList.index) {
-                    row.classList.add('duice-ui-grid-index');
+                    row.classList.add('duice-ui-tableViewer-index');
                 }
                 row.addEventListener('mouseup', function (event) {
                     for (var i = 0; i < $this.rows.length; i++) {
-                        $this.rows[i].classList.remove('duice-ui-grid-index');
+                        $this.rows[i].classList.remove('duice-ui-tableViewer-index');
                     }
-                    row.classList.add('duice-ui-grid-index');
+                    row.classList.add('duice-ui-tableViewer-index');
                     $this.bindList.index = index;
                 });
                 // drag and drop event
@@ -755,9 +1239,39 @@ var duice;
                 // return
                 return row;
             };
-            return Grid;
+            TableViewer.prototype.createEmptyRow = function () {
+                var emptyRow = this.tbody.cloneNode(true);
+                this.removeChildNodes(emptyRow);
+                emptyRow.classList.add('duice-ui-tableViewer-empty');
+                var tr = document.createElement('tr');
+                var td = document.createElement('td');
+                var colspan = this.tbody.querySelectorAll('tr > td').length;
+                td.setAttribute('colspan', String(colspan));
+                var emptyMessage = document.createElement('div');
+                emptyMessage.classList.add('duice-ui-tableViewer-empty-message');
+                td.appendChild(emptyMessage);
+                tr.appendChild(td);
+                emptyRow.appendChild(tr);
+                return emptyRow;
+            };
+            return TableViewer;
         }(__));
-        ui.Grid = Grid;
+        ui.TableViewer = TableViewer;
+        /**
+         * duice.ui.TreeViewer
+         */
+        var TreeViewer = (function (_super) {
+            __extends(TreeViewer, _super);
+            function TreeViewer() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            TreeViewer.prototype.setBind = function (list) {
+            };
+            TreeViewer.prototype.update = function () {
+            };
+            return TreeViewer;
+        }(__));
+        ui.TreeViewer = TreeViewer;
     })(ui = duice.ui || (duice.ui = {}));
 })(duice || (duice = {}));
 //DOMContentLoaded event process
@@ -765,5 +1279,5 @@ document.addEventListener("DOMContentLoaded", function (event) {
     var $context = typeof self !== 'undefined' ? self :
         typeof window !== 'undefined' ? window :
             {};
-    duice.initialize(document, $context);
+    duice.ui.initialize(document, $context);
 });

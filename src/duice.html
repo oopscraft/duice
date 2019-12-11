@@ -7,23 +7,24 @@
 <link rel="stylesheet" type="text/css" href="duice.css">
 <script>
 var users = new duice.data.List([
-	{id:"dog", name:"Dog", groupId:'animal', isAlive:'Y'},
-	{id:"apple", name:"Apple", groupId:'fruit', isAlive:'N'},
-	{id:"cat", name:"Cat", groupId:'animal', isAlive:'Y'},
-	{id:"orange", name:"Orange", groupId:'fruit', isAlive:'N'},
-	{id:"dog1", name:"Dog1", groupId:'animal', isAlive:'Y'},
-	{id:"apple1", name:"Apple1", groupId:'fruit', isAlive:'N'},
-	{id:"cat1", name:"Cat1", groupId:'animal', isAlive:'Y'},
-	{id:"orange1", name:"Orange1", groupId:'fruit', isAlive:'N'},
-	{id:"dog2", name:"Dog2", groupId:'animal', isAlive:'Y'},
-	{id:"apple2", name:"Apple2", groupId:'fruit', isAlive:'N'},
-	{id:"cat2", name:"Cat2", groupId:'animal', isAlive:'Y'},
-	{id:"orange2", name:"Orange2", groupId:'fruit', isAlive:'N'}
+	{id:"dog", name:"Dog", groupId:'animal', isAlive:'Y', gender:'F', birthday:'2001-01-01', comment:'I am Dog'},
+	{id:"apple", name:"Apple", groupId:'fruit', isAlive:'N', gender:'', birthday:'2001-01-01', comment:'I am Apple'},
+	{id:"cat", name:"Cat", groupId:'animal', isAlive:'Y', gender:'M', birthday:'2001-01-01', comment:'I am Cat'},
+	{id:"orange", name:"Orange", groupId:'fruit', isAlive:'N', gender:'', birthday:'2001-01-01', comment:'I am Orange'},
+	{id:"dog1", name:"Dog1", groupId:'animal', isAlive:'Y', gender:'F', birthday:'2001-01-01', comment:'I am Dog1'},
+	{id:"apple1", name:"Apple1", groupId:'fruit', isAlive:'N', gender:'', birthday:'2001-01-01', comment:'I am Apple1'},
+	{id:"cat1", name:"Cat1", groupId:'animal', isAlive:'Y', gender:'M', birthday:'2001-01-01', comment:'I am Cat1'},
+	{id:"orange1", name:"Orange1", groupId:'fruit', isAlive:'N', gender:'', birthday:'2001-01-01', comment:'I am Orange1'},
+	{id:"dog2", name:"Dog2", groupId:'animal', isAlive:'Y', gender:'M', birthday:'2001-01-01', comment:'I am Dog2'},
+	{id:"apple2", name:"Apple2", groupId:'fruit', isAlive:'N', gender:'', birthday:'2001-01-01', comment:'I am Apple2'},
+	{id:"cat2", name:"Cat2", groupId:'animal', isAlive:'Y', gender:'F', birthday:'2001-01-01', comment:'I am Cat2'},
+	{id:"orange2", name:"Orange2", groupId:'fruit', isAlive:'N', gender:'', birthday:'2001-01-01', comment:'I am Orange2'}
 ]);
 var user = new duice.data.Map({});
 var groups = new duice.data.List([
 	{id:"animal", name:"Animal"},
-	{id:"fruit", name:"Fruit"}
+	{id:"fruit", name:"Fruit"},
+	{id:"human", name:"Human"}
 ]);
 function getUser(id){
 	var item = users.findRow(function(item){
@@ -37,49 +38,106 @@ function getUser(id){
 </script>
 </head>
 <body>
-<button type="button" onclick="alert(JSON.stringify(users.toJson()));">users</button>
-<button type="button" onclick="alert(JSON.stringify(groups.toJson()));">groups</button>
-<div>
-	<table data-duice="Grid" data-duice-bind="users" data-duice-item="user" data-duice-editable="true">
-		<thead>
+
+<section>
+	<h1>data.ui.TableView Example</h1>
+	<div>
+		<table data-duice="TableView" data-duice-bind="users" data-duice-item="user" data-duice-editable="true">
+			<thead>
+				<tr>
+					<th>No</th>
+					<th>ID</th>
+					<th>Name</th>
+					<th>Group</th>
+					<th>Alive</th>
+					<th>Gender</th>
+				</tr>
+			</thead>
+			<tbody data-id="[[$context.user.get('id')]]" onclick="getUser(this.dataset.id);">
+				<tr>
+					<td>[[$context.index+1]]</td>
+					<td><div data-duice="Text" data-duice-bind="user,name"></div></td>
+					<td><input type="text" data-duice="TextField" data-duice-bind="user,name"/></td>
+					<td><select data-duice="ComboBox" data-duice-bind="user,groupId" data-duice-option="groups,id,name"></select></td>
+					<td><input type="checkbox" data-duice="CheckBox" data-duice-bind="user,isAlive" data-duice-option="Y,N"/></td>
+					<td>
+						<input type="radio" data-duice="Radio" data-duice-bind="user,gender" value="F"/>Female |
+						<input type="radio" data-duice="Radio" data-duice-bind="user,gender" value="M"/>Male |
+						<input type="radio" data-duice="Radio" data-duice-bind="user,gender" value=""/>None
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div>
+		<table border="1" style="border-collapse: collapse; border:solid 1px #efefef; width:800px;">
 			<tr>
-				<th>No</th>
 				<th>ID</th>
-				<th>Name</th>
-				<th>Group</th>
-				<th>Alive</th>
+				<td>Text is <div data-duice="Text" data-duice-bind="user,name"></div> ... ?!</td>
 			</tr>
-		</thead>
-		<tbody data-id="[[$context.user.get('id')]]" onclick="getUser(this.dataset.id);">
 			<tr>
-				<td>[[$context.index+1]]</td>
-				<td><span data-duice="Text" data-duice-bind="user,name"></span></td>
+				<th>Name</th>
 				<td><input type="text" data-duice="TextField" data-duice-bind="user,name"/></td>
+			</tr>
+			<tr>
+				<th>Group</th>
 				<td><select data-duice="ComboBox" data-duice-bind="user,groupId" data-duice-option="groups,id,name"></select></td>
+			</tr>
+			<tr>
+				<th>isAlive</th>
 				<td><input type="checkbox" data-duice="CheckBox" data-duice-bind="user,isAlive" data-duice-option="Y,N"/></td>
 			</tr>
-		</tbody>
-	</table>
-</div>
-<div style="border:solid 2px #efefef;">
-	<table>
-		<tr>
-			<th>ID</th>
-			<td><span data-duice="Text" data-duice-bind="user,name"></span></td>
-		</tr>
-		<tr>
-			<th>Name</th>
-			<td><input type="text" data-duice="TextField" data-duice-bind="user,name"/></td>
-		</tr>
-		<tr>
-			<th>Group</th>
-			<td><select data-duice="ComboBox" data-duice-bind="user,groupId" data-duice-option="groups,id,name"></select></td>
-		</tr>
-		<tr>
-			<th>isAlive</th>
-			<td><input type="checkbox" data-duice="CheckBox" data-duice-bind="user,isAlive" data-duice-option="Y,N"/></td>
-		</tr>
-	</table>
-</div>
+			<tr>
+				<th>Gender</th>
+				<td>
+					<input type="radio" data-duice="Radio" data-duice-bind="user,gender" value="F"/>Female |
+					<input type="radio" data-duice="Radio" data-duice-bind="user,gender" value="M"/>Male |
+					<input type="radio" data-duice="Radio" data-duice-bind="user,gender" value=""/>None
+				<td>
+			</tr>
+			<tr>
+				<th>Birth Date</th>
+				<td><input type="text" data-duice="TextField" data-duice-bind="user,birthday"/></td>
+			</tr>
+			<tr>
+				<th>Comment(Text - default mode)</th>
+				<td>
+					<div data-duice="Text" data-duice-bind="user,comment"></div>
+				</td>
+			</tr>
+			<tr>
+				<th>Comment(Text - html mode)</th>
+				<td>
+					<div data-duice="Text" data-duice-bind="user,comment" data-duice-mode="html"></div>
+				</td>
+			</tr>
+			<tr>
+				<th>Comment(Text - markdown mode)</th>
+				<td>
+					<div data-duice="Text" data-duice-bind="user,comment" data-duice-mode="markdown"></div>
+				</td>
+			</tr>
+			<tr>
+				<th>Comment(TextArea)</th>
+				<td><textarea data-duice="TextArea" data-duice-bind="user,comment"></textarea></td>
+			</tr>
+			<tr>
+				<th>Comment(TextEditor)</th>
+				<td><div data-duice="HtmlEditor" data-duice-bind="user,comment"></div></td>
+			</tr>
+			<tr>
+				<th>Comment(MarkdownEditor)</th>
+				<td><div data-duice="MarkdownEditor" data-duice-bind="user,comment"></div></td>
+			</tr>
+		</table>
+	</div>
+	<div>
+		<button type="button" onclick="alert(JSON.stringify(users.toJson()));">users</button>
+		<button type="button" onclick="alert(JSON.stringify(user.toJson()));">user</button>
+		<button type="button" onclick="alert(JSON.stringify(groups.toJson()));">groups</button>
+	</div>
+</section>
+
+
 </body>
 </html>

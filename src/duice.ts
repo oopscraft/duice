@@ -1,112 +1,37 @@
 namespace duice {
     
     /**
-     * duice.initialize
-     * @param container
-     * @param $context
+     * duice.generateUUID
      */
-    export function initialize(container:any, $context:any):void {
-        
-        // generateUUID
-        function generateUUID():string {
-            var dt = new Date().getTime();
-            var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = (dt + Math.random()*16)%16 | 0;
-                dt = Math.floor(dt/16);
-                return (c=='x' ? r :(r&0x3|0x8)).toString(16);
-            });
-            return uuid;
-        }
-        
-        // getObject
-        function getObject($context:any, name:string) {
-            if($context.hasOwnProperty(name)){
-                return $context[name];
-            }
-            if((<any>window).hasOwnProperty(name)){
-                return (<any>window)[name];
-            }
-            try {
-                return eval(name);
-            }catch(e){
-                console.error(e,$context, name);
-                throw e;
-            }
-        };
-        
-        // creates Grid
-        var gridElements = container.querySelectorAll('table[data-duice="Grid"]');
-        for(var i = 0; i < gridElements.length; i++ ) {
-            try {
-                var gridElement = gridElements[i];
-                var grid = new duice.ui.Grid(gridElement);
-                var bind = gridElement.dataset.duiceBind;
-                grid.setBind(getObject($context,bind));
-                var item = gridElement.dataset.duiceItem;
-                grid.setItem(item);
-                grid.setEditable((gridElement.dataset.duiceEditable === 'true'));
-                grid.update();
-                gridElement.dataset.duice += generateUUID();
-                console.log(grid);
-            }catch(e){
-                console.error(e,gridElement);
-                throw e;
-            }
-        }
-        
-        // creates unit elements
-        var elementTags = [
-             'span[data-duice="Text"]'
-            ,'input[data-duice="TextField"]'
-            ,'select[data-duice="ComboBox"]'
-            ,'input[data-duice="CheckBox"]'
-            ,'input[data-duice="Radio"]'
-            ,'div[data-duice="TextView"]'
-            ,'textarea[data-duice="TextArea"]'
-            ,'div[data-duice="HtmlEditor"]'
-            ,'input[data-duice="CronExpression"]'
-            ,'img[data-duice="Image"]'
-        ];
-        var elements = container.querySelectorAll(elementTags.join(','));
-        for(var i = 0; i < elements.length; i ++ ) {
-            try {
-                var element:any = elements[i];
-                var type:string = element.dataset.duice;
-                var bind:any = element.dataset.duiceBind.split(',');
-                switch(type) {
-                    case 'Text':
-                        var text:duice.ui.Text = new duice.ui.Text(element);
-                        var format = element.dataset.duiceFormat;
-                        text.setBind(getObject($context,bind[0]), bind[1]);
-                        text.update();
-                    break;
-                    case 'TextField':
-                        var textField = new duice.ui.TextField(element);
-                        textField.setBind(getObject($context,bind[0]), bind[1]);
-                        textField.update();
-                    break;
-                    case 'ComboBox':
-                        var comboBox = new duice.ui.ComboBox(element);
-                        comboBox.setBind(getObject($context,bind[0]), bind[1]);
-                        var option:Array<any> = element.dataset.duiceOption.split(',');
-                        comboBox.setOption(getObject($context,option[0]), option[1], option[2]);
-                        comboBox.update();
-                    break;
-                    case 'CheckBox':
-                        var checkBox = new duice.ui.CheckBox(element);
-                        checkBox.setBind($context[bind[0]], bind[1]);
-                        var option:Array<any> = element.dataset.duiceOption.split(',');
-                        checkBox.setOption(option[0], option[1]);
-                        checkBox.update();
-                    break;
-                }
-                element.dataset.duice += generateUUID();
-            }catch(e){
-                console.error(e, elements[i]);
-                throw e;
-            }
-        }
+    export function generateUUID():string {
+        var dt = new Date().getTime();
+        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = (dt + Math.random()*16)%16 | 0;
+            dt = Math.floor(dt/16);
+            return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+        });
+        return uuid;
     }
+    
+    /**
+     * duice.getObject
+     * @param $context
+     * @param name
+     */
+    export function getObject($context:any, name:string) {
+        if($context.hasOwnProperty(name)){
+            return $context[name];
+        }
+        if((<any>window).hasOwnProperty(name)){
+            return (<any>window)[name];
+        }
+        try {
+            return eval(name);
+        }catch(e){
+            console.error(e,$context, name);
+            throw e;
+        }
+    };
     
     /**
      * duice.data
@@ -338,6 +263,110 @@ namespace duice {
     export namespace ui {
         
         /**
+         * duice.initialize
+         * @param container
+         * @param $context
+         */
+        export function initialize(container:any, $context:any):void {
+            
+            // creates TableViewer
+            var tableViewerElements = container.querySelectorAll('table[data-duice="TableView"]');
+            for(var i = 0; i < tableViewerElements.length; i++ ) {
+                try {
+                    var tableViewerElement = tableViewerElements[i];
+                    var tableViewer = new duice.ui.TableViewer(tableViewerElement);
+                    var bind = tableViewerElement.dataset.duiceBind;
+                    tableViewer.setBind(getObject($context,bind));
+                    var item = tableViewerElement.dataset.duiceItem;
+                    tableViewer.setItem(item);
+                    tableViewer.setEditable((tableViewerElement.dataset.duiceEditable === 'true'));
+                    tableViewer.update();
+                    tableViewerElement.dataset.duice += generateUUID();
+                    console.log(tableViewer);
+                }catch(e){
+                    console.error(e,tableViewerElement);
+                    throw e;
+                }
+            }
+            
+            // creates unit elements
+            var elementTags = [
+                 'div[data-duice="Text"]'
+                ,'input[data-duice="TextField"]'
+                ,'textarea[data-duice="TextArea"]'
+                ,'select[data-duice="ComboBox"]'
+                ,'input[data-duice="CheckBox"]'
+                ,'input[data-duice="Radio"]'
+                ,'div[data-duice="HtmlEditor"]'
+                ,'div[data-duice="MarkdownEditor"]'
+    // --
+                ,'img[data-duice="Image"]'
+                ,'input[data-duice="CronExpression"]'
+            ];
+            var elements = container.querySelectorAll(elementTags.join(','));
+            for(var i = 0; i < elements.length; i ++ ) {
+                try {
+                    var element:any = elements[i];
+                    var type:string = element.dataset.duice;
+                    var bind:any = element.dataset.duiceBind.split(',');
+                    switch(type) {
+                        case 'Text':
+                            var text:duice.ui.Text = new duice.ui.Text(element);
+                            var format = element.dataset.duiceFormat;
+                            text.setBind(getObject($context,bind[0]), bind[1]);
+                            text.setMode(element.dataset.duiceMode);
+                            text.update();
+                        break;
+                        case 'TextField':
+                            var textField = new duice.ui.TextField(element);
+                            textField.setBind(getObject($context,bind[0]), bind[1]);
+                            textField.update();
+                        break;
+                        case 'TextArea':
+                            console.log("fdsafdsafdsa");
+                            var textArea = new duice.ui.TextArea(element);
+                            textArea.setBind(getObject($context,bind[0]), bind[1]);
+                            textArea.update();
+                        break;
+                        case 'ComboBox':
+                            var comboBox = new duice.ui.ComboBox(element);
+                            comboBox.setBind(getObject($context,bind[0]), bind[1]);
+                            var option:Array<any> = element.dataset.duiceOption.split(',');
+                            comboBox.setOption(getObject($context,option[0]), option[1], option[2]);
+                            comboBox.update();
+                        break;
+                        case 'CheckBox':
+                            var checkBox = new duice.ui.CheckBox(element);
+                            checkBox.setBind($context[bind[0]], bind[1]);
+                            var option:Array<any> = element.dataset.duiceOption.split(',');
+                            checkBox.setOption(option[0], option[1]);
+                            checkBox.update();
+                        break;
+                        case 'Radio':
+                            var radio = new duice.ui.Radio(element);
+                            radio.setBind($context[bind[0]], bind[1]);
+                            radio.update();
+                        break;
+                        case 'HtmlEditor':
+                            var htmlEditor = new duice.ui.HtmlEditor(element);
+                            htmlEditor.setBind($context[bind[0]], bind[1]);
+                            htmlEditor.update();
+                        break;
+                        case 'MarkdownEditor':
+                            var markdownEditor = new duice.ui.MarkdownEditor(element);
+                            markdownEditor.setBind($context[bind[0]], bind[1]);
+                            markdownEditor.update();
+                        break;
+                    }
+                    element.dataset.duice += generateUUID();
+                }catch(e){
+                    console.error(e, elements[i]);
+                    throw e;
+                }
+            }
+        }
+        
+        /**
          * Super prototype of duice.ui
          */
         export abstract class __ {
@@ -360,6 +389,23 @@ namespace duice {
                 var template = document.createElement('template');
                 template.innerHTML = string;
                 return template.content.firstChild;
+            }
+            escapeHtml(value:string):string {
+                if(value){
+                    var htmlMap:any = {
+                        '&': '&amp;',
+                        '<': '&lt;',
+                        '>': '&gt;',
+                        '"': '&quot;',
+                        "'": '&#039;'
+                    };
+                    return value.replace(/[&<>"']/g, function(m:string) {return htmlMap[m];});
+                }else{
+                    return value;
+                }
+            }
+            parseMarkdown(value:string):string {
+                return null;
             }
             removeChildNodes(element:HTMLElement):void {
                 // Remove element nodes and prevent memory leaks
@@ -530,23 +576,35 @@ namespace duice {
          * duice.ui.Text
          */
         export class Text extends __ {
-            span:HTMLSpanElement;
+            div:HTMLDivElement;
             bindMap:duice.data.Map;
             bindName:string;
-            constructor(span:HTMLSpanElement){
+            mode:string;
+            constructor(span:HTMLDivElement){
                 super();
-                this.span = span;
-                this.span.classList.add('duice-ui-text');
+                this.div = span;
+                this.div.classList.add('duice-ui-text');
             }
             setBind(map:duice.data.Map, name:string):void {
                 this.bindMap = map;
                 this.bindName = name;
                 this.bindMap.addObserver(this);
             }
+            setMode(mode:string):void {
+                this.mode = mode;
+            }
             update(): void {
-                this.removeChildNodes(this.span);
+                this.removeChildNodes(this.div);
                 var value = this.bindMap.get(this.bindName);
-                this.span.appendChild(this.createDocumentFragment(value));
+                if(this.mode === 'html') {
+                    value = value;
+                }else if(this.mode === 'markdown'){
+                    // TODO 
+                    // value = this.parseMarkdown(value);
+                }else{
+                    value = this.escapeHtml(value);
+                }
+                this.div.appendChild(this.createDocumentFragment(value));
             }
         }
         
@@ -574,6 +632,33 @@ namespace duice {
             update():void {
                 var value = this.bindMap.get(this.bindName);
                 this.input.value = value;
+            }
+        }
+        
+        /**
+         * duice.ui.TextArea
+         */
+        export class TextArea extends __ {
+            textarea:HTMLTextAreaElement;
+            bindMap:duice.data.Map;
+            bindName:string;
+            constructor(textarea:HTMLTextAreaElement){
+                super();
+                this.textarea = textarea;
+                this.textarea.classList.add('duice-ui-textArea');
+            }
+            setBind(map:duice.data.Map, name:string):void {
+                this.bindMap = map;
+                this.bindName = name;
+                this.bindMap.addObserver(this);
+                var $this = this;
+                this.textarea.addEventListener('change', function(){
+                   $this.bindMap.set($this.bindName, this.value); 
+                });
+            }
+            update():void {
+                var value = this.bindMap.get(this.bindName);
+                this.textarea.value = value;
             }
         }
         
@@ -657,10 +742,427 @@ namespace duice {
             }
         }
         
-       /**
-        * duice.ui.Grid
-        */
-        export class Grid extends __ {
+        /**
+         * duice.ui.Radio
+         */
+        export class Radio extends __ {
+            input:HTMLInputElement;
+            bindMap:duice.data.Map;
+            bindName:string;
+            constructor(input:HTMLInputElement){
+                super();
+                this.input = input;
+                this.input.classList.add('duice-ui-radio');
+            }
+            setBind(map:duice.data.Map, name:string):void {
+                this.bindMap = map;
+                this.bindName = name;
+                this.bindMap.addObserver(this);
+                var $this = this;
+                this.input.addEventListener('change', function(){
+                    $this.bindMap.set($this.bindName, this.value);
+                });
+            }
+            update():void {
+                var value = this.bindMap.get(this.bindName);
+                if(value === this.input.value){
+                    this.input.checked = true;
+                }else{
+                    this.input.checked = false;
+                }
+            }
+        }
+        
+        /**
+         * duice.ui.HtmlEditor
+         */
+        export class HtmlEditor extends __ {
+            div:HTMLDivElement;
+            bindMap:duice.data.Map;
+            bindName:string;
+            toolbar:HTMLDivElement;
+            content:HTMLDivElement;
+            contentHtml:HTMLPreElement;
+            contentText:HTMLTextAreaElement;
+            mode:string = 'html';
+            constructor(div:HTMLDivElement) {
+                super();
+                this.div = div;
+                this.div.classList.add('duice-ui-htmlEditor');
+                
+                // create tool bar
+                this.toolbar = document.createElement('div');
+                this.toolbar.classList.add('duice-ui-htmlEditor-toolbar');
+                this.div.appendChild(this.toolbar);
+
+                // font family
+                var fontfamily = document.createElement('select');
+                fontfamily.classList.add('duice-ui-htmlEditor-toolbar-fontfamily');
+                var defaultFont = window.getComputedStyle(this.div,null).getPropertyValue('font-family');
+                defaultFont = defaultFont.replace(/"/gi, '');
+                var fonts = defaultFont.split(',');
+                var additionalFonts = ['Arial','Arial Black','Times New Roman','Courier New','Impact'];
+                for(var i = 0; i < additionalFonts.length; i ++ ) {
+                    var font = additionalFonts[i];
+                    if(fonts.indexOf(font) < 0) {
+                        fonts.push(font);
+                    }
+                }
+                for(var i = 0; i < fonts.length; i++){
+                    var option = document.createElement('option');
+                    option.value = fonts[i];
+                    option.appendChild(document.createTextNode(fonts[i]));
+                    fontfamily.appendChild(option);
+                }
+                fontfamily.addEventListener('change',function(){
+                    document.execCommand('fontName', null, this.value);
+                });
+                this.toolbar.appendChild(fontfamily);
+                
+                // font size
+                var fontsize = document.createElement('select');
+                fontsize.classList.add('duice-ui-htmlEditor-toolbar-fontsize');
+                for(var i = 1; i <= 7; i++){
+                    var option = document.createElement('option');
+                    option.value = String(i);
+                    if(i == 3){
+                        option.selected = true;     //  default font size
+                    }
+                    option.appendChild(document.createTextNode(String(i)));
+                    fontsize.appendChild(option);
+                }
+                fontsize.addEventListener('change',function(){
+                    document.execCommand('fontSize', null, this.value);
+                });
+                this.toolbar.appendChild(fontsize);
+
+                // bold
+                var bold = document.createElement('button');
+                bold.title = 'Bold';
+                bold.classList.add('duice-ui-htmlEditor-toolbar-bold');
+                bold.addEventListener('click', function(){
+                    document.execCommand('bold', null, null);
+                });
+                this.toolbar.appendChild(bold);
+                
+                // italic
+                var italic = document.createElement('button');
+                italic.title = 'Italic';
+                italic.classList.add('duice-ui-htmlEditor-toolbar-italic');
+                italic.addEventListener('click',function(){
+                    document.execCommand('italic',null,null);
+                });
+                this.toolbar.appendChild(italic);
+                
+                // underline
+                var underline = document.createElement('button');
+                underline.title = 'Underline';
+                underline.classList.add('duice-ui-htmlEditor-toolbar-underline');
+                underline.addEventListener('click',function() {
+                    document.execCommand('underline',null,null);
+                });
+                this.toolbar.appendChild(underline);
+
+                // align left
+                var alignleft = document.createElement('button');
+                alignleft.title = 'Align Left';
+                alignleft.classList.add('duice-ui-htmlEditor-toolbar-alignleft');
+                alignleft.addEventListener('click',function() {
+                    document.execCommand('justifyLeft',null,null);
+                });
+                this.toolbar.appendChild(alignleft);
+                
+                // align center
+                var aligncenter = document.createElement('button');
+                aligncenter.title = 'Align Center';
+                aligncenter.classList.add('duice-ui-htmlEditor-toolbar-aligncenter');
+                aligncenter.addEventListener('click',function() {
+                    document.execCommand('justifyCenter',null,null);
+                });
+                this.toolbar.appendChild(aligncenter);
+                
+                // align right
+                var alignright = document.createElement('button');
+                alignright.title = 'Align Right';
+                alignright.classList.add('duice-ui-htmlEditor-toolbar-alignright');
+                alignright.addEventListener('click',function() {
+                    document.execCommand('justifyRight',null,null);
+                });
+                this.toolbar.appendChild(alignright);
+                
+                // indent increase
+                var indentincrease = document.createElement('button');
+                indentincrease.title = 'Indent';
+                indentincrease.classList.add('duice-ui-htmlEditor-toolbar-indentincrease');
+                indentincrease.addEventListener('click',function() {
+                    document.execCommand('indent',null,null);
+                });
+                this.toolbar.appendChild(indentincrease);
+                
+                // indent decrease
+                var indentdecrease = document.createElement('button');
+                indentdecrease.title = 'Outdent';
+                indentdecrease.classList.add('duice-ui-htmlEditor-toolbar-indentdecrease');
+                indentdecrease.addEventListener('click',function() {
+                    document.execCommand('outdent',null,null);
+                });
+                this.toolbar.appendChild(indentdecrease);
+                
+                // list order
+                var listorder = document.createElement('button');
+                listorder.title = 'Orderd List';
+                listorder.classList.add('duice-ui-htmlEditor-toolbar-listorder');
+                listorder.addEventListener('click',function() {
+                    document.execCommand('insertorderedlist',null,null);
+                });
+                this.toolbar.appendChild(listorder);
+                
+                // list unorder
+                var listunorder = document.createElement('button');
+                listunorder.title = 'Unorderd List';
+                listunorder.classList.add('duice-ui-htmlEditor-toolbar-listunorder');
+                listunorder.addEventListener('click',function() {
+                    document.execCommand('insertUnorderedList',null,null);
+                });
+                this.toolbar.appendChild(listunorder);
+                
+                // mode
+                var mode = document.createElement('button');
+                mode.title = 'Change Mode';
+                mode.classList.add('duice-ui-htmlEditor-toolbar-mode');
+                var $this = this;
+                mode.addEventListener('click', function() {
+                    $this.toggleMode();
+                });
+                this.toolbar.appendChild(mode);
+                
+                // create content
+                this.content = document.createElement('div');
+                this.content.classList.add('duice-ui-htmlEditor-content');
+                this.contentHtml = document.createElement('pre');
+                this.contentHtml.contentEditable = 'true';
+                this.content.appendChild(this.contentHtml);
+                this.contentText = document.createElement('textarea');
+                this.contentText.style.display = 'none';
+                this.content.appendChild(this.contentText);
+                this.div.appendChild(this.content);
+            }
+            setBind(map:duice.data.Map, name:string):void {
+                this.bindMap = map;
+                this.bindName = name;
+                this.bindMap.addObserver(this);
+                var $this = this;
+                this.contentHtml.addEventListener('DOMSubtreeModified', function(){
+                    console.log(this.innerHTML);
+                    if(map.get(name) !== this.innerHTML){
+                        map.set(name, this.innerHTML);
+                    }
+                });
+                this.contentText.addEventListener('change', function(){
+                    console.log(this);
+                    map.set(name, this.value);
+                });
+            }
+            update():void {
+                if(this.contentHtml.innerHTML !== this.bindMap.get(this.bindName)) {
+                    this.contentHtml.innerHTML = this.bindMap.get(this.bindName);
+                }
+                if(this.contentText.value !== this.bindMap.get(this.bindName)){
+                    this.contentText.value = this.bindMap.get(this.bindName);
+                }
+            }
+            toggleMode():void {
+                if(this.mode === 'html' ){
+                    this.mode = 'text';
+                    this.contentHtml.style.display = 'none';
+                    this.contentText.style.display = 'block';
+                }else{
+                    this.mode = 'html';
+                    this.contentText.style.display = 'none';
+                    this.contentHtml.style.display = 'block';
+                }
+            }
+        }
+        
+        export class MarkdownEditor extends __ {
+            div:HTMLDivElement;
+            bindMap:duice.data.Map;
+            bindName:string;
+            toolbar:HTMLDivElement;
+            content:HTMLDivElement;
+            contentHtml:HTMLPreElement;
+            contentText:HTMLTextAreaElement;
+            mode:string = 'markdown';
+            constructor(div:HTMLDivElement){
+                super();
+                this.div = div;
+                this.div.classList.add('duice-ui-markdownEditor');
+                
+                // create tool bar
+                this.toolbar = document.createElement('div');
+                this.toolbar.classList.add('duice-ui-markdownEditor-toolbar');
+                this.div.appendChild(this.toolbar);
+                
+                // header
+                var header = document.createElement('button');
+                header.title = 'Header';
+                header.classList.add('duice-ui-markdownEditor-toolbar-header');
+                header.addEventListener('click', function(){
+                    //
+                });
+                this.toolbar.appendChild(header);
+                
+                // bold
+                var bold = document.createElement('button');
+                bold.title = 'Bold';
+                bold.classList.add('duice-ui-markdownEditor-toolbar-bold');
+                bold.addEventListener('click', function(){
+                    //
+                });
+                this.toolbar.appendChild(bold);
+                
+                // italic
+                var italic = document.createElement('button');
+                italic.title = 'Italic';
+                italic.classList.add('duice-ui-markdownEditor-toolbar-italic');
+                italic.addEventListener('click', function(){
+                    //
+                });
+                this.toolbar.appendChild(italic);
+                
+                // cancel
+                var cancel = document.createElement('button');
+                cancel.title = 'Cancel';
+                cancel.classList.add('duice-ui-markdownEditor-toolbar-cancel');
+                cancel.addEventListener('click', function(){
+                    //
+                });
+                this.toolbar.appendChild(cancel);
+                
+                // list order
+                var listorder = document.createElement('button');
+                listorder.title = 'Orderd List';
+                listorder.classList.add('duice-ui-markdownEditor-toolbar-listorder');
+                listorder.addEventListener('click',function() {
+                    //
+                });
+                this.toolbar.appendChild(listorder);
+                
+                // list unorder
+                var listunorder = document.createElement('button');
+                listunorder.title = 'Unorderd List';
+                listunorder.classList.add('duice-ui-markdownEditor-toolbar-listunorder');
+                listunorder.addEventListener('click',function() {
+                    //
+                });
+                this.toolbar.appendChild(listunorder);
+                
+                // line
+                var line = document.createElement('button');
+                line.title = 'Line';
+                line.classList.add('duice-ui-markdownEditor-toolbar-line');
+                line.addEventListener('click',function() {
+                    //
+                });
+                this.toolbar.appendChild(line);
+                
+                // code
+                var code = document.createElement('button');
+                code.title = 'Image';
+                code.classList.add('duice-ui-markdownEditor-toolbar-code');
+                code.addEventListener('click',function() {
+                    //
+                });
+                this.toolbar.appendChild(code);
+                
+                // image
+                var image = document.createElement('button');
+                image.title = 'Image';
+                image.classList.add('duice-ui-markdownEditor-toolbar-image');
+                image.addEventListener('click',function() {
+                    //
+                });
+                this.toolbar.appendChild(image);
+                
+                // link
+                var link = document.createElement('button');
+                link.title = 'Image';
+                link.classList.add('duice-ui-markdownEditor-toolbar-link');
+                link.addEventListener('click',function() {
+                    //
+                });
+                this.toolbar.appendChild(link);
+                
+                
+                
+                
+                
+                // mode
+                var mode = document.createElement('button');
+                mode.title = 'Change Mode';
+                mode.classList.add('duice-ui-markdownEditor-toolbar-mode');
+                mode.addEventListener('click', function(){
+                    //
+                });
+                this.toolbar.appendChild(mode);
+                
+                // create content
+                this.content = document.createElement('div');
+                this.content.classList.add('duice-ui-htmlEditor-content');
+                this.contentHtml = document.createElement('pre');
+                this.contentHtml.contentEditable = 'true';
+                this.content.appendChild(this.contentHtml);
+                this.contentText = document.createElement('textarea');
+                this.contentText.style.display = 'none';
+                this.content.appendChild(this.contentText);
+                this.div.appendChild(this.content);
+            }
+            setBind(map:duice.data.Map, name:string):void {
+            }
+            update():void {
+            }
+        }
+        
+        /**
+         * duice.ui.Calendar
+         */
+        export class Calendar extends __ {
+            constructor(input:HTMLInputElement){
+                super();
+            }
+            setBind(list:duice.data.List):void {
+            }
+            update():void {
+            }
+        }
+        
+        /**
+         * duice.ui.CronExpression
+         */
+        export class CronExpression extends __ {
+            constructor(input:HTMLInputElement){
+                super();
+            }
+            setBind(list:duice.data.List):void {
+            }
+            update():void {
+            }
+        }
+        
+        /**
+         * duice.ui.ListViewer
+         */
+        export class ListViewer extends __ {
+            setBind(list:duice.data.List):void {
+            }
+            update():void {
+            }
+        }
+        
+        /**
+         * duice.ui.TableViewer
+         */
+        export class TableViewer extends __ {
             table:HTMLTableElement;
             thead:HTMLTableSectionElement;
             tbody:HTMLTableSectionElement;
@@ -671,7 +1173,7 @@ namespace duice {
             constructor(table:HTMLTableElement) {
                 super();
                 this.table = table;
-                this.table.classList.add('duice-ui-grid');
+                this.table.classList.add('duice-ui-tableViewer');
                 this.thead = <HTMLTableSectionElement>this.table.querySelector('thead');
                 var tbody = this.table.querySelector('tbody');
                 this.tbody = <HTMLTableSectionElement>tbody.cloneNode(true);
@@ -689,7 +1191,7 @@ namespace duice {
             }
             update():void {
                 var $this = this;
-
+                
                 // remove previous rows
                 for(var i = 0; i < this.rows.length; i ++ ) {
                     this.table.removeChild(this.rows[i]);
@@ -703,6 +1205,13 @@ namespace duice {
                     this.table.appendChild(row);
                     this.rows.push(row);
                 }
+                
+                // not found row
+                if(this.bindList.getRowCount() < 1) {
+                    var emptyRow = this.createEmptyRow();
+                    this.table.appendChild(emptyRow);
+                    this.rows.push(emptyRow);
+                }
             }
             createRow(index:number, bindMap:duice.data.Map):HTMLTableSectionElement {
                 var $this = this;
@@ -711,17 +1220,17 @@ namespace duice {
                 $context['index'] = index;
                 $context[this.item] = bindMap;
                 row = this.executeExpression(<HTMLElement>row, $context);
-                duice.initialize(row,$context);
+                initialize(row,$context);
                 
                 // select index
                 if(index == this.bindList.index){
-                    row.classList.add('duice-ui-grid-index');
+                    row.classList.add('duice-ui-tableViewer-index');
                 }
                 row.addEventListener('mouseup', function(event){
                     for(var i = 0; i < $this.rows.length; i ++ ) {
-                        $this.rows[i].classList.remove('duice-ui-grid-index');
+                        $this.rows[i].classList.remove('duice-ui-tableViewer-index');
                     }
-                    row.classList.add('duice-ui-grid-index');
+                    row.classList.add('duice-ui-tableViewer-index');
                     $this.bindList.index = index;
                 });
                 
@@ -736,7 +1245,6 @@ namespace duice {
                         event.preventDefault();
                         console.log('dragover');
                     });
-                    
                     row.addEventListener('drop', function(event){
                         event.preventDefault();
                         console.log('drop',index,event);
@@ -753,7 +1261,46 @@ namespace duice {
                 // return
                 return row;
             }
+            createEmptyRow():HTMLTableSectionElement {
+                var emptyRow:HTMLTableSectionElement = <HTMLTableSectionElement>this.tbody.cloneNode(true);
+                this.removeChildNodes(emptyRow);
+                emptyRow.classList.add('duice-ui-tableViewer-empty')
+                var tr = document.createElement('tr');
+                var td = document.createElement('td');
+                var colspan = this.tbody.querySelectorAll('tr > td').length;
+                td.setAttribute('colspan',String(colspan));
+                var emptyMessage = document.createElement('div');
+                emptyMessage.classList.add('duice-ui-tableViewer-empty-message');
+                td.appendChild(emptyMessage);
+                tr.appendChild(td);
+                emptyRow.appendChild(tr);
+                return emptyRow;
+            }
         }
+        
+        /**
+         * duice.ui.TreeViewer
+         */
+        export class TreeViewer extends __ {
+            setBind(list:duice.data.List):void {
+            }
+            update():void {
+            }
+        }
+    }
+    
+    /**
+     * TODO duice.widget
+     */
+    export namespace widget {
+        
+    }
+    
+    /**
+     * TODO duice.chart
+     */
+    export namespace chart {
+        
     }
 }
 
@@ -762,7 +1309,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     var $context:any = typeof self !== 'undefined' ? self : 
                         typeof window !== 'undefined' ? window :
                         {};
-    duice.initialize(document, $context);
+    duice.ui.initialize(document, $context);
 });
 
 

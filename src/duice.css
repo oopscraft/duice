@@ -11,22 +11,27 @@
  * duice.ui.Label
  */
 .duice-ui-text {
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: inherit;
 	margin: 0px;
-	padding-left: 0.5rem;
-	padding-right: 0.5rem;
-    font-weight: inherit;
+	padding: 0.2rem 0.5rem;
     cursor: inherit;
+    display:inline-block;
+    white-space: pre;
 }
 
 /**
  * duice.ui.TextField
  */
 .duice-ui-textField {
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: inherit;
 	margin: 0px;
-	padding-left: 0.5rem;
-	padding-right: 0.5rem;
-	border: 1px solid #ddd;
+	padding: 0.2rem 0.5rem;
 	width: calc(100% - 1rem - 2px);
+	border: 1px solid #ddd;
 	border-radius: 2px;
 	transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
 }
@@ -42,11 +47,48 @@
 }
 
 /**
+ * duice.ui.TextArea
+ */
+.duice-ui-textArea {
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: inherit;
+	white-space: nowrap;
+	padding: 0.2rem 0.5rem;
+	border-radius: 2px;
+	border: 1px solid #ddd;
+	transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+	box-sizing: border-box;         
+	-moz-box-sizing: border-box;    
+	-webkit-box-sizing: border-box; 
+	width: 100%;
+	height: 100%;
+	display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.duice-ui-textArea:-moz-read-only { /* For Firefox */
+    background-color: #f7f7f7;
+    outline: none;
+}
+.duice-ui-textArea:read-only {
+	background-color: #f7f7f7;
+	outline: none;
+}
+.duice-ui-textArea:focus {
+	outline: none;
+	border: solid 1px gray;
+}
+
+/**
  * duice.ui.ComboBox
  */
 .duice-ui-comboBox {
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: inherit;
 	margin: 0px;
-	padding-left: 0.5rem;
+	padding: 0.2rem 0.5rem;
     width: 100%;
     color: #495057;
 	-webkit-appearance: none; 
@@ -178,54 +220,21 @@
 .duice-ui-textView code .string {
 	color:red;
 }
-/**
- * duice.ui.TextArea
- */
-.duice-ui-textArea {
-	white-space: nowrap;
-	padding: .5rem .5rem;
-	border-radius: 2px;
-	border: 1px solid #ddd;
-	transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
-	box-sizing: border-box;         
-	-moz-box-sizing: border-box;    
-	-webkit-box-sizing: border-box; 
-	width: 100%;
-	height: 100%;
-	display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.duice-ui-textArea:-moz-read-only { /* For Firefox */
-    background-color: #f7f7f7;
-    outline: none;
-}
-.duice-ui-textArea:read-only {
-	background-color: #f7f7f7;
-	outline: none;
-}
-.duice-ui-textArea:focus {
-	outline: none;
-	border: solid 1px gray;
-}
 
 /**
- * duice.ui.Editor
+ * duice.ui.HtmlEditor
  */
 .duice-ui-htmlEditor {
 	margin: 0px;
 	padding: 1px;
 	display: flex;
 	flex-direction: column;
-	width: 100%;
 	height: 100%;
 	border-radius: 2px;
 	border: 1px solid #ddd;
 	transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
 }
 .duice-ui-htmlEditor .duice-ui-htmlEditor-toolbar {
-	display: flex;
-    justify-content: start;
 	padding: 0.3rem;
 	border: 0px;
 	border-bottom: dotted 1px #cccccc;
@@ -239,6 +248,10 @@
     vertical-align: top;
     border: solid 1px #efefef;
 }
+.duice-ui-htmlEditor .duice-ui-htmlEditor-toolbar select:focus {
+	outline: none;
+	border: solid 1px #ccc;
+}
 .duice-ui-htmlEditor .duice-ui-htmlEditor-toolbar button {
 	width: 24px;
 	height: 24px;
@@ -251,10 +264,8 @@
 	opacity: 0.8;
 }
 .duice-ui-htmlEditor .duice-ui-htmlEditor-toolbar button:hover { 
-    background-color: #efefef;
-	opacity: 1;
-	box-shadow: inset 0 0 2px #cccccc;
-	border-radius: 1px;
+	border-radius: 1rem;
+	background-color: #eee;
 }
 .duice-ui-htmlEditor .duice-ui-htmlEditor-toolbar button:focus {
 	outline: none;
@@ -294,7 +305,7 @@
 .duice-ui-htmlEditor .duice-ui-htmlEditor-toolbar button.duice-ui-htmlEditor-toolbar-listunorder {
 	background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABAElEQVQ4T2NkoBAwUqifAWxA9vwnBVrS7AXXnv6cMDVRZgIphoINmLrr9QMFUTb5B69/Pcx2E1UoLy/PZmBgmPL371+GP3/+MPz+/Zvh169fYPrnz59g9tq1a8F6qeMCUpyMrpY6gZgy82GBqiRHwembXyasKVUmPRDb1j9/IC/KJn/h4Y+H3dHSCrGxsdm/f/+eAgowZPzjxw84/9atW4hADOi8XaAixVFw4drnCXvatUh3wcAHom3BxQJFNd6Cu9c/Tzg6WZ90L8RNu/fAUIFb/vyDrw8XZSkpGBkZZf/8+RMciKBUB6KRUyModf79+xcRiNa5FwuUNSlwASWBCACuVpkRn3/wawAAAABJRU5ErkJggg==');
 }
-.duice-ui-htmlEditor .duice-ui-htmlEditor-toolbar button.duice-ui-htmlEditor-toolbar-html {
+.duice-ui-htmlEditor .duice-ui-htmlEditor-toolbar button.duice-ui-htmlEditor-toolbar-mode {
 	background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAa0lEQVQ4T7WTQQ7AIAgEx5fXvrwNBxrFQqRWEg8GdlwUC4tRFvVsAVRA1lsMOetACg5wnV3A2R7QAlTcFRgbQ40CIrHNdXsBZMRq6NFEgCmw18KUWNz/dom2N2/AwmdsIZ8HKf01tvyFlIsb65YpEZUXIwUAAAAASUVORK5CYII=');
 	float: right;
 }
@@ -309,13 +320,11 @@
 }
 .duice-ui-htmlEditor .duice-ui-htmlEditor-content pre {
 	margin: 0px;
-	padding: 0px;
-	padding-left: 0.5rem;
-	padding-right: 0.5rem;
+	padding: 0.2rem 0.5rem;
 	white-space: pre-wrap;
 	border: 0px;
-	width: 100%;
 	height: 100%;
+	min-height: 2rem;
     overflow-y: scroll;
     overflow-x: auto;
 }
@@ -324,14 +333,122 @@
 }
 .duice-ui-htmlEditor .duice-ui-htmlEditor-content textarea {
 	margin: 0px;
-	padding: 1rem;
+	padding: 0.2rem 0.5rem;
 	border: 0px;
 	height: 100%;
+	min-height: 2rem;
     overflow-y: scroll;
     overflow-x: auto;
   	background-color: #f7f7f7;
 }
 .duice-ui-htmlEditor .duice-ui-htmlEditor-content textarea:focus {
+	outline: none;
+}
+
+/**
+ * duice.ui.MarkdownEditor
+ */
+.duice-ui-markdownEditor {
+	margin: 0px;
+	padding: 1px;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	border-radius: 2px;
+	border: 1px solid #ddd;
+	transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+}
+.duice-ui-markdownEditor .duice-ui-markdownEditor-toolbar {
+	padding: 0.3rem;
+	border: 0px;
+	border-bottom: dotted 1px #cccccc;
+	
+}
+.duice-ui-markdownEditor .duice-ui-markdownEditor-toolbar button {
+	width: 24px;
+	height: 24px;
+	border: solid 0px;
+	background-color: white;
+	background-repeat:no-repeat;
+	background-position: center; 
+	cursor: pointer;
+	cursor: hand;
+	opacity: 0.8;
+}
+.duice-ui-markdownEditor .duice-ui-markdownEditor-toolbar button:hover { 
+	border-radius: 1rem;
+	background-color: #eee;
+}
+.duice-ui-markdownEditor .duice-ui-markdownEditor-toolbar button:focus {
+	outline: none;
+}
+.duice-ui-markdownEditor .duice-ui-markdownEditor-toolbar .duice-ui-markdownEditor-toolbar-header {
+	background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAF3SURBVDhPxZIxT8JQEMfvvVcKqMEoxhjC5gBJw+Tk5sDo6idwcPRj+BVc/BpODA5+AjeIkYQBE4XEQQIU2vN/r8/SKiwu/prr3fv37nq9lP4d5byl1WrVwzD0FCiXi5Nqde8TMo9GH6XpdLqbZFHY7XaHLibtvCWOwkfP6D7sJVosLyEZ2Hwxn187va+VurfJjlwDAS+HIWCKcZ90Og/ic7TbZ2ldGkBUSuNCMTNRFEXhumLHtvO5CUp4ty1m3Firi6DZvBVjRecuhzQQl5zyDRTKbLE9EJ2SVldiiE+sZr/NLj6dLNuAOeZNI692I9vBbmwEsg1mzicw3UQxN5hUw2hzJ5PFMYzZZHeTNoCYzP4N81u9fvRcqx2+OsWCRgsXWrIT/EQGlm1rFL1bZQ0bGxhjfDh5HoPQiiBZw4rcOQiCY62XfqHgb3lecVyp7IwhTwaD4b7v04Hk6JDmT71eX2Ih10B+JrgSTLzsZPZrN0Dy1ul/gOgLKa2J4QPHCBoAAAAASUVORK5CYII=');
+}
+.duice-ui-markdownEditor .duice-ui-markdownEditor-toolbar .duice-ui-markdownEditor-toolbar-bold {
+	background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABhElEQVQ4T62TIW/CQBTHjwRCECR4EPsIJVhIhkGyysrOoEg2ULh2n2BMoQgYfBXIVjZBrHyDOgIktBRyvXd3cEubjLB0QwxOnbj3u9//vbsUunGlbqxH9wX0ej1VCPFyPB4lzrlPKe0zxiTG2CMhxCCEdAzD8C+tEwbdblcLw1BHCFmDwaAeHVYUZcQ5VzHGznQ6LV8FtNttDQD00+lkDYfDGNBsNjWEkL7f75Fpmj8uTRi0Wq0YwDm3JpNJXZblAsb4EyH0EATB2Lbt56sGqqrGAEqpCwBjAJCFENJut7Pm83lsdBWgKIrGGNMxxtZsNosLKpXKKJPJqNvt1qGU1l3XPTcyESHKK4TQD4eDZZpmDJAkKYrhZbNZtF6vO6vVqv9tkQA0Go24YUEQWLZtn5VLpZLI5/NouVzqvu+//QmoVqtaOp3WPc9zFotFPLJisfiay+XeN5uNDwBlQoj7K6BWq6lhGD4BQIEQggDAYYwhSqkU7TnnH5fFEeS+T/k/H+tmgy+v8uQRParnEQAAAABJRU5ErkJggg==');
+}
+.duice-ui-markdownEditor .duice-ui-markdownEditor-toolbar .duice-ui-markdownEditor-toolbar-italic {
+	background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA3UlEQVQ4T7XTOw6CQBAG4Bk4gRwBryJXMISOylBSANJsAQUQaOiIBeU2HkGP4BXkCHKDHbMFBh+8Qtx+vvw7D4SVD1fWw3+BPM8fALDppcw8zzv2U08mSJKkQ4wwDK+fXx4F4jjeEdEFABrG2PZXv0YBxlhKRAEiZlEUvUXvsFHA9/07AOhCCKMoiq/4EhkEXNeVhRJoy7LUhsY9CDiOExBRCgDnqqr2iwHbtmXzdoh4qOv6tAiwLEtXFOUmd0AIseWcN7MB0zS76K8aVVU1znm7eIxz7mRyE6eQ1cATpXFHEZe7UXUAAAAASUVORK5CYII=');
+}
+.duice-ui-markdownEditor .duice-ui-markdownEditor-toolbar .duice-ui-markdownEditor-toolbar-cancel {
+	background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAAAzklEQVRIie3Tz0pCQRTH8Y9uAmkrEQQ+gASC+0LQ9CkC9y16IMFIkF6gKPzTLlz0Li1aluDijtHidv+Y19X9wmzO78z5nZk5Q0nJIangAXd5NlVz5LZxggaaRRj0sA7rat8Gx7jECm/o4mifBheh4AueUQuxVCoJ2mtG8y2dnPk/nGKJ21+xGyxQT9ucdIItQ1z/oY1xn6FGYgNT8bM/wkRKk2mP3BJd0VOM9ogznP/HoI9vzGK0Ob4w2NWgJpr9d3zE6J+iP9EJuSUlBbEBg5Aao/0pTNsAAAAASUVORK5CYII=');
+}
+.duice-ui-markdownEditor .duice-ui-markdownEditor-toolbar button.duice-ui-markdownEditor-toolbar-listorder {
+	background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABH0lEQVQ4T2NkoBAwgvRnzXmsYqHOfTvOVgjMJwWANSw6/O4/iCbbAJghMAPKy8uzGRgYpvz9+5fhz58/DL9//2b49esXmP758yeYvXbtWrDlKC5g+MfAEGdPmjdI9jN6+IANmLv/7f+/f/8x7L70UXV1kcodkgMRpCG0746KhRrv7WIfcZJcBVYc2n5HxUSb+3a5nySYHxsbm/379+8poABDxj9+/IDzb926hQjEtvXP///++4/h9z8GhpYwadJdQIqfsQZi+bLH///9Z2D494+BoTdWljwXFC9+/P/YuY+qx/t1yIsFy8IrKlZG/LdBLjAyMsr++fMnOBBBqQ5EI6dGUOr8+/cvIhBBtoP8dvr8x85DfToVpIQJSf7FZjAANBuaEYkwFDQAAAAASUVORK5CYII=');
+}
+.duice-ui-markdownEditor .duice-ui-markdownEditor-toolbar button.duice-ui-markdownEditor-toolbar-listunorder {
+	background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABAElEQVQ4T2NkoBAwUqifAWxA9vwnBVrS7AXXnv6cMDVRZgIphoINmLrr9QMFUTb5B69/Pcx2E1UoLy/PZmBgmPL371+GP3/+MPz+/Zvh169fYPrnz59g9tq1a8F6qeMCUpyMrpY6gZgy82GBqiRHwembXyasKVUmPRDb1j9/IC/KJn/h4Y+H3dHSCrGxsdm/f/+eAgowZPzjxw84/9atW4hADOi8XaAixVFw4drnCXvatUh3wcAHom3BxQJFNd6Cu9c/Tzg6WZ90L8RNu/fAUIFb/vyDrw8XZSkpGBkZZf/8+RMciKBUB6KRUyModf79+xcRiNa5FwuUNSlwASWBCACuVpkRn3/wawAAAABJRU5ErkJggg==');
+}
+.duice-ui-markdownEditor .duice-ui-markdownEditor-toolbar button.duice-ui-markdownEditor-toolbar-line {
+	background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAdVBMVEUAAABEREBEREBEREBEREAXFxYVFRNEREBEREAQEA8JCQgBAQEAAABEREAJCQgPDw4AAAAAAAAHBwYAAAAAAAAAAABEREAFBQUKCgkBAQEJCQgHBwYGBgYBAQEICAcjIyEwMC0yMi8ODg0KCgoCAgIbGxoFBQVoWlXHAAAAJ3RSTlMAAQQFCR4dAg1BZV01D2gIBmARamsPCnBqYXRmZWxyHRMVP2Y2IReH6F4wAAAAhElEQVQYV21P2xaCMAzbpbiKMOXuQERQ+f9PZLVjhwfzsJNsSdYK8R9SaSWPGpITaz4NntNLxk7Wub3eCmKg6RZzLKu6oZfWO2R3t64gONuD71ADGrEnqVM/okZHRI3B75N1/LkZn1NIMtxrtkdtlnf6EdFPfd+V9W9SCS2ETXjSuCmxDeVfBfm+8NBKAAAAAElFTkSuQmCC');
+}
+.duice-ui-markdownEditor .duice-ui-markdownEditor-toolbar button.duice-ui-markdownEditor-toolbar-code {
+	background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAolBMVEUAAAAAAAAAAABEREBEREAAAAAAAAAAAAACAgICAgIAAABEREBEREBEREAEBAMDAwMDAwMAAAAAAABEREAXFxYSEhEDAwMAAAAAAABEREAEBAQAAAAAAAABAQABAQEAAAABAQEHBwcAAAAAAAABAQEFBQUHBwcAAAAAAAAAAAAEBAMEBAQEBAQAAAAAAAACAgIPDw4RERADAwMAAAACAgL///9LqlszAAAANXRSTlMAOWABAjicYGJidAEEBVRjY2BTAw8QDQwKA0tUVEolLCwqLTQ0ODJFUFBTU0kNEBEUFQ5ROvKUCcUAAAABYktHRDXettlrAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4gsaBgAduKeGqAAAAKRJREFUGNNdj+kSgjAMhGOottAiLfXC+xYvROX9n82GIuO4PzrNl51kAwAd+BPSE7CgKbvYQ+QiFBwRo8YhVayk/5IPZT/RxvVTMJY5wNVgOBo7TaTOyCHi6WxOWqjE0vxQLVek9SbWNIgJud057Q9HZeoEHE55np8v15vEZu29KB7ls3zBF7zRaLc5bUGbzIPI910y7PGqRjaz/jBeJ/25tGLBByzcCsMgQop1AAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDE4LTExLTI2VDAwOjAwOjI5LTA2OjAw0p3FnQAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxOC0xMS0yNlQwMDowMDoyOS0wNjowMKPAfSEAAAAASUVORK5CYII=');
+}
+.duice-ui-markdownEditor .duice-ui-markdownEditor-toolbar button.duice-ui-markdownEditor-toolbar-image {
+	background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAulBMVEUAAAAAAAAAAAAAAAAAAAAAAAABAQEBAQFEREBEREACAgEAAAAAAAAFBQVEREBEREBEREAAAAALCwoAAAAFBQUCAgILCwoBAQEMDAsCAgIHBwcCAgIBAQECAgENDQwCAgIBAQEXFxUCAgICAgIAAAAAAAAAAAADAwMYGBcAAAAAAAAAAAAAAAACAgIDAwMAAAAAAAADAwMDAwIAAAAAAAAAAAAAAAAAAAAAAAABAQEPDw4AAABERED////FMF15AAAAPXRSTlMABgjOmJiZmQMDCBFpOAUEAZgJlT2jG5kKmi6bHJkce0MNgcEZvHBnDKFFr3CzZgOSgnIBv6Luw6DPCAcBTMc1QwAAAAFiS0dEPdBtUVkAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfjAw0NMhQWvHLeAAAAtElEQVQY002P1xqCMAxG07JR6HCAAwdCXbjFgb7/c5kCF/43+c75miYBIPQvBIAYJsayHdvCahCgJmBcz9UFTF+LTjcIGa+FkFr0+oNhwzyKtRiNJ9OGWYIvLHc2X7QcRviH7bX9fBkyQYE6bsvpKuAmChshyxVP15vtTgsLeZ8VhyPjp3NO9RRkzi5X7Lzdtag5ZIVqNy0b5qBUvSl5lCJKIoGXPV/iXQF8fBlLvz7el9X3B0BRDgy6k43iAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDE5LTAzLTEzVDA4OjUwOjIwLTA1OjAwUdyPagAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxOS0wMy0xM1QwODo1MDoyMC0wNTowMCCBN9YAAAAASUVORK5CYII=');
+}
+.duice-ui-markdownEditor .duice-ui-markdownEditor-toolbar button.duice-ui-markdownEditor-toolbar-link {
+	background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAA2FBMVEUAAABEREBEREBEREAEBAQAAAAAAAAAAAAAAABEREBEREAEBAQAAAAAAAAAAAAAAABEREBEREBEREAHBwYAAAAAAAAAAAABAQECAgIAAAABAQEEBAMODg0BAQEAAAAAAAAEBAQEBAQGBgYAAAAAAAAAAAAAAAAJCQgICAgGBgYAAAAAAAAJCQgEBAQGBgYAAAAAAAAICAgGBgYEBAQAAAAAAAAEBAQGBgYAAAAAAAACAgIHBwYICAcODg0AAAAAAAAKCgoNDQwAAAAHBwcBAQEEBAQAAAAEBAQBu8W6AAAARnRSTlMAAQQFTp2jXQIJCpXEvPuwAg0Pg1Y5+lpFR7qhQoN/Mcqaktrf/m1mSZlbYGP8jlRja5FNcOXljJzAMoWHP6G3V1FcfMDPyr/SoQAAAK1JREFUGBkFwQdCwjAAAMBLqlJAS1oZKi7UCg5w773g/z/yDgAAIMRsaXmlkQOEZqs9X10rOnkAqazWiy69/iBCKqtyYxO2hhlCWW3v7O4h7Y8ioVkdzA+P6mNpvJgEYuukOOWsm86ns4CsXVxoXEpX0+sEN3WX2/rufvGQwOMTPL+8viXg/QPp86tMgO9+TxpPfxII5J3i928xSyBE5IPhaBJAaGYIMYsBhJjFfwILDptldieyAAAAAElFTkSuQmCC');
+}
+.duice-ui-markdownEditor .duice-ui-markdownEditor-toolbar button.duice-ui-markdownEditor-toolbar-mode {
+	background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAABF1BMVEUAAAAAf38qtnMtt3Ius3M/v38stnQttnQttHQttnQzzGYvr28rtnQttnIquHFEREAstHQ2s19EREAst3MvrXBEREAttnIsr3AvVlMvt3YttHAstXIttXIttXQrtXIttHhApHEvrW8ssHJEREA4ZjQstnErtXUutnMrtHYA/wAttnQttHMttXQusnIusXIusHEur3EwsXJMwIlPwoovt3Yvr3KEzarr9/Hs+PLq+PHu+fSN17Mvt3Wk2b/+/v6W27o0uHk1uHmQ2LX///+v48piwpTv+fQ0uXjl9u7p9/A1uXro9u/19fVpw5dfxpTt+fPn9+/g7uf09PSe3b+S2beJz66d17p60afh9OvY6uF7y6Q/tn1Atn0l66ouAAAAKnRSTlMAAipOLARt4OJwBRDBxBIBwwYEbnUF4eQGKy1Qb7/CEQVv3wkFKExNKQF9ZhegAAAAwklEQVQYVzXOvU4CQQAA4Zndu+PHEBQBqWiwNb7/a2grFmpETDQECRGO3bVQv266EQAVUwEQqHUhLHUPwpnzoKVknt0Ope7MQ7SkDLyqXF6FqOoewpuVMcRG1Y6bGK1mF9r1V3T6Ed51YvfXvBQDlF7dO3Q3+6b5TpkwpTyc78bHzsRqlVlrs4Abv5qud5nHgzTXQLj1PmXYvkg9G/B/tlv1IznF3l8/9VOM0I7aY5Uzy89TGrcRhu2pl3JhtB7ENv0AzUlK0c17k4oAAAAASUVORK5CYII=');
+	float: right;
+}
+.duice-ui-markdownEditor .duice-ui-markdownEditor-content {
+	display: flex;
+	flex-direction: column;
+	margin: 0px;
+	padding: 0px;
+	width: 100%;
+	height: 100%;
+	border: 0px;
+}
+.duice-ui-markdownEditor .duice-ui-markdownEditor-content pre {
+	margin: 0px;
+	padding: 0.2rem 0.5rem;
+	white-space: pre-wrap;
+	border: 0px;
+	height: 100%;
+	min-height: 2rem;
+    overflow-y: scroll;
+    overflow-x: auto;
+}
+.duice-ui-markdownEditor .duice-ui-markdownEditor-content pre:focus {
+	outline: none;
+}
+.duice-ui-markdownEditor .duice-ui-markdownEditor-content textarea {
+	margin: 0px;
+	padding: 0.2rem 0.5rem;
+	border: 0px;
+	height: 100%;
+	min-height: 2rem;
+    overflow-y: scroll;
+    overflow-x: auto;
+  	background-color: #f7f7f7;
+}
+.duice-ui-markdownEditor .duice-ui-markdownEditor-content textarea:focus {
 	outline: none;
 }
 
@@ -459,53 +576,56 @@
 }
 
 /**
- * duice.ui.Grid 
+ * duice.ui.TableView
  */
-[data-duice="Grid"] {
+[data-duice="TableView"] {
 	visibility: hidden;
 }
-.duice-ui-grid {
+.duice-ui-tableViewer {
 	width: 100%;
 	border-collapse: collapse;
 	border: solid 1px #ddd;
 }
-.duice-ui-grid thead {
-	background: #eee;
+.duice-ui-tableViewer thead {	
 }
-.duice-ui-grid thead th {
+.duice-ui-tableViewer thead th {
+	font-family: inherit;
+	font-size: inherit;
+	padding: 0.3rem 0.6rem;
 	border: solid 1px #ddd;
+	background: #eee;
 	text-align: center;
 	text-overflow: ellipsis;
 }
-.duice-ui-grid tbody {
+.duice-ui-tableViewer tbody {
 	cursor:pointer;
 	cursor:hand;
 }
-.duice-ui-grid tbody:hover {
+.duice-ui-tableViewer tbody:hover {
 	background-color: #f7f7f7;
 	transition: all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
-.duice-ui-grid .duice-ui-grid-draggable *:not(input):not(select):not(textarea):not(button) {
+.duice-ui-tableViewer .duice-ui-tableViewer-draggable *:not(input):not(select):not(textarea):not(button) {
 	cursor: move;
 }
-.duice-ui-grid tbody td {
+.duice-ui-tableViewer tbody td {
 	border: dotted 1px #ddd;
 	text-align: center;
 	text-overflow: ellipsis;
 }
-.duice-ui-grid .duice-ui-grid-index {
+.duice-ui-tableViewer .duice-ui-tableViewer-index {
 	background-color: #f7f7f7;
 }
-.duice-ui-grid .duice-ui-grid-empty {
+.duice-ui-tableViewer .duice-ui-tableViewer-empty {
 	vertical-align:middle;
 }
-.duice-ui-grid .duice-ui-grid-empty .duice-ui-grid-empty-message {
+.duice-ui-tableViewer .duice-ui-tableViewer-empty .duice-ui-tableViewer-empty-message {
 	display: flex;
     align-items: center;
 	justify-content: center;
 	height: 2rem;
 }
-.duice-ui-grid .duice-ui-grid-empty .duice-ui-grid-empty-message:before {
+.duice-ui-tableViewer .duice-ui-tableViewer-empty .duice-ui-tableViewer-empty-message:before {
 	content: 'No Data Found';
 	color: #ccc;
 }
