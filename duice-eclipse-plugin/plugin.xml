@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            id="net.oopscraft.duice.eclipse.plugin.DuiceEditor"
+            name="Duice Editor"
+            icon="icons/sample.png"
+            extensions="html"
+            class="net.oopscraft.duice.eclipse.plugin.DuiceEditor"
+            contributorClass="net.oopscraft.duice.eclipse.plugin.DuiceEditorContributor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            name="Duice Wizards"
+            id="duice-eclipse-plugin">
+      </category>
+      <wizard
+            id="net.oopscraft.duice.eclipse.plugin.DuiceNewWizard"
+            name="Duice New Wizard"
+            icon="icons/sample.png"
+            class="net.oopscraft.duice.eclipse.plugin.DuiceNewWizard"
+            category="duice-eclipse-plugin">
+      </wizard>
+   </extension>
+
+</plugin>
