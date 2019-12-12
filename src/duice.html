@@ -5,9 +5,20 @@
 <title>duice</title>
 <script src="duice.js"></script>
 <link rel="stylesheet" type="text/css" href="duice.css">
+<style>
+body {
+	font-family: Tahoma, Dotum;
+	font-size: 12px;
+	line-height: 2;
+}
+table {
+	border-collapse: collapse;
+	border: solid 1px #ccc;
+}
+</style>
 <script>
 var users = new duice.data.List([
-	{id:"dog", name:"Dog", groupId:'animal', isAlive:'Y', gender:'F', birthday:'2001-01-01', comment:'I am Dog'},
+	{id:"dog", name:"Dog", groupId:'animal', isAlive:'Y', gender:'F', birthday:'2001-01-01', comment:'I am Dog\nI am Apple1'},
 	{id:"apple", name:"Apple", groupId:'fruit', isAlive:'N', gender:'', birthday:'2001-01-01', comment:'I am Apple'},
 	{id:"cat", name:"Cat", groupId:'animal', isAlive:'Y', gender:'M', birthday:'2001-01-01', comment:'I am Cat'},
 	{id:"orange", name:"Orange", groupId:'fruit', isAlive:'N', gender:'', birthday:'2001-01-01', comment:'I am Orange'},
@@ -56,7 +67,7 @@ function getUser(id){
 			<tbody data-id="[[$context.user.get('id')]]" onclick="getUser(this.dataset.id);">
 				<tr>
 					<td>[[$context.index+1]]</td>
-					<td><div data-duice="Text" data-duice-bind="user,name"></div></td>
+					<td><div data-duice="Text" data-duice-bind="user,id"></div></td>
 					<td><input type="text" data-duice="TextField" data-duice-bind="user,name"/></td>
 					<td><select data-duice="ComboBox" data-duice-bind="user,groupId" data-duice-option="groups,id,name"></select></td>
 					<td><input type="checkbox" data-duice="CheckBox" data-duice-bind="user,isAlive" data-duice-option="Y,N"/></td>
@@ -69,11 +80,18 @@ function getUser(id){
 			</tbody>
 		</table>
 	</div>
+	<div style="white-space:pre-line;">
+		[Text]
+		ID is <div data-duice="Text" data-duice-bind="user,id" style="width:auto;"></div> ...
+		Name is <input type="text" data-duice="TextField" data-duice-bind="user,name" style="width:auto;"/> ...
+		Group is <select data-duice="ComboBox" data-duice-bind="user,groupId" data-duice-option="groups,id,name" style="width:auto;"></select>
+		...
+	</div>
 	<div>
-		<table border="1" style="border-collapse: collapse; border:solid 1px #efefef; width:800px;">
+		<table border="1" style="width:50%;">
 			<tr>
 				<th>ID</th>
-				<td>Text is <div data-duice="Text" data-duice-bind="user,name"></div> ... ?!</td>
+				<td><div data-duice="Text" data-duice-bind="user,id"></div></td>
 			</tr>
 			<tr>
 				<th>Name</th>
@@ -90,10 +108,10 @@ function getUser(id){
 			<tr>
 				<th>Gender</th>
 				<td>
-					<input type="radio" data-duice="Radio" data-duice-bind="user,gender" value="F"/>Female |
-					<input type="radio" data-duice="Radio" data-duice-bind="user,gender" value="M"/>Male |
+					<input type="radio" data-duice="Radio" data-duice-bind="user,gender" value="F"/>Female
+					<input type="radio" data-duice="Radio" data-duice-bind="user,gender" value="M"/>Male 
 					<input type="radio" data-duice="Radio" data-duice-bind="user,gender" value=""/>None
-				<td>
+				</td>
 			</tr>
 			<tr>
 				<th>Birth Date</th>
@@ -102,7 +120,7 @@ function getUser(id){
 			<tr>
 				<th>Comment(Text - default mode)</th>
 				<td>
-					<div data-duice="Text" data-duice-bind="user,comment"></div>
+					<div data-duice="Text" data-duice-bind="user,comment" style="width:600px;"></div>
 				</td>
 			</tr>
 			<tr>
