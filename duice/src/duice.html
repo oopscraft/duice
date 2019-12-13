@@ -17,8 +17,8 @@ table {
 }
 </style>
 <script>
-var users = new duice.data.List([
-	{id:"dog", name:"Dog", groupId:'animal', isAlive:'Y', gender:'F', birthday:'2001-01-01', comment:'I am Dog\nI am Apple1'},
+var list = new duice.data.List([
+	{id:"dog", name:"Dog", groupId:'animal', isAlive:'Y', gender:'F', birthday:'2001-01-01', comment:'I am Dog\nI am Apple1', photo:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABC0lEQVRIibXVQUrDQBjF8Z/deQBd9wSC4DWk4GVcuBEVCl5Aj+FBxOINXEltV6JIXcVFm5KMyUwmbR7MYr687/0nM2FCu2b4xmXE06Yr/OIlZioq4zoj/DboTQLeMiBleNnTCTDuCLmphI9zAAJIbJThYX8S0AVSDd/2HyQAEPOkFmjUs7mzRrjAEgtMEv57rDBN1Gpa4gSn+KjUmw5ptfH9JGq1/iIoxgDTTdBdotYbkKMCxQjvPQNeJe6aNmptBcHzhfV+n2HeMA+z/u1ACjCx/hDmOG+Y7wzI0fYMBlUI+MLRkMBHPOHYnrYoLB7iAZ8thhiwyZt1XfcCDH7IXf4HOyn2BrM95D//AUGPi1ZZA00cAAAAAElFTkSuQmCC'},
 	{id:"apple", name:"Apple", groupId:'fruit', isAlive:'N', gender:'', birthday:'2001-01-01', comment:'I am Apple'},
 	{id:"cat", name:"Cat", groupId:'animal', isAlive:'Y', gender:'M', birthday:'2001-01-01', comment:'I am Cat'},
 	{id:"orange", name:"Orange", groupId:'fruit', isAlive:'N', gender:'', birthday:'2001-01-01', comment:'I am Orange'},
@@ -31,130 +31,139 @@ var users = new duice.data.List([
 	{id:"cat2", name:"Cat2", groupId:'animal', isAlive:'Y', gender:'F', birthday:'2001-01-01', comment:'I am Cat2'},
 	{id:"orange2", name:"Orange2", groupId:'fruit', isAlive:'N', gender:'', birthday:'2001-01-01', comment:'I am Orange2'}
 ]);
-var user = new duice.data.Map({});
+var map = new duice.data.Map({});
 var groups = new duice.data.List([
 	{id:"animal", name:"Animal"},
 	{id:"fruit", name:"Fruit"},
 	{id:"human", name:"Human"}
 ]);
-function getUser(id){
-	var item = users.findRow(function(item){
+
+function getRow(id){
+	var item = list.findRow(function(item){
 		if(item.get('id') === id){
 			return true;
 		}
 	});
 	console.log(id, item);
-	user.fromJson(item.toJson());
+	map.fromJson(item.toJson());
 }
 </script>
 </head>
 <body>
-
-<section>
-	<h1>data.ui.TableView Example</h1>
-	<div>
-		<table data-duice="TableView" data-duice-bind="users" data-duice-item="user" data-duice-editable="true">
+<h1>DUICE(Data-Oriented User Interface Engine)</h1>
+<hr/>
+<div style="display:flex;">
+	<div style="width:60%; height:1000px; overflow-y:scroll;">
+		<h2>data.ui.TableViewer</h2>
+		<table data-duice="TableView" data-duice-bind="list" data-duice-item="map" data-duice-editable="true">
 			<thead>
 				<tr>
 					<th>No</th>
 					<th>ID</th>
+					<th>Photo</th>
 					<th>Name</th>
 					<th>Group</th>
 					<th>Alive</th>
 					<th>Gender</th>
 				</tr>
 			</thead>
-			<tbody data-id="[[$context.user.get('id')]]" onclick="getUser(this.dataset.id);">
+			<tbody data-id="[[$context.map.get('id')]]" onclick="getRow(this.dataset.id);">
 				<tr>
 					<td>[[$context.index+1]]</td>
-					<td><div data-duice="Text" data-duice-bind="user,id"></div></td>
-					<td><input type="text" data-duice="TextField" data-duice-bind="user,name"/></td>
-					<td><select data-duice="ComboBox" data-duice-bind="user,groupId" data-duice-option="groups,id,name"></select></td>
-					<td><input type="checkbox" data-duice="CheckBox" data-duice-bind="user,isAlive" data-duice-option="Y,N"/></td>
+					<td><div data-duice="Text" data-duice-bind="map,id"></div></td>
+					<td><img data-duice="Image" data-duice-bind="map,photo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAB70lEQVRIic2Vv2sTYRjHP8/dRYoKQQR/4FBExRxCRaGTlOqguMhxyNFBkEzO4uASkSz+EaK42C3CNQTaoSgpiIhbBustdQ3FIVk0cLne49JAfrzcpQmC3+ne5/m+38/z3ntw8I8l05jK5fJCt9t9LCIrwAGw0+l03jebzWRuQBAEF5IkCYHlsdaO4zhBrVb7lbXfygMkSbJuCAdYTZLkdd7+TIDneQ+A2xkW3/O8lZkBtm3fy+oDiMjdmQGqem0KQKYn7w76eQBVzfTkAX7kAfI8mQAR+ZyXLiJfZgbYth0CexmW72EYbmcOYCpWq1Wr1Wo9B74B54F1k09V14DjIlIIw/CNccjxQhAEx9rt9ibwBLhZLBafxXEcA3dGJhOpiEgd2ADWXNe9HEXRRi6gVCq9BR4eLs/GcXy91+s9tW17FzgpIj9F5KWqfgA+AouH3iXXdQtRFH0aGWR44fv+KtA0nHQPeAV8tSzLUtX7qloBTo35DtI0XarX67uDgjPcVdUXIsZruQS8A0jT1NQfyBaRCvBo4gS+758G9jG8tqNIRH73+/0zjUbjD4x+psvzhgOo6olCoXBjsLaGGhfnDR/KujoBEJFFs30mXZkAqKpj9h5dqroweB4O3QJuAeeY8l9tyhaRfVXdmmO+/0x/AXyYmmwrMeOYAAAAAElFTkSuQmCC" style="height:1rem;"/></td>
+					<td><input type="text" data-duice="TextField" data-duice-bind="map,name"/></td>
+					<td><select data-duice="ComboBox" data-duice-bind="map,groupId" data-duice-option="groups,id,name"></select></td>
+					<td><input type="checkbox" data-duice="CheckBox" data-duice-bind="map,isAlive" data-duice-option="Y,N"/></td>
 					<td>
-						<input type="radio" data-duice="Radio" data-duice-bind="user,gender" value="F"/>Female |
-						<input type="radio" data-duice="Radio" data-duice-bind="user,gender" value="M"/>Male |
-						<input type="radio" data-duice="Radio" data-duice-bind="user,gender" value=""/>None
+						<input type="radio" data-duice="Radio" data-duice-bind="map,gender" value="F"/>Female |
+						<input type="radio" data-duice="Radio" data-duice-bind="map,gender" value="M"/>Male |
+						<input type="radio" data-duice="Radio" data-duice-bind="map,gender" value=""/>None
 					</td>
 				</tr>
 			</tbody>
 		</table>
+		<h2>data.ui.ListViewer</h2>
+		<ul data-duice="ListViewer" data-duice-bind="list" data-duice-item="map" style="border:solid 3px red;">
+			<li>
+				<div style="border:solid 1px #ccc;">
+					[[$context.index + 1]]
+					<label data-duice="Text" data-duice-bind="map,id"></label>
+					<input data-duice="TextField" data-duice-bind="map,name"/>
+				</div>
+			<li>
+		</ul>
 	</div>
-	<div style="white-space:pre-line;">
-		[Text]
-		ID is <div data-duice="Text" data-duice-bind="user,id" style="width:auto;"></div> ...
-		Name is <input type="text" data-duice="TextField" data-duice-bind="user,name" style="width:auto;"/> ...
-		Group is <select data-duice="ComboBox" data-duice-bind="user,groupId" data-duice-option="groups,id,name" style="width:auto;"></select>
-		...
-	</div>
-	<div>
-		<table border="1" style="width:50%;">
+	<div style="width:40%;">
+		<h2>duice.data.Map</h2>
+		<table border="1">
 			<tr>
 				<th>ID</th>
-				<td><div data-duice="Text" data-duice-bind="user,id"></div></td>
+				<td><div data-duice="Text" data-duice-bind="map,id"></div></td>
+			</tr>
+			<tr>
+				<th>Photo</th>
+				<td>
+					<img data-duice="Image" data-duice-bind="map,photo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAB70lEQVRIic2Vv2sTYRjHP8/dRYoKQQR/4FBExRxCRaGTlOqguMhxyNFBkEzO4uASkSz+EaK42C3CNQTaoSgpiIhbBustdQ3FIVk0cLne49JAfrzcpQmC3+ne5/m+38/z3ntw8I8l05jK5fJCt9t9LCIrwAGw0+l03jebzWRuQBAEF5IkCYHlsdaO4zhBrVb7lbXfygMkSbJuCAdYTZLkdd7+TIDneQ+A2xkW3/O8lZkBtm3fy+oDiMjdmQGqem0KQKYn7w76eQBVzfTkAX7kAfI8mQAR+ZyXLiJfZgbYth0CexmW72EYbmcOYCpWq1Wr1Wo9B74B54F1k09V14DjIlIIw/CNccjxQhAEx9rt9ibwBLhZLBafxXEcA3dGJhOpiEgd2ADWXNe9HEXRRi6gVCq9BR4eLs/GcXy91+s9tW17FzgpIj9F5KWqfgA+AouH3iXXdQtRFH0aGWR44fv+KtA0nHQPeAV8tSzLUtX7qloBTo35DtI0XarX67uDgjPcVdUXIsZruQS8A0jT1NQfyBaRCvBo4gS+758G9jG8tqNIRH73+/0zjUbjD4x+psvzhgOo6olCoXBjsLaGGhfnDR/KujoBEJFFs30mXZkAqKpj9h5dqroweB4O3QJuAeeY8l9tyhaRfVXdmmO+/0x/AXyYmmwrMeOYAAAAAElFTkSuQmCC" style="height:2rem;"/>
+				</td>
 			</tr>
 			<tr>
 				<th>Name</th>
-				<td><input type="text" data-duice="TextField" data-duice-bind="user,name"/></td>
+				<td><input type="text" data-duice="TextField" data-duice-bind="map,name"/></td>
 			</tr>
 			<tr>
 				<th>Group</th>
-				<td><select data-duice="ComboBox" data-duice-bind="user,groupId" data-duice-option="groups,id,name"></select></td>
+				<td><select data-duice="ComboBox" data-duice-bind="map,groupId" data-duice-option="groups,id,name"></select></td>
 			</tr>
 			<tr>
 				<th>isAlive</th>
-				<td><input type="checkbox" data-duice="CheckBox" data-duice-bind="user,isAlive" data-duice-option="Y,N"/></td>
+				<td><input type="checkbox" data-duice="CheckBox" data-duice-bind="map,isAlive" data-duice-option="Y,N"/></td>
 			</tr>
 			<tr>
 				<th>Gender</th>
 				<td>
-					<input type="radio" data-duice="Radio" data-duice-bind="user,gender" value="F"/>Female
-					<input type="radio" data-duice="Radio" data-duice-bind="user,gender" value="M"/>Male 
-					<input type="radio" data-duice="Radio" data-duice-bind="user,gender" value=""/>None
+					<input type="radio" data-duice="Radio" data-duice-bind="map,gender" value="F"/>Female
+					<input type="radio" data-duice="Radio" data-duice-bind="map,gender" value="M"/>Male 
+					<input type="radio" data-duice="Radio" data-duice-bind="map,gender" value=""/>None
 				</td>
 			</tr>
 			<tr>
 				<th>Birth Date</th>
-				<td><input type="text" data-duice="TextField" data-duice-bind="user,birthday"/></td>
+				<td><input type="text" data-duice="TextField" data-duice-bind="map,birthday"/></td>
 			</tr>
 			<tr>
 				<th>Comment(Text - default mode)</th>
 				<td>
-					<div data-duice="Text" data-duice-bind="user,comment" style="width:600px;"></div>
+					<div data-duice="Text" data-duice-bind="map,comment"></div>
 				</td>
 			</tr>
 			<tr>
 				<th>Comment(Text - html mode)</th>
 				<td>
-					<div data-duice="Text" data-duice-bind="user,comment" data-duice-mode="html"></div>
+					<div data-duice="Text" data-duice-bind="map,comment" data-duice-mode="html"></div>
 				</td>
 			</tr>
 			<tr>
 				<th>Comment(Text - markdown mode)</th>
 				<td>
-					<div data-duice="Text" data-duice-bind="user,comment" data-duice-mode="markdown"></div>
+					<div data-duice="Text" data-duice-bind="map,comment" data-duice-mode="markdown"></div>
 				</td>
 			</tr>
 			<tr>
 				<th>Comment(TextArea)</th>
-				<td><textarea data-duice="TextArea" data-duice-bind="user,comment"></textarea></td>
+				<td><textarea data-duice="TextArea" data-duice-bind="map,comment"></textarea></td>
 			</tr>
 			<tr>
 				<th>Comment(TextEditor)</th>
-				<td><div data-duice="HtmlEditor" data-duice-bind="user,comment"></div></td>
+				<td><div data-duice="HtmlEditor" data-duice-bind="map,comment"></div></td>
 			</tr>
 			<tr>
 				<th>Comment(MarkdownEditor)</th>
-				<td><div data-duice="MarkdownEditor" data-duice-bind="user,comment"></div></td>
+				<td><div data-duice="MarkdownEditor" data-duice-bind="map,comment"></div></td>
 			</tr>
 		</table>
 	</div>
-	<div>
-		<button type="button" onclick="alert(JSON.stringify(users.toJson()));">users</button>
-		<button type="button" onclick="alert(JSON.stringify(user.toJson()));">user</button>
-		<button type="button" onclick="alert(JSON.stringify(groups.toJson()));">groups</button>
-	</div>
-</section>
+</div>
 
 
 </body>
