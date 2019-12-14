@@ -18,26 +18,32 @@ table {
 </style>
 <script>
 var list = new duice.data.List([
-	{id:"dog", name:"Dog", groupId:'animal', isAlive:'Y', gender:'F', birthday:'2001-01-01', comment:'I am Dog\nI am Apple1', photo:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABC0lEQVRIibXVQUrDQBjF8Z/deQBd9wSC4DWk4GVcuBEVCl5Aj+FBxOINXEltV6JIXcVFm5KMyUwmbR7MYr687/0nM2FCu2b4xmXE06Yr/OIlZioq4zoj/DboTQLeMiBleNnTCTDuCLmphI9zAAJIbJThYX8S0AVSDd/2HyQAEPOkFmjUs7mzRrjAEgtMEv57rDBN1Gpa4gSn+KjUmw5ptfH9JGq1/iIoxgDTTdBdotYbkKMCxQjvPQNeJe6aNmptBcHzhfV+n2HeMA+z/u1ACjCx/hDmOG+Y7wzI0fYMBlUI+MLRkMBHPOHYnrYoLB7iAZ8thhiwyZt1XfcCDH7IXf4HOyn2BrM95D//AUGPi1ZZA00cAAAAAElFTkSuQmCC'},
-	{id:"apple", name:"Apple", groupId:'fruit', isAlive:'N', gender:'', birthday:'2001-01-01', comment:'I am Apple'},
-	{id:"cat", name:"Cat", groupId:'animal', isAlive:'Y', gender:'M', birthday:'2001-01-01', comment:'I am Cat'},
-	{id:"orange", name:"Orange", groupId:'fruit', isAlive:'N', gender:'', birthday:'2001-01-01', comment:'I am Orange'},
-	{id:"dog1", name:"Dog1", groupId:'animal', isAlive:'Y', gender:'F', birthday:'2001-01-01', comment:'I am Dog1'},
-	{id:"apple1", name:"Apple1", groupId:'fruit', isAlive:'N', gender:'', birthday:'2001-01-01', comment:'I am Apple1'},
-	{id:"cat1", name:"Cat1", groupId:'animal', isAlive:'Y', gender:'M', birthday:'2001-01-01', comment:'I am Cat1'},
-	{id:"orange1", name:"Orange1", groupId:'fruit', isAlive:'N', gender:'', birthday:'2001-01-01', comment:'I am Orange1'},
-	{id:"dog2", name:"Dog2", groupId:'animal', isAlive:'Y', gender:'M', birthday:'2001-01-01', comment:'I am Dog2'},
-	{id:"apple2", name:"Apple2", groupId:'fruit', isAlive:'N', gender:'', birthday:'2001-01-01', comment:'I am Apple2'},
-	{id:"cat2", name:"Cat2", groupId:'animal', isAlive:'Y', gender:'F', birthday:'2001-01-01', comment:'I am Cat2'},
-	{id:"orange2", name:"Orange2", groupId:'fruit', isAlive:'N', gender:'', birthday:'2001-01-01', comment:'I am Orange2'}
+	{id:"dog", name:"Dog", groupId:'animal', isAlive:true, gender:'F', birthday:'2001-01-01', comment:'I am Dog\nI am Apple1', photo:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABC0lEQVRIibXVQUrDQBjF8Z/deQBd9wSC4DWk4GVcuBEVCl5Aj+FBxOINXEltV6JIXcVFm5KMyUwmbR7MYr687/0nM2FCu2b4xmXE06Yr/OIlZioq4zoj/DboTQLeMiBleNnTCTDuCLmphI9zAAJIbJThYX8S0AVSDd/2HyQAEPOkFmjUs7mzRrjAEgtMEv57rDBN1Gpa4gSn+KjUmw5ptfH9JGq1/iIoxgDTTdBdotYbkKMCxQjvPQNeJe6aNmptBcHzhfV+n2HeMA+z/u1ACjCx/hDmOG+Y7wzI0fYMBlUI+MLRkMBHPOHYnrYoLB7iAZ8thhiwyZt1XfcCDH7IXf4HOyn2BrM95D//AUGPi1ZZA00cAAAAAElFTkSuQmCC'},
+	{id:"apple", name:"Apple", groupId:'fruit', isAlive:true, gender:'', birthday:'2001-01-01', comment:'I am Apple'},
+	{id:"cat", name:"Cat", groupId:'animal', isAlive:true, gender:'M', birthday:'2001-01-01', comment:'I am Cat'},
+	{id:"orange", name:"Orange", groupId:'fruit', isAlive:true, gender:'', birthday:'2001-01-01', comment:'I am Orange'},
+	{id:"dog1", name:"Dog1", groupId:'animal', isAlive:false, gender:'F', birthday:'2001-01-01', comment:'I am Dog1'},
+	{id:"apple1", name:"Apple1", groupId:'fruit', isAlive:true, gender:'', birthday:'1992-01-01', comment:'I am Apple1'},
+	{id:"cat1", name:"Cat1", groupId:'animal', isAlive:true, gender:'M', birthday:'1945-01-01', comment:'I am Cat1'},
+	{id:"orange1", name:"Orange1", groupId:'fruit', isAlive:false, gender:'', birthday:'2001-01-01', comment:'I am Orange1'},
+	{id:"dog2", name:"Dog2", groupId:'animal', isAlive:false, gender:'M', birthday:'2001-01-01', comment:'I am Dog2'},
+	{id:"apple2", name:"Apple2", groupId:'fruit', isAlive:false, gender:'', birthday:'2001-01-01', comment:'I am Apple2'},
+	{id:"cat2", name:"Cat2", groupId:'animal', isAlive:true, gender:'F', birthday:'2001-01-01', comment:'I am Cat2'},
+	{id:"orange2", name:"Orange2", groupId:'fruit', isAlive:false, gender:'', birthday:'2001-01-01', comment:'I am Orange2'}
 ]);
 var map = new duice.data.Map({});
+map.setReadonly('id',true);
+map.setEnable(false);
+map.fromJson(list.getRow(2).toJson());
 var groups = new duice.data.List([
 	{id:"animal", name:"Animal"},
 	{id:"fruit", name:"Fruit"},
 	{id:"human", name:"Human"}
 ]);
 
+/**
+ * get Row
+ */
 function getRow(id){
 	var item = list.findRow(function(item){
 		if(item.get('id') === id){
@@ -46,6 +52,14 @@ function getRow(id){
 	});
 	console.log(id, item);
 	map.fromJson(item.toJson());
+	map.setEnable(true);
+}
+
+/**
+ * remove Current Row
+ */
+function removeCurrentRow(){
+	list.removeRow(list.getIndex());
 }
 </script>
 </head>
@@ -54,7 +68,14 @@ function getRow(id){
 <hr/>
 <div style="display:flex;">
 	<div style="width:60%; height:1000px; overflow-y:scroll;">
-		<h2>data.ui.TableViewer</h2>
+		<div style="display:flex; justify-content: space-between;">
+			<div>data.ui.TableViewer</div>
+			<div>
+				<button onclick="removeCurrentRow();">removeCurrentRow</button>
+				<button onclick="list.setReadonlyAll(true);');">setReadonlyAll(true);</button>
+				<button onclick="list.setReadonlyAll(false);');">setReadonlyAll(false);</button>
+			</div>
+		</div>
 		<table data-duice="TableView" data-duice-bind="list" data-duice-item="map" data-duice-editable="true">
 			<thead>
 				<tr>
@@ -65,6 +86,7 @@ function getRow(id){
 					<th>Group</th>
 					<th>Alive</th>
 					<th>Gender</th>
+					<th>Birthday</th>
 				</tr>
 			</thead>
 			<tbody data-id="[[$context.map.get('id')]]" onclick="getRow(this.dataset.id);">
@@ -74,11 +96,14 @@ function getRow(id){
 					<td><img data-duice="Image" data-duice-bind="map,photo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAB70lEQVRIic2Vv2sTYRjHP8/dRYoKQQR/4FBExRxCRaGTlOqguMhxyNFBkEzO4uASkSz+EaK42C3CNQTaoSgpiIhbBustdQ3FIVk0cLne49JAfrzcpQmC3+ne5/m+38/z3ntw8I8l05jK5fJCt9t9LCIrwAGw0+l03jebzWRuQBAEF5IkCYHlsdaO4zhBrVb7lbXfygMkSbJuCAdYTZLkdd7+TIDneQ+A2xkW3/O8lZkBtm3fy+oDiMjdmQGqem0KQKYn7w76eQBVzfTkAX7kAfI8mQAR+ZyXLiJfZgbYth0CexmW72EYbmcOYCpWq1Wr1Wo9B74B54F1k09V14DjIlIIw/CNccjxQhAEx9rt9ibwBLhZLBafxXEcA3dGJhOpiEgd2ADWXNe9HEXRRi6gVCq9BR4eLs/GcXy91+s9tW17FzgpIj9F5KWqfgA+AouH3iXXdQtRFH0aGWR44fv+KtA0nHQPeAV8tSzLUtX7qloBTo35DtI0XarX67uDgjPcVdUXIsZruQS8A0jT1NQfyBaRCvBo4gS+758G9jG8tqNIRH73+/0zjUbjD4x+psvzhgOo6olCoXBjsLaGGhfnDR/KujoBEJFFs30mXZkAqKpj9h5dqroweB4O3QJuAeeY8l9tyhaRfVXdmmO+/0x/AXyYmmwrMeOYAAAAAElFTkSuQmCC" style="height:1rem;"/></td>
 					<td><input type="text" data-duice="TextField" data-duice-bind="map,name"/></td>
 					<td><select data-duice="ComboBox" data-duice-bind="map,groupId" data-duice-option="groups,id,name"></select></td>
-					<td><input type="checkbox" data-duice="CheckBox" data-duice-bind="map,isAlive" data-duice-option="Y,N"/></td>
+					<td><input type="checkbox" data-duice="CheckBox" data-duice-bind="map,isAlive"/></td>
 					<td>
 						<input type="radio" data-duice="Radio" data-duice-bind="map,gender" value="F"/>Female |
 						<input type="radio" data-duice="Radio" data-duice-bind="map,gender" value="M"/>Male |
 						<input type="radio" data-duice="Radio" data-duice-bind="map,gender" value=""/>None
+					</td>
+					<td>
+						<input type="text" data-duice="Calendar" data-duice-bind="map,birthday"/>
 					</td>
 				</tr>
 			</tbody>
@@ -99,7 +124,7 @@ function getRow(id){
 		<table border="1">
 			<tr>
 				<th>ID</th>
-				<td><div data-duice="Text" data-duice-bind="map,id"></div></td>
+				<td><input type="text" data-duice="TextField" data-duice-bind="map,id"/></td>
 			</tr>
 			<tr>
 				<th>Photo</th>

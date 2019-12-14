@@ -40,26 +40,26 @@ namespace duice {
      */
     export function initialize(container:any, $context:any):void {
         
-        // creates ListView 
-        var listViewerElements = container.querySelectorAll('ul[data-duice="ListViewer"]');
-        for(var i = 0; i < listViewerElements.length; i++ ) {
-            try {
-                var listViewerElement = listViewerElements[i];
-                var listViewer = new duice.ui.ListViewer(listViewerElement);
-                var bind = listViewerElement.dataset.duiceBind;
-                listViewer.setBind(getObject($context,bind));
-                var item = listViewerElement.dataset.duiceItem;
-                listViewer.setItem(item);
-                listViewer.setEditable((listViewerElement.dataset.duiceEditable === 'true'));
-                listViewer.update();
-                listViewerElement.dataset.duice += generateUUID();
-                console.log(listViewer);
-            }catch(e){
-                console.error(e,listViewerElement);
-                throw e;
-            }
-        }
-        
+//        // creates ListView 
+//        var listViewerElements = container.querySelectorAll('ul[data-duice="ListViewer"]');
+//        for(var i = 0; i < listViewerElements.length; i++ ) {
+//            try {
+//                var listViewerElement = listViewerElements[i];
+//                var listViewer = new duice.ui.ListViewer(listViewerElement);
+//                var bind = listViewerElement.dataset.duiceBind;
+//                listViewer.setBind(getObject($context,bind));
+//                var item = listViewerElement.dataset.duiceItem;
+//                listViewer.setItem(item);
+//                listViewer.setEditable((listViewerElement.dataset.duiceEditable === 'true'));
+//                listViewer.update();
+//                listViewerElement.dataset.duice += generateUUID();
+//                console.log(listViewer);
+//            }catch(e){
+//                console.error(e,listViewerElement);
+//                throw e;
+//            }
+//        }
+//        
         // creates TableViewer
         var tableViewerElements = container.querySelectorAll('table[data-duice="TableView"]');
         for(var i = 0; i < tableViewerElements.length; i++ ) {
@@ -67,13 +67,13 @@ namespace duice {
                 var tableViewerElement = tableViewerElements[i];
                 var tableViewer = new duice.ui.TableViewer(tableViewerElement);
                 var bind = tableViewerElement.dataset.duiceBind;
-                tableViewer.setBind(getObject($context,bind));
+                var bindList = getObject($context,bind)
+                tableViewer.setBind(bindList);
                 var item = tableViewerElement.dataset.duiceItem;
                 tableViewer.setItem(item);
                 tableViewer.setEditable((tableViewerElement.dataset.duiceEditable === 'true'));
-                tableViewer.update();
+                tableViewer.build();
                 tableViewerElement.dataset.duice += generateUUID();
-                console.log(tableViewer);
             }catch(e){
                 console.error(e,tableViewerElement);
                 throw e;
@@ -88,71 +88,96 @@ namespace duice {
             ,'select[data-duice="ComboBox"]'
             ,'input[data-duice="CheckBox"]'
             ,'input[data-duice="Radio"]'
+            ,'input[data-duice="Calendar"]'
             ,'img[data-duice="Image"]'
             ,'div[data-duice="HtmlEditor"]'
             ,'div[data-duice="MarkdownEditor"]'
-// --
-            ,'img[data-duice="Image"]'
-            ,'input[data-duice="CronExpression"]'
+//         // --
+//            ,'input[data-duice="CronExpression"]'
         ];
         var elements = container.querySelectorAll(elementTags.join(','));
         for(var i = 0; i < elements.length; i ++ ) {
             try {
                 var element:any = elements[i];
                 var type:string = element.dataset.duice;
-                var bind:any = element.dataset.duiceBind.split(',');
+                var bind = element.dataset.duiceBind.split(',');
                 switch(type) {
                     case 'Text':
                         var text:duice.ui.Text = new duice.ui.Text(element);
-                        var format = element.dataset.duiceFormat;
-                        text.setBind(getObject($context,bind[0]), bind[1]);
                         text.setMode(element.dataset.duiceMode);
-                        text.update();
+                        var bindMap = getObject($context, bind[0]);
+                        var bindName = bind[1];
+                        text.setBind(bindMap, bindName);
+                        text.build();
                     break;
                     case 'TextField':
                         var textField = new duice.ui.TextField(element);
-                        textField.setBind(getObject($context,bind[0]), bind[1]);
-                        textField.update();
+                        var bindMap = getObject($context, bind[0]);
+                        var bindName = bind[1];
+                        textField.setBind(bindMap, bindName);
+                        textField.build();
                     break;
                     case 'TextArea':
-                        console.log("fdsafdsafdsa");
                         var textArea = new duice.ui.TextArea(element);
-                        textArea.setBind(getObject($context,bind[0]), bind[1]);
-                        textArea.update();
+                        var bindMap = getObject($context, bind[0]);
+                        var bindName = bind[1];
+                        textArea.setBind(bindMap, bindName);
+                        textArea.build();
                     break;
                     case 'ComboBox':
                         var comboBox = new duice.ui.ComboBox(element);
-                        comboBox.setBind(getObject($context,bind[0]), bind[1]);
-                        var option:Array<any> = element.dataset.duiceOption.split(',');
-                        comboBox.setOption(getObject($context,option[0]), option[1], option[2]);
-                        comboBox.update();
+                        var bindMap = getObject($context, bind[0]);
+                        var bindName = bind[1];
+                        comboBox.setBind(bindMap, bindName);
+                        var option = element.dataset.duiceOption.split(',');
+                        var optionList = getObject($context, option[0]);
+                        var optionValue = option[1];
+                        var optionText = option[2];
+                        comboBox.setOption(optionList, optionValue, optionText);
+                        comboBox.build();
                     break;
                     case 'CheckBox':
                         var checkBox = new duice.ui.CheckBox(element);
-                        checkBox.setBind($context[bind[0]], bind[1]);
-                        var option:Array<any> = element.dataset.duiceOption.split(',');
-                        checkBox.setOption(option[0], option[1]);
-                        checkBox.update();
+                        var bindMap = getObject($context, bind[0]);
+                        var bindName = bind[1];
+                        checkBox.setBind(bindMap, bindName);
+                        checkBox.build();
                     break;
                     case 'Radio':
                         var radio = new duice.ui.Radio(element);
-                        radio.setBind($context[bind[0]], bind[1]);
-                        radio.update();
+                        var bindMap = getObject($context, bind[0]);
+                        var bindName = bind[1];
+                        radio.setBind(bindMap, bindName);
+                        radio.build();
+                    break;
+                    case 'Calendar':
+                        var calendar = new duice.ui.Calendar(element);
+                        var radio = new duice.ui.Radio(element);
+                        var bindMap = getObject($context, bind[0]);
+                        var bindName = bind[1];
+                        calendar.setBind(bindMap, bindName);
+                        calendar.build();
                     break;
                     case 'Image':
                         var image = new duice.ui.Image(element);
-                        image.setBind($context[bind[0]], bind[1]);
-                        image.update();
+                        var bindMap = getObject($context, bind[0]);
+                        var bindName = bind[1];
+                        image.setBind(bindMap, bindName);
+                        image.build();
                     break;
                     case 'HtmlEditor':
                         var htmlEditor = new duice.ui.HtmlEditor(element);
-                        htmlEditor.setBind($context[bind[0]], bind[1]);
-                        htmlEditor.update();
+                        var bindMap = getObject($context, bind[0]);
+                        var bindName = bind[1];
+                        htmlEditor.setBind(bindMap, bindName);
+                        htmlEditor.build();
                     break;
                     case 'MarkdownEditor':
                         var markdownEditor = new duice.ui.MarkdownEditor(element);
-                        markdownEditor.setBind($context[bind[0]], bind[1]);
-                        markdownEditor.update();
+                        var bindMap = getObject($context, bind[0]);
+                        var bindName = bind[1];
+                        markdownEditor.setBind(bindMap, bindName);
+                        markdownEditor.build();
                     break;
                 }
                 element.dataset.duice += generateUUID();
@@ -167,13 +192,13 @@ namespace duice {
      * duice.data
      */
     export namespace data {
-        
+
         /**
          * Super prototype of duice.data
          */
         export abstract class __ {
-            observers:Array<any> = new Array<any>();
-            addObserver(observer:any): void {
+            observers:Array<duice.ui.__> = new Array<duice.ui.__>();
+            addObserver(observer:duice.ui.__):void {
                 for(var i = 0, size = this.observers.length; i < size; i++){
                     if(this.observers[i] === observer){
                         return;
@@ -181,16 +206,10 @@ namespace duice {
                 }
                 this.observers.push(observer);
             }
-            notifyObservers(observer:any): void {
+            notifyObservers():void {
                 for(var i = 0, size = this.observers.length; i < size; i++){
-                    if(this.observers[i] === observer){
-                        continue;
-                    }
-                    this.observers[i].update();
+                    this.observers[i].update(this);
                 }
-            }
-            update():void {
-                this.notifyObservers(this);
             }
         }
         
@@ -198,37 +217,39 @@ namespace duice {
          * Map data structure
          */
         export class Map extends __ {
-            data:any = new Object();
+            values:any = new Object();
             parentNode:Map;
             childNodes:Array<Map> = new Array<Map>();
+            enable:boolean = true;
+            readonlyNames:Array<string> = new Array<string>();
             constructor(json:any) {
                 super();
                 this.fromJson(json);
             }
             fromJson(json: any): void {
-                this.data = new Object();
+                this.values = new Object();
                 for(var name in json){
-                    this.data[name] = json[name];
+                    this.values[name] = json[name];
                 }
-                this.notifyObservers(this);
+                this.notifyObservers();
             }
             toJson():object {
                 var json: any = new Object();
-                for(var name in this.data){
-                    json[name] = this.data[name];
+                for(var name in this.values){
+                    json[name] = this.values[name];
                 }
                 return json;
             }
             set(name:string, value:any):void {
-                this.data[name] = value;
-                this.notifyObservers(this);
+                this.values[name] = value;
+                this.notifyObservers();
             }
             get(name:string):any {
-                return this.data[name];
+                return this.values[name];
             }
-            getNames():any[]{
+            getNames():string[]{
                 var names = new Array();
-                for(var name in this.data){
+                for(var name in this.values){
                     names.push(name);
                 }
                 return names;
@@ -252,10 +273,29 @@ namespace duice {
             insertChildNode(index:number, node:Map):void {
                 node.setParentNode(this);
                 this.childNodes.splice(index, 0, node);
-                node.addObserver(this);
             }
             removeChildNode(index:number):void {
                 this.childNodes.splice(index,1);
+            }
+            setEnable(enable:boolean):void {
+                this.enable = enable;
+                this.notifyObservers();
+            }
+            isEnable():boolean {
+                return this.enable;
+            }
+            setReadonly(name:string, readonly:boolean):void {
+                if(this.readonlyNames.indexOf(name) == -1){
+                    this.readonlyNames.push(name);
+                }
+                this.notifyObservers();
+            }
+            isReadonly(name:string):boolean {
+                if(this.readonlyNames.indexOf(name) >= 0){
+                    return true;
+                }else{
+                    return false;
+                }
             }
         }
         
@@ -269,15 +309,17 @@ namespace duice {
                 super();
                 this.fromJson(jsonArray);
             }
+            update(ui:duice.ui.__):void {
+                
+            }
             fromJson(jsonArray:Array<any>):void {
                 this.mapList = new Array<Map>();
                 for(var i = 0; i < jsonArray.length; i ++ ) {
                     var map = new duice.data.Map(jsonArray[i]);
-                    map.addObserver(this);
                     this.mapList.push(map);
                 }
                 this.index = -1;
-                this.notifyObservers(this);
+                this.notifyObservers();
             }
             toJson():Array<object> {
                 var jsonArray = new Array();
@@ -288,14 +330,14 @@ namespace duice {
             }
             setIndex(index:number):void {
                 this.index = index;
-                this.notifyObservers(this);
+                this.notifyObservers();
             }
             getIndex():number {
                 return this.index;
             }
             clearIndex():void {
                 this.index = -1;
-                this.notifyObservers(this);
+                this.notifyObservers();
             }
             getRowCount():number {
                 return this.mapList.length;
@@ -304,26 +346,24 @@ namespace duice {
                 return this.mapList[index];
             }
             addRow(map:Map):void {
-                map.addObserver(this);
                 this.mapList.push(map);
                 this.index = this.getRowCount();
-                this.notifyObservers(this);
+                this.notifyObservers();
             }
             insertRow(index:number, map:Map):void {
-                map.addObserver(this);
                 this.mapList.splice(index, 0, map);
                 this.index = index;
-                this.notifyObservers(this);
+                this.notifyObservers();
             }
             removeRow(index:number):void {
                 this.mapList.splice(index, 1);
-                this.notifyObservers(this);
+                this.notifyObservers();
             }
             moveRow(fromIndex:number, toIndex:number):void {
                 this.index = fromIndex;
                 this.mapList.splice(toIndex, 0, this.mapList.splice(fromIndex, 1)[0]);
                 this.index = toIndex;
-                this.notifyObservers(this);
+                this.notifyObservers();
             }
             sortRow(name:string, ascending:boolean):void {
                 this.mapList.sort(function(a:duice.data.Map,b:duice.data.Map):number {
@@ -331,6 +371,7 @@ namespace duice {
                     var bValue = b.get(name);
                     return (aValue > bValue ? 1 : aValue < bValue ? -1 : 0) * (ascending == false ? -1 : 1);
                 });
+                this.notifyObservers();
             }
             forEach(handler:Function):void {
                 for(var i = 0, size = this.mapList.length; i < size; i ++){
@@ -369,22 +410,24 @@ namespace duice {
             }
         }
         
-        /**
-         * Tree data structure
-         */
-        export class Tree extends __ {
-            index:Array<number> = [];
-            rootNode:Map = new Map({});
-            Tree(jsonArray:Array<any>, childNodeName:string):void {
-                if(jsonArray) {
-                    this.fromJson(jsonArray, childNodeName);
-                }
-            }
-            fromJson(jsonArray:Array<Map>, childNodeName:string) {
-                this.rootNode = new Map({});
-                this.addObserver(this);
-            }
-        }
+//        /**
+//         * Tree data structure
+//         */
+//        export class Tree extends __ {
+//            index:Array<number> = [];
+//            rootNode:Map = new Map({});
+//            Tree(jsonArray:Array<any>, childNodeName:string):void {
+//                if(jsonArray) {
+//                    this.fromJson(jsonArray, childNodeName);
+//                }
+//            }
+//            fromJson(jsonArray:Array<Map>, childNodeName:string) {
+//                this.rootNode = new Map({});
+//            }
+//            toJson():any {
+//                return null;
+//            }
+//        }
     }
     
     /**
@@ -397,7 +440,8 @@ namespace duice {
          */
         export abstract class __ {
             abstract setBind(...args: any[]):void;
-            abstract update(): void;
+            abstract build():void;
+            abstract update(observable:duice.data.__):void;
             executeExpression(element:HTMLElement, $context:any):any {
                 var string = element.outerHTML;
                 string = string.replace(/\[\[(.*?)\]\]/mgi,function(match, command){
@@ -719,17 +763,20 @@ namespace duice {
             constructor(span:HTMLDivElement){
                 super();
                 this.div = span;
-                this.div.classList.add('duice-ui-text');
             }
             setBind(map:duice.data.Map, name:string):void {
                 this.bindMap = map;
                 this.bindName = name;
-                this.bindMap.addObserver(this);
             }
             setMode(mode:string):void {
                 this.mode = mode;
             }
-            update(): void {
+            build():void {
+                this.div.classList.add('duice-ui-text');
+                this.bindMap.addObserver(this);
+                this.update(null);
+            }
+            update(observable:duice.data.__):void {
                 this.removeChildNodes(this.div);
                 var value = this.bindMap.get(this.bindName);
                 if(this.mode === 'html') {
@@ -758,15 +805,31 @@ namespace duice {
             setBind(map:duice.data.Map, name:string):void {
                 this.bindMap = map;
                 this.bindName = name;
-                this.bindMap.addObserver(this);
+            }
+            build():void {
                 var $this = this;
+                this.bindMap.addObserver(this);
                 this.input.addEventListener('change', function(){
                     $this.bindMap.set($this.bindName, this.value);
                 });
+                this.update(null);
             }
-            update():void {
-                var value = this.bindMap.get(this.bindName);
-                this.input.value = value;
+            update(observable:duice.data.__):void {
+                this.input.value = this.bindMap.get(this.bindName);
+                
+                // checks enable
+                if(this.bindMap.isEnable()){
+                    this.input.disabled = false;
+                }else{
+                    this.input.disabled = true;
+                }
+                
+                // checks read-only
+                if(this.bindMap.isReadonly(this.bindName)){
+                    this.input.setAttribute('readOnly','readOnly');
+                }else{
+                    this.input.removeAttribute('readOnly');
+                }
             }
         }
         
@@ -785,15 +848,17 @@ namespace duice {
             setBind(map:duice.data.Map, name:string):void {
                 this.bindMap = map;
                 this.bindName = name;
-                this.bindMap.addObserver(this);
-                var $this = this;
-                this.textarea.addEventListener('change', function(){
-                   $this.bindMap.set($this.bindName, this.value); 
-                });
             }
-            update():void {
-                var value = this.bindMap.get(this.bindName);
-                this.textarea.value = value;
+            build():void {
+                var $this = this;
+                this.bindMap.addObserver(this);
+                this.textarea.addEventListener('change', function(){
+                    $this.bindMap.set($this.bindName, this.value);
+                });
+                this.update(null);
+            }
+            update(observable:duice.data.__):void {
+                this.textarea.value = this.bindMap.get(this.bindName);
             }
         }
         
@@ -815,28 +880,37 @@ namespace duice {
             setBind(map:duice.data.Map, name:string):void {
                 this.bindMap = map;
                 this.bindName = name;
-                this.bindMap.addObserver(this);
-                var $this = this;
-                this.select.addEventListener('change', function(){
-                    $this.bindMap.set($this.bindName, this.value);
-                });
             }
             setOption(list:duice.data.List, value:string, text:string):void {
                 this.optionList = list;
                 this.optionValue = value;
                 this.optionText = text;
             }
-            update():void {
-                this.removeChildNodes(this.select);
-                for(var i = 0, size = this.optionList.getRowCount(); i < size; i ++){
-                    var optionMap = this.optionList.getRow(i);
-                    var option = document.createElement('option');
-                    option.appendChild(document.createTextNode(optionMap.get(this.optionText)));
-                    option.value = optionMap.get(this.optionValue);
-                    this.select.appendChild(option);
+            build():void {
+                var $this = this;
+                this.bindMap.addObserver(this);
+                this.select.addEventListener('change', function(){
+                    $this.bindMap.set($this.bindName, this.value);
+                });
+                this.update(this.bindMap);
+                this.optionList.addObserver(this);
+                this.update(this.optionList);
+            }
+            update(observable:duice.data.__):void {
+                if(observable === this.optionList){
+                    this.removeChildNodes(this.select);
+                    for(var i = 0, size = this.optionList.getRowCount(); i < size; i ++){
+                        var optionMap = this.optionList.getRow(i);
+                        var option = document.createElement('option');
+                        option.appendChild(document.createTextNode(optionMap.get(this.optionText)));
+                        option.value = optionMap.get(this.optionValue);
+                        this.select.appendChild(option);
+                    }
                 }
-                var value = this.bindMap.get(this.bindName);
-                this.select.value = value;
+                if(observable === this.bindMap){
+                    var value = this.bindMap.get(this.bindName);
+                    this.select.value = value;
+                }
             }
         }
         
@@ -847,8 +921,6 @@ namespace duice {
             input:HTMLInputElement;
             bindMap:duice.data.Map;
             bindName:string;
-            optionCheck:any;
-            optionUncheck:any;
             constructor(input:HTMLInputElement) {
                 super();
                 this.input = input;
@@ -857,19 +929,18 @@ namespace duice {
             setBind(map:duice.data.Map, name:string):void {
                 this.bindMap = map;
                 this.bindName = name;
-                this.bindMap.addObserver(this);
+            }
+            build():void {
                 var $this = this;
+                this.bindMap.addObserver(this);
                 this.input.addEventListener('change', function(){
-                    $this.bindMap.set($this.bindName, this.checked ? $this.optionCheck : $this.optionUncheck);
+                    $this.bindMap.set($this.bindName, this.checked);
                 });
+                this.update(null);
             }
-            setOption(check:any, uncheck:any):void {
-                this.optionCheck = check;
-                this.optionUncheck = uncheck;
-            }
-            update():void {
+            update(observable:duice.data.__):void {
                 var value = this.bindMap.get(this.bindName);
-                if(value === this.optionCheck){
+                if(value === true){
                     this.input.checked = true;
                 }else{
                     this.input.checked = false;
@@ -892,19 +963,55 @@ namespace duice {
             setBind(map:duice.data.Map, name:string):void {
                 this.bindMap = map;
                 this.bindName = name;
-                this.bindMap.addObserver(this);
+            }
+            build():void {
                 var $this = this;
+                this.bindMap.addObserver(this);
                 this.input.addEventListener('change', function(){
                     $this.bindMap.set($this.bindName, this.value);
                 });
+                this.update(null);
             }
-            update():void {
+            update(observable:duice.data.__):void {
                 var value = this.bindMap.get(this.bindName);
                 if(value === this.input.value){
                     this.input.checked = true;
                 }else{
                     this.input.checked = false;
                 }
+            }
+        }
+        
+        /**
+         * duice.ui.Calendar
+         */
+        export class Calendar extends __ {
+            input:HTMLInputElement;
+            bindMap:duice.data.Map;
+            bindName:string;
+            constructor(input:HTMLInputElement){
+                super();
+                this.input = input;
+                this.input.classList.add('duice-ui-textField');
+            }
+            setBind(map:duice.data.Map, name:string):void {
+                this.bindMap = map;
+                this.bindName = name;
+
+            }
+            build():void {
+                var $this = this;
+                this.bindMap.addObserver(this);
+                this.input.addEventListener('change', function(){
+                    $this.bindMap.set($this.bindName, this.value);
+                });
+            }
+            update(observable:duice.data.__):void {
+                var value = this.bindMap.get(this.bindName);
+                this.input.value = value;
+            }
+            createPicker():void {
+                
             }
         }
         
@@ -917,61 +1024,70 @@ namespace duice {
             bindName:string;
             input:HTMLInputElement;
             blank:string;
-            width:number = 128;
-            height:number = 128;
+            limitSize:number = 1024 * 1024;
             constructor(img:HTMLImageElement) {
                 super();
                 this.img = img;
                 this.img.classList.add('duice-ui-image');
+
+            }
+            setBind(map:duice.data.Map, name:string):void {
+                this.bindMap = map;
+                this.bindName = name;
+
+            }
+            build():void {
+                var $this = this;
                 this.input = document.createElement('input');
                 this.input.setAttribute("type", "file");
                 this.input.setAttribute("accept", "image/gif, image/jpeg, image/png");
-                this.blank = img.src;
-            }
-            setBind(map:duice.data.Map, name:string):void {
-                var $this = this;
-                this.bindMap = map;
-                this.bindName = name;
-                this.bindMap.addObserver(this);
-                this.img.addEventListener('error', function() {
-                    console.log('error',this);
-                });
+                this.blank = this.img.src;
                 
-                // adds click event
-                this.img.addEventListener('click', function() {
-                    $this.input.click();
+                // adds event listener for change
+                this.img.addEventListener('click', function(e:any){
+                    if($this.bindMap.isEnable() && $this.bindMap.isReadonly($this.bindName) == false){
+                        $this.input.click();
+                    }
                 });
-            
-                // add change event listener
                 this.input.addEventListener('change', function(e:any){
                     var fileReader = new FileReader();
                     if (this.files && this.files[0]) {
                         fileReader.addEventListener("load", function(e:any) {
                             var value = e.target.result;
-                            var width = $this.width;
-                            var height = $this.height;
                             var canvas = document.createElement("canvas");
                             var ctx = canvas.getContext("2d");
-                            canvas.width = width;
-                            canvas.height = height;
                             var image = document.createElement('img');
                             image.onload = function(){
-                                ctx.drawImage(image, 0, 0, width, height);
+                                ctx.drawImage(image, 0, 0);
                                 value = canvas.toDataURL("image/png");
                                 $this.bindMap.set($this.bindName, value);
                             };
                             image.src = value;
-                        }); 
+                        });
                         fileReader.readAsDataURL(this.files[0]);
                     }
                 });
+                
+                // bind data
+                this.bindMap.addObserver(this);
+                this.img.addEventListener('error', function() {
+                    console.log('error',this);
+                });
+                
+                // update
+                this.update(null);
             }
-            update():void {
+            update(observable:duice.data.__):void {
                 if(this.bindMap.get(this.bindName)) {
                     var src = this.bindMap.get(this.bindName);
                     this.img.src = src; 
                 }else{
                     this.img.src = this.blank;
+                }
+                if(this.bindMap.isEnable() && this.bindMap.isReadonly(this.bindName) == false){
+                    this.img.style.cursor = 'pointer';
+                }else{
+                    this.img.style.cursor = '';
                 }
             }
         }
@@ -993,6 +1109,13 @@ namespace duice {
                 super();
                 this.div = div;
                 this.div.classList.add('duice-ui-htmlEditor');
+            }
+            setBind(map:duice.data.Map, name:string):void {
+                this.bindMap = map;
+                this.bindName = name;
+            }
+            build():void {
+                var $this = this;
                 
                 // create tool bar
                 this.toolBar = document.createElement('div');
@@ -1151,22 +1274,22 @@ namespace duice {
                 this.contentText.style.display = 'none';
                 this.content.appendChild(this.contentText);
                 this.div.appendChild(this.content);
-            }
-            setBind(map:duice.data.Map, name:string):void {
-                this.bindMap = map;
-                this.bindName = name;
+
+                // bind element
                 this.bindMap.addObserver(this);
-                var $this = this;
                 this.contentHtml.addEventListener('DOMSubtreeModified', function(){
-                    if(map.get(name) !== this.innerHTML){
-                        map.set(name, this.innerHTML);
+                    if($this.bindMap.get($this.bindName) !== this.innerHTML){
+                        $this.bindMap.set($this.bindName, this.innerHTML);
                     }
                 });
                 this.contentText.addEventListener('change', function(){
-                    map.set(name, this.value);
+                    $this.bindMap.set($this.bindName, this.value);
                 });
+                
+                // update
+                this.update(null);
             }
-            update():void {
+            update(observable:duice.data.__):void {
                 if(this.contentHtml.innerHTML !== this.bindMap.get(this.bindName)) {
                     this.contentHtml.innerHTML = this.bindMap.get(this.bindName);
                 }
@@ -1206,9 +1329,15 @@ namespace duice {
             selectionEnd:number;
             constructor(div:HTMLDivElement){
                 super();
-                var $this = this;
                 this.div = div;
                 this.div.classList.add('duice-ui-markdownEditor');
+            }
+            setBind(map:duice.data.Map, name:string):void {
+                this.bindMap = map;
+                this.bindName = name;
+            }
+            build():void {
+                var $this = this;
                 
                 // create tool bar
                 this.toolBar = document.createElement('div');
@@ -1331,19 +1460,18 @@ namespace duice {
                 this.contentHtml.style.display = 'none';
                 this.content.appendChild(this.contentHtml);
                 this.div.appendChild(this.content);
-            }
-            setBind(map:duice.data.Map, name:string):void {
-                this.bindMap = map;
-                this.bindName = name;
+                
+                // bind data object
                 this.bindMap.addObserver(this);
-                var $this = this;
                 this.contentMarkdown.addEventListener('change', function(){
-                    map.set(name, this.value);
+                    $this.bindMap.set($this.bindName, this.value);
                 });
+                
+                // updates data
+                this.update(null);
             }
-            update():void {
+            update(observable:duice.data.__):void {
                 if(this.contentMarkdown.value !== this.bindMap.get(this.bindName)){
-                    console.log('update');
                     this.contentMarkdown.value = this.bindMap.get(this.bindName);
                     this.contentMarkdown.setSelectionRange(this.selectionStart,this.selectionEnd);
                     this.contentHtml.innerHTML = this.parseMarkdown(this.bindMap.get(this.bindName));
@@ -1379,88 +1507,75 @@ namespace duice {
             }
         }
         
-        /**
-         * duice.ui.Calendar
-         */
-        export class Calendar extends __ {
-            constructor(input:HTMLInputElement){
-                super();
-            }
-            setBind(list:duice.data.List):void {
-            }
-            update():void {
-            }
-        }
-        
-        /**
-         * duice.ui.CronExpression
-         */
-        export class CronExpression extends __ {
-            constructor(input:HTMLInputElement){
-                super();
-            }
-            setBind(list:duice.data.List):void {
-            }
-            update():void {
-            }
-        }
-        
-        /**
-         * duice.ui.ListViewer
-         */
-        export class ListViewer extends __ {
-            ul:HTMLUListElement;
-            li:HTMLLIElement;
-            bindList:duice.data.List;
-            item:string;
-            rows:Array<HTMLLIElement> = new Array<HTMLLIElement>();
-            editable:boolean;
-            constructor(ul:HTMLUListElement){
-                super();
-                this.ul = ul;
-                this.ul.classList.add('duice-ui-listViewer');
-                var li = this.ul.querySelector('li');
-                this.li = <HTMLLIElement>li.cloneNode(true);
-                this.ul.innerHTML = '';
-            }
-            setBind(list:duice.data.List):void {
-                this.bindList = list;
-                this.bindList.addObserver(this);   
-            }
-            setItem(item:string):void {
-                this.item = item;
-            }
-            setEditable(editable:boolean):void {
-                this.editable = editable;
-            }
-            update():void {
-                var $this = this;
-                
-                // remove previous rows
-                for(var i = 0; i < this.rows.length; i ++ ) {
-                    this.ul.removeChild(this.rows[i]);
-                }
-                this.rows.length = 0;
-                
-                // creates new rows
-                for(var index = 0; index < this.bindList.getRowCount(); index ++ ) {
-                    var map = this.bindList.getRow(index);
-                    var row = this.createRow(index,map);
-                    this.ul.appendChild(row);
-                    this.rows.push(row);
-                }
-            }
-            createRow(index:number, bindMap:duice.data.Map):HTMLLIElement {
-                var $this = this;
-                var row:HTMLLIElement = <HTMLLIElement>this.li.cloneNode(true);
-                var $context:any = new Object;
-                $context['index'] = index;
-                $context[this.item] = bindMap;
-                row = this.executeExpression(<HTMLElement>row, $context);
-                initialize(row,$context);
-                return row;
-            }
-        }
+//        /**
+//         * duice.ui.CronExpression
+//         */
+//        export class CronExpression extends __ {
+//            constructor(input:HTMLInputElement){
+//                super();
+//            }
+//            setBind(list:duice.data.List):void {
+//            }
+//            update():void {
+//            }
+//        }
+
+//        /**
+//         * duice.ui.ListViewer
+//         */
+//        export class ListViewer extends __ {
+//            ul:HTMLUListElement;
+//            li:HTMLLIElement;
+//            bindList:duice.data.List;
+//            item:string;
+//            rows:Array<HTMLLIElement> = new Array<HTMLLIElement>();
+//            editable:boolean;
+//            constructor(ul:HTMLUListElement){
+//                super();
+//                this.ul = ul;
+//                this.ul.classList.add('duice-ui-listViewer');
+//                var li = this.ul.querySelector('li');
+//                this.li = <HTMLLIElement>li.cloneNode(true);
+//                this.ul.innerHTML = '';
+//            }
+//            setBind(list:duice.data.List):void {
+//                this.bindList = list;
+//                this.bindList.addObserver(this);   
+//            }
+//            setItem(item:string):void {
+//                this.item = item;
+//            }
+//            setEditable(editable:boolean):void {
+//                this.editable = editable;
+//            }
+//            update():void {
+//                var $this = this;
+//                
+//                // remove previous rows
+//                for(var i = 0; i < this.rows.length; i ++ ) {
+//                    this.ul.removeChild(this.rows[i]);
+//                }
+//                this.rows.length = 0;
+//                
+//                // creates new rows
+//                for(var index = 0; index < this.bindList.getRowCount(); index ++ ) {
+//                    var map = this.bindList.getRow(index);
+//                    var row = this.createRow(index,map);
+//                    this.ul.appendChild(row);
+//                    this.rows.push(row);
+//                }
+//            }
+//            createRow(index:number, bindMap:duice.data.Map):HTMLLIElement {
+//                var $this = this;
+//                var row:HTMLLIElement = <HTMLLIElement>this.li.cloneNode(true);
+//                var $context:any = new Object;
+//                $context['index'] = index;
+//                $context[this.item] = bindMap;
+//                row = this.executeExpression(<HTMLElement>row, $context);
+//                initialize(row,$context);
+//                return row;
+//            }
+//        }
         
         /**
          * duice.ui.TableViewer
@@ -1484,13 +1599,16 @@ namespace duice {
             }
             setBind(list:duice.data.List):void {
                 this.bindList = list;
-                this.bindList.addObserver(this);
             }
             setItem(item:string):void {
                 this.item = item;
             }
             setEditable(editable:boolean):void {
                 this.editable = editable;
+            }
+            build():void {
+                this.bindList.addObserver(this);
+                this.update();
             }
             update():void {
                 var $this = this;
@@ -1554,7 +1672,6 @@ namespace duice {
                         var toIndex = index;
                         $this.bindList.moveRow(fromIndex, toIndex);
                         $this.bindList.index = toIndex;
-                        $this.update();
                         row.click();
                     });
                 }
@@ -1578,16 +1695,16 @@ namespace duice {
                 return emptyRow;
             }
         }
-        
-        /**
-         * duice.ui.TreeViewer
-         */
-        export class TreeViewer extends __ {
-            setBind(list:duice.data.List):void {
-            }
-            update():void {
-            }
-        }
+//        
+//        /**
+//         * duice.ui.TreeViewer
+//         */
+//        export class TreeViewer extends __ {
+//            setBind(list:duice.data.List):void {
+//            }
+//            update():void {
+//            }
+//        }
     }
 
 }
