@@ -999,16 +999,7 @@ namespace duice {
             bindName:string;
             format:string = 'yyyy-MM-dd HH:mm:ss';
             date:Date = new Date();
-            windowClickListener:any = function(event:any){
-                //if(this.dateTimePicker){
-                    if (this.input.contains(event.target) || this.dateTimePicker.contains(event.target)){
-                        console.log('click inside.');
-                    }else{
-                        console.log('click outside.');
-                        this.closeDateTimePicker();
-                    }
-                //}
-            }
+            windowClickListener:any;
             constructor(input:HTMLInputElement){
                 super();
                 this.input = input;
@@ -1044,8 +1035,6 @@ namespace duice {
                 var $this = this;
                 this.dateTimePicker = document.createElement('div');
                 this.dateTimePicker.classList.add('duice-ui-calendar-dateTimePicker');
-                this.dateTimePicker.style.position = 'absolute';
-                this.dateTimePicker.style.zIndex = String(this.getCurrentMaxZIndex());
                 
                 // click event listener
                 this.windowClickListener = function(event:any){
@@ -1225,8 +1214,10 @@ namespace duice {
                 footer.appendChild(confirm);
                 
                 // show
-                this.input.parentNode.appendChild(this.dateTimePicker);
+                this.dateTimePicker.style.position = 'absolute';
+                this.dateTimePicker.style.zIndex = String(this.getCurrentMaxZIndex() + 1);
                 this.dateTimePicker.style.display = 'block';
+                this.input.parentNode.appendChild(this.dateTimePicker);
             }
             closeDateTimePicker():void {
                 this.dateTimePicker.style.display = 'none';

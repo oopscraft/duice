@@ -990,17 +990,6 @@ var duice;
                 var _this = _super.call(this) || this;
                 _this.format = 'yyyy-MM-dd HH:mm:ss';
                 _this.date = new Date();
-                _this.windowClickListener = function (event) {
-                    //if(this.dateTimePicker){
-                    if (this.input.contains(event.target) || this.dateTimePicker.contains(event.target)) {
-                        console.log('click inside.');
-                    }
-                    else {
-                        console.log('click outside.');
-                        this.closeDateTimePicker();
-                    }
-                    //}
-                };
                 _this.input = input;
                 _this.input.classList.add('duice-ui-calendar');
                 return _this;
@@ -1034,8 +1023,6 @@ var duice;
                 var $this = this;
                 this.dateTimePicker = document.createElement('div');
                 this.dateTimePicker.classList.add('duice-ui-calendar-dateTimePicker');
-                this.dateTimePicker.style.position = 'absolute';
-                this.dateTimePicker.style.zIndex = String(this.getCurrentMaxZIndex());
                 // click event listener
                 this.windowClickListener = function (event) {
                     if (!$this.input.contains(event.target) && !$this.dateTimePicker.contains(event.target)) {
@@ -1193,8 +1180,10 @@ var duice;
                 confirm.classList.add('duice-ui-calendar-dateTimePicker-footer-confirm');
                 footer.appendChild(confirm);
                 // show
-                this.input.parentNode.appendChild(this.dateTimePicker);
+                this.dateTimePicker.style.position = 'absolute';
+                this.dateTimePicker.style.zIndex = String(this.getCurrentMaxZIndex() + 1);
                 this.dateTimePicker.style.display = 'block';
+                this.input.parentNode.appendChild(this.dateTimePicker);
             };
             Calendar.prototype.closeDateTimePicker = function () {
                 this.dateTimePicker.style.display = 'none';
