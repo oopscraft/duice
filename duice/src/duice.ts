@@ -1,39 +1,6 @@
 namespace duice {
     
     /**
-     * duice.generateUUID
-     */
-    export function generateUUID():string {
-        var dt = new Date().getTime();
-        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            var r = (dt + Math.random()*16)%16 | 0;
-            dt = Math.floor(dt/16);
-            return (c=='x' ? r :(r&0x3|0x8)).toString(16);
-        });
-        return uuid;
-    }
-    
-    /**
-     * duice.getObject
-     * @param $context
-     * @param name
-     */
-    export function getObject($context:any, name:string) {
-        if($context.hasOwnProperty(name)){
-            return $context[name];
-        }
-        if((<any>window).hasOwnProperty(name)){
-            return (<any>window)[name];
-        }
-        try {
-            return eval(name);
-        }catch(e){
-            console.error(e,$context, name);
-            throw e;
-        }
-    };
-    
-    /**
      * duice.initialize
      * @param container
      * @param $context
@@ -189,6 +156,39 @@ namespace duice {
     }
     
     /**
+     * generateObjectID
+     */
+    function generateUUID():string {
+        var dt = new Date().getTime();
+        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = (dt + Math.random()*16)%16 | 0;
+            dt = Math.floor(dt/16);
+            return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+        });
+        return uuid;
+    }
+    
+    /**
+     * getObject
+     * @param $context
+     * @param name
+     */
+    function getObject($context:any, name:string) {
+        if($context.hasOwnProperty(name)){
+            return $context[name];
+        }
+        if((<any>window).hasOwnProperty(name)){
+            return (<any>window)[name];
+        }
+        try {
+            return eval(name);
+        }catch(e){
+            console.error(e,$context, name);
+            throw e;
+        }
+    };
+    
+    /**
      * duice.data
      */
     export namespace data {
@@ -196,9 +196,9 @@ namespace duice {
         /**
          * Super prototype of duice.data
          */
-        export abstract class __ {
-            observers:Array<duice.ui.__> = new Array<duice.ui.__>();
-            addObserver(observer:duice.ui.__):void {
+        export abstract class DataObject {
+            observers:Array<duice.ui.UIComponent> = new Array<duice.ui.UIComponent>();
+            addObserver(observer:duice.ui.UIComponent):void {
                 for(var i = 0, size = this.observers.length; i < size; i++){
                     if(this.observers[i] === observer){
                         return;
@@ -216,7 +216,7 @@ namespace duice {
         /**
          * Map data structure
          */
-        export class Map extends __ {
+        export class Map extends DataObject {
             values:any = new Object();
             parentNode:Map;
             childNodes:Array<Map> = new Array<Map>();
@@ -302,14 +302,14 @@ namespace duice {
         /**
          * List data structure
          */
-        export class List extends __ {
+        export class List extends DataObject {
             mapList:Array<Map> = new Array<Map>();
             index:number = -1;
             constructor(jsonArray:Array<any>) {
                 super();
                 this.fromJson(jsonArray);
             }
-            update(ui:duice.ui.__):void {
+            update(ui:duice.ui.UIComponent):void {
                 
             }
             fromJson(jsonArray:Array<any>):void {
@@ -438,10 +438,10 @@ namespace duice {
         /**
          * Super prototype of duice.ui
          */
-        export abstract class __ {
+        export abstract class UIComponent {
             abstract setBind(...args: any[]):void;
             abstract build():void;
-            abstract update(observable:duice.data.__):void;
+            abstract update(observable:duice.data.DataObject):void;
             executeExpression(element:HTMLElement, $context:any):any {
                 var string = element.outerHTML;
                 string = string.replace(/\[\[(.*?)\]\]/mgi,function(match, command){
@@ -616,6 +616,9 @@ namespace duice {
                 template.innerHTML = html;
                 return template.content;
             }
+            /**
+             * getCurrentWindow
+             */
             getCurrentWindow():Window {
                 if(window.frameElement){
                     return window.parent;
@@ -627,6 +630,10 @@ namespace duice {
                 var parentNode = element.parentNode;
                 return parentNode;
             }
+            /**
+             * setPositionCentered
+             * @param element
+             */
             setPositionCentered(element:HTMLElement):void {
                 var window = this.getCurrentWindow();
                 var computedStyle = window.getComputedStyle(element);
@@ -727,7 +734,7 @@ namespace duice {
                 div.style.zIndex = String(this.getCurrentMaxZIndex() + 1);
 
                 // on resize event
-                this.getCurrentWindow().addEventListener('resize', function(ev) {
+                this.getCurrentWindow().addEventListener('resize', function(event:any) {
                     if(div){
                         $this.setPositionCentered(div);
                         div.style.top = '30vh';   // adjust top
@@ -755,7 +762,7 @@ namespace duice {
         /**
          * duice.ui.Text
          */
-        export class Text extends __ {
+        export class Text extends UIComponent {
             div:HTMLDivElement;
             bindMap:duice.data.Map;
             bindName:string;
@@ -776,7 +783,7 @@ namespace duice {
                 this.bindMap.addObserver(this);
                 this.update(null);
             }
-            update(observable:duice.data.__):void {
+            update(observable:duice.data.DataObject):void {
                 this.removeChildNodes(this.div);
                 var value = this.bindMap.get(this.bindName);
                 if(this.mode === 'html') {
@@ -793,7 +800,7 @@ namespace duice {
         /**
          * duice.ui.TextField
          */
-        export class TextField extends __ {
+        export class TextField extends UIComponent {
             input:HTMLInputElement;
             bindMap:duice.data.Map;
             bindName:string;
@@ -814,7 +821,7 @@ namespace duice {
                 });
                 this.update(null);
             }
-            update(observable:duice.data.__):void {
+            update(observable:duice.data.DataObject):void {
                 this.input.value = this.bindMap.get(this.bindName);
                 
                 // checks enable
@@ -836,7 +843,7 @@ namespace duice {
         /**
          * duice.ui.TextArea
          */
-        export class TextArea extends __ {
+        export class TextArea extends UIComponent {
             textarea:HTMLTextAreaElement;
             bindMap:duice.data.Map;
             bindName:string;
@@ -857,7 +864,7 @@ namespace duice {
                 });
                 this.update(null);
             }
-            update(observable:duice.data.__):void {
+            update(observable:duice.data.DataObject):void {
                 this.textarea.value = this.bindMap.get(this.bindName);
             }
         }
@@ -865,7 +872,7 @@ namespace duice {
         /**
          * duice.ui.ComboBox
          */
-        export class ComboBox extends __ {
+        export class ComboBox extends UIComponent {
             select:HTMLSelectElement;
             bindMap:duice.data.Map;
             bindName:string;
@@ -896,7 +903,7 @@ namespace duice {
                 this.optionList.addObserver(this);
                 this.update(this.optionList);
             }
-            update(observable:duice.data.__):void {
+            update(observable:duice.data.DataObject):void {
                 if(observable === this.optionList){
                     this.removeChildNodes(this.select);
                     for(var i = 0, size = this.optionList.getRowCount(); i < size; i ++){
@@ -917,7 +924,7 @@ namespace duice {
         /**
          * duice.ui.CheckBox
          */
-        export class CheckBox extends __ {
+        export class CheckBox extends UIComponent {
             input:HTMLInputElement;
             bindMap:duice.data.Map;
             bindName:string;
@@ -938,7 +945,7 @@ namespace duice {
                 });
                 this.update(null);
             }
-            update(observable:duice.data.__):void {
+            update(observable:duice.data.DataObject):void {
                 var value = this.bindMap.get(this.bindName);
                 if(value === true){
                     this.input.checked = true;
@@ -951,7 +958,7 @@ namespace duice {
         /**
          * duice.ui.Radio
          */
-        export class Radio extends __ {
+        export class Radio extends UIComponent {
             input:HTMLInputElement;
             bindMap:duice.data.Map;
             bindName:string;
@@ -972,7 +979,7 @@ namespace duice {
                 });
                 this.update(null);
             }
-            update(observable:duice.data.__):void {
+            update(observable:duice.data.DataObject):void {
                 var value = this.bindMap.get(this.bindName);
                 if(value === this.input.value){
                     this.input.checked = true;
@@ -985,19 +992,31 @@ namespace duice {
         /**
          * duice.ui.Calendar
          */
-        export class Calendar extends __ {
+        export class Calendar extends UIComponent {
             input:HTMLInputElement;
+            dateTimePicker:HTMLDivElement;
             bindMap:duice.data.Map;
             bindName:string;
+            format:string = 'yyyy-MM-dd HH:mm:ss';
+            date:Date = new Date();
+            windowClickListener:any = function(event:any){
+                //if(this.dateTimePicker){
+                    if (this.input.contains(event.target) || this.dateTimePicker.contains(event.target)){
+                        console.log('click inside.');
+                    }else{
+                        console.log('click outside.');
+                        this.closeDateTimePicker();
+                    }
+                //}
+            }
             constructor(input:HTMLInputElement){
                 super();
                 this.input = input;
-                this.input.classList.add('duice-ui-textField');
+                this.input.classList.add('duice-ui-calendar');
             }
             setBind(map:duice.data.Map, name:string):void {
                 this.bindMap = map;
                 this.bindName = name;
-
             }
             build():void {
                 var $this = this;
@@ -1005,20 +1024,221 @@ namespace duice {
                 this.input.addEventListener('change', function(){
                     $this.bindMap.set($this.bindName, this.value);
                 });
+                
+                // date picker
+                this.input.addEventListener('focus', function(){
+                    $this.openDateTimePicker($this.date);
+                });
             }
-            update(observable:duice.data.__):void {
+            update(observable:duice.data.DataObject):void {
                 var value = this.bindMap.get(this.bindName);
                 this.input.value = value;
             }
-            createPicker():void {
+            convertDateToString(date:Date, format:string):string {
+                return null;
+            }
+            convertStringToDate(string:string, format:string):Date {
+                return null;
+            }
+            openDateTimePicker(date:Date):void {
+                var $this = this;
+                this.dateTimePicker = document.createElement('div');
+                this.dateTimePicker.classList.add('duice-ui-calendar-dateTimePicker');
+                this.dateTimePicker.style.position = 'absolute';
+                this.dateTimePicker.style.zIndex = String(this.getCurrentMaxZIndex());
                 
+                // click event listener
+                this.windowClickListener = function(event:any){
+                    if(!$this.input.contains(event.target) && !$this.dateTimePicker.contains(event.target)){
+                        $this.closeDateTimePicker();
+                    }
+                }
+                window.addEventListener('click', this.windowClickListener);
+
+                // defines year, month, date integer.
+                var yyyy = date.getFullYear();
+                var mm = date.getMonth();
+                var dd = date.getDate();
+                var hh = date.getHours();
+                var mi = date.getMinutes();
+                var ss = date.getSeconds();
+                
+                // datePicker
+                var datePicker = document.createElement('div');
+                datePicker.classList.add('duice-ui-calendar-dateTimePicker-datePicker');
+                this.dateTimePicker.appendChild(datePicker);
+                
+                // toolBar
+                var toolBar = document.createElement('div');
+                toolBar.classList.add('duice-ui-calendar-dateTimePicker-datePicker-toolBar');
+                datePicker.appendChild(toolBar);
+                
+                // previous month button
+                var prevMonth = document.createElement('button');
+                prevMonth.classList.add('duice-ui-calendar-dateTimePicker-datePicker-toolBar-prevMonth');
+                toolBar.appendChild(prevMonth);
+                
+                // today
+                var today = document.createElement('button');
+                today.classList.add('duice-ui-calendar-dateTimePicker-datePicker-toolBar-today');
+                toolBar.appendChild(today);
+                
+                // year select
+                var yearSelect = document.createElement('select');
+                yearSelect.classList.add('duice-ui-calendar-dateTimePicker-datePicker-toolBar-yearSelect');
+                toolBar.appendChild(yearSelect);
+                for(var i = yyyy - 5, end = yyyy + 5; i <= end; i ++ ) {
+                    var option = document.createElement('option');
+                    option.value = String(i);
+                    option.text = String(i);
+                    yearSelect.appendChild(option);
+                }
+                yearSelect.value = String(yyyy);
+                yearSelect.addEventListener('change', function(event){
+//                    date.setFullYear(parseInt(this.value));
+//                    $this.openDatePicker(date);
+                });
+                
+                // divider
+                toolBar.appendChild(document.createTextNode('-'));
+                
+                // month select
+                var monthSelect = document.createElement('select');
+                monthSelect.classList.add('duice-ui-calendar-dateTimePicker-datePicker-toolBar-monthSelect');
+                toolBar.appendChild(monthSelect);
+                for(var i = 1, end = 12; i <= end; i ++ ) {
+                    var option = document.createElement('option');
+                    option.value = String(i);
+                    option.text = String(i);
+                    if(i === yyyy){
+                        option.setAttribute('selected', 'selected');
+                    }
+                    monthSelect.appendChild(option);
+                }
+                monthSelect.addEventListener('change', function(event){
+//                    date.setFullYear(parseInt(this.value));
+//                    $this.openDatePicker(date);
+                });
+                monthSelect.value = String(mm);
+               
+                // next month button
+                var nextMonth = document.createElement('button');
+                nextMonth.classList.add('duice-ui-calendar-dateTimePicker-datePicker-toolBar-nextMonth');
+                toolBar.appendChild(nextMonth);
+                
+                // calendar table
+                var dateTable = document.createElement('table');
+                dateTable.classList.add('duice-ui-calendar-dateTimePicker-datePicker-dateTable');
+                this.dateTimePicker.appendChild(dateTable);
+                var dayThead = document.createElement('thead');
+                dateTable.appendChild(dayThead);
+                var dayTr = document.createElement('tr');
+                dayThead.appendChild(dayTr);
+                ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(function(element){
+                    var dayTh = document.createElement('th');
+                    dayTh.appendChild(document.createTextNode(element));
+                    dayTr.appendChild(dayTh);
+                });
+                
+                var dateTbody = document.createElement('tbody');
+                dateTable.appendChild(dateTbody);
+                var startDay = new Date(yyyy,mm,1).getDay();
+                var lastDays = [31,28,31,30,31,30,31,31,30,31,30,31];
+                if (yyyy%4 && yyyy%100!=0 || yyyy%400===0) {
+                    lastDays[1] = 29;
+                }
+                var lastDay = lastDays[mm];
+                var rowNum = Math.ceil((startDay + lastDay)/7);
+                var dNum = 1;
+                var currentDate = new Date();
+                for (var i=1; i<=rowNum; i++) {
+                    console.log('i',i);
+                    var dateTr = document.createElement('tr');
+                    for (var k=1; k<=7; k++) {
+                        var dateTd = document.createElement('td');
+                        if(dNum <= lastDay) {
+                            dateTd.appendChild(document.createTextNode(String(dNum)));
+                        }
+                        dateTr.appendChild(dateTd);
+                        dNum++;
+                    }
+                    dateTbody.appendChild(dateTr);
+                }
+                
+                // timePicker
+                var timePicker = document.createElement('div');
+                timePicker.classList.add('duice-ui-calendar-dateTimePicker-timePicker');
+                this.dateTimePicker.appendChild(timePicker);
+                
+                // now
+                var now = document.createElement('button');
+                now.classList.add('duice-ui-calendar-dateTimePicker-timePicker-now');
+                timePicker.appendChild(now);
+
+                // hourSelect
+                var hourSelect = document.createElement('select');
+                hourSelect.classList.add('duice-ui-calendar-dateTimePicker-timePicker-hourSelect');
+                for(var i = 0; i < 23; i ++){
+                    var option = document.createElement('option');
+                    option.value = String(i);
+                    option.text = String(i);
+                    hourSelect.appendChild(option);
+                }
+                timePicker.appendChild(hourSelect);
+                
+                // divider
+                timePicker.appendChild(document.createTextNode(':'));
+                
+                // minuteSelect
+                var minuteSelect = document.createElement('select');
+                minuteSelect.classList.add('duice-ui-calendar-dateTimePicker-timePicker-minuteSelect');
+                for(var i = 0; i < 59; i ++){
+                    var option = document.createElement('option');
+                    option.value = String(i);
+                    option.text = String(i);
+                    minuteSelect.appendChild(option);
+                }
+                timePicker.appendChild(minuteSelect);
+                
+                // divider
+                timePicker.appendChild(document.createTextNode(':'));
+                
+                // secondsSelect
+                var secondSelect = document.createElement('select');
+                secondSelect.classList.add('duice-ui-calendar-dateTimePicker-timePicker-secondSelect');
+                for(var i = 0; i < 59; i ++){
+                    var option = document.createElement('option');
+                    option.value = String(i);
+                    option.text = String(i);
+                    secondSelect.appendChild(option);
+                }
+                timePicker.appendChild(secondSelect);
+                
+                // footer
+                var footer = document.createElement('div');
+                footer.classList.add('duice-ui-calendar-dateTimePicker-footer');
+                this.dateTimePicker.appendChild(footer);
+                
+                // confirm
+                var confirm = document.createElement('button');
+                confirm.classList.add('duice-ui-calendar-dateTimePicker-footer-confirm');
+                footer.appendChild(confirm);
+                
+                // show
+                this.input.parentNode.appendChild(this.dateTimePicker);
+                this.dateTimePicker.style.display = 'block';
+            }
+            closeDateTimePicker():void {
+                this.dateTimePicker.style.display = 'none';
+                this.dateTimePicker.remove();
+                window.removeEventListener('click', this.windowClickListener);
             }
         }
         
         /**
          * duice.ui.Image
          */
-        export class Image extends __ {
+        export class Image extends UIComponent {
             img:HTMLImageElement;
             bindMap:duice.data.Map;
             bindName:string;
@@ -1077,7 +1297,7 @@ namespace duice {
                 // update
                 this.update(null);
             }
-            update(observable:duice.data.__):void {
+            update(observable:duice.data.DataObject):void {
                 if(this.bindMap.get(this.bindName)) {
                     var src = this.bindMap.get(this.bindName);
                     this.img.src = src; 
@@ -1095,7 +1315,7 @@ namespace duice {
         /**
          * duice.ui.HtmlEditor
          */
-        export class HtmlEditor extends __ {
+        export class HtmlEditor extends UIComponent {
             div:HTMLDivElement;
             bindMap:duice.data.Map;
             bindName:string;
@@ -1289,7 +1509,7 @@ namespace duice {
                 // update
                 this.update(null);
             }
-            update(observable:duice.data.__):void {
+            update(observable:duice.data.DataObject):void {
                 if(this.contentHtml.innerHTML !== this.bindMap.get(this.bindName)) {
                     this.contentHtml.innerHTML = this.bindMap.get(this.bindName);
                 }
@@ -1315,7 +1535,7 @@ namespace duice {
         /**
          * duice.ui.MarkdownEditor
          */
-        export class MarkdownEditor extends __ {
+        export class MarkdownEditor extends UIComponent {
             div:HTMLDivElement;
             bindMap:duice.data.Map;
             bindName:string;
@@ -1470,7 +1690,7 @@ namespace duice {
                 // updates data
                 this.update(null);
             }
-            update(observable:duice.data.__):void {
+            update(observable:duice.data.DataObject):void {
                 if(this.contentMarkdown.value !== this.bindMap.get(this.bindName)){
                     this.contentMarkdown.value = this.bindMap.get(this.bindName);
                     this.contentMarkdown.setSelectionRange(this.selectionStart,this.selectionEnd);
@@ -1580,7 +1800,7 @@ namespace duice {
         /**
          * duice.ui.TableViewer
          */
-        export class TableViewer extends __ {
+        export class TableViewer extends UIComponent {
             table:HTMLTableElement;
             thead:HTMLTableSectionElement;
             tbody:HTMLTableSectionElement;
@@ -1647,7 +1867,7 @@ namespace duice {
                 if(index == this.bindList.index){
                     row.classList.add('duice-ui-tableViewer-index');
                 }
-                row.addEventListener('mouseup', function(event){
+                row.addEventListener('mousedown', function(event){
                     for(var i = 0; i < $this.rows.length; i ++ ) {
                         $this.rows[i].classList.remove('duice-ui-tableViewer-index');
                     }

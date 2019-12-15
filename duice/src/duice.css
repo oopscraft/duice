@@ -140,6 +140,281 @@
 }
 
 /**
+ * duice.ui.Calendar
+ */
+.duice-ui-calendar {
+	width:100%;
+	line-height: inherit;
+	margin: 0rem;
+	padding: 0rem 0.3rem;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+	margin: 0px;
+	padding: 0rem 0.3rem;
+    color: #495057;
+	-webkit-appearance: none; 
+	-moz-appearance: none;    
+    appearance: none;
+    border-radius: 2px;
+    border: 1px solid #cccccc;
+    background-clip: padding-box;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+	overflow: hidden;
+	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAsVBMVEUAAABEREBEREBEREAAAAACAgJEREBEREAAAAAAAAAAAAABAQEGBgYKCgkJCQgBAQEAAAAAAABEREAmJiUZGRhEREAQEBAVFRUBAQAKCgkLCwsKCgoBAQEAAAAAAAABAQEGBgYFBQUiIiAgIB4HBwYAAAAAAAAGBgUdHRsJCQgHBwYAAAAAAAAAAAABAQEJCQgyMi8GBgZEREAAAAAAAAAtLSsKCgkRERANDQwKCgkAAACDix+0AAAAO3RSTlMAAQQFBicJCiaCYGuYamhhkmoCJFoNUBiPWVpYUE5NTpNuHhwSERIVH3RmBF8HX2cVZQ8FXhRoBwlpYf19NA0AAACsSURBVBgZBcG9SsNQGIDh9/V8MT8oQqBgh24Ogptj7/8OxE1cOjgIERxik/T083kAAAAAEADUzAQoAFFKsbZcwYBeVePWJc8G2Kl14s6fh1qFR1VB9GsL7FUR1MzA/rtOL6L6uWVgWyfeYSyHk4nc3D8t3dKurUv3NiP2MzCWw6lOw0yQxHMXf8Nlf/0FgCOMu9fdCBwxYB2ay/bhNsCqAjbmlgA2VVAzE0DNf+UTOypHKh5VAAAAAElFTkSuQmCC');
+	background-repeat: no-repeat;
+	background-position: right 0.5rem center;
+	background-color: white;
+	padding-right:2em;
+	font-family:inherit;
+	font-size:inherit;
+}
+.duice-ui-calendar:disabled { 
+    background-color: #fafafa;
+}
+.duice-ui-calendar:focus {
+	outline: none;
+	border: solid 1px gray;
+}
+.duice-ui-calendar-dateTimePicker {
+	border:solid 1px #ccc;
+	background-color: white;
+	font-family: Verdana,Tahoma;
+	font-size: 11px;
+	padding: 5px;
+	text-align:left;
+}
+.duice-ui-calendar-dateTimePicker select {
+	margin: 0px;
+	padding: 0px;
+    vertical-align: top;
+    border: solid 1px #eee;
+}
+.duice-ui-calendar-dateTimePicker select:focus {
+	outline: none;
+	border: solid 1px #ccc;
+}
+.duice-ui-calendar-dateTimePicker button:focus {
+	outline: none;
+}
+.duice-ui-calendar-dateTimePicker button:hover { 
+	border-radius: 1rem;
+	background-color: #eee;
+}
+.duice-ui-calendar-dateTimePicker button:disabled {
+	opacity: 0.5;
+	pointer-events: none;
+}
+
+.duice-ui-calendar-dateTimePicker-datePicker {
+	height: 32px;
+	width: 100%;
+	padding: 2px;
+	border: none;
+	text-align: center;
+}
+.duice-ui-calendar-dateTimePicker-datePicker-toolBar {
+	line-height: 32px;
+	display: flex;
+    justify-content: space-between;
+}
+.duice-ui-calendar-dateTimePicker-datePicker-toolBar-prevMonth {
+	width: 32px;
+	height: 32px;
+	border: solid 0px;
+	background-color: white;
+	background-repeat:no-repeat;
+	background-position: center; 
+	cursor: pointer;
+	cursor: hand;
+	opacity: 0.8;
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAlklEQVQ4T2NkoBAwEqlfF6juERB/RFdPjAFGQE17gHgeEJeQagBM81mgRn8g/kaKAQQ1gwzD5QWiNOMygGjN2AwAaQb59zgQu2DzM6EwMAQqOAfEJ6AGfCUUzdjCwACoaS8QXwRiXyDGawiuQCTaEHwJiShDCKVEgoYQMgAUhjBDFgDZxYRiAVegawMlHgPxJ3INwBmbAOH0JhFSdgJYAAAAAElFTkSuQmCC);
+}
+.duice-ui-calendar-dateTimePicker-datePicker-toolBar-today {
+	width: 32px;
+	height: 32px;
+	border: solid 0px;
+	background-color: white;
+	background-repeat:no-repeat;
+	background-position: center; 
+	cursor: pointer;
+	cursor: hand;
+	opacity: 0.8;
+	background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAERJREFUOI1jYBisoIFIMQZGJPYBKGZgYGBwQGIzYBFzgGKcNmBIoonB1eJyASFA0AWEAFwtEwmasIJRA6hgAFXTwcAAAMNsC5Cn3S3mAAAAAElFTkSuQmCC');
+}
+.duice-ui-calendar-dateTimePicker-datePicker-toolBar-yearSelect {
+	height: 32px;
+	width: 75px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+	-webkit-appearance: none; 
+	-moz-appearance: none;    
+    appearance: none;
+    background-clip: padding-box;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+	overflow: hidden;
+	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAGdJREFUOI3tzjsOwjAURNGDUqSgTxU5K2AVrJtswjUsgHSR0qdxAZZFPrS+3ZvRzBsqf9MUtBtazJk+oMe0VTriiZCFX8nbpENMgfARjsn74vKj5IFruhfc8d6zIF9S/Hyk5HS4spMVeFcOjszaOwMAAAAASUVORK5CYII=');
+	background-repeat: no-repeat;
+	direction: rtl;
+	padding-right: 10px !important;
+	background-position: left 5px center;
+	background-color: white;
+    font-weight: bold;
+    font-family: Verdana,Tahoma;
+}
+.duice-ui-calendar-dateTimePicker-datePicker-toolBar-monthSelect {
+	height: 32px;
+	width: 55px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+	-webkit-appearance: none; 
+	-moz-appearance: none;    
+    appearance: none;
+    background-clip: padding-box;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+	overflow: hidden;
+	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAGdJREFUOI3tzjsOwjAURNGDUqSgTxU5K2AVrJtswjUsgHSR0qdxAZZFPrS+3ZvRzBsqf9MUtBtazJk+oMe0VTriiZCFX8nbpENMgfARjsn74vKj5IFruhfc8d6zIF9S/Hyk5HS4spMVeFcOjszaOwMAAAAASUVORK5CYII=');
+	background-repeat: no-repeat;
+	direction: rtl;
+	padding-right: 10px !important;
+	background-position: left 5px center;
+	background-color: white;
+    font-weight: bold;
+    font-family: Verdana,Tahoma;
+}
+.duice-ui-calendar-dateTimePicker-datePicker-toolBar-nextMonth {
+	width: 32px;
+	height: 32px;
+	border: solid 0px;
+	background-color: white;
+	background-repeat:no-repeat;
+	background-position: center; 
+	cursor: pointer;
+	cursor: hand;
+	opacity: 0.8;
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAmUlEQVQ4T6XTTQpAUBQFYG9MydgOTFCswC5kU9YiY1tAsh7nyquX3J+iTgnn0/tz0c/LMf0Mz3Pk0HwOGFEckA5ZJYQDYpQmpNQQDqCfmhAJMCEaoCIWwCMLblqkDifWCiQoEdAgFbL5lbEAVJ6R4lmRPVxWDRDLBEmAWpYAU1kCaCv3X2N+b2tuCCk+pMN0SudAmwOte7+/AELAGhGETefAAAAAAElFTkSuQmCC);
+}
+.duice-ui-calendar-dateTimePicker-datePicker-dateTable {
+	border: none;
+}
+.duice-ui-calendar-dateTimePicker-datePicker-dateTable th {
+	width: 32px;
+	height: 32px;
+	border: solid 1px white;
+    text-align: center;
+	background-color: #eee;
+}
+.duice-ui-calendar-dateTimePicker-datePicker-dateTable td {
+	width: 32px;
+	height: 32px;
+	border: dotted 1px #eee;
+    text-align: center;
+}
+.duice-ui-calendar-dateTimePicker-datePicker-dateTable td:hover {
+	background-color: #eee;
+}
+.duice-ui-calendar-dateTimePicker-timePicker {
+	line-height: 32px;
+	padding-top: 2px;
+	display: flex;
+    justify-content: space-between;
+}
+.duice-ui-calendar-dateTimePicker-timePicker-now {
+	height: 32px;
+	width: 32px;
+	border: solid 0px;
+	background-color: white;
+	background-repeat:no-repeat;
+	background-position: center; 
+	cursor: pointer;
+	cursor: hand;
+	opacity: 0.8;
+	background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAQCAMAAAD+iNU2AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAN5QTFRF1NTUXl5eXFxcwsLCg4ODYmJi09PTVVVV3t7e3d3dNTU1b29vz8/P/Pz8+Pj4zc3NTU1N7OzsZmZmtbW1/v7++fn4+Pj3tLS0pKSkOjo6vb29////9fX19PT0u7u7xcXFd3d30tLSenp6w8PDdHR04ODgvLy8WVlZ6urq1tbWc3Ny7u7u6enp+vr68/PzpaWlWFhY6Ojo+fn57+/v5+fnZ2dnsrKylJSUk5OTs7Oz1dXV2NjY2dnZ19fXODg4mJiYmZmZ/f39jIyMo6OiXV1daWlppqamxMTEkpKS+/v7WiXV5gAAAAFiS0dEGwJg1KQAAAAJcEhZcwAACxMAAAsTAQCanBgAAADGSURBVAjXRY3neoJQEETnXkBQQ2xry5LYBTtBTSOaYOf9X8iLxvhvzzczZwEhNeiGNPSUJgVgWulM9sG2H3PZTNoykS8US0TlSpmoWizkUas/MTnPDjHzS72GRvOGrTY3O+ha5PT6ClOuR4MhhEpHhsZwx+oScCeqPBUz/zWZuZBBsp13FxeLxHKRmPkq9ZZ4e78jf3wiML/+EWYADv3vPwz9kMG8Wv94yY/f9YoJHOmbrdzthTxsdHsCPp7i2I7mkZKctPgMvtway4h19ioAAAAldEVYdGRhdGU6Y3JlYXRlADIwMTgtMDgtMTBUMDg6NDY6NDAtMDU6MDDPNGJ0AAAAJXRFWHRkYXRlOm1vZGlmeQAyMDE4LTA4LTEwVDA4OjQ2OjQwLTA1OjAwvmnayAAAAABJRU5ErkJggg==');
+}
+.duice-ui-calendar-dateTimePicker-timePicker-hourSelect {
+	height: 32px;
+	width: 60px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+	-webkit-appearance: none; 
+	-moz-appearance: none;    
+    appearance: none;
+    background-clip: padding-box;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+	overflow: hidden;
+	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAGdJREFUOI3tzjsOwjAURNGDUqSgTxU5K2AVrJtswjUsgHSR0qdxAZZFPrS+3ZvRzBsqf9MUtBtazJk+oMe0VTriiZCFX8nbpENMgfARjsn74vKj5IFruhfc8d6zIF9S/Hyk5HS4spMVeFcOjszaOwMAAAAASUVORK5CYII=');
+	background-repeat: no-repeat;
+	direction: rtl;
+	padding-right: 10px !important;
+	background-position: left 5px center;
+	background-color: white;
+    font-weight: bold;
+    font-family: Verdana,Tahoma;
+}
+.duice-ui-calendar-dateTimePicker-timePicker-minuteSelect {
+	height: 32px;
+	width: 60px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+	-webkit-appearance: none; 
+	-moz-appearance: none;    
+    appearance: none;
+    background-clip: padding-box;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+	overflow: hidden;
+	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAGdJREFUOI3tzjsOwjAURNGDUqSgTxU5K2AVrJtswjUsgHSR0qdxAZZFPrS+3ZvRzBsqf9MUtBtazJk+oMe0VTriiZCFX8nbpENMgfARjsn74vKj5IFruhfc8d6zIF9S/Hyk5HS4spMVeFcOjszaOwMAAAAASUVORK5CYII=');
+	background-repeat: no-repeat;
+	direction: rtl;
+	padding-right: 10px !important;
+	background-position: left 5px center;
+	background-color: white;
+    font-weight: bold;
+    font-family: Verdana,Tahoma;
+}
+.duice-ui-calendar-dateTimePicker-timePicker-secondSelect {
+	height: 32px;
+	width: 60px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+	-webkit-appearance: none; 
+	-moz-appearance: none;    
+    appearance: none;
+    background-clip: padding-box;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+	overflow: hidden;
+	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAGdJREFUOI3tzjsOwjAURNGDUqSgTxU5K2AVrJtswjUsgHSR0qdxAZZFPrS+3ZvRzBsqf9MUtBtazJk+oMe0VTriiZCFX8nbpENMgfARjsn74vKj5IFruhfc8d6zIF9S/Hyk5HS4spMVeFcOjszaOwMAAAAASUVORK5CYII=');
+	background-repeat: no-repeat;
+	direction: rtl;
+	padding-right: 10px !important;
+	background-position: left 5px center;
+	background-color: white;
+    font-weight: bold;
+    font-family: Verdana,Tahoma;
+}
+.duice-ui-calendar-dateTimePicker-footer {
+	display: flex;
+	justify-content: flex-end;
+	padding: 2px;
+}
+.duice-ui-calendar-dateTimePicker-footer-confirm {
+	width: 32px;
+	height: 32px;
+	border: solid 0px;
+	background-color: white;
+	background-repeat:no-repeat;
+	background-position: center; 
+	cursor: pointer;
+	cursor: hand;
+	opacity: 0.8;
+	background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAMAAADXqc3KAAAArlBMVEUAAAA0r4wzspAxrJQvr48usZI0rI4yrpExrZAvrZExrpAwsI8xrpEwr5EvrpIxr5EwrpAwr5AxrpExr5AwrpExr5ExrpAvrZExr48xr5EvrZExrpEvr5Evr48xr48xrZEvrY8vr5Exr5Evr48xr5ExrY8xr5Eyr5E5spVEtptJuJ5VvaRewalgwapiwquDz72M0sKi282j286k3M6l3M+349nI6uL0+/n1+/r///8+DYLLAAAAJnRSTlMAHR4fICEiI1hbXF5ydHV3eHp7pqiqq6y5urzk5ufz9PX2+fr9/r6A61gAAADXSURBVChTZZHXEoIwEABPwd6wK1jBHPbe+P8f8xICHHEfILObCcwFIKbSc+dBMHO7JeCUxwI1YmhnvrFGxqqeeAcNWnq/6RFr6vzcOTFLi8Lo3yMO6D8F5ggvW3oKG3qGf0ZvWRxwTR99DrSYwlyJHfNHufIgkK/r55T36KtwjqIvlfCRegozufMmS3jPPB2lPq7Ki3mcQBeTwj12oCTSwvyGZjJEXZjHPs3KXumyz/yiIMdbxz+q8YW0Td9MrrC25HpRhRRrkA5/0y8Cx3amnu97k46lxQ/u3UYNx3M79QAAAABJRU5ErkJggg==');
+}
+
+/**
  * duice.ui.Image
  */
 .duice-ui-image {
@@ -564,7 +839,6 @@
 	display: flex;
     align-items: center;
 	justify-content: center;
-	height: 2rem;
 }
 .duice-ui-tableViewer .duice-ui-tableViewer-empty .duice-ui-tableViewer-empty-message:before {
 	content: 'No Data Found';
