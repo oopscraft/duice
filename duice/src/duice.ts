@@ -56,11 +56,10 @@ namespace duice {
             ,'input[data-duice="CheckBox"]'
             ,'input[data-duice="Radio"]'
             ,'input[data-duice="Calendar"]'
+            ,'input[data-duice="CronExpression"]'
             ,'img[data-duice="Image"]'
             ,'div[data-duice="HtmlEditor"]'
             ,'div[data-duice="MarkdownEditor"]'
-//         // --
-//            ,'input[data-duice="CronExpression"]'
         ];
         var elements = container.querySelectorAll(elementTags.join(','));
         for(var i = 0; i < elements.length; i ++ ) {
@@ -119,11 +118,17 @@ namespace duice {
                     break;
                     case 'Calendar':
                         var calendar = new duice.ui.Calendar(element);
-                        var radio = new duice.ui.Radio(element);
                         var bindMap = getObject($context, bind[0]);
                         var bindName = bind[1];
                         calendar.setBind(bindMap, bindName);
                         calendar.build();
+                    break;
+                    case 'CronExpression':
+                        var cronExpression = new duice.ui.CronExpression(element);
+                        var bindMap = getObject($context, bind[0]);
+                        var bindName = bind[1];
+                        cronExpression.setBind(bindMap, bindName);
+                        cronExpression.build();
                     break;
                     case 'Image':
                         var image = new duice.ui.Image(element);
@@ -436,327 +441,407 @@ namespace duice {
     export namespace ui {
         
         /**
+         * executeExpression
+         * @param element
+         * @param $context
+         */
+        function executeExpression(element:HTMLElement, $context:any):any {
+            var string = element.outerHTML;
+            string = string.replace(/\[\[(.*?)\]\]/mgi,function(match, command){
+                try {
+                    command = command.replace('&amp;', '&');
+                    command = command.replace('&lt;', '<');
+                    command = command.replace('&gt;', '>');
+                    var result = eval(command);
+                    return result;
+                }catch(e){
+                    console.error(e,command);
+                    throw e;
+                }
+            });
+            var template = document.createElement('template');
+            template.innerHTML = string;
+            return template.content.firstChild;
+        }
+        
+        /**
+         * escapeHtml
+         * @param value
+         */
+        function escapeHtml(value:string):string {
+            
+            // checks value is valid.
+            if(!value){
+                return value;
+            }
+
+            // replace tag
+            var htmlMap:any = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return value.replace(/[&<>"']/g, function(m:string) {return htmlMap[m];});
+        }
+        
+        /**
+         * parseMarkdown
+         * @param value
+         */
+        function parseMarkdown(value:string):string {
+            
+            // checks value is valid.
+            if(!value){
+                return value;
+            }
+            
+            // code
+            value = value.replace(/[\`]{3}([\w]*)\n([^\`]+)\n[\`]{3}/g, function(match,language,code){
+                var codeHtml = new Array();
+                codeHtml.push('<code data-langhage="' + language + '">');
+                var lines = code.split('\n');
+                for(var i = 0; i < lines.length; i++){
+                    var line = lines[i];
+
+                    // replace tag
+                    line = line.replace(/\</g, '&lt');
+                    line = line.replace(/\>/g, '&gt');
+
+                    // comment
+                    line = line.replace(/(^|[\s])(\/\/[\s]*.+)/gm,'<span class="comment">$2</span>');
+                    line = line.replace(/(\/\*)/gm,'<span class="comment">$1');
+                    line = line.replace(/(\*\/)/gm,'$1</span>');
+                    line = line.replace(/(\s*)(#+.*)/gm,'$1<span class="comment">$2</span>');
+
+                    // append 
+                    codeHtml.push(line);
+                }
+                codeHtml.push('</code>');
+                return codeHtml.join('\n') + '\n';
+            });
+            
+            //ul
+            value = value.replace(/(^[ \t]*[\*\-]\s+.+\n)+/gm, function(match) {
+                var ulHtml = new Array();
+                ulHtml.push('<ul>');
+                var lines = match.split('\n');
+                for(var i = 0; i < lines.length; i++){
+                    var line = lines[i];
+                    if(line.trim().length < 1){
+                        continue;
+                    }
+                    line = line.replace(/^[ \t]*[\*\-]\s+(.+)/gm,'<li>$1</li>');
+                    ulHtml.push(line);
+                }
+                ulHtml.push('</ul>');
+                return ulHtml.join('\n') + '\n';
+            });
+            
+            //ol
+            value = value.replace(/(^[ \t]*[\d]+[\.]?\s+.+\n)+/gm, function(match) {
+                var olHtml = new Array();
+                olHtml.push('<ol>');
+                var lines = match.split('\n');
+                for(var i = 0; i < lines.length; i++){
+                    var line = lines[i];
+                    if(line.trim().length < 1){
+                        continue;
+                    }
+                    line = line.replace(/^[ \t]*[\d]+[\.]?\s+(.+)/gm,'<li>$1</li>');
+                    olHtml.push(line);
+                }
+                olHtml.push('</ol>');
+                return olHtml.join('\n') + '\n';
+            });
+
+            // title
+            value = value.replace(/^[\#]{6}\s(.+)/gm, '<h6>$1</h6>');
+            value = value.replace(/^[\#]{5}\s(.+)/gm, '<h5>$1</h5>');
+            value = value.replace(/^[\#]{4}\s(.+)/gm, '<h4>$1</h4>');
+            value = value.replace(/^[\#]{3}\s(.+)/gm, '<h3>$1</h3>');
+            value = value.replace(/^[\#]{2}\s(.+)/gm, '<h2>$1</h2>');
+            value = value.replace(/^[\#]{1}\s(.+)/gm, '<h1>$1</h1>');
+
+            // hr
+            value = value.replace(/(^[\-\=]{5,}\n)/gm, function(match){
+                return '<hr/>';
+            });
+            
+            // parses in-line element
+            var lines = value.split('\n');
+            for(var i = 0, size = lines.length; i < size; i ++){
+                var line = lines[i];
+
+                // font style
+                line = line.replace(/\*{2}([^\*].+)\*{2}/gm, '<b>$1</b>');
+                line = line.replace(/\_{2}([^\_].+)\_{2}/gm, '<em>$1</em>');
+                line = line.replace(/\~{2}([^\~].+)\~{2}/gm, '<del>$1</del>');
+
+                // image
+                line = line.replace(/\!\[([^\]]+)\]\(([^\)]+)\)/g, '<img src="$2" alt="$1" />');
+
+                // link
+                line = line.replace(/[\[]{1}([^\]]+)[\]]{1}[\(]{1}([^\)\"]+)(\"(.+)\")?[\)]{1}/g, '<a href="$2" title="$4">$1</a>');
+                
+                // replace line
+                lines[i] = line;
+            }
+            value = lines.join('\n');
+
+            // return parsed value
+            return value;
+        }
+        
+        /**
+         * removeChildNodes
+         * @param element
+         */
+        function removeChildNodes(element:HTMLElement):void {
+            // Remove element nodes and prevent memory leaks
+            var node, nodes = element.childNodes, i = 0;
+            while (node = nodes[i++]) {
+                if (node.nodeType === 1 ) {
+                    element.removeChild(node);
+                }
+            }
+
+            // Remove any remaining nodes
+            while (element.firstChild) {
+                element.removeChild(element.firstChild);
+            }
+
+            // If this is a select, ensure that it displays empty
+            if(element instanceof HTMLSelectElement){
+                (<HTMLSelectElement>element).options.length = 0;
+            }
+        }
+        
+        /**
+         * enableElement
+         * @param element
+         * @param enable
+         */
+        function enableElement(element:HTMLElement, enable:boolean):void {
+            if(element.tagName === 'SELECT'){
+                (<HTMLSelectElement>element).disabled = (enable === true ? false : true);
+            }else if(element.tagName === 'BUTTON'){
+                (<HTMLButtonElement>element).disabled = (enable === true ? false : true);
+            }
+            var childNodes = element.childNodes, i = 0;
+            for(var i = 0, size = childNodes.length; i < size; i ++ ){
+                var element:HTMLElement = <HTMLElement>childNodes[i];
+                this.enableElement(element, enable);
+            }
+        }
+        
+        /**
+         * createDocumentFragment
+         * @param html
+         */
+        function createDocumentFragment(html:string):DocumentFragment {
+            var template = document.createElement('template');
+            template.innerHTML = html;
+            return template.content;
+        }
+        
+        /**
+         * getCurrentWindow
+         */
+        function getCurrentWindow():Window {
+            if(window.frameElement){
+                return window.parent;
+            }else{
+                return window;
+            }
+        }
+        
+        /**
+         * getParentNode
+         * @param element
+         */
+        function getParentNode(element:HTMLElement):Node {
+            var parentNode = element.parentNode;
+            return parentNode;
+        }
+        
+        /**
+         * setPositionCentered
+         * @param element
+         */
+        function setPositionCentered(element:HTMLElement):void {
+            var window = this.getCurrentWindow();
+            var computedStyle = window.getComputedStyle(element);
+            var computedWidth = parseInt(computedStyle.getPropertyValue('width').replace(/px/gi, ''));
+            var computedHeight = parseInt(computedStyle.getPropertyValue('height').replace(/px/gi, ''));
+            element.style.width = Math.min(window.screen.width-20, computedWidth) + 'px';
+            element.style.height = Math.min(window.screen.height, computedHeight) + 'px';
+            element.style.left = Math.max(10,window.innerWidth/2 - computedWidth/2) + 'px';
+            element.style.top = Math.max(0,window.innerHeight/2 - computedHeight/2) + 'px';
+        }
+        
+        /**
+         * delay
+         * @param callback
+         */
+        function delay(callback:Function){
+            var interval = setInterval(function() {
+                try {
+                    callback.call(callback);
+                }catch(ignore){
+                    console.log(ignore, callback);
+                }finally{
+                    clearInterval(interval);
+                }
+            },200); 
+        }
+        
+        /**
+         * fadeIn
+         * @param element
+         */
+        function fadeIn(element:HTMLElement):void {
+            element.classList.remove('duice-ui-fadeOut');
+            element.classList.add('duice-ui-fadeIn');
+        }
+        
+        /**
+         * fadeOut
+         * @param element
+         */
+        function fadeOut(element:HTMLElement):void {
+            element.classList.remove('duice-ui-fadeIn');
+            element.classList.add('duice-ui-fadeOut');
+        }
+        
+        /**
+         * getCurrentMaxZIndex
+         */
+        function getCurrentMaxZIndex():number {
+            var zIndex,
+            z = 0,
+            all = document.getElementsByTagName('*');
+            for (var i = 0, n = all.length; i < n; i++) {
+                zIndex = document.defaultView.getComputedStyle(all[i],null).getPropertyValue("z-index");
+                zIndex = parseInt(zIndex, 10);
+                z = (zIndex) ? Math.max(z, zIndex) : z;
+            }
+            return z;
+        }
+        
+        /**
+         * block
+         * @param element
+         */
+        function block(element:HTMLElement):object {
+            
+            var div = document.createElement('div');
+            div.classList.add('duice-ui-block');
+            
+            // defines maxZIndex
+            var zIndex = this.getCurrentMaxZIndex() + 1;
+            
+            // adjusting position
+            div.style.position = 'fixed';
+            div.style.zIndex = String(zIndex);
+            
+            // full blocking in case of BODY
+            if(element.tagName == 'BODY'){
+                div.style.width = '100%';
+                div.style.height = '100%';
+                div.style.top = '0px';
+                div.style.left = '0px';
+            }
+            // otherwise adjusting to parent element
+            else{
+                var boundingClientRect = element.getBoundingClientRect();
+                var width = boundingClientRect.width;
+                var height = boundingClientRect.height;
+                var left = boundingClientRect.left;
+                var top = boundingClientRect.top;
+                div.style.width = width + "px";
+                div.style.height = height + "px";
+                div.style.top = top + 'px';
+                div.style.left = left + 'px';
+            }
+            
+            // append
+            element.appendChild(div);
+            this.fadeIn(div);
+            
+            // return handler
+            var $this = this;
+            return {
+                getZIndex: function(){
+                    return zIndex;
+                },
+                release: function() {
+                    $this.fadeOut(div);
+                    $this.delay(function(){
+                        element.removeChild(div);
+                    });
+                }
+            }
+        }
+        
+        /**
+         * load
+         * @param element
+         */
+        function load(element:HTMLElement):object {
+            var $this = this;
+            var div = document.createElement('div');
+            div.classList.add('duice-ui-load');
+            div.style.position = 'fixed';
+            div.style.opacity = '0';
+            div.style.zIndex = String(this.getCurrentMaxZIndex() + 1);
+
+            // on resize event
+            this.getCurrentWindow().addEventListener('resize', function(event:any) {
+                if(div){
+                    $this.setPositionCentered(div);
+                    div.style.top = '30vh';   // adjust top
+                }
+            });
+            
+            // start
+            element.appendChild(div);
+            this.setPositionCentered(div);
+            div.style.top = '30vh'; // adjust top   
+            this.fadeIn(div);
+            
+            // return handler
+            return {
+                release: function() {
+                    $this.fadeOut(div);
+                    $this.delay(function(){
+                        element.removeChild(div);
+                    });
+                }
+            }
+        }
+        
+        /**
+         * lpad
+         * @param value
+         * @param length
+         * @param padChar
+         */
+        function lpad(value:string, length:number, padChar:string) {
+            for(var i = 0, size = (length-value.length); i < size; i ++ ) {
+                value = padChar + value;
+            }
+            return value;
+        }
+        
+        /**
          * Super prototype of duice.ui
          */
         export abstract class UIComponent {
             abstract setBind(...args: any[]):void;
             abstract build():void;
             abstract update(observable:duice.data.DataObject):void;
-            executeExpression(element:HTMLElement, $context:any):any {
-                var string = element.outerHTML;
-                string = string.replace(/\[\[(.*?)\]\]/mgi,function(match, command){
-                    try {
-                        command = command.replace('&amp;', '&');
-                        command = command.replace('&lt;', '<');
-                        command = command.replace('&gt;', '>');
-                        var result = eval(command);
-                        return result;
-                    }catch(e){
-                        console.error(e,command);
-                        throw e;
-                    }
-                });
-                var template = document.createElement('template');
-                template.innerHTML = string;
-                return template.content.firstChild;
-            }
-            escapeHtml(value:string):string {
-                
-                // checks value is valid.
-                if(!value){
-                    return value;
-                }
-
-                // replace tag
-                var htmlMap:any = {
-                    '&': '&amp;',
-                    '<': '&lt;',
-                    '>': '&gt;',
-                    '"': '&quot;',
-                    "'": '&#039;'
-                };
-                return value.replace(/[&<>"']/g, function(m:string) {return htmlMap[m];});
-            }
-            parseMarkdown(value:string):string {
-                
-                // checks value is valid.
-                if(!value){
-                    return value;
-                }
-                
-                // code
-                value = value.replace(/[\`]{3}([\w]*)\n([^\`]+)\n[\`]{3}/g, function(match,language,code){
-                    var codeHtml = new Array();
-                    codeHtml.push('<code data-langhage="' + language + '">');
-                    var lines = code.split('\n');
-                    for(var i = 0; i < lines.length; i++){
-                        var line = lines[i];
-
-                        // replace tag
-                        line = line.replace(/\</g, '&lt');
-                        line = line.replace(/\>/g, '&gt');
-
-                        // comment
-                        line = line.replace(/(^|[\s])(\/\/[\s]*.+)/gm,'<span class="comment">$2</span>');
-                        line = line.replace(/(\/\*)/gm,'<span class="comment">$1');
-                        line = line.replace(/(\*\/)/gm,'$1</span>');
-                        line = line.replace(/(\s*)(#+.*)/gm,'$1<span class="comment">$2</span>');
-
-                        // append 
-                        codeHtml.push(line);
-                    }
-                    codeHtml.push('</code>');
-                    return codeHtml.join('\n') + '\n';
-                });
-                
-                //ul
-                value = value.replace(/(^[ \t]*[\*\-]\s+.+\n)+/gm, function(match) {
-                    var ulHtml = new Array();
-                    ulHtml.push('<ul>');
-                    var lines = match.split('\n');
-                    for(var i = 0; i < lines.length; i++){
-                        var line = lines[i];
-                        if(line.trim().length < 1){
-                            continue;
-                        }
-                        line = line.replace(/^[ \t]*[\*\-]\s+(.+)/gm,'<li>$1</li>');
-                        ulHtml.push(line);
-                    }
-                    ulHtml.push('</ul>');
-                    return ulHtml.join('\n') + '\n';
-                });
-                
-                //ol
-                value = value.replace(/(^[ \t]*[\d]+[\.]?\s+.+\n)+/gm, function(match) {
-                    var olHtml = new Array();
-                    olHtml.push('<ol>');
-                    var lines = match.split('\n');
-                    for(var i = 0; i < lines.length; i++){
-                        var line = lines[i];
-                        if(line.trim().length < 1){
-                            continue;
-                        }
-                        line = line.replace(/^[ \t]*[\d]+[\.]?\s+(.+)/gm,'<li>$1</li>');
-                        olHtml.push(line);
-                    }
-                    olHtml.push('</ol>');
-                    return olHtml.join('\n') + '\n';
-                });
-
-                // title
-                value = value.replace(/^[\#]{6}\s(.+)/gm, '<h6>$1</h6>');
-                value = value.replace(/^[\#]{5}\s(.+)/gm, '<h5>$1</h5>');
-                value = value.replace(/^[\#]{4}\s(.+)/gm, '<h4>$1</h4>');
-                value = value.replace(/^[\#]{3}\s(.+)/gm, '<h3>$1</h3>');
-                value = value.replace(/^[\#]{2}\s(.+)/gm, '<h2>$1</h2>');
-                value = value.replace(/^[\#]{1}\s(.+)/gm, '<h1>$1</h1>');
-
-                // hr
-                value = value.replace(/(^[\-\=]{5,}\n)/gm, function(match){
-                    return '<hr/>';
-                });
-                
-                // parses in-line element
-                var lines = value.split('\n');
-                for(var i = 0, size = lines.length; i < size; i ++){
-                    var line = lines[i];
-
-                    // font style
-                    line = line.replace(/\*{2}([^\*].+)\*{2}/gm, '<b>$1</b>');
-                    line = line.replace(/\_{2}([^\_].+)\_{2}/gm, '<em>$1</em>');
-                    line = line.replace(/\~{2}([^\~].+)\~{2}/gm, '<del>$1</del>');
-
-                    // image
-                    line = line.replace(/\!\[([^\]]+)\]\(([^\)]+)\)/g, '<img src="$2" alt="$1" />');
-
-                    // link
-                    line = line.replace(/[\[]{1}([^\]]+)[\]]{1}[\(]{1}([^\)\"]+)(\"(.+)\")?[\)]{1}/g, '<a href="$2" title="$4">$1</a>');
-                    
-                    // replace line
-                    lines[i] = line;
-                }
-                value = lines.join('\n');
-
-                // return parsed value
-                return value;
-            }
-            removeChildNodes(element:HTMLElement):void {
-                // Remove element nodes and prevent memory leaks
-                var node, nodes = element.childNodes, i = 0;
-                while (node = nodes[i++]) {
-                    if (node.nodeType === 1 ) {
-                        element.removeChild(node);
-                    }
-                }
-
-                // Remove any remaining nodes
-                while (element.firstChild) {
-                    element.removeChild(element.firstChild);
-                }
-
-                // If this is a select, ensure that it displays empty
-                if(element instanceof HTMLSelectElement){
-                    (<HTMLSelectElement>element).options.length = 0;
-                }
-            }
-            enableElement(element:HTMLElement, enable:boolean):void {
-                if(element.tagName === 'SELECT'){
-                    (<HTMLSelectElement>element).disabled = (enable === true ? false : true);
-                }else if(element.tagName === 'BUTTON'){
-                    (<HTMLButtonElement>element).disabled = (enable === true ? false : true);
-                }
-                var childNodes = element.childNodes, i = 0;
-                for(var i = 0, size = childNodes.length; i < size; i ++ ){
-                    var element:HTMLElement = <HTMLElement>childNodes[i];
-                    this.enableElement(element, enable);
-                }
-            }
-            createDocumentFragment(html:string):DocumentFragment {
-                var template = document.createElement('template');
-                template.innerHTML = html;
-                return template.content;
-            }
-            /**
-             * getCurrentWindow
-             */
-            getCurrentWindow():Window {
-                if(window.frameElement){
-                    return window.parent;
-                }else{
-                    return window;
-                }
-            }
-            getParentNode(element:HTMLElement):Node {
-                var parentNode = element.parentNode;
-                return parentNode;
-            }
-            /**
-             * setPositionCentered
-             * @param element
-             */
-            setPositionCentered(element:HTMLElement):void {
-                var window = this.getCurrentWindow();
-                var computedStyle = window.getComputedStyle(element);
-                var computedWidth = parseInt(computedStyle.getPropertyValue('width').replace(/px/gi, ''));
-                var computedHeight = parseInt(computedStyle.getPropertyValue('height').replace(/px/gi, ''));
-                element.style.width = Math.min(window.screen.width-20, computedWidth) + 'px';
-                element.style.height = Math.min(window.screen.height, computedHeight) + 'px';
-                element.style.left = Math.max(10,window.innerWidth/2 - computedWidth/2) + 'px';
-                element.style.top = Math.max(0,window.innerHeight/2 - computedHeight/2) + 'px';
-            }
-            delay(callback:Function){
-                var interval = setInterval(function() {
-                    try {
-                        callback.call(callback);
-                    }catch(ignore){
-                        console.log(ignore, callback);
-                    }finally{
-                        clearInterval(interval);
-                    }
-                },200); 
-            }
-            fadeIn(element:HTMLElement):void {
-                element.classList.remove('duice-ui-fadeOut');
-                element.classList.add('duice-ui-fadeIn');
-            }
-            fadeOut(element:HTMLElement):void {
-                element.classList.remove('duice-ui-fadeIn');
-                element.classList.add('duice-ui-fadeOut');
-            }
-            getCurrentMaxZIndex():number {
-                var zIndex,
-                z = 0,
-                all = document.getElementsByTagName('*');
-                for (var i = 0, n = all.length; i < n; i++) {
-                    zIndex = document.defaultView.getComputedStyle(all[i],null).getPropertyValue("z-index");
-                    zIndex = parseInt(zIndex, 10);
-                    z = (zIndex) ? Math.max(z, zIndex) : z;
-                }
-                return z;
-            }
-            block(element:HTMLElement):object {
-                console.log('block');
-                
-                var div = document.createElement('div');
-                div.classList.add('duice-ui-block');
-                
-                // defines maxZIndex
-                var zIndex = this.getCurrentMaxZIndex() + 1;
-                
-                // adjusting position
-                div.style.position = 'fixed';
-                div.style.zIndex = String(zIndex);
-                
-                // full blocking in case of BODY
-                if(element.tagName == 'BODY'){
-                    div.style.width = '100%';
-                    div.style.height = '100%';
-                    div.style.top = '0px';
-                    div.style.left = '0px';
-                }
-                // otherwise adjusting to parent element
-                else{
-                    var boundingClientRect = element.getBoundingClientRect();
-                    var width = boundingClientRect.width;
-                    var height = boundingClientRect.height;
-                    var left = boundingClientRect.left;
-                    var top = boundingClientRect.top;
-                    div.style.width = width + "px";
-                    div.style.height = height + "px";
-                    div.style.top = top + 'px';
-                    div.style.left = left + 'px';
-                }
-                
-                // append
-                element.appendChild(div);
-                this.fadeIn(div);
-                
-                // return handler
-                var $this = this;
-                return {
-                    getZIndex: function(){
-                        return zIndex;
-                    },
-                    release: function() {
-                        $this.fadeOut(div);
-                        $this.delay(function(){
-                            element.removeChild(div);
-                        });
-                    }
-                }
-            }
-            load(element:HTMLElement):object {
-                var $this = this;
-                var div = document.createElement('div');
-                div.classList.add('duice-ui-load');
-                div.style.position = 'fixed';
-                div.style.opacity = '0';
-                div.style.zIndex = String(this.getCurrentMaxZIndex() + 1);
-
-                // on resize event
-                this.getCurrentWindow().addEventListener('resize', function(event:any) {
-                    if(div){
-                        $this.setPositionCentered(div);
-                        div.style.top = '30vh';   // adjust top
-                    }
-                });
-                
-                // start
-                element.appendChild(div);
-                this.setPositionCentered(div);
-                div.style.top = '30vh'; // adjust top   
-                this.fadeIn(div);
-                
-                // return handler
-                return {
-                    release: function() {
-                        $this.fadeOut(div);
-                        $this.delay(function(){
-                            element.removeChild(div);
-                        });
-                    }
-                }
-            }
         }
         
         /**
@@ -784,16 +869,16 @@ namespace duice {
                 this.update(null);
             }
             update(observable:duice.data.DataObject):void {
-                this.removeChildNodes(this.div);
+                removeChildNodes(this.div);
                 var value = this.bindMap.get(this.bindName);
                 if(this.mode === 'html') {
                     value = value;
                 }else if(this.mode === 'markdown'){
-                    value = this.parseMarkdown(value);
+                    value = parseMarkdown(value);
                 }else{
-                    value = this.escapeHtml(value);
+                    value = escapeHtml(value);
                 }
-                this.div.appendChild(this.createDocumentFragment(value));
+                this.div.appendChild(createDocumentFragment(value));
             }
         }
         
@@ -905,7 +990,7 @@ namespace duice {
             }
             update(observable:duice.data.DataObject):void {
                 if(observable === this.optionList){
-                    this.removeChildNodes(this.select);
+                    removeChildNodes(this.select);
                     for(var i = 0, size = this.optionList.getRowCount(); i < size; i ++){
                         var optionMap = this.optionList.getRow(i);
                         var option = document.createElement('option');
@@ -994,12 +1079,12 @@ namespace duice {
          */
         export class Calendar extends UIComponent {
             input:HTMLInputElement;
-            dateTimePicker:HTMLDivElement;
             bindMap:duice.data.Map;
             bindName:string;
             format:string = 'yyyy-MM-dd HH:mm:ss';
             date:Date = new Date();
-            windowClickListener:any;
+            pickerDiv:HTMLDivElement;
+            clickListener:any;
             constructor(input:HTMLInputElement){
                 super();
                 this.input = input;
@@ -1018,33 +1103,20 @@ namespace duice {
                 
                 // date picker
                 this.input.addEventListener('focus', function(){
-                    $this.openDateTimePicker($this.date);
+                    $this.openPicker();
                 });
             }
             update(observable:duice.data.DataObject):void {
                 var value = this.bindMap.get(this.bindName);
                 this.input.value = value;
             }
-            convertDateToString(date:Date, format:string):string {
-                return null;
-            }
-            convertStringToDate(string:string, format:string):Date {
-                return null;
-            }
-            openDateTimePicker(date:Date):void {
+            openPicker():void {
                 var $this = this;
-                this.dateTimePicker = document.createElement('div');
-                this.dateTimePicker.classList.add('duice-ui-calendar-dateTimePicker');
-                
-                // click event listener
-                this.windowClickListener = function(event:any){
-                    if(!$this.input.contains(event.target) && !$this.dateTimePicker.contains(event.target)){
-                        $this.closeDateTimePicker();
-                    }
-                }
-                window.addEventListener('click', this.windowClickListener);
+                this.pickerDiv = document.createElement('div');
+                this.pickerDiv.classList.add('duice-ui-calendar__pickerDiv');
 
-                // defines year, month, date integer.
+                // parses parts
+                var date = new Date(this.date.getTime());
                 var yyyy = date.getFullYear();
                 var mm = date.getMonth();
                 var dd = date.getDate();
@@ -1052,177 +1124,497 @@ namespace duice {
                 var mi = date.getMinutes();
                 var ss = date.getSeconds();
                 
-                // datePicker
-                var datePicker = document.createElement('div');
-                datePicker.classList.add('duice-ui-calendar-dateTimePicker-datePicker');
-                this.dateTimePicker.appendChild(datePicker);
+                // click event listener
+                this.clickListener = function(event:any){
+                    if(!$this.input.contains(event.target) && !$this.pickerDiv.contains(event.target)){
+                        $this.closePicker();
+                    }
+                }
+                window.addEventListener('click', this.clickListener);
                 
-                // toolBar
-                var toolBar = document.createElement('div');
-                toolBar.classList.add('duice-ui-calendar-dateTimePicker-datePicker-toolBar');
-                datePicker.appendChild(toolBar);
+                // header
+                var headerDiv = document.createElement('div');
+                headerDiv.classList.add('duice-ui-calendar__pickerDiv-headerDiv');
+                this.pickerDiv.appendChild(headerDiv);
+                
+                // titleIcon
+                var titleSpan = document.createElement('span');
+                titleSpan.classList.add('duice-ui-calendar__pickerDiv-headerDiv-titleSpan');
+                headerDiv.appendChild(titleSpan);
+                
+                // closeButton
+                var closeButton = document.createElement('button');
+                closeButton.classList.add('duice-ui-calendar__pickerDiv-headerDiv-closeButton');
+                headerDiv.appendChild(closeButton);
+                closeButton.addEventListener('click', function(event){
+                    $this.closePicker();
+                });
+                
+                // bodyDiv
+                var bodyDiv = document.createElement('div');
+                bodyDiv.classList.add('duice-ui-calendar__pickerDiv-bodyDiv');
+                this.pickerDiv.appendChild(bodyDiv);
+                
+                // daySelector
+                var dateDiv = document.createElement('div');
+                dateDiv.classList.add('duice-ui-calendar__pickerDiv-bodyDiv-dateDiv');
+                bodyDiv.appendChild(dateDiv);
                 
                 // previous month button
-                var prevMonth = document.createElement('button');
-                prevMonth.classList.add('duice-ui-calendar-dateTimePicker-datePicker-toolBar-prevMonth');
-                toolBar.appendChild(prevMonth);
+                var prevMonthButton = document.createElement('button');
+                prevMonthButton.classList.add('duice-ui-calendar__pickerDiv-bodyDiv-dateDiv-prevMonthButton');
+                dateDiv.appendChild(prevMonthButton);
+                prevMonthButton.addEventListener('click', function(event){
+                    date.setMonth(date.getMonth() - 1);
+                    updateDate(date);
+                });
                 
-                // today
-                var today = document.createElement('button');
-                today.classList.add('duice-ui-calendar-dateTimePicker-datePicker-toolBar-today');
-                toolBar.appendChild(today);
+                // todayButton
+                var todayButton = document.createElement('button');
+                todayButton.classList.add('duice-ui-calendar__pickerDiv-bodyDiv-dateDiv-todayButton');
+                dateDiv.appendChild(todayButton);
+                todayButton.addEventListener('click', function(event){
+                    var newDate = new Date();
+                    date.setFullYear(newDate.getFullYear());
+                    date.setMonth(newDate.getMonth());
+                    date.setDate(newDate.getDate());
+                    updateDate(date);
+                });
                 
                 // year select
                 var yearSelect = document.createElement('select');
-                yearSelect.classList.add('duice-ui-calendar-dateTimePicker-datePicker-toolBar-yearSelect');
-                toolBar.appendChild(yearSelect);
-                for(var i = yyyy - 5, end = yyyy + 5; i <= end; i ++ ) {
-                    var option = document.createElement('option');
-                    option.value = String(i);
-                    option.text = String(i);
-                    yearSelect.appendChild(option);
-                }
-                yearSelect.value = String(yyyy);
+                yearSelect.classList.add('duice-ui-calendar__pickerDiv-bodyDiv-dateDiv-yearSelect');
+                dateDiv.appendChild(yearSelect);
                 yearSelect.addEventListener('change', function(event){
-//                    date.setFullYear(parseInt(this.value));
-//                    $this.openDatePicker(date);
+                    date.setFullYear(parseInt(this.value));
+                    updateDate(date);
                 });
                 
                 // divider
-                toolBar.appendChild(document.createTextNode('-'));
+                dateDiv.appendChild(document.createTextNode('-'));
                 
                 // month select
                 var monthSelect = document.createElement('select');
-                monthSelect.classList.add('duice-ui-calendar-dateTimePicker-datePicker-toolBar-monthSelect');
-                toolBar.appendChild(monthSelect);
-                for(var i = 1, end = 12; i <= end; i ++ ) {
+                monthSelect.classList.add('duice-ui-calendar__pickerDiv-bodyDiv-dateDiv-monthSelect');
+                dateDiv.appendChild(monthSelect);
+                for(var i = 0, end = 11; i <= end; i ++ ) {
                     var option = document.createElement('option');
                     option.value = String(i);
-                    option.text = String(i);
-                    if(i === yyyy){
-                        option.setAttribute('selected', 'selected');
-                    }
+                    option.text = String(i + 1);
                     monthSelect.appendChild(option);
                 }
                 monthSelect.addEventListener('change', function(event){
-//                    date.setFullYear(parseInt(this.value));
-//                    $this.openDatePicker(date);
+                    date.setMonth(parseInt(this.value));
+                    updateDate(date);
                 });
-                monthSelect.value = String(mm);
                
                 // next month button
-                var nextMonth = document.createElement('button');
-                nextMonth.classList.add('duice-ui-calendar-dateTimePicker-datePicker-toolBar-nextMonth');
-                toolBar.appendChild(nextMonth);
-                
-                // calendar table
-                var dateTable = document.createElement('table');
-                dateTable.classList.add('duice-ui-calendar-dateTimePicker-datePicker-dateTable');
-                this.dateTimePicker.appendChild(dateTable);
-                var dayThead = document.createElement('thead');
-                dateTable.appendChild(dayThead);
-                var dayTr = document.createElement('tr');
-                dayThead.appendChild(dayTr);
-                ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(function(element){
-                    var dayTh = document.createElement('th');
-                    dayTh.appendChild(document.createTextNode(element));
-                    dayTr.appendChild(dayTh);
+                var nextMonthButton = document.createElement('button');
+                nextMonthButton.classList.add('duice-ui-calendar__pickerDiv-bodyDiv-dateDiv-nextMonthButton');
+                dateDiv.appendChild(nextMonthButton);
+                nextMonthButton.addEventListener('click', function(event){
+                   date.setMonth(date.getMonth() + 1);
+                   updateDate(date);
                 });
                 
-                var dateTbody = document.createElement('tbody');
-                dateTable.appendChild(dateTbody);
-                var startDay = new Date(yyyy,mm,1).getDay();
-                var lastDays = [31,28,31,30,31,30,31,31,30,31,30,31];
-                if (yyyy%4 && yyyy%100!=0 || yyyy%400===0) {
-                    lastDays[1] = 29;
-                }
-                var lastDay = lastDays[mm];
-                var rowNum = Math.ceil((startDay + lastDay)/7);
-                var dNum = 1;
-                var currentDate = new Date();
-                for (var i=1; i<=rowNum; i++) {
-                    console.log('i',i);
-                    var dateTr = document.createElement('tr');
-                    for (var k=1; k<=7; k++) {
-                        var dateTd = document.createElement('td');
-                        if(dNum <= lastDay) {
-                            dateTd.appendChild(document.createTextNode(String(dNum)));
-                        }
-                        dateTr.appendChild(dateTd);
-                        dNum++;
-                    }
-                    dateTbody.appendChild(dateTr);
-                }
+                // calendar table
+                var calendarTable = document.createElement('table');
+                calendarTable.classList.add('duice-ui-calendar__pickerDiv-bodyDiv-calendarTable');
+                bodyDiv.appendChild(calendarTable);
+                var calendarThead = document.createElement('thead');
+                calendarTable.appendChild(calendarThead);
+                var weekTr = document.createElement('tr');
+                weekTr.classList.add('duice-ui-calendar__pickerDiv-bodyDiv-calendarTable-weekTr');
+                calendarThead.appendChild(weekTr);
+                ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(function(element){
+                    var weekTh = document.createElement('th');
+                    weekTh.classList.add('duice-ui-calendar__pickerDiv-bodyDiv-calendarTable-weekTh');
+                    weekTh.appendChild(document.createTextNode(element));
+                    weekTr.appendChild(weekTh);
+                });
+                var calendarTbody = document.createElement('tbody');
+                calendarTable.appendChild(calendarTbody);
                 
-                // timePicker
-                var timePicker = document.createElement('div');
-                timePicker.classList.add('duice-ui-calendar-dateTimePicker-timePicker');
-                this.dateTimePicker.appendChild(timePicker);
+                // timeDiv
+                var timeDiv = document.createElement('div');
+                timeDiv.classList.add('duice-ui-calendar__pickerDiv-bodyDiv-timeDiv');
+                bodyDiv.appendChild(timeDiv);
                 
                 // now
-                var now = document.createElement('button');
-                now.classList.add('duice-ui-calendar-dateTimePicker-timePicker-now');
-                timePicker.appendChild(now);
+                var nowButton = document.createElement('button');
+                nowButton.classList.add('duice-ui-calendar__pickerDiv-bodyDiv-timeDiv-nowButton');
+                timeDiv.appendChild(nowButton);
+                nowButton.addEventListener('click', function(event){
+                    var newDate = new Date();
+                    date.setHours(newDate.getHours());
+                    date.setMinutes(newDate.getMinutes());
+                    date.setSeconds(newDate.getSeconds());
+                    updateDate(date);
+                });
 
                 // hourSelect
                 var hourSelect = document.createElement('select');
-                hourSelect.classList.add('duice-ui-calendar-dateTimePicker-timePicker-hourSelect');
-                for(var i = 0; i < 23; i ++){
+                hourSelect.classList.add('duice-ui-calendar__pickerDiv-bodyDiv-timeDiv-hourSelect');
+                for(var i = 0; i <= 23; i ++){
                     var option = document.createElement('option');
                     option.value = String(i);
-                    option.text = String(i);
+                    option.text = lpad(String(i), 2, '0');
                     hourSelect.appendChild(option);
                 }
-                timePicker.appendChild(hourSelect);
+                timeDiv.appendChild(hourSelect);
+                hourSelect.addEventListener('change', function(event){
+                    date.setHours(parseInt(this.value)); 
+                });
                 
                 // divider
-                timePicker.appendChild(document.createTextNode(':'));
+                timeDiv.appendChild(document.createTextNode(':'));
                 
                 // minuteSelect
                 var minuteSelect = document.createElement('select');
-                minuteSelect.classList.add('duice-ui-calendar-dateTimePicker-timePicker-minuteSelect');
-                for(var i = 0; i < 59; i ++){
+                minuteSelect.classList.add('duice-ui-calendar__pickerDiv-bodyDiv-timeDiv-minuteSelect');
+                for(var i = 0; i <= 59; i ++){
                     var option = document.createElement('option');
                     option.value = String(i);
-                    option.text = String(i);
+                    option.text = lpad(String(i), 2, '0');
                     minuteSelect.appendChild(option);
                 }
-                timePicker.appendChild(minuteSelect);
+                timeDiv.appendChild(minuteSelect);
+                minuteSelect.addEventListener('change', function(event){
+                    date.setMinutes(parseInt(this.value)); 
+                });
                 
                 // divider
-                timePicker.appendChild(document.createTextNode(':'));
+                timeDiv.appendChild(document.createTextNode(':'));
                 
                 // secondsSelect
                 var secondSelect = document.createElement('select');
-                secondSelect.classList.add('duice-ui-calendar-dateTimePicker-timePicker-secondSelect');
-                for(var i = 0; i < 59; i ++){
+                secondSelect.classList.add('duice-ui-calendar__pickerDiv-bodyDiv-timeDiv-secondSelect');
+                for(var i = 0; i <= 59; i ++){
                     var option = document.createElement('option');
                     option.value = String(i);
-                    option.text = String(i);
+                    option.text = lpad(String(i), 2, '0');
                     secondSelect.appendChild(option);
                 }
-                timePicker.appendChild(secondSelect);
+                timeDiv.appendChild(secondSelect);
+                secondSelect.addEventListener('change', function(event){
+                    date.setSeconds(parseInt(this.value)); 
+                });
                 
                 // footer
-                var footer = document.createElement('div');
-                footer.classList.add('duice-ui-calendar-dateTimePicker-footer');
-                this.dateTimePicker.appendChild(footer);
+                var footerDiv = document.createElement('div');
+                footerDiv.classList.add('duice-ui-calendar__pickerDiv-footerDiv');
+                this.pickerDiv.appendChild(footerDiv);
                 
                 // confirm
-                var confirm = document.createElement('button');
-                confirm.classList.add('duice-ui-calendar-dateTimePicker-footer-confirm');
-                footer.appendChild(confirm);
+                var confirmButton = document.createElement('button');
+                confirmButton.classList.add('duice-ui-calendar__pickerDiv-footerDiv-confirmButton');
+                footerDiv.appendChild(confirmButton);
+                confirmButton.addEventListener('click', function(event){
+                    $this.date.setTime(date.getTime());
+                    $this.bindMap.set($this.bindName, $this.date.getTime());
+                    $this.closePicker();
+                });
                 
                 // show
-                this.dateTimePicker.style.position = 'absolute';
-                this.dateTimePicker.style.zIndex = String(this.getCurrentMaxZIndex() + 1);
-                this.dateTimePicker.style.display = 'block';
-                this.input.parentNode.appendChild(this.dateTimePicker);
+                this.pickerDiv.style.position = 'absolute';
+                this.pickerDiv.style.zIndex = String(getCurrentMaxZIndex() + 1);
+                this.pickerDiv.style.display = 'block';
+                this.input.parentNode.appendChild(this.pickerDiv);
+                
+                // updates date
+                function updateDate(date:Date):void {
+                    var yyyy = date.getFullYear();
+                    var mm = date.getMonth();
+                    var dd = date.getDate();
+                    var hh = date.getHours();
+                    var mi = date.getMinutes();
+                    var ss = date.getSeconds();
+                    
+                    // updates yearSelect
+                    for(var i = yyyy - 5, end = yyyy + 5; i <= end; i ++ ) {
+                        var option = document.createElement('option');
+                        option.value = String(i);
+                        option.text = String(i);
+                        yearSelect.appendChild(option);
+                    }
+                    yearSelect.value = String(yyyy);
+                    
+                    // updates monthSelect
+                    monthSelect.value = String(mm);
+                    
+                    // updates dateTbody
+                    var startDay = new Date(yyyy,mm,1).getDay();
+                    var lastDates = [31,28,31,30,31,30,31,31,30,31,30,31];
+                    if (yyyy%4 && yyyy%100!=0 || yyyy%400===0) {
+                        lastDates[1] = 29;
+                    }
+                    var lastDate = lastDates[mm];
+                    var rowNum = Math.ceil((startDay + lastDate - 1)/7);
+                    var dNum = 0;
+                    var currentDate = new Date();
+                    removeChildNodes(calendarTbody);
+                    for (var i=1; i<=rowNum; i++) {
+                        var dateTr = document.createElement('tr');
+                        dateTr.classList.add('duice-ui-calendar__pickerDiv-bodyDiv-calendarTable-dateTr');
+                        for (var k=1; k<=7; k++) {
+                            var dateTd = document.createElement('td');
+                            dateTd.classList.add('duice-ui-calendar__pickerDiv-bodyDiv-calendarTable-dateTd');
+                            if((i === 1 && k < startDay) 
+                            || (i === rowNum && dNum >= lastDate)
+                            ){
+                                dateTd.appendChild(document.createTextNode(''));
+                            }else{
+                                dNum++;
+                                dateTd.appendChild(document.createTextNode(String(dNum)));
+                                dateTd.dataset.date = String(dNum);
+                                
+                                // checks selected
+                                if(currentDate.getFullYear() === yyyy
+                                && currentDate.getMonth() === mm
+                                && currentDate.getDate() === dNum){
+                                    dateTd.classList.add('duice-ui-calendar__pickerDiv-bodyDiv-calendarTable-dateTd--today');
+                                }
+                                if(dd === dNum){
+                                    dateTd.classList.add('duice-ui-calendar__pickerDiv-bodyDiv-calendarTable-dateTd--selected');
+                                }
+                                dateTd.addEventListener('click', function(event){
+                                    date.setDate(parseInt(this.dataset.date));
+                                    updateDate(date);
+                                    event.preventDefault();
+                                    event.stopPropagation();
+                                });
+                            }
+                            dateTr.appendChild(dateTd);
+                        }
+                        calendarTbody.appendChild(dateTr);
+                    }
+                    
+                    // updates times
+                    hourSelect.value = String(hh);
+                    minuteSelect.value = String(mi);
+                    secondSelect.value = String(ss);
+                }
+                updateDate(date);
             }
-            closeDateTimePicker():void {
-                this.dateTimePicker.style.display = 'none';
-                this.dateTimePicker.remove();
-                window.removeEventListener('click', this.windowClickListener);
+            closePicker():void {
+                this.pickerDiv.style.display = 'none';
+                this.pickerDiv.remove();
+                window.removeEventListener('click', this.clickListener);
+            }
+        }
+        
+        /**
+         * duice.ui.CronExpression
+         */
+        export class CronExpression extends UIComponent {
+            input:HTMLInputElement;
+            bindMap:duice.data.Map;
+            bindName:string;
+            cronExpression:any = {
+                second:'0',
+                minute:'0',
+                hour:'0',
+                day:'*',
+                month:'*',
+                week:'?',
+                year:'*'
+            };
+            pickerDiv:HTMLDivElement;
+            clickListener:any;
+            constructor(input:HTMLInputElement){
+                super();
+                this.input = input;
+                this.input.classList.add('duice-ui-cronExpression');
+            }
+            setBind(map:duice.data.Map, name:string):void {
+                this.bindMap = map;
+                this.bindName = name;
+            }
+            build():void {
+                var $this = this;
+                this.bindMap.addObserver(this);
+                this.input.addEventListener('change', function(){
+                    $this.bindMap.set($this.bindName, this.value);
+                });
+                
+                // date picker
+                this.input.addEventListener('focus', function(){
+                    $this.openPicker();
+                });
+            }
+            update(observable:duice.data.DataObject):void {
+                var value = this.bindMap.get(this.bindName);
+                this.input.value = value;
+            }
+            openPicker():void {
+                var $this = this;
+                this.pickerDiv = document.createElement('div');
+                this.pickerDiv.classList.add('duice-ui-cronExpression__pickerDiv');
+                
+                // click event listener
+                this.clickListener = function(event:any){
+                    if(!$this.input.contains(event.target) && !$this.pickerDiv.contains(event.target)){
+                        $this.closePicker();
+                    }
+                }
+                window.addEventListener('click', this.clickListener);
+                
+                // header
+                var headerDiv = document.createElement('div');
+                headerDiv.classList.add('duice-ui-cronExpression__pickerDiv-headerDiv');
+                this.pickerDiv.appendChild(headerDiv);
+                
+                // titleIcon
+                var titleSpan = document.createElement('span');
+                titleSpan.classList.add('duice-ui-cronExpression__pickerDiv-headerDiv-titleSpan');
+                headerDiv.appendChild(titleSpan);
+                
+                // closeButton
+                var closeButton = document.createElement('button');
+                closeButton.classList.add('duice-ui-cronExpression__pickerDiv-headerDiv-closeButton');
+                headerDiv.appendChild(closeButton);
+                closeButton.addEventListener('click', function(event){
+                    $this.closePicker();
+                });
+                
+                // bodyDiv
+                var bodyDiv = document.createElement('div');
+                bodyDiv.classList.add('duice-ui-cronExpression__pickerDiv-bodyDiv');
+                this.pickerDiv.appendChild(bodyDiv);
+                
+                // secondSelectorDiv
+                var secondOptions = new Array();
+                secondOptions.push({value:'*', text:'Every'});
+                for(var i = 0; i <= 59; i ++){
+                    secondOptions.push({value:String(i), text:String(i)})
+                }
+                var secondSelectorDiv = this.createSelectorDiv('Second', secondOptions, this.cronExpression.second);
+                bodyDiv.appendChild(secondSelectorDiv);
+
+                // minuteSelectorDiv
+                var minuteOptions = new Array();
+                minuteOptions.push({value:'*', text:'Every'});
+                for(var i = 0; i <= 59; i ++){
+                    minuteOptions.push({value:String(i), text:String(i)})
+                }
+                var minuteSelectorDiv = this.createSelectorDiv('Minute', minuteOptions, this.cronExpression.minute);
+                bodyDiv.appendChild(minuteSelectorDiv);
+                
+                // hourSelectorDiv
+                var hourOptions = new Array();
+                hourOptions.push({value:'*', text:'Every'});
+                for(var i = 0; i <= 23; i ++){
+                    hourOptions.push({value:String(i), text:String(i)})
+                }
+                var minuteSelectorDiv = this.createSelectorDiv('Hour', hourOptions, this.cronExpression.hour);
+                bodyDiv.appendChild(minuteSelectorDiv);
+                
+                // daySelectorDiv
+                var dayOptions = new Array();
+                dayOptions.push({value:'?', text:'-'});
+                dayOptions.push({value:'*', text:'Every'});
+                dayOptions.push({value:'L', text:'Last Day'});
+                dayOptions.push({value:'LW', text:'Last Weekday'});
+                for(var i = 1; i <= 31; i ++){
+                    dayOptions.push({value:String(i), text:String(i)})
+                }
+                var daySelectorDiv = this.createSelectorDiv('Day', dayOptions, this.cronExpression.day);
+                bodyDiv.appendChild(daySelectorDiv);
+                
+                // monthSelectorDiv
+                var monthOptions = new Array();
+                monthOptions.push({value:'*', text:'Every'});
+                for(var i = 1; i <= 12; i ++){
+                    monthOptions.push({value:String(i), text:String(i)})
+                }
+                var monthSelectorDiv = this.createSelectorDiv('Month', monthOptions, this.cronExpression.month);
+                bodyDiv.appendChild(monthSelectorDiv);
+                
+                // weekSelectorDiv
+                var weekOptions = new Array();
+                weekOptions.push({value:'?', text:'-'});
+                weekOptions.push({value:'1-5', text:'Weekday'});
+                weekOptions.push({value:'6-7', text:'Weekend'});
+                weekOptions.push({value:'1', text:'MON'});
+                weekOptions.push({value:'2', text:'TUE'});
+                weekOptions.push({value:'3', text:'WED'});
+                weekOptions.push({value:'4', text:'THU'});
+                weekOptions.push({value:'5', text:'FRI'});
+                weekOptions.push({value:'6', text:'SAT'});
+                weekOptions.push({value:'7', text:'SUN'});
+                var weekSelectorDiv = this.createSelectorDiv('Week', weekOptions, this.cronExpression.week);
+                bodyDiv.appendChild(weekSelectorDiv);
+                
+                // yearSelectorDiv
+                var yearOptions = new Array();
+                yearOptions.push({value:'', text:'(Optional)'});
+                yearOptions.push({value:'*', text:'Every'});
+                for(var i = 1; i <= 12; i ++){
+                    monthOptions.push({value:String(i), text:String(i)})
+                }
+                var yearSelectorDiv = this.createSelectorDiv('Year', yearOptions, this.cronExpression.year);
+                bodyDiv.appendChild(yearSelectorDiv);
+
+                // footer
+                var footerDiv = document.createElement('div');
+                footerDiv.classList.add('duice-ui-calendar__pickerDiv-footerDiv');
+                this.pickerDiv.appendChild(footerDiv);
+                
+                // confirm
+                var confirmButton = document.createElement('button');
+                confirmButton.classList.add('duice-ui-calendar__pickerDiv-footerDiv-confirmButton');
+                footerDiv.appendChild(confirmButton);
+                confirmButton.addEventListener('click', function(event){
+                    var cronExpression = $this.generateCronExpression();
+                    $this.bindMap.set($this.bindName, cronExpression);
+                    $this.closePicker();
+                });
+                
+                // show
+                this.pickerDiv.style.position = 'absolute';
+                this.pickerDiv.style.zIndex = String(getCurrentMaxZIndex() + 1);
+                this.pickerDiv.style.display = 'block';
+                this.input.parentNode.appendChild(this.pickerDiv);
+            }
+            generateCronExpression():string {
+                return  this.cronExpression.second 
+                + ' ' + this.cronExpression.minute 
+                + ' ' + this.cronExpression.hour
+                + ' ' + this.cronExpression.day 
+                + ' ' + this.cronExpression.month
+                + ' ' + this.cronExpression.week
+                + ' ' + this.cronExpression.minute;
+            }
+            createSelectorDiv(title:string, options:Array<any>, value:string):HTMLDivElement {
+                var selectorDiv = document.createElement('div');
+                selectorDiv.classList.add('duice-ui-cronExpression__pickerDiv-bodyDiv-selectorDiv');
+                var label = document.createElement('label');
+                label.appendChild(document.createTextNode(title));
+                selectorDiv.appendChild(label);
+                var select = document.createElement('select');
+                options.forEach(function(item){
+                    var option = document.createElement('option');
+                    option.value = item.value;
+                    option.text = item.text;
+                    select.appendChild(option);
+                });
+                select.value = value;
+                select.addEventListener('change', function(event){
+                    input.value = this.value;
+                });
+                selectorDiv.appendChild(select);
+                var input = document.createElement('input');
+                input.value = value;
+                input.addEventListener('keyup', function(event){
+                    select.value = this.value;
+                });
+                selectorDiv.appendChild(input);
+                return selectorDiv;
+            }
+            closePicker():void {
+                this.pickerDiv.style.display = 'none';
+                this.pickerDiv.remove();
+                window.removeEventListener('click', this.clickListener);
             }
         }
         
@@ -1518,7 +1910,7 @@ namespace duice {
                     this.contentText.style.display = 'none';
                     this.contentHtml.style.display = 'block';
                 }
-                this.enableElement(this.toolBar, this.mode === 'html' ? true : false);
+                enableElement(this.toolBar, this.mode === 'html' ? true : false);
                 this.modeButton.disabled = false;
             }
         }
@@ -1685,7 +2077,7 @@ namespace duice {
                 if(this.contentMarkdown.value !== this.bindMap.get(this.bindName)){
                     this.contentMarkdown.value = this.bindMap.get(this.bindName);
                     this.contentMarkdown.setSelectionRange(this.selectionStart,this.selectionEnd);
-                    this.contentHtml.innerHTML = this.parseMarkdown(this.bindMap.get(this.bindName));
+                    this.contentHtml.innerHTML = parseMarkdown(this.bindMap.get(this.bindName));
                 }
             }
             insertMarkdown(startTag:string, endTag:string) {
@@ -1713,23 +2105,10 @@ namespace duice {
                     this.contentMarkdown.style.display = 'block';
                     this.contentHtml.style.display = 'none';
                 }
-                this.enableElement(this.toolBar, this.mode === 'markdown' ? true : false);
+                enableElement(this.toolBar, this.mode === 'markdown' ? true : false);
                 this.modeButton.disabled = false;
             }
         }
-        
-//        /**
-//         * duice.ui.CronExpression
-//         */
-//        export class CronExpression extends __ {
-//            constructor(input:HTMLInputElement){
-//                super();
-//            }
-//            setBind(list:duice.data.List):void {
-//            }
-//            update():void {
-//            }
-//        }
 
 //        /**
 //         * duice.ui.ListViewer
@@ -1851,7 +2230,7 @@ namespace duice {
                 var $context:any = new Object;
                 $context['index'] = index;
                 $context[this.item] = bindMap;
-                row = this.executeExpression(<HTMLElement>row, $context);
+                row = executeExpression(<HTMLElement>row, $context);
                 initialize(row,$context);
                 
                 // select index
@@ -1892,7 +2271,7 @@ namespace duice {
             }
             createEmptyRow():HTMLTableSectionElement {
                 var emptyRow:HTMLTableSectionElement = <HTMLTableSectionElement>this.tbody.cloneNode(true);
-                this.removeChildNodes(emptyRow);
+                removeChildNodes(emptyRow);
                 emptyRow.classList.add('duice-ui-tableViewer-empty')
                 var tr = document.createElement('tr');
                 var td = document.createElement('td');

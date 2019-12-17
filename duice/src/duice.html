@@ -87,6 +87,7 @@ function removeCurrentRow(){
 					<th>Alive</th>
 					<th>Gender</th>
 					<th>Birthday</th>
+					<th>Schedule</th>
 				</tr>
 			</thead>
 			<tbody data-id="[[$context.map.get('id')]]" onclick="getRow(this.dataset.id);">
@@ -103,6 +104,7 @@ function removeCurrentRow(){
 						<input type="radio" data-duice="Radio" data-duice-bind="map,gender" value=""/>None
 					</td>
 					<td><input type="text" data-duice="Calendar" data-duice-bind="map,birthday"/></td>
+					<td><input type="text" data-duice="CronExpression" data-duice-bind="map,schedule"/></td>
 				</tr>
 			</tbody>
 		</table>
