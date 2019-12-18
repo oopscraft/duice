@@ -18,18 +18,18 @@ table {
 </style>
 <script>
 var list = new duice.data.List([
-	{id:"dog", name:"Dog", groupId:'animal', isAlive:true, gender:'F', birthday:'2001-01-01', comment:'I am Dog\nI am Apple1', photo:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABC0lEQVRIibXVQUrDQBjF8Z/deQBd9wSC4DWk4GVcuBEVCl5Aj+FBxOINXEltV6JIXcVFm5KMyUwmbR7MYr687/0nM2FCu2b4xmXE06Yr/OIlZioq4zoj/DboTQLeMiBleNnTCTDuCLmphI9zAAJIbJThYX8S0AVSDd/2HyQAEPOkFmjUs7mzRrjAEgtMEv57rDBN1Gpa4gSn+KjUmw5ptfH9JGq1/iIoxgDTTdBdotYbkKMCxQjvPQNeJe6aNmptBcHzhfV+n2HeMA+z/u1ACjCx/hDmOG+Y7wzI0fYMBlUI+MLRkMBHPOHYnrYoLB7iAZ8thhiwyZt1XfcCDH7IXf4HOyn2BrM95D//AUGPi1ZZA00cAAAAAElFTkSuQmCC'},
-	{id:"apple", name:"Apple", groupId:'fruit', isAlive:true, gender:'', birthday:'2001-01-01', comment:'I am Apple'},
-	{id:"cat", name:"Cat", groupId:'animal', isAlive:true, gender:'M', birthday:'2001-01-01', comment:'I am Cat'},
-	{id:"orange", name:"Orange", groupId:'fruit', isAlive:true, gender:'', birthday:'2001-01-01', comment:'I am Orange'},
-	{id:"dog1", name:"Dog1", groupId:'animal', isAlive:false, gender:'F', birthday:'2001-01-01', comment:'I am Dog1'},
-	{id:"apple1", name:"Apple1", groupId:'fruit', isAlive:true, gender:'', birthday:'1992-01-01', comment:'I am Apple1'},
-	{id:"cat1", name:"Cat1", groupId:'animal', isAlive:true, gender:'M', birthday:'1945-01-01', comment:'I am Cat1'},
-	{id:"orange1", name:"Orange1", groupId:'fruit', isAlive:false, gender:'', birthday:'2001-01-01', comment:'I am Orange1'},
-	{id:"dog2", name:"Dog2", groupId:'animal', isAlive:false, gender:'M', birthday:'2001-01-01', comment:'I am Dog2'},
-	{id:"apple2", name:"Apple2", groupId:'fruit', isAlive:false, gender:'', birthday:'2001-01-01', comment:'I am Apple2'},
-	{id:"cat2", name:"Cat2", groupId:'animal', isAlive:true, gender:'F', birthday:'2001-01-01', comment:'I am Cat2'},
-	{id:"orange2", name:"Orange2", groupId:'fruit', isAlive:false, gender:'', birthday:'2001-01-01', comment:'I am Orange2'}
+	{id:"dog", name:"Dog", groupId:'animal', isAlive:true, gender:'F', birthday:1576647474398, schedule:'0 0 0 * * ?', comment:'I am Dog\nI am Apple1', photo:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABC0lEQVRIibXVQUrDQBjF8Z/deQBd9wSC4DWk4GVcuBEVCl5Aj+FBxOINXEltV6JIXcVFm5KMyUwmbR7MYr687/0nM2FCu2b4xmXE06Yr/OIlZioq4zoj/DboTQLeMiBleNnTCTDuCLmphI9zAAJIbJThYX8S0AVSDd/2HyQAEPOkFmjUs7mzRrjAEgtMEv57rDBN1Gpa4gSn+KjUmw5ptfH9JGq1/iIoxgDTTdBdotYbkKMCxQjvPQNeJe6aNmptBcHzhfV+n2HeMA+z/u1ACjCx/hDmOG+Y7wzI0fYMBlUI+MLRkMBHPOHYnrYoLB7iAZ8thhiwyZt1XfcCDH7IXf4HOyn2BrM95D//AUGPi1ZZA00cAAAAAElFTkSuQmCC'},
+	{id:"apple", name:"Apple", groupId:'fruit', isAlive:true, gender:'', birthday:1576647474398, schedule:'0 0 0 * * ?',comment:'I am Apple'},
+	{id:"cat", name:"Cat", groupId:'animal', isAlive:true, gender:'M', birthday:1576647474398, schedule:'0 0 0 * * ?',comment:'I am Cat'},
+	{id:"orange", name:"Orange", groupId:'fruit', isAlive:true, gender:'', birthday:1576647474398, schedule:'0 0 0 * * ?',comment:'I am Orange'},
+	{id:"dog1", name:"Dog1", groupId:'animal', isAlive:false, gender:'F', birthday:1576647474398, schedule:'0 0 0 * * ?',comment:'I am Dog1'},
+	{id:"apple1", name:"Apple1", groupId:'fruit', isAlive:true, gender:'', birthday:1576647474398, schedule:'0 0 0 * * ?',comment:'I am Apple1'},
+	{id:"cat1", name:"Cat1", groupId:'animal', isAlive:true, gender:'M', birthday:1576647474398, schedule:'0 0 10 * * ?',comment:'I am Cat1'},
+	{id:"orange1", name:"Orange1", groupId:'fruit', isAlive:false, gender:'', birthday:1576647474398, schedule:'0 0 0 * * ?',comment:'I am Orange1'},
+	{id:"dog2", name:"Dog2", groupId:'animal', isAlive:false, gender:'M', birthday:1576647474398, schedule:'0 0 0 * * ?',comment:'I am Dog2'},
+	{id:"apple2", name:"Apple2", groupId:'fruit', isAlive:false, gender:'', birthday:1576647474398, schedule:'0 0 0 * * ?',comment:'I am Apple2'},
+	{id:"cat2", name:"Cat2", groupId:'animal', isAlive:true, gender:'F', birthday:1576647474398, schedule:'0 0 0 * * ?',comment:'I am Cat2'},
+	{id:"orange2", name:"Orange2", groupId:'fruit', isAlive:false, gender:'', birthday:1576647474398, schedule:'0 0 0 * * ?',comment:'I am Orange2'}
 ]);
 var map = new duice.data.Map({});
 map.setReadonly('id',true);

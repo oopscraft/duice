@@ -172,6 +172,33 @@ var duice;
     }
     duice.initialize = initialize;
     /**
+     * isEmpty
+     * @param value
+     */
+    function isEmpty(value) {
+        if (value === undefined
+            || value === null
+            || value === '') {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    /**
+     * defaultIfEmpty
+     * @param value
+     * @param defaultValue
+     */
+    function defaultIfEmpty(value, defaultValue) {
+        if (isEmpty(value) === true) {
+            return defaultValue;
+        }
+        else {
+            return value;
+        }
+    }
+    /**
      * generateObjectID
      */
     function generateUUID() {
@@ -1074,15 +1101,21 @@ var duice;
                     $this.bindMap.set($this.bindName, this.value);
                 });
                 // date picker
-                this.input.addEventListener('focus', function () {
+                this.input.addEventListener('click', function () {
                     $this.openPicker();
                 });
+                // update
+                this.update(null);
             };
             Calendar.prototype.update = function (observable) {
                 var value = this.bindMap.get(this.bindName);
                 this.input.value = value;
             };
             Calendar.prototype.openPicker = function () {
+                // checks pickerDiv is open.
+                if (this.pickerDiv) {
+                    return;
+                }
                 var $this = this;
                 this.pickerDiv = document.createElement('div');
                 this.pickerDiv.classList.add('duice-ui-calendar__pickerDiv');
@@ -1266,7 +1299,6 @@ var duice;
                 // show
                 this.pickerDiv.style.position = 'absolute';
                 this.pickerDiv.style.zIndex = String(getCurrentMaxZIndex() + 1);
-                this.pickerDiv.style.display = 'block';
                 this.input.parentNode.appendChild(this.pickerDiv);
                 // updates date
                 function updateDate(date) {
@@ -1339,8 +1371,8 @@ var duice;
                 updateDate(date);
             };
             Calendar.prototype.closePicker = function () {
-                this.pickerDiv.style.display = 'none';
                 this.pickerDiv.remove();
+                this.pickerDiv = null;
                 window.removeEventListener('click', this.clickListener);
             };
             return Calendar;
@@ -1353,15 +1385,6 @@ var duice;
             __extends(CronExpression, _super);
             function CronExpression(input) {
                 var _this = _super.call(this) || this;
-                _this.cronExpression = {
-                    second: '0',
-                    minute: '0',
-                    hour: '0',
-                    day: '*',
-                    month: '*',
-                    week: '?',
-                    year: '*'
-                };
                 _this.input = input;
                 _this.input.classList.add('duice-ui-cronExpression');
                 return _this;
@@ -1377,18 +1400,25 @@ var duice;
                     $this.bindMap.set($this.bindName, this.value);
                 });
                 // date picker
-                this.input.addEventListener('focus', function () {
+                this.input.addEventListener('click', function () {
                     $this.openPicker();
                 });
+                // update
+                this.update(null);
             };
             CronExpression.prototype.update = function (observable) {
                 var value = this.bindMap.get(this.bindName);
                 this.input.value = value;
             };
             CronExpression.prototype.openPicker = function () {
+                // checks pickerDiv is open.
+                if (this.pickerDiv) {
+                    return;
+                }
                 var $this = this;
                 this.pickerDiv = document.createElement('div');
                 this.pickerDiv.classList.add('duice-ui-cronExpression__pickerDiv');
+                var cronExpression = this.decodeCronExpression(this.input.value);
                 // click event listener
                 this.clickListener = function (event) {
                     if (!$this.input.contains(event.target) && !$this.pickerDiv.contains(event.target)) {
@@ -1421,7 +1451,7 @@ var duice;
                 for (var i = 0; i <= 59; i++) {
                     secondOptions.push({ value: String(i), text: String(i) });
                 }
-                var secondSelectorDiv = this.createSelectorDiv('Second', secondOptions, this.cronExpression.second);
+                var secondSelectorDiv = this.createSelectorDiv('Second', secondOptions, cronExpression.second);
                 bodyDiv.appendChild(secondSelectorDiv);
                 // minuteSelectorDiv
                 var minuteOptions = new Array();
@@ -1429,7 +1459,7 @@ var duice;
                 for (var i = 0; i <= 59; i++) {
                     minuteOptions.push({ value: String(i), text: String(i) });
                 }
-                var minuteSelectorDiv = this.createSelectorDiv('Minute', minuteOptions, this.cronExpression.minute);
+                var minuteSelectorDiv = this.createSelectorDiv('Minute', minuteOptions, cronExpression.minute);
                 bodyDiv.appendChild(minuteSelectorDiv);
                 // hourSelectorDiv
                 var hourOptions = new Array();
@@ -1437,8 +1467,8 @@ var duice;
                 for (var i = 0; i <= 23; i++) {
                     hourOptions.push({ value: String(i), text: String(i) });
                 }
-                var minuteSelectorDiv = this.createSelectorDiv('Hour', hourOptions, this.cronExpression.hour);
-                bodyDiv.appendChild(minuteSelectorDiv);
+                var hourSelectorDiv = this.createSelectorDiv('Hour', hourOptions, cronExpression.hour);
+                bodyDiv.appendChild(hourSelectorDiv);
                 // daySelectorDiv
                 var dayOptions = new Array();
                 dayOptions.push({ value: '?', text: '-' });
@@ -1448,7 +1478,7 @@ var duice;
                 for (var i = 1; i <= 31; i++) {
                     dayOptions.push({ value: String(i), text: String(i) });
                 }
-                var daySelectorDiv = this.createSelectorDiv('Day', dayOptions, this.cronExpression.day);
+                var daySelectorDiv = this.createSelectorDiv('Day', dayOptions, cronExpression.day);
                 bodyDiv.appendChild(daySelectorDiv);
                 // monthSelectorDiv
                 var monthOptions = new Array();
@@ -1456,7 +1486,7 @@ var duice;
                 for (var i = 1; i <= 12; i++) {
                     monthOptions.push({ value: String(i), text: String(i) });
                 }
-                var monthSelectorDiv = this.createSelectorDiv('Month', monthOptions, this.cronExpression.month);
+                var monthSelectorDiv = this.createSelectorDiv('Month', monthOptions, cronExpression.month);
                 bodyDiv.appendChild(monthSelectorDiv);
                 // weekSelectorDiv
                 var weekOptions = new Array();
@@ -1470,7 +1500,7 @@ var duice;
                 weekOptions.push({ value: '5', text: 'FRI' });
                 weekOptions.push({ value: '6', text: 'SAT' });
                 weekOptions.push({ value: '7', text: 'SUN' });
-                var weekSelectorDiv = this.createSelectorDiv('Week', weekOptions, this.cronExpression.week);
+                var weekSelectorDiv = this.createSelectorDiv('Week', weekOptions, cronExpression.week);
                 bodyDiv.appendChild(weekSelectorDiv);
                 // yearSelectorDiv
                 var yearOptions = new Array();
@@ -1479,7 +1509,7 @@ var duice;
                 for (var i = 1; i <= 12; i++) {
                     monthOptions.push({ value: String(i), text: String(i) });
                 }
-                var yearSelectorDiv = this.createSelectorDiv('Year', yearOptions, this.cronExpression.year);
+                var yearSelectorDiv = this.createSelectorDiv('Year', yearOptions, cronExpression.year);
                 bodyDiv.appendChild(yearSelectorDiv);
                 // footer
                 var footerDiv = document.createElement('div');
@@ -1490,24 +1520,44 @@ var duice;
                 confirmButton.classList.add('duice-ui-calendar__pickerDiv-footerDiv-confirmButton');
                 footerDiv.appendChild(confirmButton);
                 confirmButton.addEventListener('click', function (event) {
-                    var cronExpression = $this.generateCronExpression();
-                    $this.bindMap.set($this.bindName, cronExpression);
+                    var cronExpression = {
+                        second: secondSelectorDiv.querySelector('input').value,
+                        minute: minuteSelectorDiv.querySelector('input').value,
+                        hour: hourSelectorDiv.querySelector('input').value,
+                        day: daySelectorDiv.querySelector('input').value,
+                        month: monthSelectorDiv.querySelector('input').value,
+                        week: weekSelectorDiv.querySelector('input').value,
+                        year: yearSelectorDiv.querySelector('input').value
+                    };
+                    $this.bindMap.set($this.bindName, $this.encodeCronExpression(cronExpression));
                     $this.closePicker();
                 });
                 // show
                 this.pickerDiv.style.position = 'absolute';
                 this.pickerDiv.style.zIndex = String(getCurrentMaxZIndex() + 1);
-                this.pickerDiv.style.display = 'block';
                 this.input.parentNode.appendChild(this.pickerDiv);
             };
-            CronExpression.prototype.generateCronExpression = function () {
-                return this.cronExpression.second
-                    + ' ' + this.cronExpression.minute
-                    + ' ' + this.cronExpression.hour
-                    + ' ' + this.cronExpression.day
-                    + ' ' + this.cronExpression.month
-                    + ' ' + this.cronExpression.week
-                    + ' ' + this.cronExpression.minute;
+            CronExpression.prototype.decodeCronExpression = function (value) {
+                var values = value.split(/[\s]{1}/);
+                return {
+                    second: defaultIfEmpty(values[0], '0'),
+                    minute: defaultIfEmpty(values[1], '0'),
+                    hour: defaultIfEmpty(values[2], '0'),
+                    day: defaultIfEmpty(values[3], '*'),
+                    month: defaultIfEmpty(values[4], '*'),
+                    week: defaultIfEmpty(values[5], '?'),
+                    year: defaultIfEmpty(values[6], '') // optional
+                };
+            };
+            CronExpression.prototype.encodeCronExpression = function (cronExpression) {
+                return defaultIfEmpty(cronExpression.second, ' ')
+                    + ' ' + defaultIfEmpty(cronExpression.minute, ' ')
+                    + ' ' + defaultIfEmpty(cronExpression.hour, ' ')
+                    + ' ' + defaultIfEmpty(cronExpression.day, ' ')
+                    + ' ' + defaultIfEmpty(cronExpression.month, ' ')
+                    + ' ' + defaultIfEmpty(cronExpression.week, ' ')
+                    + (isEmpty(cronExpression.year) ? '' : ' ' + cronExpression.year) // optional
+                ;
             };
             CronExpression.prototype.createSelectorDiv = function (title, options, value) {
                 var selectorDiv = document.createElement('div');
@@ -1536,8 +1586,8 @@ var duice;
                 return selectorDiv;
             };
             CronExpression.prototype.closePicker = function () {
-                this.pickerDiv.style.display = 'none';
                 this.pickerDiv.remove();
+                this.pickerDiv = null;
                 window.removeEventListener('click', this.clickListener);
             };
             return CronExpression;
