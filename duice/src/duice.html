@@ -34,7 +34,6 @@ var list = new duice.data.List([
 var map = new duice.data.Map({});
 map.setReadonly('id',true);
 map.setEnable(false);
-map.fromJson(list.getRow(2).toJson());
 var groups = new duice.data.List([
 	{id:"animal", name:"Animal"},
 	{id:"fruit", name:"Fruit"},
@@ -103,7 +102,7 @@ function removeCurrentRow(){
 						<input type="radio" data-duice="Radio" data-duice-bind="map,gender" value="M"/>Male |
 						<input type="radio" data-duice="Radio" data-duice-bind="map,gender" value=""/>None
 					</td>
-					<td><input type="text" data-duice="Calendar" data-duice-bind="map,birthday"/></td>
+					<td><input type="text" data-duice="Calendar" data-duice-bind="map,birthday" data-duice-mask="date,yyyy-MM-dd HH:mm:ss"/></td>
 					<td><input type="text" data-duice="CronExpression" data-duice-bind="map,schedule"/></td>
 				</tr>
 			</tbody>
@@ -154,7 +153,11 @@ function removeCurrentRow(){
 			</tr>
 			<tr>
 				<th>Birth Date</th>
-				<td><input type="text" data-duice="Calendar" data-duice-bind="map,birthday"/></td>
+				<td><input type="text" data-duice="Calendar" data-duice-bind="map,birthday" data-duice-mask="date,yyyy-MM-dd HH:mm:ss"/></td>
+			</tr>
+			<tr>
+				<th>Schedule</th>
+				<td><input type="text" data-duice="CronExpression" data-duice-bind="map,schedule"/></td>
 			</tr>
 			<tr>
 				<th>Comment(Text - default mode)</th>

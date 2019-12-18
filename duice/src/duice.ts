@@ -121,6 +121,11 @@ namespace duice {
                         var bindMap = getObject($context, bind[0]);
                         var bindName = bind[1];
                         calendar.setBind(bindMap, bindName);
+                        if(element.dataset.duiceMask){
+                            var mask = element.dataset.duiceMask.split(',');
+                            
+                            calendar.setMask(mask[0],mask[1]);
+                        }
                         calendar.build();
                     break;
                     case 'CronExpression':
@@ -159,35 +164,7 @@ namespace duice {
             }
         }
     }
-    
-    /**
-     * isEmpty
-     * @param value
-     */
-    function isEmpty(value:any){
-        if(value === undefined
-        || value === null
-        || value === ''
-        ){
-            return true;
-        }else{
-            return false;
-        }
-    }
-    
-    /**
-     * defaultIfEmpty
-     * @param value
-     * @param defaultValue
-     */
-    function defaultIfEmpty(value:any, defaultValue:any) {
-        if(isEmpty(value) === true) {
-            return defaultValue;
-        }else{
-            return value;
-        }
-    }
-    
+
     /**
      * generateObjectID
      */
@@ -220,6 +197,132 @@ namespace duice {
             throw e;
         }
     };
+    
+    
+    /**
+     * isEmpty
+     * @param value
+     */
+    function isEmpty(value:any){
+        if(value === undefined
+        || value === null
+        || value === ''
+        ){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
+    /**
+     * defaultIfEmpty
+     * @param value
+     * @param defaultValue
+     */
+    function defaultIfEmpty(value:any, defaultValue:any) {
+        if(isEmpty(value) === true) {
+            return defaultValue;
+        }else{
+            return value;
+        }
+    }
+    
+    
+    /**
+     * lpad
+     * @param value
+     * @param length
+     * @param padChar
+     */
+    function lpad(value:string, length:number, padChar:string) {
+        for(var i = 0, size = (length-value.length); i < size; i ++ ) {
+            value = padChar + value;
+        }
+        return value;
+    }
+    
+    /**
+     * rpad
+     * @param value
+     * @param length
+     * @param padChar
+     */
+    function rpad(value:string, length:number, padChar:string) {
+        for(var i = 0, size = (length-value.length); i < size; i ++ ) {
+            value = value + padChar;
+        }
+        return value;
+    }
+    
+    /**
+     * encodeMask
+     * data-duice-mask="string,###-####"
+     * data-duice-mask="number,1"
+     * data-duice-mask="date,yyyy-mm-dd HH:mi:ss"
+     * @param value
+     * @param type
+     * @param format
+     */
+    function encodeMask(value:any, type:string, format:any):string {
+        var maskedValue;
+        switch (type) {
+            case 'string' :
+                var string = value;
+                // TODO
+                break;
+            case 'number' :
+                var number = (value instanceof Number ? value : Number(value));;
+                var scale = parseInt(format);
+                maskedValue = String(number.toFixed(scale));
+                var reg = /(^[+-]?\d+)(\d{3})/;
+                while (reg.test(maskedValue)) {
+                    maskedValue = maskedValue.replace(reg, '$1' + ',' + '$2');
+                }
+                break;
+            case 'date' :
+                var date = (value instanceof Date ? value : new Date(value));
+                var weekName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                var formatRex = /yyyy|yy|MM|dd|E|HH|hh|mm|ss|ap/gi;
+                maskedValue = format.replace(formatRex, function($1:string) {
+                    switch ($1) {
+                        case "yyyy": return date.getFullYear();
+                        case "yy": return lpad(String(date.getFullYear()%1000), 2, '0');
+                        case "MM": return lpad(String(date.getMonth() + 1), 2, '0');
+                        case "dd": return lpad(String(date.getDate()), 2, '0');
+                        case "E": return weekName[date.getDay()];
+                        case "HH": return lpad(String(date.getHours()), 2, '0');
+                        case "hh": return lpad(String(date.getHours() <= 12 ? date.getHours() : date.getHours()%12), 2, '0');
+                        case "mm": return lpad(String(date.getMinutes()), 2, '0');
+                        case "ss": return lpad(String(date.getSeconds()), 2, '0');
+                        case "ap": return date.getHours() < 12 ? 'AM' : 'PM';
+                        default: return $1;
+                    }
+                });
+                break;
+            default:
+                throw 'encodeMask-type must be string|number|date';
+        }
+        return maskedValue;
+    }
+    
+    /**
+     * decodeMask
+     * @param value
+     * @param type
+     * @param format
+     */
+    function decodeMask(value:string, type:string, format:any):string {
+        switch (type) {
+            case 'string' :
+                return value;
+            case 'number' :
+                return value;
+            case 'date' :
+                return value;
+            default:
+                return value
+        }
+    }
     
     /**
      * duice.data
@@ -851,25 +954,23 @@ namespace duice {
         }
         
         /**
-         * lpad
-         * @param value
-         * @param length
-         * @param padChar
-         */
-        function lpad(value:string, length:number, padChar:string) {
-            for(var i = 0, size = (length-value.length); i < size; i ++ ) {
-                value = padChar + value;
-            }
-            return value;
-        }
-        
-        /**
          * Super prototype of duice.ui
          */
         export abstract class UIComponent {
             abstract setBind(...args: any[]):void;
             abstract build():void;
             abstract update(observable:duice.data.DataObject):void;
+            mask:{type:string, format:any};
+            setMask(type:string, format:any):void {
+                this.mask = { type: type, format: format };
+            }
+            hasMask():boolean {
+                if(this.mask){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
         }
         
         /**
@@ -1109,7 +1210,6 @@ namespace duice {
             input:HTMLInputElement;
             bindMap:duice.data.Map;
             bindName:string;
-            format:string = 'yyyy-MM-dd HH:mm:ss';
             date:Date = new Date();
             pickerDiv:HTMLDivElement;
             clickListener:any;
@@ -1139,7 +1239,7 @@ namespace duice {
             }
             update(observable:duice.data.DataObject):void {
                 var value = this.bindMap.get(this.bindName);
-                this.input.value = value;
+                this.input.value = this.hasMask() ? encodeMask(value, this.mask.type, this.mask.format) : value;
             }
             openPicker():void {
                 

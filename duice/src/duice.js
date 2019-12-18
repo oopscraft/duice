@@ -131,6 +131,10 @@ var duice;
                         var bindMap = getObject($context, bind[0]);
                         var bindName = bind[1];
                         calendar.setBind(bindMap, bindName);
+                        if (element.dataset.duiceMask) {
+                            var mask = element.dataset.duiceMask.split(',');
+                            calendar.setMask(mask[0], mask[1]);
+                        }
                         calendar.build();
                         break;
                     case 'CronExpression':
@@ -172,33 +176,6 @@ var duice;
     }
     duice.initialize = initialize;
     /**
-     * isEmpty
-     * @param value
-     */
-    function isEmpty(value) {
-        if (value === undefined
-            || value === null
-            || value === '') {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    /**
-     * defaultIfEmpty
-     * @param value
-     * @param defaultValue
-     */
-    function defaultIfEmpty(value, defaultValue) {
-        if (isEmpty(value) === true) {
-            return defaultValue;
-        }
-        else {
-            return value;
-        }
-    }
-    /**
      * generateObjectID
      */
     function generateUUID() {
@@ -231,6 +208,126 @@ var duice;
         }
     }
     ;
+    /**
+     * isEmpty
+     * @param value
+     */
+    function isEmpty(value) {
+        if (value === undefined
+            || value === null
+            || value === '') {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    /**
+     * defaultIfEmpty
+     * @param value
+     * @param defaultValue
+     */
+    function defaultIfEmpty(value, defaultValue) {
+        if (isEmpty(value) === true) {
+            return defaultValue;
+        }
+        else {
+            return value;
+        }
+    }
+    /**
+     * lpad
+     * @param value
+     * @param length
+     * @param padChar
+     */
+    function lpad(value, length, padChar) {
+        for (var i = 0, size = (length - value.length); i < size; i++) {
+            value = padChar + value;
+        }
+        return value;
+    }
+    /**
+     * rpad
+     * @param value
+     * @param length
+     * @param padChar
+     */
+    function rpad(value, length, padChar) {
+        for (var i = 0, size = (length - value.length); i < size; i++) {
+            value = value + padChar;
+        }
+        return value;
+    }
+    /**
+     * encodeMask
+     * data-duice-mask="string,###-####"
+     * data-duice-mask="number,1"
+     * data-duice-mask="date,yyyy-mm-dd HH:mi:ss"
+     * @param value
+     * @param type
+     * @param format
+     */
+    function encodeMask(value, type, format) {
+        var maskedValue;
+        switch (type) {
+            case 'string':
+                var string = value;
+                // TODO
+                break;
+            case 'number':
+                var number = (value instanceof Number ? value : Number(value));
+                ;
+                var scale = parseInt(format);
+                maskedValue = String(number.toFixed(scale));
+                var reg = /(^[+-]?\d+)(\d{3})/;
+                while (reg.test(maskedValue)) {
+                    maskedValue = maskedValue.replace(reg, '$1' + ',' + '$2');
+                }
+                break;
+            case 'date':
+                var date = (value instanceof Date ? value : new Date(value));
+                var weekName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                var formatRex = /yyyy|yy|MM|dd|E|HH|hh|mm|ss|ap/gi;
+                maskedValue = format.replace(formatRex, function ($1) {
+                    switch ($1) {
+                        case "yyyy": return date.getFullYear();
+                        case "yy": return lpad(String(date.getFullYear() % 1000), 2, '0');
+                        case "MM": return lpad(String(date.getMonth() + 1), 2, '0');
+                        case "dd": return lpad(String(date.getDate()), 2, '0');
+                        case "E": return weekName[date.getDay()];
+                        case "HH": return lpad(String(date.getHours()), 2, '0');
+                        case "hh": return lpad(String(date.getHours() <= 12 ? date.getHours() : date.getHours() % 12), 2, '0');
+                        case "mm": return lpad(String(date.getMinutes()), 2, '0');
+                        case "ss": return lpad(String(date.getSeconds()), 2, '0');
+                        case "ap": return date.getHours() < 12 ? 'AM' : 'PM';
+                        default: return $1;
+                    }
+                });
+                break;
+            default:
+                throw 'encodeMask-type must be string|number|date';
+        }
+        return maskedValue;
+    }
+    /**
+     * decodeMask
+     * @param value
+     * @param type
+     * @param format
+     */
+    function decodeMask(value, type, format) {
+        switch (type) {
+            case 'string':
+                return value;
+            case 'number':
+                return value;
+            case 'date':
+                return value;
+            default:
+                return value;
+        }
+    }
     /**
      * duice.data
      */
@@ -827,23 +924,22 @@ var duice;
             };
         }
         /**
-         * lpad
-         * @param value
-         * @param length
-         * @param padChar
-         */
-        function lpad(value, length, padChar) {
-            for (var i = 0, size = (length - value.length); i < size; i++) {
-                value = padChar + value;
-            }
-            return value;
-        }
-        /**
          * Super prototype of duice.ui
          */
         var UIComponent = (function () {
             function UIComponent() {
             }
+            UIComponent.prototype.setMask = function (type, format) {
+                this.mask = { type: type, format: format };
+            };
+            UIComponent.prototype.hasMask = function () {
+                if (this.mask) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            };
             return UIComponent;
         }());
         ui.UIComponent = UIComponent;
@@ -1084,7 +1180,6 @@ var duice;
             __extends(Calendar, _super);
             function Calendar(input) {
                 var _this = _super.call(this) || this;
-                _this.format = 'yyyy-MM-dd HH:mm:ss';
                 _this.date = new Date();
                 _this.input = input;
                 _this.input.classList.add('duice-ui-calendar');
@@ -1109,7 +1204,7 @@ var duice;
             };
             Calendar.prototype.update = function (observable) {
                 var value = this.bindMap.get(this.bindName);
-                this.input.value = value;
+                this.input.value = this.hasMask() ? encodeMask(value, this.mask.type, this.mask.format) : value;
             };
             Calendar.prototype.openPicker = function () {
                 // checks pickerDiv is open.

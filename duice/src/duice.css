@@ -130,6 +130,8 @@
  */
 .duice-ui-checkBox {
 	vertical-align: middle;
+	width: 1rem;
+    height: 1rem;
 }
 
 /**
@@ -137,6 +139,8 @@
  */
 .duice-ui-radio {
 	vertical-align: middle;
+	width: 1rem;
+    height: 1rem;
 }
 
 /**
