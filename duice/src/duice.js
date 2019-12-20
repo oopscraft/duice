@@ -84,6 +84,10 @@ var duice;
                         var bindMap = getObject($context, bind[0]);
                         var bindName = bind[1];
                         text.setBind(bindMap, bindName);
+                        if (element.dataset.duiceMask) {
+                            var mask = element.dataset.duiceMask.split(',');
+                            text.setMask(mask[0], mask[1]);
+                        }
                         text.build();
                         break;
                     case 'TextField':
@@ -91,6 +95,10 @@ var duice;
                         var bindMap = getObject($context, bind[0]);
                         var bindName = bind[1];
                         textField.setBind(bindMap, bindName);
+                        if (element.dataset.duiceMask) {
+                            var mask = element.dataset.duiceMask.split(',');
+                            textField.setMask(mask[0], mask[1]);
+                        }
                         textField.build();
                         break;
                     case 'TextArea':
@@ -259,6 +267,26 @@ var duice;
         }
         return value;
     }
+    //    /**
+    //     * isMaskChar
+    //     * @param value
+    //     * @param type
+    //     * @param format
+    //     */
+    //    function isValidMaskValue(value:any, type:string, format:any):boolean {
+    //        switch (type) {
+    //            case 'string' :
+    //                return true;
+    //            case 'number' :
+    //                console.log('fdsafdsafdsa', isNaN(value));
+    //                value = value.replace(/\+|\-|,|\./g,'');
+    //                return (isNaN(value) ? false : true);
+    //            case 'date' :
+    //                return (isNaN(value) ? true : false);
+    //            default:
+    //                throw 'encodeMask-type must be string|number|date';
+    //        }
+    //    }
     /**
      * encodeMask
      * data-duice-mask="string,###-####"
@@ -269,15 +297,41 @@ var duice;
      * @param format
      */
     function encodeMask(value, type, format) {
-        var maskedValue;
+        if (isEmpty(value)) {
+            return null;
+        }
+        var maskedValue = value;
         switch (type) {
             case 'string':
-                var string = value;
-                // TODO
+                var string = '';
+                var index = -1;
+                for (var i = 0, size = format.length; i < size; i++) {
+                    var formatChar = format.charAt(i);
+                    if (formatChar === '#') {
+                        index++;
+                        string += value.charAt(index);
+                    }
+                    else {
+                        string += formatChar;
+                    }
+                }
+                maskedValue = string;
                 break;
             case 'number':
-                var number = (value instanceof Number ? value : Number(value));
-                ;
+                var number;
+                if (typeof value === 'number') {
+                    number = value;
+                }
+                else if (typeof value === 'string') {
+                    value = value.replace(/\,/gi, '');
+                    number = Number(value);
+                }
+                else {
+                    number = Number(value);
+                }
+                if (isNaN(number)) {
+                    throw 'NaN';
+                }
                 var scale = parseInt(format);
                 maskedValue = String(number.toFixed(scale));
                 var reg = /(^[+-]?\d+)(\d{3})/;
@@ -286,21 +340,27 @@ var duice;
                 }
                 break;
             case 'date':
-                var date = (value instanceof Date ? value : new Date(value));
-                var weekName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-                var formatRex = /yyyy|yy|MM|dd|E|HH|hh|mm|ss|ap/gi;
+                var date;
+                if (value instanceof Date) {
+                    date = value;
+                }
+                else {
+                    date = new Date(value);
+                }
+                if (isNaN(date.getTime())) {
+                    throw 'Not Date Type';
+                }
+                var formatRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
                 maskedValue = format.replace(formatRex, function ($1) {
                     switch ($1) {
                         case "yyyy": return date.getFullYear();
                         case "yy": return lpad(String(date.getFullYear() % 1000), 2, '0');
                         case "MM": return lpad(String(date.getMonth() + 1), 2, '0');
                         case "dd": return lpad(String(date.getDate()), 2, '0');
-                        case "E": return weekName[date.getDay()];
                         case "HH": return lpad(String(date.getHours()), 2, '0');
                         case "hh": return lpad(String(date.getHours() <= 12 ? date.getHours() : date.getHours() % 12), 2, '0');
                         case "mm": return lpad(String(date.getMinutes()), 2, '0');
                         case "ss": return lpad(String(date.getSeconds()), 2, '0');
-                        case "ap": return date.getHours() < 12 ? 'AM' : 'PM';
                         default: return $1;
                     }
                 });
@@ -317,16 +377,78 @@ var duice;
      * @param format
      */
     function decodeMask(value, type, format) {
+        if (isEmpty(value)) {
+            return null;
+        }
+        var unmaskedValue = value;
         switch (type) {
             case 'string':
-                return value;
+                break;
             case 'number':
-                return value;
+                var number;
+                if (typeof value === 'number') {
+                    number = value;
+                }
+                else if (typeof value === 'string') {
+                    value = value.replace(/,/g, '');
+                    number = Number(value);
+                }
+                else {
+                    number = Number(value);
+                }
+                if (isNaN(number)) {
+                    throw 'NaN';
+                }
+                var scale = parseInt(format);
+                unmaskedValue = number.toFixed(scale);
+                break;
             case 'date':
-                return value;
+                var date = new Date();
+                var formatRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
+                var match;
+                while ((match = formatRex.exec(format)) != null) {
+                    var matchStr = match[0];
+                    var index = match.index;
+                    var length = matchStr.length;
+                    var matchValue = Number(value.substr(index, length));
+                    if (isNaN(matchValue)) {
+                        throw 'Not a Date';
+                    }
+                    switch (matchStr) {
+                        case 'yyyy':
+                            date.setFullYear(matchValue);
+                            break;
+                        case 'yy':
+                            var yearPrefix = Math.floor(new Date().getFullYear() / 100);
+                            var fullYear = yearPrefix * 100 + matchValue;
+                            date.setFullYear(fullYear);
+                            break;
+                        case 'MM':
+                            date.setMonth(matchValue - 1);
+                            break;
+                        case 'dd':
+                            date.setDate(matchValue);
+                            break;
+                        case 'HH':
+                            date.setHours(matchValue);
+                            break;
+                        case 'hh':
+                            date.setHours(matchValue > 12 ? (matchValue + 12) : matchValue);
+                            break;
+                        case 'mm':
+                            date.setMinutes(matchValue);
+                            break;
+                        case 'ss':
+                            date.setSeconds(matchValue);
+                            break;
+                    }
+                }
+                unmaskedValue = date;
+                break;
             default:
-                return value;
+                throw 'encodeMask-type must be string|number|date';
         }
+        return unmaskedValue;
     }
     /**
      * duice.data
@@ -612,7 +734,7 @@ var duice;
          */
         function escapeHtml(value) {
             // checks value is valid.
-            if (!value) {
+            if (!value || typeof value !== 'string') {
                 return value;
             }
             // replace tag
@@ -933,12 +1055,7 @@ var duice;
                 this.mask = { type: type, format: format };
             };
             UIComponent.prototype.hasMask = function () {
-                if (this.mask) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
+                return (this.mask ? true : false);
             };
             return UIComponent;
         }());
@@ -966,8 +1083,8 @@ var duice;
                 this.update(null);
             };
             Text.prototype.update = function (observable) {
-                removeChildNodes(this.div);
                 var value = this.bindMap.get(this.bindName);
+                // adjust mode
                 if (this.mode === 'html') {
                     value = value;
                 }
@@ -977,6 +1094,12 @@ var duice;
                 else {
                     value = escapeHtml(value);
                 }
+                // sets mask
+                if (this.hasMask()) {
+                    value = encodeMask(value, this.mask.type, this.mask.format);
+                }
+                // create child nodes
+                removeChildNodes(this.div);
                 this.div.appendChild(createDocumentFragment(value));
             };
             return Text;
@@ -1001,12 +1124,51 @@ var duice;
                 var $this = this;
                 this.bindMap.addObserver(this);
                 this.input.addEventListener('change', function () {
-                    $this.bindMap.set($this.bindName, this.value);
+                    var value = this.value;
+                    if ($this.hasMask()) {
+                        value = decodeMask(this.value, $this.mask.type, $this.mask.format);
+                    }
+                    $this.bindMap.set($this.bindName, value);
                 });
+                if (this.hasMask()) {
+                    this.input.addEventListener('keypress', function (event) {
+                        var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+                        var selectionLength = this.selectionEnd - this.selectionStart;
+                        var value = this.value.substr(0, this.selectionStart) + key + this.value.substr(this.selectionStart + selectionLength);
+                        try {
+                            decodeMask(value, $this.mask.type, $this.mask.format);
+                        }
+                        catch (e) {
+                            event.preventDefault();
+                            return false;
+                        }
+                    });
+                    this.input.addEventListener('paste', function (event) {
+                        var pasteValue = (event.clipboardData).getData('text');
+                        var selectionLength = this.selectionEnd - this.selectionStart;
+                        var value = this.value.substr(0, this.selectionStart) + pasteValue + this.value.substr(this.selectionStart + selectionLength);
+                        try {
+                            decodeMask(value, $this.mask.type, $this.mask.format);
+                        }
+                        catch (e) {
+                            event.preventDefault();
+                            return false;
+                        }
+                    });
+                }
                 this.update(null);
             };
             TextField.prototype.update = function (observable) {
-                this.input.value = this.bindMap.get(this.bindName);
+                var value = this.bindMap.get(this.bindName);
+                if (this.hasMask()) {
+                    try {
+                        value = encodeMask(value, this.mask.type, this.mask.format);
+                    }
+                    catch (e) {
+                        value = e;
+                    }
+                }
+                this.input.value = value;
                 // checks enable
                 if (this.bindMap.isEnable()) {
                     this.input.disabled = false;
@@ -1180,7 +1342,6 @@ var duice;
             __extends(Calendar, _super);
             function Calendar(input) {
                 var _this = _super.call(this) || this;
-                _this.date = new Date();
                 _this.input = input;
                 _this.input.classList.add('duice-ui-calendar');
                 return _this;
@@ -1192,19 +1353,65 @@ var duice;
             Calendar.prototype.build = function () {
                 var $this = this;
                 this.bindMap.addObserver(this);
-                this.input.addEventListener('change', function () {
-                    $this.bindMap.set($this.bindName, this.value);
+                this.input.addEventListener('change', function (event) {
+                    var value = parseInt(this.value);
+                    if ($this.hasMask()) {
+                        if (isEmpty(this.value)) {
+                            value = null;
+                        }
+                        else {
+                            value = decodeMask(this.value, $this.mask.type, $this.mask.format).getTime();
+                        }
+                    }
+                    $this.bindMap.set($this.bindName, value);
                 });
                 // date picker
                 this.input.addEventListener('click', function () {
                     $this.openPicker();
                 });
+                // in case of mask
+                if (this.hasMask()) {
+                    this.input.setAttribute('placeholder', this.mask.format);
+                    this.input.addEventListener('keypress', function (event) {
+                        console.log('keypress');
+                        var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+                        var selectionLength = this.selectionEnd - this.selectionStart;
+                        var value = this.value.substr(0, this.selectionStart) + key + this.value.substr(this.selectionStart + selectionLength);
+                        try {
+                            decodeMask(value, $this.mask.type, $this.mask.format);
+                        }
+                        catch (e) {
+                            event.preventDefault();
+                            return false;
+                        }
+                    });
+                    this.input.addEventListener('paste', function (event) {
+                        var pasteValue = (event.clipboardData).getData('text');
+                        var selectionLength = this.selectionEnd - this.selectionStart;
+                        var value = this.value.substr(0, this.selectionStart) + pasteValue + this.value.substr(this.selectionStart + selectionLength);
+                        try {
+                            decodeMask(value, $this.mask.type, $this.mask.format);
+                        }
+                        catch (e) {
+                            event.preventDefault();
+                            return false;
+                        }
+                    });
+                }
                 // update
                 this.update(null);
             };
             Calendar.prototype.update = function (observable) {
                 var value = this.bindMap.get(this.bindName);
-                this.input.value = this.hasMask() ? encodeMask(value, this.mask.type, this.mask.format) : value;
+                if (this.hasMask()) {
+                    value = encodeMask(value, this.mask.type, this.mask.format);
+                }
+                this.input.value = value;
+                // re-open picker picker is already open.
+                if (this.pickerDiv) {
+                    this.closePicker();
+                    this.openPicker();
+                }
             };
             Calendar.prototype.openPicker = function () {
                 // checks pickerDiv is open.
@@ -1215,7 +1422,7 @@ var duice;
                 this.pickerDiv = document.createElement('div');
                 this.pickerDiv.classList.add('duice-ui-calendar__pickerDiv');
                 // parses parts
-                var date = new Date(this.date.getTime());
+                var date = new Date(this.bindMap.get(this.bindName));
                 var yyyy = date.getFullYear();
                 var mm = date.getMonth();
                 var dd = date.getDate();
@@ -1387,8 +1594,8 @@ var duice;
                 confirmButton.classList.add('duice-ui-calendar__pickerDiv-footerDiv-confirmButton');
                 footerDiv.appendChild(confirmButton);
                 confirmButton.addEventListener('click', function (event) {
-                    $this.date.setTime(date.getTime());
-                    $this.bindMap.set($this.bindName, $this.date.getTime());
+                    date.setTime(date.getTime());
+                    $this.bindMap.set($this.bindName, date.getTime());
                     $this.closePicker();
                 });
                 // show
