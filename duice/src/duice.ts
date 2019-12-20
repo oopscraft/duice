@@ -1428,6 +1428,10 @@ namespace duice {
                             return false;
                         }
                     });
+                    this.input.addEventListener('keyup', function(event){
+                        console.log('keyup');
+                        this.value = decodeMask(this.value, $this.mask.type, $this.mask.format);
+                    });
                 }
                 
                 // update
