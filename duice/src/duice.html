@@ -6,202 +6,361 @@
 <script src="duice.js"></script>
 <link rel="stylesheet" type="text/css" href="duice.css">
 <style>
+</style>
+<script>
+var user = new duice.data.Map({
+	id:'dog',
+	name:'Happy',
+	balance:370100.00,
+	active:true,
+	gender:'F',
+	hireDate:1576647474398,
+	birthday:854636400000,
+	score:40,
+	groupId:'animal',
+	profile:'I am Happy'
+});
+var groups = new duice.data.Collection([
+	{id:"animal", name:"Animal"},
+	{id:"fruit", name:"Fruit"},
+	{id:"human", name:"Human"}
+]);
+var users = new duice.data.Collection([
+	{
+		id:'dog',
+		name:'Happy',
+		balance:370100.00,
+		active:true,
+		gender:'F',
+		hireDate:1576647474398,
+		birthday:854636400000,
+		score:40,
+		groupId:'animal',
+		profile:'I am Happy'
+	},
+	{
+		id:'dog',
+		name:'Happy',
+		balance:370100.00,
+		active:true,
+		gender:'F',
+		hireDate:1576647474398,
+		birthday:854636400000,
+		score:40,
+		groupId:'animal',
+		profile:'I am Happy'
+	},
+	{
+		id:'dog',
+		name:'Happy',
+		balance:370100.00,
+		active:true,
+		gender:'F',
+		hireDate:1576647474398,
+		birthday:854636400000,
+		score:40,
+		groupId:'animal',
+		profile:'I am Happy'
+	},
+	{
+		id:'dog',
+		name:'Happy',
+		balance:370100.00,
+		active:true,
+		gender:'F',
+		hireDate:1576647474398,
+		birthday:854636400000,
+		score:40,
+		groupId:'animal',
+		profile:'I am Happy'
+	}
+]);
+
+/**
+ * DOMContentLoaded
+ */
+document.addEventListener("DOMContentLoaded", function(event) {
+	
+	// mapJson
+	var userJson = document.getElementById('userJson')
+	function printUserJson() {
+		userJson.value = JSON.stringify(user.toJson(), null, 2);
+	}
+	printUserJson();
+	user.addObserver({
+		update:function(){
+			printUserJson();
+		}
+	});
+	userJson.addEventListener('change', function(event){
+		user.fromJson(JSON.parse(this.value));
+	});
+	
+	// usersJson
+	var usersJson = document.getElementById('usersJson');
+	function printUsersJson(){
+		usersJson.value = JSON.stringify(users.toJson(), null, 2);
+	}
+	printUsersJson();
+	users.addObserver({
+		update:function(){
+			printUsersJson();
+		}
+	});
+	usersJson.addEventListener('change', function(event){
+		users.fromJson(JSON.parse(this.value));
+	});
+});
+</script>
+<style>
 body {
-	font-family: Tahoma, Dotum;
+	margin: 0px;
+	padding: 0px;
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
 	font-size: 12px;
 	line-height: 2;
+	overflow-x: hidden;
+}
+.layout-header {
+	position:fixed; 
+	z-index: 1;
+	top:0px; 
+	left:0px; 
+	height:70px; 
+	width:100%; 
+	background-color: white;
+	border: none;
+	border-bottom: groove 2px #eee;
+}
+.layout-left {
+	position:fixed; 
+	z-index: 1;
+	top:70px; 
+	left:0px; 
+	width:400px; 
+	margin:0.5rem;
+}
+.layout-center {
+	position:relative; 
+	top:70px; 
+	left:410px; 
+	width: calc(100% - 430px); 
+	margin:0.5rem;
 }
 table {
 	border-collapse: collapse;
 	border: solid 1px #ccc;
 }
+h1 {
+	margin: 0rem;
+	padding: 0.2rem 0.5rem;
+}
+h2 {
+	margin: 0rem;
+	padding: 0.2rem 0.5rem;
+	border-bottom: dotted 1px #ccc;
+}
+h3 {
+	margin: 0rem;
+	padding: 0.2rem 0.5rem;
+}
+section div {
+	margin: 0.2rem;
+}
+.mapUIElement {
+  border-collapse: collapse;
+  width: 100%;
+}
+.mapUIElement td, .mapUIElement th {
+  border: 1px solid #ddd;
+  padding: 1px 2px;
+}
+.mapUIElement th {
+	padding: 1px 2px;
+	text-align: left;
+	background-color: #eee;
+	text-align: center;
+}
+.jsonTextarea {
+	width:100%;
+	height:100px;
+	box-sizing: border-box;         
+	-moz-box-sizing: border-box;    
+	-webkit-box-sizing: border-box; 
+	border:solid 1px #ccc;
+    padding: 0.5rem 0.5rem;
+    white-space: pre-line;
+    background-color: #f7f7f7;
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    font-size: 12px;
+}
+.jsonTextarea:focus {
+	outline: none;
+	border: solid 1px gray;
+}
 </style>
-<script>
-var list = new duice.data.List([
-	{id:"dog", name:"Dog", groupId:'animal', isAlive:true, gender:'F', balance:'aaa', birthday:1576647474398, lastLogin:1576647474398, schedule:'0 0 0 * * ?', comment:'I am Dog\nI am Apple1', photo:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABC0lEQVRIibXVQUrDQBjF8Z/deQBd9wSC4DWk4GVcuBEVCl5Aj+FBxOINXEltV6JIXcVFm5KMyUwmbR7MYr687/0nM2FCu2b4xmXE06Yr/OIlZioq4zoj/DboTQLeMiBleNnTCTDuCLmphI9zAAJIbJThYX8S0AVSDd/2HyQAEPOkFmjUs7mzRrjAEgtMEv57rDBN1Gpa4gSn+KjUmw5ptfH9JGq1/iIoxgDTTdBdotYbkKMCxQjvPQNeJe6aNmptBcHzhfV+n2HeMA+z/u1ACjCx/hDmOG+Y7wzI0fYMBlUI+MLRkMBHPOHYnrYoLB7iAZ8thhiwyZt1XfcCDH7IXf4HOyn2BrM95D//AUGPi1ZZA00cAAAAAElFTkSuQmCC'},
-	{id:"apple", name:"Apple", groupId:'fruit', isAlive:true, gender:'', balance:null, birthday:1576647474398, lastLogin:1576647474398, schedule:'0 0 0 * * ?',comment:'I am Apple'},
-	{id:"cat", name:"Cat", groupId:'animal', isAlive:true, gender:'M', balance:'', birthday:1576647474398, lastLogin:1576647474398, schedule:'0 0 0 * * ?',comment:'I am Cat'},
-	{id:"orange", name:"Orange", groupId:'fruit', isAlive:true, gender:'', balance:13000, birthday:1576647474398, lastLogin:1576647474398, schedule:'0 0 0 * * ?',comment:'I am Orange'},
-	{id:"dog1", name:"Dog1", groupId:'animal', isAlive:false, gender:'F', balance:-30000, birthday:1576647474398, lastLogin:1576647474398, schedule:'0 0 0 * * ?',comment:'I am Dog1'},
-	{id:"apple1", name:"Apple1", groupId:'fruit', isAlive:true, gender:'', balance:undefined, birthday:1576647474398, lastLogin:1576647474398, schedule:'0 0 0 * * ?',comment:'I am Apple1'},
-	{id:"cat1", name:"Cat1", groupId:'animal', isAlive:true, gender:'M', balance:'13000', birthday:1576647474398, lastLogin:1576647474398, schedule:'0 0 10 * * ?',comment:'I am Cat1'},
-	{id:"orange1", name:"Orange1", groupId:'fruit', isAlive:false, gender:'', balance:'+13000', birthday:1576647474398, lastLogin:1576647474398, schedule:'0 0 0 * * ?',comment:'I am Orange1'},
-	{id:"dog2", name:"Dog2", groupId:'animal', isAlive:false, gender:'M', balance:13000, birthday:1576647474398, lastLogin:1576647474398, schedule:'0 0 0 * * ?',comment:'I am Dog2'},
-	{id:"apple2", name:"Apple2", groupId:'fruit', isAlive:false, gender:'', balance:13000, birthday:1576647474398, lastLogin:1576647474398, schedule:'0 0 0 * * ?',comment:'I am Apple2'},
-	{id:"cat2", name:"Cat2", groupId:'animal', isAlive:true, gender:'F', balance:13000, birthday:1576647474398, lastLogin:1576647474398, schedule:'0 0 0 * * ?',comment:'I am Cat2'},
-	{id:"orange2", name:"Orange2", groupId:'fruit', isAlive:false, gender:'', balance:13000, birthday:1576647474398, lastLogin:1576647474398, schedule:'0 0 0 * * ?',comment:'I am Orange2'}
-]);
-var map = new duice.data.Map({});
-map.setReadonly('id',true);
-map.setEnable(false);
-var groups = new duice.data.List([
-	{id:"animal", name:"Animal"},
-	{id:"fruit", name:"Fruit"},
-	{id:"human", name:"Human"}
-]);
-
-/**
- * get Row
- */
-function getRow(id){
-	var item = list.findRow(function(item){
-		if(item.get('id') === id){
-			return true;
-		}
-	});
-	console.log(id, item);
-	map.fromJson(item.toJson());
-	map.setEnable(true);
-}
-
-/**
- * remove Current Row
- */
-function removeCurrentRow(){
-	list.removeRow(list.getIndex());
-}
-</script>
 </head>
 <body>
-<h1>DUICE(Data-Oriented User Interface Engine)</h1>
-<hr/>
-<section>
-	<div style="display:flex; justify-content: space-between;">
-		<div>data.ui.TableViewer</div>
-		<div>
-			<button onclick="removeCurrentRow();">removeCurrentRow</button>
-			<button onclick="list.setReadonlyAll(true);');">setReadonlyAll(true);</button>
-			<button onclick="list.setReadonlyAll(false);');">setReadonlyAll(false);</button>
-		</div>
+	<div class="layout-header">
+		<h1 >DUICE <small>(Data-oriented UI Component Engine)</small></h1>
 	</div>
-	<table data-duice="TableView" data-duice-bind="list" data-duice-item="map" data-duice-editable="false">
-		<thead>
-			<tr>
-				<th>No</th>
-				<th>ID</th>
-				<th>Photo</th>
-				<th>Name</th>
-				<th>Group</th>
-				<th>Alive</th>
-				<th>Gender</th>
-				<th>Balance</th>
-				<th>Birthday</th>
-				<th>Last Login</th>
-				<th>Schedule</th>
-			</tr>
-		</thead>
-		<tbody data-id="[[$context.map.get('id')]]" onclick="getRow(this.dataset.id);">
-			<tr>
-				<td>[[$context.index+1]]</td>
-				<td><div data-duice="Text" data-duice-bind="map,id" data-duice-mask="string,id is [####-####]"></div></td>
-				<td><img data-duice="Image" data-duice-bind="map,photo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAB70lEQVRIic2Vv2sTYRjHP8/dRYoKQQR/4FBExRxCRaGTlOqguMhxyNFBkEzO4uASkSz+EaK42C3CNQTaoSgpiIhbBustdQ3FIVk0cLne49JAfrzcpQmC3+ne5/m+38/z3ntw8I8l05jK5fJCt9t9LCIrwAGw0+l03jebzWRuQBAEF5IkCYHlsdaO4zhBrVb7lbXfygMkSbJuCAdYTZLkdd7+TIDneQ+A2xkW3/O8lZkBtm3fy+oDiMjdmQGqem0KQKYn7w76eQBVzfTkAX7kAfI8mQAR+ZyXLiJfZgbYth0CexmW72EYbmcOYCpWq1Wr1Wo9B74B54F1k09V14DjIlIIw/CNccjxQhAEx9rt9ibwBLhZLBafxXEcA3dGJhOpiEgd2ADWXNe9HEXRRi6gVCq9BR4eLs/GcXy91+s9tW17FzgpIj9F5KWqfgA+AouH3iXXdQtRFH0aGWR44fv+KtA0nHQPeAV8tSzLUtX7qloBTo35DtI0XarX67uDgjPcVdUXIsZruQS8A0jT1NQfyBaRCvBo4gS+758G9jG8tqNIRH73+/0zjUbjD4x+psvzhgOo6olCoXBjsLaGGhfnDR/KujoBEJFFs30mXZkAqKpj9h5dqroweB4O3QJuAeeY8l9tyhaRfVXdmmO+/0x/AXyYmmwrMeOYAAAAAElFTkSuQmCC" style="height:1rem;"/></td>
-				<td><input type="text" data-duice="TextField" data-duice-bind="map,name" data-duice-bind="string,#####-#####"/></td>
-				<td><select data-duice="ComboBox" data-duice-bind="map,groupId" data-duice-option="groups,id,name"></select></td>
-				<td><input type="checkbox" data-duice="CheckBox" data-duice-bind="map,isAlive"/></td>
-				<td>
-					<input type="radio" data-duice="Radio" data-duice-bind="map,gender" value="F"/>Female |
-					<input type="radio" data-duice="Radio" data-duice-bind="map,gender" value="M"/>Male |
-					<input type="radio" data-duice="Radio" data-duice-bind="map,gender" value=""/>None
-				</td>
-				<td><input type="text" data-duice="TextField" data-duice-bind="map,balance" data-duice-mask="number,1"/></td>
-				<td><input type="text" data-duice="Calendar" data-duice-bind="map,birthday" data-duice-mask="date,yyyy-MM-dd"/></td>
-				<td><input type="text" data-duice="Calendar" data-duice-bind="map,lastLogin" data-duice-mask="date,yyyy-MM-dd HH:mm:ss"/></td>
-				<td><input type="text" data-duice="CronExpression" data-duice-bind="map,schedule"/></td>
-			</tr>
-		</tbody>
-	</table>
-	<table border="1">
-		<tr>
-			<th>ID</th>
-			<td><input type="text" data-duice="TextField" data-duice-bind="map,id"/></td>
-		</tr>
-		<tr>
-			<th>Photo</th>
-			<td>
-				<img data-duice="Image" data-duice-bind="map,photo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAB70lEQVRIic2Vv2sTYRjHP8/dRYoKQQR/4FBExRxCRaGTlOqguMhxyNFBkEzO4uASkSz+EaK42C3CNQTaoSgpiIhbBustdQ3FIVk0cLne49JAfrzcpQmC3+ne5/m+38/z3ntw8I8l05jK5fJCt9t9LCIrwAGw0+l03jebzWRuQBAEF5IkCYHlsdaO4zhBrVb7lbXfygMkSbJuCAdYTZLkdd7+TIDneQ+A2xkW3/O8lZkBtm3fy+oDiMjdmQGqem0KQKYn7w76eQBVzfTkAX7kAfI8mQAR+ZyXLiJfZgbYth0CexmW72EYbmcOYCpWq1Wr1Wo9B74B54F1k09V14DjIlIIw/CNccjxQhAEx9rt9ibwBLhZLBafxXEcA3dGJhOpiEgd2ADWXNe9HEXRRi6gVCq9BR4eLs/GcXy91+s9tW17FzgpIj9F5KWqfgA+AouH3iXXdQtRFH0aGWR44fv+KtA0nHQPeAV8tSzLUtX7qloBTo35DtI0XarX67uDgjPcVdUXIsZruQS8A0jT1NQfyBaRCvBo4gS+758G9jG8tqNIRH73+/0zjUbjD4x+psvzhgOo6olCoXBjsLaGGhfnDR/KujoBEJFFs30mXZkAqKpj9h5dqroweB4O3QJuAeeY8l9tyhaRfVXdmmO+/0x/AXyYmmwrMeOYAAAAAElFTkSuQmCC" style="height:2rem;"/>
-			</td>
-		</tr>
-		<tr>
-			<th>Name</th>
-			<td><input type="text" data-duice="TextField" data-duice-bind="map,name"/></td>
-		</tr>
-		<tr>
-			<th>Group</th>
-			<td><select data-duice="ComboBox" data-duice-bind="map,groupId" data-duice-option="groups,id,name"></select></td>
-		</tr>
-		<tr>
-			<th>isAlive</th>
-			<td><input type="checkbox" data-duice="CheckBox" data-duice-bind="map,isAlive" data-duice-option="Y,N"/></td>
-		</tr>
-		<tr>
-			<th>Gender</th>
-			<td>
-				<input type="radio" data-duice="Radio" data-duice-bind="map,gender" value="F"/>Female
-				<input type="radio" data-duice="Radio" data-duice-bind="map,gender" value="M"/>Male 
-				<input type="radio" data-duice="Radio" data-duice-bind="map,gender" value=""/>None
-			</td>
-		</tr>
-		<tr>
-			<th>Birth Date</th>
-			<td><input type="text" data-duice="Calendar" data-duice-bind="map,birthday" data-duice-mask="date,yyyy-MM-dd HH:mm:ss"/></td>
-		</tr>
-		<tr>
-			<th>Schedule</th>
-			<td><input type="text" data-duice="CronExpression" data-duice-bind="map,schedule"/></td>
-		</tr>
-		<tr>
-			<th>Comment(Text - default mode)</th>
-			<td>
-				<div data-duice="Text" data-duice-bind="map,comment"></div>
-			</td>
-		</tr>
-		<tr>
-			<th>Comment(Text - html mode)</th>
-			<td>
-				<div data-duice="Text" data-duice-bind="map,comment" data-duice-mode="html"></div>
-			</td>
-		</tr>
-		<tr>
-			<th>Comment(Text - markdown mode)</th>
-			<td>
-				<div data-duice="Text" data-duice-bind="map,comment" data-duice-mode="markdown"></div>
-			</td>
-		</tr>
-		<tr>
-			<th>Comment(TextArea)</th>
-			<td><textarea data-duice="TextArea" data-duice-bind="map,comment"></textarea></td>
-		</tr>
-		<tr>
-			<th>Comment(TextEditor)</th>
-			<td><div data-duice="HtmlEditor" data-duice-bind="map,comment"></div></td>
-		</tr>
-		<tr>
-			<th>Comment(MarkdownEditor)</th>
-			<td><div data-duice="MarkdownEditor" data-duice-bind="map,comment"></div></td>
-		</tr>
-	</table>
-</section>
-
-<section>
-	<div style="display:flex; justify-content: space-between;">
-		<div>data.ui.TableViewer</div>
-		<div>
-			<button onclick="removeCurrentRow();">removeCurrentRow</button>
-			<button onclick="list.setReadonlyAll(true);');">setReadonlyAll(true);</button>
-			<button onclick="list.setReadonlyAll(false);');">setReadonlyAll(false);</button>
-		</div>
+	<div class="layout-left">
+		<h2>duice.data.*</h2>
+		<h3>duice.data.Map <small>(var user)</small></h3>
+		<textarea id="userJson" class="jsonTextarea" style="height:200px;"></textarea>
+		<h3>duice.data.Collection <small>(var users)</small></h3>
+		<textarea id="usersJson" class="jsonTextarea" style="height:600px;"></textarea>
 	</div>
-	<ul data-duice="ListViewer" data-duice-bind="list" data-duice-item="map" style="border:solid 3px red;">
-		<li>
-			<div style="border:solid 1px #ccc;">
-				[[$context.index + 1]]
-				<label data-duice="Text" data-duice-bind="map,id"></label>
-				<input data-duice="TextField" data-duice-bind="map,name"/>
-			</div>
-		<li>
-	</ul>
-</section>
-
-
+	<div class="layout-center">
+		<h2>duice.ui.*</h2>
+		<h3>duice.ui.MapUIElement <small>(binding to duice.data.Map)</small></h3>
+		<table class="mapUIElement">
+			<colgroup>
+				<col width="20%"/>
+				<col width="15%"/>
+				<col width="15%"/>
+				<col width="60%"/>
+			</colgroup>
+			<thead style="background-color:#eee;">
+				<tr>
+					<th>HTML Tag</th>
+					<th>Prototype Class</th>
+					<th>Bind</th>
+					<th>-</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td rowspan="2">&lt;span is="duice-ui-span" ...</td>
+					<td rowspan="2">duice.ui.Span</td>
+					<td>user,id</td>
+					<td><span is="duice-ui-span" data-duice-bind="user,id"></span></td>
+				</tr>
+				<tr>
+					<td>user,profile</td>
+					<td>
+						<span is="duice-ui-span" data-duice-bind="user,profile"></span>
+					</td>
+				</tr>
+				<tr>
+					<td>&lt;input is="duice-ui-input" type="text" ...</td>
+					<td>duice.ui.TextInput</td>
+					<td>user,name</td>
+					<td>
+						<input is="duice-ui-input" type="text" data-duice-bind="user,name"/>
+					</td>
+				</tr>
+				<tr>
+					<td>&lt;input is="duice-ui-input" type="number" ...</td>
+					<td>duice.ui.NumberInput</td>
+					<td>user,balance</td>
+					<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance"/></td>
+				</tr>
+				<tr>
+					<td>&lt;input is="duice-ui-input" type="checkbox" ...</td>
+					<td>duice.ui.CheckboxInput</td>
+					<td>user,active</td>
+					<td><input is="duice-ui-input" type="checkbox" data-duice-bind="user,active"/></td>
+				</tr>
+				<tr>
+					<td>&lt;input is="duice-ui-input" type="radio" ...</td>
+					<td>duice.ui.RadioInput</td>
+					<td>user,gender</td>
+					<td>
+						M<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="M"/>
+						F<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="F"/>
+					</td>
+				</tr>
+				<tr>
+					<td>&lt;input is="duice-ui-input" type="datetime" ...</td>
+					<td>duice.ui.DateInput</td>
+					<td>user,hireDate</td>
+					<td><input is="duice-ui-input" type="datetime" data-duice-bind="user,hireDate"/></td>
+				</tr>
+				<tr>
+					<td>&lt;input is="duice-ui-input" type="date" ...</td>
+					<td>duice.ui.DateInput</td>
+					<td>user,birthday</td>
+					<td><input is="duice-ui-input" type="date" data-duice-bind="user,birthday"/></td>
+				</tr>
+				<tr>
+					<td>&lt;input is="duice-ui-input" type="range" ...</td>
+					<td>duice.ui.GenericInput</td>
+					<td>user,score</td>
+					<td><input is="duice-ui-input" type="range" data-duice-bind="user,score" min="0" max="100" step="10"/></td>
+				</tr>
+				<tr>
+					<td>&lt;select is="duice-ui-select" ...</td>
+					<td>duice.ui.Select</td>
+					<td>user,groupId</td>
+					<td>
+						<select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name">
+							<option value=""> - select - </option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td>&lt;textarea is="duice-ui-textarea" ...</td>
+					<td>duice.ui.Textarea</td>
+					<td>user,profile</td>
+					<td><textarea is="duice-ui-textarea" data-duice-bind="user,profile"></textarea></td>
+				</tr>
+			</tbody>
+		</table>
+		<h3>duice.ui.Table <small>(binding to duice.data.Collection)</small></h3>
+		<table is="duice-ui-table" data-duice-bind="users,user" data-duice-editable="true">
+			<thead>
+				<tr>
+					<th>No</th>
+					<th>duice.ui.Span</th>
+					<th>duice.ui.TextInput</th>
+					<th>duice.ui.NumberInput</th>
+					<th>duice.ui.CheckboxInput</th>
+					<th>duice.ui.RadioInput</th>
+					<th>duice.ui.DateInput</th>
+					<th>duice.ui.Select</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>[[$context.index+1]]</td>
+					<td><span is="duice-ui-span" data-duice-bind="user,span"></span></td>
+					<td><input is="duice-ui-input" type="text" data-duice-bind="user,textInput"/></td>
+					<td><input is="duice-ui-input" type="number" data-duice-bind="user,numberInput" ondragstart="console.log('fdsa'); event.preventDefault(); event.stopPropagation();"/></td>
+					<td><input is="duice-ui-input" type="checkbox" data-duice-bind="user,checkboxInput"/></td>
+					<td>
+						M<input is="duice-ui-input" type="radio" data-duice-bind="user,radioInput" value="M"/>
+						F<input is="duice-ui-input" type="radio" data-duice-bind="user,radioInput" value="F"/>
+					</td>
+					<td><input is="duice-ui-input" type="date" data-duice-bind="user,dateInput"/></td>
+					<td><select is="duice-ui-select" data-duice-bind="user,select" data-duice-option="groups,id,name"></select></td>
+				</tr>
+			</tbody>
+		</table>
+		<h3>duice.ui.List <small>(binding to duice.data.Collection)</small></h3>
+		<ul is="duice-ui-list11" data-duice-bind="users,map">
+			<li style="margin:0.2rem 0rem;">
+				<table style="width:100%;">
+					<tr style="font-weight:bold;">
+						<td rowspan="2" style="width:30px; text-align:center; border-right:dotted 1px #ccc;">[[$context.index+1]]</td>
+						<td>duice.ui.Span</td>
+						<td>duice.ui.TextInput</td>
+						<td>duice.ui.NumberInput</td>
+						<td>duice.ui.CheckboxInput</td>
+						<td>duice.ui.DateInput</td>
+						<td>duice.ui.Select</td>
+					</tr>
+					<tr>
+						<td><span is="duice-ui-span" data-duice-bind="user,span"></span></td>
+						<td><input is="duice-ui-input" type="text" data-duice-bind="user,textInput"/></td>
+						<td><input is="duice-ui-input" type="number" data-duice-bind="user,numberInput"/></td>
+						<td><input is="duice-ui-input" type="checkbox" data-duice-bind="user,checkboxInput"/></td>
+						<td><input is="duice-ui-input" type="date" data-duice-bind="user,dateInput"/></td>
+						<td><select is="duice-ui-select" data-duice-bind="user,select" data-duice-option="groups,id,name"></select></td>
+					</tr>
+				</table>
+			<li>
+		</ul>
+	</div>
 </body>
 </html>
