@@ -1,0 +1,9 @@
+{
+	"host":"oopscraft.iptime.org",
+	"port":3306,
+	"user":"duice",
+	"password":"duice",
+	"database":"duice",
+	"connectionLimit":10,
+	"waitForConnections":false
+}

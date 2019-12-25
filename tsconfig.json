@@ -1,0 +1,19 @@
+{
+	"compileOnSave": true,
+	"compilerOptions": {
+	    "target": "es3",
+	    "strict": true,
+	    "strictNullChecks": false,
+	    "noImplicitThis": false,
+	    "module":"none",
+	    "watch":true
+	},
+	"typedocOptions":{
+		"mode": "modules",
+		"out": "doc",
+		"theme": "minimal"
+	},
+	"files":[
+		"./src/duice.ts"
+	]
+}
