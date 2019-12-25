@@ -472,10 +472,14 @@
  * duice.ui.List
  */
 .duice-ui-list {
+    margin: 0px;
+    padding: 0px;
 	list-style: none;
 	list-style-position: inside;
 }
 .duice-ui-list__li {
+    margin: 0px;
+    padding: 0px;
 	list-style-type: none;
 }
 

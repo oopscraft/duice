@@ -8,6 +8,11 @@
 	    "module":"none",
 	    "watch":true
 	},
+	"typedocOptions":{
+		"mode": "modules",
+		"out": "doc",
+		"theme": "minimal"
+	},
 	"files":[
 		"./src/duice.ts"
 	]

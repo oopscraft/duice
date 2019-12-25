@@ -681,13 +681,15 @@ var duice;
          */
         var Map = (function (_super) {
             __extends(Map, _super);
-            function Map(json) {
+            function Map(json, __childName) {
                 var _this = _super.call(this) || this;
                 _this.data = new Object();
                 _this.childNodes = new Array();
                 _this.enable = true;
                 _this.readonlyNames = new Array();
-                _this.fromJson(json);
+                if (json) {
+                    _this.fromJson(json, __childName);
+                }
                 return _this;
             }
             Map.prototype.update = function (uiElement, obj) {
@@ -696,14 +698,35 @@ var duice;
                 var value = uiElement.getValue();
                 this.set(name, value);
             };
-            Map.prototype.fromJson = function (json) {
+            Map.prototype.fromJson = function (json, __childName) {
+                // sets data
                 this.data = new Object();
                 for (var name in json) {
                     this.data[name] = json[name];
                 }
+                // makes child nodes
+                var $this = this;
+                if (__childName) {
+                    var childs = json[__childName];
+                    if (childs && Array.isArray(childs)) {
+                        childs.forEach(function (child) {
+                            var childNode = new duice.data.Map(child, __childName);
+                            $this.addChildNode(childNode);
+                        });
+                    }
+                }
+                // saves original data.
                 this.originData = JSON.stringify(this.toJson());
+                // notify to observers
                 this.setChanged();
                 this.notifyObservers(this);
+            };
+            Map.prototype.toJson = function (__childName) {
+                var json = new Object();
+                for (var name in this.data) {
+                    json[name] = this.data[name];
+                }
+                return json;
             };
             Map.prototype.isDirty = function () {
                 if (JSON.stringify(this.toJson()) === this.originData) {
@@ -716,13 +739,6 @@ var duice;
             Map.prototype.reset = function () {
                 var originJson = JSON.parse(this.originData);
                 this.fromJson(originJson);
-            };
-            Map.prototype.toJson = function () {
-                var json = new Object();
-                for (var name in this.data) {
-                    json[name] = this.data[name];
-                }
-                return json;
             };
             Map.prototype.set = function (name, value) {
                 this.data[name] = value;
@@ -793,11 +809,13 @@ var duice;
          */
         var Collection = (function (_super) {
             __extends(Collection, _super);
-            function Collection(jsonArray) {
+            function Collection(jsonArray, __childName) {
                 var _this = _super.call(this) || this;
                 _this.data = new Array();
                 _this.index = -1;
-                _this.fromJson(jsonArray);
+                if (jsonArray) {
+                    _this.fromJson(jsonArray, __childName);
+                }
                 return _this;
             }
             Collection.prototype.update = function (observable, obj) {
@@ -805,10 +823,10 @@ var duice;
                 this.setChanged();
                 this.notifyObservers(obj);
             };
-            Collection.prototype.fromJson = function (jsonArray) {
+            Collection.prototype.fromJson = function (jsonArray, __childName) {
                 this.data = new Array();
                 for (var i = 0; i < jsonArray.length; i++) {
-                    var map = new duice.data.Map(jsonArray[i]);
+                    var map = new duice.data.Map(jsonArray[i], __childName);
                     map.addObserver(this);
                     this.data.push(map);
                 }
@@ -817,7 +835,7 @@ var duice;
                 this.setChanged();
                 this.notifyObservers(this);
             };
-            Collection.prototype.toJson = function () {
+            Collection.prototype.toJson = function (__childName) {
                 var jsonArray = new Array();
                 for (var i = 0; i < this.data.length; i++) {
                     jsonArray.push(this.data[i].toJson());
@@ -1911,7 +1929,7 @@ var duice;
             __extends(List, _super);
             function List(ul) {
                 var _this = _super.call(this, ul) || this;
-                _this.rows = new Array();
+                _this.lis = new Array();
                 _this.ul = ul;
                 _this.ul.classList.add('duice-ui-list');
                 var li = _this.ul.querySelector('li');
@@ -1927,29 +1945,43 @@ var duice;
                 if (obj instanceof duice.data.Map) {
                     return;
                 }
+                console.log('####collection', collection);
                 var $this = this;
                 // remove previous rows
-                for (var i = 0; i < this.rows.length; i++) {
-                    this.ul.removeChild(this.rows[i]);
+                for (var i = 0; i < this.lis.length; i++) {
+                    this.ul.removeChild(this.lis[i]);
                 }
-                this.rows.length = 0;
+                this.lis.length = 0;
                 // creates new rows
                 for (var index = 0; index < collection.getSize(); index++) {
                     var map = collection.get(index);
-                    var row = this.createRow(index, map);
-                    this.ul.appendChild(row);
-                    this.rows.push(row);
+                    var li = this.createLi(index, map);
+                    this.ul.appendChild(li);
+                    this.lis.push(li);
                 }
             };
-            List.prototype.createRow = function (index, map) {
+            List.prototype.createLi = function (index, map) {
                 var $this = this;
-                var row = this.li.cloneNode(true);
+                var li = this.li.cloneNode(true);
                 var $context = new Object;
                 $context['index'] = index;
                 $context[this.item] = map;
-                row = executeExpression(row, $context);
-                initialize(row, $context);
-                return row;
+                li = executeExpression(li, $context);
+                initialize(li, $context);
+                console.log('####map', map);
+                // create child nodes
+                var childNodes = map.getChildNodes();
+                if (childNodes && childNodes.length > 0) {
+                    console.log('############');
+                    var ul = document.createElement('ul');
+                    for (var i = 0, size = childNodes.length; i < size; i++) {
+                        var childNode = childNodes[i];
+                        var childLi = this.createLi(i, childNode);
+                        ul.appendChild(childLi);
+                    }
+                    li.appendChild(ul);
+                }
+                return li;
             };
             return List;
         }(CollectionUIElement));

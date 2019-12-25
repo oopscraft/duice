@@ -711,6 +711,8 @@ namespace duice {
             abstract update(observable:Observable, obj:object):void;
             abstract fromJson(...args: any[]):void;
             abstract toJson(...args: any[]):object;  
+            abstract isDirty():boolean;
+            abstract reset():void;
         }
         
         /**
@@ -723,9 +725,11 @@ namespace duice {
             childNodes:Array<Map> = new Array<Map>();
             enable:boolean = true;
             readonlyNames:Array<string> = new Array<string>();
-            constructor(json:any) {
+            constructor(json?:any, __childName?:string) {
                 super();
-                this.fromJson(json);
+                if(json){
+                    this.fromJson(json, __childName);
+                }
             }
             update(uiElement:duice.ui.MapUIElement, obj:object):void {
                 console.info('Map.update', uiElement, obj);
@@ -733,14 +737,39 @@ namespace duice {
                 var value = uiElement.getValue();
                 this.set(name, value);
             }
-            fromJson(json: any): void {
+            fromJson(json:any, __childName?:string): void {
+                
+                // sets data
                 this.data = new Object();
                 for(var name in json){
                     this.data[name] = json[name];
                 }
+                
+                // makes child nodes
+                var $this = this;
+                if(__childName){
+                    var childs = json[__childName];
+                    if(childs && Array.isArray(childs)){
+                        childs.forEach(function(child:object){
+                            var childNode = new duice.data.Map(child, __childName);
+                            $this.addChildNode(childNode);
+                        });
+                    }
+                }
+                
+                // saves original data.
                 this.originData = JSON.stringify(this.toJson());
+                
+                // notify to observers
                 this.setChanged();
                 this.notifyObservers(this);
+            }
+            toJson(__childName?:string):object {
+                var json: any = new Object();
+                for(var name in this.data){
+                    json[name] = this.data[name];
+                }
+                return json;
             }
             isDirty():boolean {
                 if(JSON.stringify(this.toJson()) === this.originData){
@@ -752,13 +781,6 @@ namespace duice {
             reset():void {
                 var originJson = JSON.parse(this.originData);
                 this.fromJson(originJson);
-            }
-            toJson():object {
-                var json: any = new Object();
-                for(var name in this.data){
-                    json[name] = this.data[name];
-                }
-                return json;
             }
             set(name:string, value:any):void {
                 this.data[name] = value;
@@ -829,19 +851,21 @@ namespace duice {
             data:Array<duice.data.Map> = new Array<duice.data.Map>();
             originData:string;
             index:number = -1;
-            constructor(jsonArray:Array<any>) {
+            constructor(jsonArray?:Array<any>, __childName?:string) {
                 super();
-                this.fromJson(jsonArray);
+                if(jsonArray){
+                    this.fromJson(jsonArray, __childName);
+                }
             }
             update(observable:Observable, obj:object):void {
                 console.log('Collection.update');
                 this.setChanged();
                 this.notifyObservers(obj);
             }
-            fromJson(jsonArray:Array<any>):void {
+            fromJson(jsonArray:Array<any>, __childName?:string):void {
                 this.data = new Array<duice.data.Map>();
                 for(var i = 0; i < jsonArray.length; i ++ ) {
-                    var map = new duice.data.Map(jsonArray[i]);
+                    var map = new duice.data.Map(jsonArray[i], __childName);
                     map.addObserver(this);
                     this.data.push(map);
                 }
@@ -850,7 +874,7 @@ namespace duice {
                 this.setChanged();
                 this.notifyObservers(this);
             }
-            toJson():Array<object> {
+            toJson(__childName?:string):Array<object> {
                 var jsonArray = new Array();
                 for(var i = 0; i < this.data.length; i ++){
                     jsonArray.push(this.data[i].toJson());
@@ -1969,7 +1993,7 @@ namespace duice {
         export class List extends CollectionUIElement {
             ul:HTMLUListElement;
             li:HTMLLIElement;
-            rows:Array<HTMLLIElement> = new Array<HTMLLIElement>();
+            lis:Array<HTMLLIElement> = new Array<HTMLLIElement>();
             editable:boolean;
             constructor(ul:HTMLUListElement) {
                 super(ul);
@@ -1988,32 +2012,47 @@ namespace duice {
                 if(obj instanceof duice.data.Map){
                     return;
                 }
-                
+                console.log('####collection', collection);
                 var $this = this;
               
                 // remove previous rows
-                for(var i = 0; i < this.rows.length; i ++ ) {
-                  this.ul.removeChild(this.rows[i]);
+                for(var i = 0; i < this.lis.length; i ++ ) {
+                  this.ul.removeChild(this.lis[i]);
                 }
-                this.rows.length = 0;
+                this.lis.length = 0;
               
                 // creates new rows
                 for(var index = 0; index < collection.getSize(); index ++ ) {
                     var map = collection.get(index);
-                    var row = this.createRow(index,map);
-                    this.ul.appendChild(row);
-                    this.rows.push(row);
+                    var li = this.createLi(index,map);
+                    this.ul.appendChild(li);
+                    this.lis.push(li);
                 }
             }
-            createRow(index:number, map:duice.data.Map):HTMLLIElement {
+            createLi(index:number, map:duice.data.Map):HTMLLIElement {
                 var $this = this;
-                var row:HTMLLIElement = <HTMLLIElement>this.li.cloneNode(true);
+                var li:HTMLLIElement = <HTMLLIElement>this.li.cloneNode(true);
                 var $context:any = new Object;
                 $context['index'] = index;
                 $context[this.item] = map;
-                row = executeExpression(<HTMLElement>row, $context);
-                initialize(row,$context);
-                return row;
+                li = executeExpression(<HTMLElement>li, $context);
+                initialize(li,$context);
+                
+                console.log('####map', map);
+                
+                // create child nodes
+                var childNodes = map.getChildNodes();
+                if(childNodes && childNodes.length > 0){
+                    console.log('############');
+                    var ul = document.createElement('ul');
+                    for(var i = 0, size = childNodes.length; i < size; i ++){
+                        var childNode = childNodes[i];
+                        var childLi = this.createLi(i, childNode);
+                        ul.appendChild(childLi);
+                    }
+                    li.appendChild(ul);
+                }
+                return li;
             }
         }
         
