@@ -468,7 +468,16 @@
 	color: #ccc;
 }
 
-
+/**
+ * duice.ui.List
+ */
+.duice-ui-list {
+	list-style: none;
+	list-style-position: inside;
+}
+.duice-ui-list__li {
+	list-style-type: none;
+}
 
 
 

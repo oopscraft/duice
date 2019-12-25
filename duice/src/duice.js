@@ -11,71 +11,6 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var duice;
 (function (duice) {
-    /**
-     * duice.initialize
-     * @param container
-     * @param $context
-     */
-    function initialize(container, $context) {
-        // ul
-        var listElements = container.querySelectorAll('ul[is="duice-ui-list"][data-duice-bind]:not([data-duice-id])');
-        for (var i = 0; i < listElements.length; i++) {
-            try {
-                var element = listElements[i];
-                duice.ui.ListFactory.getList(element, $context);
-            }
-            catch (e) {
-                console.error(e, element);
-                throw e;
-            }
-        }
-        // table
-        var tableElements = container.querySelectorAll('table[is="duice-ui-table"][data-duice-bind]:not([data-duice-id])');
-        for (var i = 0; i < tableElements.length; i++) {
-            try {
-                var element = tableElements[i];
-                duice.ui.TableFactory.getTable(element, $context);
-            }
-            catch (e) {
-                console.error(e, element);
-                throw e;
-            }
-        }
-        // creates unit elements
-        var elementTags = [
-            'span[is="duice-ui-span"][data-duice-bind]:not([data-duice-id])',
-            'input[is="duice-ui-input"][data-duice-bind]:not([data-duice-id])',
-            'select[is="duice-ui-select"][data-duice-bind]:not([data-duice-id])',
-            'textarea[is="duice-ui-textarea"][data-duice-bind]:not([data-duice-id])'
-        ];
-        var elements = container.querySelectorAll(elementTags.join(','));
-        for (var i = 0; i < elements.length; i++) {
-            try {
-                var element = elements[i];
-                var type = element.dataset.duice;
-                var is = element.getAttribute('is');
-                switch (is) {
-                    case 'duice-ui-span':
-                        duice.ui.SpanFactory.getSpan(element, $context);
-                        break;
-                    case 'duice-ui-input':
-                        duice.ui.InputFactory.getInput(element, $context);
-                        break;
-                    case 'duice-ui-select':
-                        duice.ui.SelectFactory.getSelect(element, $context);
-                        break;
-                    case 'duice-ui-textarea':
-                        duice.ui.TextareaFactory.getTextarea(element, $context);
-                        break;
-                }
-            }
-            catch (e) {
-                console.error(e, elements[i]);
-                throw e;
-            }
-        }
-    }
-    duice.initialize = initialize;
     var Observable = (function () {
         function Observable() {
             this.observers = new Array();
@@ -748,7 +683,7 @@ var duice;
             __extends(Map, _super);
             function Map(json) {
                 var _this = _super.call(this) || this;
-                _this.values = new Object();
+                _this.data = new Object();
                 _this.childNodes = new Array();
                 _this.enable = true;
                 _this.readonlyNames = new Array();
@@ -762,31 +697,44 @@ var duice;
                 this.set(name, value);
             };
             Map.prototype.fromJson = function (json) {
-                this.values = new Object();
+                this.data = new Object();
                 for (var name in json) {
-                    this.values[name] = json[name];
+                    this.data[name] = json[name];
                 }
+                this.originData = JSON.stringify(this.toJson());
                 this.setChanged();
                 this.notifyObservers(this);
             };
+            Map.prototype.isDirty = function () {
+                if (JSON.stringify(this.toJson()) === this.originData) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            };
+            Map.prototype.reset = function () {
+                var originJson = JSON.parse(this.originData);
+                this.fromJson(originJson);
+            };
             Map.prototype.toJson = function () {
                 var json = new Object();
-                for (var name in this.values) {
-                    json[name] = this.values[name];
+                for (var name in this.data) {
+                    json[name] = this.data[name];
                 }
                 return json;
             };
             Map.prototype.set = function (name, value) {
-                this.values[name] = value;
+                this.data[name] = value;
                 this.setChanged();
                 this.notifyObservers(this);
             };
             Map.prototype.get = function (name) {
-                return this.values[name];
+                return this.data[name];
             };
             Map.prototype.getNames = function () {
                 var names = new Array();
-                for (var name in this.values) {
+                for (var name in this.data) {
                     names.push(name);
                 }
                 return names;
@@ -853,7 +801,7 @@ var duice;
                 return _this;
             }
             Collection.prototype.update = function (observable, obj) {
-                console.log('Map.update');
+                console.log('Collection.update');
                 this.setChanged();
                 this.notifyObservers(obj);
             };
@@ -864,6 +812,7 @@ var duice;
                     map.addObserver(this);
                     this.data.push(map);
                 }
+                this.originData = JSON.stringify(this.toJson());
                 this.index = -1;
                 this.setChanged();
                 this.notifyObservers(this);
@@ -874,6 +823,18 @@ var duice;
                     jsonArray.push(this.data[i].toJson());
                 }
                 return jsonArray;
+            };
+            Collection.prototype.isDirty = function () {
+                if (JSON.stringify(this.toJson()) === this.originData) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            };
+            Collection.prototype.reset = function () {
+                var originJson = JSON.parse(this.originData);
+                this.fromJson(originJson);
             };
             Collection.prototype.setIndex = function (index) {
                 this.index = index;
@@ -897,21 +858,27 @@ var duice;
             Collection.prototype.add = function (map) {
                 map.addObserver(this);
                 this.data.push(map);
-                this.index = this.getSize();
+                this.index = this.getSize() - 1;
                 this.setChanged();
                 this.notifyObservers(this);
             };
             Collection.prototype.insert = function (index, map) {
-                map.addObserver(this);
-                this.data.splice(index, 0, map);
-                this.index = index;
-                this.setChanged();
-                this.notifyObservers(this);
+                if (0 <= index && index < this.data.length) {
+                    map.addObserver(this);
+                    this.data.splice(index, 0, map);
+                    this.index = index;
+                    this.setChanged();
+                    this.notifyObservers(this);
+                }
             };
             Collection.prototype.remove = function (index) {
-                this.data.splice(index, 1);
-                this.setChanged();
-                this.notifyObservers(this);
+                console.log(index);
+                if (0 <= index && index < this.data.length) {
+                    this.data.splice(index, 1);
+                    this.index = Math.min(this.index, this.data.length - 1);
+                    this.setChanged();
+                    this.notifyObservers(this);
+                }
             };
             Collection.prototype.move = function (fromIndex, toIndex) {
                 this.index = fromIndex;
@@ -967,81 +934,146 @@ var duice;
             return Collection;
         }(DataObject));
         data.Collection = Collection;
-        /**
-         * duice.data.Tree
-         */
-        var Tree = (function (_super) {
-            __extends(Tree, _super);
-            function Tree(jsonArray, childName) {
-                var _this = _super.call(this) || this;
-                _this.rootNode = new duice.data.Map({});
-                _this.index = [];
-                _this.fromJson(jsonArray, childName);
-                return _this;
-            }
-            Tree.prototype.update = function (observable, obj) {
-                this.setChanged();
-                this.notifyObservers(obj);
-            };
-            Tree.prototype.fromJson = function (jsonArray, childName) {
-                this.rootNode = new duice.data.Map({});
-                for (var i = 0; i < jsonArray.length; i++) {
-                    var json = jsonArray[i];
-                    var childNode = createNodeTree(json, childName);
-                    this.rootNode.addChildNode(childNode);
-                }
-                // traverse function
-                function createNodeTree(json, childName) {
-                    var node = new duice.data.Map(json);
-                    var childs = json[childName];
-                    if (Array.isArray(childs)) {
-                        for (var i = 0, size = childs.length; i < size; i++) {
-                            var child = childs[i];
-                            var childNode = createNodeTree(child, childName);
-                            node.addChildNode(childNode);
-                        }
-                    }
-                    return node;
-                }
-                // set other properties.
-                this.index = [];
-                this.setChanged();
-                this.notifyObservers(this);
-            };
-            Tree.prototype.toJson = function (childName) {
-                var jsonArray = new Array();
-                var childNodes = this.rootNode.getChildNodes();
-                for (var i = 0, size = childNodes.length; i < size; i++) {
-                    var childNode = childNodes[i];
-                    var json = createJsonTree(childNode, childName);
-                    jsonArray.push(json);
-                }
-                // traverse function
-                function createJsonTree(node, childName) {
-                    var json = node.toJson();
-                    json[childName] = new Array();
-                    var childNodes = node.getChildNodes();
-                    for (var i = 0, size = childNodes.length; i < size; i++) {
-                        var childJson = createJsonTree(childNodes[i], childName);
-                        json[childName].push(childJson);
-                    }
-                    return json;
-                }
-                // return jsonArray
-                return jsonArray;
-            };
-            Tree.prototype.getRootNode = function () {
-                return this.rootNode;
-            };
-            return Tree;
-        }(DataObject));
-        data.Tree = Tree;
+        //        /**
+        //         * duice.data.Tree
+        //         */
+        //        export class Tree extends DataObject {
+        //            rootNode:duice.data.Map = new duice.data.Map({});
+        //            index:any = [];
+        //            constructor(jsonArray:Array<any>, childName:string) {
+        //                super();
+        //                this.fromJson(jsonArray, childName);
+        //            }
+        //            update(observable:Observable, obj:object):void {
+        //                this.setChanged();
+        //                this.notifyObservers(obj);
+        //            }
+        //            fromJson(jsonArray: Array<any>, childName:string): void {
+        //                this.rootNode = new duice.data.Map({});
+        //                for (var i = 0; i < jsonArray.length; i++) {
+        //                    var json = jsonArray[i];
+        //                    var childNode = createNodeTree(json, childName);
+        //                    this.rootNode.addChildNode(childNode);
+        //                }
+        //
+        //                // traverse function
+        //                function createNodeTree(json: any, childName:string) {
+        //                    var node = new duice.data.Map(json);
+        //                    var childs = json[childName];
+        //                    if (Array.isArray(childs)) {
+        //                        for (var i = 0, size = childs.length; i < size; i++) {
+        //                            var child = childs[i];
+        //                            var childNode = createNodeTree(child, childName);
+        //                            node.addChildNode(childNode);
+        //                        }
+        //                    }
+        //                    return node;
+        //                }
+        //
+        //                // set other properties.
+        //                this.index = [];
+        //                this.setChanged();
+        //                this.notifyObservers(this);
+        //            }
+        //            toJson(childName: string): Array<object> {
+        //                var jsonArray = new Array();
+        //                var childNodes = this.rootNode.getChildNodes();
+        //                for (var i = 0, size = childNodes.length; i < size; i++){
+        //                    var childNode = childNodes[i];
+        //                    var json = createJsonTree(childNode, childName);
+        //                    jsonArray.push(json);
+        //                }
+        //
+        //                // traverse function
+        //                function createJsonTree(node: duice.data.Map, childName:string) {
+        //                    var json:any = node.toJson();
+        //                    json[childName] = new Array();
+        //                    var childNodes = node.getChildNodes();
+        //                    for (var i = 0, size = childNodes.length; i < size; i++){
+        //                        var childJson = createJsonTree(childNodes[i], childName);
+        //                        json[childName].push(childJson);
+        //                    }
+        //                    return json;
+        //                }
+        //
+        //                // return jsonArray
+        //                return jsonArray;
+        //            }
+        //            getRootNode():duice.data.Map {
+        //                return this.rootNode;
+        //            }
+        //        }
     })(data = duice.data || (duice.data = {}));
     /**
      * duice.ui
      */
     var ui;
     (function (ui) {
+        /**
+         * duice.initialize
+         * @param container
+         * @param $context
+         */
+        function initialize(container, $context) {
+            // ul
+            var listElements = container.querySelectorAll('ul[is="duice-ui-list"][data-duice-bind]:not([data-duice-id])');
+            for (var i = 0; i < listElements.length; i++) {
+                try {
+                    var element = listElements[i];
+                    duice.ui.ListFactory.getList(element, $context);
+                }
+                catch (e) {
+                    console.error(e, element);
+                    throw e;
+                }
+            }
+            // table
+            var tableElements = container.querySelectorAll('table[is="duice-ui-table"][data-duice-bind]:not([data-duice-id])');
+            for (var i = 0; i < tableElements.length; i++) {
+                try {
+                    var element = tableElements[i];
+                    duice.ui.TableFactory.getTable(element, $context);
+                }
+                catch (e) {
+                    console.error(e, element);
+                    throw e;
+                }
+            }
+            // creates unit elements
+            var elementTags = [
+                'span[is="duice-ui-span"][data-duice-bind]:not([data-duice-id])',
+                'input[is="duice-ui-input"][data-duice-bind]:not([data-duice-id])',
+                'select[is="duice-ui-select"][data-duice-bind]:not([data-duice-id])',
+                'textarea[is="duice-ui-textarea"][data-duice-bind]:not([data-duice-id])'
+            ];
+            var elements = container.querySelectorAll(elementTags.join(','));
+            for (var i = 0; i < elements.length; i++) {
+                try {
+                    var element = elements[i];
+                    var type = element.dataset.duice;
+                    var is = element.getAttribute('is');
+                    switch (is) {
+                        case 'duice-ui-span':
+                            duice.ui.SpanFactory.getSpan(element, $context);
+                            break;
+                        case 'duice-ui-input':
+                            duice.ui.InputFactory.getInput(element, $context);
+                            break;
+                        case 'duice-ui-select':
+                            duice.ui.SelectFactory.getSelect(element, $context);
+                            break;
+                        case 'duice-ui-textarea':
+                            duice.ui.TextareaFactory.getTextarea(element, $context);
+                            break;
+                    }
+                }
+                catch (e) {
+                    console.error(e, elements[i]);
+                    throw e;
+                }
+            }
+        }
+        ui.initialize = initialize;
         var UIElement = (function (_super) {
             __extends(UIElement, _super);
             function UIElement(element) {
@@ -1608,13 +1640,13 @@ var duice;
         ui.SelectFactory = {
             getSelect: function (element, $context) {
                 var select = new Select(element);
-                var bind = element.dataset.duiceBind.split(',');
-                select.bind(getObject($context, bind[0]), bind[1]);
                 var option = element.dataset.duiceOption.split(',');
                 var optionList = getObject($context, option[0]);
                 var optionValue = option[1];
                 var optionText = option[2];
                 select.setOption(optionList, optionValue, optionText);
+                var bind = element.dataset.duiceBind.split(',');
+                select.bind(getObject($context, bind[0]), bind[1]);
                 return select;
             }
         };
@@ -1745,10 +1777,10 @@ var duice;
         ui.TableFactory = {
             getTable: function (element, $context) {
                 var table = new Table(element);
-                var bind = element.dataset.duiceBind.split(',');
                 if (element.dataset.duiceEditable) {
                     table.setEditable(Boolean(element.dataset.duiceEditable));
                 }
+                var bind = element.dataset.duiceBind.split(',');
                 table.bind(getObject($context, bind[0]), bind[1]);
                 return table;
             }
@@ -1799,7 +1831,7 @@ var duice;
                             $this.rows[i].classList.remove('duice-ui-table__tbody--index');
                         }
                         this.classList.add('duice-ui-table__tbody--index');
-                        collection.index = index;
+                        collection.index = Number(this.dataset.duiceIndex);
                     });
                     // drag and drop event
                     if (this.editable === true) {
@@ -1864,11 +1896,11 @@ var duice;
         ui.ListFactory = {
             getList: function (element, $context) {
                 var list = new List(element);
-                var bind = element.dataset.duiceBind.split(',');
-                list.bind(getObject($context, bind[0]), bind[1]);
                 if (element.dataset.duiceEditable) {
                     list.setEditable(Boolean(element.dataset.duiceEditable));
                 }
+                var bind = element.dataset.duiceBind.split(',');
+                list.bind(getObject($context, bind[0]), bind[1]);
                 return list;
             }
         };
@@ -1881,7 +1913,7 @@ var duice;
                 var _this = _super.call(this, ul) || this;
                 _this.rows = new Array();
                 _this.ul = ul;
-                _this.ul.classList.add('duice-ui-listViewer');
+                _this.ul.classList.add('duice-ui-list');
                 var li = _this.ul.querySelector('li');
                 _this.li = li.cloneNode(true);
                 _this.ul.innerHTML = '';
@@ -1891,6 +1923,10 @@ var duice;
                 this.editable = editable;
             };
             List.prototype.update = function (collection, obj) {
+                // checks changed source instance
+                if (obj instanceof duice.data.Map) {
+                    return;
+                }
                 var $this = this;
                 // remove previous rows
                 for (var i = 0; i < this.rows.length; i++) {
@@ -1920,10 +1956,43 @@ var duice;
         ui.List = List;
     })(ui = duice.ui || (duice.ui = {})); // end of duice.ui
 })(duice || (duice = {})); // end
+(function (duice) {
+    var dialog;
+    (function (dialog) {
+        function initialize(container, $context) {
+        }
+        dialog.initialize = initialize;
+        var Dialog = (function () {
+            function Dialog() {
+            }
+            return Dialog;
+        }());
+        dialog.Dialog = Dialog;
+        var Alert = (function () {
+            function Alert() {
+            }
+            return Alert;
+        }());
+        dialog.Alert = Alert;
+        var Confirm = (function () {
+            function Confirm() {
+            }
+            return Confirm;
+        }());
+        dialog.Confirm = Confirm;
+        var Prompt = (function () {
+            function Prompt() {
+            }
+            return Prompt;
+        }());
+        dialog.Prompt = Prompt;
+    })(dialog = duice.dialog || (duice.dialog = {}));
+})(duice || (duice = {}));
 //DOMContentLoaded event process
 document.addEventListener("DOMContentLoaded", function (event) {
     var $context = typeof self !== 'undefined' ? self :
         typeof window !== 'undefined' ? window :
             {};
-    duice.initialize(document, $context);
+    duice.ui.initialize(document, $context);
+    duice.dialog.initialize(document, $context);
 });

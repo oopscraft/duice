@@ -21,8 +21,8 @@ var user = new duice.data.Map({
 	profile:'I am Happy'
 });
 var groups = new duice.data.Collection([
-	{id:"animal", name:"Animal"},
 	{id:"fruit", name:"Fruit"},
+	{id:"animal", name:"Animal"},
 	{id:"human", name:"Human"}
 ]);
 var users = new duice.data.Collection([
@@ -39,40 +39,52 @@ var users = new duice.data.Collection([
 		profile:'I am Happy'
 	},
 	{
-		id:'dog',
-		name:'Happy',
-		balance:370100.00,
-		active:true,
-		gender:'F',
+		id:'cat',
+		name:'Candy',
+		balance:280100.00,
+		active:false,
+		gender:'M',
 		hireDate:1576647474398,
 		birthday:854636400000,
-		score:40,
+		score:80,
 		groupId:'animal',
-		profile:'I am Happy'
+		profile:'I am Candy'
 	},
 	{
-		id:'dog',
-		name:'Happy',
-		balance:370100.00,
+		id:'apple',
+		name:'Apple',
+		balance:77100.00,
 		active:true,
-		gender:'F',
+		gender:'M',
 		hireDate:1576647474398,
 		birthday:854636400000,
-		score:40,
-		groupId:'animal',
-		profile:'I am Happy'
+		score:60,
+		groupId:'fruit',
+		profile:'I am Apple'
 	},
 	{
-		id:'dog',
-		name:'Happy',
-		balance:370100.00,
+		id:'rabbit',
+		name:'Bunny',
+		balance:77100.00,
 		active:true,
 		gender:'F',
 		hireDate:1576647474398,
 		birthday:854636400000,
-		score:40,
+		score:20,
 		groupId:'animal',
-		profile:'I am Happy'
+		profile:'I am Bunny'
+	},
+	{
+		id:'bob',
+		name:'Bob',
+		balance:170100.00,
+		active:true,
+		gender:'M',
+		hireDate:1576647474398,
+		birthday:854636400000,
+		score:40,
+		groupId:'human',
+		profile:'I am Bob'
 	}
 ]);
 
@@ -213,7 +225,14 @@ section div {
 	</div>
 	<div class="layout-center">
 		<h2>duice.ui.*</h2>
-		<h3>duice.ui.MapUIElement <small>(binding to duice.data.Map)</small></h3>
+		<div style="display:flex; justify-content:space-between; align-items: flex-end;">
+			<h3>duice.ui.MapUIElement <small>(binding to duice.data.Map)</small></h3>
+			<div>
+				<button onclick="alert(JSON.stringify(user.toJson(),null,2));">toJson()</button>
+				<button onclick="alert(user.isDirty());">isDirty()</button>
+				<button onclick="user.reset();">reset()</button>
+			</div>
+		</div>
 		<table class="mapUIElement">
 			<colgroup>
 				<col width="20%"/>
@@ -307,56 +326,79 @@ section div {
 				</tr>
 			</tbody>
 		</table>
-		<h3>duice.ui.Table <small>(binding to duice.data.Collection)</small></h3>
+		<div style="display:flex; justify-content:space-between; align-items: flex-end;">
+			<h3>duice.ui.Table <small>(binding to duice.data.Collection)</small></h3>
+			<div>
+				<button onclick="users.add(new duice.data.Map({}));">add(map)</button>
+				<button onclick="users.insert(users.getIndex(), new duice.data.Map({}));">insert(map)</button>
+				<button onclick="users.remove(users.getIndex());">remove(index)</button>
+				<button onclick="alert(JSON.stringify(users.toJson()));">toJson()</button>
+				<button onclick="alert(users.isDirty());">isDirty()</button>
+				<button onclick="users.reset();">reset()</button>
+			</div>
+		</div>
 		<table is="duice-ui-table" data-duice-bind="users,user" data-duice-editable="true">
 			<thead>
 				<tr>
 					<th>No</th>
-					<th>duice.ui.Span</th>
-					<th>duice.ui.TextInput</th>
-					<th>duice.ui.NumberInput</th>
-					<th>duice.ui.CheckboxInput</th>
-					<th>duice.ui.RadioInput</th>
-					<th>duice.ui.DateInput</th>
-					<th>duice.ui.Select</th>
+					<th>users[].id</th>
+					<th>users[].name</th>
+					<th>users[].balance</th>
+					<th>duice[].active</th>
+					<th>duice[].gender</th>
+					<th>duice[].hireDate</th>
+					<th>duice[].birthday</th>
+					<th>duice[].groupId</th>
+					<th>duice[].profile</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr>
 					<td>[[$context.index+1]]</td>
-					<td><span is="duice-ui-span" data-duice-bind="user,span"></span></td>
-					<td><input is="duice-ui-input" type="text" data-duice-bind="user,textInput"/></td>
-					<td><input is="duice-ui-input" type="number" data-duice-bind="user,numberInput" ondragstart="console.log('fdsa'); event.preventDefault(); event.stopPropagation();"/></td>
-					<td><input is="duice-ui-input" type="checkbox" data-duice-bind="user,checkboxInput"/></td>
+					<td><span is="duice-ui-span" data-duice-bind="user,id"></span></td>
+					<td><input is="duice-ui-input" type="text" data-duice-bind="user,name"/></td>
+					<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance" ondragstart="console.log('fdsa'); event.preventDefault(); event.stopPropagation();"/></td>
+					<td><input is="duice-ui-input" type="checkbox" data-duice-bind="user,active"/></td>
 					<td>
-						M<input is="duice-ui-input" type="radio" data-duice-bind="user,radioInput" value="M"/>
-						F<input is="duice-ui-input" type="radio" data-duice-bind="user,radioInput" value="F"/>
+						M<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="M"/>
+						F<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="F"/>
 					</td>
-					<td><input is="duice-ui-input" type="date" data-duice-bind="user,dateInput"/></td>
-					<td><select is="duice-ui-select" data-duice-bind="user,select" data-duice-option="groups,id,name"></select></td>
+					<td><input is="duice-ui-input" type="date" data-duice-bind="user,hireDate"/></td>
+					<td><input is="duice-ui-input" type="date" data-duice-bind="user,birthday"/></td>
+					<td><select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"></select></td>
+					<td><textarea is="duice-ui-textarea" data-duice-bind="user,profile"></textarea></td>
 				</tr>
 			</tbody>
 		</table>
 		<h3>duice.ui.List <small>(binding to duice.data.Collection)</small></h3>
-		<ul is="duice-ui-list11" data-duice-bind="users,map">
+		<ul is="duice-ui-list" data-duice-bind="users,user">
 			<li style="margin:0.2rem 0rem;">
 				<table style="width:100%;">
+					<colgroup>
+						<col width="5%"/>
+						<col width="10%"/>
+						<col width="10%"/>
+						<col width="10%"/>
+						<col width="10%"/>
+						<col width="10%"/>
+						<col width="10%"/>
+					</colgroup>
 					<tr style="font-weight:bold;">
 						<td rowspan="2" style="width:30px; text-align:center; border-right:dotted 1px #ccc;">[[$context.index+1]]</td>
-						<td>duice.ui.Span</td>
-						<td>duice.ui.TextInput</td>
-						<td>duice.ui.NumberInput</td>
-						<td>duice.ui.CheckboxInput</td>
-						<td>duice.ui.DateInput</td>
-						<td>duice.ui.Select</td>
+						<td>ID</td>
+						<td>Name</td>
+						<td>Balance</td>
+						<td>Active</td>
+						<td>Hire Date</td>
+						<td>Group</td>
 					</tr>
 					<tr>
-						<td><span is="duice-ui-span" data-duice-bind="user,span"></span></td>
-						<td><input is="duice-ui-input" type="text" data-duice-bind="user,textInput"/></td>
-						<td><input is="duice-ui-input" type="number" data-duice-bind="user,numberInput"/></td>
-						<td><input is="duice-ui-input" type="checkbox" data-duice-bind="user,checkboxInput"/></td>
-						<td><input is="duice-ui-input" type="date" data-duice-bind="user,dateInput"/></td>
-						<td><select is="duice-ui-select" data-duice-bind="user,select" data-duice-option="groups,id,name"></select></td>
+						<td><span is="duice-ui-span" data-duice-bind="user,id"></span></td>
+						<td><input is="duice-ui-input" type="text" data-duice-bind="user,name"/></td>
+						<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance"/></td>
+						<td><input is="duice-ui-input" type="checkbox" data-duice-bind="user,active"/></td>
+						<td><input is="duice-ui-input" type="date" data-duice-bind="user,hireDate"/></td>
+						<td><select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"></select></td>
 					</tr>
 				</table>
 			<li>
