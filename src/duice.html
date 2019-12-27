@@ -163,75 +163,24 @@ users.fromJson([
 ]);
 
 /**
- * treeUsers(duice.data.List)
+ * hierarchyUsers(duice.data.List)
  */
-var treeUsers = new duice.data.List([
+var hierarchyUsers = new duice.data.List([
 	{
-		id:'apple',
-		name:'Apple',
-		balance:77100.00,
+		id:'1',
+		name:'Happy',
+		balance:370100.00,
 		active:true,
-		gender:'M',
+		gender:'F',
 		hireDate:1576647474398,
 		birthday:854636400000,
-		score:60,
-		groupId:'fruit',
-		profile:'I am Apple',
-		childs: [
-			{
-				id:'rabbit1',
-				name:'Bunny',
-				balance:77100.00,
-				active:true,
-				gender:'F',
-				hireDate:1576647474398,
-				birthday:854636400000,
-				score:20,
-				groupId:'animal',
-				profile:'I am Bunny',
-				childs: [
-					{
-						id:'rabbit2',
-						name:'Bunny',
-						balance:77100.00,
-						active:true,
-						gender:'F',
-						hireDate:1576647474398,
-						birthday:854636400000,
-						score:20,
-						groupId:'animal',
-						profile:'I am Bunny'
-					},
-					{
-						id:'rabbit3',
-						name:'Bunny',
-						balance:77100.00,
-						active:true,
-						gender:'F',
-						hireDate:1576647474398,
-						birthday:854636400000,
-						score:20,
-						groupId:'animal',
-						profile:'I am Bunny'
-					}
-				]
-			},
-			{
-				id:'bob',
-				name:'Bob',
-				balance:170100.00,
-				active:true,
-				gender:'M',
-				hireDate:1576647474398,
-				birthday:854636400000,
-				score:40,
-				groupId:'human',
-				profile:'I am Bob'
-			}	
-		]
+		score:40,
+		groupId:'animal',
+		profile:'I am Happy'
 	},
 	{
-		id:'cat',
+		id:'2',
+		parentId:'1',
 		name:'Candy',
 		balance:280100.00,
 		active:false,
@@ -243,18 +192,45 @@ var treeUsers = new duice.data.List([
 		profile:'I am Candy'
 	},
 	{
-		id:'apple3',
-		name:'Apple',
-		balance:77100.00,
-		active:true,
+		id:'3',
+		parentId:'1',
+		name:'Candy',
+		balance:280100.00,
+		active:false,
 		gender:'M',
 		hireDate:1576647474398,
 		birthday:854636400000,
-		score:60,
-		groupId:'fruit',
-		profile:'I am Apple'
+		score:80,
+		groupId:'animal',
+		profile:'I am Candy'
+	},
+	{
+		id:'4',
+		parentId:'2',
+		name:'Candy',
+		balance:280100.00,
+		active:false,
+		gender:'M',
+		hireDate:1576647474398,
+		birthday:854636400000,
+		score:80,
+		groupId:'animal',
+		profile:'I am Candy'
+	},
+	{
+		id:'5',
+		parentId:'',
+		name:'Candy',
+		balance:280100.00,
+		active:false,
+		gender:'M',
+		hireDate:1576647474398,
+		birthday:854636400000,
+		score:80,
+		groupId:'animal',
+		profile:'I am Candy'
 	}
-],'childs');
+]);
 
 /**
  * DOMContentLoaded
@@ -291,19 +267,19 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		users.fromJson(JSON.parse(this.value));
 	});
 	
-	// prints treeUsersJson as JSON
-	var treeUsersTextarea = document.getElementById('treeUsersTextarea');
-	function printTreeUsers(){
-		treeUsersTextarea.value = JSON.stringify(treeUsers.toJson(), null, 2);
+	// prints hierarchyUsersJson as JSON
+	var hierarchyUsersTextarea = document.getElementById('hierarchyUsersTextarea');
+	function printHierarchyUsers(){
+		hierarchyUsersTextarea.value = JSON.stringify(hierarchyUsers.toJson(), null, 2);
 	}
-	printTreeUsers();
-	treeUsers.addObserver({
+	printHierarchyUsers();
+	hierarchyUsers.addObserver({
 		update:function(){
-			printTreeUsers();
+			printHierarchyUsers();
 		}
 	});
-	treeUsersTextarea.addEventListener('change', function(event){
-		treeUsers.fromJson(JSON.parse(this.value), 'childs');
+	hierarchyUsersTextarea.addEventListener('change', function(event){
+		hierarchyUsers.fromJson(JSON.parse(this.value), 'childs');
 	});
 });
 </script>
@@ -585,8 +561,8 @@ h3 {
 		</div>
 		<div class="chapter__bodyDiv">
 			<div class="chapter__bodyDiv-dataDiv">
-				<h3>duice.data.Collection <small>(var treeUsers)</small></h3>
-				<textarea id="treeUsersTextarea" class="chapter__bodyDiv-uiDiv-jsonTextarea" style="height:600px;"></textarea>
+				<h3>duice.data.Collection <small>(var hierarchyUsers)</small></h3>
+				<textarea id="hierarchyUsersTextarea" class="chapter__bodyDiv-uiDiv-jsonTextarea" style="height:600px;"></textarea>
 			</div>
 			<div class="chapter__bodyDiv-uiDiv">
 				<div style="display:flex; justify-content:space-between; align-items: flex-end;">
@@ -600,12 +576,12 @@ h3 {
 						<button onclick="users.reset();">reset()</button>
 					</div>
 				</div>
-				<ul is="duice-ui-list" data-duice-bind="treeUsers,user" data-duice-foldable="true">
+				<ul is="duice-ui-list" data-duice-bind="hierarchyUsers,user" data-duice-hierarchy="id,parentId" data-duice-foldable="true">
 					<li style="margin:0.2rem 0rem;">
 						<table style="width:100%;">
 							<colgroup>
-								<col width="10%"/>
-								<col width="10%"/>
+								<col width="5%"/>
+								<col width="5%"/>
 								<col width="10%"/>
 								<col width="10%"/>
 								<col width="10%"/>
@@ -613,10 +589,7 @@ h3 {
 								<col width="10%"/>
 							</colgroup>
 							<tr style="font-weight:bold;">
-								<td rowspan="2" style="width:30px; text-align:center; border-right:dotted 1px #ccc;">
-									[[$context.index]]
-									[[$context.path]]
-								</td>
+								<td>Parent ID</td>
 								<td>ID</td>
 								<td>Name</td>
 								<td>Balance</td>
@@ -625,6 +598,7 @@ h3 {
 								<td>Group</td>
 							</tr>
 							<tr>
+								<td><span is="duice-ui-span" data-duice-bind="user,parentId"></span></td>
 								<td><span is="duice-ui-span" data-duice-bind="user,id"></span></td>
 								<td><input is="duice-ui-input" type="text" data-duice-bind="user,name"/></td>
 								<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance"/></td>

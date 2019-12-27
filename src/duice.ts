@@ -719,14 +719,12 @@ namespace duice {
         export class Map extends DataObject {
             data:any = new Object();
             originData:string;
-            parentNode:Map;
-            childNodes:Array<Map> = new Array<Map>();
             enable:boolean = true;
             readonly:Array<string> = new Array<string>();
-            constructor(json?:any, __childName?:string) {
+            constructor(json?:any) {
                 super();
                 if(json){
-                    this.fromJson(json, __childName);
+                    this.fromJson(json);
                 }
             }
             update(uiElement:duice.ui.MapUIElement, obj:object):void {
@@ -735,24 +733,12 @@ namespace duice {
                 var value = uiElement.getValue();
                 this.set(name, value);
             }
-            fromJson(json:any, __childName?:string): void {
+            fromJson(json:any): void {
                 
                 // sets data
                 this.data = new Object();
                 for(var name in json){
                     this.data[name] = json[name];
-                }
-                
-                // makes child nodes
-                var $this = this;
-                if(__childName){
-                    var childs = json[__childName];
-                    if(childs && Array.isArray(childs)){
-                        childs.forEach(function(child:object){
-                            var childNode = new duice.data.Map(child, __childName);
-                            $this.addChildNode(childNode);
-                        });
-                    }
                 }
                 
                 // saves original data.
@@ -762,7 +748,7 @@ namespace duice {
                 this.setChanged();
                 this.notifyObservers(this);
             }
-            toJson(__childName?:string):object {
+            toJson():object {
                 var json: any = new Object();
                 for(var name in this.data){
                     json[name] = this.data[name];
@@ -794,36 +780,6 @@ namespace duice {
                     names.push(name);
                 }
                 return names;
-            }
-            setParentNode(parentNode:Map):void {
-                this.parentNode = parentNode;
-            }
-            getParentNode():Map {
-                return this.parentNode;
-            }
-            getChildNodes():Array<Map> {
-                return this.childNodes;
-            }
-            getChildNode(index:number):Map {
-                return this.childNodes[index];
-            }
-            getChildNodeByPath(path:Array<number>):Map {
-                var node:Map = this;
-                path.forEach(function(index){
-                    node = node.getChildNode(index);
-                });
-                return node;
-            }
-            addChildNode(node:Map):void {
-                node.setParentNode(this);
-                this.childNodes.push(node);
-            }
-            insertChildNode(index:number, node:Map):void {
-                node.setParentNode(this);
-                this.childNodes.splice(index, 0, node);
-            }
-            removeChildNode(index:number):void {
-                this.childNodes.splice(index,1);
             }
             setEnable(enable:boolean):void {
                 this.enable = enable;
@@ -859,7 +815,7 @@ namespace duice {
             constructor(jsonArray?:Array<any>, __childName?:string) {
                 super();
                 if(jsonArray){
-                    this.fromJson(jsonArray, __childName);
+                    this.fromJson(jsonArray);
                 }
             }
             update(observable:Observable, obj:object):void {
@@ -867,10 +823,10 @@ namespace duice {
                 this.setChanged();
                 this.notifyObservers(obj);
             }
-            fromJson(jsonArray:Array<any>, __childName?:string):void {
+            fromJson(jsonArray:Array<any>):void {
                 this.data = new Array<duice.data.Map>();
                 for(var i = 0; i < jsonArray.length; i ++ ) {
-                    var map = new duice.data.Map(jsonArray[i], __childName);
+                    var map = new duice.data.Map(jsonArray[i]);
                     map.addObserver(this);
                     this.data.push(map);
                 }
@@ -1877,6 +1833,10 @@ namespace duice {
         export var UListFactory = {
             getUList(element:HTMLUListElement, $context:any):UList {
                 var uList = new UList(element);
+                if(element.dataset.duiceHierarchy){
+                    var hirearchy = element.dataset.duiceHierarchy.split(',');
+                    uList.setHierarchy(hirearchy[0], hirearchy[1]);
+                }
                 if(element.dataset.duiceFoldable){
                     uList.setFoldable(Boolean(element.dataset.duiceFoldable));
                 }
@@ -1896,6 +1856,7 @@ namespace duice {
             ul:HTMLUListElement;
             li:HTMLLIElement;
             lis:Array<HTMLLIElement> = new Array<HTMLLIElement>();
+            hierarchy:{ name:string, parentName:string }
             foldable:boolean;
             editable:boolean;
             constructor(ul:HTMLUListElement) {
@@ -1905,6 +1866,9 @@ namespace duice {
                 var li = <HTMLLIElement>this.ul.querySelector('li');
                 this.li = <HTMLLIElement>li.cloneNode(true);
                 this.ul.innerHTML = '';
+            }
+            setHierarchy(name:string, parentName:string):void {
+                this.hierarchy = { name:name, parentName:parentName };
             }
             setFoldable(foldable:boolean):void {
                 this.foldable = foldable;
@@ -1924,7 +1888,6 @@ namespace duice {
                     return;
                 }
                 
-                console.log('####list', list);
                 var $this = this;
               
                 // remove previous rows
@@ -1937,31 +1900,36 @@ namespace duice {
                 for(var i = 0; i < list.getSize(); i ++ ) {
                     var map = list.get(i);
                     var path:Array<number> = [];
-                    var li = this.createLi(i, path, map);
+                    
+                    // checks hierarchy
+                    if(this.hierarchy){
+                        if(map.get(this.hierarchy.parentName)){
+                            continue;
+                        }
+                    }
+                    
+                    // creates LI element
+                    var li = this.createLi(i, map);
                     this.ul.appendChild(li);
                     this.lis.push(li);
                 }
             }
-            createLi(index:number, path:Array<number>, map:duice.data.Map):HTMLLIElement {
+            createLi(index:number, map:duice.data.Map):HTMLLIElement {
                 var $this = this;
                 var li:HTMLLIElement = <HTMLLIElement>this.li.cloneNode(true);
                 li.classList.add('duice-ui-ul__li');
                 var $context:any = new Object;
                 $context['index'] = index;
-                $context['path'] = JSON.stringify(path);
                 $context[this.item] = map;
                 li = executeExpression(<HTMLElement>li, $context);
                 initialize(li,$context);
                 li.dataset.duiceIndex = String(index);
-                li.dataset.duicePath = JSON.stringify(path);
 
                 // drag and drop
                 li.setAttribute('draggable', 'true');
                 li.addEventListener('dragstart', function(event){
                     event.stopPropagation();
                     event.dataTransfer.setData("fromIndex", this.dataset.duiceIndex);
-                    event.dataTransfer.setData("fromPath", this.dataset.duicePath);
-                    
                 });
                 li.addEventListener('dragover', function(event){
                     event.preventDefault();
@@ -1970,82 +1938,41 @@ namespace duice {
                 li.addEventListener('drop', function(event){
                     event.preventDefault();
                     event.stopPropagation();
-                    console.log('drop', this.dataset.duiceIndex);
-                    console.log('index', this.dataset.duiceIndex);
-                    console.log('path', this.dataset.duicePath);
-                    
                     var fromIndex = parseInt(event.dataTransfer.getData('fromIndex'));
-                    var fromPath = JSON.parse(event.dataTransfer.getData('fromPath'));
                     var toIndex = parseInt(this.dataset.duiceIndex);
-                    var toPath = JSON.parse(this.dataset.duicePath);
-                    $this.moveLi(fromIndex, fromPath, toIndex, toPath);
+                    $this.moveLi(fromIndex, toIndex);
                 });
                 
-                // create child nodes
-                var childNodes = map.getChildNodes();
-                if(childNodes && childNodes.length > 0){
-                    var ul = <HTMLUListElement>this.ul.cloneNode(true);
-                    var childPath = path.slice();
-                    childPath.push(0);
-                    for(var i = 0, size = childNodes.length; i < size; i ++){
-                        var childNode = childNodes[i];
-                        childPath[childPath.length-1] = i;
-                        var childLi = this.createLi(index, childPath, childNode);
-                        ul.appendChild(childLi);
+                // creates child node
+                var childUl = document.createElement('ul');
+                for(var i = 0, size = this.list.getSize(); i < size; i ++ ){
+                    var element = this.list.get(i);
+                    if(element.get(this.hierarchy.parentName) === map.get(this.hierarchy.name)){
+                        console.log('element.get(this.hierarchy.parentName)', element.get(this.hierarchy.parentName));
+                        console.log('map.get(this.hierarchy.name)', map.get(this.hierarchy.name));
+                        var childLi = this.createLi(i, element);
+                        childUl.appendChild(childLi);
                     }
-                    li.appendChild(ul);
                 }
+                li.appendChild(childUl);
+
+                // return node element
                 return li;
             }
-            moveLi(fromIndex:number, fromPath:Array<number>, toIndex:number, toPath:Array<number>):void {
-                console.log('#### fromIndex', fromIndex);
-                console.log('#### fromPath', fromPath);
-                console.log('#### toIndex', toIndex);
-                console.log('#### toPath', toPath);
-
-                var fromMap = this.list.get(fromIndex).getChildNodeByPath(fromPath);
-                var toMap = this.list.get(toIndex).getChildNodeByPath(toPath);
+            moveLi(fromIndex:number, toIndex:number):void {
                 
-//                if(fromPath.length === 0){
-//                    this.list.remove(fromIndex);
-//                }else{
-//                    var fromMap = this.list.get(fromIndex);
-//                    for(var i = 0; i < fromPath.length; i ++ ){
-//                        console.log('#3#####:', fromPath[i]);
-//                        fromMap = fromMap.getChildNode(fromPath[i])    
-//                    }
-//                    fromMap.getParentNode().removeChildNode(fromPath[fromPath.length-1]);
-//                }
-//
-//                var toMap = this.list.get(toIndex);
-//                for(var i = 0; i < toPath.length; i ++ ){
-//                    toMap = toMap.getChildNode(toPath[i])    
-//                }
-                
-                console.log('moveLi:',fromMap.get('id') + '==>' + toMap.get('id'));
-                
-//                fromMap.getParentNode().removeChildNode(fromPath[fromPath.length-1]);
-//                toMap.addChildNode(fromMap);
-                
-                
-                
-                
-                // sibling
-                if(fromMap.getParentNode() === toMap.getParentNode()){
-                    fromMap.getParentNode().removeChildNode(fromPath[fromPath.length-1]);
-                    toMap.getParentNode().insertChildNode(toPath[toPath.length-1], fromMap);
-                }else{
-                    fromMap.getParentNode().removeChildNode(fromPath[fromPath.length-1]);
-                    toMap.addChildNode(fromMap);
+                // checks same index
+                if(fromIndex === toIndex){
+                    return;
                 }
                 
-
-
-
+                var fromMap = this.list.get(fromIndex);
+                var toMap = this.list.get(toIndex);
                 
+                // change parents
+                fromMap.set(this.hierarchy.parentName, toMap.get(this.hierarchy.name));
                 this.setChanged();
                 this.notifyObservers(this);
-                
             }
         }
         
