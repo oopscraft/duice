@@ -26,7 +26,6 @@
  * duice.ui.GenericInput
  */
 .duice-ui-genericInput {
-	width: 100%;
 	line-height: inherit;
 	margin: 0;
 	padding: 0rem 0.3rem;
@@ -54,7 +53,6 @@
  * duice.ui.TextInput
  */
 .duice-ui-textInput {
-	width: 100%;
 	line-height: inherit;
 	margin: 0;
 	padding: 0rem 0.3rem;
@@ -82,7 +80,6 @@
  * duice.ui.NumberInput
  */
 .duice-ui-numberInput {
-	width: 100%;
 	line-height: inherit;
 	margin: 0;
 	padding: 0rem 0.3rem;
@@ -128,7 +125,6 @@
  * duice.ui.Calendar
  */
 .duice-ui-dateInput {
-	width:100%;
 	line-height: inherit;
 	margin: 0rem;
 	padding: 0rem 0.3rem;
@@ -345,7 +341,6 @@
  * duice.ui.select
  */
 .duice-ui-select {
-	width:100%;
 	line-height: inherit;
 	margin: 0rem;
 	padding: 0rem 0.3rem;
@@ -474,10 +469,54 @@
 	margin: 0px;
 	padding: 0px;
 }
-.duice-ui-ul--foldable {
-	list-style-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAJklEQVR42mNgGAXUBA0NDf9HfTDqg1EfQHxALD0KRsEoGAWDBQAAM5IY9y7mNu0AAAAASUVORK5CYII=);
-	padding-left: 2rem;
+.duice-ui-ul--hierarchy {
+	padding-left: 24px;
+	background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAADC0lEQVRIx92Vz2tdRRzFPzP3Nc9iU2tId+pCUFxIJeJOaDdKti4k4LpujSC6E1yJa/FvyFYkuNAoTSs2D1xoi6jb8mgS0gal1b5fme/5upi59+YlT03pzoH37tzLnXO+33POzA1Mj3Dk3nnE0QCura2tzs/PfzrrpdFo9OHKysrHj0IQ1tfXdenSRUKIxBipqooY87zX6zEcDrszOqz+AXeyvLycADpTejjECDEGQmh/S0tLbG5ujk9a9WAw+AxYPUYwOUjEVFF1oIpOjJEQI1V1itdeXz7iTrZHLiRHZpgMmej1rr8DvAt4Q/DVj7fp7fwwbUwIhALUaOnZ+oDAA8gbQlfOxR93+rV8qSFQNccTZ8+DO5KQOy7H3ZELl2MS5o7MS+VCLswcM2ESMtjevw8Qj0kkywvcHRVw90wmZUIpA5uEyZFl0gxuWS616e60cQokM+AweAYQjtfVp1K1aIgkYWblmaNDRbcdhAzihSAl4RQDC0g9T+aYWSuPO+bZpySQmN1BrswLkCHP2iazVmPlZ1l/SJ6rTpYNNoeUJTrqgZNMjdaTZJgZybytvimgXB1MYOYkz0kyy+tndJBNNomUxCSlmfKYUzrLlaZa9yau06dEG1PB+CCVDePFtLZ6U24/z8n3ypH1fzkSWwIzUkpI5AiaCoiKFF4MpUmQ7L+PjYbAUjHSHPM2dlbkyPOst+QnPshrgiodGLFOh8SBFTk865x3qz/MF6JT/3WA+fH4gKrWvUQty0IT3Yf8/DwODGqCM3f2tu92/xqc17Ej/+RjNMk7bPzn/j5wCqhCITgNdOvNcXRcvvz2B4uLi7z08ivvxxj45eebW8PhcOvGjZvXv/1mY2vGEgOGwCgArL73yfyTCwuvdufm3oqxuhgCT00lLO3x4oULPNY9DQFGoyHusPH19zz9zHP1a/eAX3F9/uDB/S++u7Zx6+qVL1PnjTdXQ7+/m/r93VvAOvATcPZwNy88f+ajvd0dOp0ODlhKxBjZ3elfvb1971qtEHAX+A34/dzCs+J/Mf4GvsK2HSfv9UwAAAAASUVORK5CYII=');
+	background-repeat: no-repeat;
 }
+.duice-ui-ul__li {
+	list-style-type: none;
+	margin: 0px;
+	padding: 0px;
+	border: solid 0px red;
+}
+.duice-ui-ul__li--indent {
+	padding-left: 24px;
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAJklEQVR42mNgGAXUBA0NDf9HfTDqg1EfQHxALD0KRsEoGAWDBQAAM5IY9y7mNu0AAAAASUVORK5CYII=);
+	background-repeat: no-repeat;
+}
+.duice-ui-ul__li--fold {
+	padding-left: 24px;
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAMUlEQVR42mNgGAWjYGiDhoaG/4QwxRZQIk+OBf+HrAX/seDRIKJTKqJpPhgFo2CEAAB0fljYcQiAXAAAAABJRU5ErkJggg==);
+	background-repeat: no-repeat;
+}
+.duice-ui-ul__li--fold > ul {
+	display: none;
+}
+.duice-ui-ul__li--unfold {
+	padding-left: 24px;
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAALUlEQVR42mNgGAWjYGiDhoaG/4QwxRZQIj+yLPiPBY8GEZ0soGk+GAWjYIQAAJJVVNxp/NqzAAAAAElFTkSuQmCC);
+	background-repeat: no-repeat;
+}
+.duice-ui-ul__li--unfold > ul {
+	display: block;
+}
+
+
+
+
+
+
+
+
+/*
+.duice-ui-ul--hierarchy {
+	list-style: none;
+	padding-left: 24px;
+	list-style-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAJklEQVR42mNgGAXUBA0NDf9HfTDqg1EfQHxALD0KRsEoGAWDBQAAM5IY9y7mNu0AAAAASUVORK5CYII=);
+}
+
+
 .duice-ui-ul--foldable-fold {
 	list-style-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAJklEQVR42mNgGAXUBA0NDf9HfTDqg1EfQHxALD0KRsEoGAWDBQAAM5IY9y7mNu0AAAAASUVORK5CYII=);
 	padding-left: 2rem;
@@ -486,17 +525,7 @@
 	list-style-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAJklEQVR42mNgGAXUBA0NDf9HfTDqg1EfQHxALD0KRsEoGAWDBQAAM5IY9y7mNu0AAAAASUVORK5CYII=);
 	padding-left: 2rem;
 }
-.duice-ui-ul__li {
-	margin: 0px;
-	padding: 0px;
-	border: solid 1px red;
-}
-.duice-ui-ul__li > ul {
-	list-style-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAJklEQVR42mNgGAXUBA0NDf9HfTDqg1EfQHxALD0KRsEoGAWDBQAAM5IY9y7mNu0AAAAASUVORK5CYII=);
-	padding-left: 2rem;
-}
-
-
+*/
 
 
 

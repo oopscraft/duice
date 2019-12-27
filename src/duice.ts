@@ -929,10 +929,10 @@ namespace duice {
         export function initialize(container:any, $context:any):void {
 
             // ul
-            var listElements = container.querySelectorAll('ul[is="duice-ui-list"][data-duice-bind]:not([data-duice-id])');
-            for(var i = 0; i < listElements.length; i++ ) {
+            var ulElements = container.querySelectorAll('ul[is="duice-ui-ul"][data-duice-bind]:not([data-duice-id])');
+            for(var i = 0; i < ulElements.length; i++ ) {
                 try {
-                    var element:any = listElements[i];
+                    var element:any = ulElements[i];
                     duice.ui.UListFactory.getUList(element, $context);
                 }catch(e){
                     console.error(e,element);
@@ -1855,9 +1855,9 @@ namespace duice {
         export class UList extends ListUIElement {
             ul:HTMLUListElement;
             li:HTMLLIElement;
-            lis:Array<HTMLLIElement> = new Array<HTMLLIElement>();
             hierarchy:{ name:string, parentName:string }
             foldable:boolean;
+            foldName:any = {};
             editable:boolean;
             constructor(ul:HTMLUListElement) {
                 super(ul);
@@ -1865,36 +1865,33 @@ namespace duice {
                 this.ul.classList.add('duice-ui-ul');
                 var li = <HTMLLIElement>this.ul.querySelector('li');
                 this.li = <HTMLLIElement>li.cloneNode(true);
-                this.ul.innerHTML = '';
             }
             setHierarchy(name:string, parentName:string):void {
                 this.hierarchy = { name:name, parentName:parentName };
             }
             setFoldable(foldable:boolean):void {
                 this.foldable = foldable;
-                if(this.foldable === true) {
-                    this.ul.classList.add('duice-ui-ul--foldable');
-                }else{
-                    this.ul.classList.remove('duice-ui-ul--foldable');
-                }
             }
             setEditable(editable:boolean):void {
                 this.editable = editable;
             }
             update(list:duice.data.List, obj:object):void {
-                
+
                 // checks changed source instance
                 if(obj instanceof duice.data.Map){
                     return;
                 }
                 
+                // defines
                 var $this = this;
-              
-                // remove previous rows
-                for(var i = 0; i < this.lis.length; i ++ ) {
-                  this.ul.removeChild(this.lis[i]);
+                
+                // clear child elements
+                this.ul.innerHTML = '';
+                
+                // hierarchy 
+                if(this.hierarchy){
+                    this.ul.classList.add('duice-ui-ul--hierarchy');
                 }
-                this.lis.length = 0;
               
                 // creates new rows
                 for(var i = 0; i < list.getSize(); i ++ ) {
@@ -1911,7 +1908,6 @@ namespace duice {
                     // creates LI element
                     var li = this.createLi(i, map);
                     this.ul.appendChild(li);
-                    this.lis.push(li);
                 }
             }
             createLi(index:number, map:duice.data.Map):HTMLLIElement {
@@ -1925,39 +1921,88 @@ namespace duice {
                 initialize(li,$context);
                 li.dataset.duiceIndex = String(index);
 
-                // drag and drop
-                li.setAttribute('draggable', 'true');
-                li.addEventListener('dragstart', function(event){
-                    event.stopPropagation();
-                    event.dataTransfer.setData("fromIndex", this.dataset.duiceIndex);
-                });
-                li.addEventListener('dragover', function(event){
-                    event.preventDefault();
-                    event.stopPropagation();
-                });
-                li.addEventListener('drop', function(event){
-                    event.preventDefault();
-                    event.stopPropagation();
-                    var fromIndex = parseInt(event.dataTransfer.getData('fromIndex'));
-                    var toIndex = parseInt(this.dataset.duiceIndex);
-                    $this.moveLi(fromIndex, toIndex);
-                });
-                
+                // editable
+                if(this.editable){
+                    li.setAttribute('draggable', 'true');
+                    li.addEventListener('dragstart', function(event){
+                        event.stopPropagation();
+                        event.dataTransfer.setData("fromIndex", this.dataset.duiceIndex);
+                    });
+                    li.addEventListener('dragover', function(event){
+                        event.preventDefault();
+                        event.stopPropagation();
+                    });
+                    li.addEventListener('drop', function(event){
+                        event.preventDefault();
+                        event.stopPropagation();
+                        var fromIndex = parseInt(event.dataTransfer.getData('fromIndex'));
+                        var toIndex = parseInt(this.dataset.duiceIndex);
+                        $this.moveLi(fromIndex, toIndex);
+                    });
+                }
+
                 // creates child node
-                var childUl = document.createElement('ul');
-                for(var i = 0, size = this.list.getSize(); i < size; i ++ ){
-                    var element = this.list.get(i);
-                    if(element.get(this.hierarchy.parentName) === map.get(this.hierarchy.name)){
-                        console.log('element.get(this.hierarchy.parentName)', element.get(this.hierarchy.parentName));
-                        console.log('map.get(this.hierarchy.name)', map.get(this.hierarchy.name));
-                        var childLi = this.createLi(i, element);
-                        childUl.appendChild(childLi);
+                if(this.hierarchy) {
+                    
+                    var childUl = document.createElement('ul');
+                    childUl.classList.add('duice-ui-ul');
+                    var hasChild:boolean = false;
+                    for(var i = 0, size = this.list.getSize(); i < size; i ++ ){
+                        var element = this.list.get(i);
+                        if(element.get(this.hierarchy.parentName) === map.get(this.hierarchy.name)){
+                            var childLi = this.createLi(i, element);
+                            childLi.classList.add('duice-ui-ul__li--indent');
+                            childUl.appendChild(childLi);
+                            hasChild = true;
+                        }
+                    }
+                    li.appendChild(childUl);
+                    
+                    // sets foldable
+                    if(this.foldable === true) {
+                        if(hasChild) {
+                            if(this.isFoldLi(map)){
+                                this.foldLi(map, li, true);
+                            }else{
+                                this.foldLi(map, li, false);
+                            }
+                            li.addEventListener('click', function(event){
+                                event.preventDefault();
+                                event.stopPropagation();
+                                if(event.target === this){
+                                    if($this.isFoldLi(map)){
+                                        $this.foldLi(map, this, false);
+                                    }else{
+                                        $this.foldLi(map, this, true);
+                                    }
+                                }
+                            });
+                        }else{
+                            this.foldLi(map, li, false);
+                        }
                     }
                 }
-                li.appendChild(childUl);
 
                 // return node element
                 return li;
+            }
+            isFoldLi(map:duice.data.Map){
+                if(this.foldName[map.get(this.hierarchy.name)] === true){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+            foldLi(map:duice.data.Map, li:HTMLLIElement, fold:boolean){
+                if(fold){
+                    this.foldName[map.get(this.hierarchy.name)] = true;
+                    li.classList.remove('duice-ui-ul__li--unfold');
+                    li.classList.add('duice-ui-ul__li--fold');
+                }else{
+                    this.foldName[map.get(this.hierarchy.name)] = false;
+                    li.classList.remove('duice-ui-ul__li--fold');
+                    li.classList.add('duice-ui-ul__li--unfold');
+                }
             }
             moveLi(fromIndex:number, toIndex:number):void {
                 
@@ -1966,11 +2011,20 @@ namespace duice {
                     return;
                 }
                 
+                //defines map
                 var fromMap = this.list.get(fromIndex);
                 var toMap = this.list.get(toIndex);
                 
-                // change parents
-                fromMap.set(this.hierarchy.parentName, toMap.get(this.hierarchy.name));
+                // moving action
+                if(this.hierarchy){
+                    // change parents
+                    fromMap.set(this.hierarchy.parentName, toMap.get(this.hierarchy.name));
+                }else{
+                    // changes row position
+                    this.list.move(fromIndex, toIndex);
+                }
+                
+                // notifies observers.
                 this.setChanged();
                 this.notifyObservers(this);
             }

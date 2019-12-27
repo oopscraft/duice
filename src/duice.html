@@ -378,7 +378,7 @@ h3 {
 	<!-- Section.1 -->
 	<section class="chapter">
 		<div class="chapter__headerDiv">
-			<h2>Binding between duice.data.Map and MapUIElement</h2>
+			<h2>Binding between duice.data.Map and Form Element</h2>
 		</div>
 		<div class="chapter__bodyDiv">
 			<div class="chapter__bodyDiv-dataDiv">
@@ -498,7 +498,7 @@ h3 {
 	<!-- Section.2 -->
 	<section class="chapter">
 		<div class="chapter__headerDiv">
-			<h2>Binding between duice.data.Map and MapUIElement</h2>
+			<h2>Binding between duice.data.List and Table Element</h2>
 		</div>
 		<div class="chapter__bodyDiv">
 			<div class="chapter__bodyDiv-dataDiv">
@@ -557,16 +557,16 @@ h3 {
 	<!-- Section.2 -->
 	<section class="chapter">
 		<div class="chapter__headerDiv">
-			<h2>Binding between duice.data.Map and MapUIElement</h2>
+			<h2>Binding between duice.data.List and Ul Element</h2>
 		</div>
 		<div class="chapter__bodyDiv">
 			<div class="chapter__bodyDiv-dataDiv">
-				<h3>duice.data.Collection <small>(var hierarchyUsers)</small></h3>
+				<h3>duice.data.List <small>(var hierarchyUsers)</small></h3>
 				<textarea id="hierarchyUsersTextarea" class="chapter__bodyDiv-uiDiv-jsonTextarea" style="height:600px;"></textarea>
 			</div>
 			<div class="chapter__bodyDiv-uiDiv">
 				<div style="display:flex; justify-content:space-between; align-items: flex-end;">
-					<h3>duice.ui.Table <small>(binding to duice.data.Collection)</small></h3>
+					<h3>duice.ui.UList <small>(&lt;ul is="duice-ui-ul" data-duice-bind="hierarchyUsers,user"...)</small></h3>
 					<div>
 						<button onclick="users.add(new duice.data.Map({}));">add(map)</button>
 						<button onclick="users.insert(users.getIndex(), new duice.data.Map({}));">insert(map)</button>
@@ -576,7 +576,7 @@ h3 {
 						<button onclick="users.reset();">reset()</button>
 					</div>
 				</div>
-				<ul is="duice-ui-list" data-duice-bind="hierarchyUsers,user" data-duice-hierarchy="id,parentId" data-duice-foldable="true">
+				<ul is="duice-ui-ul" data-duice-bind="hierarchyUsers,user" data-duice-editable="true">
 					<li style="margin:0.2rem 0rem;">
 						<table style="width:100%;">
 							<colgroup>
@@ -607,6 +607,74 @@ h3 {
 								<td><select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"></select></td>
 							</tr>
 						</table>
+					<li>
+				</ul>
+				<div style="display:flex; justify-content:space-between; align-items: flex-end;">
+					<h3>duice.ui.UList <small>(&lt;ul is="duice-ui-ul" data-duice-bind="hierarchyUsers,user" data-duice-hierarchy="id,parentId"...)</small></h3>
+					<div>
+						<button onclick="users.add(new duice.data.Map({}));">add(map)</button>
+						<button onclick="users.insert(users.getIndex(), new duice.data.Map({}));">insert(map)</button>
+						<button onclick="users.delete(users.getIndex());">delete(index)</button>
+						<button onclick="alert(JSON.stringify(users.toJson()));">toJson()</button>
+						<button onclick="alert(users.isDirty());">isDirty()</button>
+						<button onclick="users.reset();">reset()</button>
+					</div>
+				</div>
+				<ul is="duice-ui-ul" data-duice-bind="hierarchyUsers,user" data-duice-hierarchy="id,parentId" data-duice-editable="true">
+					<li style="margin:0.2rem 0rem;">
+						<table style="width:100%;">
+							<colgroup>
+								<col width="5%"/>
+								<col width="5%"/>
+								<col width="10%"/>
+								<col width="10%"/>
+								<col width="10%"/>
+								<col width="10%"/>
+								<col width="10%"/>
+							</colgroup>
+							<tr style="font-weight:bold;">
+								<td>Parent ID</td>
+								<td>ID</td>
+								<td>Name</td>
+								<td>Balance</td>
+								<td>Active</td>
+								<td>Hire Date</td>
+								<td>Group</td>
+							</tr>
+							<tr>
+								<td><span is="duice-ui-span" data-duice-bind="user,parentId"></span></td>
+								<td><span is="duice-ui-span" data-duice-bind="user,id"></span></td>
+								<td><input is="duice-ui-input" type="text" data-duice-bind="user,name"/></td>
+								<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance"/></td>
+								<td><input is="duice-ui-input" type="checkbox" data-duice-bind="user,active"/></td>
+								<td><input is="duice-ui-input" type="date" data-duice-bind="user,hireDate"/></td>
+								<td><select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"></select></td>
+							</tr>
+						</table>
+					<li>
+				</ul>
+				<div style="display:flex; justify-content:space-between; align-items: flex-end;">
+					<h3>duice.ui.UList <small>(&lt;ul is="duice-ui-ul" data-duice-bind="hierarchyUsers,user" data-duice-hierarchy="id,parentId"...)</small></h3>
+					<div>
+						<button onclick="users.add(new duice.data.Map({}));">add(map)</button>
+						<button onclick="users.insert(users.getIndex(), new duice.data.Map({}));">insert(map)</button>
+						<button onclick="users.delete(users.getIndex());">delete(index)</button>
+						<button onclick="alert(JSON.stringify(users.toJson()));">toJson()</button>
+						<button onclick="alert(users.isDirty());">isDirty()</button>
+						<button onclick="users.reset();">reset()</button>
+					</div>
+				</div>
+				<ul is="duice-ui-ul" data-duice-bind="hierarchyUsers,user" data-duice-hierarchy="id,parentId" data-duice-editable="true" data-duice-foldable="true">
+					<li style="margin:0.2rem 0rem;">
+						<div style="border-bottom:dotted 1px #ccc;">
+							<span is="duice-ui-span" data-duice-bind="user,parentId"></span>
+							<span is="duice-ui-span" data-duice-bind="user,id"></span>
+							<input is="duice-ui-input" type="text" data-duice-bind="user,name"/>
+							<input is="duice-ui-input" type="number" data-duice-bind="user,balance"/>
+							<input is="duice-ui-input" type="checkbox" data-duice-bind="user,active"/>
+							<input is="duice-ui-input" type="date" data-duice-bind="user,hireDate"/>
+							<select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"></select>
+						</div>
 					<li>
 				</ul>
 			</div>
