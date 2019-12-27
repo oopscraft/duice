@@ -697,8 +697,6 @@ namespace duice {
         }
     }
     
-
-    
     /**
      * duice.data
      */
@@ -724,7 +722,7 @@ namespace duice {
             parentNode:Map;
             childNodes:Array<Map> = new Array<Map>();
             enable:boolean = true;
-            readonlyNames:Array<string> = new Array<string>();
+            readonly:Array<string> = new Array<string>();
             constructor(json?:any, __childName?:string) {
                 super();
                 if(json){
@@ -809,6 +807,13 @@ namespace duice {
             getChildNode(index:number):Map {
                 return this.childNodes[index];
             }
+            getChildNodeByPath(path:Array<number>):Map {
+                var node:Map = this;
+                path.forEach(function(index){
+                    node = node.getChildNode(index);
+                });
+                return node;
+            }
             addChildNode(node:Map):void {
                 node.setParentNode(this);
                 this.childNodes.push(node);
@@ -829,14 +834,14 @@ namespace duice {
                 return this.enable;
             }
             setReadonly(name:string, readonly:boolean):void {
-                if(this.readonlyNames.indexOf(name) == -1){
-                    this.readonlyNames.push(name);
+                if(this.readonly.indexOf(name) == -1){
+                    this.readonly.push(name);
                 }
                 this.setChanged();
                 this.notifyObservers(this);
             }
             isReadonly(name:string):boolean {
-                if(this.readonlyNames.indexOf(name) >= 0){
+                if(this.readonly.indexOf(name) >= 0){
                     return true;
                 }else{
                     return false;
@@ -845,9 +850,9 @@ namespace duice {
         }
         
         /**
-         * duice.data.Collection
+         * duice.data.List
          */
-        export class Collection extends DataObject {
+        export class List extends DataObject {
             data:Array<duice.data.Map> = new Array<duice.data.Map>();
             originData:string;
             index:number = -1;
@@ -858,7 +863,7 @@ namespace duice {
                 }
             }
             update(observable:Observable, obj:object):void {
-                console.log('Collection.update');
+                console.log('List.update');
                 this.setChanged();
                 this.notifyObservers(obj);
             }
@@ -870,7 +875,7 @@ namespace duice {
                     this.data.push(map);
                 }
                 this.originData = JSON.stringify(this.toJson());
-                this.index = -1;
+                this.clearIndex();
                 this.setChanged();
                 this.notifyObservers(this);
             }
@@ -952,113 +957,7 @@ namespace duice {
                 this.setChanged();
                 this.notifyObservers(this);
             }
-            forEach(handler:Function):void {
-                for(var i = 0, size = this.data.length; i < size; i ++){
-                    handler.call(this, this.data[i]);
-                }
-            }
-            findIndex(handler:Function):number {
-                for(var i = 0, size = this.data.length; i < size; i ++){
-                    if(handler.call(this, this.data[i]) === true){
-                        return i;
-                    }
-                }
-                return -1;
-            }
-            findIndexes(handler:Function):Array<number> {
-                var indexes = [];
-                for(var i = 0, size = this.data.length; i < size; i ++){
-                    if(handler.call(this, this.data[i]) === true){
-                        indexes.push(i);
-                    }
-                }
-                return indexes;
-            }
-            findNode(handler:Function):Map {
-                var index = this.findIndex(handler);
-                return this.get(index);
-            }
-            findNodes(handler:Function):Array<Map> {
-                var indexes = this.findIndexes(handler);
-                var rows = new Array();
-                for(var i = 0, size = indexes.length; i < size; i ++){
-                    var node = this.get(indexes[i]);
-                    rows.push(node);
-                }
-                return rows;
-            }
         }
-        
-//        /**
-//         * duice.data.Tree
-//         */
-//        export class Tree extends DataObject {
-//            rootNode:duice.data.Map = new duice.data.Map({});
-//            index:any = [];
-//            constructor(jsonArray:Array<any>, childName:string) {
-//                super();
-//                this.fromJson(jsonArray, childName);
-//            }
-//            update(observable:Observable, obj:object):void {
-//                this.setChanged();
-//                this.notifyObservers(obj);
-//            }
-//            fromJson(jsonArray: Array<any>, childName:string): void {
-//                this.rootNode = new duice.data.Map({});
-//                for (var i = 0; i < jsonArray.length; i++) {
-//                    var json = jsonArray[i];
-//                    var childNode = createNodeTree(json, childName);
-//                    this.rootNode.addChildNode(childNode);
-//                }
-//
-//                // traverse function
-//                function createNodeTree(json: any, childName:string) {
-//                    var node = new duice.data.Map(json);
-//                    var childs = json[childName];
-//                    if (Array.isArray(childs)) {
-//                        for (var i = 0, size = childs.length; i < size; i++) {
-//                            var child = childs[i];
-//                            var childNode = createNodeTree(child, childName);
-//                            node.addChildNode(childNode);
-//                        }
-//                    }
-//                    return node;
-//                }
-//
-//                // set other properties.
-//                this.index = [];
-//                this.setChanged();
-//                this.notifyObservers(this);
-//            }
-//            toJson(childName: string): Array<object> {
-//                var jsonArray = new Array();
-//                var childNodes = this.rootNode.getChildNodes();
-//                for (var i = 0, size = childNodes.length; i < size; i++){
-//                    var childNode = childNodes[i];
-//                    var json = createJsonTree(childNode, childName);
-//                    jsonArray.push(json);
-//                }
-//
-//                // traverse function
-//                function createJsonTree(node: duice.data.Map, childName:string) {
-//                    var json:any = node.toJson();
-//                    json[childName] = new Array();
-//                    var childNodes = node.getChildNodes();
-//                    for (var i = 0, size = childNodes.length; i < size; i++){
-//                        var childJson = createJsonTree(childNodes[i], childName);
-//                        json[childName].push(childJson);
-//                    }
-//                    return json;
-//                }
-//
-//                // return jsonArray
-//                return jsonArray;
-//            }
-//            getRootNode():duice.data.Map {
-//                return this.rootNode;
-//            }
-//        }
-
     }
     
     /**
@@ -1078,7 +977,7 @@ namespace duice {
             for(var i = 0; i < listElements.length; i++ ) {
                 try {
                     var element:any = listElements[i];
-                    duice.ui.ListFactory.getList(element, $context);
+                    duice.ui.UListFactory.getUList(element, $context);
                 }catch(e){
                     console.error(e,element);
                     throw e;
@@ -1723,7 +1622,7 @@ namespace duice {
          */
         export class Select extends MapUIElement {
             select:HTMLSelectElement;
-            optionList:duice.data.Collection;
+            optionList:duice.data.List;
             optionValue:string;
             optionText:string;
             defaultOptions:Array<HTMLOptionElement> = new Array<HTMLOptionElement>();
@@ -1742,12 +1641,12 @@ namespace duice {
                     this.defaultOptions.push(this.select.options[i])
                 }
             }
-            setOption(list:duice.data.Collection, value:string, text:string):void {
+            setOption(list:duice.data.List, value:string, text:string):void {
                 this.optionList = list;
                 this.optionValue = value;
                 this.optionText = text;
                 var $this = this;
-                function updateOption(optionList:duice.data.Collection){
+                function updateOption(optionList:duice.data.List){
                     
                     // removes all options
                     removeChildNodes($this.select);
@@ -1768,7 +1667,7 @@ namespace duice {
                 }
                 updateOption(this.optionList);
                 this.optionList.addObserver({
-                    update(list:duice.data.Collection):void {
+                    update(list:duice.data.List):void {
                         updateOption(list);
                     }
                 });
@@ -1822,25 +1721,25 @@ namespace duice {
         }
         
         /**
-         * duice.ui.CollectionUIElement
+         * duice.ui.ListUIElement
          */
-        export abstract class CollectionUIElement extends UIElement {
-            collection:duice.data.Collection;
+        export abstract class ListUIElement extends UIElement {
+            list:duice.data.List;
             item:string;
-            bind(list:duice.data.Collection, item:string):void {
-                this.collection = list;
+            bind(list:duice.data.List, item:string):void {
+                this.list = list;
                 this.item = item;
-                this.collection.addObserver(this);
-                this.addObserver(this.collection);
-                this.update(this.collection, this);
+                this.list.addObserver(this);
+                this.addObserver(this.list);
+                this.update(this.list, this);
             }
-            getCollection():duice.data.Collection {
-                return this.collection;
+            getList():duice.data.List {
+                return this.list;
             }
             getItem():string {
                 return this.item;
             }
-            abstract update(collection:duice.data.Collection, obj:object):void;
+            abstract update(list:duice.data.List, obj:object):void;
         }
         
         /**
@@ -1861,11 +1760,11 @@ namespace duice {
         /**
          * duice.ui.TableViewer
          */
-        export class Table extends CollectionUIElement {
+        export class Table extends ListUIElement {
             table:HTMLTableElement;
             thead:HTMLTableSectionElement;
             tbody:HTMLTableSectionElement;
-            rows:Array<HTMLTableSectionElement> = new Array<HTMLTableSectionElement>();
+            tbodies:Array<HTMLTableSectionElement> = new Array<HTMLTableSectionElement>();
             editable:boolean;
             constructor(table:HTMLTableElement) {
                 super(table);
@@ -1881,7 +1780,7 @@ namespace duice {
             setEditable(editable:boolean):void {
                 this.editable = editable;
             }
-            update(collection:duice.data.Collection, obj:object):void {
+            update(list:duice.data.List, obj:object):void {
                 
                 // checks changed source instance
                 if(obj instanceof duice.data.Map){
@@ -1891,128 +1790,141 @@ namespace duice {
                 var $this = this;
                 
                 // remove previous rows
-                for(var i = 0; i < this.rows.length; i ++ ) {
-                    this.table.removeChild(this.rows[i]);
+                for(var i = 0; i < this.tbodies.length; i ++ ) {
+                    this.table.removeChild(this.tbodies[i]);
                 }
-                this.rows.length = 0;
+                this.tbodies.length = 0;
                 
                 // creates new rows
-                for(var index = 0; index < collection.getSize(); index ++ ) {
-                    var map = collection.get(index);
-                    var row = this.createRow(index,map);
-                    row.dataset.duiceIndex = String(index);
+                for(var index = 0; index < list.getSize(); index ++ ) {
+                    var map = list.get(index);
+                    var tbody = this.createTbody(index,map);
+                    tbody.dataset.duiceIndex = String(index);
                     
                     // select index
-                    if(index == collection.index){
-                        row.classList.add('duice-ui-table__tbody--index');
+                    if(index === list.getIndex()){
+                        tbody.classList.add('duice-ui-table__tbody--index');
                     }
-                    row.addEventListener('mousedown', function(event){
-                        for(var i = 0; i < $this.rows.length; i ++ ) {
-                            $this.rows[i].classList.remove('duice-ui-table__tbody--index');
+                    tbody.addEventListener('mousedown', function(event){
+                        for(var i = 0; i < $this.tbodies.length; i ++ ) {
+                            $this.tbodies[i].classList.remove('duice-ui-table__tbody--index');
                         }
                         this.classList.add('duice-ui-table__tbody--index');
-                        collection.index = Number(this.dataset.duiceIndex);
+                        list.index = Number(this.dataset.duiceIndex);
                     });
                     
                     // drag and drop event
                     if(this.editable === true) {
-                        row.setAttribute('draggable', 'true');
-                        row.addEventListener('dragstart', function(event){
+                        tbody.setAttribute('draggable', 'true');
+                        tbody.addEventListener('dragstart', function(event){
                             event.dataTransfer.setData("fromIndex", this.dataset.duiceIndex);
                         });
-                        row.addEventListener('dragover', function(event){
+                        tbody.addEventListener('dragover', function(event){
                             event.preventDefault();
                             event.stopPropagation();
                         });
-                        row.addEventListener('drop', function(event){
+                        tbody.addEventListener('drop', function(event){
                             event.preventDefault();
                             event.stopPropagation();
                             var fromIndex = parseInt(event.dataTransfer.getData('fromIndex'));
                             var toIndex = parseInt(this.dataset.duiceIndex);
-                            collection.move(fromIndex, toIndex);
-                            row.click();
+                            list.move(fromIndex, toIndex);
+                            tbody.click();
                         });
                     }
                     
-                    this.table.appendChild(row);
-                    this.rows.push(row);
+                    this.table.appendChild(tbody);
+                    this.tbodies.push(tbody);
                 }
                 
                 // not found row
-                if(collection.getSize() < 1) {
-                    var emptyRow = this.createEmptyRow();
-                    this.table.appendChild(emptyRow);
-                    this.rows.push(emptyRow);
+                if(list.getSize() < 1) {
+                    var emptyTbody = this.createEmptyTbody();
+                    this.table.appendChild(emptyTbody);
+                    this.tbodies.push(emptyTbody);
                 }
             }
-            createRow(index:number, map:duice.data.Map):HTMLTableSectionElement {
+            createTbody(index:number, map:duice.data.Map):HTMLTableSectionElement {
                 var $this = this;
-                var row:HTMLTableSectionElement = <HTMLTableSectionElement>this.tbody.cloneNode(true);
+                var tbody:HTMLTableSectionElement = <HTMLTableSectionElement>this.tbody.cloneNode(true);
                 var $context:any = new Object;
                 $context['index'] = index;
                 $context[this.item] = map;
-                row = executeExpression(<HTMLElement>row, $context);
-                initialize(row,$context);
-                return row;
+                tbody = executeExpression(<HTMLElement>tbody, $context);
+                initialize(tbody,$context);
+                return tbody;
             }
-            createEmptyRow():HTMLTableSectionElement {
-                var emptyRow:HTMLTableSectionElement = <HTMLTableSectionElement>this.tbody.cloneNode(true);
-                removeChildNodes(emptyRow);
-                emptyRow.classList.add('duice-ui-tableViewer-empty')
+            createEmptyTbody():HTMLTableSectionElement {
+                var emptyTbody:HTMLTableSectionElement = <HTMLTableSectionElement>this.tbody.cloneNode(true);
+                removeChildNodes(emptyTbody);
+                emptyTbody.classList.add('duice-ui-table__tbody--empty')
                 var tr = document.createElement('tr');
                 var td = document.createElement('td');
                 var colspan = this.tbody.querySelectorAll('tr > td').length;
                 td.setAttribute('colspan',String(colspan));
                 var emptyMessage = document.createElement('div');
-                emptyMessage.classList.add('duice-ui-tableViewer-empty-message');
+                emptyMessage.classList.add('duice-ui-table__tbody--empty-message');
                 td.appendChild(emptyMessage);
                 tr.appendChild(td);
-                emptyRow.appendChild(tr);
-                return emptyRow;
+                emptyTbody.appendChild(tr);
+                return emptyTbody;
             }
         }
         
         /**
-         * duice.ui.ListFactory
+         * duice.ui.UListFactory
          */
-        export var ListFactory = {
-            getList(element:HTMLUListElement, $context:any):List {
-                var list = new List(element);
+        export var UListFactory = {
+            getUList(element:HTMLUListElement, $context:any):UList {
+                var uList = new UList(element);
+                if(element.dataset.duiceFoldable){
+                    uList.setFoldable(Boolean(element.dataset.duiceFoldable));
+                }
                 if(element.dataset.duiceEditable){
-                    list.setEditable(Boolean(element.dataset.duiceEditable));
+                    uList.setEditable(Boolean(element.dataset.duiceEditable));
                 }
                 var bind = element.dataset.duiceBind.split(',');
-                list.bind(getObject($context, bind[0]), bind[1]);
-                return list;
+                uList.bind(getObject($context, bind[0]), bind[1]);
+                return uList;
             }
         }
         
         /**
-         * duice.ui.List
+         * duice.ui.UList
          */
-        export class List extends CollectionUIElement {
+        export class UList extends ListUIElement {
             ul:HTMLUListElement;
             li:HTMLLIElement;
             lis:Array<HTMLLIElement> = new Array<HTMLLIElement>();
+            foldable:boolean;
             editable:boolean;
             constructor(ul:HTMLUListElement) {
                 super(ul);
                 this.ul = ul;
-                this.ul.classList.add('duice-ui-list');
+                this.ul.classList.add('duice-ui-ul');
                 var li = <HTMLLIElement>this.ul.querySelector('li');
                 this.li = <HTMLLIElement>li.cloneNode(true);
                 this.ul.innerHTML = '';
             }
+            setFoldable(foldable:boolean):void {
+                this.foldable = foldable;
+                if(this.foldable === true) {
+                    this.ul.classList.add('duice-ui-ul--foldable');
+                }else{
+                    this.ul.classList.remove('duice-ui-ul--foldable');
+                }
+            }
             setEditable(editable:boolean):void {
                 this.editable = editable;
             }
-            update(collection:duice.data.Collection, obj:object):void {
+            update(list:duice.data.List, obj:object):void {
                 
                 // checks changed source instance
                 if(obj instanceof duice.data.Map){
                     return;
                 }
-                console.log('####collection', collection);
+                
+                console.log('####list', list);
                 var $this = this;
               
                 // remove previous rows
@@ -2022,37 +1934,118 @@ namespace duice {
                 this.lis.length = 0;
               
                 // creates new rows
-                for(var index = 0; index < collection.getSize(); index ++ ) {
-                    var map = collection.get(index);
-                    var li = this.createLi(index,map);
+                for(var i = 0; i < list.getSize(); i ++ ) {
+                    var map = list.get(i);
+                    var path:Array<number> = [];
+                    var li = this.createLi(i, path, map);
                     this.ul.appendChild(li);
                     this.lis.push(li);
                 }
             }
-            createLi(index:number, map:duice.data.Map):HTMLLIElement {
+            createLi(index:number, path:Array<number>, map:duice.data.Map):HTMLLIElement {
                 var $this = this;
                 var li:HTMLLIElement = <HTMLLIElement>this.li.cloneNode(true);
+                li.classList.add('duice-ui-ul__li');
                 var $context:any = new Object;
                 $context['index'] = index;
+                $context['path'] = JSON.stringify(path);
                 $context[this.item] = map;
                 li = executeExpression(<HTMLElement>li, $context);
                 initialize(li,$context);
-                
-                console.log('####map', map);
+                li.dataset.duiceIndex = String(index);
+                li.dataset.duicePath = JSON.stringify(path);
+
+                // drag and drop
+                li.setAttribute('draggable', 'true');
+                li.addEventListener('dragstart', function(event){
+                    event.stopPropagation();
+                    event.dataTransfer.setData("fromIndex", this.dataset.duiceIndex);
+                    event.dataTransfer.setData("fromPath", this.dataset.duicePath);
+                    
+                });
+                li.addEventListener('dragover', function(event){
+                    event.preventDefault();
+                    event.stopPropagation();
+                });
+                li.addEventListener('drop', function(event){
+                    event.preventDefault();
+                    event.stopPropagation();
+                    console.log('drop', this.dataset.duiceIndex);
+                    console.log('index', this.dataset.duiceIndex);
+                    console.log('path', this.dataset.duicePath);
+                    
+                    var fromIndex = parseInt(event.dataTransfer.getData('fromIndex'));
+                    var fromPath = JSON.parse(event.dataTransfer.getData('fromPath'));
+                    var toIndex = parseInt(this.dataset.duiceIndex);
+                    var toPath = JSON.parse(this.dataset.duicePath);
+                    $this.moveLi(fromIndex, fromPath, toIndex, toPath);
+                });
                 
                 // create child nodes
                 var childNodes = map.getChildNodes();
                 if(childNodes && childNodes.length > 0){
-                    console.log('############');
-                    var ul = document.createElement('ul');
+                    var ul = <HTMLUListElement>this.ul.cloneNode(true);
+                    var childPath = path.slice();
+                    childPath.push(0);
                     for(var i = 0, size = childNodes.length; i < size; i ++){
                         var childNode = childNodes[i];
-                        var childLi = this.createLi(i, childNode);
+                        childPath[childPath.length-1] = i;
+                        var childLi = this.createLi(index, childPath, childNode);
                         ul.appendChild(childLi);
                     }
                     li.appendChild(ul);
                 }
                 return li;
+            }
+            moveLi(fromIndex:number, fromPath:Array<number>, toIndex:number, toPath:Array<number>):void {
+                console.log('#### fromIndex', fromIndex);
+                console.log('#### fromPath', fromPath);
+                console.log('#### toIndex', toIndex);
+                console.log('#### toPath', toPath);
+
+                var fromMap = this.list.get(fromIndex).getChildNodeByPath(fromPath);
+                var toMap = this.list.get(toIndex).getChildNodeByPath(toPath);
+                
+//                if(fromPath.length === 0){
+//                    this.list.remove(fromIndex);
+//                }else{
+//                    var fromMap = this.list.get(fromIndex);
+//                    for(var i = 0; i < fromPath.length; i ++ ){
+//                        console.log('#3#####:', fromPath[i]);
+//                        fromMap = fromMap.getChildNode(fromPath[i])    
+//                    }
+//                    fromMap.getParentNode().removeChildNode(fromPath[fromPath.length-1]);
+//                }
+//
+//                var toMap = this.list.get(toIndex);
+//                for(var i = 0; i < toPath.length; i ++ ){
+//                    toMap = toMap.getChildNode(toPath[i])    
+//                }
+                
+                console.log('moveLi:',fromMap.get('id') + '==>' + toMap.get('id'));
+                
+//                fromMap.getParentNode().removeChildNode(fromPath[fromPath.length-1]);
+//                toMap.addChildNode(fromMap);
+                
+                
+                
+                
+                // sibling
+                if(fromMap.getParentNode() === toMap.getParentNode()){
+                    fromMap.getParentNode().removeChildNode(fromPath[fromPath.length-1]);
+                    toMap.getParentNode().insertChildNode(toPath[toPath.length-1], fromMap);
+                }else{
+                    fromMap.getParentNode().removeChildNode(fromPath[fromPath.length-1]);
+                    toMap.addChildNode(fromMap);
+                }
+                
+
+
+
+                
+                this.setChanged();
+                this.notifyObservers(this);
+                
             }
         }
         

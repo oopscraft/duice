@@ -26,9 +26,9 @@ user.fromJson({
 });
 
 /**
- * groups(duice.data.Collection) for select options
+ * groups(duice.data.List) for select options
  */
-var groups = new duice.data.Collection();
+var groups = new duice.data.List();
 groups.fromJson([
 	{id:"fruit", name:"Fruit"},
 	{id:"animal", name:"Animal"},
@@ -36,9 +36,9 @@ groups.fromJson([
 ]);
 
 /**
- * users(duice.data.Collection)
+ * users(duice.data.List)
  */
-var users = new duice.data.Collection();
+var users = new duice.data.List();
 users.fromJson([
 	{
 		id:'dog',
@@ -163,9 +163,9 @@ users.fromJson([
 ]);
 
 /**
- * treeUsers(duice.data.Collection)
+ * treeUsers(duice.data.List)
  */
-var treeUsers = new duice.data.Collection([
+var treeUsers = new duice.data.List([
 	{
 		id:'apple',
 		name:'Apple',
@@ -179,7 +179,7 @@ var treeUsers = new duice.data.Collection([
 		profile:'I am Apple',
 		childs: [
 			{
-				id:'rabbit',
+				id:'rabbit1',
 				name:'Bunny',
 				balance:77100.00,
 				active:true,
@@ -188,7 +188,33 @@ var treeUsers = new duice.data.Collection([
 				birthday:854636400000,
 				score:20,
 				groupId:'animal',
-				profile:'I am Bunny'
+				profile:'I am Bunny',
+				childs: [
+					{
+						id:'rabbit2',
+						name:'Bunny',
+						balance:77100.00,
+						active:true,
+						gender:'F',
+						hireDate:1576647474398,
+						birthday:854636400000,
+						score:20,
+						groupId:'animal',
+						profile:'I am Bunny'
+					},
+					{
+						id:'rabbit3',
+						name:'Bunny',
+						balance:77100.00,
+						active:true,
+						gender:'F',
+						hireDate:1576647474398,
+						birthday:854636400000,
+						score:20,
+						groupId:'animal',
+						profile:'I am Bunny'
+					}
+				]
 			},
 			{
 				id:'bob',
@@ -217,7 +243,7 @@ var treeUsers = new duice.data.Collection([
 		profile:'I am Candy'
 	},
 	{
-		id:'apple',
+		id:'apple3',
 		name:'Apple',
 		balance:77100.00,
 		active:true,
@@ -509,7 +535,7 @@ h3 {
 					<div>
 						<button onclick="users.add(new duice.data.Map({}));">add(map)</button>
 						<button onclick="users.insert(users.getIndex(), new duice.data.Map({}));">insert(map)</button>
-						<button onclick="users.remove(users.getIndex());">remove(index)</button>
+						<button onclick="users.delete(users.getIndex());">delete(index)</button>
 						<button onclick="alert(JSON.stringify(users.toJson()));">toJson()</button>
 						<button onclick="alert(users.isDirty());">isDirty()</button>
 						<button onclick="users.reset();">reset()</button>
@@ -568,13 +594,13 @@ h3 {
 					<div>
 						<button onclick="users.add(new duice.data.Map({}));">add(map)</button>
 						<button onclick="users.insert(users.getIndex(), new duice.data.Map({}));">insert(map)</button>
-						<button onclick="users.remove(users.getIndex());">remove(index)</button>
+						<button onclick="users.delete(users.getIndex());">delete(index)</button>
 						<button onclick="alert(JSON.stringify(users.toJson()));">toJson()</button>
 						<button onclick="alert(users.isDirty());">isDirty()</button>
 						<button onclick="users.reset();">reset()</button>
 					</div>
 				</div>
-				<ul is="duice-ui-list" data-duice-bind="treeUsers,user">
+				<ul is="duice-ui-list" data-duice-bind="treeUsers,user" data-duice-foldable="true">
 					<li style="margin:0.2rem 0rem;">
 						<table style="width:100%;">
 							<colgroup>
@@ -587,7 +613,10 @@ h3 {
 								<col width="10%"/>
 							</colgroup>
 							<tr style="font-weight:bold;">
-								<td rowspan="2" style="width:30px; text-align:center; border-right:dotted 1px #ccc;">[[$context.index+1]]</td>
+								<td rowspan="2" style="width:30px; text-align:center; border-right:dotted 1px #ccc;">
+									[[$context.index]]
+									[[$context.path]]
+								</td>
 								<td>ID</td>
 								<td>Name</td>
 								<td>Balance</td>
