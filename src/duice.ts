@@ -546,14 +546,29 @@ namespace duice {
      * @param element
      */
     function setPositionCentered(element:HTMLElement):void {
-        var window = this.getCurrentWindow();
-        var computedStyle = window.getComputedStyle(element);
+        var win = getCurrentWindow();
+        var computedStyle = win.getComputedStyle(element);
         var computedWidth = parseInt(computedStyle.getPropertyValue('width').replace(/px/gi, ''));
         var computedHeight = parseInt(computedStyle.getPropertyValue('height').replace(/px/gi, ''));
-        element.style.width = Math.min(window.screen.width-20, computedWidth) + 'px';
-        element.style.height = Math.min(window.screen.height, computedHeight) + 'px';
-        element.style.left = Math.max(10,window.innerWidth/2 - computedWidth/2) + 'px';
-        element.style.top = Math.max(0,window.innerHeight/2 - computedHeight/2) + 'px';
+        element.style.left = Math.max(10,win.innerWidth/2 - computedWidth/2) + win.scrollX + 'px';
+        element.style.top = Math.max(0,win.innerHeight/2 - computedHeight/2) + win.scrollY + 'px';
+    }
+
+    /**
+     * cumulativeOffset
+     * @param element
+     */
+    function cumulativeOffset(element:any) {
+        var top = 0, left = 0;
+        do {
+            top += element.offsetTop  || 0;
+            left += element.offsetLeft || 0;
+            element = element.offsetParent;
+        } while(element);
+        return {
+            top: top,
+            left: left
+        };
     }
     
     /**
@@ -570,6 +585,21 @@ namespace duice {
                 clearInterval(interval);
             }
         },200); 
+    }
+    
+    /**
+     * getCurrentMaxZIndex
+     */
+    function getCurrentMaxZIndex():number {
+        var zIndex,
+        z = 0,
+        all = document.getElementsByTagName('*');
+        for (var i = 0, n = all.length; i < n; i++) {
+            zIndex = document.defaultView.getComputedStyle(all[i],null).getPropertyValue("z-index");
+            zIndex = parseInt(zIndex, 10);
+            z = (zIndex) ? Math.max(z, zIndex) : z;
+        }
+        return z;
     }
     
     /**
@@ -591,31 +621,16 @@ namespace duice {
     }
     
     /**
-     * getCurrentMaxZIndex
-     */
-    function getCurrentMaxZIndex():number {
-        var zIndex,
-        z = 0,
-        all = document.getElementsByTagName('*');
-        for (var i = 0, n = all.length; i < n; i++) {
-            zIndex = document.defaultView.getComputedStyle(all[i],null).getPropertyValue("z-index");
-            zIndex = parseInt(zIndex, 10);
-            z = (zIndex) ? Math.max(z, zIndex) : z;
-        }
-        return z;
-    }
-    
-    /**
      * block
      * @param element
      */
     function block(element:HTMLElement):object {
         
         var div = document.createElement('div');
-        div.classList.add('duice-ui-block');
+        div.classList.add('duice-block');
         
         // defines maxZIndex
-        var zIndex = this.getCurrentMaxZIndex() + 1;
+        var zIndex = getCurrentMaxZIndex() + 1;
         
         // adjusting position
         div.style.position = 'fixed';
@@ -819,7 +834,7 @@ namespace duice {
                 }
             }
             update(observable:Observable, obj:object):void {
-                console.log('List.update');
+                console.log('List.update', observable, obj);
                 this.setChanged();
                 this.notifyObservers(obj);
             }
@@ -1472,6 +1487,7 @@ namespace duice {
                 this.input.parentNode.insertBefore(this.pickerDiv, this.input.nextSibling);
                 this.pickerDiv.style.position = 'absolute';
                 this.pickerDiv.style.zIndex = String(getCurrentMaxZIndex() + 1);
+                this.pickerDiv.style.left = cumulativeOffset(this.input).left + 'px';
                 this.pickerDiv.style.margin = '0px';
                 
                 // updates date
@@ -1855,6 +1871,7 @@ namespace duice {
         export class UList extends ListUIElement {
             ul:HTMLUListElement;
             li:HTMLLIElement;
+            lis:Array<HTMLLIElement> = new Array<HTMLLIElement>();
             hierarchy:{ name:string, parentName:string }
             foldable:boolean;
             foldName:any = {};
@@ -1882,20 +1899,42 @@ namespace duice {
                     return;
                 }
                 
-                // defines
+                // initiates
                 var $this = this;
-                
-                // clear child elements
                 this.ul.innerHTML = '';
+                this.lis.length = 0;
                 
                 // hierarchy 
                 if(this.hierarchy){
                     this.ul.classList.add('duice-ui-ul--hierarchy');
+                    
+                    // add root event
+                    this.ul.addEventListener('dragover', function(event){
+                        event.preventDefault();
+                        event.stopPropagation();
+                        $this.ul.classList.add('duice-ui-ul--hierarchy-dragover');
+                    });
+                    this.ul.addEventListener('dragleave', function(event){
+                        event.preventDefault();
+                        event.stopPropagation();
+                        $this.ul.classList.remove('duice-ui-ul--hierarchy-dragover');
+                    });
+                    this.ul.addEventListener('drop', function(event){
+                        event.preventDefault();
+                        event.stopPropagation();
+                        var fromIndex = parseInt(event.dataTransfer.getData('fromIndex'));
+                        var fromMap = $this.list.get(fromIndex);
+                        fromMap.set($this.hierarchy.parentName, null);
+                        $this.ul.classList.remove('duice-ui-ul--hierarchy-dragover');
+                        $this.setChanged();
+                        $this.notifyObservers(this);
+                        console.log(event);
+                    });
                 }
               
                 // creates new rows
-                for(var i = 0; i < list.getSize(); i ++ ) {
-                    var map = list.get(i);
+                for(var index = 0; index < list.getSize(); index ++ ) {
+                    var map = list.get(index);
                     var path:Array<number> = [];
                     
                     // checks hierarchy
@@ -1906,8 +1945,19 @@ namespace duice {
                     }
                     
                     // creates LI element
-                    var li = this.createLi(i, map);
+                    var li = this.createLi(index, map);
                     this.ul.appendChild(li);
+                }
+                
+                // creates orphans
+                if(this.hierarchy){
+                    for(var index = 0, size = list.getSize(); index < size; index ++ ) {
+                        if(this.isLiCreated(index) === false){
+                            var orphanLi = this.createLi(index, list.get(index));
+                            orphanLi.classList.add('duice-ui-ul__li--orphan');
+                            this.ul.appendChild(orphanLi);
+                        }
+                    }
                 }
             }
             createLi(index:number, map:duice.data.Map):HTMLLIElement {
@@ -1919,6 +1969,7 @@ namespace duice {
                 $context[this.item] = map;
                 li = executeExpression(<HTMLElement>li, $context);
                 initialize(li,$context);
+                this.lis.push(li);
                 li.dataset.duiceIndex = String(index);
 
                 // editable
@@ -1943,7 +1994,6 @@ namespace duice {
 
                 // creates child node
                 if(this.hierarchy) {
-                    
                     var childUl = document.createElement('ul');
                     childUl.classList.add('duice-ui-ul');
                     var hasChild:boolean = false;
@@ -1958,7 +2008,7 @@ namespace duice {
                     }
                     li.appendChild(childUl);
                     
-                    // sets foldable
+                    // sets fold 
                     if(this.foldable === true) {
                         if(hasChild) {
                             if(this.isFoldLi(map)){
@@ -1985,6 +2035,14 @@ namespace duice {
 
                 // return node element
                 return li;
+            }
+            isLiCreated(index:number):boolean {
+                for(var i = 0, size = this.lis.length; i < size; i ++ ){
+                    if(parseInt(this.lis[i].dataset.duiceIndex) === index){
+                        return true;
+                    }
+                }
+                return false;
             }
             isFoldLi(map:duice.data.Map){
                 if(this.foldName[map.get(this.hierarchy.name)] === true){
@@ -2019,40 +2077,169 @@ namespace duice {
                 if(this.hierarchy){
                     // change parents
                     fromMap.set(this.hierarchy.parentName, toMap.get(this.hierarchy.name));
+                    
+                    // notifies observers.
+                    this.setChanged();
+                    this.notifyObservers(this);
                 }else{
                     // changes row position
                     this.list.move(fromIndex, toIndex);
                 }
-                
-                // notifies observers.
-                this.setChanged();
-                this.notifyObservers(this);
             }
         }
+        
+        /**
+         * new duice.ui.Blocker(this.div).block().unblock();
+         * 
+         */
+        export class Blocker {
+            element:HTMLElement;
+            div:HTMLDivElement;
+            constructor(element:HTMLElement){
+                this.element = element;
+                this.div = document.createElement('div');
+                this.div.classList.add('duice-ui-blocker');
+            }
+            block():void {
+                
+                // adjusting position
+                this.div.style.position = 'fixed';
+                this.div.style.zIndex = String(getCurrentMaxZIndex() + 1);
+                
+                // full blocking in case of BODY
+                if(this.element.tagName == 'BODY'){
+                    this.div.style.width = '100%';
+                    this.div.style.height = '100%';
+                    this.div.style.top = '0px';
+                    this.div.style.left = '0px';
+                }
+                // otherwise adjusting to parent element
+                else{
+                    var boundingClientRect = this.element.getBoundingClientRect();
+                    var width = boundingClientRect.width;
+                    var height = boundingClientRect.height;
+                    var left = boundingClientRect.left;
+                    var top = boundingClientRect.top;
+                    this.div.style.width = width + "px";
+                    this.div.style.height = height + "px";
+                    this.div.style.top = top + 'px';
+                    this.div.style.left = left + 'px';
+                }
+                
+                // append
+                this.element.appendChild(this.div);
+            }
+            unblock():void {
+                this.element.removeChild(this.div);
+            }
+        }
+        
+        export abstract class Modal {
+            container:HTMLDivElement;
+            headerDiv:HTMLDivElement;
+            bodyDiv:HTMLDivElement;
+            blocker:duice.ui.Blocker;
+            constructor(){
+                var $this = this;
+                this.container = document.createElement('div');
+                this.container.classList.add('duice-ui-model');
+                
+                this.headerDiv = document.createElement('div');
+                this.headerDiv.classList.add('duice-ui-modal__headerDiv');
+                this.container.appendChild(this.headerDiv);
+                
+                // drag
+                this.headerDiv.style.cursor = 'move';
+                this.headerDiv.onmousedown = function(ev){
+                    var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+                    pos3 = ev.clientX;
+                    pos4 = ev.clientY;
+                    getCurrentWindow().document.onmouseup = function(ev){ 
+                        getCurrentWindow().document.onmousemove = null;
+                        getCurrentWindow().document.onmouseup = null;
+                    };
+                    getCurrentWindow().document.onmousemove = function(ev){
+                        pos1 = pos3 - ev.clientX;
+                        pos2 = pos4 - ev.clientY;
+                        pos3 = ev.clientX;
+                        pos4 = ev.clientY;
+                        $this.container.style.left = ($this.container.offsetLeft - pos1) + 'px';
+                        $this.container.style.top = ($this.container.offsetTop - pos2) + 'px';
+                    };
+                };
+                
+                var titleIcon = document.createElement('span');
+                titleIcon.classList.add('duice-ui-modal__headerDiv-titleIcon');
+                this.headerDiv.appendChild(titleIcon);
+                
+                var closeButton = document.createElement('span');
+                closeButton.classList.add('duice-ui-modal__headerDiv-closeButton');
+                closeButton.addEventListener('click', function(event){
+                   $this.close();
+                });
+                this.headerDiv.appendChild(closeButton);
+                
+                this.bodyDiv = document.createElement('div');
+                this.container.appendChild(this.bodyDiv);
+                
+                // adds blocker
+                this.blocker = new Blocker(getCurrentWindow().document.body);
+            }
+            open():void {
+                // block
+                this.blocker.block();
+                
+                // opens modal
+                this.container.style.display = 'block';
+                this.container.style.position = 'absolute';
+                this.container.style.zIndex = String(getCurrentMaxZIndex() + 1);
+                getCurrentWindow().document.body.appendChild(this.container);
+                setPositionCentered(this.container);
+            }
+            close():void {
+                
+                // closes modal
+                this.container.style.display = 'none';
+                getCurrentWindow().document.body.removeChild(this.container);
+                
+                // unblock
+                this.blocker.unblock();
+            }
+        }
+        
+//        export class Dialog extends Modal {
+//            dialog:HTMLDivElement;
+//            constructor(dialog:HTMLDivElement) {
+//                super(dialog);
+//            }
+//        }
+        export class Alert extends Modal {
+            message:string;
+            constructor(message:string) {
+                super();
+                this.message = message;
+                this.bodyDiv.appendChild(document.createTextNode(this.message));
+            }
+        }
+//        export class Confirm extends Modal {
+//            message:string;
+//            constructor(message:string) {
+//                super(document.createElement('dialog'));
+//                this.message = message;    
+//            }
+//        }
+//        export class Prompt extends Modal {
+//            message:string;
+//            constructor(message:string) {
+//                super(document.createElement('dialog'));
+//                this.message = message;    
+//            }
+//        }
         
     }   // end of duice.ui
 
 }   // end
 
-namespace duice {
-    export namespace dialog {
-        export function initialize(container:any, $context:any):void {
-
-        }
-        export class Dialog {
-            
-        }
-        export class Alert {
-            
-        }
-        export class Confirm {
-            
-        }
-        export class Prompt {
-            
-        }
-    }
-}
 
 //DOMContentLoaded event process
 document.addEventListener("DOMContentLoaded", function(event) {
@@ -2060,6 +2247,5 @@ document.addEventListener("DOMContentLoaded", function(event) {
                         typeof window !== 'undefined' ? window :
                         {};
     duice.ui.initialize(document, $context);
-    duice.dialog.initialize(document, $context);
 });
 

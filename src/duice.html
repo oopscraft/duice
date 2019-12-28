@@ -620,9 +620,12 @@ h3 {
 						<button onclick="users.reset();">reset()</button>
 					</div>
 				</div>
-				<ul is="duice-ui-ul" data-duice-bind="hierarchyUsers,user" data-duice-hierarchy="id,parentId" data-duice-editable="true">
-					<li style="margin:0.2rem 0rem;">
-						<table style="width:100%;">
+				<ul is="duice-ui-ul" 
+				data-duice-bind="hierarchyUsers,user" 
+				data-duice-hierarchy="id,parentId" 
+				data-duice-editable="true">
+					<li>
+						<table style="width:100%; margin:0.2rem">
 							<colgroup>
 								<col width="5%"/>
 								<col width="5%"/>
@@ -664,7 +667,11 @@ h3 {
 						<button onclick="users.reset();">reset()</button>
 					</div>
 				</div>
-				<ul is="duice-ui-ul" data-duice-bind="hierarchyUsers,user" data-duice-hierarchy="id,parentId" data-duice-editable="true" data-duice-foldable="true">
+				<ul is="duice-ui-ul" 
+				data-duice-bind="hierarchyUsers,user" 
+				data-duice-hierarchy="id,parentId" 
+				data-duice-editable="true" 
+				data-duice-foldable="true">
 					<li style="margin:0.2rem 0rem;">
 						<div style="border-bottom:dotted 1px #ccc;">
 							<span is="duice-ui-span" data-duice-bind="user,parentId"></span>
@@ -679,6 +686,18 @@ h3 {
 				</ul>
 			</div>
 		</div>
+	</section>
+
+	<section>
+		<button onclick="new duice.ui.Alert('fdasfdsa').open();">alert</button>
+		<dialog is="duice-ui-dialog" id="dialog">
+			<div>
+				duice.ui.Dialog(document.getElement('id')).open();
+				duice.ui.Alert("message").open();
+				duice.ui.Confirm("message").open();
+				duice.ui.Prompt("message").open();
+			</div>
+		</dialog>
 	</section>
 
 </body>
