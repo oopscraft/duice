@@ -1079,11 +1079,14 @@ namespace duice {
                 });
                 
                 // disabled drag in case of parent element is draggable.
-                this.input.setAttribute('draggable', 'true');
-                this.input.addEventListener('dragstart', function(event){
-                   event.preventDefault();
-                   event.stopPropagation();
-                });
+                var type = this.input.getAttribute('type');
+                if(type !== 'range'){
+                    this.input.setAttribute('draggable', 'true');
+                    this.input.addEventListener('dragstart', function(event){
+                        event.preventDefault();
+                        event.stopPropagation();
+                    });
+                }
             }
             abstract update(map:duice.data.Map, obj:object):void;
             abstract getValue():any;
