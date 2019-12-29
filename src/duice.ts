@@ -2156,6 +2156,11 @@ namespace duice {
             addContent(content:HTMLDivElement):void {
                 this.bodyDiv.appendChild(content);
             }
+            createButton(type:string):HTMLButtonElement {
+                var button = document.createElement('button');
+                button.classList.add('duice-ui-modal__button--' + type);
+                return button;
+            }
             open():void {
                 // block
                 this.blocker.block();
@@ -2202,8 +2207,7 @@ namespace duice {
                 this.buttonDiv = document.createElement('div');
                 this.buttonDiv.classList.add('duice-ui-alert__buttonDiv');
                 
-                this.confirmButton = document.createElement('button');
-                this.confirmButton.classList.add('duice-ui-alert__buttonDiv-confirmButton');
+                this.confirmButton = this.createButton('confirm');
                 this.confirmButton.addEventListener('click', function(event){
                    $this.close(); 
                 });
@@ -2246,16 +2250,14 @@ namespace duice {
                 this.buttonDiv.classList.add('duice-ui-confirm__buttonDiv');
                 
                 // cancel button
-                this.cancelButton = document.createElement('button');
-                this.cancelButton.classList.add('duice-ui-confirm__buttonDiv-cancelButton');
+                this.cancelButton = this.createButton('cancel');
                 this.cancelButton.addEventListener('click', function(event){
                    $this.close(); 
                 });
                 this.buttonDiv.appendChild(this.cancelButton);
                 
                 // confirm button
-                this.confirmButton = document.createElement('button');
-                this.confirmButton.classList.add('duice-ui-confirm__buttonDiv-confirmButton');
+                this.confirmButton = this.createButton('confirm');
                 this.confirmButton.addEventListener('click', function(event){
                    $this.close(); 
                 });
@@ -2306,16 +2308,14 @@ namespace duice {
                 this.buttonDiv.classList.add('duice-ui-prompt__buttonDiv');
                 
                 // cancel button
-                this.cancelButton = document.createElement('button');
-                this.cancelButton.classList.add('duice-ui-prompt__buttonDiv-cancelButton');
+                this.cancelButton = this.createButton('cancel');
                 this.cancelButton.addEventListener('click', function(event){
                    $this.close(); 
                 });
                 this.buttonDiv.appendChild(this.cancelButton);
                 
                 // confirm button
-                this.confirmButton = document.createElement('button');
-                this.confirmButton.classList.add('duice-ui-prompt__buttonDiv-confirmButton');
+                this.confirmButton = this.createButton('confirm');
                 this.confirmButton.addEventListener('click', function(event){
                    $this.close(); 
                 });
