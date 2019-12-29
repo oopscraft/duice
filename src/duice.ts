@@ -4,6 +4,7 @@ namespace duice {
         observers:Array<Observer> = new Array<Observer>();
         changed:boolean = false;
         addObserver(observer:Observer):void {
+            
             for(var i = 0, size = this.observers.length; i < size; i++){
                 if(this.observers[i] === observer){
                     return;
@@ -11,10 +12,23 @@ namespace duice {
             }
             this.observers.push(observer);
         }
+        removeObserver(observer:Observer):void {
+            for(var i = 0, size = this.observers.length; i < size; i++){
+                if(this.observers[i] === observer){
+                    this.observers.splice(i,1);
+                    return;
+                }
+            }
+        }
         notifyObservers(obj:object):void {
             if(this.hasChanged()){
+                this.clearUnavailableObservers();
                 for(var i = 0, size = this.observers.length; i < size; i++){
-                    this.observers[i].update(this, obj);
+                    try {
+                        this.observers[i].update(this, obj);
+                    }catch(e){
+                        console.error(e, this.observers[i]);
+                    }
                 }
                 this.clearChanged();
             }
@@ -28,21 +42,22 @@ namespace duice {
         clearChanged():void {
             this.changed = false;
         }
+        clearUnavailableObservers():void {
+            for(var i = this.observers.length - 1; i >= 0; i--){
+                try {
+                    if(this.observers[i].isAvailable() === false){
+                        this.observers.splice(i,1);
+                    }
+                }catch(e){
+                    console.error(e, this.observers[i]);
+                }
+            }
+        }
     }
     
     export interface Observer {
+        isAvailable():boolean;
         update(observable:Observable, obj:object):void;
-    }
-    
-    export class BindException {
-        element:any;
-        dataObject:duice.data.DataObject;
-        name:string;
-        constructor(element:any, dataObject:duice.data.DataObject, name:string){
-            this.element = element;
-            this.dataObject = dataObject;
-            this.name = name;
-        }
     }
     
     /**
@@ -91,6 +106,18 @@ namespace duice {
             return true;
         }else{
             return false;
+        }
+    }
+    
+    /**
+     * isNotEmpty
+     * @param value
+     */
+    export function isNotEmpty(value:any) {
+        if(isEmpty(value)){
+            return false;
+        }else{
+            return true;
         }
     }
     
@@ -494,24 +521,6 @@ namespace duice {
     }
     
     /**
-     * enableElement
-     * @param element
-     * @param enable
-     */
-    function enableElement(element:HTMLElement, enable:boolean):void {
-        if(element.tagName === 'SELECT'){
-            (<HTMLSelectElement>element).disabled = (enable === true ? false : true);
-        }else if(element.tagName === 'BUTTON'){
-            (<HTMLButtonElement>element).disabled = (enable === true ? false : true);
-        }
-        var childNodes = element.childNodes, i = 0;
-        for(var i = 0, size = childNodes.length; i < size; i ++ ){
-            var element:HTMLElement = <HTMLElement>childNodes[i];
-            this.enableElement(element, enable);
-        }
-    }
-    
-    /**
      * createDocumentFragment
      * @param html
      */
@@ -550,24 +559,23 @@ namespace duice {
         var computedStyle = win.getComputedStyle(element);
         var computedWidth = parseInt(computedStyle.getPropertyValue('width').replace(/px/gi, ''));
         var computedHeight = parseInt(computedStyle.getPropertyValue('height').replace(/px/gi, ''));
-        element.style.left = Math.max(10,win.innerWidth/2 - computedWidth/2) + win.scrollX + 'px';
+        element.style.left = Math.max(0,win.innerWidth/2 - computedWidth/2) + win.scrollX + 'px';
         element.style.top = Math.max(0,win.innerHeight/2 - computedHeight/2) + win.scrollY + 'px';
     }
 
     /**
-     * cumulativeOffset
+     * getElementPosition
      * @param element
      */
-    function cumulativeOffset(element:any) {
-        var top = 0, left = 0;
-        do {
-            top += element.offsetTop  || 0;
-            left += element.offsetLeft || 0;
-            element = element.offsetParent;
-        } while(element);
+    function getElementPosition(el:any) {
+        var pos:any = ('absolute relative').indexOf(getComputedStyle(el).position) == -1;
+        var rect1:any = {top: el.offsetTop * pos, left: el.offsetLeft * pos};
+        var rect2:any = el.offsetParent ? getElementPosition(el.offsetParent) : {top:0,left:0};
         return {
-            top: top,
-            left: left
+            top: rect1.top + rect2.top,
+            left: rect1.left + rect2.left,
+            width: el.offsetWidth,
+            height: el.offsetHeight
         };
     }
     
@@ -624,56 +632,6 @@ namespace duice {
      * block
      * @param element
      */
-    function block(element:HTMLElement):object {
-        
-        var div = document.createElement('div');
-        div.classList.add('duice-block');
-        
-        // defines maxZIndex
-        var zIndex = getCurrentMaxZIndex() + 1;
-        
-        // adjusting position
-        div.style.position = 'fixed';
-        div.style.zIndex = String(zIndex);
-        
-        // full blocking in case of BODY
-        if(element.tagName == 'BODY'){
-            div.style.width = '100%';
-            div.style.height = '100%';
-            div.style.top = '0px';
-            div.style.left = '0px';
-        }
-        // otherwise adjusting to parent element
-        else{
-            var boundingClientRect = element.getBoundingClientRect();
-            var width = boundingClientRect.width;
-            var height = boundingClientRect.height;
-            var left = boundingClientRect.left;
-            var top = boundingClientRect.top;
-            div.style.width = width + "px";
-            div.style.height = height + "px";
-            div.style.top = top + 'px';
-            div.style.left = left + 'px';
-        }
-        
-        // append
-        element.appendChild(div);
-        this.fadeIn(div);
-        
-        // return handler
-        var $this = this;
-        return {
-            getZIndex: function(){
-                return zIndex;
-            },
-            release: function() {
-                $this.fadeOut(div);
-                $this.delay(function(){
-                    element.removeChild(div);
-                });
-            }
-        }
-    }
     
     /**
      * load
@@ -723,9 +681,12 @@ namespace duice {
         export abstract class DataObject extends Observable implements Observer {
             abstract update(observable:Observable, obj:object):void;
             abstract fromJson(...args: any[]):void;
-            abstract toJson(...args: any[]):object;  
+            abstract toJson(...args: any[]):object;
             abstract isDirty():boolean;
             abstract reset():void;
+            isAvailable():boolean {
+                return true;
+            }
         }
         
         /**
@@ -1002,21 +963,27 @@ namespace duice {
         }
         
         export abstract class UIElement extends Observable implements Observer {
+            element:HTMLElement;
             constructor(element:HTMLElement){
                 super();
-                element.dataset.duiceId = generateUUID();
+                this.element = element;
+                this.element.dataset.duiceId = generateUUID();
             }
             abstract bind(...args: any[]):void;
             abstract update(observable:duice.data.DataObject, obj:object):void;
+            isAvailable():boolean {
+                if(document.contains(this.element)){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
         }
         
         export abstract class MapUIElement extends UIElement {
             map:duice.data.Map;
             name:string;
             bind(map:duice.data.Map, name:string):void {
-                if(map instanceof duice.data.Map === false){
-                    throw new BindException(this, map, name);
-                }
                 this.map = map;
                 this.name = name;
                 this.map.addObserver(this);
@@ -1189,6 +1156,11 @@ namespace duice {
             constructor(input:HTMLInputElement){
                 super(input);
                 this.input.classList.add('duice-ui-checkboxInput');
+                
+                // stop click event propagation
+                this.input.addEventListener('click', function(event){
+                    event.stopPropagation();
+                });
             }
             update(map:duice.data.Map, obj:object):void {
                 var value = map.get(this.getName());
@@ -1487,7 +1459,7 @@ namespace duice {
                 this.input.parentNode.insertBefore(this.pickerDiv, this.input.nextSibling);
                 this.pickerDiv.style.position = 'absolute';
                 this.pickerDiv.style.zIndex = String(getCurrentMaxZIndex() + 1);
-                this.pickerDiv.style.left = cumulativeOffset(this.input).left + 'px';
+                this.pickerDiv.style.left = getElementPosition(this.input).left + 'px';
                 this.pickerDiv.style.margin = '0px';
                 
                 // updates date
@@ -1638,11 +1610,6 @@ namespace duice {
                     }
                 }
                 updateOption(this.optionList);
-                this.optionList.addObserver({
-                    update(list:duice.data.List):void {
-                        updateOption(list);
-                    }
-                });
             }
             update(map:duice.data.Map, obj:object):void {
                 var value = map.get(this.getName());
@@ -1885,6 +1852,31 @@ namespace duice {
             }
             setHierarchy(name:string, parentName:string):void {
                 this.hierarchy = { name:name, parentName:parentName };
+                this.ul.classList.add('duice-ui-ul--hierarchy');
+                    
+                // add root event
+                var $this = this;
+                this.ul.addEventListener('dragover', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    $this.ul.classList.add('duice-ui-ul--hierarchy-dragover');
+                });
+                this.ul.addEventListener('dragleave', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    $this.ul.classList.remove('duice-ui-ul--hierarchy-dragover');
+                });
+                this.ul.addEventListener('drop', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    var fromIndex = parseInt(event.dataTransfer.getData('fromIndex'));
+                    var fromMap = $this.list.get(fromIndex);
+                    fromMap.set($this.hierarchy.parentName, null);
+                    $this.ul.classList.remove('duice-ui-ul--hierarchy-dragover');
+                    $this.setChanged();
+                    $this.notifyObservers(this);
+                    console.log(event);
+                });
             }
             setFoldable(foldable:boolean):void {
                 this.foldable = foldable;
@@ -1903,34 +1895,6 @@ namespace duice {
                 var $this = this;
                 this.ul.innerHTML = '';
                 this.lis.length = 0;
-                
-                // hierarchy 
-                if(this.hierarchy){
-                    this.ul.classList.add('duice-ui-ul--hierarchy');
-                    
-                    // add root event
-                    this.ul.addEventListener('dragover', function(event){
-                        event.preventDefault();
-                        event.stopPropagation();
-                        $this.ul.classList.add('duice-ui-ul--hierarchy-dragover');
-                    });
-                    this.ul.addEventListener('dragleave', function(event){
-                        event.preventDefault();
-                        event.stopPropagation();
-                        $this.ul.classList.remove('duice-ui-ul--hierarchy-dragover');
-                    });
-                    this.ul.addEventListener('drop', function(event){
-                        event.preventDefault();
-                        event.stopPropagation();
-                        var fromIndex = parseInt(event.dataTransfer.getData('fromIndex'));
-                        var fromMap = $this.list.get(fromIndex);
-                        fromMap.set($this.hierarchy.parentName, null);
-                        $this.ul.classList.remove('duice-ui-ul--hierarchy-dragover');
-                        $this.setChanged();
-                        $this.notifyObservers(this);
-                        console.log(event);
-                    });
-                }
               
                 // creates new rows
                 for(var index = 0; index < list.getSize(); index ++ ) {
@@ -1939,7 +1903,7 @@ namespace duice {
                     
                     // checks hierarchy
                     if(this.hierarchy){
-                        if(map.get(this.hierarchy.parentName)){
+                        if(isNotEmpty(map.get(this.hierarchy.parentName))){
                             continue;
                         }
                     }
@@ -2089,7 +2053,7 @@ namespace duice {
         }
         
         /**
-         * new duice.ui.Blocker(this.div).block().unblock();
+         * new duice.dialog.Blocker(this.div).block().unblock();
          * 
          */
         export class Blocker {
@@ -2134,11 +2098,14 @@ namespace duice {
             }
         }
         
+        /**
+         * duice.ui.Modal
+         */
         export abstract class Modal {
             container:HTMLDivElement;
             headerDiv:HTMLDivElement;
             bodyDiv:HTMLDivElement;
-            blocker:duice.ui.Blocker;
+            blocker:Blocker;
             constructor(){
                 var $this = this;
                 this.container = document.createElement('div');
@@ -2179,11 +2146,15 @@ namespace duice {
                 });
                 this.headerDiv.appendChild(closeButton);
                 
+                // creates body
                 this.bodyDiv = document.createElement('div');
                 this.container.appendChild(this.bodyDiv);
-                
+
                 // adds blocker
                 this.blocker = new Blocker(getCurrentWindow().document.body);
+            }
+            addContent(content:HTMLDivElement):void {
+                this.bodyDiv.appendChild(content);
             }
             open():void {
                 // block
@@ -2206,36 +2177,183 @@ namespace duice {
                 this.blocker.unblock();
             }
         }
-        
-//        export class Dialog extends Modal {
-//            dialog:HTMLDivElement;
-//            constructor(dialog:HTMLDivElement) {
-//                super(dialog);
-//            }
-//        }
+
+        /**
+         * duice.ui.Alert
+         */
         export class Alert extends Modal {
             message:string;
+            iconDiv:HTMLDivElement;
+            messageDiv:HTMLDivElement;
+            buttonDiv:HTMLDivElement;
+            confirmButton:HTMLButtonElement;
             constructor(message:string) {
                 super();
                 this.message = message;
-                this.bodyDiv.appendChild(document.createTextNode(this.message));
+                var $this = this;
+                
+                this.iconDiv = document.createElement('div');
+                this.iconDiv.classList.add('duice-ui-alert__iconDiv');
+                
+                this.messageDiv = document.createElement('div');
+                this.messageDiv.classList.add('duice-ui-alert__messageDiv');
+                this.messageDiv.appendChild(document.createTextNode(this.message));
+                
+                this.buttonDiv = document.createElement('div');
+                this.buttonDiv.classList.add('duice-ui-alert__buttonDiv');
+                
+                this.confirmButton = document.createElement('button');
+                this.confirmButton.classList.add('duice-ui-alert__buttonDiv-confirmButton');
+                this.confirmButton.addEventListener('click', function(event){
+                   $this.close(); 
+                });
+                this.buttonDiv.appendChild(this.confirmButton);
+                
+                // appends parts to bodyDiv
+                this.addContent(this.iconDiv);
+                this.addContent(this.messageDiv);
+                this.addContent(this.buttonDiv);
+            }
+            open():void {
+                super.open();
+                this.confirmButton.focus();
             }
         }
-//        export class Confirm extends Modal {
-//            message:string;
-//            constructor(message:string) {
-//                super(document.createElement('dialog'));
-//                this.message = message;    
-//            }
-//        }
-//        export class Prompt extends Modal {
-//            message:string;
-//            constructor(message:string) {
-//                super(document.createElement('dialog'));
-//                this.message = message;    
-//            }
-//        }
         
+        /**
+         * duice.ui.Confirm
+         */
+        export class Confirm extends Modal {
+            message:string;
+            iconDiv:HTMLDivElement;
+            messageDiv:HTMLDivElement;
+            buttonDiv:HTMLDivElement;
+            cancelButton:HTMLButtonElement;
+            confirmButton:HTMLButtonElement;
+            constructor(message:string) {
+                super();
+                this.message = message;
+                var $this = this;
+                
+                this.iconDiv = document.createElement('div');
+                this.iconDiv.classList.add('duice-ui-confirm__iconDiv');
+                
+                this.messageDiv = document.createElement('div');
+                this.messageDiv.classList.add('duice-ui-confirm__messageDiv');
+                this.messageDiv.appendChild(document.createTextNode(this.message));
+                
+                this.buttonDiv = document.createElement('div');
+                this.buttonDiv.classList.add('duice-ui-confirm__buttonDiv');
+                
+                // cancel button
+                this.cancelButton = document.createElement('button');
+                this.cancelButton.classList.add('duice-ui-confirm__buttonDiv-cancelButton');
+                this.cancelButton.addEventListener('click', function(event){
+                   $this.close(); 
+                });
+                this.buttonDiv.appendChild(this.cancelButton);
+                
+                // confirm button
+                this.confirmButton = document.createElement('button');
+                this.confirmButton.classList.add('duice-ui-confirm__buttonDiv-confirmButton');
+                this.confirmButton.addEventListener('click', function(event){
+                   $this.close(); 
+                });
+                this.buttonDiv.appendChild(this.confirmButton);
+                
+                // appends parts to bodyDiv
+                this.addContent(this.iconDiv);
+                this.addContent(this.messageDiv);
+                this.addContent(this.buttonDiv);
+            }
+            open():void {
+                super.open();
+                this.cancelButton.focus();
+            }
+        }
+        
+        /**
+         * duice.ui.Prompt
+         */
+        export class Prompt extends Modal {
+            message:string;
+            iconDiv:HTMLDivElement;
+            messageDiv:HTMLDivElement;
+            inputDiv:HTMLDivElement;
+            input:HTMLInputElement;
+            buttonDiv:HTMLDivElement;
+            cancelButton:HTMLButtonElement;
+            confirmButton:HTMLButtonElement;
+            constructor(message:string) {
+                super();
+                this.message = message;
+                var $this = this;
+                
+                this.iconDiv = document.createElement('div');
+                this.iconDiv.classList.add('duice-ui-prompt__iconDiv');
+                
+                this.messageDiv = document.createElement('div');
+                this.messageDiv.classList.add('duice-ui-prompt__messageDiv');
+                this.messageDiv.appendChild(document.createTextNode(this.message));
+                
+                this.inputDiv = document.createElement('div');
+                this.inputDiv.classList.add('duice-ui-prompt__inputDiv');
+                this.input = document.createElement('input');
+                this.input.classList.add('duice-ui-prompt__inputDiv-input');
+                this.inputDiv.appendChild(this.input);
+                
+                this.buttonDiv = document.createElement('div');
+                this.buttonDiv.classList.add('duice-ui-prompt__buttonDiv');
+                
+                // cancel button
+                this.cancelButton = document.createElement('button');
+                this.cancelButton.classList.add('duice-ui-prompt__buttonDiv-cancelButton');
+                this.cancelButton.addEventListener('click', function(event){
+                   $this.close(); 
+                });
+                this.buttonDiv.appendChild(this.cancelButton);
+                
+                // confirm button
+                this.confirmButton = document.createElement('button');
+                this.confirmButton.classList.add('duice-ui-prompt__buttonDiv-confirmButton');
+                this.confirmButton.addEventListener('click', function(event){
+                   $this.close(); 
+                });
+                this.buttonDiv.appendChild(this.confirmButton);
+                
+                // appends parts to bodyDiv
+                this.addContent(this.iconDiv);
+                this.addContent(this.messageDiv);
+                this.addContent(this.inputDiv);
+                this.addContent(this.buttonDiv);
+            }
+            open():void {
+                super.open();
+                this.input.focus();
+            }
+        }
+        
+        export class Dialog extends Modal {
+            dialog:HTMLDivElement;
+            parentNode:Node;
+            constructor(dialog:HTMLDivElement) {
+                super();
+                this.dialog = dialog;
+                this.dialog.classList.add('duice-ui-dialog');
+                this.parentNode = this.dialog.parentNode;
+            }
+            open():void {
+                this.dialog.style.display = 'block';
+                this.bodyDiv.appendChild(this.dialog);
+                super.open();
+            }
+            close():void {
+                this.dialog.style.display = 'none';
+                this.parentNode.appendChild(this.dialog);
+                super.close();
+            }
+        }   
+
     }   // end of duice.ui
 
 }   // end
