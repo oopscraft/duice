@@ -10,9 +10,6 @@ global.config = {
 	server: require('./conf/server.json')
 }
 
-// creates dataSource
-global.dataSource = mysql.createPool(global.config.dataSource);
-
 // routes root 
 app.get('/', function(req, res){
 	res.redirect('/doc');
