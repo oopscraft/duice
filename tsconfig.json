@@ -11,7 +11,7 @@
 	"typedocOptions":{
 		"mode": "modules",
 		"out": "doc",
-		"theme": "default"
+		"theme": "typedoc-duice-theme"
 	},
 	"files":[
 		"./src/duice.ts"
