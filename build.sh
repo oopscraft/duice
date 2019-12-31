@@ -20,6 +20,7 @@ function doc() {
 
 # gulp dist 
 function dist() {
+	rm -rf ./dist/*
 	gulp min
 	gulp zip
 }
