@@ -18,8 +18,8 @@ app.get('/', function(req, res){
 // routes doc
 app.use('/doc', express.static(path.join(__dirname,'doc')));
 
-// routes src
-app.use('/src', express.static(path.join(__dirname,'src')));
+// routes dist
+app.use('/dist', express.static(path.join(__dirname,'dist')));
 
 // start server
 app.listen(global.config.server.port, function(){
