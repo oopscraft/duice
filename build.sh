@@ -21,8 +21,8 @@ function doc() {
 # gulp dist 
 function dist() {
 	rm -rf ./dist/*
-	gulp min
-	gulp zip
+	node node_modules/gulp/bin/gulp min
+	node_modules/gulp/bin/gulp zip
 }
 
 # main
