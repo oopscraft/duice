@@ -5,11 +5,11 @@
   "homepage": "http://duice.oopscraft.net",
   "main": "duice",
   "dependencies": {
-    "express": "^4.16.4",
     "mysql": "^2.16.0",
     "squel": "^5.12.2"
   },
   "devDependencies": {
+    "express": "^4.17.1",
     "gulp": "^4.0.2",
     "gulp-clean-css": "^4.2.0",
     "gulp-rename": "^2.0.0",
