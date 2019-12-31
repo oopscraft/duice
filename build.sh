@@ -15,7 +15,7 @@ function compile() {
 # generates document
 function doc() {
 	rm -rf ./doc/*
-	npx typedoc
+	node node_modules/typedoc/bin/typedoc
 }
 
 # gulp dist 
