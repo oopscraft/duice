@@ -22,7 +22,7 @@ function doc() {
 function dist() {
 	rm -rf ./dist/*
 	node node_modules/gulp/bin/gulp min
-	node_modules/gulp/bin/gulp zip
+	node node_modules/gulp/bin/gulp zip
 }
 
 # main
