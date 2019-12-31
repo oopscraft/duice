@@ -1,8 +1,6 @@
-/.project
 /.settings
 /dist/
 /doc/
-/node_modules/
 *.log
 *.pid
 *.swp

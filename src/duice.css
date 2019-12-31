@@ -460,8 +460,8 @@
 	text-overflow: ellipsis;
 }
 .duice-ui-table__tbody {
-	cursor:pointer;
-	cursor:hand;
+	margin: 0px;
+	border: 0px;
 }
 .duice-ui-table__tbody:hover {
 	background-color: #eee;
@@ -517,9 +517,6 @@
 	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAJklEQVR42mNgGAXUBA0NDf9HfTDqg1EfQHxALD0KRsEoGAWDBQAAM5IY9y7mNu0AAAAASUVORK5CYII=);
 	background-repeat: no-repeat;
 }
-.duice-ui-ul__li--orphan {
-	opacity: 0.5;	
-}
 .duice-ui-ul__li--fold {
 	padding-left: 16px;
 	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAMUlEQVR42mNgGAWjYGiDhoaG/4QwxRZQIk+OBf+HrAX/seDRIKJTKqJpPhgFo2CEAAB0fljYcQiAXAAAAABJRU5ErkJggg==);
@@ -535,6 +532,9 @@
 }
 .duice-ui-ul__li--unfold > ul {
 	display: block;
+}
+.duice-ui-ul__li--orphan {
+	opacity: 0.5;	
 }
 
 /**

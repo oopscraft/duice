@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>duice</title>
+<script src="polyfill/dataset.js"></script>
 <script src="duice.js"></script>
 <link rel="stylesheet" type="text/css" href="duice.css">
 <style>
@@ -244,7 +245,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	}
 	printUser();
 	user.addObserver({
-		isAvailable(){
+		isAvailable:function(){
 			return true;
 		},
 		update:function(){
@@ -262,7 +263,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	}
 	printUsers();
 	users.addObserver({
-		isAvailable(){
+		isAvailable:function(){
 			return true;
 		},
 		update:function(){
@@ -280,7 +281,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	}
 	printHierarchyUsers();
 	hierarchyUsers.addObserver({
-		isAvailable(){
+		isAvailable:function(){
 			return true;
 		},
 		update:function(){
@@ -382,6 +383,7 @@ h3 {
 	<div>
 		<h1 >DUICE <small>(Data-oriented UI Component Engine)</small></h1>
 	</div>
+	<input type="text" value="fdafdasfdsa"/>
 	<hr/>
 	
 	<!-- Section.1 -->
@@ -526,7 +528,9 @@ h3 {
 						<button onclick="users.reset();">reset()</button>
 					</div>
 				</div>
-				<table is="duice-ui-table" data-duice-bind="users,user" data-duice-editable="true">
+				<table is="duice-ui-table" 
+					data-duice-bind="users,user" 
+					data-duice-editable="true">
 					<thead>
 						<tr>
 							<th>No</th>
@@ -563,7 +567,7 @@ h3 {
 		</div>
 	</section>
 	
-	<!-- Section.2 -->
+	<!-- Section.3 -->
 	<section class="chapter">
 		<div class="chapter__headerDiv">
 			<h2>Binding between duice.data.List and Ul Element</h2>
@@ -585,7 +589,9 @@ h3 {
 						<button onclick="users.reset();">reset()</button>
 					</div>
 				</div>
-				<ul is="duice-ui-ul" data-duice-bind="hierarchyUsers,user" data-duice-editable="true">
+				<ul is="duice-ui-ul" 
+					data-duice-bind="hierarchyUsers,user" 
+					data-duice-editable="true">
 					<li style="margin:0.2rem 0rem;">
 						<table style="width:100%;">
 							<colgroup>
@@ -703,11 +709,83 @@ h3 {
 		</div>
 		<div class="chapter__bodyDiv">
 			<div>
-				<button onclick="new duice.ui.Alert('alert message...').open();">duice.dialog.Alert</button>
-				<button onclick="new duice.ui.Confirm('confirm message...').open();">duice.dialog.Confirm</button>
-				<button onclick="new duice.ui.Prompt('enter value...').open();">duice.dialog.Prompt</button>
-				<button onclick="new duice.ui.Dialog(document.getElementById('dialog')).open();">duice.dialog.Dialog</button>
-				<dialog id="dialog" style="width:600px; padding:1rem;">
+				<button onclick="
+					new duice.ui.Alert('alert message...')
+					.beforeOpen(function(){
+						return confirm('beforeOpen');
+					})
+					.afterOpen(function(){
+						alert('afterOpen');
+					})
+					.beforeClose(function(){
+						return confirm('beforeClose');
+					})
+					.afterClose(function(){
+						alert('afterClose');
+					})
+					.open();
+				">duice.dialog.Alert</button>
+				<button onclick="
+					new duice.ui.Confirm('confirm message...')
+					.beforeOpen(function(){
+						return confirm('beforeOpen');
+					})
+					.afterOpen(function(){
+						alert('afterOpen');
+					})
+					.beforeClose(function(){
+						return confirm('beforeClose');
+					})
+					.afterClose(function(){
+						alert('afterClose');
+					})
+					.beforeConfirm(function(){
+						return confirm('beforeConfirm');
+					})
+					.afterConfirm(function(){
+						alert('afterConfirm');
+					})
+					.open();
+				">duice.ui.Confirm</button>
+				<button onclick="
+					new duice.ui.Prompt('enter value...')
+					.beforeOpen(function(){
+						return confirm('beforeOpen');
+					})
+					.afterOpen(function(){
+						alert('afterOpen');
+					})
+					.beforeClose(function(){
+						return confirm('beforeClose');
+					})
+					.afterClose(function(){
+						alert('afterClose');
+					})
+					.beforeConfirm(function(){
+						return confirm('beforeConfirm');
+					})
+					.afterConfirm(function(){
+						alert('afterConfirm:' + this.getValue());
+					})
+					.open();
+				">duice.dialog.Prompt</button>
+				<button onclick="
+					new duice.ui.Dialog(document.getElementById('dialog'))
+					.beforeOpen(function(){
+						return confirm('beforeOpen');
+					})
+					.afterOpen(function(){
+						alert('afterOpen');
+					})
+					.beforeClose(function(){
+						return confirm('beforeClose');
+					})
+					.afterClose(function(){
+						alert('afterClose');
+					})
+					.open();
+				">duice.dialog.Dialog</button>
+				<dialog id="dialog" style="width:600px; padding:1rem; display:none;">
 					<table class="chapter__bodyDiv-uiDiv-uiTable" style="width:100%;">
 						<tr>
 							<th>user,id</th>

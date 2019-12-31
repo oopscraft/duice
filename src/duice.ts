@@ -1,8 +1,28 @@
+/* =============================================================================
+ * DUICE (Javascript UI Component Engine)
+ * - Anyone can use it freely.
+ * - Modify the source or allow re-creation. However, you must state that you have the original creator.
+ * - However, we can not grant patents or licenses for reproductives. (Modifications or reproductions must be shared with the public.)
+ * Licence: LGPL(GNU Lesser General Public License version 3)
+ * Copyright (C) 2017 duice.oopscraft.net
+ * ============================================================================= */
+
+/**
+ * project package
+ */
 namespace duice {
     
-    export class Observable {
+    /**
+     * duice.Observable
+     * Observable abstract class of Observer Pattern
+     */
+    abstract class Observable {
         observers:Array<Observer> = new Array<Observer>();
         changed:boolean = false;
+        /**
+         * Adds observer instance
+         * @param observer
+         */
         addObserver(observer:Observer):void {
             
             for(var i = 0, size = this.observers.length; i < size; i++){
@@ -12,6 +32,10 @@ namespace duice {
             }
             this.observers.push(observer);
         }
+        /**
+         * Removes specified observer instance from observer instances
+         * @param observer
+         */
         removeObserver(observer:Observer):void {
             for(var i = 0, size = this.observers.length; i < size; i++){
                 if(this.observers[i] === observer){
@@ -20,6 +44,10 @@ namespace duice {
                 }
             }
         }
+        /**
+         * Notifies changes to observers
+         * @param obj object to transfer to observer
+         */
         notifyObservers(obj:object):void {
             if(this.hasChanged()){
                 this.clearUnavailableObservers();
@@ -33,15 +61,27 @@ namespace duice {
                 this.clearChanged();
             }
         }
+        /**
+         * Sets changed flag 
+         */
         setChanged():void {
             this.changed = true;
         }
+        /**
+         * Returns changed flag
+         */
         hasChanged():boolean {
             return this.changed;
         }
+        /**
+         * Clears changed flag
+         */
         clearChanged():void {
             this.changed = false;
         }
+        /**
+         * Clears unavailable observers to prevent memory leak
+         */
         clearUnavailableObservers():void {
             for(var i = this.observers.length - 1; i >= 0; i--){
                 try {
@@ -55,15 +95,20 @@ namespace duice {
         }
     }
     
-    export interface Observer {
+    /**
+     * duice.Observer
+     * Observer interface of Observer Pattern
+     */
+    interface Observer {
         isAvailable():boolean;
         update(observable:Observable, obj:object):void;
     }
     
     /**
-     * generateObjectID
+     * Generates random UUID value
+     * @return  UUID string
      */
-    export function generateUUID():string {
+    function generateUUID():string {
         var dt = new Date().getTime();
         var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
             var r = (dt + Math.random()*16)%16 | 0;
@@ -75,10 +120,11 @@ namespace duice {
     
     /**
      * getObject
-     * @param $context
-     * @param name
+     * @param   Scope context in which the variable exists
+     * @param   variable name to find
+     * @return  found variables(or object)  
      */
-    export function getObject($context:any, name:string) {
+    function getObject($context:any, name:string) {
         if($context.hasOwnProperty(name)){
             return $context[name];
         }
@@ -86,19 +132,20 @@ namespace duice {
             return (<any>window)[name];
         }
         try {
-            return eval(name);
+            return eval.call($context, name);
         }catch(e){
             console.error(e,$context, name);
             throw e;
         }
-    };
+    }
     
     
     /**
-     * isEmpty
+     * Check if value is empty
      * @param value
+     * @return whether value is empty
      */
-    export function isEmpty(value:any){
+    function isEmpty(value:any){
         if(value === undefined
         || value === null
         || value === ''
@@ -110,10 +157,11 @@ namespace duice {
     }
     
     /**
-     * isNotEmpty
+     * Check if value is not empty
      * @param value
+     * @return whether value is not empty
      */
-    export function isNotEmpty(value:any) {
+    function isNotEmpty(value:any) {
         if(isEmpty(value)){
             return false;
         }else{
@@ -122,11 +170,11 @@ namespace duice {
     }
     
     /**
-     * defaultIfEmpty
-     * @param value
-     * @param defaultValue
+     * Checks if value is empty and return specified value as default
+     * @param value to check
+     * @param default value if value is empty
      */
-    export function defaultIfEmpty(value:any, defaultValue:any) {
+    function defaultIfEmpty(value:any, defaultValue:any) {
         if(isEmpty(value) === true) {
             return defaultValue;
         }else{
@@ -134,14 +182,14 @@ namespace duice {
         }
     }
     
-    
     /**
-     * lpad
-     * @param value
-     * @param length
-     * @param padChar
+     * converts value to left-padded value
+     * @param original value
+     * @param length to pad
+     * @param pading character
+     * @return left-padded value
      */
-    export function lpad(value:string, length:number, padChar:string) {
+    function lpad(value:string, length:number, padChar:string) {
         for(var i = 0, size = (length-value.length); i < size; i ++ ) {
             value = padChar + value;
         }
@@ -149,10 +197,11 @@ namespace duice {
     }
     
     /**
-     * rpad
-     * @param value
-     * @param length
-     * @param padChar
+     * converts value to right-padded value
+     * @param original value
+     * @param length to pad
+     * @param pading character
+     * @return right-padded string
      */
     function rpad(value:string, length:number, padChar:string) {
         for(var i = 0, size = (length-value.length); i < size; i ++ ) {
@@ -161,6 +210,12 @@ namespace duice {
         return value;
     }
     
+    /**
+     * Converts value to masked value.
+     * @param value
+     * @param type
+     * @param format
+     */
     function mask(value: any, type: string, format: any):string {
         switch (type) {
         
@@ -234,7 +289,7 @@ namespace duice {
     }
     
     /**
-     * unmask
+     * Converts masked value to original value.
      * @param value
      * @param type
      * @param format
@@ -343,34 +398,57 @@ namespace duice {
     }
     
     /**
-     * executeExpression
+     * Executes custom expression in HTML element and returns.
      * @param element
      * @param $context
+     * @return converted HTML element
      */
     function executeExpression(element:HTMLElement, $context:any):any {
-        var string = element.outerHTML;
-        string = string.replace(/\[\[(.*?)\]\]/mgi,function(match, command){
-            try {
-                command = command.replace('&amp;', '&');
-                command = command.replace('&lt;', '<');
-                command = command.replace('&gt;', '>');
-                var result = eval(command);
-                return result;
-            }catch(e){
-                console.error(e,command);
-                throw e;
-            }
-        });
-        var template = document.createElement('template');
-        template.innerHTML = string;
-        return template.content.firstChild;
+        // template support 
+        try {
+            var string = element.outerHTML;
+            string = string.replace(/\[\[(.*?)\]\]/mgi,function(match, command){
+                try {
+                    command = command.replace('&amp;', '&');
+                    command = command.replace('&lt;', '<');
+                    command = command.replace('&gt;', '>');
+                    var result = eval(command);
+                    return result;
+                }catch(e){
+                    console.error(e,command);
+                    throw e;
+                }
+            });
+            var template = document.createElement('template');
+            template.innerHTML = string;
+            return template.content.firstChild;
+        }catch(e){
+            // not support template
+            var string = element.innerHTML;
+            string = string.replace(/\[\[(.*?)\]\]/mgi,function(match, command){
+                try {
+                    command = command.replace('&amp;', '&');
+                    command = command.replace('&lt;', '<');
+                    command = command.replace('&gt;', '>');
+                    var result = eval(command);
+                    return result;
+                }catch(e){
+                    console.error(e,command);
+                    throw e;
+                }
+            });
+            removeChildNodes(element);
+            element.innerHTML = string;
+            return element;
+        }
     }
     
     /**
-     * escapeHtml
+     * Escapes HTML tag from string value
      * @param value
+     * @return escaped string value
      */
-    function escapeHtml(value:string):string {
+    function escapeHTML(value:string):string {
         
         // checks value is valid.
         if(!value || typeof value !== 'string'){
@@ -385,119 +463,15 @@ namespace duice {
             '"': '&quot;',
             "'": '&#039;'
         };
-        return value.replace(/[&<>"']/g, function(m:string) {return htmlMap[m];});
+        
+        // replace and returns
+        return value.replace(/[&<>"']/g, function(m:string) {
+            return htmlMap[m];
+        });
     }
     
     /**
-     * parseMarkdown
-     * @param value
-     */
-    function parseMarkdown(value:string):string {
-        
-        // checks value is valid.
-        if(!value){
-            return value;
-        }
-        
-        // code
-        value = value.replace(/[\`]{3}([\w]*)\n([^\`]+)\n[\`]{3}/g, function(match,language,code){
-            var codeHtml = new Array();
-            codeHtml.push('<code data-langhage="' + language + '">');
-            var lines = code.split('\n');
-            for(var i = 0; i < lines.length; i++){
-                var line = lines[i];
-
-                // replace tag
-                line = line.replace(/\</g, '&lt');
-                line = line.replace(/\>/g, '&gt');
-
-                // comment
-                line = line.replace(/(^|[\s])(\/\/[\s]*.+)/gm,'<span class="comment">$2</span>');
-                line = line.replace(/(\/\*)/gm,'<span class="comment">$1');
-                line = line.replace(/(\*\/)/gm,'$1</span>');
-                line = line.replace(/(\s*)(#+.*)/gm,'$1<span class="comment">$2</span>');
-
-                // append 
-                codeHtml.push(line);
-            }
-            codeHtml.push('</code>');
-            return codeHtml.join('\n') + '\n';
-        });
-        
-        //ul
-        value = value.replace(/(^[ \t]*[\*\-]\s+.+\n)+/gm, function(match) {
-            var ulHtml = new Array();
-            ulHtml.push('<ul>');
-            var lines = match.split('\n');
-            for(var i = 0; i < lines.length; i++){
-                var line = lines[i];
-                if(line.trim().length < 1){
-                    continue;
-                }
-                line = line.replace(/^[ \t]*[\*\-]\s+(.+)/gm,'<li>$1</li>');
-                ulHtml.push(line);
-            }
-            ulHtml.push('</ul>');
-            return ulHtml.join('\n') + '\n';
-        });
-        
-        //ol
-        value = value.replace(/(^[ \t]*[\d]+[\.]?\s+.+\n)+/gm, function(match) {
-            var olHtml = new Array();
-            olHtml.push('<ol>');
-            var lines = match.split('\n');
-            for(var i = 0; i < lines.length; i++){
-                var line = lines[i];
-                if(line.trim().length < 1){
-                    continue;
-                }
-                line = line.replace(/^[ \t]*[\d]+[\.]?\s+(.+)/gm,'<li>$1</li>');
-                olHtml.push(line);
-            }
-            olHtml.push('</ol>');
-            return olHtml.join('\n') + '\n';
-        });
-
-        // title
-        value = value.replace(/^[\#]{6}\s(.+)/gm, '<h6>$1</h6>');
-        value = value.replace(/^[\#]{5}\s(.+)/gm, '<h5>$1</h5>');
-        value = value.replace(/^[\#]{4}\s(.+)/gm, '<h4>$1</h4>');
-        value = value.replace(/^[\#]{3}\s(.+)/gm, '<h3>$1</h3>');
-        value = value.replace(/^[\#]{2}\s(.+)/gm, '<h2>$1</h2>');
-        value = value.replace(/^[\#]{1}\s(.+)/gm, '<h1>$1</h1>');
-
-        // hr
-        value = value.replace(/(^[\-\=]{5,}\n)/gm, function(match){
-            return '<hr/>';
-        });
-        
-        // parses in-line element
-        var lines = value.split('\n');
-        for(var i = 0, size = lines.length; i < size; i ++){
-            var line = lines[i];
-
-            // font style
-            line = line.replace(/\*{2}([^\*].+)\*{2}/gm, '<b>$1</b>');
-            line = line.replace(/\_{2}([^\_].+)\_{2}/gm, '<em>$1</em>');
-            line = line.replace(/\~{2}([^\~].+)\~{2}/gm, '<del>$1</del>');
-
-            // image
-            line = line.replace(/\!\[([^\]]+)\]\(([^\)]+)\)/g, '<img src="$2" alt="$1" />');
-
-            // link
-            line = line.replace(/[\[]{1}([^\]]+)[\]]{1}[\(]{1}([^\)\"]+)(\"(.+)\")?[\)]{1}/g, '<a href="$2" title="$4">$1</a>');
-            
-            // replace line
-            lines[i] = line;
-        }
-        value = lines.join('\n');
-
-        // return parsed value
-        return value;
-    }
-    
-    /**
-     * removeChildNodes
+     * Removes child elements from HTML element.
      * @param element
      */
     function removeChildNodes(element:HTMLElement):void {
@@ -521,17 +495,8 @@ namespace duice {
     }
     
     /**
-     * createDocumentFragment
-     * @param html
-     */
-    function createDocumentFragment(html:string):DocumentFragment {
-        var template = document.createElement('template');
-        template.innerHTML = html;
-        return template.content;
-    }
-    
-    /**
-     * getCurrentWindow
+     * Returns current upper window object.
+     * @return window object
      */
     function getCurrentWindow():Window {
         if(window.frameElement){
@@ -542,16 +507,7 @@ namespace duice {
     }
     
     /**
-     * getParentNode
-     * @param element
-     */
-    function getParentNode(element:HTMLElement):Node {
-        var parentNode = element.parentNode;
-        return parentNode;
-    }
-    
-    /**
-     * setPositionCentered
+     * Sets element position to be centered
      * @param element
      */
     function setPositionCentered(element:HTMLElement):void {
@@ -564,39 +520,40 @@ namespace duice {
     }
 
     /**
-     * getElementPosition
+     * Returns position info of specified element
      * @param element
      */
-    function getElementPosition(el:any) {
-        var pos:any = ('absolute relative').indexOf(getComputedStyle(el).position) == -1;
-        var rect1:any = {top: el.offsetTop * pos, left: el.offsetLeft * pos};
-        var rect2:any = el.offsetParent ? getElementPosition(el.offsetParent) : {top:0,left:0};
+    function getElementPosition(element:any) {
+        var pos:any = ('absolute relative').indexOf(getComputedStyle(element).position) == -1;
+        var rect1:any = {top: element.offsetTop * pos, left: element.offsetLeft * pos};
+        var rect2:any = element.offsetParent ? getElementPosition(element.offsetParent) : {top:0,left:0};
         return {
             top: rect1.top + rect2.top,
             left: rect1.left + rect2.left,
-            width: el.offsetWidth,
-            height: el.offsetHeight
+            width: element.offsetWidth,
+            height: element.offsetHeight
         };
     }
     
     /**
-     * delay
+     * Delays specified milliseconds and calls specified function
      * @param callback
      */
-    function delay(callback:Function){
+    function delayCall(millis:number, callback:Function, $this:any, ...args:any[]){
         var interval = setInterval(function() {
             try {
-                callback.call(callback);
-            }catch(ignore){
-                console.log(ignore, callback);
+                callback.call($this, ...args);
+            }catch(e){
+                throw e;
             }finally{
                 clearInterval(interval);
             }
-        },200); 
+        },millis); 
     }
     
     /**
-     * getCurrentMaxZIndex
+     * Returns current max z-index value.
+     * @return max z-index value
      */
     function getCurrentMaxZIndex():number {
         var zIndex,
@@ -611,67 +568,8 @@ namespace duice {
     }
     
     /**
-     * fadeIn
-     * @param element
-     */
-    function fadeIn(element:HTMLElement):void {
-        element.classList.remove('duice-ui-fadeOut');
-        element.classList.add('duice-ui-fadeIn');
-    }
-    
-    /**
-     * fadeOut
-     * @param element
-     */
-    function fadeOut(element:HTMLElement):void {
-        element.classList.remove('duice-ui-fadeIn');
-        element.classList.add('duice-ui-fadeOut');
-    }
-    
-    /**
-     * block
-     * @param element
-     */
-    
-    /**
-     * load
-     * @param element
-     */
-    function load(element:HTMLElement):object {
-        var $this = this;
-        var div = document.createElement('div');
-        div.classList.add('duice-ui-load');
-        div.style.position = 'fixed';
-        div.style.opacity = '0';
-        div.style.zIndex = String(this.getCurrentMaxZIndex() + 1);
-
-        // on resize event
-        this.getCurrentWindow().addEventListener('resize', function(event:any) {
-            if(div){
-                $this.setPositionCentered(div);
-                div.style.top = '30vh';   // adjust top
-            }
-        });
-        
-        // start
-        element.appendChild(div);
-        this.setPositionCentered(div);
-        div.style.top = '30vh'; // adjust top   
-        this.fadeIn(div);
-        
-        // return handler
-        return {
-            release: function() {
-                $this.fadeOut(div);
-                $this.delay(function(){
-                    element.removeChild(div);
-                });
-            }
-        }
-    }
-    
-    /**
      * duice.data
+     * package of Data structure 
      */
     export namespace data {
 
@@ -691,6 +589,7 @@ namespace duice {
         
         /**
          * Map data structure
+         * @param JSON object
          */
         export class Map extends DataObject {
             data:any = new Object();
@@ -962,6 +861,9 @@ namespace duice {
             }
         }
         
+        /**
+         * duice.ui.UIElement
+         */
         export abstract class UIElement extends Observable implements Observer {
             element:HTMLElement;
             constructor(element:HTMLElement){
@@ -972,6 +874,18 @@ namespace duice {
             abstract bind(...args: any[]):void;
             abstract update(observable:duice.data.DataObject, obj:object):void;
             isAvailable():boolean {
+                
+                // contains method not support(IE)
+                if(!Node.prototype.contains) {
+                    Node.prototype.contains = function(el){
+                        while (el = el.parentNode) {
+                            if (el === this) return true;
+                        }
+                        return false;
+                    }
+                }
+                
+                // checks contains element
                 if(document.contains(this.element)){
                     return true;
                 }else{
@@ -1077,16 +991,6 @@ namespace duice {
                     $this.setChanged();
                     $this.notifyObservers(this); 
                 });
-                
-                // disabled drag in case of parent element is draggable.
-                var type = this.input.getAttribute('type');
-                if(type !== 'range'){
-                    this.input.setAttribute('draggable', 'true');
-                    this.input.addEventListener('dragstart', function(event){
-                        event.preventDefault();
-                        event.stopPropagation();
-                    });
-                }
             }
             abstract update(map:duice.data.Map, obj:object):void;
             abstract getValue():any;
@@ -1541,7 +1445,7 @@ namespace duice {
                 updateDate(date);
             }
             closePicker():void {
-                this.pickerDiv.remove();
+                this.pickerDiv.parentNode.removeChild(this.pickerDiv);
                 this.pickerDiv = null;
                 window.removeEventListener('click', this.clickListener);
             }
@@ -1691,7 +1595,7 @@ namespace duice {
             getTable(element:HTMLTableElement, $context:any):Table {
                 var table = new Table(element);
                 if(element.dataset.duiceEditable){
-                    table.setEditable(Boolean(element.dataset.duiceEditable));
+                    table.setEditable(element.dataset.duiceEditable === 'true');
                 }
                 var bind = element.dataset.duiceBind.split(',');
                 table.bind(getObject($context, bind[0]), bind[1]);
@@ -1753,13 +1657,14 @@ namespace duice {
                         }
                         this.classList.add('duice-ui-table__tbody--index');
                         list.index = Number(this.dataset.duiceIndex);
+                        console.log(list.getIndex(), list);
                     });
                     
                     // drag and drop event
                     if(this.editable === true) {
                         tbody.setAttribute('draggable', 'true');
                         tbody.addEventListener('dragstart', function(event){
-                            event.dataTransfer.setData("fromIndex", this.dataset.duiceIndex);
+                            event.dataTransfer.setData("text", this.dataset.duiceIndex);
                         });
                         tbody.addEventListener('dragover', function(event){
                             event.preventDefault();
@@ -1768,7 +1673,7 @@ namespace duice {
                         tbody.addEventListener('drop', function(event){
                             event.preventDefault();
                             event.stopPropagation();
-                            var fromIndex = parseInt(event.dataTransfer.getData('fromIndex'));
+                            var fromIndex = parseInt(event.dataTransfer.getData('text'));
                             var toIndex = parseInt(this.dataset.duiceIndex);
                             list.move(fromIndex, toIndex);
                             tbody.click();
@@ -1872,13 +1777,12 @@ namespace duice {
                 this.ul.addEventListener('drop', function(event) {
                     event.preventDefault();
                     event.stopPropagation();
-                    var fromIndex = parseInt(event.dataTransfer.getData('fromIndex'));
+                    var fromIndex = parseInt(event.dataTransfer.getData('text'));
                     var fromMap = $this.list.get(fromIndex);
                     fromMap.set($this.hierarchy.parentName, null);
                     $this.ul.classList.remove('duice-ui-ul--hierarchy-dragover');
                     $this.setChanged();
                     $this.notifyObservers(this);
-                    console.log(event);
                 });
             }
             setFoldable(foldable:boolean):void {
@@ -1938,13 +1842,20 @@ namespace duice {
                 initialize(li,$context);
                 this.lis.push(li);
                 li.dataset.duiceIndex = String(index);
+                
+                // sets index
+                li.addEventListener('mousedown', function(event){
+                    event.stopPropagation();
+                    $this.list.index = Number(this.dataset.duiceIndex);
+                    console.log($this.list.getIndex(), $this.list);
+                });
 
                 // editable
                 if(this.editable){
                     li.setAttribute('draggable', 'true');
                     li.addEventListener('dragstart', function(event){
                         event.stopPropagation();
-                        event.dataTransfer.setData("fromIndex", this.dataset.duiceIndex);
+                        event.dataTransfer.setData("text/plain", this.dataset.duiceIndex);
                     });
                     li.addEventListener('dragover', function(event){
                         event.preventDefault();
@@ -1953,7 +1864,7 @@ namespace duice {
                     li.addEventListener('drop', function(event){
                         event.preventDefault();
                         event.stopPropagation();
-                        var fromIndex = parseInt(event.dataTransfer.getData('fromIndex'));
+                        var fromIndex = parseInt(event.dataTransfer.getData('text'));
                         var toIndex = parseInt(this.dataset.duiceIndex);
                         $this.moveLi(fromIndex, toIndex);
                     });
@@ -2109,6 +2020,7 @@ namespace duice {
             headerDiv:HTMLDivElement;
             bodyDiv:HTMLDivElement;
             blocker:Blocker;
+            listener:any = {};
             constructor(){
                 var $this = this;
                 this.container = document.createElement('div');
@@ -2164,7 +2076,8 @@ namespace duice {
                 button.classList.add('duice-ui-modal__button--' + type);
                 return button;
             }
-            open():void {
+            show():void {
+                
                 // block
                 this.blocker.block();
                 
@@ -2175,14 +2088,74 @@ namespace duice {
                 getCurrentWindow().document.body.appendChild(this.container);
                 setPositionCentered(this.container);
             }
-            close():void {
-                
+            hide():void {
+
                 // closes modal
                 this.container.style.display = 'none';
                 getCurrentWindow().document.body.removeChild(this.container);
                 
                 // unblock
                 this.blocker.unblock();
+            }
+            open():boolean {
+                if(this.listener.beforeOpen){
+                    if(this.listener.beforeOpen.call(this) === false){
+                        return false;
+                    }
+                }
+                this.show();
+                if(this.listener.afterOpen){
+                    delayCall(200, this.listener.afterOpen, this);
+                }
+                return true;
+            }
+            beforeOpen(listener:Function):any {
+                this.listener.beforeOpen = listener;
+                return this;
+            }
+            afterOpen(listener:Function):any {
+                this.listener.afterOpen = listener;
+                return this;
+            }
+            close():boolean {
+                if(this.listener.beforeClose){
+                    if(this.listener.beforeClose.call(this) === false){
+                        return false;
+                    }
+                }
+                this.hide();
+                if(this.listener.afterClose){
+                    delayCall(200, this.listener.afterClose, this);
+                }
+                return true;
+            }
+            beforeClose(listener:Function):any{
+                this.listener.beforeClose = listener;
+                return this;
+            }
+            afterClose(listener:Function):any {
+                this.listener.afterClose = listener;
+                return this;
+            }
+            confirm():boolean {
+                if(this.listener.beforeConfirm){
+                    if(this.listener.beforeConfirm.call(this) === false){
+                        return false;
+                    }
+                }
+                this.hide();
+                if(this.listener.afterConfirm){
+                    delayCall(200, this.listener.afterConfirm, this);
+                }
+                return true;
+            }
+            beforeConfirm(listener:Function):any {
+                this.listener.beforeConfirm = listener;
+                return this;
+            }
+            afterConfirm(listener:Function):any {
+                this.listener.afterConfirm = listener;
+                return this;
             }
         }
 
@@ -2212,7 +2185,8 @@ namespace duice {
                 
                 this.confirmButton = this.createButton('confirm');
                 this.confirmButton.addEventListener('click', function(event){
-                   $this.close(); 
+                    console.log(this);
+                    $this.close(); 
                 });
                 this.buttonDiv.appendChild(this.confirmButton);
                 
@@ -2221,9 +2195,13 @@ namespace duice {
                 this.addContent(this.messageDiv);
                 this.addContent(this.buttonDiv);
             }
-            open():void {
-                super.open();
-                this.confirmButton.focus();
+            open():boolean {
+                if(super.open()){
+                    this.confirmButton.focus();
+                    return true;
+                }else{
+                    return false;
+                }
             }
         }
         
@@ -2262,7 +2240,7 @@ namespace duice {
                 // confirm button
                 this.confirmButton = this.createButton('confirm');
                 this.confirmButton.addEventListener('click', function(event){
-                   $this.close(); 
+                   $this.confirm(); 
                 });
                 this.buttonDiv.appendChild(this.confirmButton);
                 
@@ -2271,9 +2249,12 @@ namespace duice {
                 this.addContent(this.messageDiv);
                 this.addContent(this.buttonDiv);
             }
-            open():void {
-                super.open();
-                this.cancelButton.focus();
+            open():boolean {
+                if(super.open()){
+                    this.cancelButton.focus();    
+                }else{
+                    return false;
+                }
             }
         }
         
@@ -2320,7 +2301,7 @@ namespace duice {
                 // confirm button
                 this.confirmButton = this.createButton('confirm');
                 this.confirmButton.addEventListener('click', function(event){
-                   $this.close(); 
+                   $this.confirm(); 
                 });
                 this.buttonDiv.appendChild(this.confirmButton);
                 
@@ -2330,9 +2311,16 @@ namespace duice {
                 this.addContent(this.inputDiv);
                 this.addContent(this.buttonDiv);
             }
-            open():void {
-                super.open();
-                this.input.focus();
+            open():boolean {
+                if(super.open()){
+                    this.input.focus();
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+            getValue():string {
+                return this.input.value;
             }
         }
         
@@ -2345,15 +2333,25 @@ namespace duice {
                 this.dialog.classList.add('duice-ui-dialog');
                 this.parentNode = this.dialog.parentNode;
             }
-            open():void {
+            open():boolean {
                 this.dialog.style.display = 'block';
-                this.bodyDiv.appendChild(this.dialog);
-                super.open();
+                this.addContent(this.dialog);
+                if(super.open()){
+                    return true;
+                }else{
+                    this.dialog.style.display = 'none';
+                    this.parentNode.appendChild(this.dialog);
+                    return false;
+                }
             }
-            close():void {
-                this.dialog.style.display = 'none';
-                this.parentNode.appendChild(this.dialog);
-                super.close();
+            close():boolean {
+                if(super.close()){
+                    this.dialog.style.display = 'none';
+                    this.parentNode.appendChild(this.dialog);
+                    return true;
+                }else{
+                    return false;
+                }
             }
         }   
 
@@ -2362,7 +2360,9 @@ namespace duice {
 }   // end
 
 
-//DOMContentLoaded event process
+/**
+ * DOMContentLoaded event process
+ */
 document.addEventListener("DOMContentLoaded", function(event) {
     var $context:any = typeof self !== 'undefined' ? self : 
                         typeof window !== 'undefined' ? window :

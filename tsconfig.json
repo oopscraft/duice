@@ -6,12 +6,12 @@
 	    "strictNullChecks": false,
 	    "noImplicitThis": false,
 	    "module":"none",
-	    "watch":true
+	    "watch": false
 	},
 	"typedocOptions":{
 		"mode": "modules",
 		"out": "doc",
-		"theme": "minimal"
+		"theme": "node_modules/typedoc-clarity-theme"
 	},
 	"files":[
 		"./src/duice.ts"
