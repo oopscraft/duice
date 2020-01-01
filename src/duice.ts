@@ -125,7 +125,7 @@ namespace duice {
      * @return  found variables(or object)  
      */
     function getObject($context:any, name:string) {
-        if($context.hasOwnProperty(name)){
+        if($context[name]){
             return $context[name];
         }
         if((<any>window).hasOwnProperty(name)){
@@ -138,7 +138,6 @@ namespace duice {
             throw e;
         }
     }
-    
     
     /**
      * Check if value is empty
@@ -404,39 +403,25 @@ namespace duice {
      * @return converted HTML element
      */
     function executeExpression(element:HTMLElement, $context:any):any {
-        // template support 
+        var string = element.outerHTML;
+        string = string.replace(/\[\[([\s\S]*?)\]\]/mgi,function(match, command){
+            try {
+                command = command.replace('&amp;', '&');
+                command = command.replace('&lt;', '<');
+                command = command.replace('&gt;', '>');
+                const func = Function('$context', '"use strict";' + command + '');
+                var result = func($context);
+                return result;
+            }catch(e){
+                console.error(e,command);
+                throw e;
+            }
+        });
         try {
-            var string = element.outerHTML;
-            string = string.replace(/\[\[(.*?)\]\]/mgi,function(match, command){
-                try {
-                    command = command.replace('&amp;', '&');
-                    command = command.replace('&lt;', '<');
-                    command = command.replace('&gt;', '>');
-                    var result = eval(command);
-                    return result;
-                }catch(e){
-                    console.error(e,command);
-                    throw e;
-                }
-            });
             var template = document.createElement('template');
             template.innerHTML = string;
             return template.content.firstChild;
         }catch(e){
-            // not support template
-            var string = element.innerHTML;
-            string = string.replace(/\[\[(.*?)\]\]/mgi,function(match, command){
-                try {
-                    command = command.replace('&amp;', '&');
-                    command = command.replace('&lt;', '<');
-                    command = command.replace('&gt;', '>');
-                    var result = eval(command);
-                    return result;
-                }catch(e){
-                    console.error(e,command);
-                    throw e;
-                }
-            });
             removeChildNodes(element);
             element.innerHTML = string;
             return element;
@@ -574,14 +559,45 @@ namespace duice {
     export namespace data {
 
         /**
-         * Abstract DataObject
+         * Abstract data object
+         * extends from Observable and implements Observer interface.
          */
         export abstract class DataObject extends Observable implements Observer {
+            
+            /**
+             * Updates self data object from observable instance 
+             * @param observable
+             * @param obj
+             */
             abstract update(observable:Observable, obj:object):void;
+            
+            /**
+             * Loads data from JSON object 
+             * @param args
+             */
             abstract fromJson(...args: any[]):void;
+            
+            /**
+             * Converts data into JSON object.
+             * @param args
+             * @return JSON object
+             */
             abstract toJson(...args: any[]):object;
+            
+            /**
+             * Checks original data is changed.
+             * @return whether original data is changed
+             */
             abstract isDirty():boolean;
+            
+            /**
+             * Restores data as original data.
+             */
             abstract reset():void;
+            
+            /**
+             * Returns whether instance is active 
+             */
             isAvailable():boolean {
                 return true;
             }
@@ -592,22 +608,38 @@ namespace duice {
          * @param JSON object
          */
         export class Map extends DataObject {
-            data:any = new Object();
-            originData:string;
-            enable:boolean = true;
-            readonly:Array<string> = new Array<string>();
+            data:any = new Object();    // internal data object
+            originData:string;          // original string JSON data
+            enable:boolean = true;      // enable
+            readonly:Array<string> = new Array<string>();   // read only names
+        
+            /**
+             * constructor 
+             * @param json
+             */
             constructor(json?:any) {
                 super();
                 if(json){
                     this.fromJson(json);
                 }
             }
+            
+            /**
+             * Updates data from observable instance
+             * @param uiElement
+             * @param obj
+             */
             update(uiElement:duice.ui.MapUIElement, obj:object):void {
                 console.info('Map.update', uiElement, obj);
                 var name = uiElement.getName();
                 var value = uiElement.getValue();
                 this.set(name, value);
             }
+            
+            /**
+             * Loads data from JSON object.
+             * @param json
+             */
             fromJson(json:any): void {
                 
                 // sets data
@@ -623,6 +655,11 @@ namespace duice {
                 this.setChanged();
                 this.notifyObservers(this);
             }
+            
+            /**
+             * Convert data to JSON object
+             * @return JSON object
+             */
             toJson():object {
                 var json: any = new Object();
                 for(var name in this.data){
@@ -630,6 +667,11 @@ namespace duice {
                 }
                 return json;
             }
+            
+            /**
+             * Checks original data is changed
+             * @return whether original data is changed or not
+             */
             isDirty():boolean {
                 if(JSON.stringify(this.toJson()) === this.originData){
                     return false;
@@ -637,18 +679,38 @@ namespace duice {
                     return true;
                 }
             }
+            
+            /**
+             * Restores instance as original data
+             */
             reset():void {
                 var originJson = JSON.parse(this.originData);
                 this.fromJson(originJson);
             }
+            
+            /**
+             * Sets property as input value
+             * @param name
+             * @param value
+             */
             set(name:string, value:any):void {
                 this.data[name] = value;
                 this.setChanged();
                 this.notifyObservers(this);
             }
+            
+            /**
+             * Gets specified property value.
+             * @param name
+             */
             get(name:string):any {
                 return this.data[name];
             }
+            
+            /**
+             * Returns properties names as array.
+             * @return array of names
+             */
             getNames():string[]{
                 var names = new Array();
                 for(var name in this.data){
@@ -656,14 +718,30 @@ namespace duice {
                 }
                 return names;
             }
+            
+            /**
+             * Sets instance to be enabled.
+             * @param whether enable or not
+             */
             setEnable(enable:boolean):void {
                 this.enable = enable;
                 this.setChanged();
                 this.notifyObservers(this);
             }
+            
+            /**
+             * Returns instance is enabled.
+             * @return whether enable or not
+             */
             isEnable():boolean {
                 return this.enable;
             }
+            
+            /**
+             * Sets read-only specified name
+             * @param name
+             * @param readonly
+             */
             setReadonly(name:string, readonly:boolean):void {
                 if(this.readonly.indexOf(name) == -1){
                     this.readonly.push(name);
@@ -671,6 +749,12 @@ namespace duice {
                 this.setChanged();
                 this.notifyObservers(this);
             }
+            
+            /**
+             * Returns specified name is read-only
+             * @param name
+             * @return whether specified property is read-only or not
+             */
             isReadonly(name:string):boolean {
                 if(this.readonly.indexOf(name) >= 0){
                     return true;
@@ -764,7 +848,6 @@ namespace duice {
                 }
             }
             remove(index:number):void {
-                console.log(index);
                 if(0 <= index && index < this.data.length) {
                     this.data.splice(index, 1);
                     this.index = Math.min(this.index, this.data.length -1);
@@ -778,6 +861,11 @@ namespace duice {
                 this.index = toIndex;
                 this.setChanged();
                 this.notifyObservers(this);
+            }
+            forEach(handler:Function){
+                for(var i = 0, size = this.data.length; i < size; i ++){
+                    handler.call(this, this.data[i]);
+                }
             }
             sort(name:string, ascending:boolean):void {
                 this.data.sort(function(a:duice.data.Map,b:duice.data.Map):number {
@@ -829,16 +917,17 @@ namespace duice {
             
             // creates unit elements
             var elementTags = [
-                 'span[is="duice-ui-span"][data-duice-bind]:not([data-duice-id])'
+                 '*[is="duice-ui-expression"]:not([data-duice-id])'
+                ,'span[is="duice-ui-span"][data-duice-bind]:not([data-duice-id])'
                 ,'input[is="duice-ui-input"][data-duice-bind]:not([data-duice-id])'
                 ,'select[is="duice-ui-select"][data-duice-bind]:not([data-duice-id])'
                 ,'textarea[is="duice-ui-textarea"][data-duice-bind]:not([data-duice-id])'
+                ,'span[is="duice-ui-expression"][data-duice-bind]:not([data-duice-id])'
             ];
             var elements = container.querySelectorAll(elementTags.join(','));
             for(var i = 0; i < elements.length; i ++ ) {
                 try {
                     var element:any = elements[i];
-                    var type = element.dataset.duice;
                     var is = element.getAttribute('is');
                     switch(is) {
                         case 'duice-ui-span':
@@ -852,6 +941,9 @@ namespace duice {
                             break;
                         case 'duice-ui-textarea':
                             duice.ui.TextareaFactory.getTextarea(element, $context);
+                            break;
+                        case 'duice-ui-expression':
+                            duice.ui.ExpressionFactory.getExpression(element, $context);
                             break;
                     }
                 }catch(e){
@@ -872,7 +964,7 @@ namespace duice {
                 this.element.dataset.duiceId = generateUUID();
             }
             abstract bind(...args: any[]):void;
-            abstract update(observable:duice.data.DataObject, obj:object):void;
+            abstract update(dataObject:duice.data.DataObject, obj:object):void;
             isAvailable():boolean {
                 
                 // contains method not support(IE)
@@ -894,6 +986,58 @@ namespace duice {
             }
         }
         
+        /**
+         * duice.ui.SpanFactory
+         */
+        export var ExpressionFactory = {
+            getExpression(element:HTMLElement, $context:any):Expression {
+                var expression = new Expression(element);
+                
+                var context:any;
+                if($context !== window) {
+                    context = $context;
+                }else{
+                    context = {};
+                }
+                if(element.dataset.duiceBind) {
+                    var bind = element.dataset.duiceBind.split(',');
+                    bind.forEach(function(name){
+                       context[name] = getObject($context, name); 
+                    });
+                }
+                expression.bind(context);
+                return expression;
+            }
+        }
+        
+        export class Expression extends UIElement {
+            expression:string;
+            context:any;;
+            constructor(element:HTMLElement){
+                super(element);
+                this.expression = element.innerHTML;
+            }
+            bind(context:any):void {
+                this.context = context;
+                for(var name in this.context){
+                    var obj = this.context[name];
+                    if(typeof obj === 'object'
+                    && obj instanceof duice.data.DataObject){
+                        obj.addObserver(this);
+                        this.addObserver(obj);
+                        this.update(obj, obj);
+                    }
+                }
+            }
+            update(dataObject:duice.data.DataObject, obj:object) {
+                const func = Function('$context', '"use strict";' + this.expression + '');
+                var result = func(this.context);
+                this.element.innerHTML = '';
+                this.element.appendChild(document.createTextNode(result));
+                this.element.style.display = 'inline-block';
+            }
+        }
+        
         export abstract class MapUIElement extends UIElement {
             map:duice.data.Map;
             name:string;
@@ -902,7 +1046,7 @@ namespace duice {
                 this.name = name;
                 this.map.addObserver(this);
                 this.addObserver(this.map);
-                this.update(this.map, this);
+                this.update(this.map, this.map);
             }
             getMap():duice.data.Map {
                 return this.map;
@@ -1577,7 +1721,7 @@ namespace duice {
                 this.item = item;
                 this.list.addObserver(this);
                 this.addObserver(this.list);
-                this.update(this.list, this);
+                this.update(this.list, this.list);
             }
             getList():duice.data.List {
                 return this.list;
@@ -1635,7 +1779,7 @@ namespace duice {
                 
                 var $this = this;
                 
-                // remove previous rows
+                // remove previous tbodies
                 for(var i = 0; i < this.tbodies.length; i ++ ) {
                     this.table.removeChild(this.tbodies[i]);
                 }
@@ -1682,18 +1826,19 @@ namespace duice {
                     
                     this.table.appendChild(tbody);
                     this.tbodies.push(tbody);
-                }
-                
-                // not found row
-                if(list.getSize() < 1) {
-                    var emptyTbody = this.createEmptyTbody();
-                    this.table.appendChild(emptyTbody);
-                    this.tbodies.push(emptyTbody);
+                    
+                    // not found row
+                    if(list.getSize() < 1) {
+                        var emptyTbody = this.createEmptyTbody();
+                        this.table.appendChild(emptyTbody);
+                        this.tbodies.push(emptyTbody);
+                    }
                 }
             }
             createTbody(index:number, map:duice.data.Map):HTMLTableSectionElement {
                 var $this = this;
                 var tbody:HTMLTableSectionElement = <HTMLTableSectionElement>this.tbody.cloneNode(true);
+                tbody.classList.add('duice-ui-table__tbody');
                 var $context:any = new Object;
                 $context['index'] = index;
                 $context[this.item] = map;

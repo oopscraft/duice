@@ -8,6 +8,13 @@
  * ============================================================================= */
 
 /**
+ * duice.ui.Expression
+ */
+*[is="duice-ui-expression"] {
+	display:none;
+}
+
+/**
  * duice.ui.Span
  */
 .duice-ui-span {
@@ -79,7 +86,6 @@
  * duice.ui.TextInput
  */
 .duice-ui-textInput {
-	line-height: inherit;
 	margin: 0;
 	padding: 0rem 0.3rem;
     box-sizing: border-box;
@@ -88,8 +94,6 @@
 	border: 1px solid #ddd;
 	border-radius: 2px;
 	transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
-	font-family:inherit;
-	font-size:inherit;
 }
 .duice-ui-textInput:-moz-read-only { /* For Firefox */
     background-color: #f7f7f7;
@@ -441,7 +445,6 @@
  * duice.ui.Table
  */
 .duice-ui-table {
-	width: 100%;
 	border-collapse: collapse;
 	border: solid 1px #ccc;
 }
@@ -450,12 +453,13 @@
 .duice-ui-table__thead tr {
 }
 .duice-ui-table__thead tr th {
-	font-family: inherit;
-	font-size: inherit;
 	font-weight: bold;
 	margin: 0rem;
+	padding: 2px 5px;
 	border: solid 1px #ddd;
 	background: #eee;
+	background: -webkit-gradient(linear, left top, left bottom, from(#f7f7f7), to(#eee));
+	background: -moz-linear-gradient(top,  #f7f7f7,  #eee);
 	text-align: center;
 	text-overflow: ellipsis;
 }
@@ -464,18 +468,23 @@
 	border: 0px;
 }
 .duice-ui-table__tbody:hover {
-	background-color: #eee;
+	background: #eee;
+	background: -webkit-gradient(linear, left top, left bottom, from(#f7f7f7), to(#eee));
+	background: -moz-linear-gradient(top,  #f7f7f7,  #eee);
 	transition: all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
 .duice-ui-table__tbody tr {
 }
 .duice-ui-table__tbody tr td {
 	border: dotted 1px #ccc;
+	padding: 1px;
 	text-align: center;
 	text-overflow: ellipsis;
 }
 .duice-ui-table__tbody--index {
-	background-color: #eee;
+	background: #eee;
+	background: -webkit-gradient(linear, left top, left bottom, from(#f7f7f7), to(#eee));
+	background: -moz-linear-gradient(top,  #f7f7f7,  #eee);
 }
 .duice-ui-table__tbody--empty {
 	vertical-align:middle;
@@ -486,6 +495,12 @@
 .duice-ui-table__tbody--empty-message:before {
 	content: 'No Data Found';
 	color: #ccc;
+}
+.duice-ui-table__tfoot {
+}
+.duice-ui-table__tfoot tr {
+}
+.duice-ui-table__tfoot tr td {
 }
 
 /**
