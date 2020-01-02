@@ -395,39 +395,7 @@ namespace duice {
                 throw 'encodeMask-type must be string|number|date';
         }
     }
-    
-    /**
-     * Executes custom expression in HTML element and returns.
-     * @param element
-     * @param $context
-     * @return converted HTML element
-     */
-    function executeExpression(element:HTMLElement, $context:any):any {
-        var string = element.outerHTML;
-        string = string.replace(/\[\[([\s\S]*?)\]\]/mgi,function(match, command){
-            try {
-                command = command.replace('&amp;', '&');
-                command = command.replace('&lt;', '<');
-                command = command.replace('&gt;', '>');
-                const func = Function('$context', '"use strict";' + command + '');
-                var result = func($context);
-                return result;
-            }catch(e){
-                console.error(e,command);
-                throw e;
-            }
-        });
-        try {
-            var template = document.createElement('template');
-            template.innerHTML = string;
-            return template.content.firstChild;
-        }catch(e){
-            removeChildNodes(element);
-            element.innerHTML = string;
-            return element;
-        }
-    }
-    
+
     /**
      * Escapes HTML tag from string value
      * @param value
@@ -1748,28 +1716,64 @@ namespace duice {
         }
         
         /**
-         * duice.ui.TableViewer
+         * duice.ui.Table
          */
         export class Table extends ListUIElement {
             table:HTMLTableElement;
-            thead:HTMLTableSectionElement;
             tbody:HTMLTableSectionElement;
             tbodies:Array<HTMLTableSectionElement> = new Array<HTMLTableSectionElement>();
             editable:boolean;
+        
+            /**
+             * constructor table
+             * @param table
+             */
             constructor(table:HTMLTableElement) {
                 super(table);
                 this.table = table;
                 this.table.classList.add('duice-ui-table');
-                this.thead = <HTMLTableSectionElement>this.table.querySelector('thead');
-                this.thead.classList.add('duice-ui-table__thead');
+                
+                // initializes caption
+                var caption = <HTMLTableCaptionElement>this.table.querySelector('caption');
+                if(caption){
+                    caption.classList.add('duice-ui-table__caption');
+                    initialize(caption, new Object());
+                }
+                
+                // initializes head
+                var thead = <HTMLTableSectionElement>this.table.querySelector('thead');
+                if(thead){
+                    thead.classList.add('duice-ui-table__thead');
+                    initialize(thead, new Object());
+                }
+                
+                // clones body
                 var tbody = this.table.querySelector('tbody');
                 this.tbody = <HTMLTableSectionElement>tbody.cloneNode(true);
                 this.tbody.classList.add('duice-ui-table__tbody');
                 this.table.removeChild(tbody);
+                
+                // initializes foot
+                var tfoot = <HTMLTableSectionElement>this.table.querySelector('tfoot');
+                if(tfoot){
+                    tfoot.classList.add('duice-ui-table__tfoot');
+                    initialize(tfoot, new Object());
+                }
             }
+            
+            /**
+             * Sets enable flag
+             * @param editable
+             */
             setEditable(editable:boolean):void {
                 this.editable = editable;
             }
+            
+            /**
+             * Updates table
+             * @param list
+             * @param obj
+             */
             update(list:duice.data.List, obj:object):void {
                 
                 // checks changed source instance
@@ -1779,7 +1783,7 @@ namespace duice {
                 
                 var $this = this;
                 
-                // remove previous tbodies
+                // remove previous rows
                 for(var i = 0; i < this.tbodies.length; i ++ ) {
                     this.table.removeChild(this.tbodies[i]);
                 }
@@ -1835,6 +1839,12 @@ namespace duice {
                     }
                 }
             }
+            
+            /**
+             * Creates table body element
+             * @param index
+             * @param map
+             */
             createTbody(index:number, map:duice.data.Map):HTMLTableSectionElement {
                 var $this = this;
                 var tbody:HTMLTableSectionElement = <HTMLTableSectionElement>this.tbody.cloneNode(true);
@@ -1842,10 +1852,13 @@ namespace duice {
                 var $context:any = new Object;
                 $context['index'] = index;
                 $context[this.item] = map;
-                tbody = executeExpression(<HTMLElement>tbody, $context);
                 initialize(tbody,$context);
                 return tbody;
             }
+            
+            /**
+             * Creates empty table body element
+             */
             createEmptyTbody():HTMLTableSectionElement {
                 var emptyTbody:HTMLTableSectionElement = <HTMLTableSectionElement>this.tbody.cloneNode(true);
                 removeChildNodes(emptyTbody);
@@ -1983,7 +1996,6 @@ namespace duice {
                 var $context:any = new Object;
                 $context['index'] = index;
                 $context[this.item] = map;
-                li = executeExpression(<HTMLElement>li, $context);
                 initialize(li,$context);
                 this.lis.push(li);
                 li.dataset.duiceIndex = String(index);
@@ -1991,6 +2003,10 @@ namespace duice {
                 // sets index
                 li.addEventListener('mousedown', function(event){
                     event.stopPropagation();
+                    for(var i = 0; i < $this.lis.length; i ++ ) {
+                        $this.lis[i].classList.remove('duice-ui-ul__li--index');
+                    }
+                    this.classList.add('duice-ui-ul__li--index');
                     $this.list.index = Number(this.dataset.duiceIndex);
                     console.log($this.list.getIndex(), $this.list);
                 });
@@ -2020,9 +2036,14 @@ namespace duice {
                     var childUl = document.createElement('ul');
                     childUl.classList.add('duice-ui-ul');
                     var hasChild:boolean = false;
+                    var hierarchyValue = map.get(this.hierarchy.name);
                     for(var i = 0, size = this.list.getSize(); i < size; i ++ ){
                         var element = this.list.get(i);
-                        if(element.get(this.hierarchy.parentName) === map.get(this.hierarchy.name)){
+                        var hierarchyParentValue = element.get(this.hierarchy.parentName);
+                        if(isEmpty(hierarchyParentValue) === true){
+                            continue;
+                        }
+                        if(hierarchyParentValue === hierarchyValue){
                             var childLi = this.createLi(i, element);
                             childLi.classList.add('duice-ui-ul__li--indent');
                             childUl.appendChild(childLi);

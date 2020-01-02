@@ -18,8 +18,10 @@
  * duice.ui.Span
  */
 .duice-ui-span {
-	display:inline-block;
+	width: 100%;
+	height: inherit;
 	line-height: inherit;
+	display:inline-block;
 	margin: 0;
 	padding: 0rem 0.3rem;
     cursor: inherit;
@@ -33,6 +35,8 @@
  * duice.ui.GenericInput
  */
 .duice-ui-genericInput {
+	width: 100%;
+	height: inherit;
 	line-height: inherit;
 	margin: 0;
 	padding: 0rem 0.3rem;
@@ -57,6 +61,7 @@
 }
 .duice-ui-genericInput[type="range"] {
 	-webkit-appearance: none;
+	border: solid 1px #ccc;
 	height: 10px;
 	background: #fff;
 	outline: none;
@@ -68,24 +73,27 @@
   opacity: 1;
 }
 .duice-ui-genericInput[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 5px;
-  height: 10px;
-  background: black;
-  cursor: pointer;
+  	-webkit-appearance: none;
+  	appearance: none;
+  	width: 10px;
+  	height: 10px;
+  	background-color: black;
+  	cursor: pointer;
 }
 .duice-ui-genericInput[type="range"]::-moz-range-thumb {
-  width: 5px;
-  height: 10px;
-  background: black;
-  cursor: pointer;
+  	width: 10px;
+  	height: 10px;
+  	background-color: black;
+  	cursor: pointer;
 }
 
 /**
  * duice.ui.TextInput
  */
 .duice-ui-textInput {
+	width: 100%;
+	height: inherit;
+	line-height: inherit;
 	margin: 0;
 	padding: 0rem 0.3rem;
     box-sizing: border-box;
@@ -110,6 +118,8 @@
  * duice.ui.NumberInput
  */
 .duice-ui-numberInput {
+	width: 100%;
+	height: inherit;
 	line-height: inherit;
 	margin: 0;
 	padding: 0rem 0.3rem;
@@ -137,25 +147,26 @@
  * duice.ui.CheckboxInput
  */
 .duice-ui-checkboxInput {
+	height: inherit;
+	line-height: inherit;
 	vertical-align: middle;
-	width: 1rem;
-    height: 1rem;
 }
 
 /**
  * duice.ui.RangeInput
  */
 .duice-ui-radioInput {
+	height: inherit;
+	line-height: inherit;
 	vertical-align: middle;
-	width: 1rem;
-    height: 1rem;
 }
-
 
 /**
  * duice.ui.Calendar
  */
 .duice-ui-dateInput {
+	width: 100%;
+	height: inherit;
 	line-height: inherit;
 	margin: 0rem;
 	padding: 0rem 0.3rem;
@@ -372,6 +383,8 @@
  * duice.ui.select
  */
 .duice-ui-select {
+	width: 100%;
+	height: inherit;
 	line-height: inherit;
 	margin: 0rem;
 	padding: 0rem 0.3rem;
@@ -409,20 +422,18 @@
  * duice.ui.Textarea
  */
 .duice-ui-textarea {
-	font-family: inherit;
-	font-size: inherit;
-	font-weight: inherit;
+	width: 100%;
+	height: inherit;
+	line-height: inherit;
 	white-space: pre-line;
 	margin: 0;
-	padding: 0.2rem 0.3rem;
+	padding: 0;
 	border-radius: 2px;
 	border: 1px solid #ddd;
 	transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
 	box-sizing: border-box;         
 	-moz-box-sizing: border-box;    
 	-webkit-box-sizing: border-box; 
-	width: 100%;
-	height: 100%;
 	display: flex;
     align-items: center;
     justify-content: center;
@@ -448,14 +459,20 @@
 	border-collapse: collapse;
 	border: solid 1px #ccc;
 }
+.duice-ui-table__caption {
+}
 .duice-ui-table__thead {
 }
 .duice-ui-table__thead tr {
+	height: inherit;
+	line-height: inherit;
 }
 .duice-ui-table__thead tr th {
+	height: inherit;
+	line-height: inherit;
 	font-weight: bold;
 	margin: 0rem;
-	padding: 2px 5px;
+	padding: 0.2rem 0.5rem;
 	border: solid 1px #ddd;
 	background: #eee;
 	background: -webkit-gradient(linear, left top, left bottom, from(#f7f7f7), to(#eee));
@@ -474,8 +491,12 @@
 	transition: all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
 .duice-ui-table__tbody tr {
+	height: inherit;
+	line-height: inherit;
 }
 .duice-ui-table__tbody tr td {
+	height: inherit;
+	line-height: inherit;
 	border: dotted 1px #ccc;
 	padding: 1px;
 	text-align: center;
@@ -497,10 +518,19 @@
 	color: #ccc;
 }
 .duice-ui-table__tfoot {
+	border-top: solid 1px #eee;
+	background: #f7f7f7;
+	background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#f7f7f7));
+	background: -moz-linear-gradient(top,  #fff,  #f7f7f7);
 }
 .duice-ui-table__tfoot tr {
+	height: inherit;
+	line-height: inherit;
 }
 .duice-ui-table__tfoot tr td {
+	height: inherit;
+	line-height: inherit;
+	padding: 0.2rem 0.5rem;
 }
 
 /**
@@ -512,20 +542,22 @@
 	padding: 0px;
 }
 .duice-ui-ul--hierarchy {
-	padding-left: 16px;
-	background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABA0lEQVR42rXTP2qEQBiH4a/KEbbY0iqNjYWi+OcWe4+whEAISRFIkSIHSK2FICqIIiKiIKIogif64i9sE3SLScjA0zi+4zgi0X8OXddvHce524O575ts2z6tztfM88x7LvMnsizrflkWnqbpB1xLkoTDMOSyLDeGYWC0ZJrmwziO3DTNBp4UxzG7rrvheR6jxQ4e+77nqqp2dV23C7tEizN4atuWi6IQggYtGYbxUtc1Z1kmBA1aLPCKQ8GBiUCDFt/6Lc9zjqJICBq0pGnae5qmHASBEDRoSVXVD2zJ930haNCSoiifWE30FdCgJUmSnmVZ9n4DLX6Hm9VhdRR0uLR/G19cYAnqWi7zswAAAABJRU5ErkJggg==');
+	padding-left: 24px;
+	background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABi0lEQVR42u2VPWvCUBSG3dqptFNpf0R/hv8iU92cHER0UFKbGkMpFFqhUCl0LuggFKeuEgKJMUpChhDwA/EDcXPxNG9pL0IxsfQuhQae6Vye59wMSSz2//B+JEk6UxRF3Abmv5KXy+ULXddpG5h/i8iyfB4MLnfBsixar9e0Wq1ouVzSZDKhwWBA9XqdqtUqYY5zcLJAqVS6WiwWNJvNtgJZs9kkwzDIcZxI4Ny8ujydTmk0GoWCJRqNxseWnueFAudmQBmPx9Tv9yOZz+dUq9UigZMFisXi9XA4JN/3dwJnw8CycLKAKIo32C7q2rsCF5wsUCgUbrGZ67pcgAtOFsjn83co27bNBbjgZIFcLldBudvtcgEuOFkgm80+oGyaJhfggpMFMpnMY6/Xo7BPwE+AC04WSKfTT51OhzRN4wJccLJAKpV6brfbpKoqF+CCkwWSyeQLrtZqtbgAF5wskEgkXlHl9YrggvPLfxiPxyuCILzxJHDeB+4DBPYDjgJOAk45cfwp3/v7//B3jBai2S8PveEAAAAASUVORK5CYII=');
 	background-repeat: no-repeat;
 }
 .duice-ui-ul--hierarchy-dragover {
-	padding-left: 16px;
-	background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABjElEQVR42rWTzUoCcRTFp020q1VFixBXIbgRxq/8eIpsKeITREQQUeroqC3CRbgYENy0ERUVHU0UUcFvJTdCb9EbnP73j4iF0Eg08INh7j2Hc+9lBOG/HpvNduZ2u69+Qt+/NbpcLg/jehOTyQSj0QjD4RCDwQD9fh/Lmmdl4HQ6b+bzOabTKUgwHo85JGw2m2g0GqjX66jValBVFbPZDKRZGTgcjlsSdrtddDodtNtttFqtjeJKpcL7SLOe4I4iahGXSiXeQ5r1Hdz3ej0kk0nEYjFEo1HIsoxIJIJwOAxJkhAKhRAMBhEIBHidLVNdLvVCsNvtj+VyGYqiYLFYaKZarX6wUXxkIKXTaWQymVXU36A+llBlBud0bzkej/NCsVjUBO3G6/W+GAyGY8FisTzRfCwScrmcJvL5/KfVaqVL7Ahms/k5kUggm83yMbTAEr+LonjJr2AymZRUKoVCoaAJOqXf73/T6/UiN2AvD0aj8XUbdDqdzKSnjAPy2GUcMk624Iixz9j781/7BS+r10KEi7GdAAAAAElFTkSuQmCC');
+	padding-left: 24px;
+	background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAACaklEQVR42u2VS4tSYRzGh6hoUVDQovoQfQZJoc+gSxMJJpABRRRxcBzzMiGEEQQNE23ahDoz3kJXwpSK4h11vIyXuXhhFFfTyn/v85LWoBEd2wQJP/Cc9/g8/+txZeX/529+LBbLQ4fDYVoEzpYWt9vtG5lMhkA6nb4Ezn5pYrPZnrAHNn9HqVSiyWRCFxcXNBwO6fT0lLxeL21vb1M+n4fJJrTmDKxW6/PxeEyj0Yj/8Pz8nDMYDKjf71Ov16N2u031ep1TrVbp8PCQyuUyB8bFYpF/h9ai9G0Qn4p1u106OzvjER4fH1On0+EGzWaTjo6OqNFoUK1Wm5lMDSqVCkFrkYEDkS8jXigU+DW05gzMZvMLlGQZ8Vwux6+hNWdgMpmcMIA4hCORCO3u7lIwGKRAIEB+v598Ph/t7+/T3t4eB+doMPB4POR2u/k91uQv09FlTZdyg/X19ZdoKCJHFNFolDd8GViGDdbwp9zAaDS+QoMRfSwWo2w2y81QGiG0Wi1kHGHlesQN9Hr9azQYNQ+FQrOao95CgIHL5drRaDT3uIFOp3uD+qN5MIDRdMaFwJZuZDAYNmZN1mq1b1GSRCJBBwcHPApsphAwVazxObVaLZsZsFR2Tk5OKBwO8/rjwek750/ByDqdzk8qlerHe2ltbe09yoLxQ4qpVIqSyaRQvq6urn5QKpXXZgbsxkcsFOYfCxOPxwXDdqEll8v1lxZNoVAE2ewPET3SRAZC2draykgkksc/698WiUTPZDLZZ6lUmlwGppEUi8XvmOYDxk3GVRjcYNxh3P9+sAzQuMu4xbjOuPLv/49/AxLmdcP7ZiAuAAAAAElFTkSuQmCC');
 	background-repeat: no-repeat;
 }
 .duice-ui-ul__li {
 	list-style-type: none;
-	margin: 0px;
-	padding: 0px;
-	border: solid 0px red;
+	margin: 1px;
+	padding: 1px;
+}
+.duice-ui-ul__li--index {
+	border-left: solid 2px #ccc;
 }
 .duice-ui-ul__li--indent {
 	padding-left: 24px;
@@ -533,7 +565,7 @@
 	background-repeat: no-repeat;
 }
 .duice-ui-ul__li--fold {
-	padding-left: 16px;
+	padding-left: 24px;
 	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAMUlEQVR42mNgGAWjYGiDhoaG/4QwxRZQIk+OBf+HrAX/seDRIKJTKqJpPhgFo2CEAAB0fljYcQiAXAAAAABJRU5ErkJggg==);
 	background-repeat: no-repeat;
 }
