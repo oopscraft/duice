@@ -2016,7 +2016,7 @@ namespace duice {
                     li.setAttribute('draggable', 'true');
                     li.addEventListener('dragstart', function(event){
                         event.stopPropagation();
-                        event.dataTransfer.setData("text/plain", this.dataset.duiceIndex);
+                        event.dataTransfer.setData("text", this.dataset.duiceIndex);
                     });
                     li.addEventListener('dragover', function(event){
                         event.preventDefault();

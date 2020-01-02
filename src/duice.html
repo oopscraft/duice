@@ -283,24 +283,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	usersTextarea.addEventListener('change', function(event){
 		users.fromJson(JSON.parse(this.value));
 	});
-	
-	// prints hierarchyUsersJson as JSON
-	var hierarchyUsersTextarea = document.getElementById('hierarchyUsersTextarea');
-	function printHierarchyUsers(){
-		hierarchyUsersTextarea.value = JSON.stringify(hierarchyUsers.toJson(), null, 2);
-	}
-	printHierarchyUsers();
-	hierarchyUsers.addObserver({
-		isAvailable:function(){
-			return true;
-		},
-		update:function(){
-			printHierarchyUsers();
-		}
-	});
-	hierarchyUsersTextarea.addEventListener('change', function(event){
-		hierarchyUsers.fromJson(JSON.parse(this.value), 'childs');
-	});
 });
 </script>
 <style>
