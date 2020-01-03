@@ -1,5 +1,5 @@
 /* =============================================================================
- * DUICE (Javascript UI Component Engine)
+ * DUICE (Data-oriented UI Component Engine)
  * - Anyone can use it freely.
  * - Modify the source or allow re-creation. However, you must state that you have the original creator.
  * - However, we can not grant patents or licenses for reproductives. (Modifications or reproductions must be shared with the public.)
@@ -8,9 +8,9 @@
  * ============================================================================= */
 
 /**
- * duice.ui.Expression
+ * duice.ui.Scriptlet
  */
-*[is="duice-ui-expression"] {
+*[is="duice-ui-scriptlet"] {
 	display:none;
 }
 
@@ -59,33 +59,6 @@
 	outline: none;
 	border: solid 1px gray;
 }
-.duice-ui-genericInput[type="range"] {
-	-webkit-appearance: none;
-	border: solid 1px #ccc;
-	height: 10px;
-	background: #fff;
-	outline: none;
-	opacity: 0.7;
-	-webkit-transition: .2s;
-	transition: opacity .2s;
-}
-.duice-ui-genericInput[type="range"]:hover {
-  opacity: 1;
-}
-.duice-ui-genericInput[type="range"]::-webkit-slider-thumb {
-  	-webkit-appearance: none;
-  	appearance: none;
-  	width: 10px;
-  	height: 10px;
-  	background-color: black;
-  	cursor: pointer;
-}
-.duice-ui-genericInput[type="range"]::-moz-range-thumb {
-  	width: 10px;
-  	height: 10px;
-  	background-color: black;
-  	cursor: pointer;
-}
 
 /**
  * duice.ui.TextInput
@@ -94,8 +67,9 @@
 	width: 100%;
 	height: inherit;
 	line-height: inherit;
+	text-align: inherit;
 	margin: 0;
-	padding: 0rem 0.3rem;
+	padding: 0em 0.5em;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
@@ -122,7 +96,7 @@
 	height: inherit;
 	line-height: inherit;
 	margin: 0;
-	padding: 0rem 0.3rem;
+	padding: 0em 0.5em;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
@@ -131,6 +105,7 @@
 	transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
 	font-family:inherit;
 	font-size:inherit;
+	text-align: right;
 }
 .duice-ui-numberInput:-moz-read-only { /* For Firefox */
     background-color: #f7f7f7;
@@ -184,7 +159,7 @@
     background-clip: padding-box;
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 	overflow: hidden;
-	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAsVBMVEUAAABEREBEREBEREAAAAACAgJEREBEREAAAAAAAAAAAAABAQEGBgYKCgkJCQgBAQEAAAAAAABEREAmJiUZGRhEREAQEBAVFRUBAQAKCgkLCwsKCgoBAQEAAAAAAAABAQEGBgYFBQUiIiAgIB4HBwYAAAAAAAAGBgUdHRsJCQgHBwYAAAAAAAAAAAABAQEJCQgyMi8GBgZEREAAAAAAAAAtLSsKCgkRERANDQwKCgkAAACDix+0AAAAO3RSTlMAAQQFBicJCiaCYGuYamhhkmoCJFoNUBiPWVpYUE5NTpNuHhwSERIVH3RmBF8HX2cVZQ8FXhRoBwlpYf19NA0AAACsSURBVBgZBcG9SsNQGIDh9/V8MT8oQqBgh24Ogptj7/8OxE1cOjgIERxik/T083kAAAAAEADUzAQoAFFKsbZcwYBeVePWJc8G2Kl14s6fh1qFR1VB9GsL7FUR1MzA/rtOL6L6uWVgWyfeYSyHk4nc3D8t3dKurUv3NiP2MzCWw6lOw0yQxHMXf8Nlf/0FgCOMu9fdCBwxYB2ay/bhNsCqAjbmlgA2VVAzE0DNf+UTOypHKh5VAAAAAElFTkSuQmCC');
+	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAERJREFUOI1jYBisoIFIMQZGJPYBKGZgYGBwQGIzYBFzgGKcNmBIoonB1eJyASFA0AWEAFwtEwmasIJRA6hgAFXTwcAAAMNsC5Cn3S3mAAAAAElFTkSuQmCC');
 	background-repeat: no-repeat;
 	background-position: right 0.5rem center;
 	background-color: white;
@@ -260,7 +235,7 @@
 .duice-ui-dateInput__pickerDiv-headerDiv {
 	margin: 0px;
 	padding: 1px;
-	border-bottom: dotted 1px lightgray;
+	border: none;
 	display: flex;
 	justify-content: space-between;
 }
@@ -268,7 +243,7 @@
 	width: 24px;
 	height: 24px;
 	border: solid 0px;
-	background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAsVBMVEUAAABEREBEREBEREAAAAACAgJEREBEREAAAAAAAAAAAAABAQEGBgYKCgkJCQgBAQEAAAAAAABEREAmJiUZGRhEREAQEBAVFRUBAQAKCgkLCwsKCgoBAQEAAAAAAAABAQEGBgYFBQUiIiAgIB4HBwYAAAAAAAAGBgUdHRsJCQgHBwYAAAAAAAAAAAABAQEJCQgyMi8GBgZEREAAAAAAAAAtLSsKCgkRERANDQwKCgkAAACDix+0AAAAO3RSTlMAAQQFBicJCiaCYGuYamhhkmoCJFoNUBiPWVpYUE5NTpNuHhwSERIVH3RmBF8HX2cVZQ8FXhRoBwlpYf19NA0AAACsSURBVBgZBcG9SsNQGIDh9/V8MT8oQqBgh24Ogptj7/8OxE1cOjgIERxik/T083kAAAAAEADUzAQoAFFKsbZcwYBeVePWJc8G2Kl14s6fh1qFR1VB9GsL7FUR1MzA/rtOL6L6uWVgWyfeYSyHk4nc3D8t3dKurUv3NiP2MzCWw6lOw0yQxHMXf8Nlf/0FgCOMu9fdCBwxYB2ay/bhNsCqAjbmlgA2VVAzE0DNf+UTOypHKh5VAAAAAElFTkSuQmCC');
+	background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAERJREFUOI1jYBisoIFIMQZGJPYBKGZgYGBwQGIzYBFzgGKcNmBIoonB1eJyASFA0AWEAFwtEwmasIJRA6hgAFXTwcAAAMNsC5Cn3S3mAAAAAElFTkSuQmCC');
 	background-color: white;
 	background-repeat:no-repeat;
 	background-position: center; 

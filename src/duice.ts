@@ -1,5 +1,5 @@
 /* =============================================================================
- * DUICE (Javascript UI Component Engine)
+ * DUICE (Data-oriented UI Component Engine)
  * - Anyone can use it freely.
  * - Modify the source or allow re-creation. However, you must state that you have the original creator.
  * - However, we can not grant patents or licenses for reproductives. (Modifications or reproductions must be shared with the public.)
@@ -551,6 +551,184 @@ namespace duice {
         return z;
     }
     
+    export var MaskFactory = {
+        getMask(type:string, ...args:string[]){
+            var mask:Mask;
+            switch(type){
+                case 'string':
+                    mask = new StringMask(args[0]);
+                    break;
+                case 'number':
+                    mask = new NumberMask(parseInt(args[0]));  
+                    break;
+                case 'date':
+                    mask = new DateMask(args[0]);
+                    break;
+                default:
+                    throw 'invalid mask type[' + type + ']';
+            }
+            return mask;
+        }
+    }
+    
+    /**
+     * duice.Mask interface
+     */
+    interface Mask {
+        encode(value:any):any;
+        validate(value:any):boolean;
+        decode(value:any):any;
+    }
+    
+    /**
+     * duice.StringMask
+     * @param string format to mask
+     */
+    export class StringMask implements Mask {
+        format:string;
+        constructor(format:string){
+            this.format = format;
+        }
+        encode(value:any):any{
+            return value;
+        }
+        validate(value:any):boolean{
+            return true;
+        }
+        decode(value:any):any{
+            return value;
+        }
+    }
+    
+    /**
+     * duice.NumberMask
+     * @param scale number scale
+     */
+    export class NumberMask implements Mask {
+        scale:number;
+        constructor(scale:number){
+            this.scale = scale;
+        }
+        encode(value:number):string{
+            var string = String(value.toFixed(this.scale));
+            var reg = /(^[+-]?\d+)(\d{3})/;
+            while (reg.test(string)) {
+                string = string.replace(reg, '$1' + ',' + '$2');
+            }
+            return string;
+        }
+        validate(value:any):boolean{
+            return true;
+        }
+        decode(string:string):number{
+            var number = Number(string);
+            return Number(number.toFixed(this.scale));
+        }
+    }
+    
+    /**
+     * duice.DateMask
+     */
+    export class DateMask implements Mask {
+        format:string;
+        constructor(format:string){
+            this.format = format;
+        }
+        encode(number:number):string{
+            if(isEmpty(number)){
+                return '';
+            }
+            if(isEmpty(this.format)){
+                return new Date(number).toString();
+            }
+            var date = new Date(number);
+            var formatRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
+            var string:string = this.format.replace(formatRex, function($1:any) {
+                switch ($1) {
+                    case "yyyy": return date.getFullYear();
+                    case "yy": return lpad(String(date.getFullYear()%1000), 2, '0');
+                    case "MM": return lpad(String(date.getMonth() + 1), 2, '0');
+                    case "dd": return lpad(String(date.getDate()), 2, '0');
+                    case "HH": return lpad(String(date.getHours()), 2, '0');
+                    case "hh": return lpad(String(date.getHours() <= 12 ? date.getHours() : date.getHours()%12), 2, '0');
+                    case "mm": return lpad(String(date.getMinutes()), 2, '0');
+                    case "ss": return lpad(String(date.getSeconds()), 2, '0');
+                    default: return $1;
+                }
+            });
+            return string;
+        }
+        validate(value:any):boolean{
+            return true;
+        }
+        decode(string:string):number{
+            if(isEmpty(string)){
+                return null;
+            }
+            if(isEmpty(this.format)){
+                return new Date(string).getTime();
+            }
+            var date = new Date();
+            date.setFullYear(0);
+            date.setMonth(0);
+            date.setDate(1);
+            date.setHours(0);
+            date.setMinutes(0);
+            date.setSeconds(0);
+            var formatRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
+            var match;
+            while ((match = formatRex.exec(this.format)) != null) {
+                var formatStr = match[0];
+                var formatIndex = match.index;
+                var formatLength = formatStr.length;
+                var matchValue = string.substr(formatIndex, formatLength);
+                matchValue = lpad(matchValue, formatLength,'0');
+                if(isNaN(Number(matchValue))){
+                    throw 'Not a Date - ' + formatStr + ':' + matchValue;
+                }
+                switch (formatStr) {
+                    case 'yyyy':
+                        var fullYear = parseInt(matchValue);
+                        date.setFullYear(fullYear);
+                        break;
+                    case 'yy':
+                        var yyValue = parseInt(matchValue);
+                        var yearPrefix = Math.floor(new Date().getFullYear() / 100);
+                        var fullYear = yearPrefix * 100 + yyValue;
+                        date.setFullYear(fullYear);
+                        break;
+                    case 'MM':
+                        var monthValue = parseInt(matchValue);
+                        date.setMonth(monthValue-1);
+                        break;
+                    case 'dd':
+                        var dateValue = parseInt(matchValue);
+                        date.setDate(dateValue);
+                        break;
+                    case 'HH':
+                        var hoursValue = parseInt(matchValue);
+                        date.setHours(hoursValue);
+                        break;
+                    case 'hh':
+                        var hoursValue = parseInt(matchValue);
+                        date.setHours(hoursValue > 12 ? (hoursValue + 12) : hoursValue);
+                        break;
+                    case 'mm':
+                        var minutesValue = parseInt(matchValue);
+                        date.setMinutes(minutesValue);
+                        break;
+                    case 'ss':
+                        var secondsValue = parseInt(matchValue);
+                        date.setSeconds(secondsValue);
+                        break;
+                }
+            }
+            var number = date.getTime();
+            return number;
+        }
+    }
+    
+    
     /**
      * duice.data
      * package of Data structure 
@@ -916,7 +1094,7 @@ namespace duice {
             
             // creates unit elements
             var elementTags = [
-                 '*[is="duice-ui-expression"]:not([data-duice-id])'
+                 '*[is="duice-ui-scriptlet"]:not([data-duice-id])'
                 ,'span[is="duice-ui-span"][data-duice-bind]:not([data-duice-id])'
                 ,'input[is="duice-ui-input"][data-duice-bind]:not([data-duice-id])'
                 ,'select[is="duice-ui-select"][data-duice-bind]:not([data-duice-id])'
@@ -941,8 +1119,8 @@ namespace duice {
                         case 'duice-ui-textarea':
                             duice.ui.TextareaFactory.getTextarea(element, $context);
                             break;
-                        case 'duice-ui-expression':
-                            duice.ui.ExpressionFactory.getExpression(element, $context);
+                        case 'duice-ui-scriptlet':
+                            duice.ui.ScriptletFactory.getScriptlet(element, $context);
                             break;
                     }
                 }catch(e){
@@ -988,9 +1166,9 @@ namespace duice {
         /**
          * duice.ui.SpanFactory
          */
-        export var ExpressionFactory = {
-            getExpression(element:HTMLElement, $context:any):Expression {
-                var expression = new Expression(element);
+        export var ScriptletFactory = {
+            getScriptlet(element:HTMLElement, $context:any):Scriptlet {
+                var expression = new Scriptlet(element);
                 
                 var context:any;
                 if($context !== window) {
@@ -1009,7 +1187,10 @@ namespace duice {
             }
         }
         
-        export class Expression extends UIElement {
+        /**
+         * duice.ui.Scriptlet
+         */
+        export class Scriptlet extends UIElement {
             expression:string;
             context:any;;
             constructor(element:HTMLElement){
@@ -1040,6 +1221,16 @@ namespace duice {
         export abstract class MapUIElement extends UIElement {
             map:duice.data.Map;
             name:string;
+            mask:Mask;
+            setMask(mask:Mask) {
+                this.mask = mask;
+            }
+            hasMask(){
+                return this.mask ? true : false;
+            }
+            getMask():Mask {
+                return this.mask;
+            }
             bind(map:duice.data.Map, name:string):void {
                 this.map = map;
                 this.name = name;
@@ -1063,6 +1254,14 @@ namespace duice {
         export var SpanFactory = {
             getSpan(element:HTMLInputElement, $context:any):Span {
                 var span = new Span(element);
+                
+                // sets mask
+                if(element.dataset.duiceMask){
+                    var mask = element.dataset.duiceMask.split(',');
+                    span.setMask(MaskFactory.getMask(mask[0], mask[1]));
+                }
+                
+                // binds
                 var bind = element.dataset.duiceBind.split(',');
                 span.bind(getObject($context, bind[0]), bind[1]);
                 return span;
@@ -1080,12 +1279,21 @@ namespace duice {
                 this.span.classList.add('duice-ui-span');
             }
             update(map:duice.data.Map, obj:object):void {
-                var value = map.get(this.name);
                 removeChildNodes(this.span);
-                this.span.appendChild(document.createTextNode(defaultIfEmpty(value, '')));
+                var value = map.get(this.name);
+                value = defaultIfEmpty(value, '');
+                if(this.hasMask()){
+                    value = this.getMask().encode(value);
+                }
+                this.span.appendChild(document.createTextNode(value));
             }
             getValue():string {
-                return defaultIfEmpty(this.span.innerHTML, null);
+                var value = this.span.innerHTML;
+                value = defaultIfEmpty(value, null);
+                if(this.hasMask()){
+                    value = this.getMask().decode(value);
+                }
+                return value;
             }
         }
 
@@ -1115,6 +1323,14 @@ namespace duice {
                 default:
                     input = new GenericInput(element);
                 }
+                
+                // sets mask
+                if(element.dataset.duiceMask){
+                    var mask = element.dataset.duiceMask.split(',');
+                    input.setMask(MaskFactory.getMask(mask[0], mask[1]));
+                }
+                
+                // bind
                 var bind = element.dataset.duiceBind.split(',');
                 input.bind(getObject($context, bind[0]), bind[1]);
                 return input;
@@ -1175,10 +1391,20 @@ namespace duice {
             }
             update(map:duice.data.Map, obj:object):void {
                 var value = map.get(this.getName());
-                this.input.value = defaultIfEmpty(value, '');
+                console.log('value', value);
+                value = defaultIfEmpty(value, '');
+                if(this.hasMask()){
+                    value = this.mask.encode(value);
+                }
+                this.input.value = value;
             }
             getValue():string {
-                return defaultIfEmpty(this.input.value, null);
+                var value = this.input.value;
+                value = defaultIfEmpty(value, null);
+                if(this.hasMask()){
+                    value = this.mask.decode(value);
+                }
+                return value;
             }
         }
         
@@ -1189,13 +1415,20 @@ namespace duice {
             constructor(input:HTMLInputElement){
                 super(input);
                 this.input.classList.add('duice-ui-numberInput');
+                this.input.setAttribute('type','text');
+                this.setMask(new NumberMask(0));
             }
             update(map:duice.data.Map, obj:object):void {
                 var value = map.get(this.getName());
-                this.input.value = String(defaultIfEmpty(value,0));
+                value = defaultIfEmpty(value,0);
+                value = this.mask.encode(value);
+                this.input.value = value;
             }
             getValue():number {
-                return Number(defaultIfEmpty(this.input.value,'0'));
+                var value:any = this.input.value;
+                value = defaultIfEmpty(value,'0');
+                value = this.mask.decode(value);
+                return value;
             }
         }
         
@@ -1258,27 +1491,31 @@ namespace duice {
                 this.type = this.input.getAttribute('type').toLowerCase();
                 this.input.setAttribute('type','text');
                 this.input.classList.add('duice-ui-dateInput');
+                
+                // adds click event listener
                 var $this = this;
                 this.input.addEventListener('click', function(event){
                     $this.openPicker();
-                });
+                },true);
+
+                // sets default mask
+                if(this.type === 'date'){
+                    this.setMask(new DateMask('yyyy-MM-dd'));
+                }else{
+                    this.setMask(new DateMask('yyyy-MM-dd HH:mm:ss'));
+                }
             }
             update(map:duice.data.Map, obj:object):void {
-                var value = map.get(this.getName());
-                if(isEmpty(value)){
-                    this.input.value = '';
-                }else{
-                    value = new Date(value);
-                    this.input.value = value.toString();
-                }
+                var value:any = map.get(this.getName());
+                value = defaultIfEmpty(value,'');
+                value = this.mask.encode(value);
+                this.input.value = value;
             }
             getValue():number {
-                var value = this.input.value;
-                if(isEmpty(value)){
-                    return null;
-                }else{
-                    return new Date(value).getTime();
-                }
+                var value:any = this.input.value;
+                value = defaultIfEmpty(value, null);
+                value = this.mask.decode(value);
+                return value;
             }
             openPicker():void {
                 
@@ -1499,7 +1736,7 @@ namespace duice {
                 confirmButton.classList.add('duice-ui-dateInput__pickerDiv-footerDiv-confirmButton');
                 footerDiv.appendChild(confirmButton);
                 confirmButton.addEventListener('click', function(event){
-                    $this.input.value = String(date.toString());
+                    $this.input.value = $this.mask.encode(date.getTime());
                     $this.setChanged();
                     $this.notifyObservers(this);
                     $this.closePicker();
