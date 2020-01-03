@@ -6,8 +6,6 @@
 <script src="polyfill/dataset.js"></script>
 <script src="duice.js"></script>
 <link rel="stylesheet" type="text/css" href="duice.css">
-<style>
-</style>
 <script>
 /**
  * user(duice.data.Map)
@@ -311,7 +309,7 @@ h3 {
 	font-size: 1.2rem;
 	display: inline-block;
 }
-button {
+.button {
 	min-width: 70px;
 	padding: 0.1rem 0.5rem;
 	border: solid 1px #999;
@@ -319,11 +317,11 @@ button {
 	background-color: #fff;
 	cursor: pointer;
 }
-button:hover {
+.button:hover {
 	border: solid 1px #111;
 	background-color: #f7f7f7;
 }
-button:focus {
+.button:focus {
 	outline: none;
 	border: solid 1px #111;
 }
@@ -372,10 +370,12 @@ button:focus {
 	border-collapse: collapse;
 	border: solid 1px #ccc;
 }
-.table tr {
+.table > tr ,
+.table > tbody > tr {
 	line-height: 2;
 }
-.table tr th {
+.table > tr > th ,
+.table > tbody > tr > th {
 	height: inherit;
 	line-height: inherit;
 	font-weight: bold;
@@ -386,7 +386,8 @@ button:focus {
 	text-align: center;
 	text-overflow: ellipsis;
 }
-.table tr td {
+.table > tr > td ,
+.table > tbody > tr > td {
 	height: inherit;
 	line-height: inherit;
 	border: dotted 1px #ccc;
@@ -553,7 +554,7 @@ button:focus {
 									<th>groupId</th>
 								</tr>
 							</thead>
-							<tbody style="line-height:2;">
+							<tbody style="line-height:2;" data-index="[[$context.index]]" onclick="console.log(this.dataset.index + ':' + users.get(users.getIndex()).get('id'));">
 								<tr>
 									<td><span is="duice-ui-expression" data-duice-bind="user">return $context.index + 1;</span></td>
 									<td><span is="duice-ui-span" data-duice-bind="user,id"></span></td>
@@ -900,7 +901,7 @@ button:focus {
 						</thead>
 						<tbody>
 							<tr>
-								<td>[[return $context.index+1]]</td>
+								<td></td>
 								<td><span is="duice-ui-span" data-duice-bind="user,id"></span></td>
 								<td><input is="duice-ui-input" type="text" data-duice-bind="user,name"/></td>
 								<td><input is="duice-ui-input" type="checkbox" data-duice-bind="user,active"/></td>

@@ -235,7 +235,7 @@
 	border: solid 1px #ccc;
 }
 .duice-ui-dateInput__pickerDiv button {
-	width: 24px;
+	width: 24px !important;
 	height: 24px;
 	border: solid 0px;
 	background-color: white;
@@ -265,23 +265,15 @@
 	justify-content: space-between;
 }
 .duice-ui-dateInput__pickerDiv-headerDiv-titleSpan {
-	width: 24px !important;
-	height: 24px !important;
+	width: 24px;
+	height: 24px;
 	border: solid 0px;
+	background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAsVBMVEUAAABEREBEREBEREAAAAACAgJEREBEREAAAAAAAAAAAAABAQEGBgYKCgkJCQgBAQEAAAAAAABEREAmJiUZGRhEREAQEBAVFRUBAQAKCgkLCwsKCgoBAQEAAAAAAAABAQEGBgYFBQUiIiAgIB4HBwYAAAAAAAAGBgUdHRsJCQgHBwYAAAAAAAAAAAABAQEJCQgyMi8GBgZEREAAAAAAAAAtLSsKCgkRERANDQwKCgkAAACDix+0AAAAO3RSTlMAAQQFBicJCiaCYGuYamhhkmoCJFoNUBiPWVpYUE5NTpNuHhwSERIVH3RmBF8HX2cVZQ8FXhRoBwlpYf19NA0AAACsSURBVBgZBcG9SsNQGIDh9/V8MT8oQqBgh24Ogptj7/8OxE1cOjgIERxik/T083kAAAAAEADUzAQoAFFKsbZcwYBeVePWJc8G2Kl14s6fh1qFR1VB9GsL7FUR1MzA/rtOL6L6uWVgWyfeYSyHk4nc3D8t3dKurUv3NiP2MzCWw6lOw0yQxHMXf8Nlf/0FgCOMu9fdCBwxYB2ay/bhNsCqAjbmlgA2VVAzE0DNf+UTOypHKh5VAAAAAElFTkSuQmCC');
 	background-color: white;
 	background-repeat:no-repeat;
 	background-position: center; 
-	background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAsVBMVEUAAABEREBEREBEREAAAAACAgJEREBEREAAAAAAAAAAAAABAQEGBgYKCgkJCQgBAQEAAAAAAABEREAmJiUZGRhEREAQEBAVFRUBAQAKCgkLCwsKCgoBAQEAAAAAAAABAQEGBgYFBQUiIiAgIB4HBwYAAAAAAAAGBgUdHRsJCQgHBwYAAAAAAAAAAAABAQEJCQgyMi8GBgZEREAAAAAAAAAtLSsKCgkRERANDQwKCgkAAACDix+0AAAAO3RSTlMAAQQFBicJCiaCYGuYamhhkmoCJFoNUBiPWVpYUE5NTpNuHhwSERIVH3RmBF8HX2cVZQ8FXhRoBwlpYf19NA0AAACsSURBVBgZBcG9SsNQGIDh9/V8MT8oQqBgh24Ogptj7/8OxE1cOjgIERxik/T083kAAAAAEADUzAQoAFFKsbZcwYBeVePWJc8G2Kl14s6fh1qFR1VB9GsL7FUR1MzA/rtOL6L6uWVgWyfeYSyHk4nc3D8t3dKurUv3NiP2MzCWw6lOw0yQxHMXf8Nlf/0FgCOMu9fdCBwxYB2ay/bhNsCqAjbmlgA2VVAzE0DNf+UTOypHKh5VAAAAAElFTkSuQmCC');
 }
 .duice-ui-dateInput__pickerDiv-headerDiv-closeButton {
-	width: 16px;
-	height: 16px;
-	border: solid 0px;
-	background-color: white;
-	background-repeat:no-repeat;
-	background-position: center; 
-	cursor: pointer;
-	cursor: hand;
 	background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAQAAAAnOwc2AAAAhUlEQVQIHUXBO2oCARQAwLfrF2FzAvFeaTzLgGCjjWArpBQrESy208JWSBEES5G9xlNByUwYWivjTaXWDbW0UcSTgZs0Dh1n6Ueh7yrN40XXr7TyJy3iQ89FSsv4p+0kpVl8aDtKe3dpGi9aDtJWqdJIk4iwlXbKeFJppO8wslbGmy+1/gNe3EnJbtyo9AAAAABJRU5ErkJggg==');
 }
 .duice-ui-dateInput__pickerDiv-bodyDiv {
@@ -314,6 +306,7 @@
 	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAmUlEQVQ4T6XTTQpAUBQFYG9MydgOTFCswC5kU9YiY1tAsh7nyquX3J+iTgnn0/tz0c/LMf0Mz3Pk0HwOGFEckA5ZJYQDYpQmpNQQDqCfmhAJMCEaoCIWwCMLblqkDifWCiQoEdAgFbL5lbEAVJ6R4lmRPVxWDRDLBEmAWpYAU1kCaCv3X2N+b2tuCCk+pMN0SudAmwOte7+/AELAGhGETefAAAAAAElFTkSuQmCC);
 }
 .duice-ui-dateInput__pickerDiv-bodyDiv-calendarTable {
+	border-collapse:collapse;
 	border: none;
 	width: 100%;
 }
@@ -554,9 +547,10 @@
 .duice-ui-ul__li {
 	list-style-type: none;
 	margin: 1px;
-	padding: 1px;
+	padding: 0px;
 }
 .duice-ui-ul__li--index {
+	padding-left: 1px;
 	border-left: solid 2px #ccc;
 }
 .duice-ui-ul__li--indent {

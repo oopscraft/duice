@@ -397,6 +397,37 @@ namespace duice {
     }
 
     /**
+     * Executes custom expression in HTML element and returns.
+     * @param element
+     * @param $context
+     * @return converted HTML element
+     */
+    function executeExpression(element:HTMLElement, $context:any):any {
+        var string = element.outerHTML;
+        string = string.replace(/\[\[([\s\S]*?)\]\]/mgi,function(match, command){
+            try {
+                command = command.replace('&amp;', '&');
+                command = command.replace('&lt;', '<');
+                command = command.replace('&gt;', '>');
+                var result = eval(command);
+                return result;
+            }catch(e){
+                console.error(e,command);
+                throw e;
+            }
+        });
+        try {
+            var template = document.createElement('template');
+            template.innerHTML = string;
+            return template.content.firstChild;
+        }catch(e){
+            removeChildNodes(element);
+            element.innerHTML = string;
+            return element;
+        }
+    }
+    
+    /**
      * Escapes HTML tag from string value
      * @param value
      * @return escaped string value
@@ -1737,6 +1768,7 @@ namespace duice {
                 var caption = <HTMLTableCaptionElement>this.table.querySelector('caption');
                 if(caption){
                     caption.classList.add('duice-ui-table__caption');
+                    caption = executeExpression(<HTMLElement>caption, new Object());
                     initialize(caption, new Object());
                 }
                 
@@ -1744,6 +1776,7 @@ namespace duice {
                 var thead = <HTMLTableSectionElement>this.table.querySelector('thead');
                 if(thead){
                     thead.classList.add('duice-ui-table__thead');
+                    thead = executeExpression(<HTMLElement>thead, new Object());
                     initialize(thead, new Object());
                 }
                 
@@ -1757,6 +1790,7 @@ namespace duice {
                 var tfoot = <HTMLTableSectionElement>this.table.querySelector('tfoot');
                 if(tfoot){
                     tfoot.classList.add('duice-ui-table__tfoot');
+                    tfoot = executeExpression(<HTMLElement>tfoot, new Object());
                     initialize(tfoot, new Object());
                 }
             }
@@ -1799,14 +1833,14 @@ namespace duice {
                     if(index === list.getIndex()){
                         tbody.classList.add('duice-ui-table__tbody--index');
                     }
-                    tbody.addEventListener('mousedown', function(event){
+                    tbody.addEventListener('click', function(event){
                         for(var i = 0; i < $this.tbodies.length; i ++ ) {
                             $this.tbodies[i].classList.remove('duice-ui-table__tbody--index');
                         }
                         this.classList.add('duice-ui-table__tbody--index');
                         list.index = Number(this.dataset.duiceIndex);
                         console.log(list.getIndex(), list);
-                    });
+                    }, true);
                     
                     // drag and drop event
                     if(this.editable === true) {
@@ -1824,10 +1858,10 @@ namespace duice {
                             var fromIndex = parseInt(event.dataTransfer.getData('text'));
                             var toIndex = parseInt(this.dataset.duiceIndex);
                             list.move(fromIndex, toIndex);
-                            tbody.click();
                         });
                     }
                     
+                    // appends body
                     this.table.appendChild(tbody);
                     this.tbodies.push(tbody);
                     
@@ -1852,6 +1886,7 @@ namespace duice {
                 var $context:any = new Object;
                 $context['index'] = index;
                 $context[this.item] = map;
+                tbody = executeExpression(<HTMLElement>tbody,$context);
                 initialize(tbody,$context);
                 return tbody;
             }
