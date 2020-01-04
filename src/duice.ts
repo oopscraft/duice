@@ -551,26 +551,6 @@ namespace duice {
         return z;
     }
     
-    export var MaskFactory = {
-        getMask(type:string, ...args:string[]){
-            var mask:Mask;
-            switch(type){
-                case 'string':
-                    mask = new StringMask(args[0]);
-                    break;
-                case 'number':
-                    mask = new NumberMask(parseInt(args[0]));  
-                    break;
-                case 'date':
-                    mask = new DateMask(args[0]);
-                    break;
-                default:
-                    throw 'invalid mask type[' + type + ']';
-            }
-            return mask;
-        }
-    }
-    
     /**
      * duice.Mask interface
      */
@@ -586,7 +566,7 @@ namespace duice {
      */
     export class StringMask implements Mask {
         format:string;
-        constructor(format:string){
+        setFormat(format:string){
             this.format = format;
         }
         encode(value:any):any{
@@ -605,24 +585,41 @@ namespace duice {
      * @param scale number scale
      */
     export class NumberMask implements Mask {
-        scale:number;
-        constructor(scale:number){
+        scale:number = 0;
+        setScale(scale:number){
             this.scale = scale;
         }
-        encode(value:number):string{
-            var string = String(value.toFixed(this.scale));
+        encode(number:number):string{
+            if(isEmpty(number) || isNaN(Number(number))){
+                return '';
+            }
+            number = Number(number);
+            var string = String(number.toFixed(this.scale));
             var reg = /(^[+-]?\d+)(\d{3})/;
             while (reg.test(string)) {
                 string = string.replace(reg, '$1' + ',' + '$2');
             }
             return string;
         }
-        validate(value:any):boolean{
-            return true;
+        validate(string:any):boolean{
+            string = this.decode(string);
+            if(isEmpty(string)){
+                return false;
+            }else{
+                return true;
+            }
         }
         decode(string:string):number{
+            if(isEmpty(string)){
+                return null;
+            }
+            string = string.replace(/\,/gi,'');
+            if(isNaN(Number(string))){
+                return null;
+            }
             var number = Number(string);
-            return Number(number.toFixed(this.scale));
+            number = Number(number.toFixed(this.scale));
+            return number;
         }
     }
     
@@ -631,7 +628,7 @@ namespace duice {
      */
     export class DateMask implements Mask {
         format:string;
-        constructor(format:string){
+        setFormat(format:string){
             this.format = format;
         }
         encode(number:number):string{
@@ -1099,7 +1096,7 @@ namespace duice {
                 ,'input[is="duice-ui-input"][data-duice-bind]:not([data-duice-id])'
                 ,'select[is="duice-ui-select"][data-duice-bind]:not([data-duice-id])'
                 ,'textarea[is="duice-ui-textarea"][data-duice-bind]:not([data-duice-id])'
-                ,'span[is="duice-ui-expression"][data-duice-bind]:not([data-duice-id])'
+                ,'img[is="duice-ui-img"][data-duice-bind]:not([data-duice-id])'
             ];
             var elements = container.querySelectorAll(elementTags.join(','));
             for(var i = 0; i < elements.length; i ++ ) {
@@ -1118,6 +1115,9 @@ namespace duice {
                             break;
                         case 'duice-ui-textarea':
                             duice.ui.TextareaFactory.getTextarea(element, $context);
+                            break;
+                        case 'duice-ui-img':
+                            duice.ui.ImageFactory.getImage(element, $context);
                             break;
                         case 'duice-ui-scriptlet':
                             duice.ui.ScriptletFactory.getScriptlet(element, $context);
@@ -1221,16 +1221,6 @@ namespace duice {
         export abstract class MapUIElement extends UIElement {
             map:duice.data.Map;
             name:string;
-            mask:Mask;
-            setMask(mask:Mask) {
-                this.mask = mask;
-            }
-            hasMask(){
-                return this.mask ? true : false;
-            }
-            getMask():Mask {
-                return this.mask;
-            }
             bind(map:duice.data.Map, name:string):void {
                 this.map = map;
                 this.name = name;
@@ -1257,8 +1247,26 @@ namespace duice {
                 
                 // sets mask
                 if(element.dataset.duiceMask){
-                    var mask = element.dataset.duiceMask.split(',');
-                    span.setMask(MaskFactory.getMask(mask[0], mask[1]));
+                    var duiceMask:Array<string> = element.dataset.duiceMask.split(',');
+                    var type = duiceMask[0];
+                    var mask;
+                    switch(type){
+                    case 'string':
+                        mask = new StringMask();
+                        mask.setFormat(duiceMask[1]);
+                        break;
+                    case 'number':
+                        mask = new NumberMask();
+                        mask.setScale(parseInt(duiceMask[1]));
+                        break;
+                    case 'date':
+                        mask = new DateMask();
+                        mask.setFormat(duiceMask[1]);
+                        break;
+                    default:
+                        throw 'mask type[' + type + '] is invalid';
+                    }
+                    span.setMask(mask);
                 }
                 
                 // binds
@@ -1273,25 +1281,29 @@ namespace duice {
          */
         export class Span extends MapUIElement {
             span:HTMLSpanElement;
+            mask:Mask;
             constructor(span:HTMLSpanElement){
                 super(span);
                 this.span = span;
                 this.span.classList.add('duice-ui-span');
             }
+            setMask(mask:Mask){
+                this.mask = mask;
+            }
             update(map:duice.data.Map, obj:object):void {
                 removeChildNodes(this.span);
                 var value = map.get(this.name);
                 value = defaultIfEmpty(value, '');
-                if(this.hasMask()){
-                    value = this.getMask().encode(value);
+                if(this.mask){
+                    value = this.mask.encode(value);
                 }
                 this.span.appendChild(document.createTextNode(value));
             }
             getValue():string {
                 var value = this.span.innerHTML;
                 value = defaultIfEmpty(value, null);
-                if(this.hasMask()){
-                    value = this.getMask().decode(value);
+                if(this.mask){
+                    value = this.mask.decode(value);
                 }
                 return value;
             }
@@ -1306,9 +1318,15 @@ namespace duice {
                 switch(element.getAttribute('type')){
                 case 'text':
                     input = new TextInput(element);
+                    if(element.dataset.duiceFormat){
+                        input.setFormat(element.dataset.duiceFormat);
+                    }
                     break;
                 case 'number':
                     input = new NumberInput(element);
+                    if(element.dataset.duiceScale){
+                        input.setScale(parseInt(element.dataset.duiceScale));
+                    }
                     break;
                 case 'checkbox':
                     input = new CheckboxInput(element);
@@ -1319,15 +1337,12 @@ namespace duice {
                 case 'date':
                 case 'datetime':
                     input = new DateInput(element);
+                    if(element.dataset.duiceFormat){
+                        input.setFormat(element.dataset.duiceFormat);
+                    }
                     break;
                 default:
                     input = new GenericInput(element);
-                }
-                
-                // sets mask
-                if(element.dataset.duiceMask){
-                    var mask = element.dataset.duiceMask.split(',');
-                    input.setMask(MaskFactory.getMask(mask[0], mask[1]));
                 }
                 
                 // bind
@@ -1385,25 +1400,25 @@ namespace duice {
          * duice.ui.TextInput
          */
         export class TextInput extends Input {
+            mask:StringMask;
             constructor(input:HTMLInputElement){
                 super(input);
                 this.input.classList.add('duice-ui-textInput');
+                this.mask = new StringMask();
+            }
+            setFormat(format:string){
+                this.mask.setFormat(format);
             }
             update(map:duice.data.Map, obj:object):void {
                 var value = map.get(this.getName());
-                console.log('value', value);
                 value = defaultIfEmpty(value, '');
-                if(this.hasMask()){
-                    value = this.mask.encode(value);
-                }
+                value = this.mask.encode(value);
                 this.input.value = value;
             }
             getValue():string {
                 var value = this.input.value;
                 value = defaultIfEmpty(value, null);
-                if(this.hasMask()){
-                    value = this.mask.decode(value);
-                }
+                value = this.mask.decode(value);
                 return value;
             }
         }
@@ -1412,22 +1427,42 @@ namespace duice {
          * duice.ui.NumberInput
          */
         export class NumberInput extends Input {
+            mask:NumberMask;
             constructor(input:HTMLInputElement){
                 super(input);
                 this.input.classList.add('duice-ui-numberInput');
                 this.input.setAttribute('type','text');
-                this.setMask(new NumberMask(0));
+                
+                // key press event
+                var $this = this;
+                this.mask = new NumberMask();
+                this.input.addEventListener('keypress', function(event:any){
+                    var inputChars = String.fromCharCode(event.keyCode);
+                    var newValue = this.value.substr(0,this.selectionStart) + inputChars + this.value.substr(this.selectionEnd)
+                    if($this.mask.validate(newValue) === false){
+                        event.preventDefault();
+                    }
+                }, true);
+                this.input.addEventListener('paste', function(event:any){
+                    var inputChars = event.clipboardData.getData('text/plain');
+                    var newValue = this.value.substr(0,this.selectionStart) + inputChars + this.value.substr(this.selectionEnd)
+                    if($this.mask.validate(newValue) === false){
+                        event.preventDefault();
+                    }
+                }, true);
+            }
+            setScale(scale:number){
+                this.mask.setScale(scale);
             }
             update(map:duice.data.Map, obj:object):void {
                 var value = map.get(this.getName());
-                value = defaultIfEmpty(value,0);
                 value = this.mask.encode(value);
                 this.input.value = value;
             }
             getValue():number {
                 var value:any = this.input.value;
-                value = defaultIfEmpty(value,'0');
                 value = this.mask.decode(value);
+                console.log('@@@@@@@@@@@@', typeof value);
                 return value;
             }
         }
@@ -1485,6 +1520,7 @@ namespace duice {
         export class DateInput extends Input {
             pickerDiv:HTMLDivElement;
             type:string;
+            mask:DateMask;
             clickListener:any;
             constructor(input:HTMLInputElement){
                 super(input);
@@ -1499,11 +1535,15 @@ namespace duice {
                 },true);
 
                 // sets default mask
+                this.mask = new DateMask();
                 if(this.type === 'date'){
-                    this.setMask(new DateMask('yyyy-MM-dd'));
+                    this.mask.setFormat('yyyy-MM-dd');
                 }else{
-                    this.setMask(new DateMask('yyyy-MM-dd HH:mm:ss'));
+                    this.mask.setFormat('yyyy-MM-dd HH:mm:ss');
                 }
+            }
+            setFormat(format:string){
+                this.mask.setFormat(format);
             }
             update(map:duice.data.Map, obj:object):void {
                 var value:any = map.get(this.getName());
@@ -1832,6 +1872,48 @@ namespace duice {
         }
         
         /**
+         * duice.ui.ImageFactory
+         */
+        export var ImageFactory = {
+            getImage(element:HTMLImageElement, $context:any):Image {
+                var image = new Image(element);
+                var bind = element.dataset.duiceBind.split(',');
+                image.bind(getObject($context, bind[0]), bind[1]);
+                return image;
+            }
+        }
+        
+        /**
+         * duice.ui.Image
+         */
+        export class Image extends MapUIElement {
+            img:HTMLImageElement;
+            input:HTMLInputElement;
+            constructor(img:HTMLImageElement) {
+                super(img);
+                this.img = img;
+                this.img.classList.add('duice-ui-img');
+                this.img.addEventListener('error', function() {
+                    console.log('error');
+                });
+                
+                // creates file input
+                this.input = document.createElement('input');
+                this.input = document.createElement('input');
+                this.input.setAttribute("type", "file");
+                this.input.setAttribute("accept", "image/gif, image/jpeg, image/png");
+
+            }
+            update(map:duice.data.Map, obj:object):void {
+                var value = map.get(this.getName());
+                this.img.src = value;
+            }
+            getValue():any {
+                return this.img.src;
+            }
+        }
+        
+        /**
          * duice.ui.SpanFactory
          */
         export var SelectFactory = {
@@ -1925,8 +2007,6 @@ namespace duice {
          */
         export class Textarea extends MapUIElement {
             textarea:HTMLTextAreaElement;
-            editorDiv:HTMLDivElement;
-            clickListener:any;
             constructor(textarea:HTMLTextAreaElement) {
                 super(textarea);
                 this.textarea = textarea;
@@ -2268,6 +2348,7 @@ namespace duice {
                 var $context:any = new Object;
                 $context['index'] = index;
                 $context[this.item] = map;
+                li = executeExpression(<HTMLElement>li,$context);
                 initialize(li,$context);
                 this.lis.push(li);
                 li.dataset.duiceIndex = String(index);
