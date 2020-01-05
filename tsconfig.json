@@ -6,7 +6,7 @@
 	    "strictNullChecks": false,
 	    "noImplicitThis": false,
 	    "module":"none",
-	    "watch": true
+	    "watch": false
 	},
 	"typedocOptions":{
 		"mode": "modules",
