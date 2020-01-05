@@ -383,22 +383,54 @@ namespace duice {
     }
     
     /**
-     * duice.Mask interface
+     * duice.Format interface
      */
-    interface Mask {
+    interface Format {
+        
+        /**
+         * Encodes original value as formatted value
+         * @param original value
+         * @return formatted value
+         */
         encode(value:any):any;
+        
+        /**
+         * Decodes formatted value to original value
+         * @param formatted value
+         * @return original value
+         */
         decode(value:any):any;
     }
     
     /**
-     * duice.StringMask
-     * @param string format to mask
+     * duice.StringFormat
+     * @param string format
      */
-    export class StringMask implements Mask {
-        format:string;
-        setFormat(format:string){
-            this.format = format;
+    export class StringFormat implements Format {
+        pattern:string;
+    
+        /**
+         * Constructor
+         * @param pattern
+         */
+        constructor(pattern?:string){
+            if(pattern){
+                this.setPattern(pattern);
+            }
         }
+        
+        /**
+         * Sets format string
+         * @param pattern
+         */
+        setPattern(pattern:string){
+            this.pattern = pattern;
+        }
+        
+        /**
+         * encode string as format
+         * @param value
+         */
         encode(value:any):any{
             
 //            var string = '';
@@ -416,20 +448,45 @@ namespace duice {
             
             return value;
         }
+        
+        /**
+         * decodes string as format
+         * @param value
+         */
         decode(value:any):any{
             return value;
         }
     }
     
     /**
-     * duice.NumberMask
-     * @param scale number scale
+     * duice.NumberFormat
+     * @param scale number
      */
-    export class NumberMask implements Mask {
+    export class NumberFormat implements Format {
         scale:number = 0;
+    
+       /**
+        * Constructor
+        * @param scale
+        */
+        constructor(scale?:number){
+            if(scale){
+                this.setScale(scale);
+            }
+        }
+        
+        /**
+         * Sets number format scale
+         * @param scale
+         */
         setScale(scale:number){
             this.scale = scale;
         }
+        
+        /**
+         * Encodes number as format
+         * @param number
+         */
         encode(number:number):string{
             if(isEmpty(number) || isNaN(Number(number))){
                 return '';
@@ -442,6 +499,11 @@ namespace duice {
             }
             return string;
         }
+        
+        /**
+         * Decodes formatted value as original value
+         * @param string
+         */
         decode(string:string):number{
             if(isEmpty(string)){
                 return null;
@@ -460,23 +522,43 @@ namespace duice {
     }
     
     /**
-     * duice.DateMask
+     * duice.DateFormat
      */
-    export class DateMask implements Mask {
-        format:string;
-        formatRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
-        setFormat(format:string){
-            this.format = format;
+    export class DateFormat implements Format {
+        pattern:string;
+        patternRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
+        
+        /**
+         * Constructor
+         * @param pattern
+         */
+        constructor(pattern?:string){
+            if(pattern){
+                this.setPattern(pattern);
+            }
         }
+        
+        /**
+         * Sets format string
+         * @param pattern
+         */
+        setPattern(pattern:string){
+            this.pattern = pattern;
+        }
+        
+        /**
+         * Encodes date string
+         * @param string
+         */
         encode(string:string):string{
             if(isEmpty(string)){
                 return '';
             }
-            if(isEmpty(this.format)){
+            if(isEmpty(this.pattern)){
                 return new Date(string).toString();
             }
             var date = new Date(string);
-            string = this.format.replace(this.formatRex, function($1:any) {
+            string = this.pattern.replace(this.patternRex, function($1:any) {
                 switch ($1) {
                     case "yyyy": return date.getFullYear();
                     case "yy": return lpad(String(date.getFullYear()%1000), 2, '0');
@@ -491,16 +573,21 @@ namespace duice {
             });
             return string;
         }
+        
+        /**
+         * Decodes formatted date string to ISO date string.
+         * @param string
+         */
         decode(string:string):string{
             if(isEmpty(string)){
                 return null;
             }
-            if(isEmpty(this.format)){
+            if(isEmpty(this.pattern)){
                 return new Date(string).toISOString();
             }
             var date = new Date(0,0,0,0,0,0);
             var match;
-            while ((match = this.formatRex.exec(this.format)) != null) {
+            while ((match = this.patternRex.exec(this.pattern)) != null) {
                 var formatString = match[0];
                 var formatIndex = match.index;
                 var formatLength = formatString.length;
@@ -1067,28 +1154,25 @@ namespace duice {
             getSpan(element:HTMLInputElement, $context:any):Span {
                 var span = new Span(element);
                 
-                // sets mask
-                if(element.dataset.duiceMask){
-                    var duiceMask:Array<string> = element.dataset.duiceMask.split(',');
-                    var type = duiceMask[0];
-                    var mask;
+                // sets format
+                if(element.dataset.duiceFormat){
+                    var duiceFormat:Array<string> = element.dataset.duiceFormat.split(',');
+                    var type = duiceFormat[0];
+                    var format;
                     switch(type){
                     case 'string':
-                        mask = new StringMask();
-                        mask.setFormat(duiceMask[1]);
+                        format = new StringFormat(duiceFormat[1]);
                         break;
                     case 'number':
-                        mask = new NumberMask();
-                        mask.setScale(parseInt(duiceMask[1]));
+                        format = new NumberFormat(parseInt(duiceFormat[1]));
                         break;
                     case 'date':
-                        mask = new DateMask();
-                        mask.setFormat(duiceMask[1]);
+                        format = new DateFormat(duiceFormat[1]);
                         break;
                     default:
-                        throw 'mask type[' + type + '] is invalid';
+                        throw 'format type[' + type + '] is invalid';
                     }
-                    span.setMask(mask);
+                    span.setFormat(format);
                 }
                 
                 // binds
@@ -1103,29 +1187,29 @@ namespace duice {
          */
         export class Span extends MapUIElement {
             span:HTMLSpanElement;
-            mask:Mask;
+            format:Format;
             constructor(span:HTMLSpanElement){
                 super(span);
                 this.span = span;
                 this.span.classList.add('duice-ui-span');
             }
-            setMask(mask:Mask){
-                this.mask = mask;
+            setFormat(format:Format){
+                this.format = format;
             }
             update(map:duice.data.Map, obj:object):void {
                 removeChildNodes(this.span);
                 var value = map.get(this.name);
                 value = defaultIfEmpty(value,'');
-                if(this.mask){
-                    value = this.mask.encode(value);
+                if(this.format){
+                    value = this.format.encode(value);
                 }
                 this.span.appendChild(document.createTextNode(value));
             }
             getValue():string {
                 var value = this.span.innerHTML;
                 value = defaultIfEmpty(value, null);
-                if(this.mask){
-                    value = this.mask.decode(value);
+                if(this.format){
+                    value = this.format.decode(value);
                 }
                 return value;
             }
@@ -1141,13 +1225,13 @@ namespace duice {
                 case 'text':
                     input = new TextInput(element);
                     if(element.dataset.duiceFormat){
-                        input.setFormat(element.dataset.duiceFormat);
+                        input.setPattern(element.dataset.duiceFormat);
                     }
                     break;
                 case 'number':
                     input = new NumberInput(element);
-                    if(element.dataset.duiceScale){
-                        input.setScale(parseInt(element.dataset.duiceScale));
+                    if(element.dataset.duiceFormat){
+                        input.setScale(parseInt(element.dataset.duiceFormat));
                     }
                     break;
                 case 'checkbox':
@@ -1160,7 +1244,7 @@ namespace duice {
                 case 'date':
                     input = new DateInput(element);
                     if(element.dataset.duiceFormat){
-                        input.setFormat(element.dataset.duiceFormat);
+                        input.setPattern(element.dataset.duiceFormat);
                     }
                     break;
                 default:
@@ -1239,26 +1323,34 @@ namespace duice {
          * duice.ui.TextInput
          */
         export class TextInput extends Input {
-            mask:StringMask;
+            format:StringFormat;
             constructor(input:HTMLInputElement){
                 super(input);
                 this.input.classList.add('duice-ui-textInput');
-                this.mask = new StringMask();
+                this.format = new StringFormat();
             }
-            setFormat(format:string){
-                this.mask.setFormat(format);
+            setPattern(format:string){
+                this.format.setPattern(format);
             }
             update(map:duice.data.Map, obj:object):void {
                 var value = map.get(this.getName());
                 value = defaultIfEmpty(value, '');
-                value = this.mask.encode(value);
+                value = this.format.encode(value);
                 this.input.value = value;
             }
             getValue():string {
                 var value = this.input.value;
                 value = defaultIfEmpty(value, null);
-                value = this.mask.decode(value);
+                value = this.format.decode(value);
                 return value;
+            }
+            validate(value:string):boolean {
+                try {
+                    this.format.decode(value);
+                }catch(e){
+                    return false;
+                }
+                return true;
             }
         }
         
@@ -1266,33 +1358,33 @@ namespace duice {
          * duice.ui.NumberInput
          */
         export class NumberInput extends Input {
-            mask:NumberMask;
+            format:NumberFormat;
             constructor(input:HTMLInputElement){
                 super(input);
                 this.input.classList.add('duice-ui-numberInput');
                 this.input.setAttribute('type','text');
-                this.mask = new NumberMask();
+                this.format = new NumberFormat();
             }
             setScale(scale:number){
-                this.mask.setScale(scale);
+                this.format.setScale(scale);
             }
             update(map:duice.data.Map, obj:object):void {
                 var value = map.get(this.getName());
-                value = this.mask.encode(value);
+                value = this.format.encode(value);
                 this.input.value = value;
             }
             getValue():number {
                 var value:any = this.input.value;
-                value = this.mask.decode(value);
+                value = this.format.decode(value);
                 return value;
             }
             validate(value:string):boolean {
                 try {
-                    this.mask.decode(value);
-                    return true;
+                    this.format.decode(value);
                 }catch(e){
                     return false;
                 }
+                return true;
             }
         }
         
@@ -1349,7 +1441,7 @@ namespace duice {
         export class DateInput extends Input {
             pickerDiv:HTMLDivElement;
             type:string;
-            mask:DateMask;
+            format:DateFormat;
             clickListener:any;
             constructor(input:HTMLInputElement){
                 super(input);
@@ -1363,42 +1455,39 @@ namespace duice {
                     $this.openPicker();
                 },true);
 
-                // sets default mask
-                this.mask = new DateMask();
+                // sets default format
+                this.format = new DateFormat();
                 if(this.type === 'date'){
-                    this.mask.setFormat('yyyy-MM-dd');
+                    this.format.setPattern('yyyy-MM-dd');
                 }else{
-                    this.mask.setFormat('yyyy-MM-dd HH:mm:ss');
+                    this.format.setPattern('yyyy-MM-dd HH:mm:ss');
                 }
             }
-            setFormat(format:string){
-                this.mask.setFormat(format);
+            setPattern(format:string){
+                this.format.setPattern(format);
             }
             update(map:duice.data.Map, obj:object):void {
                 var value:string = map.get(this.getName());
                 value = defaultIfEmpty(value,'');
-                value = this.mask.encode(value);
+                value = this.format.encode(value);
                 this.input.value = value;
             }
             getValue():string {
                 var value = this.input.value;
                 value = defaultIfEmpty(value, null);
-                value = this.mask.decode(value);
+                value = this.format.decode(value);
                 if(this.type === 'date'){
-                    var mask = new DateMask();
-                    mask.setFormat('yyyy-MM-dd');
-                    value = mask.encode(new Date(value).toISOString());
+                    value = new DateFormat('yyyy-MM-dd').encode(new Date(value).toISOString())
                 }
                 return value;
             }
             validate(value:string):boolean {
                 try {
-                    var s = this.mask.decode(value);
-                    console.log(s);
-                    return true;
+                    var s = this.format.decode(value);
                 }catch(e){
                     return false;
                 }
+                return true;
             }
             openPicker():void {
                 
@@ -1619,7 +1708,7 @@ namespace duice {
                 confirmButton.classList.add('duice-ui-dateInput__pickerDiv-footerDiv-confirmButton');
                 footerDiv.appendChild(confirmButton);
                 confirmButton.addEventListener('click', function(event){
-                    $this.input.value = $this.mask.encode(date.toISOString());
+                    $this.input.value = $this.format.encode(date.toISOString());
                     $this.setChanged();
                     $this.notifyObservers(this);
                     $this.closePicker();

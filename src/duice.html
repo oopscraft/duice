@@ -361,7 +361,7 @@ body {
 }
 .textarea {
 	width:100%;
-	line-height: 1.2;
+	line-height: 1.6;
 	border-radius: 2px;
 	box-sizing: border-box;         
 	-moz-box-sizing: border-box;    
@@ -457,21 +457,21 @@ body {
 							</td>
 						</tr>
 						<tr>
-							<td><span is="duice-ui-span" data-duice-bind="user,socialNo" data-duice-mask="string,######-#######"></span></td>
+							<td><span is="duice-ui-span" data-duice-bind="user,socialNo" data-duice-format="string,######-#######"></span></td>
 							<td>
-								&lt;span is="duice-ui-span" data-duice-bind="user,socialNo" data-duice-mask="string,######-#######" ...
+								&lt;span is="duice-ui-span" data-duice-bind="user,socialNo" data-duice-format="string,######-#######" ...
 							</td>
 						</tr>
 						<tr>
-							<td align="right"><span is="duice-ui-span" data-duice-bind="user,balance" data-duice-mask="number,2"></span></td>
+							<td align="right"><span is="duice-ui-span" data-duice-bind="user,balance" data-duice-format="number,2"></span></td>
 							<td>
-								&lt;span is="duice-ui-span" data-duice-bind="user,balance" date-duice-mask="number,2" ...
+								&lt;span is="duice-ui-span" data-duice-bind="user,balance" date-duice-format="number,2" ...
 							</td>
 						</tr>
 						<tr>
-							<td align="center"><span is="duice-ui-span" data-duice-bind="user,hireDate" data-duice-mask="date,yyyy.MM.dd HH:mm:ss"></span></td>
+							<td align="center"><span is="duice-ui-span" data-duice-bind="user,hireDate" data-duice-format="date,yyyy.MM.dd HH:mm:ss"></span></td>
 							<td>
-								&lt;span is="duice-ui-span" data-duice-bind="user,hireDate" data-duice-mask="date,yyyy.MM.dd HH:mm:ss" ...
+								&lt;span is="duice-ui-span" data-duice-bind="user,hireDate" data-duice-format="date,yyyy.MM.dd HH:mm:ss" ...
 							</td>
 						</tr>
 						<!-- ================================================================ -->
@@ -485,7 +485,7 @@ body {
 							</td>
 						</tr>
 						<tr>
-							<td><input is="duice-ui-input" type="text" data-duice-bind="user,socialNo" data-duice-mask="string,######-#######"/></td>
+							<td><input is="duice-ui-input" type="text" data-duice-bind="user,socialNo" data-duice-format="######-#######"/></td>
 							<td>
 								&lt;input is="duice-ui-input" type="text" data-duice-bind="user,socialNo" data-duice-format="######-#######" ...
 							</td>
@@ -495,17 +495,17 @@ body {
 						<!-- ================================================================ -->
 						<tr>
 							<th rowspan="2">duice.ui.NumberInput</th>
-							<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance" step="0.1"/></td>
+							<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance"/></td>
 							<td>
 								&lt;input is="duice-ui-input" type="number" data-duice-bind="user,balance"
 							</td>
 						</tr>
 						<tr>
 							<td>
-								<input is="duice-ui-input" type="number" data-duice-bind="user,balance" data-duice-scale="2"/>
+								<input is="duice-ui-input" type="number" data-duice-bind="user,balance" data-duice-format="2"/>
 							</td>
 							<td>
-								&lt;input is="duice-ui-input" type="number" data-duice-bind="user,balance" data-duice-scale="2"
+								&lt;input is="duice-ui-input" type="number" data-duice-bind="user,balance" data-duice-format="2"
 							</td>
 						</tr>
 						<!-- ================================================================ -->
@@ -732,9 +732,9 @@ body {
 									<td><input is="duice-ui-input" type="text" data-duice-bind="user,name"/></td>
 									<td><span is="duice-ui-span" data-duice-bind="user,socialNo"></span></td>
 									<td><input is="duice-ui-input" type="text" data-duice-bind="user,socialNo"/></td>
-									<td><span is="duice-ui-span" data-duice-bind="user,balance" data-duice-mask="number,2"></span></td>
-									<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance" data-duice-scale="2"/></td>
-									<td><span is="duice-ui-span" data-duice-bind="user,hireDate" data-duice-mask="date,yyyy.MM.dd HH:mm:ss"></span></td>
+									<td><span is="duice-ui-span" data-duice-bind="user,balance" data-duice-format="number,2"></span></td>
+									<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance" data-duice-format="2"/></td>
+									<td><span is="duice-ui-span" data-duice-bind="user,hireDate" data-duice-format="date,yyyy.MM.dd HH:mm:ss"></span></td>
 									<td><input is="duice-ui-input" type="datetime-local" data-duice-bind="user,hireDate"/></td>
 									<td><input is="duice-ui-input" type="date" data-duice-bind="user,birthday"/></td>
 									<td><input is="duice-ui-input" type="checkbox" data-duice-bind="user,active"/></td>
@@ -830,7 +830,7 @@ body {
 											<tr>
 												<th>hireDate</th>
 												<td>
-													<input is="duice-ui-input" type="datetime" data-duice-bind="user,hireDate"/>
+													<input is="duice-ui-input" type="datetime-local" data-duice-bind="user,hireDate" data-duice-format="yyyy-MM-dd HH:mm:ss"/>
 												</td>
 											</tr>
 											<tr>

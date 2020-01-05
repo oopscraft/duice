@@ -228,189 +228,6 @@ var duice;
         return value;
     }
     /**
-     * Converts value to masked value.
-     * @param value
-     * @param type
-     * @param format
-     */
-    function mask(value, type, format) {
-        switch (type) {
-            // string type
-            case 'string':
-                var string = '';
-                var index = -1;
-                for (var i = 0, size = format.length; i < size; i++) {
-                    var formatChar = format.charAt(i);
-                    if (formatChar === '#') {
-                        index++;
-                        string += value.charAt(index);
-                    }
-                    else {
-                        string += formatChar;
-                    }
-                }
-                return string;
-            // number
-            case 'number':
-                var number;
-                if (typeof value === 'number') {
-                    number = value;
-                }
-                else if (typeof value === 'string') {
-                    value = value.replace(/\,/gi, '');
-                    number = Number(value);
-                }
-                else {
-                    number = Number(value);
-                }
-                if (isNaN(number)) {
-                    throw 'NaN';
-                }
-                var scale = parseInt(format);
-                var maskValue = String(number.toFixed(scale));
-                var reg = /(^[+-]?\d+)(\d{3})/;
-                while (reg.test(maskValue)) {
-                    maskValue = maskValue.replace(reg, '$1' + ',' + '$2');
-                }
-                return maskValue;
-            // date
-            case 'date':
-                var date;
-                if (value instanceof Date) {
-                    date = value;
-                }
-                else if (typeof value === 'number') {
-                    date = new Date(value);
-                }
-                else {
-                    throw 'Not Date Type';
-                }
-                var formatRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
-                var maskValue = format.replace(formatRex, function ($1) {
-                    switch ($1) {
-                        case "yyyy": return date.getFullYear();
-                        case "yy": return lpad(String(date.getFullYear() % 1000), 2, '0');
-                        case "MM": return lpad(String(date.getMonth() + 1), 2, '0');
-                        case "dd": return lpad(String(date.getDate()), 2, '0');
-                        case "HH": return lpad(String(date.getHours()), 2, '0');
-                        case "hh": return lpad(String(date.getHours() <= 12 ? date.getHours() : date.getHours() % 12), 2, '0');
-                        case "mm": return lpad(String(date.getMinutes()), 2, '0');
-                        case "ss": return lpad(String(date.getSeconds()), 2, '0');
-                        default: return $1;
-                    }
-                });
-                return maskValue;
-            // default
-            default:
-                throw 'encodeMask-type must be string|number|date';
-        }
-    }
-    /**
-     * Converts masked value to original value.
-     * @param value
-     * @param type
-     * @param format
-     */
-    function unmask(value, type, format) {
-        switch (type) {
-            // string type
-            case 'string':
-                if (isEmpty(value)) {
-                    return null;
-                }
-                // TODO
-                return value;
-            // number type
-            case 'number':
-                if (isEmpty(value)) {
-                    return null;
-                }
-                var number;
-                if (typeof value === 'number') {
-                    number = value;
-                }
-                else if (typeof value === 'string') {
-                    value = value.replace(/,/g, '');
-                    number = Number(value);
-                }
-                else {
-                    number = Number(value);
-                }
-                if (isNaN(number)) {
-                    throw 'NaN';
-                }
-                var scale = parseInt(format);
-                return number.toFixed(scale);
-            // date type
-            case 'date':
-                if (isEmpty(value)) {
-                    return null;
-                }
-                if (value.length !== format.length) {
-                    throw 'value length is mismatch:' + value;
-                }
-                var date = new Date();
-                date.setFullYear(0);
-                date.setMonth(0);
-                date.setDate(1);
-                date.setHours(0);
-                date.setMinutes(0);
-                date.setSeconds(0);
-                var formatRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
-                var match;
-                while ((match = formatRex.exec(format)) != null) {
-                    var formatStr = match[0];
-                    var formatIndex = match.index;
-                    var formatLength = formatStr.length;
-                    var matchValue = value.substr(formatIndex, formatLength);
-                    matchValue = lpad(matchValue, formatLength, '0');
-                    if (isNaN(Number(matchValue))) {
-                        throw 'Not a Date - ' + formatStr + ':' + matchValue;
-                    }
-                    switch (formatStr) {
-                        case 'yyyy':
-                            var fullYear = parseInt(matchValue);
-                            date.setFullYear(fullYear);
-                            break;
-                        case 'yy':
-                            var yyValue = parseInt(matchValue);
-                            var yearPrefix = Math.floor(new Date().getFullYear() / 100);
-                            var fullYear = yearPrefix * 100 + yyValue;
-                            date.setFullYear(fullYear);
-                            break;
-                        case 'MM':
-                            var monthValue = parseInt(matchValue);
-                            date.setMonth(monthValue - 1);
-                            break;
-                        case 'dd':
-                            var dateValue = parseInt(matchValue);
-                            date.setDate(dateValue);
-                            break;
-                        case 'HH':
-                            var hoursValue = parseInt(matchValue);
-                            date.setHours(hoursValue);
-                            break;
-                        case 'hh':
-                            var hoursValue = parseInt(matchValue);
-                            date.setHours(hoursValue > 12 ? (hoursValue + 12) : hoursValue);
-                            break;
-                        case 'mm':
-                            var minutesValue = parseInt(matchValue);
-                            date.setMinutes(minutesValue);
-                            break;
-                        case 'ss':
-                            var secondsValue = parseInt(matchValue);
-                            date.setSeconds(secondsValue);
-                            break;
-                    }
-                }
-                return date;
-            // default 
-            default:
-                throw 'encodeMask-type must be string|number|date';
-        }
-    }
-    /**
      * Executes custom expression in HTML element and returns.
      * @param element
      * @param $context
@@ -560,36 +377,82 @@ var duice;
         return z;
     }
     /**
-     * duice.StringMask
-     * @param string format to mask
+     * duice.StringFormat
+     * @param string format
      */
-    var StringMask = (function () {
-        function StringMask() {
+    var StringFormat = (function () {
+        /**
+         * Constructor
+         * @param pattern
+         */
+        function StringFormat(pattern) {
+            if (pattern) {
+                this.setPattern(pattern);
+            }
         }
-        StringMask.prototype.setFormat = function (format) {
-            this.format = format;
+        /**
+         * Sets format string
+         * @param pattern
+         */
+        StringFormat.prototype.setPattern = function (pattern) {
+            this.pattern = pattern;
         };
-        StringMask.prototype.encode = function (value) {
+        /**
+         * encode string as format
+         * @param value
+         */
+        StringFormat.prototype.encode = function (value) {
+            //            var string = '';
+            //            var index = -1;
+            //            for(var i = 0, size = format.length; i < size; i ++){
+            //                var formatChar = format.charAt(i);
+            //                if(formatChar === '#'){
+            //                    index ++;
+            //                    string += value.charAt(index);
+            //                }else{
+            //                    string += formatChar;
+            //                }
+            //            }
+            //            return string;
             return value;
         };
-        StringMask.prototype.decode = function (value) {
+        /**
+         * decodes string as format
+         * @param value
+         */
+        StringFormat.prototype.decode = function (value) {
             return value;
         };
-        return StringMask;
+        return StringFormat;
     }());
-    duice.StringMask = StringMask;
+    duice.StringFormat = StringFormat;
     /**
-     * duice.NumberMask
-     * @param scale number scale
+     * duice.NumberFormat
+     * @param scale number
      */
-    var NumberMask = (function () {
-        function NumberMask() {
+    var NumberFormat = (function () {
+        /**
+         * Constructor
+         * @param scale
+         */
+        function NumberFormat(scale) {
             this.scale = 0;
+            if (scale) {
+                this.setScale(scale);
+            }
         }
-        NumberMask.prototype.setScale = function (scale) {
+        /**
+         * Sets number format scale
+         * @param scale
+         */
+        NumberFormat.prototype.setScale = function (scale) {
             this.scale = scale;
         };
-        NumberMask.prototype.encode = function (number) {
+        /**
+         * Encodes number as format
+         * @param number
+         */
+        NumberFormat.prototype.encode = function (number) {
             if (isEmpty(number) || isNaN(Number(number))) {
                 return '';
             }
@@ -601,7 +464,11 @@ var duice;
             }
             return string;
         };
-        NumberMask.prototype.decode = function (string) {
+        /**
+         * Decodes formatted value as original value
+         * @param string
+         */
+        NumberFormat.prototype.decode = function (string) {
             if (isEmpty(string)) {
                 return null;
             }
@@ -616,28 +483,43 @@ var duice;
             number = Number(number.toFixed(this.scale));
             return number;
         };
-        return NumberMask;
+        return NumberFormat;
     }());
-    duice.NumberMask = NumberMask;
+    duice.NumberFormat = NumberFormat;
     /**
-     * duice.DateMask
+     * duice.DateFormat
      */
-    var DateMask = (function () {
-        function DateMask() {
-            this.formatRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
+    var DateFormat = (function () {
+        /**
+         * Constructor
+         * @param pattern
+         */
+        function DateFormat(pattern) {
+            this.patternRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
+            if (pattern) {
+                this.setPattern(pattern);
+            }
         }
-        DateMask.prototype.setFormat = function (format) {
-            this.format = format;
+        /**
+         * Sets format string
+         * @param pattern
+         */
+        DateFormat.prototype.setPattern = function (pattern) {
+            this.pattern = pattern;
         };
-        DateMask.prototype.encode = function (string) {
+        /**
+         * Encodes date string
+         * @param string
+         */
+        DateFormat.prototype.encode = function (string) {
             if (isEmpty(string)) {
                 return '';
             }
-            if (isEmpty(this.format)) {
+            if (isEmpty(this.pattern)) {
                 return new Date(string).toString();
             }
             var date = new Date(string);
-            string = this.format.replace(this.formatRex, function ($1) {
+            string = this.pattern.replace(this.patternRex, function ($1) {
                 switch ($1) {
                     case "yyyy": return date.getFullYear();
                     case "yy": return lpad(String(date.getFullYear() % 1000), 2, '0');
@@ -652,16 +534,20 @@ var duice;
             });
             return string;
         };
-        DateMask.prototype.decode = function (string) {
+        /**
+         * Decodes formatted date string to ISO date string.
+         * @param string
+         */
+        DateFormat.prototype.decode = function (string) {
             if (isEmpty(string)) {
                 return null;
             }
-            if (isEmpty(this.format)) {
+            if (isEmpty(this.pattern)) {
                 return new Date(string).toISOString();
             }
             var date = new Date(0, 0, 0, 0, 0, 0);
             var match;
-            while ((match = this.formatRex.exec(this.format)) != null) {
+            while ((match = this.patternRex.exec(this.pattern)) != null) {
                 var formatString = match[0];
                 var formatIndex = match.index;
                 var formatLength = formatString.length;
@@ -706,9 +592,9 @@ var duice;
             }
             return date.toISOString();
         };
-        return DateMask;
+        return DateFormat;
     }());
-    duice.DateMask = DateMask;
+    duice.DateFormat = DateFormat;
     /**
      * duice.data
      * package of Data structure
@@ -1193,28 +1079,25 @@ var duice;
         ui.SpanFactory = {
             getSpan: function (element, $context) {
                 var span = new Span(element);
-                // sets mask
-                if (element.dataset.duiceMask) {
-                    var duiceMask = element.dataset.duiceMask.split(',');
-                    var type = duiceMask[0];
-                    var mask;
+                // sets format
+                if (element.dataset.duiceFormat) {
+                    var duiceFormat = element.dataset.duiceFormat.split(',');
+                    var type = duiceFormat[0];
+                    var format;
                     switch (type) {
                         case 'string':
-                            mask = new StringMask();
-                            mask.setFormat(duiceMask[1]);
+                            format = new StringFormat(duiceFormat[1]);
                             break;
                         case 'number':
-                            mask = new NumberMask();
-                            mask.setScale(parseInt(duiceMask[1]));
+                            format = new NumberFormat(parseInt(duiceFormat[1]));
                             break;
                         case 'date':
-                            mask = new DateMask();
-                            mask.setFormat(duiceMask[1]);
+                            format = new DateFormat(duiceFormat[1]);
                             break;
                         default:
-                            throw 'mask type[' + type + '] is invalid';
+                            throw 'format type[' + type + '] is invalid';
                     }
-                    span.setMask(mask);
+                    span.setFormat(format);
                 }
                 // binds
                 var bind = element.dataset.duiceBind.split(',');
@@ -1233,23 +1116,23 @@ var duice;
                 _this.span.classList.add('duice-ui-span');
                 return _this;
             }
-            Span.prototype.setMask = function (mask) {
-                this.mask = mask;
+            Span.prototype.setFormat = function (format) {
+                this.format = format;
             };
             Span.prototype.update = function (map, obj) {
                 removeChildNodes(this.span);
                 var value = map.get(this.name);
                 value = defaultIfEmpty(value, '');
-                if (this.mask) {
-                    value = this.mask.encode(value);
+                if (this.format) {
+                    value = this.format.encode(value);
                 }
                 this.span.appendChild(document.createTextNode(value));
             };
             Span.prototype.getValue = function () {
                 var value = this.span.innerHTML;
                 value = defaultIfEmpty(value, null);
-                if (this.mask) {
-                    value = this.mask.decode(value);
+                if (this.format) {
+                    value = this.format.decode(value);
                 }
                 return value;
             };
@@ -1266,13 +1149,13 @@ var duice;
                     case 'text':
                         input = new TextInput(element);
                         if (element.dataset.duiceFormat) {
-                            input.setFormat(element.dataset.duiceFormat);
+                            input.setPattern(element.dataset.duiceFormat);
                         }
                         break;
                     case 'number':
                         input = new NumberInput(element);
-                        if (element.dataset.duiceScale) {
-                            input.setScale(parseInt(element.dataset.duiceScale));
+                        if (element.dataset.duiceFormat) {
+                            input.setScale(parseInt(element.dataset.duiceFormat));
                         }
                         break;
                     case 'checkbox':
@@ -1285,7 +1168,7 @@ var duice;
                     case 'date':
                         input = new DateInput(element);
                         if (element.dataset.duiceFormat) {
-                            input.setFormat(element.dataset.duiceFormat);
+                            input.setPattern(element.dataset.duiceFormat);
                         }
                         break;
                     default:
@@ -1371,23 +1254,32 @@ var duice;
             function TextInput(input) {
                 var _this = _super.call(this, input) || this;
                 _this.input.classList.add('duice-ui-textInput');
-                _this.mask = new StringMask();
+                _this.format = new StringFormat();
                 return _this;
             }
-            TextInput.prototype.setFormat = function (format) {
-                this.mask.setFormat(format);
+            TextInput.prototype.setPattern = function (format) {
+                this.format.setPattern(format);
             };
             TextInput.prototype.update = function (map, obj) {
                 var value = map.get(this.getName());
                 value = defaultIfEmpty(value, '');
-                value = this.mask.encode(value);
+                value = this.format.encode(value);
                 this.input.value = value;
             };
             TextInput.prototype.getValue = function () {
                 var value = this.input.value;
                 value = defaultIfEmpty(value, null);
-                value = this.mask.decode(value);
+                value = this.format.decode(value);
                 return value;
+            };
+            TextInput.prototype.validate = function (value) {
+                try {
+                    this.format.decode(value);
+                }
+                catch (e) {
+                    return false;
+                }
+                return true;
             };
             return TextInput;
         }(Input));
@@ -1401,30 +1293,30 @@ var duice;
                 var _this = _super.call(this, input) || this;
                 _this.input.classList.add('duice-ui-numberInput');
                 _this.input.setAttribute('type', 'text');
-                _this.mask = new NumberMask();
+                _this.format = new NumberFormat();
                 return _this;
             }
             NumberInput.prototype.setScale = function (scale) {
-                this.mask.setScale(scale);
+                this.format.setScale(scale);
             };
             NumberInput.prototype.update = function (map, obj) {
                 var value = map.get(this.getName());
-                value = this.mask.encode(value);
+                value = this.format.encode(value);
                 this.input.value = value;
             };
             NumberInput.prototype.getValue = function () {
                 var value = this.input.value;
-                value = this.mask.decode(value);
+                value = this.format.decode(value);
                 return value;
             };
             NumberInput.prototype.validate = function (value) {
                 try {
-                    this.mask.decode(value);
-                    return true;
+                    this.format.decode(value);
                 }
                 catch (e) {
                     return false;
                 }
+                return true;
             };
             return NumberInput;
         }(Input));
@@ -1498,45 +1390,42 @@ var duice;
                 _this.input.addEventListener('click', function (event) {
                     $this.openPicker();
                 }, true);
-                // sets default mask
-                _this.mask = new DateMask();
+                // sets default format
+                _this.format = new DateFormat();
                 if (_this.type === 'date') {
-                    _this.mask.setFormat('yyyy-MM-dd');
+                    _this.format.setPattern('yyyy-MM-dd');
                 }
                 else {
-                    _this.mask.setFormat('yyyy-MM-dd HH:mm:ss');
+                    _this.format.setPattern('yyyy-MM-dd HH:mm:ss');
                 }
                 return _this;
             }
-            DateInput.prototype.setFormat = function (format) {
-                this.mask.setFormat(format);
+            DateInput.prototype.setPattern = function (format) {
+                this.format.setPattern(format);
             };
             DateInput.prototype.update = function (map, obj) {
                 var value = map.get(this.getName());
                 value = defaultIfEmpty(value, '');
-                value = this.mask.encode(value);
+                value = this.format.encode(value);
                 this.input.value = value;
             };
             DateInput.prototype.getValue = function () {
                 var value = this.input.value;
                 value = defaultIfEmpty(value, null);
-                value = this.mask.decode(value);
+                value = this.format.decode(value);
                 if (this.type === 'date') {
-                    var mask = new DateMask();
-                    mask.setFormat('yyyy-MM-dd');
-                    value = mask.encode(new Date(value).toISOString());
+                    value = new DateFormat('yyyy-MM-dd').encode(new Date(value).toISOString());
                 }
                 return value;
             };
             DateInput.prototype.validate = function (value) {
                 try {
-                    var s = this.mask.decode(value);
-                    console.log(s);
-                    return true;
+                    var s = this.format.decode(value);
                 }
                 catch (e) {
                     return false;
                 }
+                return true;
             };
             DateInput.prototype.openPicker = function () {
                 // checks pickerDiv is open.
@@ -1732,7 +1621,7 @@ var duice;
                 confirmButton.classList.add('duice-ui-dateInput__pickerDiv-footerDiv-confirmButton');
                 footerDiv.appendChild(confirmButton);
                 confirmButton.addEventListener('click', function (event) {
-                    $this.input.value = $this.mask.encode(date.toISOString());
+                    $this.input.value = $this.format.encode(date.toISOString());
                     $this.setChanged();
                     $this.notifyObservers(this);
                     $this.closePicker();
