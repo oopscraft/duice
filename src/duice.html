@@ -2,6 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=2048,initial-scale=1">
 <title>duice</title>
 <link rel="stylesheet" type="text/css" href="polyfill/normalize.css">
 <script src="polyfill/dataset.js"></script>
@@ -21,8 +22,8 @@ user.fromJson({
 	balance: 1000,
 	active: true,
 	gender: 'F',
-	hireDate: 1576647474398,
-	birthday: 854636400000,
+	hireDate: '2020-01-05T08:16:18.643Z',
+	birthday: '1996-12-24',
 	score: 20,
 	groupId: 'animal',
 	profile: 'I am Bunny',
@@ -60,8 +61,8 @@ users.fromJson([
         balance: 1000,
         active: true,
         gender: 'F',
-        hireDate: 1576647474398,
-        birthday: 854636400000,
+    	hireDate: '2020-01-05T08:16:18.643Z',
+    	birthday: '1996-12-24',
         score: 20,
         groupId: 'animal',
         profile: 'I am Bunny',
@@ -83,8 +84,8 @@ users.fromJson([
         balance: 1200,
         active: true,
         gender: 'M',
-        hireDate: 1576647474398,
-        birthday: 854636400000,
+    	hireDate: '2020-01-05T08:16:18.643Z',
+    	birthday: '1996-12-24',
         score: 20,
         groupId: 'fruit',
         profile: 'I am Bunny',
@@ -106,8 +107,8 @@ users.fromJson([
         balance: 1000,
         active: false,
         gender: 'F',
-        hireDate: 1576647474398,
-        birthday: 854636400000,
+    	hireDate: '2020-01-05T08:16:18.643Z',
+    	birthday: '1996-12-24',
         score: 20,
         groupId: 'fruit',
         profile: 'I am Bunny',
@@ -129,8 +130,8 @@ users.fromJson([
         balance: 1000,
         active: true,
         gender: 'F',
-        hireDate: 1576647474398,
-        birthday: 854636400000,
+    	hireDate: '2020-01-05T08:16:18.643Z',
+    	birthday: '1996-12-24',
         score: 20,
         groupId: 'human',
         profile: 'I am Bunny',
@@ -152,8 +153,8 @@ users.fromJson([
         balance: 1000,
         active: false,
         gender: 'M',
-        hireDate: 1558157874449,
-        birthday: 694278000452,
+    	hireDate: '2020-01-05T08:16:18.643Z',
+    	birthday: '1996-12-24',
         score: 20,
         groupId: 'animal',
         profile: 'I am Bunny',
@@ -175,8 +176,8 @@ users.fromJson([
         balance: 1000,
         active: true,
         gender: 'F',
-        hireDate: 1499405874159,
-        birthday: 854636400000,
+    	hireDate: '2020-01-05T08:16:18.643Z',
+    	birthday: '1996-12-24',
         score: 20,
         groupId: 'human',
         profile: 'I am Bunny',
@@ -198,8 +199,8 @@ users.fromJson([
         balance: 1000,
         active: true,
         gender: 'F',
-        hireDate: 1576647474398,
-        birthday: 854636400000,
+    	hireDate: '2020-01-05T08:16:18.643Z',
+    	birthday: '1996-12-24',
         score: 20,
         groupId: 'animal',
         profile: 'I am Bunny',
@@ -221,8 +222,8 @@ users.fromJson([
         balance: 1000,
         active: false,
         gender: 'F',
-        hireDate: 1576647474398,
-        birthday: 719161200572,
+    	hireDate: '2020-01-05T08:16:18.643Z',
+    	birthday: '1996-12-24',
         score: 20,
         groupId: 'fruit',
         profile: 'I am Bunny',
@@ -244,8 +245,8 @@ users.fromJson([
         balance: 1000,
         active: true,
         gender: 'M',
-        hireDate: 1576647474398,
-        birthday: 854636400000,
+    	hireDate: '2020-01-05T08:16:18.643Z',
+    	birthday: '1996-12-24',
         score: 20,
         groupId: 'human',
         profile: 'I am Bunny',
@@ -267,8 +268,8 @@ users.fromJson([
         balance: 1000,
         active: true,
         gender: 'F',
-        hireDate: 1576647474398,
-        birthday: 854636400000,
+    	hireDate: '2020-01-05T08:16:18.643Z',
+    	birthday: '1996-12-24',
         score: 20,
         groupId: 'animal',
         profile: 'I am Bunny',
@@ -494,7 +495,7 @@ body {
 						<!-- ================================================================ -->
 						<tr>
 							<th rowspan="2">duice.ui.NumberInput</th>
-							<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance"/></td>
+							<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance" step="0.1"/></td>
 							<td>
 								&lt;input is="duice-ui-input" type="number" data-duice-bind="user,balance"
 							</td>
@@ -508,20 +509,20 @@ body {
 							</td>
 						</tr>
 						<!-- ================================================================ -->
-						<!-- duice.ui.DateInput			   									  -->
+						<!-- duice.ui.DatetimeInput			   									  -->
 						<!-- ================================================================ -->
 						<tr>
-							<th rowspan="4">duice.ui.DateInput</th>
+							<th rowspan="4">duice.ui.DatetimeInput</th>
 							<td align="center">
-								<input is="duice-ui-input" type="datetime" data-duice-bind="user,hireDate"/>
+								<input is="duice-ui-input" type="datetime-local" data-duice-bind="user,hireDate"/>
 							</td>
 							<td>
-								&lt;input is="duice-ui-input" type="datetime" data-duice-bind="user,hireDate" ...
+								&lt;input is="duice-ui-input" type="datetime-local" data-duice-bind="user,hireDate" ...
 							</td>
 						</tr>
 						<tr>
 							<td align="center">
-								<input is="duice-ui-input" type="datetime" data-duice-bind="user,hireDate" data-duice-format="yyyy.MM.dd HH:mm:ss"/>
+								<input is="duice-ui-input" type="datetime-local" data-duice-bind="user,hireDate" data-duice-format="yyyy.MM.dd HH:mm:ss"/>
 							</td>
 							<td>
 								&lt;input is="duice-ui-input" type="datetime" data-duice-bind="user,hireDate" data-duice-format="yyyy.MM.dd HH:mm:ss" ...
@@ -734,7 +735,7 @@ body {
 									<td><span is="duice-ui-span" data-duice-bind="user,balance" data-duice-mask="number,2"></span></td>
 									<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance" data-duice-scale="2"/></td>
 									<td><span is="duice-ui-span" data-duice-bind="user,hireDate" data-duice-mask="date,yyyy.MM.dd HH:mm:ss"></span></td>
-									<td><input is="duice-ui-input" type="datetime" data-duice-bind="user,hireDate"/></td>
+									<td><input is="duice-ui-input" type="datetime-local" data-duice-bind="user,hireDate"/></td>
 									<td><input is="duice-ui-input" type="date" data-duice-bind="user,birthday"/></td>
 									<td><input is="duice-ui-input" type="checkbox" data-duice-bind="user,active"/></td>
 									<td>
@@ -909,12 +910,18 @@ body {
 											<span is="duice-ui-span" data-duice-bind="user,parentId" style="font-size:10px;color:#aaa;"></span>
 										</div>
 										<div>
-											<table style="width:500px;">
+											<table>
+												<col/>
+												<col width="80px"/>
+												<col/>
+												<col width="100px"/>
+												<col/>
+												<col width="80px"/>
 												<tr>
 													<td>balance</td>
 													<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance"/></td>
-													<td>hireDate</td>
-													<td><input is="duice-ui-input" type="datetime" data-duice-bind="user,hireDate"/></td>
+													<td>birthday</td>
+													<td><input is="duice-ui-input" type="date" data-duice-bind="user,birthday"/></td>
 													<td>groupId</td>
 													<td><select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"><option>- select -</option></select></td>
 												</tr>
@@ -960,12 +967,18 @@ body {
 											<span is="duice-ui-span" data-duice-bind="user,parentId" style="font-size:10px;color:#aaa;"></span>
 										</div>
 										<div>
-											<table style="width:500px;">
+											<table>
+												<col/>
+												<col width="80px"/>
+												<col/>
+												<col width="100px"/>
+												<col/>
+												<col width="80px"/>
 												<tr>
 													<td>balance</td>
 													<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance"/></td>
-													<td>hireDate</td>
-													<td><input is="duice-ui-input" type="datetime" data-duice-bind="user,hireDate"/></td>
+													<td>birthday</td>
+													<td><input is="duice-ui-input" type="date" data-duice-bind="user,birthday"/></td>
 													<td>groupId</td>
 													<td><select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"><option>- select -</option></select></td>
 												</tr>

@@ -140,6 +140,24 @@ namespace duice {
     }
     
     /**
+     * Checks mobile browser
+     */
+    export function isMobile() { 
+        if( navigator.userAgent.match(/Android/i)
+        || navigator.userAgent.match(/webOS/i)
+        || navigator.userAgent.match(/iPhone/i)
+        || navigator.userAgent.match(/iPad/i)
+        || navigator.userAgent.match(/iPod/i)
+        || navigator.userAgent.match(/BlackBerry/i)
+        || navigator.userAgent.match(/Windows Phone/i)
+        ){
+            return true;
+        }else {
+            return false;
+        }
+    }
+    
+    /**
      * Check if value is empty
      * @param value
      * @return whether value is empty
@@ -209,193 +227,6 @@ namespace duice {
         return value;
     }
     
-    /**
-     * Converts value to masked value.
-     * @param value
-     * @param type
-     * @param format
-     */
-    function mask(value: any, type: string, format: any):string {
-        switch (type) {
-        
-            // string type
-            case 'string' :
-                var string = '';
-                var index = -1;
-                for(var i = 0, size = format.length; i < size; i ++){
-                    var formatChar = format.charAt(i);
-                    if(formatChar === '#'){
-                        index ++;
-                        string += value.charAt(index);
-                    }else{
-                        string += formatChar;
-                    }
-                }
-                return string;
-                    
-            // number
-            case 'number':
-                var number;
-                if(typeof value === 'number'){
-                    number = value;
-                }else if(typeof value === 'string'){
-                    value = value.replace(/\,/gi,'');
-                    number = Number(value);
-                }else{
-                    number = Number(value);
-                }
-                if(isNaN(number)){
-                    throw 'NaN';
-                }
-                var scale = parseInt(format);
-                var maskValue = String(number.toFixed(scale));
-                var reg = /(^[+-]?\d+)(\d{3})/;
-                while (reg.test(maskValue)) {
-                    maskValue = maskValue.replace(reg, '$1' + ',' + '$2');
-                }
-                return maskValue;
-            
-            // date
-            case 'date':
-                var date:Date;
-                if(value instanceof Date){
-                    date = value;
-                }else if (typeof value === 'number'){
-                    date = new Date(value);
-                } else {
-                    throw 'Not Date Type';
-                }
-                var formatRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
-                var maskValue:string = format.replace(formatRex, function($1:string) {
-                    switch ($1) {
-                        case "yyyy": return date.getFullYear();
-                        case "yy": return lpad(String(date.getFullYear()%1000), 2, '0');
-                        case "MM": return lpad(String(date.getMonth() + 1), 2, '0');
-                        case "dd": return lpad(String(date.getDate()), 2, '0');
-                        case "HH": return lpad(String(date.getHours()), 2, '0');
-                        case "hh": return lpad(String(date.getHours() <= 12 ? date.getHours() : date.getHours()%12), 2, '0');
-                        case "mm": return lpad(String(date.getMinutes()), 2, '0');
-                        case "ss": return lpad(String(date.getSeconds()), 2, '0');
-                        default: return $1;
-                    }
-                });
-                return maskValue;
-    
-            // default
-            default :
-                throw 'encodeMask-type must be string|number|date';
-        }
-    }
-    
-    /**
-     * Converts masked value to original value.
-     * @param value
-     * @param type
-     * @param format
-     */
-    function unmask(value:string, type:string, format:any):any {
-        switch (type) {
-        
-            // string type
-            case 'string' :
-                if(isEmpty(value)){
-                    return null;
-                }
-                // TODO
-                
-                return value;
-                
-            // number type
-            case 'number' :
-                if(isEmpty(value)){
-                    return null;
-                }
-                var number;
-                if(typeof value === 'number'){
-                    number = value;
-                }else if(typeof value === 'string'){
-                    value = value.replace(/,/g,'');
-                    number = Number(value);
-                }else{
-                    number = Number(value);
-                }
-                if(isNaN(number)){
-                    throw 'NaN';
-                }
-                var scale = parseInt(format);
-                return number.toFixed(scale);
-                
-            // date type
-            case 'date' :
-                if(isEmpty(value)){
-                    return null;
-                }
-                if(value.length !== format.length){
-                    throw 'value length is mismatch:' + value;
-                }
-                var date = new Date();
-                date.setFullYear(0);
-                date.setMonth(0);
-                date.setDate(1);
-                date.setHours(0);
-                date.setMinutes(0);
-                date.setSeconds(0);
-                var formatRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
-                var match;
-                while ((match = formatRex.exec(format)) != null) {
-                    var formatStr = match[0];
-                    var formatIndex = match.index;
-                    var formatLength = formatStr.length;
-                    var matchValue = value.substr(formatIndex, formatLength);
-                    matchValue = lpad(matchValue, formatLength,'0');
-                    if(isNaN(Number(matchValue))){
-                        throw 'Not a Date - ' + formatStr + ':' + matchValue;
-                    }
-                    switch (formatStr) {
-                        case 'yyyy':
-                            var fullYear = parseInt(matchValue);
-                            date.setFullYear(fullYear);
-                            break;
-                        case 'yy':
-                            var yyValue = parseInt(matchValue);
-                            var yearPrefix = Math.floor(new Date().getFullYear() / 100);
-                            var fullYear = yearPrefix * 100 + yyValue;
-                            date.setFullYear(fullYear);
-                            break;
-                        case 'MM':
-                            var monthValue = parseInt(matchValue);
-                            date.setMonth(monthValue-1);
-                            break;
-                        case 'dd':
-                            var dateValue = parseInt(matchValue);
-                            date.setDate(dateValue);
-                            break;
-                        case 'HH':
-                            var hoursValue = parseInt(matchValue);
-                            date.setHours(hoursValue);
-                            break;
-                        case 'hh':
-                            var hoursValue = parseInt(matchValue);
-                            date.setHours(hoursValue > 12 ? (hoursValue + 12) : hoursValue);
-                            break;
-                        case 'mm':
-                            var minutesValue = parseInt(matchValue);
-                            date.setMinutes(minutesValue);
-                            break;
-                        case 'ss':
-                            var secondsValue = parseInt(matchValue);
-                            date.setSeconds(secondsValue);
-                            break;
-                    }
-                }
-                return date;
-                
-            // default 
-            default:
-                throw 'encodeMask-type must be string|number|date';
-        }
-    }
-
     /**
      * Executes custom expression in HTML element and returns.
      * @param element
@@ -556,7 +387,6 @@ namespace duice {
      */
     interface Mask {
         encode(value:any):any;
-        validate(value:any):boolean;
         decode(value:any):any;
     }
     
@@ -570,10 +400,21 @@ namespace duice {
             this.format = format;
         }
         encode(value:any):any{
+            
+//            var string = '';
+//            var index = -1;
+//            for(var i = 0, size = format.length; i < size; i ++){
+//                var formatChar = format.charAt(i);
+//                if(formatChar === '#'){
+//                    index ++;
+//                    string += value.charAt(index);
+//                }else{
+//                    string += formatChar;
+//                }
+//            }
+//            return string;
+            
             return value;
-        }
-        validate(value:any):boolean{
-            return true;
         }
         decode(value:any):any{
             return value;
@@ -601,21 +442,16 @@ namespace duice {
             }
             return string;
         }
-        validate(string:any):boolean{
-            string = this.decode(string);
-            if(isEmpty(string)){
-                return false;
-            }else{
-                return true;
-            }
-        }
         decode(string:string):number{
             if(isEmpty(string)){
                 return null;
             }
+            if(string.length === 1 && /[+-]/.test(string)){
+                string += '0';
+            }
             string = string.replace(/\,/gi,'');
             if(isNaN(Number(string))){
-                return null;
+                throw 'NaN';
             }
             var number = Number(string);
             number = Number(number.toFixed(this.scale));
@@ -628,19 +464,19 @@ namespace duice {
      */
     export class DateMask implements Mask {
         format:string;
+        formatRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
         setFormat(format:string){
             this.format = format;
         }
-        encode(number:number):string{
-            if(isEmpty(number)){
+        encode(string:string):string{
+            if(isEmpty(string)){
                 return '';
             }
             if(isEmpty(this.format)){
-                return new Date(number).toString();
+                return new Date(string).toString();
             }
-            var date = new Date(number);
-            var formatRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
-            var string:string = this.format.replace(formatRex, function($1:any) {
+            var date = new Date(string);
+            string = this.format.replace(this.formatRex, function($1:any) {
                 switch ($1) {
                     case "yyyy": return date.getFullYear();
                     case "yy": return lpad(String(date.getFullYear()%1000), 2, '0');
@@ -655,73 +491,59 @@ namespace duice {
             });
             return string;
         }
-        validate(value:any):boolean{
-            return true;
-        }
-        decode(string:string):number{
+        decode(string:string):string{
             if(isEmpty(string)){
                 return null;
             }
             if(isEmpty(this.format)){
-                return new Date(string).getTime();
+                return new Date(string).toISOString();
             }
-            var date = new Date();
-            date.setFullYear(0);
-            date.setMonth(0);
-            date.setDate(1);
-            date.setHours(0);
-            date.setMinutes(0);
-            date.setSeconds(0);
-            var formatRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
+            var date = new Date(0,0,0,0,0,0);
             var match;
-            while ((match = formatRex.exec(this.format)) != null) {
-                var formatStr = match[0];
+            while ((match = this.formatRex.exec(this.format)) != null) {
+                var formatString = match[0];
                 var formatIndex = match.index;
-                var formatLength = formatStr.length;
+                var formatLength = formatString.length;
                 var matchValue = string.substr(formatIndex, formatLength);
-                matchValue = lpad(matchValue, formatLength,'0');
-                if(isNaN(Number(matchValue))){
-                    throw 'Not a Date - ' + formatStr + ':' + matchValue;
-                }
-                switch (formatStr) {
-                    case 'yyyy':
-                        var fullYear = parseInt(matchValue);
-                        date.setFullYear(fullYear);
-                        break;
-                    case 'yy':
-                        var yyValue = parseInt(matchValue);
-                        var yearPrefix = Math.floor(new Date().getFullYear() / 100);
-                        var fullYear = yearPrefix * 100 + yyValue;
-                        date.setFullYear(fullYear);
-                        break;
-                    case 'MM':
-                        var monthValue = parseInt(matchValue);
-                        date.setMonth(monthValue-1);
-                        break;
-                    case 'dd':
-                        var dateValue = parseInt(matchValue);
-                        date.setDate(dateValue);
-                        break;
-                    case 'HH':
-                        var hoursValue = parseInt(matchValue);
-                        date.setHours(hoursValue);
-                        break;
-                    case 'hh':
-                        var hoursValue = parseInt(matchValue);
-                        date.setHours(hoursValue > 12 ? (hoursValue + 12) : hoursValue);
-                        break;
-                    case 'mm':
-                        var minutesValue = parseInt(matchValue);
-                        date.setMinutes(minutesValue);
-                        break;
-                    case 'ss':
-                        var secondsValue = parseInt(matchValue);
-                        date.setSeconds(secondsValue);
-                        break;
+                matchValue = rpad(matchValue, formatLength,'0');
+                switch (formatString) {
+                case 'yyyy':
+                    var fullYear = parseInt(matchValue);
+                    date.setFullYear(fullYear);
+                    break;
+                case 'yy':
+                    var yyValue = parseInt(matchValue);
+                    var yearPrefix = Math.floor(new Date().getFullYear() / 100);
+                    var fullYear = yearPrefix * 100 + yyValue;
+                    date.setFullYear(fullYear);
+                    break;
+                case 'MM':
+                    var monthValue = parseInt(matchValue);
+                    date.setMonth(monthValue-1);
+                    break;
+                case 'dd':
+                    var dateValue = parseInt(matchValue);
+                    date.setDate(dateValue);
+                    break;
+                case 'HH':
+                    var hoursValue = parseInt(matchValue);
+                    date.setHours(hoursValue);
+                    break;
+                case 'hh':
+                    var hoursValue = parseInt(matchValue);
+                    date.setHours(hoursValue > 12 ? (hoursValue + 12) : hoursValue);
+                    break;
+                case 'mm':
+                    var minutesValue = parseInt(matchValue);
+                    date.setMinutes(minutesValue);
+                    break;
+                case 'ss':
+                    var secondsValue = parseInt(matchValue);
+                    date.setSeconds(secondsValue);
+                    break;
                 }
             }
-            var number = date.getTime();
-            return number;
+            return date.toISOString();
         }
     }
     
@@ -1293,7 +1115,7 @@ namespace duice {
             update(map:duice.data.Map, obj:object):void {
                 removeChildNodes(this.span);
                 var value = map.get(this.name);
-                value = defaultIfEmpty(value, '');
+                value = defaultIfEmpty(value,'');
                 if(this.mask){
                     value = this.mask.encode(value);
                 }
@@ -1334,8 +1156,8 @@ namespace duice {
                 case 'radio':
                     input = new RadioInput(element);
                     break;
+                case 'datetime-local':
                 case 'date':
-                case 'datetime':
                     input = new DateInput(element);
                     if(element.dataset.duiceFormat){
                         input.setFormat(element.dataset.duiceFormat);
@@ -1361,13 +1183,30 @@ namespace duice {
                 super(input);
                 this.input = input;
                 var $this = this;
+                this.input.addEventListener('keypress', function(event:any){
+                    var inputChars = String.fromCharCode(event.keyCode);
+                    var newValue = this.value.substr(0,this.selectionStart) + inputChars + this.value.substr(this.selectionEnd);
+                    if($this.validate(newValue) === false){
+                        event.preventDefault();
+                    }
+                }, true);
+                this.input.addEventListener('paste', function(event:any){
+                    var inputChars = event.clipboardData.getData('text/plain');
+                    var newValue = this.value.substr(0,this.selectionStart) + inputChars + this.value.substr(this.selectionEnd);
+                    if($this.validate(newValue) === false){
+                        event.preventDefault();
+                    }
+                }, true);
                 this.input.addEventListener('change', function(event){
                     $this.setChanged();
-                    $this.notifyObservers(this); 
-                });
+                    $this.notifyObservers(this);
+                },true);
             }
             abstract update(map:duice.data.Map, obj:object):void;
             abstract getValue():any;
+            validate(value:string):boolean {
+                return true;
+            }
         }
         
         /**
@@ -1432,24 +1271,7 @@ namespace duice {
                 super(input);
                 this.input.classList.add('duice-ui-numberInput');
                 this.input.setAttribute('type','text');
-                
-                // key press event
-                var $this = this;
                 this.mask = new NumberMask();
-                this.input.addEventListener('keypress', function(event:any){
-                    var inputChars = String.fromCharCode(event.keyCode);
-                    var newValue = this.value.substr(0,this.selectionStart) + inputChars + this.value.substr(this.selectionEnd)
-                    if($this.mask.validate(newValue) === false){
-                        event.preventDefault();
-                    }
-                }, true);
-                this.input.addEventListener('paste', function(event:any){
-                    var inputChars = event.clipboardData.getData('text/plain');
-                    var newValue = this.value.substr(0,this.selectionStart) + inputChars + this.value.substr(this.selectionEnd)
-                    if($this.mask.validate(newValue) === false){
-                        event.preventDefault();
-                    }
-                }, true);
             }
             setScale(scale:number){
                 this.mask.setScale(scale);
@@ -1462,8 +1284,15 @@ namespace duice {
             getValue():number {
                 var value:any = this.input.value;
                 value = this.mask.decode(value);
-                console.log('@@@@@@@@@@@@', typeof value);
                 return value;
+            }
+            validate(value:string):boolean {
+                try {
+                    this.mask.decode(value);
+                    return true;
+                }catch(e){
+                    return false;
+                }
             }
         }
         
@@ -1515,7 +1344,7 @@ namespace duice {
         }
         
         /**
-         * duice.ui.DateInput
+         * duice.ui.DatetimeInput
          */
         export class DateInput extends Input {
             pickerDiv:HTMLDivElement;
@@ -1546,16 +1375,30 @@ namespace duice {
                 this.mask.setFormat(format);
             }
             update(map:duice.data.Map, obj:object):void {
-                var value:any = map.get(this.getName());
+                var value:string = map.get(this.getName());
                 value = defaultIfEmpty(value,'');
                 value = this.mask.encode(value);
                 this.input.value = value;
             }
-            getValue():number {
-                var value:any = this.input.value;
+            getValue():string {
+                var value = this.input.value;
                 value = defaultIfEmpty(value, null);
                 value = this.mask.decode(value);
+                if(this.type === 'date'){
+                    var mask = new DateMask();
+                    mask.setFormat('yyyy-MM-dd');
+                    value = mask.encode(new Date(value).toISOString());
+                }
                 return value;
+            }
+            validate(value:string):boolean {
+                try {
+                    var s = this.mask.decode(value);
+                    console.log(s);
+                    return true;
+                }catch(e){
+                    return false;
+                }
             }
             openPicker():void {
                 
@@ -1776,7 +1619,7 @@ namespace duice {
                 confirmButton.classList.add('duice-ui-dateInput__pickerDiv-footerDiv-confirmButton');
                 footerDiv.appendChild(confirmButton);
                 confirmButton.addEventListener('click', function(event){
-                    $this.input.value = $this.mask.encode(date.getTime());
+                    $this.input.value = $this.mask.encode(date.toISOString());
                     $this.setChanged();
                     $this.notifyObservers(this);
                     $this.closePicker();
@@ -1897,16 +1740,60 @@ namespace duice {
                     console.log('error');
                 });
                 
-                // creates file input
-                this.input = document.createElement('input');
-                this.input = document.createElement('input');
-                this.input.setAttribute("type", "file");
-                this.input.setAttribute("accept", "image/gif, image/jpeg, image/png");
+
 
             }
             update(map:duice.data.Map, obj:object):void {
                 var value = map.get(this.getName());
                 this.img.src = value;
+                var $this = this;
+                
+                // adds click event
+                this.img.addEventListener('click', function() {
+                    // creates file input
+                    $this.input = document.createElement('input');
+                    $this.input.setAttribute("type", "file");
+                    $this.input.setAttribute("accept", "image/gif, image/jpeg, image/png");
+                    
+                    
+                    // add change event listener
+                    $this.input.addEventListener('change', function(e){
+                        
+                        if (this.files && this.files[0]) {
+                            var fileReader = new FileReader();
+                            fileReader.addEventListener("load", function(event:any) {
+                                console.log(event);
+                                var value = event.target.result;
+                                /*
+//                                var width = $this.width;
+//                                var height = $this.height;
+                                var canvas = document.createElement("canvas");
+                                var ctx = canvas.getContext("2d");
+//                                canvas.width = width;
+//                                canvas.height = height;
+                                var image = document.createElement('img');
+                                image.onload = function(){
+                                    //ctx.drawImage(image, 0, 0, width, height);
+                                    ctx.drawImage(image, 0, 0);
+                                    value = canvas.toDataURL("image/png");
+                                    $this.map.set($this.name, value);
+                                };
+                                image.src = value;
+                                */
+                                $this.img.src = value;
+                                $this.map.set($this.name, value);
+                            }); 
+                            fileReader.readAsDataURL(this.files[0]);
+                        }
+                        
+                        e.preventDefault();
+                        e.stopPropagation();
+                    });
+                    
+                    $this.input.click();
+                    
+                });
+
             }
             getValue():any {
                 return this.img.src;
