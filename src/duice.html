@@ -8,6 +8,10 @@
 <script src="polyfill/dataset.js"></script>
 <script src="duice.js"></script>
 <link rel="stylesheet" type="text/css" href="duice.css">
+<!-- integrates with sunedit -->
+<script src="integrate/duice-integrate-suneditor.js"></script>
+<script src="integrate/suneditor/suneditor.min.js"></script>
+<link rel="stylesheet" type="text/css" href="integrate/suneditor/css/suneditor.min.css">
 <script>
 /**
  * user(duice.data.Map)
@@ -410,7 +414,6 @@ body {
 		<h1 >DUICE <small>(Data-oriented UI Component Engine)</small></h1>
 	</div>
 	<hr/>
-	
 	<!-- ================================================================ -->
 	<!-- duice.ui.MapUIElement   										  -->
 	<!-- ================================================================ -->
@@ -1149,6 +1152,17 @@ body {
 					</table>
 				</dialog>
 			</div>
+		</div>
+	</section>
+	
+	<section class="chapter">
+		<div class="chapter__headerDiv">
+			<h2>Integrate with SunEditor 
+				<small>(http://suneditor.com)</small>
+			</h2>
+		</div>
+		<div class="chapter__bodyDiv">
+			<textarea is="duice-integrate-suneditor" data-duice-bind="user,profile" style="width:100%;height:200px;">11111</textarea>
 		</div>
 	</section>
 
