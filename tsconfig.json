@@ -15,6 +15,6 @@
 	},
 	"files":[
 		 "./src/duice.ts"
-		,"./src/integrate/duice-integrate-suneditor.ts"
+		,"./src/plugin/duice-plugin-suneditor.ts"
 	]
 }

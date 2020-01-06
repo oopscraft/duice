@@ -1,10 +1,10 @@
 namespace duice {
     
-    export namespace integrate {
+    export namespace plugin {
         
         export class SunEditorFactory extends duice.MapUIComponentFactory {
             getInstance(element:HTMLTextAreaElement):SunEditor {
-                var sunEditor = new duice.integrate.SunEditor(element);
+                var sunEditor = new SunEditor(element);
                 var bind = element.dataset.duiceBind.split(',');
                 sunEditor.bind(this.getContextProperty(bind[0]), bind[1]);
                 return sunEditor;
@@ -36,37 +36,6 @@ namespace duice {
         }
         
         // Adds component definition
-        ComponentDefinitionRegistry.add(new ComponentDefinition('textarea','duice-integrate-suneditor', duice.integrate.SunEditorFactory));
+        ComponentDefinitionRegistry.add(new ComponentDefinition('textarea','duice-integrate-suneditor', duice.plugin.SunEditorFactory));
     }
 }
-
-//duice.addComponent('textarea', 'duice-integrate-suneditor', duice.integrate.SunEditor);
-//
-//uiElementTags.
-//duice.initialize() {
-//    
-//}
-
-/**
- * DOMContentLoaded event process
- */
-//document.addEventListener("DOMContentLoaded", function(event) {
-//    var $context:any = typeof self !== 'undefined' ? self : 
-//                        typeof window !== 'undefined' ? window :
-//                        {};
-//    // elements
-//    var elements = document.querySelectorAll('textarea[is="duice-integrate-suneditor"][data-duice-bind]:not([data-duice-id])');
-//    for(var i = 0; i < elements.length; i++ ) {
-//        try {
-//            var element:any = elements[i];
-//            
-//            var instance = new duice.integrate.SunEditor(element);
-//            var bind = element.dataset.duiceBind.split(',');
-//            instance.bind(this.getObject($context, bind[0]), bind[1]);
-//            
-//        }catch(e){
-//            console.error(e,element);
-//            throw e;
-//        }
-//    }
-//});
