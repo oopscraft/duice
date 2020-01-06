@@ -206,9 +206,284 @@ namespace duice {
             return true;
         }
     }
+
+    /**
+     * Map data structure
+     * @param JSON object
+     */
+    export class Map extends DataObject {
+        data:any = new Object();    // internal data object
+        originData:string;          // original string JSON data
+        enable:boolean = true;      // enable
+        readonly:Array<string> = new Array<string>();   // read only names
+    
+        /**
+         * constructor 
+         * @param json
+         */
+        constructor(json?:any) {
+            super();
+            if(json){
+                this.fromJson(json);
+            }
+        }
+        
+        /**
+         * Updates data from observable instance
+         * @param uiComponent
+         * @param obj
+         */
+        update(uiComponent:MapUIComponent, obj:object):void {
+            console.info('Map.update', uiComponent, obj);
+            var name = uiComponent.getName();
+            var value = uiComponent.getValue();
+            this.set(name, value);
+        }
+        
+        /**
+         * Loads data from JSON object.
+         * @param json
+         */
+        fromJson(json:any): void {
+            
+            // sets data
+            this.data = new Object();
+            for(var name in json){
+                this.data[name] = json[name];
+            }
+            
+            // saves original data.
+            this.originData = JSON.stringify(this.toJson());
+            
+            // notify to observers
+            this.setChanged();
+            this.notifyObservers(this);
+        }
+        
+        /**
+         * Convert data to JSON object
+         * @return JSON object
+         */
+        toJson():object {
+            var json: any = new Object();
+            for(var name in this.data){
+                json[name] = this.data[name];
+            }
+            return json;
+        }
+        
+        /**
+         * Checks original data is changed
+         * @return whether original data is changed or not
+         */
+        isDirty():boolean {
+            if(JSON.stringify(this.toJson()) === this.originData){
+                return false;
+            }else{
+                return true;
+            }
+        }
+        
+        /**
+         * Restores instance as original data
+         */
+        reset():void {
+            var originJson = JSON.parse(this.originData);
+            this.fromJson(originJson);
+        }
+        
+        /**
+         * Sets property as input value
+         * @param name
+         * @param value
+         */
+        set(name:string, value:any):void {
+            this.data[name] = value;
+            this.setChanged();
+            this.notifyObservers(this);
+        }
+        
+        /**
+         * Gets specified property value.
+         * @param name
+         */
+        get(name:string):any {
+            return this.data[name];
+        }
+        
+        /**
+         * Returns properties names as array.
+         * @return array of names
+         */
+        getNames():string[]{
+            var names = new Array();
+            for(var name in this.data){
+                names.push(name);
+            }
+            return names;
+        }
+        
+        /**
+         * Sets instance to be enabled.
+         * @param whether enable or not
+         */
+        setEnable(enable:boolean):void {
+            this.enable = enable;
+            this.setChanged();
+            this.notifyObservers(this);
+        }
+        
+        /**
+         * Returns instance is enabled.
+         * @return whether enable or not
+         */
+        isEnable():boolean {
+            return this.enable;
+        }
+        
+        /**
+         * Sets read-only specified name
+         * @param name
+         * @param readonly
+         */
+        setReadonly(name:string, readonly:boolean):void {
+            if(this.readonly.indexOf(name) == -1){
+                this.readonly.push(name);
+            }
+            this.setChanged();
+            this.notifyObservers(this);
+        }
+        
+        /**
+         * Returns specified name is read-only
+         * @param name
+         * @return whether specified property is read-only or not
+         */
+        isReadonly(name:string):boolean {
+            if(this.readonly.indexOf(name) >= 0){
+                return true;
+            }else{
+                return false;
+            }
+        }
+    }
     
     /**
-     * duice.ui.UIComponent
+     * duice.List
+     */
+    export class List extends DataObject {
+        data:Array<duice.Map> = new Array<duice.Map>();
+        originData:string;
+        index:number = -1;
+        constructor(jsonArray?:Array<any>, __childName?:string) {
+            super();
+            if(jsonArray){
+                this.fromJson(jsonArray);
+            }
+        }
+        update(observable:Observable, obj:object):void {
+            console.log('List.update', observable, obj);
+            this.setChanged();
+            this.notifyObservers(obj);
+        }
+        fromJson(jsonArray:Array<any>):void {
+            this.data = new Array<duice.Map>();
+            for(var i = 0; i < jsonArray.length; i ++ ) {
+                var map = new duice.Map(jsonArray[i]);
+                map.addObserver(this);
+                this.data.push(map);
+            }
+            this.originData = JSON.stringify(this.toJson());
+            this.clearIndex();
+            this.setChanged();
+            this.notifyObservers(this);
+        }
+        toJson(__childName?:string):Array<object> {
+            var jsonArray = new Array();
+            for(var i = 0; i < this.data.length; i ++){
+                jsonArray.push(this.data[i].toJson());
+            }
+            return jsonArray;
+        }
+        isDirty():boolean {
+            if(JSON.stringify(this.toJson()) === this.originData){
+                return false;
+            }else{
+                return true;
+            }
+        }
+        reset():void {
+            var originJson = JSON.parse(this.originData);
+            this.fromJson(originJson);
+        }
+        setIndex(index:number):void {
+            this.index = index;
+            this.setChanged();
+            this.notifyObservers(this);
+        }
+        getIndex():number {
+            return this.index;
+        }
+        clearIndex():void {
+            this.index = -1;
+            this.setChanged();
+            this.notifyObservers(this);
+        }
+        getSize():number {
+            return this.data.length;
+        }
+        get(index:number):Map {
+            return this.data[index];
+        }
+        add(map:Map):void {
+            map.addObserver(this);
+            this.data.push(map);
+            this.index = this.getSize()-1;
+            this.setChanged();
+            this.notifyObservers(this);
+        }
+        insert(index:number, map:Map):void {
+            if(0 <= index && index < this.data.length) {
+                map.addObserver(this);
+                this.data.splice(index, 0, map);
+                this.index = index;
+                this.setChanged();
+                this.notifyObservers(this);
+            }
+        }
+        remove(index:number):void {
+            if(0 <= index && index < this.data.length) {
+                this.data.splice(index, 1);
+                this.index = Math.min(this.index, this.data.length -1);
+                this.setChanged();
+                this.notifyObservers(this);
+            }
+        }
+        move(fromIndex:number, toIndex:number):void {
+            this.index = fromIndex;
+            this.data.splice(toIndex, 0, this.data.splice(fromIndex, 1)[0]);
+            this.index = toIndex;
+            this.setChanged();
+            this.notifyObservers(this);
+        }
+        forEach(handler:Function){
+            for(var i = 0, size = this.data.length; i < size; i ++){
+                handler.call(this, this.data[i]);
+            }
+        }
+        sort(name:string, ascending:boolean):void {
+            this.data.sort(function(a:duice.Map,b:duice.Map):number {
+                var aValue = a.get(name);
+                var bValue = b.get(name);
+                return (aValue > bValue ? 1 : aValue < bValue ? -1 : 0) * (ascending == false ? -1 : 1);
+            });
+            this.setChanged();
+            this.notifyObservers(this);
+        }
+    }
+    
+    /**
+     * duice.UIComponent
      */
     abstract class UIComponent extends Observable implements Observer {
         element:HTMLElement;
@@ -241,25 +516,25 @@ namespace duice {
     }
     
     /**
-     * duice.ui.MapUIComponent
+     * duice.MapUIComponent
      */
     export abstract class MapUIComponent extends UIComponent {
-        map:duice.data.Map;
+        map:duice.Map;
         name:string;
-        bind(map:duice.data.Map, name:string):void {
+        bind(map:duice.Map, name:string):void {
             this.map = map;
             this.name = name;
             this.map.addObserver(this);
             this.addObserver(this.map);
             this.update(this.map, this.map);
         }
-        getMap():duice.data.Map {
+        getMap():duice.Map {
             return this.map;
         }
         getName():string {
             return this.name;
         }
-        abstract update(map:duice.data.Map, obj:object):void;
+        abstract update(map:duice.Map, obj:object):void;
         abstract getValue():any;
     }
     
@@ -267,22 +542,22 @@ namespace duice {
      * duice.ui.ListUIComponent
      */
     export abstract class ListUIComponent extends UIComponent {
-        list:duice.data.List;
+        list:duice.List;
         item:string;
-        bind(list:duice.data.List, item:string):void {
+        bind(list:duice.List, item:string):void {
             this.list = list;
             this.item = item;
             this.list.addObserver(this);
             this.addObserver(this.list);
             this.update(this.list, this.list);
         }
-        getList():duice.data.List {
+        getList():duice.List {
             return this.list;
         }
         getItem():string {
             return this.item;
         }
-        abstract update(list:duice.data.List, obj:object):void;
+        abstract update(list:duice.List, obj:object):void;
     }
     
     /**
@@ -851,289 +1126,6 @@ namespace duice {
         }
     }
     
-    
-    /**
-     * duice.data
-     * package of Data structure 
-     */
-    export namespace data {
-
-        /**
-         * Map data structure
-         * @param JSON object
-         */
-        export class Map extends DataObject {
-            data:any = new Object();    // internal data object
-            originData:string;          // original string JSON data
-            enable:boolean = true;      // enable
-            readonly:Array<string> = new Array<string>();   // read only names
-        
-            /**
-             * constructor 
-             * @param json
-             */
-            constructor(json?:any) {
-                super();
-                if(json){
-                    this.fromJson(json);
-                }
-            }
-            
-            /**
-             * Updates data from observable instance
-             * @param uiComponent
-             * @param obj
-             */
-            update(uiComponent:MapUIComponent, obj:object):void {
-                console.info('Map.update', uiComponent, obj);
-                var name = uiComponent.getName();
-                var value = uiComponent.getValue();
-                this.set(name, value);
-            }
-            
-            /**
-             * Loads data from JSON object.
-             * @param json
-             */
-            fromJson(json:any): void {
-                
-                // sets data
-                this.data = new Object();
-                for(var name in json){
-                    this.data[name] = json[name];
-                }
-                
-                // saves original data.
-                this.originData = JSON.stringify(this.toJson());
-                
-                // notify to observers
-                this.setChanged();
-                this.notifyObservers(this);
-            }
-            
-            /**
-             * Convert data to JSON object
-             * @return JSON object
-             */
-            toJson():object {
-                var json: any = new Object();
-                for(var name in this.data){
-                    json[name] = this.data[name];
-                }
-                return json;
-            }
-            
-            /**
-             * Checks original data is changed
-             * @return whether original data is changed or not
-             */
-            isDirty():boolean {
-                if(JSON.stringify(this.toJson()) === this.originData){
-                    return false;
-                }else{
-                    return true;
-                }
-            }
-            
-            /**
-             * Restores instance as original data
-             */
-            reset():void {
-                var originJson = JSON.parse(this.originData);
-                this.fromJson(originJson);
-            }
-            
-            /**
-             * Sets property as input value
-             * @param name
-             * @param value
-             */
-            set(name:string, value:any):void {
-                this.data[name] = value;
-                this.setChanged();
-                this.notifyObservers(this);
-            }
-            
-            /**
-             * Gets specified property value.
-             * @param name
-             */
-            get(name:string):any {
-                return this.data[name];
-            }
-            
-            /**
-             * Returns properties names as array.
-             * @return array of names
-             */
-            getNames():string[]{
-                var names = new Array();
-                for(var name in this.data){
-                    names.push(name);
-                }
-                return names;
-            }
-            
-            /**
-             * Sets instance to be enabled.
-             * @param whether enable or not
-             */
-            setEnable(enable:boolean):void {
-                this.enable = enable;
-                this.setChanged();
-                this.notifyObservers(this);
-            }
-            
-            /**
-             * Returns instance is enabled.
-             * @return whether enable or not
-             */
-            isEnable():boolean {
-                return this.enable;
-            }
-            
-            /**
-             * Sets read-only specified name
-             * @param name
-             * @param readonly
-             */
-            setReadonly(name:string, readonly:boolean):void {
-                if(this.readonly.indexOf(name) == -1){
-                    this.readonly.push(name);
-                }
-                this.setChanged();
-                this.notifyObservers(this);
-            }
-            
-            /**
-             * Returns specified name is read-only
-             * @param name
-             * @return whether specified property is read-only or not
-             */
-            isReadonly(name:string):boolean {
-                if(this.readonly.indexOf(name) >= 0){
-                    return true;
-                }else{
-                    return false;
-                }
-            }
-        }
-        
-        /**
-         * duice.data.List
-         */
-        export class List extends DataObject {
-            data:Array<duice.data.Map> = new Array<duice.data.Map>();
-            originData:string;
-            index:number = -1;
-            constructor(jsonArray?:Array<any>, __childName?:string) {
-                super();
-                if(jsonArray){
-                    this.fromJson(jsonArray);
-                }
-            }
-            update(observable:Observable, obj:object):void {
-                console.log('List.update', observable, obj);
-                this.setChanged();
-                this.notifyObservers(obj);
-            }
-            fromJson(jsonArray:Array<any>):void {
-                this.data = new Array<duice.data.Map>();
-                for(var i = 0; i < jsonArray.length; i ++ ) {
-                    var map = new duice.data.Map(jsonArray[i]);
-                    map.addObserver(this);
-                    this.data.push(map);
-                }
-                this.originData = JSON.stringify(this.toJson());
-                this.clearIndex();
-                this.setChanged();
-                this.notifyObservers(this);
-            }
-            toJson(__childName?:string):Array<object> {
-                var jsonArray = new Array();
-                for(var i = 0; i < this.data.length; i ++){
-                    jsonArray.push(this.data[i].toJson());
-                }
-                return jsonArray;
-            }
-            isDirty():boolean {
-                if(JSON.stringify(this.toJson()) === this.originData){
-                    return false;
-                }else{
-                    return true;
-                }
-            }
-            reset():void {
-                var originJson = JSON.parse(this.originData);
-                this.fromJson(originJson);
-            }
-            setIndex(index:number):void {
-                this.index = index;
-                this.setChanged();
-                this.notifyObservers(this);
-            }
-            getIndex():number {
-                return this.index;
-            }
-            clearIndex():void {
-                this.index = -1;
-                this.setChanged();
-                this.notifyObservers(this);
-            }
-            getSize():number {
-                return this.data.length;
-            }
-            get(index:number):Map {
-                return this.data[index];
-            }
-            add(map:Map):void {
-                map.addObserver(this);
-                this.data.push(map);
-                this.index = this.getSize()-1;
-                this.setChanged();
-                this.notifyObservers(this);
-            }
-            insert(index:number, map:Map):void {
-                if(0 <= index && index < this.data.length) {
-                    map.addObserver(this);
-                    this.data.splice(index, 0, map);
-                    this.index = index;
-                    this.setChanged();
-                    this.notifyObservers(this);
-                }
-            }
-            remove(index:number):void {
-                if(0 <= index && index < this.data.length) {
-                    this.data.splice(index, 1);
-                    this.index = Math.min(this.index, this.data.length -1);
-                    this.setChanged();
-                    this.notifyObservers(this);
-                }
-            }
-            move(fromIndex:number, toIndex:number):void {
-                this.index = fromIndex;
-                this.data.splice(toIndex, 0, this.data.splice(fromIndex, 1)[0]);
-                this.index = toIndex;
-                this.setChanged();
-                this.notifyObservers(this);
-            }
-            forEach(handler:Function){
-                for(var i = 0, size = this.data.length; i < size; i ++){
-                    handler.call(this, this.data[i]);
-                }
-            }
-            sort(name:string, ascending:boolean):void {
-                this.data.sort(function(a:duice.data.Map,b:duice.data.Map):number {
-                    var aValue = a.get(name);
-                    var bValue = b.get(name);
-                    return (aValue > bValue ? 1 : aValue < bValue ? -1 : 0) * (ascending == false ? -1 : 1);
-                });
-                this.setChanged();
-                this.notifyObservers(this);
-            }
-        }
-    }
-    
     /**
      * duice.ui
      */
@@ -1248,7 +1240,7 @@ namespace duice {
             setFormat(format:Format){
                 this.format = format;
             }
-            update(map:duice.data.Map, obj:object):void {
+            update(map:Map, obj:object):void {
                 removeChildNodes(this.span);
                 var value = map.get(this.name);
                 value = defaultIfEmpty(value,'');
@@ -1338,7 +1330,7 @@ namespace duice {
                     $this.notifyObservers(this);
                 },true);
             }
-            abstract update(map:duice.data.Map, obj:object):void;
+            abstract update(map:duice.Map, obj:object):void;
             abstract getValue():any;
             validate(value:string):boolean {
                 return true;
@@ -1353,7 +1345,7 @@ namespace duice {
                 super(input);
                 this.input.classList.add('duice-ui-genericInput');
             }
-            update(map:duice.data.Map, obj:object):void {
+            update(map:duice.Map, obj:object):void {
                 var value = map.get(this.getName());
                 this.input.value = defaultIfEmpty(value, '');
             }
@@ -1384,7 +1376,7 @@ namespace duice {
             setPattern(format:string){
                 this.format.setPattern(format);
             }
-            update(map:duice.data.Map, obj:object):void {
+            update(map:duice.Map, obj:object):void {
                 var value = map.get(this.getName());
                 value = defaultIfEmpty(value, '');
                 value = this.format.encode(value);
@@ -1420,7 +1412,7 @@ namespace duice {
             setScale(scale:number){
                 this.format.setScale(scale);
             }
-            update(map:duice.data.Map, obj:object):void {
+            update(map:duice.Map, obj:object):void {
                 var value = map.get(this.getName());
                 value = this.format.encode(value);
                 this.input.value = value;
@@ -1453,7 +1445,7 @@ namespace duice {
                     event.stopPropagation();
                 });
             }
-            update(map:duice.data.Map, obj:object):void {
+            update(map:duice.Map, obj:object):void {
                 var value = map.get(this.getName());
                 if(value === true){
                     this.input.checked = true;
@@ -1474,7 +1466,7 @@ namespace duice {
                 super(input);
                 this.input.classList.add('duice-ui-radioInput');
             }
-            update(map:duice.data.Map, obj:object):void {
+            update(map:duice.Map, obj:object):void {
                 var value = map.get(this.getName());
                 if(value === this.input.value){
                     this.input.checked = true;
@@ -1518,7 +1510,7 @@ namespace duice {
             setPattern(format:string){
                 this.format.setPattern(format);
             }
-            update(map:duice.data.Map, obj:object):void {
+            update(map:duice.Map, obj:object):void {
                 var value:string = map.get(this.getName());
                 value = defaultIfEmpty(value,'');
                 value = this.format.encode(value);
@@ -1877,7 +1869,7 @@ namespace duice {
          */
         export class Select extends MapUIComponent {
             select:HTMLSelectElement;
-            optionList:duice.data.List;
+            optionList:duice.List;
             optionValue:string;
             optionText:string;
             defaultOptions:Array<HTMLOptionElement> = new Array<HTMLOptionElement>();
@@ -1896,12 +1888,12 @@ namespace duice {
                     this.defaultOptions.push(this.select.options[i])
                 }
             }
-            setOption(list:duice.data.List, value:string, text:string):void {
+            setOption(list:duice.List, value:string, text:string):void {
                 this.optionList = list;
                 this.optionValue = value;
                 this.optionText = text;
                 var $this = this;
-                function updateOption(optionList:duice.data.List){
+                function updateOption(optionList:duice.List){
                     
                     // removes all options
                     removeChildNodes($this.select);
@@ -1922,7 +1914,7 @@ namespace duice {
                 }
                 updateOption(this.optionList);
             }
-            update(map:duice.data.Map, obj:object):void {
+            update(map:duice.Map, obj:object):void {
                 var value = map.get(this.getName());
                 this.select.value = defaultIfEmpty(value,'');
             }
@@ -1959,7 +1951,7 @@ namespace duice {
                     $this.notifyObservers(this); 
                 });
             }
-            update(map:duice.data.Map, obj:object):void {
+            update(map:duice.Map, obj:object):void {
                 var value = map.get(this.getName());
                 this.textarea.value = defaultIfEmpty(value, '');
             }
@@ -2031,7 +2023,7 @@ namespace duice {
              * @param map
              * @param obj
              */
-            update(map:duice.data.Map, obj:object):void {
+            update(map:duice.Map, obj:object):void {
                 var value = map.get(this.getName());
                 this.img.src = value;
             }
@@ -2122,10 +2114,10 @@ namespace duice {
              * @param list
              * @param obj
              */
-            update(list:duice.data.List, obj:object):void {
+            update(list:duice.List, obj:object):void {
                 
                 // checks changed source instance
-                if(obj instanceof duice.data.Map){
+                if(obj instanceof duice.Map){
                     return;
                 }
                 
@@ -2193,7 +2185,7 @@ namespace duice {
              * @param index
              * @param map
              */
-            createTbody(index:number, map:duice.data.Map):HTMLTableSectionElement {
+            createTbody(index:number, map:duice.Map):HTMLTableSectionElement {
                 var $this = this;
                 var tbody:HTMLTableSectionElement = <HTMLTableSectionElement>this.tbody.cloneNode(true);
                 tbody.classList.add('duice-ui-table__tbody');
@@ -2325,10 +2317,10 @@ namespace duice {
              * @param list
              * @param obj
              */
-            update(list:duice.data.List, obj:object):void {
+            update(list:duice.List, obj:object):void {
 
                 // checks changed source instance
-                if(obj instanceof duice.data.Map){
+                if(obj instanceof duice.Map){
                     return;
                 }
                 
@@ -2371,7 +2363,7 @@ namespace duice {
              * @param index
              * @param map
              */
-            createLi(index:number, map:duice.data.Map):HTMLLIElement {
+            createLi(index:number, map:duice.Map):HTMLLIElement {
                 var $this = this;
                 var li:HTMLLIElement = <HTMLLIElement>this.li.cloneNode(true);
                 li.classList.add('duice-ui-ul__li');
@@ -2481,7 +2473,7 @@ namespace duice {
              * Return specified map is fold.
              * @param map
              */
-            isFoldLi(map:duice.data.Map){
+            isFoldLi(map:duice.Map){
                 if(this.foldName[map.get(this.hierarchy.idName)] === true){
                     return true;
                 }else{
@@ -2495,7 +2487,7 @@ namespace duice {
              * @param li
              * @param fold
              */
-            foldLi(map:duice.data.Map, li:HTMLLIElement, fold:boolean){
+            foldLi(map:duice.Map, li:HTMLLIElement, fold:boolean){
                 if(fold){
                     this.foldName[map.get(this.hierarchy.idName)] = true;
                     li.classList.remove('duice-ui-ul__li--unfold');
@@ -2547,7 +2539,7 @@ namespace duice {
              * Gets parent map
              * @param map
              */
-            getParentMap(map:duice.data.Map):duice.data.Map {
+            getParentMap(map:duice.Map):duice.Map {
                 var parentIdValue = map.get(this.hierarchy.parentIdName);
                 for(var i = 0, size = this.list.getSize(); i < size; i ++){
                     var element = this.list.get(i);
@@ -2563,7 +2555,7 @@ namespace duice {
              * @param map
              * @param idValue
              */
-            isCircularReference(map:duice.data.Map, idValue:any):boolean {
+            isCircularReference(map:duice.Map, idValue:any):boolean {
                 var parentMap = map;
                 while(true){
                     parentMap = this.getParentMap(parentMap);

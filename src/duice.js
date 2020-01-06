@@ -182,7 +182,273 @@ var duice;
     }(Observable));
     duice.DataObject = DataObject;
     /**
-     * duice.ui.UIComponent
+     * Map data structure
+     * @param JSON object
+     */
+    var Map = (function (_super) {
+        __extends(Map, _super);
+        /**
+         * constructor
+         * @param json
+         */
+        function Map(json) {
+            var _this = _super.call(this) || this;
+            _this.data = new Object(); // internal data object
+            _this.enable = true; // enable
+            _this.readonly = new Array(); // read only names
+            if (json) {
+                _this.fromJson(json);
+            }
+            return _this;
+        }
+        /**
+         * Updates data from observable instance
+         * @param uiComponent
+         * @param obj
+         */
+        Map.prototype.update = function (uiComponent, obj) {
+            console.info('Map.update', uiComponent, obj);
+            var name = uiComponent.getName();
+            var value = uiComponent.getValue();
+            this.set(name, value);
+        };
+        /**
+         * Loads data from JSON object.
+         * @param json
+         */
+        Map.prototype.fromJson = function (json) {
+            // sets data
+            this.data = new Object();
+            for (var name in json) {
+                this.data[name] = json[name];
+            }
+            // saves original data.
+            this.originData = JSON.stringify(this.toJson());
+            // notify to observers
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        /**
+         * Convert data to JSON object
+         * @return JSON object
+         */
+        Map.prototype.toJson = function () {
+            var json = new Object();
+            for (var name in this.data) {
+                json[name] = this.data[name];
+            }
+            return json;
+        };
+        /**
+         * Checks original data is changed
+         * @return whether original data is changed or not
+         */
+        Map.prototype.isDirty = function () {
+            if (JSON.stringify(this.toJson()) === this.originData) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        };
+        /**
+         * Restores instance as original data
+         */
+        Map.prototype.reset = function () {
+            var originJson = JSON.parse(this.originData);
+            this.fromJson(originJson);
+        };
+        /**
+         * Sets property as input value
+         * @param name
+         * @param value
+         */
+        Map.prototype.set = function (name, value) {
+            this.data[name] = value;
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        /**
+         * Gets specified property value.
+         * @param name
+         */
+        Map.prototype.get = function (name) {
+            return this.data[name];
+        };
+        /**
+         * Returns properties names as array.
+         * @return array of names
+         */
+        Map.prototype.getNames = function () {
+            var names = new Array();
+            for (var name in this.data) {
+                names.push(name);
+            }
+            return names;
+        };
+        /**
+         * Sets instance to be enabled.
+         * @param whether enable or not
+         */
+        Map.prototype.setEnable = function (enable) {
+            this.enable = enable;
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        /**
+         * Returns instance is enabled.
+         * @return whether enable or not
+         */
+        Map.prototype.isEnable = function () {
+            return this.enable;
+        };
+        /**
+         * Sets read-only specified name
+         * @param name
+         * @param readonly
+         */
+        Map.prototype.setReadonly = function (name, readonly) {
+            if (this.readonly.indexOf(name) == -1) {
+                this.readonly.push(name);
+            }
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        /**
+         * Returns specified name is read-only
+         * @param name
+         * @return whether specified property is read-only or not
+         */
+        Map.prototype.isReadonly = function (name) {
+            if (this.readonly.indexOf(name) >= 0) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+        return Map;
+    }(DataObject));
+    duice.Map = Map;
+    /**
+     * duice.List
+     */
+    var List = (function (_super) {
+        __extends(List, _super);
+        function List(jsonArray, __childName) {
+            var _this = _super.call(this) || this;
+            _this.data = new Array();
+            _this.index = -1;
+            if (jsonArray) {
+                _this.fromJson(jsonArray);
+            }
+            return _this;
+        }
+        List.prototype.update = function (observable, obj) {
+            console.log('List.update', observable, obj);
+            this.setChanged();
+            this.notifyObservers(obj);
+        };
+        List.prototype.fromJson = function (jsonArray) {
+            this.data = new Array();
+            for (var i = 0; i < jsonArray.length; i++) {
+                var map = new duice.Map(jsonArray[i]);
+                map.addObserver(this);
+                this.data.push(map);
+            }
+            this.originData = JSON.stringify(this.toJson());
+            this.clearIndex();
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        List.prototype.toJson = function (__childName) {
+            var jsonArray = new Array();
+            for (var i = 0; i < this.data.length; i++) {
+                jsonArray.push(this.data[i].toJson());
+            }
+            return jsonArray;
+        };
+        List.prototype.isDirty = function () {
+            if (JSON.stringify(this.toJson()) === this.originData) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        };
+        List.prototype.reset = function () {
+            var originJson = JSON.parse(this.originData);
+            this.fromJson(originJson);
+        };
+        List.prototype.setIndex = function (index) {
+            this.index = index;
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        List.prototype.getIndex = function () {
+            return this.index;
+        };
+        List.prototype.clearIndex = function () {
+            this.index = -1;
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        List.prototype.getSize = function () {
+            return this.data.length;
+        };
+        List.prototype.get = function (index) {
+            return this.data[index];
+        };
+        List.prototype.add = function (map) {
+            map.addObserver(this);
+            this.data.push(map);
+            this.index = this.getSize() - 1;
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        List.prototype.insert = function (index, map) {
+            if (0 <= index && index < this.data.length) {
+                map.addObserver(this);
+                this.data.splice(index, 0, map);
+                this.index = index;
+                this.setChanged();
+                this.notifyObservers(this);
+            }
+        };
+        List.prototype.remove = function (index) {
+            if (0 <= index && index < this.data.length) {
+                this.data.splice(index, 1);
+                this.index = Math.min(this.index, this.data.length - 1);
+                this.setChanged();
+                this.notifyObservers(this);
+            }
+        };
+        List.prototype.move = function (fromIndex, toIndex) {
+            this.index = fromIndex;
+            this.data.splice(toIndex, 0, this.data.splice(fromIndex, 1)[0]);
+            this.index = toIndex;
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        List.prototype.forEach = function (handler) {
+            for (var i = 0, size = this.data.length; i < size; i++) {
+                handler.call(this, this.data[i]);
+            }
+        };
+        List.prototype.sort = function (name, ascending) {
+            this.data.sort(function (a, b) {
+                var aValue = a.get(name);
+                var bValue = b.get(name);
+                return (aValue > bValue ? 1 : aValue < bValue ? -1 : 0) * (ascending == false ? -1 : 1);
+            });
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        return List;
+    }(DataObject));
+    duice.List = List;
+    /**
+     * duice.UIComponent
      */
     var UIComponent = (function (_super) {
         __extends(UIComponent, _super);
@@ -214,7 +480,7 @@ var duice;
         return UIComponent;
     }(Observable));
     /**
-     * duice.ui.MapUIComponent
+     * duice.MapUIComponent
      */
     var MapUIComponent = (function (_super) {
         __extends(MapUIComponent, _super);
@@ -811,279 +1077,6 @@ var duice;
         return DateFormat;
     }());
     duice.DateFormat = DateFormat;
-    /**
-     * duice.data
-     * package of Data structure
-     */
-    var data;
-    (function (data) {
-        /**
-         * Map data structure
-         * @param JSON object
-         */
-        var Map = (function (_super) {
-            __extends(Map, _super);
-            /**
-             * constructor
-             * @param json
-             */
-            function Map(json) {
-                var _this = _super.call(this) || this;
-                _this.data = new Object(); // internal data object
-                _this.enable = true; // enable
-                _this.readonly = new Array(); // read only names
-                if (json) {
-                    _this.fromJson(json);
-                }
-                return _this;
-            }
-            /**
-             * Updates data from observable instance
-             * @param uiComponent
-             * @param obj
-             */
-            Map.prototype.update = function (uiComponent, obj) {
-                console.info('Map.update', uiComponent, obj);
-                var name = uiComponent.getName();
-                var value = uiComponent.getValue();
-                this.set(name, value);
-            };
-            /**
-             * Loads data from JSON object.
-             * @param json
-             */
-            Map.prototype.fromJson = function (json) {
-                // sets data
-                this.data = new Object();
-                for (var name in json) {
-                    this.data[name] = json[name];
-                }
-                // saves original data.
-                this.originData = JSON.stringify(this.toJson());
-                // notify to observers
-                this.setChanged();
-                this.notifyObservers(this);
-            };
-            /**
-             * Convert data to JSON object
-             * @return JSON object
-             */
-            Map.prototype.toJson = function () {
-                var json = new Object();
-                for (var name in this.data) {
-                    json[name] = this.data[name];
-                }
-                return json;
-            };
-            /**
-             * Checks original data is changed
-             * @return whether original data is changed or not
-             */
-            Map.prototype.isDirty = function () {
-                if (JSON.stringify(this.toJson()) === this.originData) {
-                    return false;
-                }
-                else {
-                    return true;
-                }
-            };
-            /**
-             * Restores instance as original data
-             */
-            Map.prototype.reset = function () {
-                var originJson = JSON.parse(this.originData);
-                this.fromJson(originJson);
-            };
-            /**
-             * Sets property as input value
-             * @param name
-             * @param value
-             */
-            Map.prototype.set = function (name, value) {
-                this.data[name] = value;
-                this.setChanged();
-                this.notifyObservers(this);
-            };
-            /**
-             * Gets specified property value.
-             * @param name
-             */
-            Map.prototype.get = function (name) {
-                return this.data[name];
-            };
-            /**
-             * Returns properties names as array.
-             * @return array of names
-             */
-            Map.prototype.getNames = function () {
-                var names = new Array();
-                for (var name in this.data) {
-                    names.push(name);
-                }
-                return names;
-            };
-            /**
-             * Sets instance to be enabled.
-             * @param whether enable or not
-             */
-            Map.prototype.setEnable = function (enable) {
-                this.enable = enable;
-                this.setChanged();
-                this.notifyObservers(this);
-            };
-            /**
-             * Returns instance is enabled.
-             * @return whether enable or not
-             */
-            Map.prototype.isEnable = function () {
-                return this.enable;
-            };
-            /**
-             * Sets read-only specified name
-             * @param name
-             * @param readonly
-             */
-            Map.prototype.setReadonly = function (name, readonly) {
-                if (this.readonly.indexOf(name) == -1) {
-                    this.readonly.push(name);
-                }
-                this.setChanged();
-                this.notifyObservers(this);
-            };
-            /**
-             * Returns specified name is read-only
-             * @param name
-             * @return whether specified property is read-only or not
-             */
-            Map.prototype.isReadonly = function (name) {
-                if (this.readonly.indexOf(name) >= 0) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            };
-            return Map;
-        }(DataObject));
-        data.Map = Map;
-        /**
-         * duice.data.List
-         */
-        var List = (function (_super) {
-            __extends(List, _super);
-            function List(jsonArray, __childName) {
-                var _this = _super.call(this) || this;
-                _this.data = new Array();
-                _this.index = -1;
-                if (jsonArray) {
-                    _this.fromJson(jsonArray);
-                }
-                return _this;
-            }
-            List.prototype.update = function (observable, obj) {
-                console.log('List.update', observable, obj);
-                this.setChanged();
-                this.notifyObservers(obj);
-            };
-            List.prototype.fromJson = function (jsonArray) {
-                this.data = new Array();
-                for (var i = 0; i < jsonArray.length; i++) {
-                    var map = new duice.data.Map(jsonArray[i]);
-                    map.addObserver(this);
-                    this.data.push(map);
-                }
-                this.originData = JSON.stringify(this.toJson());
-                this.clearIndex();
-                this.setChanged();
-                this.notifyObservers(this);
-            };
-            List.prototype.toJson = function (__childName) {
-                var jsonArray = new Array();
-                for (var i = 0; i < this.data.length; i++) {
-                    jsonArray.push(this.data[i].toJson());
-                }
-                return jsonArray;
-            };
-            List.prototype.isDirty = function () {
-                if (JSON.stringify(this.toJson()) === this.originData) {
-                    return false;
-                }
-                else {
-                    return true;
-                }
-            };
-            List.prototype.reset = function () {
-                var originJson = JSON.parse(this.originData);
-                this.fromJson(originJson);
-            };
-            List.prototype.setIndex = function (index) {
-                this.index = index;
-                this.setChanged();
-                this.notifyObservers(this);
-            };
-            List.prototype.getIndex = function () {
-                return this.index;
-            };
-            List.prototype.clearIndex = function () {
-                this.index = -1;
-                this.setChanged();
-                this.notifyObservers(this);
-            };
-            List.prototype.getSize = function () {
-                return this.data.length;
-            };
-            List.prototype.get = function (index) {
-                return this.data[index];
-            };
-            List.prototype.add = function (map) {
-                map.addObserver(this);
-                this.data.push(map);
-                this.index = this.getSize() - 1;
-                this.setChanged();
-                this.notifyObservers(this);
-            };
-            List.prototype.insert = function (index, map) {
-                if (0 <= index && index < this.data.length) {
-                    map.addObserver(this);
-                    this.data.splice(index, 0, map);
-                    this.index = index;
-                    this.setChanged();
-                    this.notifyObservers(this);
-                }
-            };
-            List.prototype.remove = function (index) {
-                if (0 <= index && index < this.data.length) {
-                    this.data.splice(index, 1);
-                    this.index = Math.min(this.index, this.data.length - 1);
-                    this.setChanged();
-                    this.notifyObservers(this);
-                }
-            };
-            List.prototype.move = function (fromIndex, toIndex) {
-                this.index = fromIndex;
-                this.data.splice(toIndex, 0, this.data.splice(fromIndex, 1)[0]);
-                this.index = toIndex;
-                this.setChanged();
-                this.notifyObservers(this);
-            };
-            List.prototype.forEach = function (handler) {
-                for (var i = 0, size = this.data.length; i < size; i++) {
-                    handler.call(this, this.data[i]);
-                }
-            };
-            List.prototype.sort = function (name, ascending) {
-                this.data.sort(function (a, b) {
-                    var aValue = a.get(name);
-                    var bValue = b.get(name);
-                    return (aValue > bValue ? 1 : aValue < bValue ? -1 : 0) * (ascending == false ? -1 : 1);
-                });
-                this.setChanged();
-                this.notifyObservers(this);
-            };
-            return List;
-        }(DataObject));
-        data.List = List;
-    })(data = duice.data || (duice.data = {}));
     /**
      * duice.ui
      */
@@ -2077,7 +2070,7 @@ var duice;
              */
             Table.prototype.update = function (list, obj) {
                 // checks changed source instance
-                if (obj instanceof duice.data.Map) {
+                if (obj instanceof duice.Map) {
                     return;
                 }
                 var $this = this;
@@ -2267,7 +2260,7 @@ var duice;
              */
             UList.prototype.update = function (list, obj) {
                 // checks changed source instance
-                if (obj instanceof duice.data.Map) {
+                if (obj instanceof duice.Map) {
                     return;
                 }
                 // initiates

@@ -14,9 +14,9 @@
 <link rel="stylesheet" type="text/css" href="plugin/suneditor/css/suneditor.min.css">
 <script>
 /**
- * user(duice.data.Map)
+ * user(duice.Map)
  */
-var user = new duice.data.Map();
+var user = new duice.Map();
 user.fromJson({
 	id: 'rabbit',
 	parentId: null,
@@ -42,9 +42,9 @@ user.fromJson({
 });
 
 /**
- * groups(duice.data.List) for select options
+ * groups(duice.List) for select options
  */
-var groups = new duice.data.List();
+var groups = new duice.List();
 groups.fromJson([
 	{id:"fruit", name:"Fruit"},
 	{id:"animal", name:"Animal"},
@@ -52,9 +52,9 @@ groups.fromJson([
 ]);
 
 /**
- * users(duice.data.List)
+ * users(duice.List)
  */
-var users = new duice.data.List();
+var users = new duice.List();
 users.fromJson([
     {
         id: 'rabbit',
@@ -419,12 +419,12 @@ body {
 	<!-- ================================================================ -->
 	<section class="chapter">
 		<div class="chapter__headerDiv">
-			<h2>Binding between duice.data.Map and MapUIElement</h2>
+			<h2>Binding between duice.Map and MapUIElement</h2>
 		</div>
 		<div class="chapter__bodyDiv">
 			<div class="chapter__bodyDiv-dataDiv">
 				<div style="display:flex; justify-content:space-between; align-items: flex-end;">
-					<h3>duice.data.Map <small>(var user)</small></h3>
+					<h3>duice.Map <small>(var user)</small></h3>
 				</div>
 				<textarea id="userTextarea" class="textarea" style="height:626px;"></textarea>
 			</div>
@@ -667,11 +667,11 @@ body {
 	<!-- ================================================================ -->
 	<section class="chapter">
 		<div class="chapter__headerDiv">
-			<h2>Binding between duice.data.List and ListUIElement</h2>
+			<h2>Binding between duice.List and ListUIElement</h2>
 		</div>
 		<div class="chapter__bodyDiv">
 			<div class="chapter__bodyDiv-dataDiv">
-				<h3>duice.data.List <small>(var users)</small></h3>
+				<h3>duice.List <small>(var users)</small></h3>
 				<textarea id="usersTextarea" class="textarea" style="height:1700px;"></textarea>
 			</div>
 			<div class="chapter__bodyDiv-uiDiv">
@@ -694,8 +694,8 @@ body {
 							</h3>
 						</div>
 						<div>
-							<button onclick="users.add(new duice.data.Map({}));">add(map)</button>
-							<button onclick="users.insert(users.getIndex(), new duice.data.Map({}));">insert(map)</button>
+							<button onclick="users.add(new duice.Map({}));">add(map)</button>
+							<button onclick="users.insert(users.getIndex(), new duice.Map({}));">insert(map)</button>
 							<button onclick="users.remove(users.getIndex());">remove(index)</button>
 							<button onclick="alert(JSON.stringify(users.toJson()));">toJson()</button>
 							<button onclick="alert(users.isDirty());">isDirty()</button>
@@ -794,8 +794,8 @@ body {
 							</h3>
 						</div>
 						<div>
-							<button onclick="users.add(new duice.data.Map({}));">add(map)</button>
-							<button onclick="users.insert(users.getIndex(), new duice.data.Map({}));">insert(map)</button>
+							<button onclick="users.add(new duice.Map({}));">add(map)</button>
+							<button onclick="users.insert(users.getIndex(), new duice.Map({}));">insert(map)</button>
 							<button onclick="users.remove(users.getIndex());">remove(index)</button>
 							<button onclick="alert(JSON.stringify(users.toJson()));">toJson()</button>
 							<button onclick="alert(users.isDirty());">isDirty()</button>
@@ -888,8 +888,8 @@ body {
 							</h3>
 						</div>
 						<div>
-							<button onclick="users.add(new duice.data.Map({}));">add(map)</button>
-							<button onclick="users.insert(users.getIndex(), new duice.data.Map({}));">insert(map)</button>
+							<button onclick="users.add(new duice.Map({}));">add(map)</button>
+							<button onclick="users.insert(users.getIndex(), new duice.Map({}));">insert(map)</button>
 							<button onclick="users.remove(users.getIndex());">remove(index)</button>
 							<button onclick="alert(JSON.stringify(users.toJson()));">toJson()</button>
 							<button onclick="alert(users.isDirty());">isDirty()</button>
