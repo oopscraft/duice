@@ -1854,6 +1854,10 @@ var duice;
          */
         var Image = (function (_super) {
             __extends(Image, _super);
+            /**
+             * Constructor
+             * @param img
+             */
             function Image(img) {
                 var _this = _super.call(this, img) || this;
                 _this.img = img;
@@ -1886,10 +1890,19 @@ var duice;
                 });
                 return _this;
             }
+            /**
+             * Updates image instance
+             * @param map
+             * @param obj
+             */
             Image.prototype.update = function (map, obj) {
                 var value = map.get(this.getName());
                 this.img.src = value;
             };
+            /**
+             * Return value of image element
+             * @return base64 data or image URL
+             */
             Image.prototype.getValue = function () {
                 return this.img.src;
             };

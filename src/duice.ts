@@ -1951,6 +1951,11 @@ namespace duice {
             img:HTMLImageElement;
             input:HTMLInputElement;
             editable:boolean;
+        
+            /**
+             * Constructor
+             * @param img
+             */
             constructor(img:HTMLImageElement) {
                 super(img);
                 this.img = img;
@@ -1984,10 +1989,21 @@ namespace duice {
                     e.stopPropagation();
                 });
             }
+            
+            /**
+             * Updates image instance
+             * @param map
+             * @param obj
+             */
             update(map:duice.data.Map, obj:object):void {
                 var value = map.get(this.getName());
                 this.img.src = value;
             }
+            
+            /**
+             * Return value of image element
+             * @return base64 data or image URL
+             */
             getValue():any {
                 return this.img.src;
             }
