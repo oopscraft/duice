@@ -402,26 +402,46 @@ var duice;
          * @param value
          */
         StringFormat.prototype.encode = function (value) {
-            //            var string = '';
-            //            var index = -1;
-            //            for(var i = 0, size = format.length; i < size; i ++){
-            //                var formatChar = format.charAt(i);
-            //                if(formatChar === '#'){
-            //                    index ++;
-            //                    string += value.charAt(index);
-            //                }else{
-            //                    string += formatChar;
-            //                }
-            //            }
-            //            return string;
-            return value;
+            if (isEmpty(this.pattern)) {
+                return value;
+            }
+            var encodedValue = '';
+            var patternChars = this.pattern.split('');
+            var valueChars = value.split('');
+            var valueCharsPosition = 0;
+            for (var i = 0, size = patternChars.length; i < size; i++) {
+                var patternChar = patternChars[i];
+                if (patternChar === '#') {
+                    encodedValue += defaultIfEmpty(valueChars[valueCharsPosition++], '');
+                }
+                else {
+                    encodedValue += patternChar;
+                }
+            }
+            return encodedValue;
         };
         /**
          * decodes string as format
          * @param value
          */
         StringFormat.prototype.decode = function (value) {
-            return value;
+            if (isEmpty(this.pattern)) {
+                return value;
+            }
+            var decodedValue = '';
+            var patternChars = this.pattern.split('');
+            var valueChars = value.split('');
+            var valueCharsPosition = 0;
+            for (var i = 0, size = patternChars.length; i < size; i++) {
+                var patternChar = patternChars[i];
+                if (patternChar === '#') {
+                    decodedValue += defaultIfEmpty(valueChars[valueCharsPosition++], '');
+                }
+                else {
+                    valueCharsPosition++;
+                }
+            }
+            return decodedValue;
         };
         return StringFormat;
     }());
@@ -2105,6 +2125,10 @@ var duice;
          */
         var UList = (function (_super) {
             __extends(UList, _super);
+            /**
+             * Constructor
+             * @param ul
+             */
             function UList(ul) {
                 var _this = _super.call(this, ul) || this;
                 _this.lis = new Array();
@@ -2115,8 +2139,13 @@ var duice;
                 _this.li = li.cloneNode(true);
                 return _this;
             }
-            UList.prototype.setHierarchy = function (name, parentName) {
-                this.hierarchy = { name: name, parentName: parentName };
+            /**
+             * Sets hierarchy function options.
+             * @param idName
+             * @param parentIdName
+             */
+            UList.prototype.setHierarchy = function (idName, parentIdName) {
+                this.hierarchy = { idName: idName, parentIdName: parentIdName };
                 this.ul.classList.add('duice-ui-ul--hierarchy');
                 // add root event
                 var $this = this;
@@ -2135,18 +2164,31 @@ var duice;
                     event.stopPropagation();
                     var fromIndex = parseInt(event.dataTransfer.getData('text'));
                     var fromMap = $this.list.get(fromIndex);
-                    fromMap.set($this.hierarchy.parentName, null);
+                    fromMap.set($this.hierarchy.parentIdName, null);
                     $this.ul.classList.remove('duice-ui-ul--hierarchy-dragover');
                     $this.setChanged();
                     $this.notifyObservers(this);
                 });
             };
+            /**
+             * Sets foldable flag.
+             * @param foldable
+             */
             UList.prototype.setFoldable = function (foldable) {
                 this.foldable = foldable;
             };
+            /**
+             * Sets editable flag.
+             * @param editable
+             */
             UList.prototype.setEditable = function (editable) {
                 this.editable = editable;
             };
+            /**
+             * Updates instance
+             * @param list
+             * @param obj
+             */
             UList.prototype.update = function (list, obj) {
                 // checks changed source instance
                 if (obj instanceof duice.data.Map) {
@@ -2162,7 +2204,7 @@ var duice;
                     var path = [];
                     // checks hierarchy
                     if (this.hierarchy) {
-                        if (isNotEmpty(map.get(this.hierarchy.parentName))) {
+                        if (isNotEmpty(map.get(this.hierarchy.parentIdName))) {
                             continue;
                         }
                     }
@@ -2181,6 +2223,11 @@ var duice;
                     }
                 }
             };
+            /**
+             * Creates LI element reference to specified map includes child nodes.
+             * @param index
+             * @param map
+             */
             UList.prototype.createLi = function (index, map) {
                 var $this = this;
                 var li = this.li.cloneNode(true);
@@ -2226,14 +2273,14 @@ var duice;
                     var childUl = document.createElement('ul');
                     childUl.classList.add('duice-ui-ul');
                     var hasChild = false;
-                    var hierarchyValue = map.get(this.hierarchy.name);
+                    var hierarchyIdValue = map.get(this.hierarchy.idName);
                     for (var i = 0, size = this.list.getSize(); i < size; i++) {
                         var element = this.list.get(i);
-                        var hierarchyParentValue = element.get(this.hierarchy.parentName);
-                        if (isEmpty(hierarchyParentValue) === true) {
+                        var hierarchyParentIdValue = element.get(this.hierarchy.parentIdName);
+                        if (isEmpty(hierarchyParentIdValue) === true) {
                             continue;
                         }
-                        if (hierarchyParentValue === hierarchyValue) {
+                        if (hierarchyParentIdValue === hierarchyIdValue) {
                             var childLi = this.createLi(i, element);
                             childLi.classList.add('duice-ui-ul__li--indent');
                             childUl.appendChild(childLi);
@@ -2271,6 +2318,10 @@ var duice;
                 // return node element
                 return li;
             };
+            /**
+             * Returns specified index is already creates LI element.
+             * @param index
+             */
             UList.prototype.isLiCreated = function (index) {
                 for (var i = 0, size = this.lis.length; i < size; i++) {
                     if (parseInt(this.lis[i].dataset.duiceIndex) === index) {
@@ -2279,26 +2330,41 @@ var duice;
                 }
                 return false;
             };
+            /**
+             * Return specified map is fold.
+             * @param map
+             */
             UList.prototype.isFoldLi = function (map) {
-                if (this.foldName[map.get(this.hierarchy.name)] === true) {
+                if (this.foldName[map.get(this.hierarchy.idName)] === true) {
                     return true;
                 }
                 else {
                     return false;
                 }
             };
+            /**
+             * folds child nodes
+             * @param map
+             * @param li
+             * @param fold
+             */
             UList.prototype.foldLi = function (map, li, fold) {
                 if (fold) {
-                    this.foldName[map.get(this.hierarchy.name)] = true;
+                    this.foldName[map.get(this.hierarchy.idName)] = true;
                     li.classList.remove('duice-ui-ul__li--unfold');
                     li.classList.add('duice-ui-ul__li--fold');
                 }
                 else {
-                    this.foldName[map.get(this.hierarchy.name)] = false;
+                    this.foldName[map.get(this.hierarchy.idName)] = false;
                     li.classList.remove('duice-ui-ul__li--fold');
                     li.classList.add('duice-ui-ul__li--unfold');
                 }
             };
+            /**
+             * Modes map element from index to index.
+             * @param fromIndex
+             * @param toIndex
+             */
             UList.prototype.moveLi = function (fromIndex, toIndex) {
                 // checks same index
                 if (fromIndex === toIndex) {
@@ -2309,8 +2375,12 @@ var duice;
                 var toMap = this.list.get(toIndex);
                 // moving action
                 if (this.hierarchy) {
+                    // checkCircularReference
+                    if (this.isCircularReference(toMap, fromMap.get(this.hierarchy.idName))) {
+                        throw 'Not allow to movem, becuase of Circular Reference.';
+                    }
                     // change parents
-                    fromMap.set(this.hierarchy.parentName, toMap.get(this.hierarchy.name));
+                    fromMap.set(this.hierarchy.parentIdName, toMap.get(this.hierarchy.idName));
                     // notifies observers.
                     this.setChanged();
                     this.notifyObservers(this);
@@ -2318,6 +2388,37 @@ var duice;
                 else {
                     // changes row position
                     this.list.move(fromIndex, toIndex);
+                }
+            };
+            /**
+             * Gets parent map
+             * @param map
+             */
+            UList.prototype.getParentMap = function (map) {
+                var parentIdValue = map.get(this.hierarchy.parentIdName);
+                for (var i = 0, size = this.list.getSize(); i < size; i++) {
+                    var element = this.list.get(i);
+                    if (element.get(this.hierarchy.idName) === parentIdValue) {
+                        return element;
+                    }
+                }
+                return null;
+            };
+            /**
+             * Returns whether circular reference or not
+             * @param map
+             * @param idValue
+             */
+            UList.prototype.isCircularReference = function (map, idValue) {
+                var parentMap = map;
+                while (true) {
+                    parentMap = this.getParentMap(parentMap);
+                    if (parentMap === null) {
+                        return false;
+                    }
+                    if (parentMap.get(this.hierarchy.idName) === idValue) {
+                        return true;
+                    }
                 }
             };
             return UList;
