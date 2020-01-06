@@ -453,9 +453,8 @@
 	margin: 0px;
 	padding: 0px;
 	vertical-align: middle;
+	cursor: pointer;
 }
-
-
 
 /**
  * duice.ui.Table

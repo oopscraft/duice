@@ -1818,95 +1818,9 @@ namespace duice {
                 window.removeEventListener('click', this.clickListener);
             }
         }
-        
-        /**
-         * duice.ui.ImageFactory
-         */
-        export var ImageFactory = {
-            getImage(element:HTMLImageElement, $context:any):Image {
-                var image = new Image(element);
-                var bind = element.dataset.duiceBind.split(',');
-                image.bind(getObject($context, bind[0]), bind[1]);
-                return image;
-            }
-        }
-        
-        /**
-         * duice.ui.Image
-         */
-        export class Image extends MapUIElement {
-            img:HTMLImageElement;
-            input:HTMLInputElement;
-            constructor(img:HTMLImageElement) {
-                super(img);
-                this.img = img;
-                this.img.classList.add('duice-ui-img');
-                this.img.addEventListener('error', function() {
-                    console.log('error');
-                });
-                
 
-
-            }
-            update(map:duice.data.Map, obj:object):void {
-                var value = map.get(this.getName());
-                this.img.src = value;
-                var $this = this;
-                
-                // adds click event
-                this.img.addEventListener('click', function() {
-                    // creates file input
-                    $this.input = document.createElement('input');
-                    $this.input.setAttribute("type", "file");
-                    $this.input.setAttribute("accept", "image/gif, image/jpeg, image/png");
-                    
-                    
-                    // add change event listener
-                    $this.input.addEventListener('change', function(e){
-                        
-                        if (this.files && this.files[0]) {
-                            var fileReader = new FileReader();
-                            fileReader.addEventListener("load", function(event:any) {
-                                console.log(event);
-                                var value = event.target.result;
-                                /*
-//                                var width = $this.width;
-//                                var height = $this.height;
-                                var canvas = document.createElement("canvas");
-                                var ctx = canvas.getContext("2d");
-//                                canvas.width = width;
-//                                canvas.height = height;
-                                var image = document.createElement('img');
-                                image.onload = function(){
-                                    //ctx.drawImage(image, 0, 0, width, height);
-                                    ctx.drawImage(image, 0, 0);
-                                    value = canvas.toDataURL("image/png");
-                                    $this.map.set($this.name, value);
-                                };
-                                image.src = value;
-                                */
-                                $this.img.src = value;
-                                $this.map.set($this.name, value);
-                            }); 
-                            fileReader.readAsDataURL(this.files[0]);
-                        }
-                        
-                        e.preventDefault();
-                        e.stopPropagation();
-                    });
-                    
-                    $this.input.click();
-                    
-                });
-
-            }
-            getValue():any {
-                return this.img.src;
-            }
-        }
-        
         /**
-         * duice.ui.SpanFactory
+         * duice.ui.SelectFactory
          */
         export var SelectFactory = {
             getSelect(element:HTMLSelectElement, $context:any):Select {
@@ -2015,6 +1929,67 @@ namespace duice {
             }
             getValue():any {
                 return defaultIfEmpty(this.textarea.value, null);
+            }
+        }
+        
+        /**
+         * duice.ui.ImageFactory
+         */
+        export var ImageFactory = {
+            getImage(element:HTMLImageElement, $context:any):Image {
+                var image = new Image(element);
+                var bind = element.dataset.duiceBind.split(',');
+                image.bind(getObject($context, bind[0]), bind[1]);
+                return image;
+            }
+        }
+        
+        /**
+         * duice.ui.Image
+         */
+        export class Image extends MapUIElement {
+            img:HTMLImageElement;
+            input:HTMLInputElement;
+            editable:boolean;
+            constructor(img:HTMLImageElement) {
+                super(img);
+                this.img = img;
+                this.img.classList.add('duice-ui-img');
+                this.img.addEventListener('error', function() {
+                    console.log('error');
+                });
+                var $this = this;
+                
+                // adds click event
+                this.img.addEventListener('click', function() {
+                    $this.input.click();
+                });
+            
+                // creates file input element
+                this.input = document.createElement('input');
+                this.input.setAttribute("type", "file");
+                this.input.setAttribute("accept", "image/gif, image/jpeg, image/png");
+                this.input.addEventListener('change', function(e){
+                    var fileReader = new FileReader();
+                    if (this.files && this.files[0]) {
+                        fileReader.addEventListener("load", function(event:any) {
+                            var value = event.target.result;
+                            $this.img.src = value;
+                            $this.setChanged();
+                            $this.notifyObservers($this);
+                        }); 
+                        fileReader.readAsDataURL(this.files[0]);
+                    }
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+            }
+            update(map:duice.data.Map, obj:object):void {
+                var value = map.get(this.getName());
+                this.img.src = value;
+            }
+            getValue():any {
+                return this.img.src;
             }
         }
         
@@ -2521,7 +2496,7 @@ namespace duice {
                 // moving action
                 if(this.hierarchy){
                     
-                    // checkCircularReference
+                    // checks circular reference
                     if(this.isCircularReference(toMap, fromMap.get(this.hierarchy.idName))){
                         throw 'Not allow to movem, becuase of Circular Reference.';
                     }

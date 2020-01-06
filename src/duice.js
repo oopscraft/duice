@@ -1731,82 +1731,7 @@ var duice;
         }(Input));
         ui.DateInput = DateInput;
         /**
-         * duice.ui.ImageFactory
-         */
-        ui.ImageFactory = {
-            getImage: function (element, $context) {
-                var image = new Image(element);
-                var bind = element.dataset.duiceBind.split(',');
-                image.bind(getObject($context, bind[0]), bind[1]);
-                return image;
-            }
-        };
-        /**
-         * duice.ui.Image
-         */
-        var Image = (function (_super) {
-            __extends(Image, _super);
-            function Image(img) {
-                var _this = _super.call(this, img) || this;
-                _this.img = img;
-                _this.img.classList.add('duice-ui-img');
-                _this.img.addEventListener('error', function () {
-                    console.log('error');
-                });
-                return _this;
-            }
-            Image.prototype.update = function (map, obj) {
-                var value = map.get(this.getName());
-                this.img.src = value;
-                var $this = this;
-                // adds click event
-                this.img.addEventListener('click', function () {
-                    // creates file input
-                    $this.input = document.createElement('input');
-                    $this.input.setAttribute("type", "file");
-                    $this.input.setAttribute("accept", "image/gif, image/jpeg, image/png");
-                    // add change event listener
-                    $this.input.addEventListener('change', function (e) {
-                        if (this.files && this.files[0]) {
-                            var fileReader = new FileReader();
-                            fileReader.addEventListener("load", function (event) {
-                                console.log(event);
-                                var value = event.target.result;
-                                /*
-//                                var width = $this.width;
-//                                var height = $this.height;
-                                var canvas = document.createElement("canvas");
-                                var ctx = canvas.getContext("2d");
-//                                canvas.width = width;
-//                                canvas.height = height;
-                                var image = document.createElement('img');
-                                image.onload = function(){
-                                    //ctx.drawImage(image, 0, 0, width, height);
-                                    ctx.drawImage(image, 0, 0);
-                                    value = canvas.toDataURL("image/png");
-                                    $this.map.set($this.name, value);
-                                };
-                                image.src = value;
-                                */
-                                $this.img.src = value;
-                                $this.map.set($this.name, value);
-                            });
-                            fileReader.readAsDataURL(this.files[0]);
-                        }
-                        e.preventDefault();
-                        e.stopPropagation();
-                    });
-                    $this.input.click();
-                });
-            };
-            Image.prototype.getValue = function () {
-                return this.img.src;
-            };
-            return Image;
-        }(MapUIElement));
-        ui.Image = Image;
-        /**
-         * duice.ui.SpanFactory
+         * duice.ui.SelectFactory
          */
         ui.SelectFactory = {
             getSelect: function (element, $context) {
@@ -1913,6 +1838,64 @@ var duice;
             return Textarea;
         }(MapUIElement));
         ui.Textarea = Textarea;
+        /**
+         * duice.ui.ImageFactory
+         */
+        ui.ImageFactory = {
+            getImage: function (element, $context) {
+                var image = new Image(element);
+                var bind = element.dataset.duiceBind.split(',');
+                image.bind(getObject($context, bind[0]), bind[1]);
+                return image;
+            }
+        };
+        /**
+         * duice.ui.Image
+         */
+        var Image = (function (_super) {
+            __extends(Image, _super);
+            function Image(img) {
+                var _this = _super.call(this, img) || this;
+                _this.img = img;
+                _this.img.classList.add('duice-ui-img');
+                _this.img.addEventListener('error', function () {
+                    console.log('error');
+                });
+                var $this = _this;
+                // adds click event
+                _this.img.addEventListener('click', function () {
+                    $this.input.click();
+                });
+                // creates file input element
+                _this.input = document.createElement('input');
+                _this.input.setAttribute("type", "file");
+                _this.input.setAttribute("accept", "image/gif, image/jpeg, image/png");
+                _this.input.addEventListener('change', function (e) {
+                    var fileReader = new FileReader();
+                    if (this.files && this.files[0]) {
+                        fileReader.addEventListener("load", function (event) {
+                            var value = event.target.result;
+                            $this.img.src = value;
+                            $this.setChanged();
+                            $this.notifyObservers($this);
+                        });
+                        fileReader.readAsDataURL(this.files[0]);
+                    }
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+                return _this;
+            }
+            Image.prototype.update = function (map, obj) {
+                var value = map.get(this.getName());
+                this.img.src = value;
+            };
+            Image.prototype.getValue = function () {
+                return this.img.src;
+            };
+            return Image;
+        }(MapUIElement));
+        ui.Image = Image;
         /**
          * duice.ui.ListUIElement
          */
@@ -2375,7 +2358,7 @@ var duice;
                 var toMap = this.list.get(toIndex);
                 // moving action
                 if (this.hierarchy) {
-                    // checkCircularReference
+                    // checks circular reference
                     if (this.isCircularReference(toMap, fromMap.get(this.hierarchy.idName))) {
                         throw 'Not allow to movem, becuase of Circular Reference.';
                     }
