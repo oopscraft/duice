@@ -8,15 +8,25 @@
  * Copyright (C) 2017 duice.oopscraft.net
  * ============================================================================= */
 var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
 /**
  * project package
  */
@@ -37,7 +47,7 @@ var duice;
     /**
      * Component definition
      */
-    var ComponentDefinition = (function () {
+    var ComponentDefinition = /** @class */ (function () {
         function ComponentDefinition(tagName, isAttribute, factoryClass) {
             this.tagName = tagName;
             this.isAttribute = isAttribute;
@@ -56,7 +66,7 @@ var duice;
     }());
     duice.ComponentDefinition = ComponentDefinition;
     /**
-     * Initializes Component
+     * Initializes component
      * @param container
      * @param $context
      */
@@ -81,7 +91,7 @@ var duice;
      * duice.Observable
      * Observable abstract class of Observer Pattern
      */
-    var Observable = (function () {
+    var Observable = /** @class */ (function () {
         function Observable() {
             this.observers = new Array();
             this.changed = false;
@@ -167,7 +177,7 @@ var duice;
      * Abstract data object
      * extends from Observable and implements Observer interface.
      */
-    var DataObject = (function (_super) {
+    var DataObject = /** @class */ (function (_super) {
         __extends(DataObject, _super);
         function DataObject() {
             return _super !== null && _super.apply(this, arguments) || this;
@@ -185,7 +195,7 @@ var duice;
      * Map data structure
      * @param JSON object
      */
-    var Map = (function (_super) {
+    var Map = /** @class */ (function (_super) {
         __extends(Map, _super);
         /**
          * constructor
@@ -333,7 +343,7 @@ var duice;
     /**
      * duice.List
      */
-    var List = (function (_super) {
+    var List = /** @class */ (function (_super) {
         __extends(List, _super);
         function List(jsonArray, __childName) {
             var _this = _super.call(this) || this;
@@ -450,7 +460,7 @@ var duice;
     /**
      * duice.UIComponent
      */
-    var UIComponent = (function (_super) {
+    var UIComponent = /** @class */ (function (_super) {
         __extends(UIComponent, _super);
         function UIComponent(element) {
             var _this = _super.call(this) || this;
@@ -482,7 +492,7 @@ var duice;
     /**
      * duice.MapUIComponent
      */
-    var MapUIComponent = (function (_super) {
+    var MapUIComponent = /** @class */ (function (_super) {
         __extends(MapUIComponent, _super);
         function MapUIComponent() {
             return _super !== null && _super.apply(this, arguments) || this;
@@ -506,7 +516,7 @@ var duice;
     /**
      * duice.ui.ListUIComponent
      */
-    var ListUIComponent = (function (_super) {
+    var ListUIComponent = /** @class */ (function (_super) {
         __extends(ListUIComponent, _super);
         function ListUIComponent() {
             return _super !== null && _super.apply(this, arguments) || this;
@@ -530,7 +540,7 @@ var duice;
     /**
      * duice.ui.UIComponentFactory
      */
-    var UIComponentFactory = (function () {
+    var UIComponentFactory = /** @class */ (function () {
         function UIComponentFactory(context) {
             if (context) {
                 this.setContext(context);
@@ -559,7 +569,7 @@ var duice;
         };
         return UIComponentFactory;
     }());
-    var MapUIComponentFactory = (function (_super) {
+    var MapUIComponentFactory = /** @class */ (function (_super) {
         __extends(MapUIComponentFactory, _super);
         function MapUIComponentFactory() {
             return _super !== null && _super.apply(this, arguments) || this;
@@ -567,7 +577,7 @@ var duice;
         return MapUIComponentFactory;
     }(UIComponentFactory));
     duice.MapUIComponentFactory = MapUIComponentFactory;
-    var ListUIComponentFactory = (function (_super) {
+    var ListUIComponentFactory = /** @class */ (function (_super) {
         __extends(ListUIComponentFactory, _super);
         function ListUIComponentFactory() {
             return _super !== null && _super.apply(this, arguments) || this;
@@ -575,7 +585,7 @@ var duice;
         return ListUIComponentFactory;
     }(UIComponentFactory));
     duice.ListUIComponentFactory = ListUIComponentFactory;
-    var CompositeUIComponentFactory = (function (_super) {
+    var CompositeUIComponentFactory = /** @class */ (function (_super) {
         __extends(CompositeUIComponentFactory, _super);
         function CompositeUIComponentFactory() {
             return _super !== null && _super.apply(this, arguments) || this;
@@ -583,7 +593,7 @@ var duice;
         return CompositeUIComponentFactory;
     }(UIComponentFactory));
     duice.CompositeUIComponentFactory = CompositeUIComponentFactory;
-    var ModalUIComponentFactory = (function (_super) {
+    var ModalUIComponentFactory = /** @class */ (function (_super) {
         __extends(ModalUIComponentFactory, _super);
         function ModalUIComponentFactory() {
             return _super !== null && _super.apply(this, arguments) || this;
@@ -815,7 +825,7 @@ var duice;
         }
         var interval = setInterval(function () {
             try {
-                callback.call.apply(callback, [$this].concat(args));
+                callback.call.apply(callback, __spreadArrays([$this], args));
             }
             catch (e) {
                 throw e;
@@ -842,7 +852,7 @@ var duice;
      * duice.StringFormat
      * @param string format
      */
-    var StringFormat = (function () {
+    var StringFormat = /** @class */ (function () {
         /**
          * Constructor
          * @param pattern
@@ -912,7 +922,7 @@ var duice;
      * duice.NumberFormat
      * @param scale number
      */
-    var NumberFormat = (function () {
+    var NumberFormat = /** @class */ (function () {
         /**
          * Constructor
          * @param scale
@@ -971,7 +981,7 @@ var duice;
     /**
      * duice.DateFormat
      */
-    var DateFormat = (function () {
+    var DateFormat = /** @class */ (function () {
         /**
          * Constructor
          * @param pattern
@@ -1085,7 +1095,7 @@ var duice;
         /**
          * duice.ui.ScriptletFactory
          */
-        var ScriptletFactory = (function (_super) {
+        var ScriptletFactory = /** @class */ (function (_super) {
             __extends(ScriptletFactory, _super);
             function ScriptletFactory() {
                 return _super !== null && _super.apply(this, arguments) || this;
@@ -1115,7 +1125,7 @@ var duice;
         /**
          * duice.ui.Scriptlet
          */
-        var Scriptlet = (function (_super) {
+        var Scriptlet = /** @class */ (function (_super) {
             __extends(Scriptlet, _super);
             function Scriptlet(element) {
                 var _this = _super.call(this, element) || this;
@@ -1151,7 +1161,7 @@ var duice;
         /**
          * duice.ui.SpanFactory
          */
-        var SpanFactory = (function (_super) {
+        var SpanFactory = /** @class */ (function (_super) {
             __extends(SpanFactory, _super);
             function SpanFactory() {
                 return _super !== null && _super.apply(this, arguments) || this;
@@ -1189,7 +1199,7 @@ var duice;
         /**
          * duice.ui.Span
          */
-        var Span = (function (_super) {
+        var Span = /** @class */ (function (_super) {
             __extends(Span, _super);
             function Span(span) {
                 var _this = _super.call(this, span) || this;
@@ -1223,7 +1233,7 @@ var duice;
         /**
          * duice.ui.InputFactory
          */
-        var InputFactory = (function (_super) {
+        var InputFactory = /** @class */ (function (_super) {
             __extends(InputFactory, _super);
             function InputFactory() {
                 return _super !== null && _super.apply(this, arguments) || this;
@@ -1270,7 +1280,7 @@ var duice;
         /**
          * duice.ui.Input
          */
-        var Input = (function (_super) {
+        var Input = /** @class */ (function (_super) {
             __extends(Input, _super);
             function Input(input) {
                 var _this = _super.call(this, input) || this;
@@ -1305,7 +1315,7 @@ var duice;
         /**
          * duice.ui.GenericInput
          */
-        var GenericInput = (function (_super) {
+        var GenericInput = /** @class */ (function (_super) {
             __extends(GenericInput, _super);
             function GenericInput(input) {
                 var _this = _super.call(this, input) || this;
@@ -1336,7 +1346,7 @@ var duice;
         /**
          * duice.ui.TextInput
          */
-        var TextInput = (function (_super) {
+        var TextInput = /** @class */ (function (_super) {
             __extends(TextInput, _super);
             function TextInput(input) {
                 var _this = _super.call(this, input) || this;
@@ -1374,7 +1384,7 @@ var duice;
         /**
          * duice.ui.NumberInput
          */
-        var NumberInput = (function (_super) {
+        var NumberInput = /** @class */ (function (_super) {
             __extends(NumberInput, _super);
             function NumberInput(input) {
                 var _this = _super.call(this, input) || this;
@@ -1411,7 +1421,7 @@ var duice;
         /**
          * duice.ui.CheckboxInput
          */
-        var CheckboxInput = (function (_super) {
+        var CheckboxInput = /** @class */ (function (_super) {
             __extends(CheckboxInput, _super);
             function CheckboxInput(input) {
                 var _this = _super.call(this, input) || this;
@@ -1440,7 +1450,7 @@ var duice;
         /**
          * duice.ui.RadioInput
          */
-        var RadioInput = (function (_super) {
+        var RadioInput = /** @class */ (function (_super) {
             __extends(RadioInput, _super);
             function RadioInput(input) {
                 var _this = _super.call(this, input) || this;
@@ -1465,7 +1475,7 @@ var duice;
         /**
          * duice.ui.DatetimeInput
          */
-        var DateInput = (function (_super) {
+        var DateInput = /** @class */ (function (_super) {
             __extends(DateInput, _super);
             function DateInput(input) {
                 var _this = _super.call(this, input) || this;
@@ -1800,7 +1810,7 @@ var duice;
         /**
          * duice.ui.SelectFactory
          */
-        var SelectFactory = (function (_super) {
+        var SelectFactory = /** @class */ (function (_super) {
             __extends(SelectFactory, _super);
             function SelectFactory() {
                 return _super !== null && _super.apply(this, arguments) || this;
@@ -1822,7 +1832,7 @@ var duice;
         /**
          * duice.ui.Select
          */
-        var Select = (function (_super) {
+        var Select = /** @class */ (function (_super) {
             __extends(Select, _super);
             function Select(select) {
                 var _this = _super.call(this, select) || this;
@@ -1877,7 +1887,7 @@ var duice;
         /**
          * duice.ui.TextareaFactory
          */
-        var TextareaFactory = (function (_super) {
+        var TextareaFactory = /** @class */ (function (_super) {
             __extends(TextareaFactory, _super);
             function TextareaFactory() {
                 return _super !== null && _super.apply(this, arguments) || this;
@@ -1894,7 +1904,7 @@ var duice;
         /**
          * duice.ui.Textarea
          */
-        var Textarea = (function (_super) {
+        var Textarea = /** @class */ (function (_super) {
             __extends(Textarea, _super);
             function Textarea(textarea) {
                 var _this = _super.call(this, textarea) || this;
@@ -1920,7 +1930,7 @@ var duice;
         /**
          * duice.ui.ImageFactory
          */
-        var ImageFactory = (function (_super) {
+        var ImageFactory = /** @class */ (function (_super) {
             __extends(ImageFactory, _super);
             function ImageFactory() {
                 return _super !== null && _super.apply(this, arguments) || this;
@@ -1937,7 +1947,7 @@ var duice;
         /**
          * duice.ui.Image
          */
-        var Image = (function (_super) {
+        var Image = /** @class */ (function (_super) {
             __extends(Image, _super);
             /**
              * Constructor
@@ -1997,7 +2007,7 @@ var duice;
         /**
          * duice.ui.TableFactory
          */
-        var TableFactory = (function (_super) {
+        var TableFactory = /** @class */ (function (_super) {
             __extends(TableFactory, _super);
             function TableFactory() {
                 return _super !== null && _super.apply(this, arguments) || this;
@@ -2017,7 +2027,7 @@ var duice;
         /**
          * duice.ui.Table
          */
-        var Table = (function (_super) {
+        var Table = /** @class */ (function (_super) {
             __extends(Table, _super);
             /**
              * constructor table
@@ -2165,7 +2175,7 @@ var duice;
         /**
          * duice.ui.UListFactory
          */
-        var UListFactory = (function (_super) {
+        var UListFactory = /** @class */ (function (_super) {
             __extends(UListFactory, _super);
             function UListFactory() {
                 return _super !== null && _super.apply(this, arguments) || this;
@@ -2192,7 +2202,7 @@ var duice;
         /**
          * duice.ui.UList
          */
-        var UList = (function (_super) {
+        var UList = /** @class */ (function (_super) {
             __extends(UList, _super);
             /**
              * Constructor
@@ -2497,7 +2507,7 @@ var duice;
          * new duice.dialog.Blocker(this.div).block().unblock();
          *
          */
-        var Blocker = (function () {
+        var Blocker = /** @class */ (function () {
             function Blocker(element) {
                 this.element = element;
                 this.div = document.createElement('div');
@@ -2514,6 +2524,7 @@ var duice;
                     this.div.style.top = '0px';
                     this.div.style.left = '0px';
                 }
+                // otherwise adjusting to parent element
                 else {
                     var boundingClientRect = this.element.getBoundingClientRect();
                     var width = boundingClientRect.width;
@@ -2537,7 +2548,7 @@ var duice;
         /**
          * duice.ui.Modal
          */
-        var Modal = (function () {
+        var Modal = /** @class */ (function () {
             function Modal() {
                 this.listener = {};
                 var $this = this;
@@ -2671,7 +2682,7 @@ var duice;
         /**
          * duice.ui.Alert
          */
-        var Alert = (function (_super) {
+        var Alert = /** @class */ (function (_super) {
             __extends(Alert, _super);
             function Alert(message) {
                 var _this = _super.call(this) || this;
@@ -2711,7 +2722,7 @@ var duice;
         /**
          * duice.ui.Confirm
          */
-        var Confirm = (function (_super) {
+        var Confirm = /** @class */ (function (_super) {
             __extends(Confirm, _super);
             function Confirm(message) {
                 var _this = _super.call(this) || this;
@@ -2756,7 +2767,7 @@ var duice;
         /**
          * duice.ui.Prompt
          */
-        var Prompt = (function (_super) {
+        var Prompt = /** @class */ (function (_super) {
             __extends(Prompt, _super);
             function Prompt(message) {
                 var _this = _super.call(this) || this;
@@ -2808,7 +2819,7 @@ var duice;
             return Prompt;
         }(Modal));
         ui.Prompt = Prompt;
-        var Dialog = (function (_super) {
+        var Dialog = /** @class */ (function (_super) {
             __extends(Dialog, _super);
             function Dialog(dialog) {
                 var _this = _super.call(this) || this;

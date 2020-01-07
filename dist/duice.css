@@ -301,7 +301,6 @@
 .duice-ui-dateInput__pickerDiv-bodyDiv-timeDiv {
 	margin-top: 2px;
 	padding-top: 2px;
-	border-top: dotted 1px #eee;
 	display: flex;
     justify-content: space-between;
 }
@@ -454,9 +453,8 @@
 	margin: 0px;
 	padding: 0px;
 	vertical-align: middle;
+	cursor: pointer;
 }
-
-
 
 /**
  * duice.ui.Table

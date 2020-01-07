@@ -49,7 +49,7 @@ namespace duice {
     }
     
     /**
-     * Initializes Component
+     * Initializes component
      * @param container
      * @param $context
      */

@@ -33,6 +33,61 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
 var duice;
 (function (duice) {
     /**
+     * Component definition registry
+     */
+    duice.ComponentDefinitionRegistry = {
+        componentDefinitions: new Array(),
+        add: function (componentDefinition) {
+            this.componentDefinitions.push(componentDefinition);
+        },
+        getComponentDefinitions: function () {
+            return this.componentDefinitions;
+        }
+    };
+    /**
+     * Component definition
+     */
+    var ComponentDefinition = /** @class */ (function () {
+        function ComponentDefinition(tagName, isAttribute, factoryClass) {
+            this.tagName = tagName;
+            this.isAttribute = isAttribute;
+            this.factoryClass = factoryClass;
+        }
+        ComponentDefinition.prototype.getTagName = function () {
+            return this.tagName;
+        };
+        ComponentDefinition.prototype.getIsAttribute = function () {
+            return this.isAttribute;
+        };
+        ComponentDefinition.prototype.getFactoryClass = function () {
+            return this.factoryClass;
+        };
+        return ComponentDefinition;
+    }());
+    duice.ComponentDefinition = ComponentDefinition;
+    /**
+     * Initializes component
+     * @param container
+     * @param $context
+     */
+    function initializeComponent(container, $context) {
+        [ModalUIComponentFactory, CompositeUIComponentFactory, ListUIComponentFactory, MapUIComponentFactory]
+            .forEach(function (factoryType) {
+            duice.ComponentDefinitionRegistry.getComponentDefinitions().forEach(function (componentDefinition) {
+                var elements = container.querySelectorAll(componentDefinition.getTagName() + '[is="' + componentDefinition.getIsAttribute() + '"][data-duice-bind]:not([data-duice-id])');
+                for (var i = 0, size = elements.length; i < size; i++) {
+                    var element = elements[i];
+                    if (componentDefinition.getFactoryClass().prototype instanceof factoryType) {
+                        var factoryClass = Object.create(componentDefinition.getFactoryClass().prototype);
+                        var factoryInstance = factoryClass.constructor.call(factoryClass, $context);
+                        factoryInstance.getInstance(element);
+                    }
+                }
+            });
+        });
+    }
+    duice.initializeComponent = initializeComponent;
+    /**
      * duice.Observable
      * Observable abstract class of Observer Pattern
      */
@@ -119,6 +174,434 @@ var duice;
         return Observable;
     }());
     /**
+     * Abstract data object
+     * extends from Observable and implements Observer interface.
+     */
+    var DataObject = /** @class */ (function (_super) {
+        __extends(DataObject, _super);
+        function DataObject() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        /**
+         * Returns whether instance is active
+         */
+        DataObject.prototype.isAvailable = function () {
+            return true;
+        };
+        return DataObject;
+    }(Observable));
+    duice.DataObject = DataObject;
+    /**
+     * Map data structure
+     * @param JSON object
+     */
+    var Map = /** @class */ (function (_super) {
+        __extends(Map, _super);
+        /**
+         * constructor
+         * @param json
+         */
+        function Map(json) {
+            var _this = _super.call(this) || this;
+            _this.data = new Object(); // internal data object
+            _this.enable = true; // enable
+            _this.readonly = new Array(); // read only names
+            if (json) {
+                _this.fromJson(json);
+            }
+            return _this;
+        }
+        /**
+         * Updates data from observable instance
+         * @param uiComponent
+         * @param obj
+         */
+        Map.prototype.update = function (uiComponent, obj) {
+            console.info('Map.update', uiComponent, obj);
+            var name = uiComponent.getName();
+            var value = uiComponent.getValue();
+            this.set(name, value);
+        };
+        /**
+         * Loads data from JSON object.
+         * @param json
+         */
+        Map.prototype.fromJson = function (json) {
+            // sets data
+            this.data = new Object();
+            for (var name in json) {
+                this.data[name] = json[name];
+            }
+            // saves original data.
+            this.originData = JSON.stringify(this.toJson());
+            // notify to observers
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        /**
+         * Convert data to JSON object
+         * @return JSON object
+         */
+        Map.prototype.toJson = function () {
+            var json = new Object();
+            for (var name in this.data) {
+                json[name] = this.data[name];
+            }
+            return json;
+        };
+        /**
+         * Checks original data is changed
+         * @return whether original data is changed or not
+         */
+        Map.prototype.isDirty = function () {
+            if (JSON.stringify(this.toJson()) === this.originData) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        };
+        /**
+         * Restores instance as original data
+         */
+        Map.prototype.reset = function () {
+            var originJson = JSON.parse(this.originData);
+            this.fromJson(originJson);
+        };
+        /**
+         * Sets property as input value
+         * @param name
+         * @param value
+         */
+        Map.prototype.set = function (name, value) {
+            this.data[name] = value;
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        /**
+         * Gets specified property value.
+         * @param name
+         */
+        Map.prototype.get = function (name) {
+            return this.data[name];
+        };
+        /**
+         * Returns properties names as array.
+         * @return array of names
+         */
+        Map.prototype.getNames = function () {
+            var names = new Array();
+            for (var name in this.data) {
+                names.push(name);
+            }
+            return names;
+        };
+        /**
+         * Sets instance to be enabled.
+         * @param whether enable or not
+         */
+        Map.prototype.setEnable = function (enable) {
+            this.enable = enable;
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        /**
+         * Returns instance is enabled.
+         * @return whether enable or not
+         */
+        Map.prototype.isEnable = function () {
+            return this.enable;
+        };
+        /**
+         * Sets read-only specified name
+         * @param name
+         * @param readonly
+         */
+        Map.prototype.setReadonly = function (name, readonly) {
+            if (this.readonly.indexOf(name) == -1) {
+                this.readonly.push(name);
+            }
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        /**
+         * Returns specified name is read-only
+         * @param name
+         * @return whether specified property is read-only or not
+         */
+        Map.prototype.isReadonly = function (name) {
+            if (this.readonly.indexOf(name) >= 0) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+        return Map;
+    }(DataObject));
+    duice.Map = Map;
+    /**
+     * duice.List
+     */
+    var List = /** @class */ (function (_super) {
+        __extends(List, _super);
+        function List(jsonArray, __childName) {
+            var _this = _super.call(this) || this;
+            _this.data = new Array();
+            _this.index = -1;
+            if (jsonArray) {
+                _this.fromJson(jsonArray);
+            }
+            return _this;
+        }
+        List.prototype.update = function (observable, obj) {
+            console.log('List.update', observable, obj);
+            this.setChanged();
+            this.notifyObservers(obj);
+        };
+        List.prototype.fromJson = function (jsonArray) {
+            this.data = new Array();
+            for (var i = 0; i < jsonArray.length; i++) {
+                var map = new duice.Map(jsonArray[i]);
+                map.addObserver(this);
+                this.data.push(map);
+            }
+            this.originData = JSON.stringify(this.toJson());
+            this.clearIndex();
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        List.prototype.toJson = function (__childName) {
+            var jsonArray = new Array();
+            for (var i = 0; i < this.data.length; i++) {
+                jsonArray.push(this.data[i].toJson());
+            }
+            return jsonArray;
+        };
+        List.prototype.isDirty = function () {
+            if (JSON.stringify(this.toJson()) === this.originData) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        };
+        List.prototype.reset = function () {
+            var originJson = JSON.parse(this.originData);
+            this.fromJson(originJson);
+        };
+        List.prototype.setIndex = function (index) {
+            this.index = index;
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        List.prototype.getIndex = function () {
+            return this.index;
+        };
+        List.prototype.clearIndex = function () {
+            this.index = -1;
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        List.prototype.getSize = function () {
+            return this.data.length;
+        };
+        List.prototype.get = function (index) {
+            return this.data[index];
+        };
+        List.prototype.add = function (map) {
+            map.addObserver(this);
+            this.data.push(map);
+            this.index = this.getSize() - 1;
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        List.prototype.insert = function (index, map) {
+            if (0 <= index && index < this.data.length) {
+                map.addObserver(this);
+                this.data.splice(index, 0, map);
+                this.index = index;
+                this.setChanged();
+                this.notifyObservers(this);
+            }
+        };
+        List.prototype.remove = function (index) {
+            if (0 <= index && index < this.data.length) {
+                this.data.splice(index, 1);
+                this.index = Math.min(this.index, this.data.length - 1);
+                this.setChanged();
+                this.notifyObservers(this);
+            }
+        };
+        List.prototype.move = function (fromIndex, toIndex) {
+            this.index = fromIndex;
+            this.data.splice(toIndex, 0, this.data.splice(fromIndex, 1)[0]);
+            this.index = toIndex;
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        List.prototype.forEach = function (handler) {
+            for (var i = 0, size = this.data.length; i < size; i++) {
+                handler.call(this, this.data[i]);
+            }
+        };
+        List.prototype.sort = function (name, ascending) {
+            this.data.sort(function (a, b) {
+                var aValue = a.get(name);
+                var bValue = b.get(name);
+                return (aValue > bValue ? 1 : aValue < bValue ? -1 : 0) * (ascending == false ? -1 : 1);
+            });
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        return List;
+    }(DataObject));
+    duice.List = List;
+    /**
+     * duice.UIComponent
+     */
+    var UIComponent = /** @class */ (function (_super) {
+        __extends(UIComponent, _super);
+        function UIComponent(element) {
+            var _this = _super.call(this) || this;
+            _this.element = element;
+            _this.element.dataset.duiceId = generateUUID();
+            return _this;
+        }
+        UIComponent.prototype.isAvailable = function () {
+            // contains method not support(IE)
+            if (!Node.prototype.contains) {
+                Node.prototype.contains = function (el) {
+                    while (el = el.parentNode) {
+                        if (el === this)
+                            return true;
+                    }
+                    return false;
+                };
+            }
+            // checks contains element
+            if (document.contains(this.element)) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+        return UIComponent;
+    }(Observable));
+    /**
+     * duice.MapUIComponent
+     */
+    var MapUIComponent = /** @class */ (function (_super) {
+        __extends(MapUIComponent, _super);
+        function MapUIComponent() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        MapUIComponent.prototype.bind = function (map, name) {
+            this.map = map;
+            this.name = name;
+            this.map.addObserver(this);
+            this.addObserver(this.map);
+            this.update(this.map, this.map);
+        };
+        MapUIComponent.prototype.getMap = function () {
+            return this.map;
+        };
+        MapUIComponent.prototype.getName = function () {
+            return this.name;
+        };
+        return MapUIComponent;
+    }(UIComponent));
+    duice.MapUIComponent = MapUIComponent;
+    /**
+     * duice.ui.ListUIComponent
+     */
+    var ListUIComponent = /** @class */ (function (_super) {
+        __extends(ListUIComponent, _super);
+        function ListUIComponent() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        ListUIComponent.prototype.bind = function (list, item) {
+            this.list = list;
+            this.item = item;
+            this.list.addObserver(this);
+            this.addObserver(this.list);
+            this.update(this.list, this.list);
+        };
+        ListUIComponent.prototype.getList = function () {
+            return this.list;
+        };
+        ListUIComponent.prototype.getItem = function () {
+            return this.item;
+        };
+        return ListUIComponent;
+    }(UIComponent));
+    duice.ListUIComponent = ListUIComponent;
+    /**
+     * duice.ui.UIComponentFactory
+     */
+    var UIComponentFactory = /** @class */ (function () {
+        function UIComponentFactory(context) {
+            if (context) {
+                this.setContext(context);
+            }
+        }
+        UIComponentFactory.prototype.setContext = function (context) {
+            this.context = context;
+        };
+        UIComponentFactory.prototype.getContext = function () {
+            return this.context;
+        };
+        UIComponentFactory.prototype.getContextProperty = function (name) {
+            if (this.context[name]) {
+                return this.context[name];
+            }
+            if (window.hasOwnProperty(name)) {
+                return window[name];
+            }
+            try {
+                return eval.call(this.context, name);
+            }
+            catch (e) {
+                console.error(e, this.context, name);
+                throw e;
+            }
+        };
+        return UIComponentFactory;
+    }());
+    var MapUIComponentFactory = /** @class */ (function (_super) {
+        __extends(MapUIComponentFactory, _super);
+        function MapUIComponentFactory() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        return MapUIComponentFactory;
+    }(UIComponentFactory));
+    duice.MapUIComponentFactory = MapUIComponentFactory;
+    var ListUIComponentFactory = /** @class */ (function (_super) {
+        __extends(ListUIComponentFactory, _super);
+        function ListUIComponentFactory() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        return ListUIComponentFactory;
+    }(UIComponentFactory));
+    duice.ListUIComponentFactory = ListUIComponentFactory;
+    var CompositeUIComponentFactory = /** @class */ (function (_super) {
+        __extends(CompositeUIComponentFactory, _super);
+        function CompositeUIComponentFactory() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        return CompositeUIComponentFactory;
+    }(UIComponentFactory));
+    duice.CompositeUIComponentFactory = CompositeUIComponentFactory;
+    var ModalUIComponentFactory = /** @class */ (function (_super) {
+        __extends(ModalUIComponentFactory, _super);
+        function ModalUIComponentFactory() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        return ModalUIComponentFactory;
+    }(UIComponentFactory));
+    duice.ModalUIComponentFactory = ModalUIComponentFactory;
+    /**
      * Generates random UUID value
      * @return  UUID string
      */
@@ -132,26 +615,23 @@ var duice;
         return uuid;
     }
     /**
-     * getObject
-     * @param   Scope context in which the variable exists
-     * @param   variable name to find
-     * @return  found variables(or object)
+     * Checks mobile browser
      */
-    function getObject($context, name) {
-        if ($context[name]) {
-            return $context[name];
+    function isMobile() {
+        if (navigator.userAgent.match(/Android/i)
+            || navigator.userAgent.match(/webOS/i)
+            || navigator.userAgent.match(/iPhone/i)
+            || navigator.userAgent.match(/iPad/i)
+            || navigator.userAgent.match(/iPod/i)
+            || navigator.userAgent.match(/BlackBerry/i)
+            || navigator.userAgent.match(/Windows Phone/i)) {
+            return true;
         }
-        if (window.hasOwnProperty(name)) {
-            return window[name];
-        }
-        try {
-            return eval.call($context, name);
-        }
-        catch (e) {
-            console.error(e, $context, name);
-            throw e;
+        else {
+            return false;
         }
     }
+    duice.isMobile = isMobile;
     /**
      * Check if value is empty
      * @param value
@@ -218,189 +698,6 @@ var duice;
             value = value + padChar;
         }
         return value;
-    }
-    /**
-     * Converts value to masked value.
-     * @param value
-     * @param type
-     * @param format
-     */
-    function mask(value, type, format) {
-        switch (type) {
-            // string type
-            case 'string':
-                var string = '';
-                var index = -1;
-                for (var i = 0, size = format.length; i < size; i++) {
-                    var formatChar = format.charAt(i);
-                    if (formatChar === '#') {
-                        index++;
-                        string += value.charAt(index);
-                    }
-                    else {
-                        string += formatChar;
-                    }
-                }
-                return string;
-            // number
-            case 'number':
-                var number;
-                if (typeof value === 'number') {
-                    number = value;
-                }
-                else if (typeof value === 'string') {
-                    value = value.replace(/\,/gi, '');
-                    number = Number(value);
-                }
-                else {
-                    number = Number(value);
-                }
-                if (isNaN(number)) {
-                    throw 'NaN';
-                }
-                var scale = parseInt(format);
-                var maskValue = String(number.toFixed(scale));
-                var reg = /(^[+-]?\d+)(\d{3})/;
-                while (reg.test(maskValue)) {
-                    maskValue = maskValue.replace(reg, '$1' + ',' + '$2');
-                }
-                return maskValue;
-            // date
-            case 'date':
-                var date;
-                if (value instanceof Date) {
-                    date = value;
-                }
-                else if (typeof value === 'number') {
-                    date = new Date(value);
-                }
-                else {
-                    throw 'Not Date Type';
-                }
-                var formatRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
-                var maskValue = format.replace(formatRex, function ($1) {
-                    switch ($1) {
-                        case "yyyy": return date.getFullYear();
-                        case "yy": return lpad(String(date.getFullYear() % 1000), 2, '0');
-                        case "MM": return lpad(String(date.getMonth() + 1), 2, '0');
-                        case "dd": return lpad(String(date.getDate()), 2, '0');
-                        case "HH": return lpad(String(date.getHours()), 2, '0');
-                        case "hh": return lpad(String(date.getHours() <= 12 ? date.getHours() : date.getHours() % 12), 2, '0');
-                        case "mm": return lpad(String(date.getMinutes()), 2, '0');
-                        case "ss": return lpad(String(date.getSeconds()), 2, '0');
-                        default: return $1;
-                    }
-                });
-                return maskValue;
-            // default
-            default:
-                throw 'encodeMask-type must be string|number|date';
-        }
-    }
-    /**
-     * Converts masked value to original value.
-     * @param value
-     * @param type
-     * @param format
-     */
-    function unmask(value, type, format) {
-        switch (type) {
-            // string type
-            case 'string':
-                if (isEmpty(value)) {
-                    return null;
-                }
-                // TODO
-                return value;
-            // number type
-            case 'number':
-                if (isEmpty(value)) {
-                    return null;
-                }
-                var number;
-                if (typeof value === 'number') {
-                    number = value;
-                }
-                else if (typeof value === 'string') {
-                    value = value.replace(/,/g, '');
-                    number = Number(value);
-                }
-                else {
-                    number = Number(value);
-                }
-                if (isNaN(number)) {
-                    throw 'NaN';
-                }
-                var scale = parseInt(format);
-                return number.toFixed(scale);
-            // date type
-            case 'date':
-                if (isEmpty(value)) {
-                    return null;
-                }
-                if (value.length !== format.length) {
-                    throw 'value length is mismatch:' + value;
-                }
-                var date = new Date();
-                date.setFullYear(0);
-                date.setMonth(0);
-                date.setDate(1);
-                date.setHours(0);
-                date.setMinutes(0);
-                date.setSeconds(0);
-                var formatRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
-                var match;
-                while ((match = formatRex.exec(format)) != null) {
-                    var formatStr = match[0];
-                    var formatIndex = match.index;
-                    var formatLength = formatStr.length;
-                    var matchValue = value.substr(formatIndex, formatLength);
-                    matchValue = lpad(matchValue, formatLength, '0');
-                    if (isNaN(Number(matchValue))) {
-                        throw 'Not a Date - ' + formatStr + ':' + matchValue;
-                    }
-                    switch (formatStr) {
-                        case 'yyyy':
-                            var fullYear = parseInt(matchValue);
-                            date.setFullYear(fullYear);
-                            break;
-                        case 'yy':
-                            var yyValue = parseInt(matchValue);
-                            var yearPrefix = Math.floor(new Date().getFullYear() / 100);
-                            var fullYear = yearPrefix * 100 + yyValue;
-                            date.setFullYear(fullYear);
-                            break;
-                        case 'MM':
-                            var monthValue = parseInt(matchValue);
-                            date.setMonth(monthValue - 1);
-                            break;
-                        case 'dd':
-                            var dateValue = parseInt(matchValue);
-                            date.setDate(dateValue);
-                            break;
-                        case 'HH':
-                            var hoursValue = parseInt(matchValue);
-                            date.setHours(hoursValue);
-                            break;
-                        case 'hh':
-                            var hoursValue = parseInt(matchValue);
-                            date.setHours(hoursValue > 12 ? (hoursValue + 12) : hoursValue);
-                            break;
-                        case 'mm':
-                            var minutesValue = parseInt(matchValue);
-                            date.setMinutes(minutesValue);
-                            break;
-                        case 'ss':
-                            var secondsValue = parseInt(matchValue);
-                            date.setSeconds(secondsValue);
-                            break;
-                    }
-                }
-                return date;
-            // default 
-            default:
-                throw 'encodeMask-type must be string|number|date';
-        }
     }
     /**
      * Executes custom expression in HTML element and returns.
@@ -552,39 +849,102 @@ var duice;
         return z;
     }
     /**
-     * duice.StringMask
-     * @param string format to mask
+     * duice.StringFormat
+     * @param string format
      */
-    var StringMask = /** @class */ (function () {
-        function StringMask() {
+    var StringFormat = /** @class */ (function () {
+        /**
+         * Constructor
+         * @param pattern
+         */
+        function StringFormat(pattern) {
+            if (pattern) {
+                this.setPattern(pattern);
+            }
         }
-        StringMask.prototype.setFormat = function (format) {
-            this.format = format;
+        /**
+         * Sets format string
+         * @param pattern
+         */
+        StringFormat.prototype.setPattern = function (pattern) {
+            this.pattern = pattern;
         };
-        StringMask.prototype.encode = function (value) {
-            return value;
+        /**
+         * encode string as format
+         * @param value
+         */
+        StringFormat.prototype.encode = function (value) {
+            if (isEmpty(this.pattern)) {
+                return value;
+            }
+            var encodedValue = '';
+            var patternChars = this.pattern.split('');
+            var valueChars = value.split('');
+            var valueCharsPosition = 0;
+            for (var i = 0, size = patternChars.length; i < size; i++) {
+                var patternChar = patternChars[i];
+                if (patternChar === '#') {
+                    encodedValue += defaultIfEmpty(valueChars[valueCharsPosition++], '');
+                }
+                else {
+                    encodedValue += patternChar;
+                }
+            }
+            return encodedValue;
         };
-        StringMask.prototype.validate = function (value) {
-            return true;
+        /**
+         * decodes string as format
+         * @param value
+         */
+        StringFormat.prototype.decode = function (value) {
+            if (isEmpty(this.pattern)) {
+                return value;
+            }
+            var decodedValue = '';
+            var patternChars = this.pattern.split('');
+            var valueChars = value.split('');
+            var valueCharsPosition = 0;
+            for (var i = 0, size = patternChars.length; i < size; i++) {
+                var patternChar = patternChars[i];
+                if (patternChar === '#') {
+                    decodedValue += defaultIfEmpty(valueChars[valueCharsPosition++], '');
+                }
+                else {
+                    valueCharsPosition++;
+                }
+            }
+            return decodedValue;
         };
-        StringMask.prototype.decode = function (value) {
-            return value;
-        };
-        return StringMask;
+        return StringFormat;
     }());
-    duice.StringMask = StringMask;
+    duice.StringFormat = StringFormat;
     /**
-     * duice.NumberMask
-     * @param scale number scale
+     * duice.NumberFormat
+     * @param scale number
      */
-    var NumberMask = /** @class */ (function () {
-        function NumberMask() {
+    var NumberFormat = /** @class */ (function () {
+        /**
+         * Constructor
+         * @param scale
+         */
+        function NumberFormat(scale) {
             this.scale = 0;
+            if (scale) {
+                this.setScale(scale);
+            }
         }
-        NumberMask.prototype.setScale = function (scale) {
+        /**
+         * Sets number format scale
+         * @param scale
+         */
+        NumberFormat.prototype.setScale = function (scale) {
             this.scale = scale;
         };
-        NumberMask.prototype.encode = function (number) {
+        /**
+         * Encodes number as format
+         * @param number
+         */
+        NumberFormat.prototype.encode = function (number) {
             if (isEmpty(number) || isNaN(Number(number))) {
                 return '';
             }
@@ -596,49 +956,62 @@ var duice;
             }
             return string;
         };
-        NumberMask.prototype.validate = function (string) {
-            string = this.decode(string);
-            if (isEmpty(string)) {
-                return false;
-            }
-            else {
-                return true;
-            }
-        };
-        NumberMask.prototype.decode = function (string) {
+        /**
+         * Decodes formatted value as original value
+         * @param string
+         */
+        NumberFormat.prototype.decode = function (string) {
             if (isEmpty(string)) {
                 return null;
+            }
+            if (string.length === 1 && /[+-]/.test(string)) {
+                string += '0';
             }
             string = string.replace(/\,/gi, '');
             if (isNaN(Number(string))) {
-                return null;
+                throw 'NaN';
             }
             var number = Number(string);
             number = Number(number.toFixed(this.scale));
             return number;
         };
-        return NumberMask;
+        return NumberFormat;
     }());
-    duice.NumberMask = NumberMask;
+    duice.NumberFormat = NumberFormat;
     /**
-     * duice.DateMask
+     * duice.DateFormat
      */
-    var DateMask = /** @class */ (function () {
-        function DateMask() {
+    var DateFormat = /** @class */ (function () {
+        /**
+         * Constructor
+         * @param pattern
+         */
+        function DateFormat(pattern) {
+            this.patternRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
+            if (pattern) {
+                this.setPattern(pattern);
+            }
         }
-        DateMask.prototype.setFormat = function (format) {
-            this.format = format;
+        /**
+         * Sets format string
+         * @param pattern
+         */
+        DateFormat.prototype.setPattern = function (pattern) {
+            this.pattern = pattern;
         };
-        DateMask.prototype.encode = function (number) {
-            if (isEmpty(number)) {
+        /**
+         * Encodes date string
+         * @param string
+         */
+        DateFormat.prototype.encode = function (string) {
+            if (isEmpty(string)) {
                 return '';
             }
-            if (isEmpty(this.format)) {
-                return new Date(number).toString();
+            if (isEmpty(this.pattern)) {
+                return new Date(string).toString();
             }
-            var date = new Date(number);
-            var formatRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
-            var string = this.format.replace(formatRex, function ($1) {
+            var date = new Date(string);
+            string = this.pattern.replace(this.patternRex, function ($1) {
                 switch ($1) {
                     case "yyyy": return date.getFullYear();
                     case "yy": return lpad(String(date.getFullYear() % 1000), 2, '0');
@@ -653,35 +1026,26 @@ var duice;
             });
             return string;
         };
-        DateMask.prototype.validate = function (value) {
-            return true;
-        };
-        DateMask.prototype.decode = function (string) {
+        /**
+         * Decodes formatted date string to ISO date string.
+         * @param string
+         */
+        DateFormat.prototype.decode = function (string) {
             if (isEmpty(string)) {
                 return null;
             }
-            if (isEmpty(this.format)) {
-                return new Date(string).getTime();
+            if (isEmpty(this.pattern)) {
+                return new Date(string).toISOString();
             }
-            var date = new Date();
-            date.setFullYear(0);
-            date.setMonth(0);
-            date.setDate(1);
-            date.setHours(0);
-            date.setMinutes(0);
-            date.setSeconds(0);
-            var formatRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
+            var date = new Date(0, 0, 0, 0, 0, 0);
             var match;
-            while ((match = formatRex.exec(this.format)) != null) {
-                var formatStr = match[0];
+            while ((match = this.patternRex.exec(this.pattern)) != null) {
+                var formatString = match[0];
                 var formatIndex = match.index;
-                var formatLength = formatStr.length;
+                var formatLength = formatString.length;
                 var matchValue = string.substr(formatIndex, formatLength);
-                matchValue = lpad(matchValue, formatLength, '0');
-                if (isNaN(Number(matchValue))) {
-                    throw 'Not a Date - ' + formatStr + ':' + matchValue;
-                }
-                switch (formatStr) {
+                matchValue = rpad(matchValue, formatLength, '0');
+                switch (formatString) {
                     case 'yyyy':
                         var fullYear = parseInt(matchValue);
                         date.setFullYear(fullYear);
@@ -718,436 +1082,46 @@ var duice;
                         break;
                 }
             }
-            var number = date.getTime();
-            return number;
+            return date.toISOString();
         };
-        return DateMask;
+        return DateFormat;
     }());
-    duice.DateMask = DateMask;
-    /**
-     * duice.data
-     * package of Data structure
-     */
-    var data;
-    (function (data) {
-        /**
-         * Abstract data object
-         * extends from Observable and implements Observer interface.
-         */
-        var DataObject = /** @class */ (function (_super) {
-            __extends(DataObject, _super);
-            function DataObject() {
-                return _super !== null && _super.apply(this, arguments) || this;
-            }
-            /**
-             * Returns whether instance is active
-             */
-            DataObject.prototype.isAvailable = function () {
-                return true;
-            };
-            return DataObject;
-        }(Observable));
-        data.DataObject = DataObject;
-        /**
-         * Map data structure
-         * @param JSON object
-         */
-        var Map = /** @class */ (function (_super) {
-            __extends(Map, _super);
-            /**
-             * constructor
-             * @param json
-             */
-            function Map(json) {
-                var _this = _super.call(this) || this;
-                _this.data = new Object(); // internal data object
-                _this.enable = true; // enable
-                _this.readonly = new Array(); // read only names
-                if (json) {
-                    _this.fromJson(json);
-                }
-                return _this;
-            }
-            /**
-             * Updates data from observable instance
-             * @param uiElement
-             * @param obj
-             */
-            Map.prototype.update = function (uiElement, obj) {
-                console.info('Map.update', uiElement, obj);
-                var name = uiElement.getName();
-                var value = uiElement.getValue();
-                this.set(name, value);
-            };
-            /**
-             * Loads data from JSON object.
-             * @param json
-             */
-            Map.prototype.fromJson = function (json) {
-                // sets data
-                this.data = new Object();
-                for (var name in json) {
-                    this.data[name] = json[name];
-                }
-                // saves original data.
-                this.originData = JSON.stringify(this.toJson());
-                // notify to observers
-                this.setChanged();
-                this.notifyObservers(this);
-            };
-            /**
-             * Convert data to JSON object
-             * @return JSON object
-             */
-            Map.prototype.toJson = function () {
-                var json = new Object();
-                for (var name in this.data) {
-                    json[name] = this.data[name];
-                }
-                return json;
-            };
-            /**
-             * Checks original data is changed
-             * @return whether original data is changed or not
-             */
-            Map.prototype.isDirty = function () {
-                if (JSON.stringify(this.toJson()) === this.originData) {
-                    return false;
-                }
-                else {
-                    return true;
-                }
-            };
-            /**
-             * Restores instance as original data
-             */
-            Map.prototype.reset = function () {
-                var originJson = JSON.parse(this.originData);
-                this.fromJson(originJson);
-            };
-            /**
-             * Sets property as input value
-             * @param name
-             * @param value
-             */
-            Map.prototype.set = function (name, value) {
-                this.data[name] = value;
-                this.setChanged();
-                this.notifyObservers(this);
-            };
-            /**
-             * Gets specified property value.
-             * @param name
-             */
-            Map.prototype.get = function (name) {
-                return this.data[name];
-            };
-            /**
-             * Returns properties names as array.
-             * @return array of names
-             */
-            Map.prototype.getNames = function () {
-                var names = new Array();
-                for (var name in this.data) {
-                    names.push(name);
-                }
-                return names;
-            };
-            /**
-             * Sets instance to be enabled.
-             * @param whether enable or not
-             */
-            Map.prototype.setEnable = function (enable) {
-                this.enable = enable;
-                this.setChanged();
-                this.notifyObservers(this);
-            };
-            /**
-             * Returns instance is enabled.
-             * @return whether enable or not
-             */
-            Map.prototype.isEnable = function () {
-                return this.enable;
-            };
-            /**
-             * Sets read-only specified name
-             * @param name
-             * @param readonly
-             */
-            Map.prototype.setReadonly = function (name, readonly) {
-                if (this.readonly.indexOf(name) == -1) {
-                    this.readonly.push(name);
-                }
-                this.setChanged();
-                this.notifyObservers(this);
-            };
-            /**
-             * Returns specified name is read-only
-             * @param name
-             * @return whether specified property is read-only or not
-             */
-            Map.prototype.isReadonly = function (name) {
-                if (this.readonly.indexOf(name) >= 0) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            };
-            return Map;
-        }(DataObject));
-        data.Map = Map;
-        /**
-         * duice.data.List
-         */
-        var List = /** @class */ (function (_super) {
-            __extends(List, _super);
-            function List(jsonArray, __childName) {
-                var _this = _super.call(this) || this;
-                _this.data = new Array();
-                _this.index = -1;
-                if (jsonArray) {
-                    _this.fromJson(jsonArray);
-                }
-                return _this;
-            }
-            List.prototype.update = function (observable, obj) {
-                console.log('List.update', observable, obj);
-                this.setChanged();
-                this.notifyObservers(obj);
-            };
-            List.prototype.fromJson = function (jsonArray) {
-                this.data = new Array();
-                for (var i = 0; i < jsonArray.length; i++) {
-                    var map = new duice.data.Map(jsonArray[i]);
-                    map.addObserver(this);
-                    this.data.push(map);
-                }
-                this.originData = JSON.stringify(this.toJson());
-                this.clearIndex();
-                this.setChanged();
-                this.notifyObservers(this);
-            };
-            List.prototype.toJson = function (__childName) {
-                var jsonArray = new Array();
-                for (var i = 0; i < this.data.length; i++) {
-                    jsonArray.push(this.data[i].toJson());
-                }
-                return jsonArray;
-            };
-            List.prototype.isDirty = function () {
-                if (JSON.stringify(this.toJson()) === this.originData) {
-                    return false;
-                }
-                else {
-                    return true;
-                }
-            };
-            List.prototype.reset = function () {
-                var originJson = JSON.parse(this.originData);
-                this.fromJson(originJson);
-            };
-            List.prototype.setIndex = function (index) {
-                this.index = index;
-                this.setChanged();
-                this.notifyObservers(this);
-            };
-            List.prototype.getIndex = function () {
-                return this.index;
-            };
-            List.prototype.clearIndex = function () {
-                this.index = -1;
-                this.setChanged();
-                this.notifyObservers(this);
-            };
-            List.prototype.getSize = function () {
-                return this.data.length;
-            };
-            List.prototype.get = function (index) {
-                return this.data[index];
-            };
-            List.prototype.add = function (map) {
-                map.addObserver(this);
-                this.data.push(map);
-                this.index = this.getSize() - 1;
-                this.setChanged();
-                this.notifyObservers(this);
-            };
-            List.prototype.insert = function (index, map) {
-                if (0 <= index && index < this.data.length) {
-                    map.addObserver(this);
-                    this.data.splice(index, 0, map);
-                    this.index = index;
-                    this.setChanged();
-                    this.notifyObservers(this);
-                }
-            };
-            List.prototype.remove = function (index) {
-                if (0 <= index && index < this.data.length) {
-                    this.data.splice(index, 1);
-                    this.index = Math.min(this.index, this.data.length - 1);
-                    this.setChanged();
-                    this.notifyObservers(this);
-                }
-            };
-            List.prototype.move = function (fromIndex, toIndex) {
-                this.index = fromIndex;
-                this.data.splice(toIndex, 0, this.data.splice(fromIndex, 1)[0]);
-                this.index = toIndex;
-                this.setChanged();
-                this.notifyObservers(this);
-            };
-            List.prototype.forEach = function (handler) {
-                for (var i = 0, size = this.data.length; i < size; i++) {
-                    handler.call(this, this.data[i]);
-                }
-            };
-            List.prototype.sort = function (name, ascending) {
-                this.data.sort(function (a, b) {
-                    var aValue = a.get(name);
-                    var bValue = b.get(name);
-                    return (aValue > bValue ? 1 : aValue < bValue ? -1 : 0) * (ascending == false ? -1 : 1);
-                });
-                this.setChanged();
-                this.notifyObservers(this);
-            };
-            return List;
-        }(DataObject));
-        data.List = List;
-    })(data = duice.data || (duice.data = {}));
+    duice.DateFormat = DateFormat;
     /**
      * duice.ui
      */
     var ui;
     (function (ui) {
         /**
-         * duice.initialize
-         * @param container
-         * @param $context
+         * duice.ui.ScriptletFactory
          */
-        function initialize(container, $context) {
-            // ul
-            var ulElements = container.querySelectorAll('ul[is="duice-ui-ul"][data-duice-bind]:not([data-duice-id])');
-            for (var i = 0; i < ulElements.length; i++) {
-                try {
-                    var element = ulElements[i];
-                    duice.ui.UListFactory.getUList(element, $context);
-                }
-                catch (e) {
-                    console.error(e, element);
-                    throw e;
-                }
+        var ScriptletFactory = /** @class */ (function (_super) {
+            __extends(ScriptletFactory, _super);
+            function ScriptletFactory() {
+                return _super !== null && _super.apply(this, arguments) || this;
             }
-            // table
-            var tableElements = container.querySelectorAll('table[is="duice-ui-table"][data-duice-bind]:not([data-duice-id])');
-            for (var i = 0; i < tableElements.length; i++) {
-                try {
-                    var element = tableElements[i];
-                    duice.ui.TableFactory.getTable(element, $context);
-                }
-                catch (e) {
-                    console.error(e, element);
-                    throw e;
-                }
-            }
-            // creates unit elements
-            var elementTags = [
-                '*[is="duice-ui-scriptlet"]:not([data-duice-id])',
-                'span[is="duice-ui-span"][data-duice-bind]:not([data-duice-id])',
-                'input[is="duice-ui-input"][data-duice-bind]:not([data-duice-id])',
-                'select[is="duice-ui-select"][data-duice-bind]:not([data-duice-id])',
-                'textarea[is="duice-ui-textarea"][data-duice-bind]:not([data-duice-id])',
-                'img[is="duice-ui-img"][data-duice-bind]:not([data-duice-id])'
-            ];
-            var elements = container.querySelectorAll(elementTags.join(','));
-            for (var i = 0; i < elements.length; i++) {
-                try {
-                    var element = elements[i];
-                    var is = element.getAttribute('is');
-                    switch (is) {
-                        case 'duice-ui-span':
-                            duice.ui.SpanFactory.getSpan(element, $context);
-                            break;
-                        case 'duice-ui-input':
-                            duice.ui.InputFactory.getInput(element, $context);
-                            break;
-                        case 'duice-ui-select':
-                            duice.ui.SelectFactory.getSelect(element, $context);
-                            break;
-                        case 'duice-ui-textarea':
-                            duice.ui.TextareaFactory.getTextarea(element, $context);
-                            break;
-                        case 'duice-ui-img':
-                            duice.ui.ImageFactory.getImage(element, $context);
-                            break;
-                        case 'duice-ui-scriptlet':
-                            duice.ui.ScriptletFactory.getScriptlet(element, $context);
-                            break;
-                    }
-                }
-                catch (e) {
-                    console.error(e, elements[i]);
-                    throw e;
-                }
-            }
-        }
-        ui.initialize = initialize;
-        /**
-         * duice.ui.UIElement
-         */
-        var UIElement = /** @class */ (function (_super) {
-            __extends(UIElement, _super);
-            function UIElement(element) {
-                var _this = _super.call(this) || this;
-                _this.element = element;
-                _this.element.dataset.duiceId = generateUUID();
-                return _this;
-            }
-            UIElement.prototype.isAvailable = function () {
-                // contains method not support(IE)
-                if (!Node.prototype.contains) {
-                    Node.prototype.contains = function (el) {
-                        while (el = el.parentNode) {
-                            if (el === this)
-                                return true;
-                        }
-                        return false;
-                    };
-                }
-                // checks contains element
-                if (document.contains(this.element)) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            };
-            return UIElement;
-        }(Observable));
-        ui.UIElement = UIElement;
-        /**
-         * duice.ui.SpanFactory
-         */
-        ui.ScriptletFactory = {
-            getScriptlet: function (element, $context) {
-                var expression = new Scriptlet(element);
+            ScriptletFactory.prototype.getInstance = function (element) {
+                var scriptlet = new Scriptlet(element);
                 var context;
-                if ($context !== window) {
-                    context = $context;
+                if (this.getContext() !== window) {
+                    context = this.getContext();
                 }
                 else {
                     context = {};
                 }
                 if (element.dataset.duiceBind) {
                     var bind = element.dataset.duiceBind.split(',');
+                    var $this = this;
                     bind.forEach(function (name) {
-                        context[name] = getObject($context, name);
+                        context[name] = $this.getContextProperty(name);
                     });
                 }
-                expression.bind(context);
-                return expression;
-            }
-        };
+                scriptlet.bind(context);
+                return scriptlet;
+            };
+            return ScriptletFactory;
+        }(MapUIComponentFactory));
+        ui.ScriptletFactory = ScriptletFactory;
         /**
          * duice.ui.Scriptlet
          */
@@ -1164,7 +1138,7 @@ var duice;
                 for (var name in this.context) {
                     var obj = this.context[name];
                     if (typeof obj === 'object'
-                        && obj instanceof duice.data.DataObject) {
+                        && obj instanceof duice.DataObject) {
                         obj.addObserver(this);
                         this.addObserver(obj);
                         this.update(obj, obj);
@@ -1178,65 +1152,50 @@ var duice;
                 this.element.appendChild(document.createTextNode(result));
                 this.element.style.display = 'inline-block';
             };
+            Scriptlet.prototype.getValue = function () {
+                return null;
+            };
             return Scriptlet;
-        }(UIElement));
+        }(MapUIComponent));
         ui.Scriptlet = Scriptlet;
-        var MapUIElement = /** @class */ (function (_super) {
-            __extends(MapUIElement, _super);
-            function MapUIElement() {
-                return _super !== null && _super.apply(this, arguments) || this;
-            }
-            MapUIElement.prototype.bind = function (map, name) {
-                this.map = map;
-                this.name = name;
-                this.map.addObserver(this);
-                this.addObserver(this.map);
-                this.update(this.map, this.map);
-            };
-            MapUIElement.prototype.getMap = function () {
-                return this.map;
-            };
-            MapUIElement.prototype.getName = function () {
-                return this.name;
-            };
-            return MapUIElement;
-        }(UIElement));
-        ui.MapUIElement = MapUIElement;
         /**
          * duice.ui.SpanFactory
          */
-        ui.SpanFactory = {
-            getSpan: function (element, $context) {
+        var SpanFactory = /** @class */ (function (_super) {
+            __extends(SpanFactory, _super);
+            function SpanFactory() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            SpanFactory.prototype.getInstance = function (element) {
                 var span = new Span(element);
-                // sets mask
-                if (element.dataset.duiceMask) {
-                    var duiceMask = element.dataset.duiceMask.split(',');
-                    var type = duiceMask[0];
-                    var mask;
+                // sets format
+                if (element.dataset.duiceFormat) {
+                    var duiceFormat = element.dataset.duiceFormat.split(',');
+                    var type = duiceFormat[0];
+                    var format;
                     switch (type) {
                         case 'string':
-                            mask = new StringMask();
-                            mask.setFormat(duiceMask[1]);
+                            format = new StringFormat(duiceFormat[1]);
                             break;
                         case 'number':
-                            mask = new NumberMask();
-                            mask.setScale(parseInt(duiceMask[1]));
+                            format = new NumberFormat(parseInt(duiceFormat[1]));
                             break;
                         case 'date':
-                            mask = new DateMask();
-                            mask.setFormat(duiceMask[1]);
+                            format = new DateFormat(duiceFormat[1]);
                             break;
                         default:
-                            throw 'mask type[' + type + '] is invalid';
+                            throw 'format type[' + type + '] is invalid';
                     }
-                    span.setMask(mask);
+                    span.setFormat(format);
                 }
                 // binds
                 var bind = element.dataset.duiceBind.split(',');
-                span.bind(getObject($context, bind[0]), bind[1]);
+                span.bind(this.getContextProperty(bind[0]), bind[1]);
                 return span;
-            }
-        };
+            };
+            return SpanFactory;
+        }(MapUIComponentFactory));
+        ui.SpanFactory = SpanFactory;
         /**
          * duice.ui.Span
          */
@@ -1248,46 +1207,50 @@ var duice;
                 _this.span.classList.add('duice-ui-span');
                 return _this;
             }
-            Span.prototype.setMask = function (mask) {
-                this.mask = mask;
+            Span.prototype.setFormat = function (format) {
+                this.format = format;
             };
             Span.prototype.update = function (map, obj) {
                 removeChildNodes(this.span);
                 var value = map.get(this.name);
                 value = defaultIfEmpty(value, '');
-                if (this.mask) {
-                    value = this.mask.encode(value);
+                if (this.format) {
+                    value = this.format.encode(value);
                 }
                 this.span.appendChild(document.createTextNode(value));
             };
             Span.prototype.getValue = function () {
                 var value = this.span.innerHTML;
                 value = defaultIfEmpty(value, null);
-                if (this.mask) {
-                    value = this.mask.decode(value);
+                if (this.format) {
+                    value = this.format.decode(value);
                 }
                 return value;
             };
             return Span;
-        }(MapUIElement));
+        }(MapUIComponent));
         ui.Span = Span;
         /**
          * duice.ui.InputFactory
          */
-        ui.InputFactory = {
-            getInput: function (element, $context) {
+        var InputFactory = /** @class */ (function (_super) {
+            __extends(InputFactory, _super);
+            function InputFactory() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            InputFactory.prototype.getInstance = function (element) {
                 var input;
                 switch (element.getAttribute('type')) {
                     case 'text':
                         input = new TextInput(element);
                         if (element.dataset.duiceFormat) {
-                            input.setFormat(element.dataset.duiceFormat);
+                            input.setPattern(element.dataset.duiceFormat);
                         }
                         break;
                     case 'number':
                         input = new NumberInput(element);
-                        if (element.dataset.duiceScale) {
-                            input.setScale(parseInt(element.dataset.duiceScale));
+                        if (element.dataset.duiceFormat) {
+                            input.setScale(parseInt(element.dataset.duiceFormat));
                         }
                         break;
                     case 'checkbox':
@@ -1296,11 +1259,11 @@ var duice;
                     case 'radio':
                         input = new RadioInput(element);
                         break;
+                    case 'datetime-local':
                     case 'date':
-                    case 'datetime':
                         input = new DateInput(element);
                         if (element.dataset.duiceFormat) {
-                            input.setFormat(element.dataset.duiceFormat);
+                            input.setPattern(element.dataset.duiceFormat);
                         }
                         break;
                     default:
@@ -1308,10 +1271,12 @@ var duice;
                 }
                 // bind
                 var bind = element.dataset.duiceBind.split(',');
-                input.bind(getObject($context, bind[0]), bind[1]);
+                input.bind(this.getContextProperty(bind[0]), bind[1]);
                 return input;
-            }
-        };
+            };
+            return InputFactory;
+        }(MapUIComponentFactory));
+        ui.InputFactory = InputFactory;
         /**
          * duice.ui.Input
          */
@@ -1321,14 +1286,31 @@ var duice;
                 var _this = _super.call(this, input) || this;
                 _this.input = input;
                 var $this = _this;
+                _this.input.addEventListener('keypress', function (event) {
+                    var inputChars = String.fromCharCode(event.keyCode);
+                    var newValue = this.value.substr(0, this.selectionStart) + inputChars + this.value.substr(this.selectionEnd);
+                    if ($this.validate(newValue) === false) {
+                        event.preventDefault();
+                    }
+                }, true);
+                _this.input.addEventListener('paste', function (event) {
+                    var inputChars = event.clipboardData.getData('text/plain');
+                    var newValue = this.value.substr(0, this.selectionStart) + inputChars + this.value.substr(this.selectionEnd);
+                    if ($this.validate(newValue) === false) {
+                        event.preventDefault();
+                    }
+                }, true);
                 _this.input.addEventListener('change', function (event) {
                     $this.setChanged();
                     $this.notifyObservers(this);
-                });
+                }, true);
                 return _this;
             }
+            Input.prototype.validate = function (value) {
+                return true;
+            };
             return Input;
-        }(MapUIElement));
+        }(MapUIComponent));
         ui.Input = Input;
         /**
          * duice.ui.GenericInput
@@ -1369,23 +1351,32 @@ var duice;
             function TextInput(input) {
                 var _this = _super.call(this, input) || this;
                 _this.input.classList.add('duice-ui-textInput');
-                _this.mask = new StringMask();
+                _this.format = new StringFormat();
                 return _this;
             }
-            TextInput.prototype.setFormat = function (format) {
-                this.mask.setFormat(format);
+            TextInput.prototype.setPattern = function (format) {
+                this.format.setPattern(format);
             };
             TextInput.prototype.update = function (map, obj) {
                 var value = map.get(this.getName());
                 value = defaultIfEmpty(value, '');
-                value = this.mask.encode(value);
+                value = this.format.encode(value);
                 this.input.value = value;
             };
             TextInput.prototype.getValue = function () {
                 var value = this.input.value;
                 value = defaultIfEmpty(value, null);
-                value = this.mask.decode(value);
+                value = this.format.decode(value);
                 return value;
+            };
+            TextInput.prototype.validate = function (value) {
+                try {
+                    this.format.decode(value);
+                }
+                catch (e) {
+                    return false;
+                }
+                return true;
             };
             return TextInput;
         }(Input));
@@ -1399,38 +1390,30 @@ var duice;
                 var _this = _super.call(this, input) || this;
                 _this.input.classList.add('duice-ui-numberInput');
                 _this.input.setAttribute('type', 'text');
-                // key press event
-                var $this = _this;
-                _this.mask = new NumberMask();
-                _this.input.addEventListener('keypress', function (event) {
-                    var inputChars = String.fromCharCode(event.keyCode);
-                    var newValue = this.value.substr(0, this.selectionStart) + inputChars + this.value.substr(this.selectionEnd);
-                    if ($this.mask.validate(newValue) === false) {
-                        event.preventDefault();
-                    }
-                }, true);
-                _this.input.addEventListener('paste', function (event) {
-                    var inputChars = event.clipboardData.getData('text/plain');
-                    var newValue = this.value.substr(0, this.selectionStart) + inputChars + this.value.substr(this.selectionEnd);
-                    if ($this.mask.validate(newValue) === false) {
-                        event.preventDefault();
-                    }
-                }, true);
+                _this.format = new NumberFormat();
                 return _this;
             }
             NumberInput.prototype.setScale = function (scale) {
-                this.mask.setScale(scale);
+                this.format.setScale(scale);
             };
             NumberInput.prototype.update = function (map, obj) {
                 var value = map.get(this.getName());
-                value = this.mask.encode(value);
+                value = this.format.encode(value);
                 this.input.value = value;
             };
             NumberInput.prototype.getValue = function () {
                 var value = this.input.value;
-                value = this.mask.decode(value);
-                console.log('@@@@@@@@@@@@', typeof value);
+                value = this.format.decode(value);
                 return value;
+            };
+            NumberInput.prototype.validate = function (value) {
+                try {
+                    this.format.decode(value);
+                }
+                catch (e) {
+                    return false;
+                }
+                return true;
             };
             return NumberInput;
         }(Input));
@@ -1490,7 +1473,7 @@ var duice;
         }(Input));
         ui.RadioInput = RadioInput;
         /**
-         * duice.ui.DateInput
+         * duice.ui.DatetimeInput
          */
         var DateInput = /** @class */ (function (_super) {
             __extends(DateInput, _super);
@@ -1504,30 +1487,42 @@ var duice;
                 _this.input.addEventListener('click', function (event) {
                     $this.openPicker();
                 }, true);
-                // sets default mask
-                _this.mask = new DateMask();
+                // sets default format
+                _this.format = new DateFormat();
                 if (_this.type === 'date') {
-                    _this.mask.setFormat('yyyy-MM-dd');
+                    _this.format.setPattern('yyyy-MM-dd');
                 }
                 else {
-                    _this.mask.setFormat('yyyy-MM-dd HH:mm:ss');
+                    _this.format.setPattern('yyyy-MM-dd HH:mm:ss');
                 }
                 return _this;
             }
-            DateInput.prototype.setFormat = function (format) {
-                this.mask.setFormat(format);
+            DateInput.prototype.setPattern = function (format) {
+                this.format.setPattern(format);
             };
             DateInput.prototype.update = function (map, obj) {
                 var value = map.get(this.getName());
                 value = defaultIfEmpty(value, '');
-                value = this.mask.encode(value);
+                value = this.format.encode(value);
                 this.input.value = value;
             };
             DateInput.prototype.getValue = function () {
                 var value = this.input.value;
                 value = defaultIfEmpty(value, null);
-                value = this.mask.decode(value);
+                value = this.format.decode(value);
+                if (this.type === 'date') {
+                    value = new DateFormat('yyyy-MM-dd').encode(new Date(value).toISOString());
+                }
                 return value;
+            };
+            DateInput.prototype.validate = function (value) {
+                try {
+                    var s = this.format.decode(value);
+                }
+                catch (e) {
+                    return false;
+                }
+                return true;
             };
             DateInput.prototype.openPicker = function () {
                 // checks pickerDiv is open.
@@ -1723,7 +1718,7 @@ var duice;
                 confirmButton.classList.add('duice-ui-dateInput__pickerDiv-footerDiv-confirmButton');
                 footerDiv.appendChild(confirmButton);
                 confirmButton.addEventListener('click', function (event) {
-                    $this.input.value = $this.mask.encode(date.getTime());
+                    $this.input.value = $this.format.encode(date.toISOString());
                     $this.setChanged();
                     $this.notifyObservers(this);
                     $this.closePicker();
@@ -1813,61 +1808,27 @@ var duice;
         }(Input));
         ui.DateInput = DateInput;
         /**
-         * duice.ui.ImageFactory
+         * duice.ui.SelectFactory
          */
-        ui.ImageFactory = {
-            getImage: function (element, $context) {
-                var image = new Image(element);
-                var bind = element.dataset.duiceBind.split(',');
-                image.bind(getObject($context, bind[0]), bind[1]);
-                return image;
+        var SelectFactory = /** @class */ (function (_super) {
+            __extends(SelectFactory, _super);
+            function SelectFactory() {
+                return _super !== null && _super.apply(this, arguments) || this;
             }
-        };
-        /**
-         * duice.ui.Image
-         */
-        var Image = /** @class */ (function (_super) {
-            __extends(Image, _super);
-            function Image(img) {
-                var _this = _super.call(this, img) || this;
-                _this.img = img;
-                _this.img.classList.add('duice-ui-img');
-                _this.img.addEventListener('error', function () {
-                    console.log('error');
-                });
-                // creates file input
-                _this.input = document.createElement('input');
-                _this.input = document.createElement('input');
-                _this.input.setAttribute("type", "file");
-                _this.input.setAttribute("accept", "image/gif, image/jpeg, image/png");
-                return _this;
-            }
-            Image.prototype.update = function (map, obj) {
-                var value = map.get(this.getName());
-                this.img.src = value;
-            };
-            Image.prototype.getValue = function () {
-                return this.img.src;
-            };
-            return Image;
-        }(MapUIElement));
-        ui.Image = Image;
-        /**
-         * duice.ui.SpanFactory
-         */
-        ui.SelectFactory = {
-            getSelect: function (element, $context) {
+            SelectFactory.prototype.getInstance = function (element) {
                 var select = new Select(element);
                 var option = element.dataset.duiceOption.split(',');
-                var optionList = getObject($context, option[0]);
+                var optionList = this.getContextProperty(option[0]);
                 var optionValue = option[1];
                 var optionText = option[2];
                 select.setOption(optionList, optionValue, optionText);
                 var bind = element.dataset.duiceBind.split(',');
-                select.bind(getObject($context, bind[0]), bind[1]);
+                select.bind(this.getContextProperty(bind[0]), bind[1]);
                 return select;
-            }
-        };
+            };
+            return SelectFactory;
+        }(MapUIComponentFactory));
+        ui.SelectFactory = SelectFactory;
         /**
          * duice.ui.Select
          */
@@ -1921,19 +1882,25 @@ var duice;
                 return defaultIfEmpty(value, null);
             };
             return Select;
-        }(MapUIElement));
+        }(MapUIComponent));
         ui.Select = Select;
         /**
          * duice.ui.TextareaFactory
          */
-        ui.TextareaFactory = {
-            getTextarea: function (element, $context) {
+        var TextareaFactory = /** @class */ (function (_super) {
+            __extends(TextareaFactory, _super);
+            function TextareaFactory() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            TextareaFactory.prototype.getInstance = function (element) {
                 var textarea = new Textarea(element);
                 var bind = element.dataset.duiceBind.split(',');
-                textarea.bind(getObject($context, bind[0]), bind[1]);
+                textarea.bind(this.getContextProperty(bind[0]), bind[1]);
                 return textarea;
-            }
-        };
+            };
+            return TextareaFactory;
+        }(MapUIComponentFactory));
+        ui.TextareaFactory = TextareaFactory;
         /**
          * duice.ui.Textarea
          */
@@ -1958,46 +1925,105 @@ var duice;
                 return defaultIfEmpty(this.textarea.value, null);
             };
             return Textarea;
-        }(MapUIElement));
+        }(MapUIComponent));
         ui.Textarea = Textarea;
         /**
-         * duice.ui.ListUIElement
+         * duice.ui.ImageFactory
          */
-        var ListUIElement = /** @class */ (function (_super) {
-            __extends(ListUIElement, _super);
-            function ListUIElement() {
+        var ImageFactory = /** @class */ (function (_super) {
+            __extends(ImageFactory, _super);
+            function ImageFactory() {
                 return _super !== null && _super.apply(this, arguments) || this;
             }
-            ListUIElement.prototype.bind = function (list, item) {
-                this.list = list;
-                this.item = item;
-                this.list.addObserver(this);
-                this.addObserver(this.list);
-                this.update(this.list, this.list);
+            ImageFactory.prototype.getInstance = function (element) {
+                var image = new Image(element);
+                var bind = element.dataset.duiceBind.split(',');
+                image.bind(this.getContextProperty(bind[0]), bind[1]);
+                return image;
             };
-            ListUIElement.prototype.getList = function () {
-                return this.list;
+            return ImageFactory;
+        }(MapUIComponentFactory));
+        ui.ImageFactory = ImageFactory;
+        /**
+         * duice.ui.Image
+         */
+        var Image = /** @class */ (function (_super) {
+            __extends(Image, _super);
+            /**
+             * Constructor
+             * @param img
+             */
+            function Image(img) {
+                var _this = _super.call(this, img) || this;
+                _this.img = img;
+                _this.img.classList.add('duice-ui-img');
+                _this.img.addEventListener('error', function () {
+                    console.log('error');
+                });
+                var $this = _this;
+                // adds click event
+                _this.img.addEventListener('click', function () {
+                    $this.input.click();
+                });
+                // creates file input element
+                _this.input = document.createElement('input');
+                _this.input.setAttribute("type", "file");
+                _this.input.setAttribute("accept", "image/gif, image/jpeg, image/png");
+                _this.input.addEventListener('change', function (e) {
+                    var fileReader = new FileReader();
+                    if (this.files && this.files[0]) {
+                        fileReader.addEventListener("load", function (event) {
+                            var value = event.target.result;
+                            $this.img.src = value;
+                            $this.setChanged();
+                            $this.notifyObservers($this);
+                        });
+                        fileReader.readAsDataURL(this.files[0]);
+                    }
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+                return _this;
+            }
+            /**
+             * Updates image instance
+             * @param map
+             * @param obj
+             */
+            Image.prototype.update = function (map, obj) {
+                var value = map.get(this.getName());
+                this.img.src = value;
             };
-            ListUIElement.prototype.getItem = function () {
-                return this.item;
+            /**
+             * Return value of image element
+             * @return base64 data or image URL
+             */
+            Image.prototype.getValue = function () {
+                return this.img.src;
             };
-            return ListUIElement;
-        }(UIElement));
-        ui.ListUIElement = ListUIElement;
+            return Image;
+        }(MapUIComponent));
+        ui.Image = Image;
         /**
          * duice.ui.TableFactory
          */
-        ui.TableFactory = {
-            getTable: function (element, $context) {
+        var TableFactory = /** @class */ (function (_super) {
+            __extends(TableFactory, _super);
+            function TableFactory() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            TableFactory.prototype.getInstance = function (element) {
                 var table = new Table(element);
                 if (element.dataset.duiceEditable) {
                     table.setEditable(element.dataset.duiceEditable === 'true');
                 }
                 var bind = element.dataset.duiceBind.split(',');
-                table.bind(getObject($context, bind[0]), bind[1]);
+                table.bind(this.getContextProperty(bind[0]), bind[1]);
                 return table;
-            }
-        };
+            };
+            return TableFactory;
+        }(ListUIComponentFactory));
+        ui.TableFactory = TableFactory;
         /**
          * duice.ui.Table
          */
@@ -2017,14 +2043,14 @@ var duice;
                 if (caption) {
                     caption.classList.add('duice-ui-table__caption');
                     caption = executeExpression(caption, new Object());
-                    initialize(caption, new Object());
+                    initializeComponent(caption, new Object());
                 }
                 // initializes head
                 var thead = _this.table.querySelector('thead');
                 if (thead) {
                     thead.classList.add('duice-ui-table__thead');
                     thead = executeExpression(thead, new Object());
-                    initialize(thead, new Object());
+                    initializeComponent(thead, new Object());
                 }
                 // clones body
                 var tbody = _this.table.querySelector('tbody');
@@ -2036,7 +2062,7 @@ var duice;
                 if (tfoot) {
                     tfoot.classList.add('duice-ui-table__tfoot');
                     tfoot = executeExpression(tfoot, new Object());
-                    initialize(tfoot, new Object());
+                    initializeComponent(tfoot, new Object());
                 }
                 return _this;
             }
@@ -2054,7 +2080,7 @@ var duice;
              */
             Table.prototype.update = function (list, obj) {
                 // checks changed source instance
-                if (obj instanceof duice.data.Map) {
+                if (obj instanceof duice.Map) {
                     return;
                 }
                 var $this = this;
@@ -2122,7 +2148,7 @@ var duice;
                 $context['index'] = index;
                 $context[this.item] = map;
                 tbody = executeExpression(tbody, $context);
-                initialize(tbody, $context);
+                initializeComponent(tbody, $context);
                 return tbody;
             };
             /**
@@ -2144,13 +2170,17 @@ var duice;
                 return emptyTbody;
             };
             return Table;
-        }(ListUIElement));
+        }(ListUIComponent));
         ui.Table = Table;
         /**
          * duice.ui.UListFactory
          */
-        ui.UListFactory = {
-            getUList: function (element, $context) {
+        var UListFactory = /** @class */ (function (_super) {
+            __extends(UListFactory, _super);
+            function UListFactory() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            UListFactory.prototype.getInstance = function (element) {
                 var uList = new UList(element);
                 if (element.dataset.duiceHierarchy) {
                     var hirearchy = element.dataset.duiceHierarchy.split(',');
@@ -2163,15 +2193,21 @@ var duice;
                     uList.setEditable(Boolean(element.dataset.duiceEditable));
                 }
                 var bind = element.dataset.duiceBind.split(',');
-                uList.bind(getObject($context, bind[0]), bind[1]);
+                uList.bind(this.getContextProperty(bind[0]), bind[1]);
                 return uList;
-            }
-        };
+            };
+            return UListFactory;
+        }(ListUIComponentFactory));
+        ui.UListFactory = UListFactory;
         /**
          * duice.ui.UList
          */
         var UList = /** @class */ (function (_super) {
             __extends(UList, _super);
+            /**
+             * Constructor
+             * @param ul
+             */
             function UList(ul) {
                 var _this = _super.call(this, ul) || this;
                 _this.lis = new Array();
@@ -2182,8 +2218,13 @@ var duice;
                 _this.li = li.cloneNode(true);
                 return _this;
             }
-            UList.prototype.setHierarchy = function (name, parentName) {
-                this.hierarchy = { name: name, parentName: parentName };
+            /**
+             * Sets hierarchy function options.
+             * @param idName
+             * @param parentIdName
+             */
+            UList.prototype.setHierarchy = function (idName, parentIdName) {
+                this.hierarchy = { idName: idName, parentIdName: parentIdName };
                 this.ul.classList.add('duice-ui-ul--hierarchy');
                 // add root event
                 var $this = this;
@@ -2202,21 +2243,34 @@ var duice;
                     event.stopPropagation();
                     var fromIndex = parseInt(event.dataTransfer.getData('text'));
                     var fromMap = $this.list.get(fromIndex);
-                    fromMap.set($this.hierarchy.parentName, null);
+                    fromMap.set($this.hierarchy.parentIdName, null);
                     $this.ul.classList.remove('duice-ui-ul--hierarchy-dragover');
                     $this.setChanged();
                     $this.notifyObservers(this);
                 });
             };
+            /**
+             * Sets foldable flag.
+             * @param foldable
+             */
             UList.prototype.setFoldable = function (foldable) {
                 this.foldable = foldable;
             };
+            /**
+             * Sets editable flag.
+             * @param editable
+             */
             UList.prototype.setEditable = function (editable) {
                 this.editable = editable;
             };
+            /**
+             * Updates instance
+             * @param list
+             * @param obj
+             */
             UList.prototype.update = function (list, obj) {
                 // checks changed source instance
-                if (obj instanceof duice.data.Map) {
+                if (obj instanceof duice.Map) {
                     return;
                 }
                 // initiates
@@ -2229,7 +2283,7 @@ var duice;
                     var path = [];
                     // checks hierarchy
                     if (this.hierarchy) {
-                        if (isNotEmpty(map.get(this.hierarchy.parentName))) {
+                        if (isNotEmpty(map.get(this.hierarchy.parentIdName))) {
                             continue;
                         }
                     }
@@ -2248,6 +2302,11 @@ var duice;
                     }
                 }
             };
+            /**
+             * Creates LI element reference to specified map includes child nodes.
+             * @param index
+             * @param map
+             */
             UList.prototype.createLi = function (index, map) {
                 var $this = this;
                 var li = this.li.cloneNode(true);
@@ -2256,7 +2315,7 @@ var duice;
                 $context['index'] = index;
                 $context[this.item] = map;
                 li = executeExpression(li, $context);
-                initialize(li, $context);
+                initializeComponent(li, $context);
                 this.lis.push(li);
                 li.dataset.duiceIndex = String(index);
                 // sets index
@@ -2293,14 +2352,14 @@ var duice;
                     var childUl = document.createElement('ul');
                     childUl.classList.add('duice-ui-ul');
                     var hasChild = false;
-                    var hierarchyValue = map.get(this.hierarchy.name);
+                    var hierarchyIdValue = map.get(this.hierarchy.idName);
                     for (var i = 0, size = this.list.getSize(); i < size; i++) {
                         var element = this.list.get(i);
-                        var hierarchyParentValue = element.get(this.hierarchy.parentName);
-                        if (isEmpty(hierarchyParentValue) === true) {
+                        var hierarchyParentIdValue = element.get(this.hierarchy.parentIdName);
+                        if (isEmpty(hierarchyParentIdValue) === true) {
                             continue;
                         }
-                        if (hierarchyParentValue === hierarchyValue) {
+                        if (hierarchyParentIdValue === hierarchyIdValue) {
                             var childLi = this.createLi(i, element);
                             childLi.classList.add('duice-ui-ul__li--indent');
                             childUl.appendChild(childLi);
@@ -2338,6 +2397,10 @@ var duice;
                 // return node element
                 return li;
             };
+            /**
+             * Returns specified index is already creates LI element.
+             * @param index
+             */
             UList.prototype.isLiCreated = function (index) {
                 for (var i = 0, size = this.lis.length; i < size; i++) {
                     if (parseInt(this.lis[i].dataset.duiceIndex) === index) {
@@ -2346,26 +2409,41 @@ var duice;
                 }
                 return false;
             };
+            /**
+             * Return specified map is fold.
+             * @param map
+             */
             UList.prototype.isFoldLi = function (map) {
-                if (this.foldName[map.get(this.hierarchy.name)] === true) {
+                if (this.foldName[map.get(this.hierarchy.idName)] === true) {
                     return true;
                 }
                 else {
                     return false;
                 }
             };
+            /**
+             * folds child nodes
+             * @param map
+             * @param li
+             * @param fold
+             */
             UList.prototype.foldLi = function (map, li, fold) {
                 if (fold) {
-                    this.foldName[map.get(this.hierarchy.name)] = true;
+                    this.foldName[map.get(this.hierarchy.idName)] = true;
                     li.classList.remove('duice-ui-ul__li--unfold');
                     li.classList.add('duice-ui-ul__li--fold');
                 }
                 else {
-                    this.foldName[map.get(this.hierarchy.name)] = false;
+                    this.foldName[map.get(this.hierarchy.idName)] = false;
                     li.classList.remove('duice-ui-ul__li--fold');
                     li.classList.add('duice-ui-ul__li--unfold');
                 }
             };
+            /**
+             * Modes map element from index to index.
+             * @param fromIndex
+             * @param toIndex
+             */
             UList.prototype.moveLi = function (fromIndex, toIndex) {
                 // checks same index
                 if (fromIndex === toIndex) {
@@ -2376,8 +2454,12 @@ var duice;
                 var toMap = this.list.get(toIndex);
                 // moving action
                 if (this.hierarchy) {
+                    // checks circular reference
+                    if (this.isCircularReference(toMap, fromMap.get(this.hierarchy.idName))) {
+                        throw 'Not allow to movem, becuase of Circular Reference.';
+                    }
                     // change parents
-                    fromMap.set(this.hierarchy.parentName, toMap.get(this.hierarchy.name));
+                    fromMap.set(this.hierarchy.parentIdName, toMap.get(this.hierarchy.idName));
                     // notifies observers.
                     this.setChanged();
                     this.notifyObservers(this);
@@ -2387,8 +2469,39 @@ var duice;
                     this.list.move(fromIndex, toIndex);
                 }
             };
+            /**
+             * Gets parent map
+             * @param map
+             */
+            UList.prototype.getParentMap = function (map) {
+                var parentIdValue = map.get(this.hierarchy.parentIdName);
+                for (var i = 0, size = this.list.getSize(); i < size; i++) {
+                    var element = this.list.get(i);
+                    if (element.get(this.hierarchy.idName) === parentIdValue) {
+                        return element;
+                    }
+                }
+                return null;
+            };
+            /**
+             * Returns whether circular reference or not
+             * @param map
+             * @param idValue
+             */
+            UList.prototype.isCircularReference = function (map, idValue) {
+                var parentMap = map;
+                while (true) {
+                    parentMap = this.getParentMap(parentMap);
+                    if (parentMap === null) {
+                        return false;
+                    }
+                    if (parentMap.get(this.hierarchy.idName) === idValue) {
+                        return true;
+                    }
+                }
+            };
             return UList;
-        }(ListUIElement));
+        }(ListUIComponent));
         ui.UList = UList;
         /**
          * new duice.dialog.Blocker(this.div).block().unblock();
@@ -2740,6 +2853,17 @@ var duice;
             return Dialog;
         }(Modal));
         ui.Dialog = Dialog;
+        /**
+         * Adds components
+         */
+        duice.ComponentDefinitionRegistry.add(new ComponentDefinition('table', 'duice-ui-table', duice.ui.TableFactory));
+        duice.ComponentDefinitionRegistry.add(new ComponentDefinition('ul', 'duice-ui-ul', duice.ui.UListFactory));
+        duice.ComponentDefinitionRegistry.add(new ComponentDefinition('*', 'duice-ui-scriptlet', duice.ui.ScriptletFactory));
+        duice.ComponentDefinitionRegistry.add(new ComponentDefinition('span', 'duice-ui-span', duice.ui.SpanFactory));
+        duice.ComponentDefinitionRegistry.add(new ComponentDefinition('input', 'duice-ui-input', duice.ui.InputFactory));
+        duice.ComponentDefinitionRegistry.add(new ComponentDefinition('select', 'duice-ui-select', duice.ui.SelectFactory));
+        duice.ComponentDefinitionRegistry.add(new ComponentDefinition('textarea', 'duice-ui-textarea', duice.ui.TextareaFactory));
+        duice.ComponentDefinitionRegistry.add(new ComponentDefinition('img', 'duice-ui-img', duice.ui.ImageFactory));
     })(ui = duice.ui || (duice.ui = {})); // end of duice.ui
 })(duice || (duice = {})); // end
 /**
@@ -2749,5 +2873,5 @@ document.addEventListener("DOMContentLoaded", function (event) {
     var $context = typeof self !== 'undefined' ? self :
         typeof window !== 'undefined' ? window :
             {};
-    duice.ui.initialize(document, $context);
+    duice.initializeComponent(document, $context);
 });

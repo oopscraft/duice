@@ -2,16 +2,22 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=2048,initial-scale=1">
 <title>duice</title>
 <link rel="stylesheet" type="text/css" href="polyfill/normalize.css">
 <script src="polyfill/dataset.js"></script>
+<script src="polyfill/classList.js"></script>
 <script src="duice.js"></script>
 <link rel="stylesheet" type="text/css" href="duice.css">
+<!-- suneditor -->
+<script src="plugin/duice-plugin-suneditor.js"></script>
+<script src="plugin/suneditor/suneditor.min.js"></script>
+<link rel="stylesheet" type="text/css" href="plugin/suneditor/css/suneditor.min.css">
 <script>
 /**
- * user(duice.data.Map)
+ * user(duice.Map)
  */
-var user = new duice.data.Map();
+var user = new duice.Map();
 user.fromJson({
 	id: 'rabbit',
 	parentId: null,
@@ -21,8 +27,8 @@ user.fromJson({
 	balance: 1000,
 	active: true,
 	gender: 'F',
-	hireDate: 1576647474398,
-	birthday: 854636400000,
+	hireDate: '2020-01-05T08:16:18.643Z',
+	birthday: '1996-12-24',
 	score: 20,
 	groupId: 'animal',
 	profile: 'I am Bunny',
@@ -37,9 +43,9 @@ user.fromJson({
 });
 
 /**
- * groups(duice.data.List) for select options
+ * groups(duice.List) for select options
  */
-var groups = new duice.data.List();
+var groups = new duice.List();
 groups.fromJson([
 	{id:"fruit", name:"Fruit"},
 	{id:"animal", name:"Animal"},
@@ -47,21 +53,21 @@ groups.fromJson([
 ]);
 
 /**
- * users(duice.data.List)
+ * users(duice.List)
  */
-var users = new duice.data.List();
+var users = new duice.List();
 users.fromJson([
     {
         id: 'rabbit',
-        parentId: null,
+        parentId: 'tiger',
         password: 'abcd1234!@#$',
         name: 'Rabbit',
     	image:'data:image/png;base64,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',
         balance: 1000,
         active: true,
         gender: 'F',
-        hireDate: 1576647474398,
-        birthday: 854636400000,
+    	hireDate: '2020-01-05T08:16:18.643Z',
+    	birthday: '1996-12-24',
         score: 20,
         groupId: 'animal',
         profile: 'I am Bunny',
@@ -83,8 +89,8 @@ users.fromJson([
         balance: 1200,
         active: true,
         gender: 'M',
-        hireDate: 1576647474398,
-        birthday: 854636400000,
+    	hireDate: '2020-01-05T08:16:18.643Z',
+    	birthday: '1996-12-24',
         score: 20,
         groupId: 'fruit',
         profile: 'I am Bunny',
@@ -106,8 +112,8 @@ users.fromJson([
         balance: 1000,
         active: false,
         gender: 'F',
-        hireDate: 1576647474398,
-        birthday: 854636400000,
+    	hireDate: '2020-01-05T08:16:18.643Z',
+    	birthday: '1996-12-24',
         score: 20,
         groupId: 'fruit',
         profile: 'I am Bunny',
@@ -122,15 +128,15 @@ users.fromJson([
     },
     {
         id: 'tom',
-        parentId: null,
+        parentId: 'james',
         password: 'abcd1234!@#$',
         name: 'Tom',
         image: 'data:image/png;base64,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',
         balance: 1000,
         active: true,
         gender: 'F',
-        hireDate: 1576647474398,
-        birthday: 854636400000,
+    	hireDate: '2020-01-05T08:16:18.643Z',
+    	birthday: '1996-12-24',
         score: 20,
         groupId: 'human',
         profile: 'I am Bunny',
@@ -145,15 +151,15 @@ users.fromJson([
     },
     {
         id: 'tiger',
-        parentId: null,
+        parentId: 'lion',
         password: 'abcd1234!@#$',
         name: 'Tiger',
         image: 'data:image/png;base64,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',
         balance: 1000,
         active: false,
         gender: 'M',
-        hireDate: 1558157874449,
-        birthday: 694278000452,
+    	hireDate: '2020-01-05T08:16:18.643Z',
+    	birthday: '1996-12-24',
         score: 20,
         groupId: 'animal',
         profile: 'I am Bunny',
@@ -175,8 +181,8 @@ users.fromJson([
         balance: 1000,
         active: true,
         gender: 'F',
-        hireDate: 1499405874159,
-        birthday: 854636400000,
+    	hireDate: '2020-01-05T08:16:18.643Z',
+    	birthday: '1996-12-24',
         score: 20,
         groupId: 'human',
         profile: 'I am Bunny',
@@ -198,8 +204,8 @@ users.fromJson([
         balance: 1000,
         active: true,
         gender: 'F',
-        hireDate: 1576647474398,
-        birthday: 854636400000,
+    	hireDate: '2020-01-05T08:16:18.643Z',
+    	birthday: '1996-12-24',
         score: 20,
         groupId: 'animal',
         profile: 'I am Bunny',
@@ -214,15 +220,15 @@ users.fromJson([
     },
     {
         id: 'banana',
-        parentId: null,
+        parentId: 'no parent',
         password: 'abcd1234!@#$',
         name: 'Banana',
         image: 'data:image/png;base64,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',
         balance: 1000,
         active: false,
         gender: 'F',
-        hireDate: 1576647474398,
-        birthday: 719161200572,
+    	hireDate: '2020-01-05T08:16:18.643Z',
+    	birthday: '1996-12-24',
         score: 20,
         groupId: 'fruit',
         profile: 'I am Bunny',
@@ -237,15 +243,15 @@ users.fromJson([
     },
     {
         id: 'scott',
-        parentId: 'tom',
+        parentId: 'james',
         password: 'abcd1234!@#$',
         name: 'Scott',
         image: 'data:image/png;base64,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',
         balance: 1000,
         active: true,
         gender: 'M',
-        hireDate: 1576647474398,
-        birthday: 854636400000,
+    	hireDate: '2020-01-05T08:16:18.643Z',
+    	birthday: '1996-12-24',
         score: 20,
         groupId: 'human',
         profile: 'I am Bunny',
@@ -260,15 +266,15 @@ users.fromJson([
     },
     {
         id: 'monkey',
-        parentId: 'lion',
+        parentId: 'tiger',
         password: 'abcd1234!@#$',
         name: 'Monkey',
         image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAFtJJREFUeJztmnmQXMd93z/d/Y6Z2dmdPWZ2sYtjF+ACi4MkCJ6iBICRKNGkZVFRSodtRq7ETuxEDl2JHcflsitHRSpXVC5ZscqOIlckmXJSiiu2JUcHpVgKKRAHKR4AQQKLJQhgsVjsvTOzc7+jO3+8N7OziwUFkZD+CbvqV91v9013f7/9+/36179+8HZ5u7xd3i5vl/9/i/hpD/jA/ky3qXk7jRQ9ApMGMIiy0CYvks5rT58qFn6a8/mJE3BoX2IroXhUIN6H0YeMkL1vOCGjlxHyiMZ8VwX87dPna1d+kvP7SREgDu1KPioU/8oYcTjVkfB3bs5ZO4aysq+3i+7OTlzHwbYUAH4Q0mg0KJTLLC4XmbyyFE5MzetKo2FJYZ4KNH909FztG4C56RO92R0e3NPxoNL6j7Gs3Xft3saB3dvl4EAOdEi9vIhfWcGvlwiDBiYMokkoC8tOYLlp7I4Mic4sCMn0zBwnxy/pFyemENo/42v1+NFzladu5nxvGgH3jvZ2Je3a5xDq4/fvHzXv2D8mE5aktDBJef4S9ZV5MBohokFF++gmWloDGANIRaKrn3T/CJ25YepewNGXxvVzr1wQ6PBLvkn9y2Pnlko3Y943hYAH9rqjGPmdTdnuLY+++16nO+2yNHma0ux5jA4RAiSsghfXDtwE36x1XAtp0TW0k75tt7FcrPK17z/XWMgXJ3WoHz4y0bj4Vuf+lgl4156OfQp9bP/oSMdDhw+o8twFFi++hAk9BAIpVgG3t9tJuAb8NW2DsFxyO+4klR3h20eeD05PTJaVse9/eqI8/lbmr97Kjw/udHcoo4/fe+to54P3365mJ06wdPlVAiOo4VITLjVcfGNhhMAW+loSmizEdYigikPFuFSNSwMb3yjQAZXFywRelQMH7pF+3bNnlhd/fihn/+WVxaD4Uyfg4VHcQNpP7du1bfOD9++3ps8cobg0S1llKJsEdipDbtNmurqzaOWyXNWUTAJjDEkZRESw6gsMUAgTLJouasYl0zdAX24Qt6OLqm9YCRShdAlKC3jlJW47cI9cKlbc4nLxPX0j4RdnZtBvBof1ZgmoyuQnu7vTo+995x3W3Gs/ZLmQpyK62LVzL/ffd5jevn5E267l+x5nz53h6DN/x4xXZdBawRLRnAMtmdVdGDvFg4ffy9ie27BtJ/qhkIBgcXGeE8e+z2sTZ/CXF1Hnn+ehd91hTc8X94bl8r+D2u+/GRxvygcc3Onu0EpNfPyRd6oOWebyxClqqoOfffiDjI3tI/Qq6EYFE3pNT4a0HESii0qtwde//j9Zyc+zRRVAwJUgQ1fPAB/6+79AKpVE1woYv44xISARtotMdKLcLs6On+bJb/0VqbDMtrE7KfoJ/vJbJ3zj6FuOvFqf+nGxvCkT2D7gfHb71tytd+3Zri6fOU6FFI88/Ci7do4RlBcIaysReB2CCSEMMEGdsFHCTaTYtWsfZ86doeRpKtrFTmX42Ic/TsIS+MWrGL+G0SEYDUZjQj8i1KswsHkH3b1Zzr7+On5xhm2j+7iynNellWr35GLwv28aAe+7nY7B7uTDIzn7oW297q7tPdby5HKwcu9ob5dlwife9459jqnMsbhSZvfYPu69536C0hzGq2GMjsDrCECTCBOG6EYZp6OboYFNvHRmHM9IPvSBD5Hp6sIrXIEwaAGPtgYTtTEQ+mivysDmUQrFZeYWF0goQbYvp8YvzOzZNRR89sIc/qF9ia3bss4Hh7PW4W1Zpz837F+ZmcHfCOdGPkAcHEs+3vD4pBSiE0BIg5bCHN6VfMIo74STSDDY38vrp04TonjnOw4RVgvoRiWOZAymOXna62hLC0rzDGzazO6dY0ilGOgfxF+ZwwQNBALT9IxCtGohBAaB0QFBZZGD73wP5869wuLsJCP7DuJarlX3xC8cHjMPmFA8FvlYgQBSlUTx4C7xu89M1D7PunB6PQHy0Fjyy1LKf7hz0BHbcw4djsDXkqvFQJy+UH2socN/MNKXUaHfoOaH3DI6RiqZxMtfjlc6WjHTBN4GPoJvCCt5pOXy0LsfAiCsFggry23hoVhti3YiJAhBWF4gndvFLTvGuHT+ZYwO2DqYEa9NzX/GtVTytuGEGOyxsRVUPMHFeS8zMVP700N7EgeOnK3/WjsJa0zg0J7U71mIf/He25JqtN8i8D2mlhrMF3yEgN1bE/LKoufsHd0sO22fpUKBe++6j54OF11biew2Vn1jwjYzaKtj9db1FcLqMmFlCV0rtKm9XmcCG7S1RlgJpOUy8fp5MukOPC3l1bll5+BYUlUaAQvFBtVGg+5EyHA2wUC3w4U5f/9Izq5PLvpHWyvebBzc7ezShn9/aI9j9XQIxq+UOHYhZKZkYSc6KdYkJy9W0SDSSYdqeQVtINeXQ9crmNDHhEEsfmTLOozJliAVSBuUjVBOJMKKJH5G2dE7UsVTM1EfcZ/t/Yf1FfqyA2hjqJaKdCRdDIhTUw3Kvovd0cd00eL4Bc2FmTy9HZLDuzusMORTh3a5268xAUuq3+/PSL0p46jXrpaZKjp87ME7uX9sCKF9kA7nrub5j1/5v7iujVduIJVFRzKBLhXik52J1FVKQCJilV1jyzRVu6nutExERIaz1ncYEzlVmqtvMAh0o0K6O4tUFg2/get2Emj4zY+8mx0jm5FOilA5fO/Ey3z9/xxBmDxbtwww0FvXC0X9u8Cvtgh4YJhEoMVH9w7YdqHiMZm3+JVHD3LbSBbj16MVshKMDm+JpqsN2oQoZWFJ8EM/sk/ZBB2JECJaSdEEvx54+2kgqkXsKFf9x1r1N7EJEPooKbBsB6115HSBrbmOWFs8LMvmkb93H24yxd9887v0dVfYM5hyFgv+Y3fdxa+/8AK+BAiTifsURvR0Okwtheza1s/tOwYwQQRMWC7CdnETaYQUNDwPKS0QAiMUQtkIy47qpno3xbL59vNTPP4nT/G5vz2Fp2OVt1yE5cTiIpRDPVB89msnefxPnuK7L03Hfa7rLx4LFZ0vQERa4Hk4SiFNiAn8Nab44DvvJtPVxdWlGn2ZJMYIJ1FJ3tXSAIG4tcsxAVI5hbrkPXu2RyqtA4SdRFgO0nIRVoJ0wqVa9+hIJdBhhUZosO0EBN4GGiD5qyPn+I3PfaflaF+dXOYLv/1o2+rTWv1f/8Nv8Z3nzgPwtaMT/Nff/Fl+7h2j6xyjipygncQLIQx8LKubatmnI+kglBsB15EPMjpEGM29dx/g6DNPIZRF2taNUiBvA07IeOyc5WAFoabmaTb1pDE6AGm1Me8iLJeRzZtYLJRJpTOEgUe5WkO6aYSyYg1YK//5r3+4BuY3jk9wca4ca0EsyuHclWILfLN87m+e37BPoSxUopNypUoYeKQ6u1nKlxge7Iu0QweYMAJv4t2nVCpTqBq0EZQD2SHgC2t2geg8Hj2K5lYjrUiaA1su24e3srRSx3YSKCGYm59DJTIRILlWZY20eX16mfVlYrrYAt4k4vzMtSfaiStL15pAPIZK9jI7N42lBJZls1iss31zf7SLCBltwy2/YehIJeJeZRPvkdUnwYLnESAVriVZLJSi9JVUCGWBtOLty2b/3j3MLq1QbQTYtmL8tTMIN410Eghlt94TykZaLj2dqWuA5XozbX4gsv9sT+aa97Ld6Zgoe03f0k0hk12cPfsyjmVRrnnM50vcNjqCkAqEagFvOtOE49CVVGgEKaUrQvBEGwHmdMUTVhhChxNy8vx0bMcqsmWpYk2wuH3fHqQQTM8vk8n0MjM9xWIhj+rIXaOq0rL56PsOrAF1y5Ycd916yzUacO/tOxke7Fvz7kcePLChCVjpTSwsLTJ7dZKuTJYr88vYlmTPLVtXd5+2KNQYzQ9PniahAoJQUwmka4Q53SKgw68/Gwqh82WPXMbh1PkZLs0X4+1LtoliemaBIAwxTifpzl6M0Tx74geojl6kk2ozGQekze/98vv58IN34liK23du4c8/+U+x7MQ1PsBxk3zlU7/KraObcWyLn/+Ze/jXH/8ZaJmVjZAW0k2jOrMcP/79SLU7uzF2J54fMruYj6lb62BfOvMaV+cWyfV2slioIYzxaqnai2vePLwr+eW+bucX7xvrsycuzVHTLv/kA4fYPXpLNKibZq5Y47c+9Rlyvb0cvHWI2alxhJXkQx/5ZbZuvQV/5Wp8/lexKspW3VqZOMGxmguLSyv4aapubL/xsdg0j9ZC4vSNMHX5df76q/8F49cY3LaHp16+QiGf5z994oP0ODqKOxKdvHxxji997e/ocUNu2T7MsVeveIWS/6UfjFf/2RoCHtjrjgZajd+7s0f1dCjOTy2x0pBszvUyNJBjpdrg5PhFQhQ/d3AvxfkLCOXw0cc+Qa4vR1heiHMfCmKTWUuAWiWgGRmuZWD1IGVM69ywSkDbtiYlVmaIxaUFvvqVz2J8j67cCN88Oo4lQ/Zvz9KRTDK1UGAhX6InqdkxvIWlYp0Xzi34gdI7j5+tT0LbYWhyIVze0W/7s0veA7lslxzqz2CJgOJKhdmlPCuVCvlywN27B3GoUq/X+dgvfoL+bD9BeSECGztMIe14C41FtsuqP5FSrRImFEJIRNPvCLEaShNHkRAdi43G1FdI9w4yvH0vp146iiUN6XSKydkVMAEL+RWM9tmcTbJ18xDFasDzE/OhIfydY+P1J5u415wGJxf8o9v61LbppeqdRlj09fXS35eht7ebq4s10Jq7dw+RX57j8OFH2LXnDoLSPK9NXuXliYssFioE2uAmkzhOItICuY6EuC1bZDTNRSHaAinRBtwYqDYaTM8uMHFpmolLlxkZGkA3SmQGhrEsi4nxUwxtGuDi9DJCOezeMUS2J4N0Org0U+SVC/MYbT7/zLnav23HvFFOUBwaS/6axvyBFLK7/R+3j/SwJZukUa/wz3/jPyCDGtqroBEsLFeYml9kZn6JWsPHTSTo7emhr6eHTKab7u5uOtOd2G6i5QdE7AdMm/37jTqlcol8vkChkGc5n2c5v4zv+yQTNkPZPrZsyjLQm8boEJXMoJ1O/vjTv0W6s5vJuSqvXs5j2tMeRi8j5b85crb6RX5EQgTAHDlX+/wDw3xZJ1IPgBkRmKwR8pODvUnqtRK7du/HdpP41UUQEiUtBgeyDA5tQiNZzJeYXVxmdnGJF06fYblYxPdD/MDHUhbKcbClRMg4KNEaPwzxPQ+jNZZlYduK3kyGoYEcO3fsYFOuh2xPZxSkhUHkE4QhrBVxOwcY3rKF6ZlZNvWmeGUShNC/Y7QoCiEvpML6D548R2MDrNdPiz89SR2q3wE4OJZ83JWmlkgmko3aCkNbRqJ42xiEFGtOgkpabOrPMTg4FNu3TRBq8isliqUKpVKFcq1OvV6j4XsgBK5lk0wm6Ugk6OzsoDuTpjudxlIStB+FtKEfO8IAIyWYyEyMNpjQYyC3icvTV+hKJlAYLzCy8My56heuh+9HErCmCIZdSwshFFpr0unuKFHRds5vprLWePrYlm03wcBAmk2DTZ+gWs4uVgFMnDRFR6trdAChjxEShG71ZVg3phCYMKAjlUZrg5QWCUdTrsuRG4F2gxcjIi0FUse2aikVpy7akhxtiQ/RTkxr/4/bMvb0KsoGARgTIEJAGoyRq0nQ9l2gCV6sjmlaxBuUUlECyRikQQkp0jeCTP7oVwBDTRuM0RohonyAEDf2059KkRa+7yEE6DBEQ4gx1Rv66Q0NIPRUIxDa9xtIIcgvzyMsl2bw0kpjtafErwls4nYzYRoGmNCLLlDCIDIBvZoAXY0GN+pzbepM2gmWC3mEkPh+g3ooDYIbuiW60WV8wdMyWa3WMEJy4fyZeE93VidF+32AXgu+eTHSdGJt4FclaNk/cUZ5w74wa8aUdgohFZenpzBCUqnWCLVwBebFm0ZAOqifwJjqbL6K5XYwPX2JUmERmehanaSO83VtMXyUJo9XN2w6Nz8G7GMCL5I4h2d05OlNrBERIeHaa7JmTjAmRHX0UFiaJV/I47gp5vJVjDblSkf9+ZtGwJPnaRjNVyeX6h4IpJQ8e/y7qGRXdE434erEWhNuZmSC1X079GOwPjpYXX3dIsGP3mn7TXtfq3cOUZZH2glUspvjT38DKSUhMDVX9yXiL154YeOrsDdFAICx5GcaHvbMfBHLSXHyhWPMTV/A6toUJ2/jCZvmPWDQtqWtAjdhtOqEHiZoYIJG3PZWNSP0W9rQNJmI5FUzAoHds5Wrl8d5+eRxLDvF1fkV6kYoLYM/ulFcN3w7PLXoL2zrs7bmS8FtQ9mUkhgmxk9y6/77SHRl0Y0yzfx+exGw6iDXp7ebZLVukVZPfMS+YNWUwlX/ICROdoRqZYW/+G+fRmtDYBSnLxQDo/mzI+fqT9x0AgByfYljQgf/qFTyE0O5Tuk3apw7+yK7991NIjOA8WqgfYjDlfUXHGuuuLReA442EswaMppERM/CcnGzI5RLKzzxZ5+iXqsirAQvnV8Oa6GZLxXlx2bLXp1rluLNE6AAB0jMLHkml7ZOaMNjdc+X2d608KplTp08xpYtw/QM7UQoC+3XVy9KWbvytDmxpga0wJt2AtpWXUerbnX2Y2eGuHLhDP/9S5+mVq0i7CTjk0WzUA39UjX88Knp2jRRgNe8X3vDT2feiAAZA28Xd6YYLvd2qTP1hvlAxfPI9qRF6DV45dSzlAvzDG0bI9U7FGWFdYgJG1GC9ZoLznCVhKZqr9GC6G/CTmKnc9jdg1RrVb73jT/ne0/+L4JAg3I5O7Vi5vN+UK7rX3n5cuPFNuAybisiS9yQiOt9ImPFYscd2G1/swBr75D7rr4u+adpy7L3bk9bCQuE8TEI7rjzfg7c826ygyMIIdB+PfrkpenkdLxrxFfmxMmPKAttR3lCO4W0kyBg4epFXnzue5x+8RhaG4S0qQVw5lI5KDcCb6EcfGL8qv8sEAB+XG8k/noiNiJArQNrX6dtbe1TO7b1OX+Iktt3DiTUUG8So/3oegpDZ2eGfbffw7aRPWQHtpLO9MXJj/ZvAJocRDG9DkPKK0sszE4xdWmcV0+doFQqxrG/jZEWV5eqXJxvaN/X5ycXvd++WggvbwB0o3bzueUfrkfA9UCv1wTbskjcujnxS522/MeOLdk+mLT7Mw5CGAK/gZLN4wpIadHV1UOmu5dEKo3juqA1vu9TrZZYKeZZKS6jddg66oaApdwo6VL0uDRbCxqe1iue/uKrV+v/IwhoXAfkG7VbWrARAfI6YN/ob6o3rYZGcvYvJWz5fkcKBvtcK9tpk07ZKAE6DNChH30jYgzCmLW34/EJUCCQykYqi9BAqeqzsOIxU/DCIDCm7utvXlrwn1guh3NcX83XP4dtf18TIF3PB8jrgF0v681FdadU33DWfn/aFY9IJYaFFGFX0qK7w1IpV5FwFI4UWEq2MuMaCEODF2rqXki1HlKoBXqlGhijjdK+uVT0w29PLoTfLtXCfAwkXAe0+exv0N4Q/BsR0CxNEq4BukG9vi03ZdSWbJd1X9IRdzjK7BZCDQnxI6JPgzaEM41AnK155uTcSvDcQjGcjoHoNnBhm6wnYT05zb9dU270Q8l2AjYCu17kRmJZWP1pNZBwZZ8lRUYpHIAwxPO1Wak39NJCOZwLgpadmjbQuk3C60jAtaS8YRzwZr4UbfqI9YCvB15sUF9vbLOBtAM3rNWEjciIv9W5sfKWP5dnFdh6AtoBbwR+g6uhVr0RCevJaAJ+Ux9Jt0/+J13EOlk/bnOXbJb14OHHWNG3y9vl7fJjlf8H7VbaEKIjRmIAAAAASUVORK5CYII=',
         balance: 1000,
         active: true,
         gender: 'F',
-        hireDate: 1576647474398,
-        birthday: 854636400000,
+    	hireDate: '2020-01-05T08:16:18.643Z',
+    	birthday: '1996-12-24',
         score: 20,
         groupId: 'animal',
         profile: 'I am Bunny',
@@ -282,22 +288,6 @@ users.fromJson([
         color: '#ff0000'
     }
 ]);
-
-/**
- * adds user
- */
-function addUser(){
-	new duice.ui.Confirm('Do you want to add new user?')
-	.afterConfirm(function(){
-		var user = new duice.data.Map({
-			id: null,
-			parentId:null,
-			name: null
-		});
-		users.add(user);
-	})
-	.open();
-}
 
 /**
  * DOMContentLoaded
@@ -376,7 +366,7 @@ body {
 }
 .textarea {
 	width:100%;
-	line-height: 1.2;
+	line-height: 1.6;
 	border-radius: 2px;
 	box-sizing: border-box;         
 	-moz-box-sizing: border-box;    
@@ -425,18 +415,17 @@ body {
 		<h1 >DUICE <small>(Data-oriented UI Component Engine)</small></h1>
 	</div>
 	<hr/>
-	
 	<!-- ================================================================ -->
 	<!-- duice.ui.MapUIElement   										  -->
 	<!-- ================================================================ -->
 	<section class="chapter">
 		<div class="chapter__headerDiv">
-			<h2>Binding between duice.data.Map and MapUIElement</h2>
+			<h2>Binding between duice.Map and MapUIElement</h2>
 		</div>
 		<div class="chapter__bodyDiv">
 			<div class="chapter__bodyDiv-dataDiv">
 				<div style="display:flex; justify-content:space-between; align-items: flex-end;">
-					<h3>duice.data.Map <small>(var user)</small></h3>
+					<h3>duice.Map <small>(var user)</small></h3>
 				</div>
 				<textarea id="userTextarea" class="textarea" style="height:626px;"></textarea>
 			</div>
@@ -472,21 +461,21 @@ body {
 							</td>
 						</tr>
 						<tr>
-							<td><span is="duice-ui-span" data-duice-bind="user,socialNo" data-duice-mask="string,######-#######"></span></td>
+							<td><span is="duice-ui-span" data-duice-bind="user,socialNo" data-duice-format="string,######-#######"></span></td>
 							<td>
-								&lt;span is="duice-ui-span" data-duice-bind="user,socialNo" data-duice-mask="string,######-#######" ...
+								&lt;span is="duice-ui-span" data-duice-bind="user,socialNo" data-duice-format="string,######-#######" ...
 							</td>
 						</tr>
 						<tr>
-							<td align="right"><span is="duice-ui-span" data-duice-bind="user,balance" data-duice-mask="number,2"></span></td>
+							<td align="right"><span is="duice-ui-span" data-duice-bind="user,balance" data-duice-format="number,2"></span></td>
 							<td>
-								&lt;span is="duice-ui-span" data-duice-bind="user,balance" date-duice-mask="number,2" ...
+								&lt;span is="duice-ui-span" data-duice-bind="user,balance" date-duice-format="number,2" ...
 							</td>
 						</tr>
 						<tr>
-							<td align="center"><span is="duice-ui-span" data-duice-bind="user,hireDate" data-duice-mask="date,yyyy.MM.dd HH:mm:ss"></span></td>
+							<td align="center"><span is="duice-ui-span" data-duice-bind="user,hireDate" data-duice-format="date,yyyy.MM.dd HH:mm:ss"></span></td>
 							<td>
-								&lt;span is="duice-ui-span" data-duice-bind="user,hireDate" data-duice-mask="date,yyyy.MM.dd HH:mm:ss" ...
+								&lt;span is="duice-ui-span" data-duice-bind="user,hireDate" data-duice-format="date,yyyy.MM.dd HH:mm:ss" ...
 							</td>
 						</tr>
 						<!-- ================================================================ -->
@@ -500,7 +489,7 @@ body {
 							</td>
 						</tr>
 						<tr>
-							<td><input is="duice-ui-input" type="text" data-duice-bind="user,socialNo" data-duice-mask="string,######-#######"/></td>
+							<td><input is="duice-ui-input" type="text" data-duice-bind="user,socialNo" data-duice-format="######-#######"/></td>
 							<td>
 								&lt;input is="duice-ui-input" type="text" data-duice-bind="user,socialNo" data-duice-format="######-#######" ...
 							</td>
@@ -517,27 +506,27 @@ body {
 						</tr>
 						<tr>
 							<td>
-								<input is="duice-ui-input" type="number" data-duice-bind="user,balance" data-duice-scale="2"/>
+								<input is="duice-ui-input" type="number" data-duice-bind="user,balance" data-duice-format="2"/>
 							</td>
 							<td>
-								&lt;input is="duice-ui-input" type="number" data-duice-bind="user,balance" data-duice-scale="2"
+								&lt;input is="duice-ui-input" type="number" data-duice-bind="user,balance" data-duice-format="2"
 							</td>
 						</tr>
 						<!-- ================================================================ -->
-						<!-- duice.ui.DateInput			   									  -->
+						<!-- duice.ui.DatetimeInput			   									  -->
 						<!-- ================================================================ -->
 						<tr>
-							<th rowspan="4">duice.ui.DateInput</th>
+							<th rowspan="4">duice.ui.DatetimeInput</th>
 							<td align="center">
-								<input is="duice-ui-input" type="datetime" data-duice-bind="user,hireDate"/>
+								<input is="duice-ui-input" type="datetime-local" data-duice-bind="user,hireDate"/>
 							</td>
 							<td>
-								&lt;input is="duice-ui-input" type="datetime" data-duice-bind="user,hireDate" ...
+								&lt;input is="duice-ui-input" type="datetime-local" data-duice-bind="user,hireDate" ...
 							</td>
 						</tr>
 						<tr>
 							<td align="center">
-								<input is="duice-ui-input" type="datetime" data-duice-bind="user,hireDate" data-duice-format="yyyy.MM.dd HH:mm:ss"/>
+								<input is="duice-ui-input" type="datetime-local" data-duice-bind="user,hireDate" data-duice-format="yyyy.MM.dd HH:mm:ss"/>
 							</td>
 							<td>
 								&lt;input is="duice-ui-input" type="datetime" data-duice-bind="user,hireDate" data-duice-format="yyyy.MM.dd HH:mm:ss" ...
@@ -679,12 +668,12 @@ body {
 	<!-- ================================================================ -->
 	<section class="chapter">
 		<div class="chapter__headerDiv">
-			<h2>Binding between duice.data.List and ListUIElement</h2>
+			<h2>Binding between duice.List and ListUIElement</h2>
 		</div>
 		<div class="chapter__bodyDiv">
 			<div class="chapter__bodyDiv-dataDiv">
-				<h3>duice.data.List <small>(var users)</small></h3>
-				<textarea id="usersTextarea" class="textarea" style="height:1000px;"></textarea>
+				<h3>duice.List <small>(var users)</small></h3>
+				<textarea id="usersTextarea" class="textarea" style="height:1700px;"></textarea>
 			</div>
 			<div class="chapter__bodyDiv-uiDiv">
 			
@@ -706,8 +695,8 @@ body {
 							</h3>
 						</div>
 						<div>
-							<button onclick="addUser();">add(map)</button>
-							<button onclick="users.insert(users.getIndex(), new duice.data.Map({}));">insert(map)</button>
+							<button onclick="users.add(new duice.Map({}));">add(map)</button>
+							<button onclick="users.insert(users.getIndex(), new duice.Map({}));">insert(map)</button>
 							<button onclick="users.remove(users.getIndex());">remove(index)</button>
 							<button onclick="alert(JSON.stringify(users.toJson()));">toJson()</button>
 							<button onclick="alert(users.isDirty());">isDirty()</button>
@@ -747,10 +736,10 @@ body {
 									<td><input is="duice-ui-input" type="text" data-duice-bind="user,name"/></td>
 									<td><span is="duice-ui-span" data-duice-bind="user,socialNo"></span></td>
 									<td><input is="duice-ui-input" type="text" data-duice-bind="user,socialNo"/></td>
-									<td><span is="duice-ui-span" data-duice-bind="user,balance" data-duice-mask="number,2"></span></td>
-									<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance" data-duice-scale="2"/></td>
-									<td><span is="duice-ui-span" data-duice-bind="user,hireDate" data-duice-mask="date,yyyy.MM.dd HH:mm:ss"></span></td>
-									<td><input is="duice-ui-input" type="datetime" data-duice-bind="user,hireDate"/></td>
+									<td><span is="duice-ui-span" data-duice-bind="user,balance" data-duice-format="number,2"></span></td>
+									<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance" data-duice-format="2"/></td>
+									<td><span is="duice-ui-span" data-duice-bind="user,hireDate" data-duice-format="date,yyyy.MM.dd HH:mm:ss"></span></td>
+									<td><input is="duice-ui-input" type="datetime-local" data-duice-bind="user,hireDate"/></td>
 									<td><input is="duice-ui-input" type="date" data-duice-bind="user,birthday"/></td>
 									<td><input is="duice-ui-input" type="checkbox" data-duice-bind="user,active"/></td>
 									<td>
@@ -806,8 +795,8 @@ body {
 							</h3>
 						</div>
 						<div>
-							<button onclick="users.add(new duice.data.Map({}));">add(map)</button>
-							<button onclick="users.insert(users.getIndex(), new duice.data.Map({}));">insert(map)</button>
+							<button onclick="users.add(new duice.Map({}));">add(map)</button>
+							<button onclick="users.insert(users.getIndex(), new duice.Map({}));">insert(map)</button>
 							<button onclick="users.remove(users.getIndex());">remove(index)</button>
 							<button onclick="alert(JSON.stringify(users.toJson()));">toJson()</button>
 							<button onclick="alert(users.isDirty());">isDirty()</button>
@@ -845,7 +834,7 @@ body {
 											<tr>
 												<th>hireDate</th>
 												<td>
-													<input is="duice-ui-input" type="datetime" data-duice-bind="user,hireDate"/>
+													<input is="duice-ui-input" type="datetime-local" data-duice-bind="user,hireDate" data-duice-format="yyyy-MM-dd HH:mm:ss"/>
 												</td>
 											</tr>
 											<tr>
@@ -864,7 +853,7 @@ body {
 											<tr>
 												<th>groupId</th>
 												<td>
-													<select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"></select>
+													<select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"><option>- select -</option></select>
 												</td>
 											</tr>
 											<tr>
@@ -886,121 +875,142 @@ body {
 				<!-- duice.ui.UList(hierarchy)									  -->
 				<!-- ================================================================ -->
 				<div>
-					<div style="display:flex; justify-content:space-between;">
+					<div style="padding:1px; display:flex; justify-content:space-between; align-items:baseline;">
 						<div>
-							<h3>duice.ui.List with Hierarchy <small>(binding to users)</small></h3>
-							-
-							<span is="duice-ui-expression" data-duice-bind="users">
-								return $context.users.getSize();
-							</span>
-							Rows
+							<h3>duice.ui.UList with Hierarchy
+								<small>
+									(binding to users)
+									-
+									<span is="duice-ui-scriptlet" data-duice-bind="users">
+										return $context.users.getSize();
+									</span>
+									Rows
+								</small>
+							</h3>
 						</div>
 						<div>
-							<button onclick="users.add(new duice.data.Map({}));">add(map)</button>
-							<button onclick="users.insert(users.getIndex(), new duice.data.Map({}));">insert(map)</button>
+							<button onclick="users.add(new duice.Map({}));">add(map)</button>
+							<button onclick="users.insert(users.getIndex(), new duice.Map({}));">insert(map)</button>
 							<button onclick="users.remove(users.getIndex());">remove(index)</button>
 							<button onclick="alert(JSON.stringify(users.toJson()));">toJson()</button>
 							<button onclick="alert(users.isDirty());">isDirty()</button>
 							<button onclick="users.reset();">reset()</button>
 						</div>
 					</div>
-					<div>
-						<ul is="duice-ui-ul" 
+					<div style="display:flex; justify-content:space-between;">
+						<!-- ================================================================ -->
+						<!-- duice.ui.UList(hierarchy)									  -->
+						<!-- ================================================================ -->
+						<div style="width:49%;">
+							<ul is="duice-ui-ul" 
 							data-duice-bind="users,user" 
 							data-duice-editable="true"
 							data-duice-hierarchy="id,parentId">
-							<li>
-								<table class="table" style="width:100%; margin:0px;">
-									<tr>
-										<th style="width:50px;">no</th>
-										<th style="width:100px;">id</th>
-										<th style="width:100px;">parentId</th>
-										<th style="width:100px;">name</th>
-										<th style="width:100px;">balance</th>
-										<th style="width:100px;">active</th>
-										<th style="width:100px;">gender</th>
-										<th style="width:100px;">hireDate</th>
-										<th style="width:100px;">groupId</th>
-									</tr>
-									<tr>
-										<td>[[$context.index + 1]]</td>
-										<td><span is="duice-ui-span" data-duice-bind="user,id"></span></td>
-										<td><span is="duice-ui-span" data-duice-bind="user,parentId"></span></td>
-										<td><input is="duice-ui-input" type="text" data-duice-bind="user,name"/></td>
-										<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance"/></td>
-										<td><input is="duice-ui-input" type="checkbox" data-duice-bind="user,active"/></td>
-										<td>
-											M<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="M"/>
-											F<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="F"/>
-										</td>
-										<td><input is="duice-ui-input" type="date" data-duice-bind="user,hireDate"/></td>
-										<td><select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"></select></td>
-									</tr>
-								</table>
-							<li>
-						</ul>
-					</div>
-				</div>
-				<br/>
-				
-				<!-- ================================================================ -->
-				<!-- duice.ui.UList(hierarchy)									  -->
-				<!-- ================================================================ -->
-				<div>
-					<div style="display:flex; justify-content:space-between;">
-						<div>
-							<h3>duice.ui.List with Foldable Hierarchy <small>(binding to users)</small></h3>
-							-
-							<span is="duice-ui-expression" data-duice-bind="users">
-								return $context.users.getSize();
-							</span>
-							Rows
+								<li style="line-height:2.4;">
+									<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:dotted 1px #ccc;padding:2px;">
+										<div>
+											<img is="duice-ui-img" data-duice-bind="user,image" style="height:32px;"/>
+											<span is="duice-ui-span" data-duice-bind="user,name" style="font-weight:bold;"></span>
+											<span is="duice-ui-span" data-duice-bind="user,parentId" style="font-size:10px;color:#aaa;"></span>
+										</div>
+										<div>
+											<table>
+												<col/>
+												<col width="80px"/>
+												<col/>
+												<col width="100px"/>
+												<col/>
+												<col width="80px"/>
+												<tr>
+													<td>balance</td>
+													<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance"/></td>
+													<td>birthday</td>
+													<td><input is="duice-ui-input" type="date" data-duice-bind="user,birthday"/></td>
+													<td>groupId</td>
+													<td><select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"><option>- select -</option></select></td>
+												</tr>
+											</table>
+										</div>
+									</div>
+								</li>
+							</ul>
+							<div style="text-align:right;padding:10px;">
+								Average Balance :
+								<span is="duice-ui-scriptlet" data-duice-bind="users">
+									var totalBalance = 0;
+									$context.users.forEach(function(item){
+										totalBalance += isNaN(item.get('balance')) ? 0 : Number(item.get('balance'));
+									});
+									return Math.ceil(totalBalance/$context.users.getSize());
+								</span>
+								|
+								Total Balance :
+								<span is="duice-ui-scriptlet" data-duice-bind="users">
+									var totalBalance = 0;
+									$context.users.forEach(function(item){
+										totalBalance += isNaN(item.get('balance')) ? 0 : Number(item.get('balance'));
+									});
+									return totalBalance;
+								</span>
+							</div>
 						</div>
-						<div>
-							<button onclick="users.add(new duice.data.Map({}));">add(map)</button>
-							<button onclick="users.insert(users.getIndex(), new duice.data.Map({}));">insert(map)</button>
-							<button onclick="users.remove(users.getIndex());">remove(index)</button>
-							<button onclick="alert(JSON.stringify(users.toJson()));">toJson()</button>
-							<button onclick="alert(users.isDirty());">isDirty()</button>
-							<button onclick="users.reset();">reset()</button>
-						</div>
-					</div>
-					<div style="width:100%;">
-						<ul is="duice-ui-ul" 
+						<!-- ================================================================ -->
+						<!-- duice.ui.UList(hierarchy,foldable)								  -->
+						<!-- ================================================================ -->
+						<div style="width:49%;">
+							<ul is="duice-ui-ul" 
 							data-duice-bind="users,user" 
 							data-duice-editable="true"
 							data-duice-hierarchy="id,parentId"
 							data-duice-foldable="true">
-							<li>
-								<table class="table" style="width:100%; margin:0px;">
-									<tr>
-										<th style="width:50px;">no</th>
-										<th style="width:100px;">id</th>
-										<th style="width:100px;">parentId</th>
-										<th style="width:100px;">name</th>
-										<th style="width:100px;">balance</th>
-										<th style="width:100px;">active</th>
-										<th style="width:100px;">gender</th>
-										<th style="width:100px;">hireDate</th>
-										<th style="width:100px;">groupId</th>
-									</tr>
-									<tr>
-										<td>[[$context.index + 1]]</td>
-										<td><span is="duice-ui-span" data-duice-bind="user,id"></span></td>
-										<td><span is="duice-ui-span" data-duice-bind="user,parentId"></span></td>
-										<td><input is="duice-ui-input" type="text" data-duice-bind="user,name"/></td>
-										<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance"/></td>
-										<td><input is="duice-ui-input" type="checkbox" data-duice-bind="user,active"/></td>
-										<td>
-											M<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="M"/>
-											F<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="F"/>
-										</td>
-										<td><input is="duice-ui-input" type="date" data-duice-bind="user,hireDate"/></td>
-										<td><select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"></select></td>
-									</tr>
-								</table>
-							<li>
-						</ul>
+								<li style="line-height:2.4;">
+									<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:dotted 1px #ccc;padding:2px;">
+										<div>
+											<img is="duice-ui-img" data-duice-bind="user,image" style="height:32px;"/>
+											<span is="duice-ui-span" data-duice-bind="user,name" style="font-weight:bold;"></span>
+											<span is="duice-ui-span" data-duice-bind="user,parentId" style="font-size:10px;color:#aaa;"></span>
+										</div>
+										<div>
+											<table>
+												<col/>
+												<col width="80px"/>
+												<col/>
+												<col width="100px"/>
+												<col/>
+												<col width="80px"/>
+												<tr>
+													<td>balance</td>
+													<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance"/></td>
+													<td>birthday</td>
+													<td><input is="duice-ui-input" type="date" data-duice-bind="user,birthday"/></td>
+													<td>groupId</td>
+													<td><select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"><option>- select -</option></select></td>
+												</tr>
+											</table>
+										</div>
+									</div>
+								</li>
+							</ul>
+							<div style="text-align:right;padding:10px;">
+								Average Balance :
+								<span is="duice-ui-scriptlet" data-duice-bind="users">
+									var totalBalance = 0;
+									$context.users.forEach(function(item){
+										totalBalance += isNaN(item.get('balance')) ? 0 : Number(item.get('balance'));
+									});
+									return Math.ceil(totalBalance/$context.users.getSize());
+								</span>
+								|
+								Total Balance :
+								<span is="duice-ui-scriptlet" data-duice-bind="users">
+									var totalBalance = 0;
+									$context.users.forEach(function(item){
+										totalBalance += isNaN(item.get('balance')) ? 0 : Number(item.get('balance'));
+									});
+									return totalBalance;
+								</span>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -1093,50 +1103,67 @@ body {
 					.open();
 				">duice.dialog.Dialog</button>
 				<dialog id="dialog" style="width:600px; padding:1rem; display:none;">
-					<table class="chapter__bodyDiv-uiDiv-uiTable" style="width:100%;">
-						<tr>
-							<th>user,id</th>
-							<td><span is="duice-ui-span" data-duice-bind="user,id"></span></td>
-						</tr>
-						<tr>
-							<th>user,profile</th>
-							<td><span is="duice-ui-span" data-duice-bind="user,profile"></span></td>
-						</tr>
-						<tr>
-							<th>user,name</th>
-							<td><input is="duice-ui-input" type="text" data-duice-bind="user,name"/></td>
-						</tr>
-					</table>
-					<table is="duice-ui-table" 
-						data-duice-bind="users,user" 
-						data-duice-editable="true"
-						style="width:100%;">
-						<thead>
-							<tr>
-								<th>No</th>
-								<th>users[].id</th>
-								<th>users[].name</th>
-								<th>duice[].active</th>
-								<th>duice[].birthday</th>
-								<th>duice[].groupId</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td></td>
-								<td><span is="duice-ui-span" data-duice-bind="user,id"></span></td>
-								<td><input is="duice-ui-input" type="text" data-duice-bind="user,name"/></td>
-								<td><input is="duice-ui-input" type="checkbox" data-duice-bind="user,active"/></td>
-								<td><input is="duice-ui-input" type="date" data-duice-bind="user,birthday"/></td>
-								<td><select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"></select></td>
-							</tr>
-						</tbody>
-					</table>
-					<div style="text-align:right;">
-						<button>Confirm</button>
+					<div style="text-align:center;">
+						<img is="duice-ui-img" data-duice-bind="user,image" style="height:64px;"/>
 					</div>
+					<table style="width:100%; line-height:2.4;">
+						<tr>
+							<th>name</th>
+							<td>
+								<input is="duice-ui-input" type="text" data-duice-bind="user,name"/>
+							</td>
+						</tr>
+						<tr>
+							<th>balance</th>
+							<td>
+								<input is="duice-ui-input" type="number" data-duice-bind="user,balance"/>
+							</td>
+						</tr>
+						<tr>
+							<th>hireDate</th>
+							<td>
+								<input is="duice-ui-input" type="datetime" data-duice-bind="user,hireDate"/>
+							</td>
+						</tr>
+						<tr>
+							<th>active</th>
+							<td>
+								<input is="duice-ui-input" type="checkbox" data-duice-bind="user,active"/>
+							</td>
+						</tr>
+						<tr>
+							<th>gender</th>
+							<td>
+								Male<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="M"/>
+								Female<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="F"/>
+							</td>
+						</tr>
+						<tr>
+							<th>groupId</th>
+							<td>
+								<select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"></select>
+							</td>
+						</tr>
+						<tr>
+							<th>profile</th>
+							<td>
+								<textarea is="duice-ui-textarea" data-duice-bind="user,profile"></textarea>
+							<td>
+						</tr>
+					</table>
 				</dialog>
 			</div>
+		</div>
+	</section>
+	
+	<section class="chapter">
+		<div class="chapter__headerDiv">
+			<h2>Integrate with SunEditor 
+				<small>(http://suneditor.com)</small>
+			</h2>
+		</div>
+		<div class="chapter__bodyDiv">
+			<textarea is="duice-integrate-suneditor" data-duice-bind="user,profile" style="width:100%;height:200px;">11111</textarea>
 		</div>
 	</section>
 

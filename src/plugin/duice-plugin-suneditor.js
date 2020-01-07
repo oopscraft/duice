@@ -1,8 +1,11 @@
 "use strict";
 var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -13,7 +16,7 @@ var duice;
 (function (duice) {
     var plugin;
     (function (plugin) {
-        var SunEditorFactory = (function (_super) {
+        var SunEditorFactory = /** @class */ (function (_super) {
             __extends(SunEditorFactory, _super);
             function SunEditorFactory() {
                 return _super !== null && _super.apply(this, arguments) || this;
@@ -27,7 +30,7 @@ var duice;
             return SunEditorFactory;
         }(duice.MapUIComponentFactory));
         plugin.SunEditorFactory = SunEditorFactory;
-        var SunEditor = (function (_super) {
+        var SunEditor = /** @class */ (function (_super) {
             __extends(SunEditor, _super);
             function SunEditor(textarea) {
                 var _this = _super.call(this, textarea) || this;
