@@ -6,7 +6,7 @@
 	    "strictNullChecks": false,
 	    "noImplicitThis": false,
 	    "module":"none",
-	    "watch": true
+	    "watch": false
 	},
 	"typedocOptions":{
 		"mode": "modules",
@@ -15,6 +15,6 @@
 	},
 	"files":[
 		 "./src/duice.ts"
-		,"./src/plugin/duice-plugin-suneditor.ts"
+		//,"./src/plugin/duice-plugin-suneditor.ts"
 	]
 }

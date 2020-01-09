@@ -2,7 +2,7 @@ namespace duice {
     
     export namespace plugin {
         
-        export class SunEditorFactory extends duice.MapUIComponentFactory {
+        export class SunEditorFactory extends duice.MapUiComponentFactory {
             getInstance(element:HTMLTextAreaElement):SunEditor {
                 var sunEditor = new SunEditor(element);
                 var bind = element.dataset.duiceBind.split(',');
@@ -11,7 +11,7 @@ namespace duice {
             }
         }
 
-        export class SunEditor extends duice.MapUIComponent {
+        export class SunEditor extends duice.MapUiComponent {
             textarea:HTMLTextAreaElement;
             suneditor:object;
             constructor(textarea:HTMLTextAreaElement){

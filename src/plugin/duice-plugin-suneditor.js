@@ -28,7 +28,7 @@ var duice;
                 return sunEditor;
             };
             return SunEditorFactory;
-        }(duice.MapUIComponentFactory));
+        }(duice.MapUiComponentFactory));
         plugin.SunEditorFactory = SunEditorFactory;
         var SunEditor = /** @class */ (function (_super) {
             __extends(SunEditor, _super);
@@ -53,7 +53,7 @@ var duice;
                 return value;
             };
             return SunEditor;
-        }(duice.MapUIComponent));
+        }(duice.MapUiComponent));
         plugin.SunEditor = SunEditor;
         // Adds component definition
         duice.ComponentDefinitionRegistry.add(new duice.ComponentDefinition('textarea', 'duice-integrate-suneditor', duice.plugin.SunEditorFactory));

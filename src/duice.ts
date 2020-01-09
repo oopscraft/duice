@@ -11,6 +11,26 @@
  * project package
  */
 namespace duice {
+	
+	/**
+	 * Configuration
+	 */
+	export var Configuration = {
+		 version:'0.9'
+		,cssEnable: true
+	}
+	
+	export function initialize() {
+		
+		// prints configuration
+		console.log(Configuration);
+		
+		// initializes component
+	    var $context:any = typeof self !== 'undefined' ? self : 
+	                        typeof window !== 'undefined' ? window :
+	                        {};
+	    duice.initializeComponent(document, $context);
+	}
     
     /**
      * Component definition registry
@@ -54,7 +74,7 @@ namespace duice {
      * @param $context
      */
     export function initializeComponent(container:any, $context:any) {
-        [ModalUIComponentFactory, CompositeUIComponentFactory, ListUIComponentFactory, MapUIComponentFactory]
+        [ModalUiComponentFactory, CompositeUiComponentFactory, ListUiComponentFactory, MapUiComponentFactory]
         .forEach(function(factoryType){
             ComponentDefinitionRegistry.getComponentDefinitions().forEach(function(componentDefinition:ComponentDefinition){
                 var elements = container.querySelectorAll(componentDefinition.getTagName()+'[is="'+componentDefinition.getIsAttribute()+'"][data-duice-bind]:not([data-duice-id])');
@@ -69,6 +89,27 @@ namespace duice {
             });
         });
     }
+
+    /**
+     * Loads external style
+     * @param href
+     */
+	export function loadExternalStyle(href:string):void {
+		var link = document.createElement('link');
+		link.rel = 'stylesheet';
+		link.href = href;
+		document.head.appendChild(link);
+	}
+	
+    /**
+     * Loads external script
+     * @param src
+     */
+	export function loadExternalScript(src:string):void {
+		var script = document.createElement('script');
+		script.src = src;
+		document.head.appendChild(script);
+	}
     
     /**
      * duice.Observable
@@ -230,13 +271,13 @@ namespace duice {
         
         /**
          * Updates data from observable instance
-         * @param uiComponent
+         * @param UiComponent
          * @param obj
          */
-        update(uiComponent:MapUIComponent, obj:object):void {
-            console.info('Map.update', uiComponent, obj);
-            var name = uiComponent.getName();
-            var value = uiComponent.getValue();
+        update(UiComponent:MapUiComponent, obj:object):void {
+            console.info('Map.update', UiComponent, obj);
+            var name = UiComponent.getName();
+            var value = UiComponent.getValue();
             this.set(name, value);
         }
         
@@ -483,14 +524,14 @@ namespace duice {
     }
     
     /**
-     * duice.UIComponent
+     * duice.UiComponent
      */
-    abstract class UIComponent extends Observable implements Observer {
+    abstract class UiComponent extends Observable implements Observer {
         element:HTMLElement;
         constructor(element:HTMLElement){
             super();
             this.element = element;
-            this.element.dataset.duiceId = generateUUID();
+            this.element.dataset.duiceId = generateUuid();
         }
         abstract bind(...args: any[]):void;
         abstract update(dataObject:duice.DataObject, obj:object):void;
@@ -516,9 +557,9 @@ namespace duice {
     }
     
     /**
-     * duice.MapUIComponent
+     * duice.MapUiComponent
      */
-    export abstract class MapUIComponent extends UIComponent {
+    export abstract class MapUiComponent extends UiComponent {
         map:duice.Map;
         name:string;
         bind(map:duice.Map, name:string):void {
@@ -539,9 +580,9 @@ namespace duice {
     }
     
     /**
-     * duice.ui.ListUIComponent
+     * duice.ui.ListUiComponent
      */
-    export abstract class ListUIComponent extends UIComponent {
+    export abstract class ListUiComponent extends UiComponent {
         list:duice.List;
         item:string;
         bind(list:duice.List, item:string):void {
@@ -561,9 +602,9 @@ namespace duice {
     }
     
     /**
-     * duice.ui.UIComponentFactory
+     * duice.ui.UiComponentFactory
      */
-    abstract class UIComponentFactory {
+    abstract class UiComponentFactory {
         context:any;
         constructor(context:any){
             if(context){
@@ -590,22 +631,22 @@ namespace duice {
                 throw e;
             }
         }
-        abstract getInstance(element:HTMLElement):UIComponent;
+        abstract getInstance(element:HTMLElement):UiComponent;
     }
     
-    export abstract class MapUIComponentFactory extends UIComponentFactory { }
+    export abstract class MapUiComponentFactory extends UiComponentFactory { }
     
-    export abstract class ListUIComponentFactory extends UIComponentFactory { }
+    export abstract class ListUiComponentFactory extends UiComponentFactory { }
     
-    export abstract class CompositeUIComponentFactory extends UIComponentFactory { }
+    export abstract class CompositeUiComponentFactory extends UiComponentFactory { }
     
-    export abstract class ModalUIComponentFactory extends UIComponentFactory { }
+    export abstract class ModalUiComponentFactory extends UiComponentFactory { }
     
     /**
      * Generates random UUID value
      * @return  UUID string
      */
-    function generateUUID():string {
+    function generateUuid():string {
         var dt = new Date().getTime();
         var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
             var r = (dt + Math.random()*16)%16 | 0;
@@ -615,6 +656,15 @@ namespace duice {
         return uuid;
     }
     
+    /**
+     * Adds class
+     */
+	function addClassNameIfCssEnable(element:HTMLElement, className:string):void {
+		if(Configuration.cssEnable) {
+			element.classList.add(className);	
+		}
+	}
+
     /**
      * Checks mobile browser
      */
@@ -632,6 +682,22 @@ namespace duice {
             return false;
         }
     }
+
+    /**
+     * Returns Query Variables
+     */
+	export function getQueryVariables():any {
+		var queryVariables:any = new Object();
+		var queryString = window.location.search.substring(1);
+	    var vars = queryString.split('&');
+	    for (var i = 0; i < vars.length; i++) {
+	        var pair = vars[i].split('=');
+			var key = decodeURIComponent(pair[0]);
+			var value = decodeURIComponent(pair[1]);
+			queryVariables[key] = value;
+	    }
+		return queryVariables;
+	}
     
     /**
      * Check if value is empty
@@ -1136,7 +1202,7 @@ namespace duice {
         /**
          * duice.ui.ScriptletFactory
          */
-        export class ScriptletFactory extends MapUIComponentFactory {
+        export class ScriptletFactory extends MapUiComponentFactory {
             getInstance(element:HTMLElement):Scriptlet {
                 var scriptlet = new Scriptlet(element);
                 var context:any;
@@ -1160,7 +1226,7 @@ namespace duice {
         /**
          * duice.ui.Scriptlet
          */
-        export class Scriptlet extends MapUIComponent {
+        export class Scriptlet extends MapUiComponent {
             expression:string;
             context:any;;
             constructor(element:HTMLElement){
@@ -1194,7 +1260,7 @@ namespace duice {
         /**
          * duice.ui.SpanFactory
          */
-        export class SpanFactory extends MapUIComponentFactory {
+        export class SpanFactory extends MapUiComponentFactory {
             getInstance(element:HTMLInputElement):Span {
                 var span = new Span(element);
                 
@@ -1229,7 +1295,7 @@ namespace duice {
         /**
          * duice.ui.Span
          */
-        export class Span extends MapUIComponent {
+        export class Span extends MapUiComponent {
             span:HTMLSpanElement;
             format:Format;
             constructor(span:HTMLSpanElement){
@@ -1262,7 +1328,7 @@ namespace duice {
         /**
          * duice.ui.InputFactory
          */
-        export class InputFactory extends MapUIComponentFactory {
+        export class InputFactory extends MapUiComponentFactory {
             getInstance(element:HTMLInputElement):Input {
                 var input;
                 switch(element.getAttribute('type')){
@@ -1305,7 +1371,7 @@ namespace duice {
         /**
          * duice.ui.Input
          */
-        export abstract class Input extends MapUIComponent {
+        export abstract class Input extends MapUiComponent {
             input:HTMLInputElement;
             constructor(input:HTMLInputElement){
                 super(input);
@@ -1343,7 +1409,7 @@ namespace duice {
         export class GenericInput extends Input {
             constructor(input:HTMLInputElement){
                 super(input);
-                this.input.classList.add('duice-ui-genericInput');
+                addClassNameIfCssEnable(this.input,'duice-ui-genericInput');
             }
             update(map:duice.Map, obj:object):void {
                 var value = map.get(this.getName());
@@ -1370,7 +1436,7 @@ namespace duice {
             format:StringFormat;
             constructor(input:HTMLInputElement){
                 super(input);
-                this.input.classList.add('duice-ui-textInput');
+                addClassNameIfCssEnable(this.input,'duice-ui-textInput');
                 this.format = new StringFormat();
             }
             setPattern(format:string){
@@ -1405,7 +1471,7 @@ namespace duice {
             format:NumberFormat;
             constructor(input:HTMLInputElement){
                 super(input);
-                this.input.classList.add('duice-ui-numberInput');
+                addClassNameIfCssEnable(this.input,'duice-ui-numberInput');
                 this.input.setAttribute('type','text');
                 this.format = new NumberFormat();
             }
@@ -1438,7 +1504,7 @@ namespace duice {
         export class CheckboxInput extends Input {
             constructor(input:HTMLInputElement){
                 super(input);
-                this.input.classList.add('duice-ui-checkboxInput');
+                addClassNameIfCssEnable(this.input,'duice-ui-checkboxInput');
                 
                 // stop click event propagation
                 this.input.addEventListener('click', function(event){
@@ -1464,7 +1530,7 @@ namespace duice {
         export class RadioInput extends Input {
             constructor(input:HTMLInputElement){
                 super(input);
-                this.input.classList.add('duice-ui-radioInput');
+                addClassNameIfCssEnable(this.input,'duice-ui-radioInput');
             }
             update(map:duice.Map, obj:object):void {
                 var value = map.get(this.getName());
@@ -1491,7 +1557,7 @@ namespace duice {
                 super(input);
                 this.type = this.input.getAttribute('type').toLowerCase();
                 this.input.setAttribute('type','text');
-                this.input.classList.add('duice-ui-dateInput');
+				addClassNameIfCssEnable(this.input,'duice-ui-dateInput');
                 
                 // adds click event listener
                 var $this = this;
@@ -1850,14 +1916,16 @@ namespace duice {
         /**
          * duice.ui.SelectFactory
          */
-        export class SelectFactory extends MapUIComponentFactory {
+        export class SelectFactory extends MapUiComponentFactory {
             getInstance(element:HTMLSelectElement):Select {
                 var select = new Select(element);
-                var option = element.dataset.duiceOption.split(',');
-                var optionList = this.getContextProperty(option[0]);
-                var optionValue = option[1];
-                var optionText = option[2];
-                select.setOption(optionList, optionValue, optionText);
+				if(element.dataset.duiceOption){
+	                var option = element.dataset.duiceOption.split(',');
+	                var optionList = this.getContextProperty(option[0]);
+	                var optionValue = option[1];
+	                var optionText = option[2];
+	                select.setOption(optionList, optionValue, optionText);
+				}
                 var bind = element.dataset.duiceBind.split(',');
                 select.bind(this.getContextProperty(bind[0]), bind[1]);
                 return select;
@@ -1867,7 +1935,7 @@ namespace duice {
         /**
          * duice.ui.Select
          */
-        export class Select extends MapUIComponent {
+        export class Select extends MapUiComponent {
             select:HTMLSelectElement;
             optionList:duice.List;
             optionValue:string;
@@ -1916,7 +1984,12 @@ namespace duice {
             }
             update(map:duice.Map, obj:object):void {
                 var value = map.get(this.getName());
-                this.select.value = defaultIfEmpty(value,'');
+				this.select.value = defaultIfEmpty(value,'');
+				if(this.select.selectedIndex < 0){
+					if(this.defaultOptions.length > 0){
+						this.defaultOptions[0].selected = true;
+					}
+				}
             }
             getValue():any {
                 var value = this.select.value;
@@ -1927,7 +2000,7 @@ namespace duice {
         /**
          * duice.ui.TextareaFactory
          */
-        export class TextareaFactory extends MapUIComponentFactory {
+        export class TextareaFactory extends MapUiComponentFactory {
             getInstance(element:HTMLTextAreaElement):Textarea {
                 var textarea = new Textarea(element);
                 var bind = element.dataset.duiceBind.split(',');
@@ -1939,7 +2012,7 @@ namespace duice {
         /**
          * duice.ui.Textarea
          */
-        export class Textarea extends MapUIComponent {
+        export class Textarea extends MapUiComponent {
             textarea:HTMLTextAreaElement;
             constructor(textarea:HTMLTextAreaElement) {
                 super(textarea);
@@ -1963,7 +2036,7 @@ namespace duice {
         /**
          * duice.ui.ImageFactory
          */
-        export class ImageFactory extends MapUIComponentFactory {
+        export class ImageFactory extends MapUiComponentFactory {
             getInstance(element:HTMLImageElement):Image {
                 var image = new Image(element);
                 var bind = element.dataset.duiceBind.split(',');
@@ -1975,7 +2048,7 @@ namespace duice {
         /**
          * duice.ui.Image
          */
-        export class Image extends MapUIComponent {
+        export class Image extends MapUiComponent {
             img:HTMLImageElement;
             input:HTMLInputElement;
             editable:boolean;
@@ -2040,7 +2113,7 @@ namespace duice {
         /**
          * duice.ui.TableFactory
          */
-        export class TableFactory extends ListUIComponentFactory {
+        export class TableFactory extends ListUiComponentFactory {
             getInstance(element:HTMLTableElement):Table {
                 var table = new Table(element);
                 if(element.dataset.duiceEditable){
@@ -2055,7 +2128,7 @@ namespace duice {
         /**
          * duice.ui.Table
          */
-        export class Table extends ListUIComponent {
+        export class Table extends ListUiComponent {
             table:HTMLTableElement;
             tbody:HTMLTableSectionElement;
             tbodies:Array<HTMLTableSectionElement> = new Array<HTMLTableSectionElement>();
@@ -2068,12 +2141,12 @@ namespace duice {
             constructor(table:HTMLTableElement) {
                 super(table);
                 this.table = table;
-                this.table.classList.add('duice-ui-table');
+					addClassNameIfCssEnable(this.table, 'duice-ui-table');
                 
                 // initializes caption
                 var caption = <HTMLTableCaptionElement>this.table.querySelector('caption');
                 if(caption){
-                    caption.classList.add('duice-ui-table__caption');
+					addClassNameIfCssEnable(caption,'duice-ui-table__caption');
                     caption = executeExpression(<HTMLElement>caption, new Object());
                     initializeComponent(caption, new Object());
                 }
@@ -2081,7 +2154,7 @@ namespace duice {
                 // initializes head
                 var thead = <HTMLTableSectionElement>this.table.querySelector('thead');
                 if(thead){
-                    thead.classList.add('duice-ui-table__thead');
+					addClassNameIfCssEnable(thead,'duice-ui-table__thead');
                     thead = executeExpression(<HTMLElement>thead, new Object());
                     initializeComponent(thead, new Object());
                 }
@@ -2089,13 +2162,13 @@ namespace duice {
                 // clones body
                 var tbody = this.table.querySelector('tbody');
                 this.tbody = <HTMLTableSectionElement>tbody.cloneNode(true);
-                this.tbody.classList.add('duice-ui-table__tbody');
+				addClassNameIfCssEnable(this.tbody,'duice-ui-table__tbody');
                 this.table.removeChild(tbody);
                 
                 // initializes foot
                 var tfoot = <HTMLTableSectionElement>this.table.querySelector('tfoot');
                 if(tfoot){
-                    tfoot.classList.add('duice-ui-table__tfoot');
+					addClassNameIfCssEnable(tfoot,'duice-ui-table__tfoot');
                     tfoot = executeExpression(<HTMLElement>tfoot, new Object());
                     initializeComponent(tfoot, new Object());
                 }
@@ -2188,7 +2261,7 @@ namespace duice {
             createTbody(index:number, map:duice.Map):HTMLTableSectionElement {
                 var $this = this;
                 var tbody:HTMLTableSectionElement = <HTMLTableSectionElement>this.tbody.cloneNode(true);
-                tbody.classList.add('duice-ui-table__tbody');
+				addClassNameIfCssEnable(tbody,'duice-ui-table__tbody');
                 var $context:any = new Object;
                 $context['index'] = index;
                 $context[this.item] = map;
@@ -2220,7 +2293,7 @@ namespace duice {
         /**
          * duice.ui.UListFactory
          */
-        export class UListFactory extends ListUIComponentFactory {
+        export class UListFactory extends ListUiComponentFactory {
             getInstance(element:HTMLUListElement):UList {
                 var uList = new UList(element);
                 if(element.dataset.duiceHierarchy){
@@ -2242,7 +2315,7 @@ namespace duice {
         /**
          * duice.ui.UList
          */
-        export class UList extends ListUIComponent {
+        export class UList extends ListUiComponent {
             ul:HTMLUListElement;
             li:HTMLLIElement;
             lis:Array<HTMLLIElement> = new Array<HTMLLIElement>();
@@ -2979,9 +3052,6 @@ namespace duice {
  * DOMContentLoaded event process
  */
 document.addEventListener("DOMContentLoaded", function(event) {
-    var $context:any = typeof self !== 'undefined' ? self : 
-                        typeof window !== 'undefined' ? window :
-                        {};
-    duice.initializeComponent(document, $context);
+    duice.initialize();
 });
 

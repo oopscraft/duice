@@ -71,7 +71,7 @@ var duice;
      * @param $context
      */
     function initializeComponent(container, $context) {
-        [ModalUIComponentFactory, CompositeUIComponentFactory, ListUIComponentFactory, MapUIComponentFactory]
+        [ModalUiComponentFactory, CompositeUiComponentFactory, ListUiComponentFactory, MapUiComponentFactory]
             .forEach(function (factoryType) {
             duice.ComponentDefinitionRegistry.getComponentDefinitions().forEach(function (componentDefinition) {
                 var elements = container.querySelectorAll(componentDefinition.getTagName() + '[is="' + componentDefinition.getIsAttribute() + '"][data-duice-bind]:not([data-duice-id])');
@@ -213,13 +213,13 @@ var duice;
         }
         /**
          * Updates data from observable instance
-         * @param uiComponent
+         * @param UiComponent
          * @param obj
          */
-        Map.prototype.update = function (uiComponent, obj) {
-            console.info('Map.update', uiComponent, obj);
-            var name = uiComponent.getName();
-            var value = uiComponent.getValue();
+        Map.prototype.update = function (UiComponent, obj) {
+            console.info('Map.update', UiComponent, obj);
+            var name = UiComponent.getName();
+            var value = UiComponent.getValue();
             this.set(name, value);
         };
         /**
@@ -458,17 +458,17 @@ var duice;
     }(DataObject));
     duice.List = List;
     /**
-     * duice.UIComponent
+     * duice.UiComponent
      */
-    var UIComponent = /** @class */ (function (_super) {
-        __extends(UIComponent, _super);
-        function UIComponent(element) {
+    var UiComponent = /** @class */ (function (_super) {
+        __extends(UiComponent, _super);
+        function UiComponent(element) {
             var _this = _super.call(this) || this;
             _this.element = element;
-            _this.element.dataset.duiceId = generateUUID();
+            _this.element.dataset.duiceId = generateUuid();
             return _this;
         }
-        UIComponent.prototype.isAvailable = function () {
+        UiComponent.prototype.isAvailable = function () {
             // contains method not support(IE)
             if (!Node.prototype.contains) {
                 Node.prototype.contains = function (el) {
@@ -487,72 +487,72 @@ var duice;
                 return false;
             }
         };
-        return UIComponent;
+        return UiComponent;
     }(Observable));
     /**
-     * duice.MapUIComponent
+     * duice.MapUiComponent
      */
-    var MapUIComponent = /** @class */ (function (_super) {
-        __extends(MapUIComponent, _super);
-        function MapUIComponent() {
+    var MapUiComponent = /** @class */ (function (_super) {
+        __extends(MapUiComponent, _super);
+        function MapUiComponent() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        MapUIComponent.prototype.bind = function (map, name) {
+        MapUiComponent.prototype.bind = function (map, name) {
             this.map = map;
             this.name = name;
             this.map.addObserver(this);
             this.addObserver(this.map);
             this.update(this.map, this.map);
         };
-        MapUIComponent.prototype.getMap = function () {
+        MapUiComponent.prototype.getMap = function () {
             return this.map;
         };
-        MapUIComponent.prototype.getName = function () {
+        MapUiComponent.prototype.getName = function () {
             return this.name;
         };
-        return MapUIComponent;
-    }(UIComponent));
-    duice.MapUIComponent = MapUIComponent;
+        return MapUiComponent;
+    }(UiComponent));
+    duice.MapUiComponent = MapUiComponent;
     /**
-     * duice.ui.ListUIComponent
+     * duice.ui.ListUiComponent
      */
-    var ListUIComponent = /** @class */ (function (_super) {
-        __extends(ListUIComponent, _super);
-        function ListUIComponent() {
+    var ListUiComponent = /** @class */ (function (_super) {
+        __extends(ListUiComponent, _super);
+        function ListUiComponent() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        ListUIComponent.prototype.bind = function (list, item) {
+        ListUiComponent.prototype.bind = function (list, item) {
             this.list = list;
             this.item = item;
             this.list.addObserver(this);
             this.addObserver(this.list);
             this.update(this.list, this.list);
         };
-        ListUIComponent.prototype.getList = function () {
+        ListUiComponent.prototype.getList = function () {
             return this.list;
         };
-        ListUIComponent.prototype.getItem = function () {
+        ListUiComponent.prototype.getItem = function () {
             return this.item;
         };
-        return ListUIComponent;
-    }(UIComponent));
-    duice.ListUIComponent = ListUIComponent;
+        return ListUiComponent;
+    }(UiComponent));
+    duice.ListUiComponent = ListUiComponent;
     /**
-     * duice.ui.UIComponentFactory
+     * duice.ui.UiComponentFactory
      */
-    var UIComponentFactory = /** @class */ (function () {
-        function UIComponentFactory(context) {
+    var UiComponentFactory = /** @class */ (function () {
+        function UiComponentFactory(context) {
             if (context) {
                 this.setContext(context);
             }
         }
-        UIComponentFactory.prototype.setContext = function (context) {
+        UiComponentFactory.prototype.setContext = function (context) {
             this.context = context;
         };
-        UIComponentFactory.prototype.getContext = function () {
+        UiComponentFactory.prototype.getContext = function () {
             return this.context;
         };
-        UIComponentFactory.prototype.getContextProperty = function (name) {
+        UiComponentFactory.prototype.getContextProperty = function (name) {
             if (this.context[name]) {
                 return this.context[name];
             }
@@ -567,45 +567,45 @@ var duice;
                 throw e;
             }
         };
-        return UIComponentFactory;
+        return UiComponentFactory;
     }());
-    var MapUIComponentFactory = /** @class */ (function (_super) {
-        __extends(MapUIComponentFactory, _super);
-        function MapUIComponentFactory() {
+    var MapUiComponentFactory = /** @class */ (function (_super) {
+        __extends(MapUiComponentFactory, _super);
+        function MapUiComponentFactory() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        return MapUIComponentFactory;
-    }(UIComponentFactory));
-    duice.MapUIComponentFactory = MapUIComponentFactory;
-    var ListUIComponentFactory = /** @class */ (function (_super) {
-        __extends(ListUIComponentFactory, _super);
-        function ListUIComponentFactory() {
+        return MapUiComponentFactory;
+    }(UiComponentFactory));
+    duice.MapUiComponentFactory = MapUiComponentFactory;
+    var ListUiComponentFactory = /** @class */ (function (_super) {
+        __extends(ListUiComponentFactory, _super);
+        function ListUiComponentFactory() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        return ListUIComponentFactory;
-    }(UIComponentFactory));
-    duice.ListUIComponentFactory = ListUIComponentFactory;
-    var CompositeUIComponentFactory = /** @class */ (function (_super) {
-        __extends(CompositeUIComponentFactory, _super);
-        function CompositeUIComponentFactory() {
+        return ListUiComponentFactory;
+    }(UiComponentFactory));
+    duice.ListUiComponentFactory = ListUiComponentFactory;
+    var CompositeUiComponentFactory = /** @class */ (function (_super) {
+        __extends(CompositeUiComponentFactory, _super);
+        function CompositeUiComponentFactory() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        return CompositeUIComponentFactory;
-    }(UIComponentFactory));
-    duice.CompositeUIComponentFactory = CompositeUIComponentFactory;
-    var ModalUIComponentFactory = /** @class */ (function (_super) {
-        __extends(ModalUIComponentFactory, _super);
-        function ModalUIComponentFactory() {
+        return CompositeUiComponentFactory;
+    }(UiComponentFactory));
+    duice.CompositeUiComponentFactory = CompositeUiComponentFactory;
+    var ModalUiComponentFactory = /** @class */ (function (_super) {
+        __extends(ModalUiComponentFactory, _super);
+        function ModalUiComponentFactory() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        return ModalUIComponentFactory;
-    }(UIComponentFactory));
-    duice.ModalUIComponentFactory = ModalUIComponentFactory;
+        return ModalUiComponentFactory;
+    }(UiComponentFactory));
+    duice.ModalUiComponentFactory = ModalUiComponentFactory;
     /**
      * Generates random UUID value
      * @return  UUID string
      */
-    function generateUUID() {
+    function generateUuid() {
         var dt = new Date().getTime();
         var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
             var r = (dt + Math.random() * 16) % 16 | 0;
@@ -1120,7 +1120,7 @@ var duice;
                 return scriptlet;
             };
             return ScriptletFactory;
-        }(MapUIComponentFactory));
+        }(MapUiComponentFactory));
         ui.ScriptletFactory = ScriptletFactory;
         /**
          * duice.ui.Scriptlet
@@ -1156,7 +1156,7 @@ var duice;
                 return null;
             };
             return Scriptlet;
-        }(MapUIComponent));
+        }(MapUiComponent));
         ui.Scriptlet = Scriptlet;
         /**
          * duice.ui.SpanFactory
@@ -1194,7 +1194,7 @@ var duice;
                 return span;
             };
             return SpanFactory;
-        }(MapUIComponentFactory));
+        }(MapUiComponentFactory));
         ui.SpanFactory = SpanFactory;
         /**
          * duice.ui.Span
@@ -1228,7 +1228,7 @@ var duice;
                 return value;
             };
             return Span;
-        }(MapUIComponent));
+        }(MapUiComponent));
         ui.Span = Span;
         /**
          * duice.ui.InputFactory
@@ -1275,7 +1275,7 @@ var duice;
                 return input;
             };
             return InputFactory;
-        }(MapUIComponentFactory));
+        }(MapUiComponentFactory));
         ui.InputFactory = InputFactory;
         /**
          * duice.ui.Input
@@ -1310,7 +1310,7 @@ var duice;
                 return true;
             };
             return Input;
-        }(MapUIComponent));
+        }(MapUiComponent));
         ui.Input = Input;
         /**
          * duice.ui.GenericInput
@@ -1817,17 +1817,19 @@ var duice;
             }
             SelectFactory.prototype.getInstance = function (element) {
                 var select = new Select(element);
-                var option = element.dataset.duiceOption.split(',');
-                var optionList = this.getContextProperty(option[0]);
-                var optionValue = option[1];
-                var optionText = option[2];
-                select.setOption(optionList, optionValue, optionText);
+                if (element.dataset.duiceOption) {
+                    var option = element.dataset.duiceOption.split(',');
+                    var optionList = this.getContextProperty(option[0]);
+                    var optionValue = option[1];
+                    var optionText = option[2];
+                    select.setOption(optionList, optionValue, optionText);
+                }
                 var bind = element.dataset.duiceBind.split(',');
                 select.bind(this.getContextProperty(bind[0]), bind[1]);
                 return select;
             };
             return SelectFactory;
-        }(MapUIComponentFactory));
+        }(MapUiComponentFactory));
         ui.SelectFactory = SelectFactory;
         /**
          * duice.ui.Select
@@ -1882,7 +1884,7 @@ var duice;
                 return defaultIfEmpty(value, null);
             };
             return Select;
-        }(MapUIComponent));
+        }(MapUiComponent));
         ui.Select = Select;
         /**
          * duice.ui.TextareaFactory
@@ -1899,7 +1901,7 @@ var duice;
                 return textarea;
             };
             return TextareaFactory;
-        }(MapUIComponentFactory));
+        }(MapUiComponentFactory));
         ui.TextareaFactory = TextareaFactory;
         /**
          * duice.ui.Textarea
@@ -1925,7 +1927,7 @@ var duice;
                 return defaultIfEmpty(this.textarea.value, null);
             };
             return Textarea;
-        }(MapUIComponent));
+        }(MapUiComponent));
         ui.Textarea = Textarea;
         /**
          * duice.ui.ImageFactory
@@ -1942,7 +1944,7 @@ var duice;
                 return image;
             };
             return ImageFactory;
-        }(MapUIComponentFactory));
+        }(MapUiComponentFactory));
         ui.ImageFactory = ImageFactory;
         /**
          * duice.ui.Image
@@ -2002,7 +2004,7 @@ var duice;
                 return this.img.src;
             };
             return Image;
-        }(MapUIComponent));
+        }(MapUiComponent));
         ui.Image = Image;
         /**
          * duice.ui.TableFactory
@@ -2022,7 +2024,7 @@ var duice;
                 return table;
             };
             return TableFactory;
-        }(ListUIComponentFactory));
+        }(ListUiComponentFactory));
         ui.TableFactory = TableFactory;
         /**
          * duice.ui.Table
@@ -2170,7 +2172,7 @@ var duice;
                 return emptyTbody;
             };
             return Table;
-        }(ListUIComponent));
+        }(ListUiComponent));
         ui.Table = Table;
         /**
          * duice.ui.UListFactory
@@ -2197,7 +2199,7 @@ var duice;
                 return uList;
             };
             return UListFactory;
-        }(ListUIComponentFactory));
+        }(ListUiComponentFactory));
         ui.UListFactory = UListFactory;
         /**
          * duice.ui.UList
@@ -2501,7 +2503,7 @@ var duice;
                 }
             };
             return UList;
-        }(ListUIComponent));
+        }(ListUiComponent));
         ui.UList = UList;
         /**
          * new duice.dialog.Blocker(this.div).block().unblock();

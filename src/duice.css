@@ -44,7 +44,7 @@
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
 	border: 1px solid #ddd;
-	border-radius: 2px;
+	border-radius: 1px;
 	transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
 }
 .duice-ui-textInput:-moz-read-only { /* For Firefox */
@@ -71,7 +71,7 @@
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
 	border: 1px solid #ddd;
-	border-radius: 2px;
+	border-radius: 1px;
 	transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
 	font-family:inherit;
 	font-size:inherit;
@@ -130,7 +130,7 @@
 	-webkit-appearance: none; 
 	-moz-appearance: none;    
     appearance: none;
-    border-radius: 2px;
+    border-radius: 1px;
     border: 1px solid #cccccc;
     background-clip: padding-box;
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
@@ -340,7 +340,7 @@
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
 	border: 1px solid #ddd;
-	border-radius: 2px;
+	border-radius: 1px;
 	transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
 	font-family:inherit;
 	font-size:inherit;
@@ -391,7 +391,7 @@
 	-webkit-appearance: none; 
 	-moz-appearance: none;    
     appearance: none;
-    border-radius: 2px;
+    border-radius: 1px;
     border: 1px solid #cccccc;
     background-clip: padding-box;
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
@@ -422,7 +422,7 @@
 	white-space: pre-line;
 	margin: 0;
 	padding: 0em 0.5em;
-	border-radius: 2px;
+	border-radius: 1px;
 	border: 1px solid #ddd;
 	transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
 	box-sizing: border-box;         
@@ -464,6 +464,7 @@
 	border: solid 1px #ccc;
 }
 .duice-ui-table__caption {
+	font-weight: bold;
 }
 .duice-ui-table__thead {
 }
@@ -507,8 +508,6 @@
 }
 .duice-ui-table__tbody--index {
 	background: #eee;
-	background: -webkit-gradient(linear, left top, left bottom, from(#f7f7f7), to(#eee));
-	background: -moz-linear-gradient(top,  #f7f7f7,  #eee);
 }
 .duice-ui-table__tbody--empty {
 	vertical-align:middle;

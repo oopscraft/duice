@@ -9,7 +9,7 @@ function update() {
 
 # compile
 function compile() {
-	node node_modules/typescript/bin/tsc
+	node node_modules/typescript/bin/tsc ${@:1}
 }
 
 # generates document
@@ -31,7 +31,7 @@ case ${1} in
 		update
 		;;
 	compile)
-		compile
+		compile ${@:2}
 		;;
 	doc)
 		doc
