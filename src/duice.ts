@@ -896,7 +896,7 @@ namespace duice {
      * Delays specified milliseconds and calls specified function
      * @param callback
      */
-    function delayCall(millis:number, callback:Function, $this:any, ...args:any[]){
+    export function delayCall(millis:number, callback:Function, $this:any, ...args:any[]){
         var interval = setInterval(function() {
             try {
                 callback.call($this, ...args);
@@ -2643,23 +2643,41 @@ namespace duice {
         }
         
         /**
-         * new duice.dialog.Blocker(this.div).block().unblock();
-         * 
+         * duice.ui.Blocker
          */
         export class Blocker {
             element:HTMLElement;
             div:HTMLDivElement;
+			opacity:number = 0.2;
             constructor(element:HTMLElement){
                 this.element = element;
                 this.div = document.createElement('div');
                 this.div.classList.add('duice-ui-blocker');
             }
+			setOpacity(opacity:number):void {
+				this.opacity = opacity;
+			}
             block():void {
                 
                 // adjusting position
                 this.div.style.position = 'fixed';
                 this.div.style.zIndex = String(getCurrentMaxZIndex() + 1);
+				this.div.style.background = 'rgba(0, 0, 0, ' + this.opacity + ')';
+                this.takePosition();
+
+				// adds events
+				var $this = this;
+				getCurrentWindow().addEventListener('scroll', function(){
+					$this.takePosition();
+				});
                 
+                // append
+                this.element.appendChild(this.div);
+            }
+            unblock():void {
+                this.element.removeChild(this.div);
+            }
+			takePosition(){
                 // full blocking in case of BODY
                 if(this.element.tagName == 'BODY'){
                     this.div.style.width = '100%';
@@ -2679,14 +2697,34 @@ namespace duice {
                     this.div.style.top = top + 'px';
                     this.div.style.left = left + 'px';
                 }
-                
-                // append
-                this.element.appendChild(this.div);
-            }
-            unblock():void {
-                this.element.removeChild(this.div);
-            }
+			}
+			getBlockDiv():HTMLDivElement {
+				return this.div;	
+			}
         }
+
+        /**
+         * duice.ui.Progress
+         */
+		export class Progress {
+           	element:HTMLElement;
+			div:HTMLDivElement;
+			blocker:Blocker;
+            constructor(element:HTMLElement){
+				this.blocker =  new Blocker(element);
+				this.blocker.setOpacity(0.0);
+            }
+			start():void {
+				this.blocker.block();
+				this.div = document.createElement('div');
+                this.div.classList.add('duice-ui-progress');
+				this.blocker.getBlockDiv().appendChild(this.div);
+			}
+			stop():void {
+				this.blocker.getBlockDiv().removeChild(this.div);
+				this.blocker.unblock();
+			}
+		}
         
         /**
          * duice.ui.Modal

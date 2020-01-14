@@ -897,6 +897,7 @@ var duice;
             }
         }, millis);
     }
+    duice.delayCall = delayCall;
     /**
      * Returns current max z-index value.
      * @return max z-index value
@@ -2573,19 +2574,36 @@ var duice;
         }(ListUiComponent));
         ui.UList = UList;
         /**
-         * new duice.dialog.Blocker(this.div).block().unblock();
-         *
+         * duice.ui.Blocker
          */
         var Blocker = /** @class */ (function () {
             function Blocker(element) {
+                this.opacity = 0.2;
                 this.element = element;
                 this.div = document.createElement('div');
                 this.div.classList.add('duice-ui-blocker');
             }
+            Blocker.prototype.setOpacity = function (opacity) {
+                this.opacity = opacity;
+            };
             Blocker.prototype.block = function () {
                 // adjusting position
                 this.div.style.position = 'fixed';
                 this.div.style.zIndex = String(getCurrentMaxZIndex() + 1);
+                this.div.style.background = 'rgba(0, 0, 0, ' + this.opacity + ')';
+                this.takePosition();
+                // adds events
+                var $this = this;
+                getCurrentWindow().addEventListener('scroll', function () {
+                    $this.takePosition();
+                });
+                // append
+                this.element.appendChild(this.div);
+            };
+            Blocker.prototype.unblock = function () {
+                this.element.removeChild(this.div);
+            };
+            Blocker.prototype.takePosition = function () {
                 // full blocking in case of BODY
                 if (this.element.tagName == 'BODY') {
                     this.div.style.width = '100%';
@@ -2605,15 +2623,34 @@ var duice;
                     this.div.style.top = top + 'px';
                     this.div.style.left = left + 'px';
                 }
-                // append
-                this.element.appendChild(this.div);
             };
-            Blocker.prototype.unblock = function () {
-                this.element.removeChild(this.div);
+            Blocker.prototype.getBlockDiv = function () {
+                return this.div;
             };
             return Blocker;
         }());
         ui.Blocker = Blocker;
+        /**
+         * duice.ui.Progress
+         */
+        var Progress = /** @class */ (function () {
+            function Progress(element) {
+                this.blocker = new Blocker(element);
+                this.blocker.setOpacity(0.0);
+            }
+            Progress.prototype.start = function () {
+                this.blocker.block();
+                this.div = document.createElement('div');
+                this.div.classList.add('duice-ui-progress');
+                this.blocker.getBlockDiv().appendChild(this.div);
+            };
+            Progress.prototype.stop = function () {
+                this.blocker.getBlockDiv().removeChild(this.div);
+                this.blocker.unblock();
+            };
+            return Progress;
+        }());
+        ui.Progress = Progress;
         /**
          * duice.ui.Modal
          */

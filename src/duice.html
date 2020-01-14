@@ -1070,6 +1070,13 @@ body {
 		<div class="chapter__bodyDiv">
 			<div>
 				<button onclick="
+					var progress = new duice.ui.Progress(document.body);
+					progress.start();
+					duice.delayCall(2000, progress.stop, progress);
+				">
+				progress
+				</button>
+				<button onclick="
 					new duice.ui.Alert('alert message...')
 					.beforeOpen(function(){
 						return confirm('beforeOpen');
@@ -1209,6 +1216,7 @@ body {
 			<textarea is="duice-integrate-suneditor" data-duice-bind="user,profile" style="width:100%;height:200px;">11111</textarea>
 		</div>
 	</section>
+
 
 </body>
 </html>
