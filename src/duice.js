@@ -88,7 +88,7 @@ var duice;
      * @param $context
      */
     function initializeComponent(container, $context) {
-        [ModalUiComponentFactory, CompositeUiComponentFactory, ListUiComponentFactory, MapUiComponentFactory]
+        [ListUiComponentFactory, MapUiComponentFactory]
             .forEach(function (factoryType) {
             duice.ComponentDefinitionRegistry.getComponentDefinitions().forEach(function (componentDefinition) {
                 var elements = container.querySelectorAll(componentDefinition.getTagName() + '[is="' + componentDefinition.getIsAttribute() + '"][data-duice-bind]:not([data-duice-id])');
@@ -478,6 +478,22 @@ var duice;
             this.setChanged();
             this.notifyObservers(this);
         };
+        List.prototype.indexOf = function (handler) {
+            for (var i = 0, size = this.data.length; i < size; i++) {
+                if (handler.call(this, this.data[i]) == true) {
+                    return i;
+                }
+            }
+            return -1;
+        };
+        List.prototype.contains = function (handler) {
+            if (this.indexOf(handler) > -1) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
         List.prototype.forEach = function (handler) {
             for (var i = 0, size = this.data.length; i < size; i++) {
                 handler.call(this, this.data[i]);
@@ -552,7 +568,7 @@ var duice;
     }(UiComponent));
     duice.MapUiComponent = MapUiComponent;
     /**
-     * duice.ui.ListUiComponent
+     * duice.ListUiComponent
      */
     var ListUiComponent = /** @class */ (function (_super) {
         __extends(ListUiComponent, _super);
@@ -623,22 +639,6 @@ var duice;
         return ListUiComponentFactory;
     }(UiComponentFactory));
     duice.ListUiComponentFactory = ListUiComponentFactory;
-    var CompositeUiComponentFactory = /** @class */ (function (_super) {
-        __extends(CompositeUiComponentFactory, _super);
-        function CompositeUiComponentFactory() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        return CompositeUiComponentFactory;
-    }(UiComponentFactory));
-    duice.CompositeUiComponentFactory = CompositeUiComponentFactory;
-    var ModalUiComponentFactory = /** @class */ (function (_super) {
-        __extends(ModalUiComponentFactory, _super);
-        function ModalUiComponentFactory() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        return ModalUiComponentFactory;
-    }(UiComponentFactory));
-    duice.ModalUiComponentFactory = ModalUiComponentFactory;
     /**
      * Generates random UUID value
      * @return  UUID string
@@ -1150,6 +1150,437 @@ var duice;
         return DateFormat;
     }());
     duice.DateFormat = DateFormat;
+    /**
+     * duice.ui.Blocker
+     */
+    var Blocker = /** @class */ (function () {
+        function Blocker(element) {
+            this.opacity = 0.2;
+            this.element = element;
+            this.div = document.createElement('div');
+            this.div.classList.add('duice-blocker');
+        }
+        Blocker.prototype.setOpacity = function (opacity) {
+            this.opacity = opacity;
+        };
+        Blocker.prototype.block = function () {
+            // adjusting position
+            this.div.style.position = 'fixed';
+            this.div.style.zIndex = String(getCurrentMaxZIndex() + 1);
+            this.div.style.background = 'rgba(0, 0, 0, ' + this.opacity + ')';
+            this.takePosition();
+            // adds events
+            var $this = this;
+            getCurrentWindow().addEventListener('scroll', function () {
+                $this.takePosition();
+            });
+            // append
+            this.element.appendChild(this.div);
+        };
+        Blocker.prototype.unblock = function () {
+            this.element.removeChild(this.div);
+        };
+        Blocker.prototype.takePosition = function () {
+            // full blocking in case of BODY
+            if (this.element.tagName == 'BODY') {
+                this.div.style.width = '100%';
+                this.div.style.height = '100%';
+                this.div.style.top = '0px';
+                this.div.style.left = '0px';
+            }
+            // otherwise adjusting to parent element
+            else {
+                var boundingClientRect = this.element.getBoundingClientRect();
+                var width = boundingClientRect.width;
+                var height = boundingClientRect.height;
+                var left = boundingClientRect.left;
+                var top = boundingClientRect.top;
+                this.div.style.width = width + "px";
+                this.div.style.height = height + "px";
+                this.div.style.top = top + 'px';
+                this.div.style.left = left + 'px';
+            }
+        };
+        Blocker.prototype.getBlockDiv = function () {
+            return this.div;
+        };
+        return Blocker;
+    }());
+    duice.Blocker = Blocker;
+    /**
+     * duice.ui.Progress
+     */
+    var Progress = /** @class */ (function () {
+        function Progress(element) {
+            this.blocker = new Blocker(element);
+            this.blocker.setOpacity(0.0);
+        }
+        Progress.prototype.start = function () {
+            this.blocker.block();
+            this.div = document.createElement('div');
+            this.div.classList.add('duice-progress');
+            this.blocker.getBlockDiv().appendChild(this.div);
+        };
+        Progress.prototype.stop = function () {
+            this.blocker.getBlockDiv().removeChild(this.div);
+            this.blocker.unblock();
+        };
+        return Progress;
+    }());
+    duice.Progress = Progress;
+    /**
+      * duice.ui.Modal
+      */
+    var Modal = /** @class */ (function () {
+        function Modal() {
+            this.listener = {};
+            var $this = this;
+            this.container = document.createElement('div');
+            this.container.classList.add('duice-modal');
+            this.headerDiv = document.createElement('div');
+            this.headerDiv.classList.add('duice-modal__headerDiv');
+            this.container.appendChild(this.headerDiv);
+            // drag
+            this.headerDiv.style.cursor = 'move';
+            this.headerDiv.onmousedown = function (ev) {
+                var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+                pos3 = ev.clientX;
+                pos4 = ev.clientY;
+                getCurrentWindow().document.onmouseup = function (ev) {
+                    getCurrentWindow().document.onmousemove = null;
+                    getCurrentWindow().document.onmouseup = null;
+                };
+                getCurrentWindow().document.onmousemove = function (ev) {
+                    pos1 = pos3 - ev.clientX;
+                    pos2 = pos4 - ev.clientY;
+                    pos3 = ev.clientX;
+                    pos4 = ev.clientY;
+                    $this.container.style.left = ($this.container.offsetLeft - pos1) + 'px';
+                    $this.container.style.top = ($this.container.offsetTop - pos2) + 'px';
+                };
+            };
+            var titleIcon = document.createElement('span');
+            titleIcon.classList.add('duice-modal__headerDiv-titleIcon');
+            this.headerDiv.appendChild(titleIcon);
+            var closeButton = document.createElement('span');
+            closeButton.classList.add('duice-modal__headerDiv-closeButton');
+            closeButton.addEventListener('click', function (event) {
+                $this.close();
+            });
+            this.headerDiv.appendChild(closeButton);
+            // creates body
+            this.bodyDiv = document.createElement('div');
+            this.container.appendChild(this.bodyDiv);
+            // adds blocker
+            this.blocker = new Blocker(getCurrentWindow().document.body);
+        }
+        Modal.prototype.addContent = function (content) {
+            this.bodyDiv.appendChild(content);
+        };
+        Modal.prototype.removeContent = function (content) {
+            this.bodyDiv.removeChild(content);
+        };
+        Modal.prototype.createButton = function (type) {
+            var button = document.createElement('button');
+            button.classList.add('duice-modal__button--' + type);
+            return button;
+        };
+        Modal.prototype.show = function () {
+            // block
+            this.blocker.block();
+            // opens modal
+            this.container.style.display = 'block';
+            this.container.style.position = 'absolute';
+            this.container.style.zIndex = String(getCurrentMaxZIndex() + 1);
+            getCurrentWindow().document.body.appendChild(this.container);
+            setPositionCentered(this.container);
+        };
+        Modal.prototype.hide = function () {
+            // closes modal
+            this.container.style.display = 'none';
+            getCurrentWindow().document.body.removeChild(this.container);
+            // unblock
+            this.blocker.unblock();
+        };
+        Modal.prototype.open = function () {
+            var _a;
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            if (this.listener.beforeOpen) {
+                if ((_a = this.listener.beforeOpen).call.apply(_a, __spreadArrays([this], args)) === false) {
+                    return false;
+                }
+            }
+            this.show();
+            if (this.listener.afterOpen) {
+                delayCall.apply(void 0, __spreadArrays([200, this.listener.afterOpen, this], args));
+            }
+            return true;
+        };
+        Modal.prototype.beforeOpen = function (listener) {
+            this.listener.beforeOpen = listener;
+            return this;
+        };
+        Modal.prototype.afterOpen = function (listener) {
+            this.listener.afterOpen = listener;
+            return this;
+        };
+        Modal.prototype.close = function () {
+            var _a;
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            if (this.listener.beforeClose) {
+                if ((_a = this.listener.beforeClose).call.apply(_a, __spreadArrays([this], args)) === false) {
+                    return false;
+                }
+            }
+            this.hide();
+            if (this.listener.afterClose) {
+                delayCall.apply(void 0, __spreadArrays([200, this.listener.afterClose, this], args));
+            }
+            return true;
+        };
+        Modal.prototype.beforeClose = function (listener) {
+            this.listener.beforeClose = listener;
+            return this;
+        };
+        Modal.prototype.afterClose = function (listener) {
+            this.listener.afterClose = listener;
+            return this;
+        };
+        Modal.prototype.confirm = function () {
+            var _a;
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            if (this.listener.beforeConfirm) {
+                if ((_a = this.listener.beforeConfirm).call.apply(_a, __spreadArrays([this], args)) === false) {
+                    return false;
+                }
+            }
+            this.hide();
+            if (this.listener.afterConfirm) {
+                delayCall.apply(void 0, __spreadArrays([200, this.listener.afterConfirm, this], args));
+            }
+            return true;
+        };
+        Modal.prototype.beforeConfirm = function (listener) {
+            this.listener.beforeConfirm = listener;
+            return this;
+        };
+        Modal.prototype.afterConfirm = function (listener) {
+            this.listener.afterConfirm = listener;
+            return this;
+        };
+        return Modal;
+    }());
+    duice.Modal = Modal;
+    /**
+     * duice.ui.Alert
+     */
+    var Alert = /** @class */ (function (_super) {
+        __extends(Alert, _super);
+        function Alert(message) {
+            var _this = _super.call(this) || this;
+            _this.message = message;
+            var $this = _this;
+            _this.iconDiv = document.createElement('div');
+            _this.iconDiv.classList.add('duice-alert__iconDiv');
+            _this.messageDiv = document.createElement('div');
+            _this.messageDiv.classList.add('duice-alert__messageDiv');
+            _this.messageDiv.appendChild(document.createTextNode(_this.message));
+            _this.buttonDiv = document.createElement('div');
+            _this.buttonDiv.classList.add('duice-alert__buttonDiv');
+            _this.confirmButton = _this.createButton('confirm');
+            _this.confirmButton.addEventListener('click', function (event) {
+                console.log(this);
+                $this.close();
+            });
+            _this.buttonDiv.appendChild(_this.confirmButton);
+            // appends parts to bodyDiv
+            _this.addContent(_this.iconDiv);
+            _this.addContent(_this.messageDiv);
+            _this.addContent(_this.buttonDiv);
+            return _this;
+        }
+        Alert.prototype.open = function () {
+            if (_super.prototype.open.call(this)) {
+                this.confirmButton.focus();
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+        return Alert;
+    }(Modal));
+    duice.Alert = Alert;
+    /**
+     * duice.ui.Confirm
+     */
+    var Confirm = /** @class */ (function (_super) {
+        __extends(Confirm, _super);
+        function Confirm(message) {
+            var _this = _super.call(this) || this;
+            _this.message = message;
+            var $this = _this;
+            _this.iconDiv = document.createElement('div');
+            _this.iconDiv.classList.add('duice-confirm__iconDiv');
+            _this.messageDiv = document.createElement('div');
+            _this.messageDiv.classList.add('duice-confirm__messageDiv');
+            _this.messageDiv.appendChild(document.createTextNode(_this.message));
+            _this.buttonDiv = document.createElement('div');
+            _this.buttonDiv.classList.add('duice-confirm__buttonDiv');
+            // cancel button
+            _this.cancelButton = _this.createButton('cancel');
+            _this.cancelButton.addEventListener('click', function (event) {
+                $this.close();
+            });
+            _this.buttonDiv.appendChild(_this.cancelButton);
+            // confirm button
+            _this.confirmButton = _this.createButton('confirm');
+            _this.confirmButton.addEventListener('click', function (event) {
+                $this.confirm();
+            });
+            _this.buttonDiv.appendChild(_this.confirmButton);
+            // appends parts to bodyDiv
+            _this.addContent(_this.iconDiv);
+            _this.addContent(_this.messageDiv);
+            _this.addContent(_this.buttonDiv);
+            return _this;
+        }
+        Confirm.prototype.open = function () {
+            if (_super.prototype.open.call(this)) {
+                this.cancelButton.focus();
+            }
+            else {
+                return false;
+            }
+        };
+        return Confirm;
+    }(Modal));
+    duice.Confirm = Confirm;
+    /**
+     * duice.ui.Prompt
+     */
+    var Prompt = /** @class */ (function (_super) {
+        __extends(Prompt, _super);
+        function Prompt(message) {
+            var _this = _super.call(this) || this;
+            _this.message = message;
+            var $this = _this;
+            _this.iconDiv = document.createElement('div');
+            _this.iconDiv.classList.add('duice-prompt__iconDiv');
+            _this.messageDiv = document.createElement('div');
+            _this.messageDiv.classList.add('duice-prompt__messageDiv');
+            _this.messageDiv.appendChild(document.createTextNode(_this.message));
+            _this.inputDiv = document.createElement('div');
+            _this.inputDiv.classList.add('duice-prompt__inputDiv');
+            _this.input = document.createElement('input');
+            _this.input.classList.add('duice-prompt__inputDiv-input');
+            _this.inputDiv.appendChild(_this.input);
+            _this.buttonDiv = document.createElement('div');
+            _this.buttonDiv.classList.add('duice-prompt__buttonDiv');
+            // cancel button
+            _this.cancelButton = _this.createButton('cancel');
+            _this.cancelButton.addEventListener('click', function (event) {
+                $this.close();
+            });
+            _this.buttonDiv.appendChild(_this.cancelButton);
+            // confirm button
+            _this.confirmButton = _this.createButton('confirm');
+            _this.confirmButton.addEventListener('click', function (event) {
+                $this.confirm();
+            });
+            _this.buttonDiv.appendChild(_this.confirmButton);
+            // appends parts to bodyDiv
+            _this.addContent(_this.iconDiv);
+            _this.addContent(_this.messageDiv);
+            _this.addContent(_this.inputDiv);
+            _this.addContent(_this.buttonDiv);
+            return _this;
+        }
+        Prompt.prototype.open = function () {
+            if (_super.prototype.open.call(this)) {
+                this.input.focus();
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+        Prompt.prototype.getValue = function () {
+            return this.input.value;
+        };
+        return Prompt;
+    }(Modal));
+    duice.Prompt = Prompt;
+    /**
+     * duice.ui.Dialog
+     * @param dialog
+     */
+    var Dialog = /** @class */ (function (_super) {
+        __extends(Dialog, _super);
+        function Dialog(dialog) {
+            var _this = _super.call(this) || this;
+            _this.dialog = dialog;
+            _this.dialog.classList.add('duice-dialog');
+            _this.parentNode = _this.dialog.parentNode;
+            return _this;
+        }
+        Dialog.prototype.open = function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            this.dialog.style.display = 'block';
+            this.addContent(this.dialog);
+            // opens dialog
+            if (_super.prototype.open.apply(this, args)) {
+                return true;
+            }
+            else {
+                this.dialog.style.display = 'none';
+                this.parentNode.appendChild(this.dialog);
+                return false;
+            }
+        };
+        Dialog.prototype.close = function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            if (_super.prototype.close.apply(this, args)) {
+                this.dialog.style.display = 'none';
+                this.parentNode.appendChild(this.dialog);
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+        Dialog.prototype.confirm = function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            if (_super.prototype.confirm.call(this, args)) {
+                this.dialog.style.display = 'none';
+                this.parentNode.appendChild(this.dialog);
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+        return Dialog;
+    }(Modal));
+    duice.Dialog = Dialog;
     /**
      * duice.ui
      */
@@ -2075,6 +2506,26 @@ var duice;
         }(MapUiComponent));
         ui.Image = Image;
         /**
+         * duice.ui.Pagination
+         */
+        var Pagination = /** @class */ (function (_super) {
+            __extends(Pagination, _super);
+            function Pagination(ul) {
+                var _this = _super.call(this, ul) || this;
+                _this.ul = ul;
+                return _this;
+            }
+            Pagination.prototype.update = function (map, obj) {
+                var value = map.get(this.getName());
+                console.log(value);
+            };
+            Pagination.prototype.getValue = function () {
+                return this.page;
+            };
+            return Pagination;
+        }(MapUiComponent));
+        ui.Pagination = Pagination;
+        /**
          * duice.ui.TableFactory
          */
         var TableFactory = /** @class */ (function (_super) {
@@ -2197,12 +2648,13 @@ var duice;
                     // appends body
                     this.table.appendChild(tbody);
                     this.tbodies.push(tbody);
-                    // not found row
-                    if (list.getSize() < 1) {
-                        var emptyTbody = this.createEmptyTbody();
-                        this.table.appendChild(emptyTbody);
-                        this.tbodies.push(emptyTbody);
-                    }
+                }
+                // not found row
+                if (list.getSize() < 1) {
+                    var emptyTbody = this.createEmptyTbody();
+                    console.log('emptyTbody', emptyTbody);
+                    this.table.appendChild(emptyTbody);
+                    this.tbodies.push(emptyTbody);
                 }
             };
             /**
@@ -2573,392 +3025,6 @@ var duice;
             return UList;
         }(ListUiComponent));
         ui.UList = UList;
-        /**
-         * duice.ui.Blocker
-         */
-        var Blocker = /** @class */ (function () {
-            function Blocker(element) {
-                this.opacity = 0.2;
-                this.element = element;
-                this.div = document.createElement('div');
-                this.div.classList.add('duice-ui-blocker');
-            }
-            Blocker.prototype.setOpacity = function (opacity) {
-                this.opacity = opacity;
-            };
-            Blocker.prototype.block = function () {
-                // adjusting position
-                this.div.style.position = 'fixed';
-                this.div.style.zIndex = String(getCurrentMaxZIndex() + 1);
-                this.div.style.background = 'rgba(0, 0, 0, ' + this.opacity + ')';
-                this.takePosition();
-                // adds events
-                var $this = this;
-                getCurrentWindow().addEventListener('scroll', function () {
-                    $this.takePosition();
-                });
-                // append
-                this.element.appendChild(this.div);
-            };
-            Blocker.prototype.unblock = function () {
-                this.element.removeChild(this.div);
-            };
-            Blocker.prototype.takePosition = function () {
-                // full blocking in case of BODY
-                if (this.element.tagName == 'BODY') {
-                    this.div.style.width = '100%';
-                    this.div.style.height = '100%';
-                    this.div.style.top = '0px';
-                    this.div.style.left = '0px';
-                }
-                // otherwise adjusting to parent element
-                else {
-                    var boundingClientRect = this.element.getBoundingClientRect();
-                    var width = boundingClientRect.width;
-                    var height = boundingClientRect.height;
-                    var left = boundingClientRect.left;
-                    var top = boundingClientRect.top;
-                    this.div.style.width = width + "px";
-                    this.div.style.height = height + "px";
-                    this.div.style.top = top + 'px';
-                    this.div.style.left = left + 'px';
-                }
-            };
-            Blocker.prototype.getBlockDiv = function () {
-                return this.div;
-            };
-            return Blocker;
-        }());
-        ui.Blocker = Blocker;
-        /**
-         * duice.ui.Progress
-         */
-        var Progress = /** @class */ (function () {
-            function Progress(element) {
-                this.blocker = new Blocker(element);
-                this.blocker.setOpacity(0.0);
-            }
-            Progress.prototype.start = function () {
-                this.blocker.block();
-                this.div = document.createElement('div');
-                this.div.classList.add('duice-ui-progress');
-                this.blocker.getBlockDiv().appendChild(this.div);
-            };
-            Progress.prototype.stop = function () {
-                this.blocker.getBlockDiv().removeChild(this.div);
-                this.blocker.unblock();
-            };
-            return Progress;
-        }());
-        ui.Progress = Progress;
-        /**
-         * duice.ui.Modal
-         */
-        var Modal = /** @class */ (function () {
-            function Modal() {
-                this.listener = {};
-                var $this = this;
-                this.container = document.createElement('div');
-                this.container.classList.add('duice-ui-model');
-                this.headerDiv = document.createElement('div');
-                this.headerDiv.classList.add('duice-ui-modal__headerDiv');
-                this.container.appendChild(this.headerDiv);
-                // drag
-                this.headerDiv.style.cursor = 'move';
-                this.headerDiv.onmousedown = function (ev) {
-                    var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-                    pos3 = ev.clientX;
-                    pos4 = ev.clientY;
-                    getCurrentWindow().document.onmouseup = function (ev) {
-                        getCurrentWindow().document.onmousemove = null;
-                        getCurrentWindow().document.onmouseup = null;
-                    };
-                    getCurrentWindow().document.onmousemove = function (ev) {
-                        pos1 = pos3 - ev.clientX;
-                        pos2 = pos4 - ev.clientY;
-                        pos3 = ev.clientX;
-                        pos4 = ev.clientY;
-                        $this.container.style.left = ($this.container.offsetLeft - pos1) + 'px';
-                        $this.container.style.top = ($this.container.offsetTop - pos2) + 'px';
-                    };
-                };
-                var titleIcon = document.createElement('span');
-                titleIcon.classList.add('duice-ui-modal__headerDiv-titleIcon');
-                this.headerDiv.appendChild(titleIcon);
-                var closeButton = document.createElement('span');
-                closeButton.classList.add('duice-ui-modal__headerDiv-closeButton');
-                closeButton.addEventListener('click', function (event) {
-                    $this.close();
-                });
-                this.headerDiv.appendChild(closeButton);
-                // creates body
-                this.bodyDiv = document.createElement('div');
-                this.container.appendChild(this.bodyDiv);
-                // adds blocker
-                this.blocker = new Blocker(getCurrentWindow().document.body);
-            }
-            Modal.prototype.addContent = function (content) {
-                this.bodyDiv.appendChild(content);
-            };
-            Modal.prototype.createButton = function (type) {
-                var button = document.createElement('button');
-                button.classList.add('duice-ui-modal__button--' + type);
-                return button;
-            };
-            Modal.prototype.show = function () {
-                // block
-                this.blocker.block();
-                // opens modal
-                this.container.style.display = 'block';
-                this.container.style.position = 'absolute';
-                this.container.style.zIndex = String(getCurrentMaxZIndex() + 1);
-                getCurrentWindow().document.body.appendChild(this.container);
-                setPositionCentered(this.container);
-            };
-            Modal.prototype.hide = function () {
-                // closes modal
-                this.container.style.display = 'none';
-                getCurrentWindow().document.body.removeChild(this.container);
-                // unblock
-                this.blocker.unblock();
-            };
-            Modal.prototype.open = function () {
-                if (this.listener.beforeOpen) {
-                    if (this.listener.beforeOpen.call(this) === false) {
-                        return false;
-                    }
-                }
-                this.show();
-                if (this.listener.afterOpen) {
-                    delayCall(200, this.listener.afterOpen, this);
-                }
-                return true;
-            };
-            Modal.prototype.beforeOpen = function (listener) {
-                this.listener.beforeOpen = listener;
-                return this;
-            };
-            Modal.prototype.afterOpen = function (listener) {
-                this.listener.afterOpen = listener;
-                return this;
-            };
-            Modal.prototype.close = function () {
-                if (this.listener.beforeClose) {
-                    if (this.listener.beforeClose.call(this) === false) {
-                        return false;
-                    }
-                }
-                this.hide();
-                if (this.listener.afterClose) {
-                    delayCall(200, this.listener.afterClose, this);
-                }
-                return true;
-            };
-            Modal.prototype.beforeClose = function (listener) {
-                this.listener.beforeClose = listener;
-                return this;
-            };
-            Modal.prototype.afterClose = function (listener) {
-                this.listener.afterClose = listener;
-                return this;
-            };
-            Modal.prototype.confirm = function () {
-                if (this.listener.beforeConfirm) {
-                    if (this.listener.beforeConfirm.call(this) === false) {
-                        return false;
-                    }
-                }
-                this.hide();
-                if (this.listener.afterConfirm) {
-                    delayCall(200, this.listener.afterConfirm, this);
-                }
-                return true;
-            };
-            Modal.prototype.beforeConfirm = function (listener) {
-                this.listener.beforeConfirm = listener;
-                return this;
-            };
-            Modal.prototype.afterConfirm = function (listener) {
-                this.listener.afterConfirm = listener;
-                return this;
-            };
-            return Modal;
-        }());
-        ui.Modal = Modal;
-        /**
-         * duice.ui.Alert
-         */
-        var Alert = /** @class */ (function (_super) {
-            __extends(Alert, _super);
-            function Alert(message) {
-                var _this = _super.call(this) || this;
-                _this.message = message;
-                var $this = _this;
-                _this.iconDiv = document.createElement('div');
-                _this.iconDiv.classList.add('duice-ui-alert__iconDiv');
-                _this.messageDiv = document.createElement('div');
-                _this.messageDiv.classList.add('duice-ui-alert__messageDiv');
-                _this.messageDiv.appendChild(document.createTextNode(_this.message));
-                _this.buttonDiv = document.createElement('div');
-                _this.buttonDiv.classList.add('duice-ui-alert__buttonDiv');
-                _this.confirmButton = _this.createButton('confirm');
-                _this.confirmButton.addEventListener('click', function (event) {
-                    console.log(this);
-                    $this.close();
-                });
-                _this.buttonDiv.appendChild(_this.confirmButton);
-                // appends parts to bodyDiv
-                _this.addContent(_this.iconDiv);
-                _this.addContent(_this.messageDiv);
-                _this.addContent(_this.buttonDiv);
-                return _this;
-            }
-            Alert.prototype.open = function () {
-                if (_super.prototype.open.call(this)) {
-                    this.confirmButton.focus();
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            };
-            return Alert;
-        }(Modal));
-        ui.Alert = Alert;
-        /**
-         * duice.ui.Confirm
-         */
-        var Confirm = /** @class */ (function (_super) {
-            __extends(Confirm, _super);
-            function Confirm(message) {
-                var _this = _super.call(this) || this;
-                _this.message = message;
-                var $this = _this;
-                _this.iconDiv = document.createElement('div');
-                _this.iconDiv.classList.add('duice-ui-confirm__iconDiv');
-                _this.messageDiv = document.createElement('div');
-                _this.messageDiv.classList.add('duice-ui-confirm__messageDiv');
-                _this.messageDiv.appendChild(document.createTextNode(_this.message));
-                _this.buttonDiv = document.createElement('div');
-                _this.buttonDiv.classList.add('duice-ui-confirm__buttonDiv');
-                // cancel button
-                _this.cancelButton = _this.createButton('cancel');
-                _this.cancelButton.addEventListener('click', function (event) {
-                    $this.close();
-                });
-                _this.buttonDiv.appendChild(_this.cancelButton);
-                // confirm button
-                _this.confirmButton = _this.createButton('confirm');
-                _this.confirmButton.addEventListener('click', function (event) {
-                    $this.confirm();
-                });
-                _this.buttonDiv.appendChild(_this.confirmButton);
-                // appends parts to bodyDiv
-                _this.addContent(_this.iconDiv);
-                _this.addContent(_this.messageDiv);
-                _this.addContent(_this.buttonDiv);
-                return _this;
-            }
-            Confirm.prototype.open = function () {
-                if (_super.prototype.open.call(this)) {
-                    this.cancelButton.focus();
-                }
-                else {
-                    return false;
-                }
-            };
-            return Confirm;
-        }(Modal));
-        ui.Confirm = Confirm;
-        /**
-         * duice.ui.Prompt
-         */
-        var Prompt = /** @class */ (function (_super) {
-            __extends(Prompt, _super);
-            function Prompt(message) {
-                var _this = _super.call(this) || this;
-                _this.message = message;
-                var $this = _this;
-                _this.iconDiv = document.createElement('div');
-                _this.iconDiv.classList.add('duice-ui-prompt__iconDiv');
-                _this.messageDiv = document.createElement('div');
-                _this.messageDiv.classList.add('duice-ui-prompt__messageDiv');
-                _this.messageDiv.appendChild(document.createTextNode(_this.message));
-                _this.inputDiv = document.createElement('div');
-                _this.inputDiv.classList.add('duice-ui-prompt__inputDiv');
-                _this.input = document.createElement('input');
-                _this.input.classList.add('duice-ui-prompt__inputDiv-input');
-                _this.inputDiv.appendChild(_this.input);
-                _this.buttonDiv = document.createElement('div');
-                _this.buttonDiv.classList.add('duice-ui-prompt__buttonDiv');
-                // cancel button
-                _this.cancelButton = _this.createButton('cancel');
-                _this.cancelButton.addEventListener('click', function (event) {
-                    $this.close();
-                });
-                _this.buttonDiv.appendChild(_this.cancelButton);
-                // confirm button
-                _this.confirmButton = _this.createButton('confirm');
-                _this.confirmButton.addEventListener('click', function (event) {
-                    $this.confirm();
-                });
-                _this.buttonDiv.appendChild(_this.confirmButton);
-                // appends parts to bodyDiv
-                _this.addContent(_this.iconDiv);
-                _this.addContent(_this.messageDiv);
-                _this.addContent(_this.inputDiv);
-                _this.addContent(_this.buttonDiv);
-                return _this;
-            }
-            Prompt.prototype.open = function () {
-                if (_super.prototype.open.call(this)) {
-                    this.input.focus();
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            };
-            Prompt.prototype.getValue = function () {
-                return this.input.value;
-            };
-            return Prompt;
-        }(Modal));
-        ui.Prompt = Prompt;
-        var Dialog = /** @class */ (function (_super) {
-            __extends(Dialog, _super);
-            function Dialog(dialog) {
-                var _this = _super.call(this) || this;
-                _this.dialog = dialog;
-                _this.dialog.classList.add('duice-ui-dialog');
-                _this.parentNode = _this.dialog.parentNode;
-                return _this;
-            }
-            Dialog.prototype.open = function () {
-                this.dialog.style.display = 'block';
-                this.addContent(this.dialog);
-                if (_super.prototype.open.call(this)) {
-                    return true;
-                }
-                else {
-                    this.dialog.style.display = 'none';
-                    this.parentNode.appendChild(this.dialog);
-                    return false;
-                }
-            };
-            Dialog.prototype.close = function () {
-                if (_super.prototype.close.call(this)) {
-                    this.dialog.style.display = 'none';
-                    this.parentNode.appendChild(this.dialog);
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            };
-            return Dialog;
-        }(Modal));
-        ui.Dialog = Dialog;
         /**
          * Adds components
          */

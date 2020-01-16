@@ -619,7 +619,7 @@ body {
 							<th>duice.ui.Select</th>
 							<td>
 								<select is="duice-ui-select" data-duice-bind="user,groupId" class="form-control">
-									<option> - select - </option>
+									<option value> - select - </option>
 									<option value="animal">Animal</option>
 									<option value="fruit">Fruit</option>
 									<option value="human">Human</option>
@@ -1070,14 +1070,14 @@ body {
 		<div class="chapter__bodyDiv">
 			<div>
 				<button onclick="
-					var progress = new duice.ui.Progress(document.body);
+					var progress = new duice.Progress(document.body);
 					progress.start();
 					duice.delayCall(2000, progress.stop, progress);
 				">
 				progress
 				</button>
 				<button onclick="
-					new duice.ui.Alert('alert message...')
+					new duice.Alert('alert message...')
 					.beforeOpen(function(){
 						return confirm('beforeOpen');
 					})
@@ -1093,7 +1093,7 @@ body {
 					.open();
 				">duice.dialog.Alert</button>
 				<button onclick="
-					new duice.ui.Confirm('confirm message...')
+					new duice.Confirm('confirm message...')
 					.beforeOpen(function(){
 						return confirm('beforeOpen');
 					})
@@ -1115,7 +1115,7 @@ body {
 					.open();
 				">duice.ui.Confirm</button>
 				<button onclick="
-					new duice.ui.Prompt('enter value...')
+					new duice.Prompt('enter value...')
 					.beforeOpen(function(){
 						return confirm('beforeOpen');
 					})
@@ -1137,7 +1137,7 @@ body {
 					.open();
 				">duice.dialog.Prompt</button>
 				<button onclick="
-					new duice.ui.Dialog(document.getElementById('dialog'))
+					new duice.Dialog(document.getElementById('dialog'))
 					.beforeOpen(function(){
 						return confirm('beforeOpen');
 					})
@@ -1150,9 +1150,15 @@ body {
 					.afterClose(function(){
 						alert('afterClose');
 					})
+					.beforeConfirm(function(){
+						alert('beforeConfirm');
+					})
+					.afterConfirm(function(){
+						alert('afterConfirm');
+					})
 					.open();
 				">duice.dialog.Dialog</button>
-				<dialog id="dialog" style="width:600px; padding:1rem; display:none;">
+				<dialog id="dialog" style="width:600px; padding:1rem;">
 					<div style="text-align:center;">
 						<img is="duice-ui-img" data-duice-bind="user,image" style="height:64px;"/>
 					</div>
