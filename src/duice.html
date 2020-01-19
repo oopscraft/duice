@@ -62,7 +62,10 @@ user.fromJson({
 	tel: '08-1234-5678',
 	time: '13:00',
 	range: 60,
-	color: '#ff0000'
+	color: '#ff0000',
+	page: 1,
+	rows: 10,
+	totalCount: 89
 });
 
 /**
@@ -646,6 +649,20 @@ body {
 							<th>duice.ui.Image</th>
 							<td>
 								<img is="duice-ui-img" data-duice-bind="user,image"/>
+							</td>
+							<td>
+								&lt;img is="duice-ui-img" data-duice-bind="user,image" ...
+							</td>
+						</tr>
+						<!-- ================================================================ -->
+						<!-- duice.ui.Pagination			   								  -->
+						<!-- ================================================================ -->
+						<tr>
+							<th>duice.ui.Pagination</th>
+							<td>
+								<ul is="duice-ui-pagination" data-duice-bind="user,page,rows,totalCount" data-duice-size="5" class="pagination">
+									<li data-page="[[$context.page]]" onclick="alert(user.get('page'));" class="page-link"></li>
+								</ul>
 							</td>
 							<td>
 								&lt;img is="duice-ui-img" data-duice-bind="user,image" ...

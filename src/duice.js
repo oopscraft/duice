@@ -552,6 +552,10 @@ var duice;
             return _super !== null && _super.apply(this, arguments) || this;
         }
         MapUiComponent.prototype.bind = function (map, name) {
+            var args = [];
+            for (var _i = 2; _i < arguments.length; _i++) {
+                args[_i - 2] = arguments[_i];
+            }
             this.map = map;
             this.name = name;
             this.map.addObserver(this);
@@ -2506,21 +2510,136 @@ var duice;
         }(MapUiComponent));
         ui.Image = Image;
         /**
+         * duice.ui.PaginationFactory
+         */
+        var PaginationFactory = /** @class */ (function (_super) {
+            __extends(PaginationFactory, _super);
+            function PaginationFactory() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            PaginationFactory.prototype.getInstance = function (element) {
+                var pagination = new Pagination(element);
+                if (element.dataset.duiceSize) {
+                    pagination.setSize(Number(element.dataset.duiceSize));
+                }
+                var bind = element.dataset.duiceBind.split(',');
+                pagination.bind(this.getContextProperty(bind[0]), bind[1], bind[2], bind[3]);
+                return pagination;
+            };
+            return PaginationFactory;
+        }(MapUiComponentFactory));
+        ui.PaginationFactory = PaginationFactory;
+        /**
          * duice.ui.Pagination
          */
         var Pagination = /** @class */ (function (_super) {
             __extends(Pagination, _super);
             function Pagination(ul) {
                 var _this = _super.call(this, ul) || this;
+                _this.lis = new Array();
+                _this.size = 1;
+                _this.page = 1;
                 _this.ul = ul;
+                addClassNameIfCssEnable(_this.ul, 'duice-ui-pagination');
+                // clones li
+                var li = _this.ul.querySelector('li');
+                _this.li = li.cloneNode(true);
+                li.parentNode.removeChild(li);
                 return _this;
             }
+            Pagination.prototype.bind = function (map, pageName, rowsName, totalCountName) {
+                this.pageName = pageName;
+                this.rowsName = rowsName;
+                this.totalCountName = totalCountName;
+                _super.prototype.bind.call(this, map, pageName);
+            };
+            Pagination.prototype.setSize = function (size) {
+                this.size = size;
+            };
             Pagination.prototype.update = function (map, obj) {
-                var value = map.get(this.getName());
-                console.log(value);
+                this.page = Number(defaultIfEmpty(map.get(this.pageName), 1));
+                var rows = Number(defaultIfEmpty(map.get(this.rowsName), 1));
+                var totalCount = Number(defaultIfEmpty(map.get(this.totalCountName), 1));
+                var totalPage = Math.max(Math.ceil(totalCount / rows), 1);
+                var startPage = Math.floor((this.page - 1) / this.size) * this.size + 1;
+                var endPage = Math.min(startPage + this.size - 1, totalPage);
+                var $this = this;
+                // clear lis
+                for (var i = this.lis.length - 1; i >= 0; i--) {
+                    this.lis[i].parentNode.removeChild(this.lis[i]);
+                }
+                this.lis.length = 0;
+                // creates previous item
+                var prevPage = startPage - 1;
+                var prevLi = this.createPageItem(prevPage, '');
+                prevLi.classList.add('duice-ui-pagination__li--prev');
+                this.ul.appendChild(prevLi);
+                this.lis.push(prevLi);
+                prevLi.addEventListener('mousedown', function (event) {
+                    $this.page = prevPage;
+                    $this.setChanged();
+                    $this.notifyObservers($this);
+                    this.click();
+                });
+                if (prevPage < 1) {
+                    prevLi.onclick = null;
+                    prevLi.style.pointerEvents = 'none';
+                    prevLi.style.opacity = '0.5';
+                }
+                var _loop_1 = function () {
+                    var page = i;
+                    li = this_1.createPageItem(page, String(page));
+                    // add event listener
+                    li.addEventListener('mousedown', function (event) {
+                        $this.page = page;
+                        $this.setChanged();
+                        $this.notifyObservers($this);
+                        this.click();
+                    }, true);
+                    this_1.ul.appendChild(li);
+                    this_1.lis.push(li);
+                    if (page === this_1.page) {
+                        addClassNameIfCssEnable(li, 'duice-ui-pagination__li--current');
+                        li.onclick = null;
+                        li.style.pointerEvents = 'none';
+                    }
+                };
+                var this_1 = this, li;
+                // creates page items
+                for (var i = startPage; i <= endPage; i++) {
+                    _loop_1();
+                }
+                // creates next item
+                var nextPage = endPage + 1;
+                var nextLi = this.createPageItem(nextPage, '');
+                nextLi.classList.add('duice-ui-pagination__li--next');
+                this.ul.appendChild(nextLi);
+                this.lis.push(nextLi);
+                nextLi.addEventListener('mousedown', function (event) {
+                    $this.page = nextPage;
+                    $this.setChanged();
+                    $this.notifyObservers($this);
+                    this.click();
+                });
+                if (nextPage > totalPage) {
+                    nextLi.onclick = null;
+                    nextLi.style.pointerEvents = 'none';
+                    nextLi.style.opacity = '0.5';
+                }
             };
             Pagination.prototype.getValue = function () {
                 return this.page;
+            };
+            Pagination.prototype.createPageItem = function (page, text) {
+                var li = this.li.cloneNode(true);
+                addClassNameIfCssEnable(li, 'duice-ui-pagination__li');
+                var $this = this;
+                var $context = {};
+                $context['page'] = Number(page);
+                $context['text'] = String(text);
+                li = executeExpression(li, $context);
+                li.appendChild(document.createTextNode(text));
+                return li;
             };
             return Pagination;
         }(MapUiComponent));
@@ -2652,7 +2771,7 @@ var duice;
                 // not found row
                 if (list.getSize() < 1) {
                     var emptyTbody = this.createEmptyTbody();
-                    console.log('emptyTbody', emptyTbody);
+                    emptyTbody.style.pointerEvents = 'none';
                     this.table.appendChild(emptyTbody);
                     this.tbodies.push(emptyTbody);
                 }
@@ -3036,6 +3155,7 @@ var duice;
         duice.ComponentDefinitionRegistry.add(new ComponentDefinition('select', 'duice-ui-select', duice.ui.SelectFactory));
         duice.ComponentDefinitionRegistry.add(new ComponentDefinition('textarea', 'duice-ui-textarea', duice.ui.TextareaFactory));
         duice.ComponentDefinitionRegistry.add(new ComponentDefinition('img', 'duice-ui-img', duice.ui.ImageFactory));
+        duice.ComponentDefinitionRegistry.add(new ComponentDefinition('ul', 'duice-ui-pagination', duice.ui.PaginationFactory));
     })(ui = duice.ui || (duice.ui = {})); // end of duice.ui
 })(duice || (duice = {})); // end
 /**
