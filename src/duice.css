@@ -194,18 +194,21 @@
 	border: solid 0px;
 }
 
-
-
-
-
-
-
-
 /**
  * duice.ui.Scriptlet
  */
 *[is="duice-ui-scriptlet"] {
 	display:none;
+}
+
+/**
+ *duice.ui.Scriptlet
+ */
+.duice-ui-scriptlet {
+	height: inherit;
+	line-height: inherit;
+	margin: 0;
+	padding: 0rem 0.3rem;
 }
 
 /**
@@ -653,7 +656,7 @@
  */
 .duice-ui-img {
 	margin: 0px;
-	padding: 0px;
+	padding: 0rem 0.3rem;
 	vertical-align: middle;
 	cursor: pointer;
 }
@@ -710,11 +713,11 @@
 	margin: 0px;
 	padding: 0px;
 }
-.duice-ui-table__thead tr {
+.duice-ui-table__thead-tr {
 	height: inherit;
 	line-height: inherit;
 }
-.duice-ui-table__thead tr th {
+.duice-ui-table__thead-tr-th {
 	height: inherit;
 	line-height: inherit;
 	font-weight: bold;
@@ -732,45 +735,39 @@
 	border: 0px;
 }
 .duice-ui-table__tbody:hover {
-	background: #eee;
-	background: -webkit-gradient(linear, left top, left bottom, from(#f7f7f7), to(#eee));
-	background: -moz-linear-gradient(top,  #f7f7f7,  #eee);
+	background: #f7f7f7;
 	transition: all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
-.duice-ui-table__tbody tr {
+.duice-ui-table__tbody-tr {
 	height: inherit;
 	line-height: inherit;
 }
-.duice-ui-table__tbody tr td {
+.duice-ui-table__tbody-tr-td {
 	height: inherit;
 	line-height: inherit;
 	border: dotted 1px #ccc;
 	padding: 1px;
-	text-align: center;
+	text-align: left;
 }
 .duice-ui-table__tbody--index {
 	background: #f7f7f7;
-	background: -webkit-gradient(linear, left top, left bottom, from(#f7f7f7), to(#eee));
-	background: -moz-linear-gradient(top,  #f7f7f7,  #eee);
 }
 .duice-ui-table__tbody--empty {
 	margin: 0px;
 	border: 0px;
+	text-align: center;
 }
 .duice-ui-table__tbody--empty-message:before {
 	content: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFYAAAAHCAYAAACShLqlAAAAiElEQVR42mNgGAW0AWfOnHED4g9Q7IaH/x+KweJ4zPmPTS0uc3Do+08l+wmaQ8D/FUTIYfUvuoNAdB6RBruREEEEzSFGjBT7qeS2CrLDhkBMUztg/xORovGlcpypFl+OoXKq/E9qwCLHyP/RFIshR1rY0KOMJSaAaBmw+Mp4Ist/0svYUUAbAAD034V8Bdy9iQAAAABJRU5ErkJggg==');
 }
 .duice-ui-table__tfoot {
 	border-top: solid 1px #eee;
-	background: #f7f7f7;
-	background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#f7f7f7));
-	background: -moz-linear-gradient(top,  #fff,  #f7f7f7);
 }
-.duice-ui-table__tfoot tr {
+.duice-ui-table__tfoot-tr {
 	height: inherit;
 	line-height: inherit;
 }
-.duice-ui-table__tfoot tr td {
+.duice-ui-table__tfoot-tr-td {
 	height: inherit;
 	line-height: inherit;
 	padding: 0.2rem 0.5rem;

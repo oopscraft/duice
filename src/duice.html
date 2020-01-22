@@ -408,6 +408,7 @@ body {
 .textarea:focus {
 	outline: none;
 }
+/*
 .table {
 	border-collapse: collapse;
 	border: solid 1px #ccc;
@@ -437,6 +438,7 @@ body {
 	padding: 1px;
 	text-overflow: ellipsis;
 }
+*/
 </style>
 </head>
 <body>
@@ -476,7 +478,7 @@ body {
 						<button onclick="user.reset();">reset()</button>
 					</div>
 				</div>
-				<table class="table table-bordered" style="width:100%;">
+				<table class="table table-bordered" border="1" style="width:100%; border-collapse:collapse; border:solid 1px #ccc;">
 					<col align="left" />
 					<col align="left" />
 					<col align="right" />
@@ -765,6 +767,7 @@ body {
 					<div>
 						<table is="duice-ui-table" 
 							data-duice-bind="users,user" 
+							data-duice-selectable="true"
 							data-duice-editable="true"
 							class="table table-bordered"
 							style="width:100%;">
@@ -787,9 +790,9 @@ body {
 									<th>groupId</th>
 								</tr>
 							</thead>
-							<tbody data-index="[[$context.index]]" onclick="console.log(this.dataset.index + ':' + users.get(users.getIndex()).get('id'));">
+							<tbody data-index="[[$context.index]]" onclick="console.log(this.dataset.index + ':' + users.get(this.dataset.index).get('id'));">
 								<tr>
-									<td>[[$context.index + 1]]</td>
+									<td><span is="duice-ui-scriptlet" data-duice-bind="user">return $context.index + 1;</span></td>
 									<td><span is="duice-ui-span" data-duice-bind="user,id" class="form-control"></span></td>
 									<td><span is="duice-ui-span" data-duice-bind="user,parentId"></span></td>
 									<td><img is="duice-ui-img" data-duice-bind="user,image" src="//:0" style="height:16px;"/></td>

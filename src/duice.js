@@ -1402,7 +1402,6 @@ var duice;
             _this.buttonDiv.classList.add('duice-alert__buttonDiv');
             _this.confirmButton = _this.createButton('confirm');
             _this.confirmButton.addEventListener('click', function (event) {
-                console.log(this);
                 $this.close();
             });
             _this.buttonDiv.appendChild(_this.confirmButton);
@@ -1440,18 +1439,18 @@ var duice;
             _this.messageDiv.appendChild(document.createTextNode(_this.message));
             _this.buttonDiv = document.createElement('div');
             _this.buttonDiv.classList.add('duice-confirm__buttonDiv');
-            // cancel button
-            _this.cancelButton = _this.createButton('cancel');
-            _this.cancelButton.addEventListener('click', function (event) {
-                $this.close();
-            });
-            _this.buttonDiv.appendChild(_this.cancelButton);
             // confirm button
             _this.confirmButton = _this.createButton('confirm');
             _this.confirmButton.addEventListener('click', function (event) {
                 $this.confirm();
             });
             _this.buttonDiv.appendChild(_this.confirmButton);
+            // cancel button
+            _this.cancelButton = _this.createButton('cancel');
+            _this.cancelButton.addEventListener('click', function (event) {
+                $this.close();
+            });
+            _this.buttonDiv.appendChild(_this.cancelButton);
             // appends parts to bodyDiv
             _this.addContent(_this.iconDiv);
             _this.addContent(_this.messageDiv);
@@ -1460,7 +1459,7 @@ var duice;
         }
         Confirm.prototype.open = function () {
             if (_super.prototype.open.call(this)) {
-                this.cancelButton.focus();
+                this.confirmButton.focus();
             }
             else {
                 return false;
@@ -1490,18 +1489,18 @@ var duice;
             _this.inputDiv.appendChild(_this.input);
             _this.buttonDiv = document.createElement('div');
             _this.buttonDiv.classList.add('duice-prompt__buttonDiv');
-            // cancel button
-            _this.cancelButton = _this.createButton('cancel');
-            _this.cancelButton.addEventListener('click', function (event) {
-                $this.close();
-            });
-            _this.buttonDiv.appendChild(_this.cancelButton);
             // confirm button
             _this.confirmButton = _this.createButton('confirm');
             _this.confirmButton.addEventListener('click', function (event) {
                 $this.confirm();
             });
             _this.buttonDiv.appendChild(_this.confirmButton);
+            // cancel button
+            _this.cancelButton = _this.createButton('cancel');
+            _this.cancelButton.addEventListener('click', function (event) {
+                $this.close();
+            });
+            _this.buttonDiv.appendChild(_this.cancelButton);
             // appends parts to bodyDiv
             _this.addContent(_this.iconDiv);
             _this.addContent(_this.messageDiv);
@@ -1573,7 +1572,7 @@ var duice;
             for (var _i = 0; _i < arguments.length; _i++) {
                 args[_i] = arguments[_i];
             }
-            if (_super.prototype.confirm.call(this, args)) {
+            if (_super.prototype.confirm.apply(this, args)) {
                 this.dialog.style.display = 'none';
                 this.parentNode.appendChild(this.dialog);
                 return true;
@@ -1628,6 +1627,7 @@ var duice;
             function Scriptlet(element) {
                 var _this = _super.call(this, element) || this;
                 _this.expression = element.innerHTML;
+                _this.element.classList.add('duice-ui-scriptlet');
                 return _this;
             }
             ;
@@ -2654,9 +2654,8 @@ var duice;
             }
             TableFactory.prototype.getInstance = function (element) {
                 var table = new Table(element);
-                if (element.dataset.duiceEditable) {
-                    table.setEditable(element.dataset.duiceEditable === 'true');
-                }
+                table.setSelectable(element.dataset.duiceSelectable === 'true');
+                table.setEditable(element.dataset.duiceEditable === 'true');
                 var bind = element.dataset.duiceBind.split(',');
                 table.bind(this.getContextProperty(bind[0]), bind[1]);
                 return table;
@@ -2689,6 +2688,12 @@ var duice;
                 var thead = _this.table.querySelector('thead');
                 if (thead) {
                     addClassNameIfCssEnable(thead, 'duice-ui-table__thead');
+                    thead.querySelectorAll('tr').forEach(function (tr) {
+                        addClassNameIfCssEnable(tr, 'duice-ui-table__thead-tr');
+                    });
+                    thead.querySelectorAll('th').forEach(function (th) {
+                        addClassNameIfCssEnable(th, 'duice-ui-table__thead-tr-th');
+                    });
                     thead = executeExpression(thead, new Object());
                     initializeComponent(thead, new Object());
                 }
@@ -2696,16 +2701,35 @@ var duice;
                 var tbody = _this.table.querySelector('tbody');
                 _this.tbody = tbody.cloneNode(true);
                 addClassNameIfCssEnable(_this.tbody, 'duice-ui-table__tbody');
+                _this.tbody.querySelectorAll('tr').forEach(function (tr) {
+                    addClassNameIfCssEnable(tr, 'duice-ui-table__tbody-tr');
+                });
+                _this.tbody.querySelectorAll('td').forEach(function (th) {
+                    addClassNameIfCssEnable(th, 'duice-ui-table__tbody-tr-td');
+                });
                 _this.table.removeChild(tbody);
                 // initializes foot
                 var tfoot = _this.table.querySelector('tfoot');
                 if (tfoot) {
                     addClassNameIfCssEnable(tfoot, 'duice-ui-table__tfoot');
+                    tfoot.querySelectorAll('tr').forEach(function (tr) {
+                        addClassNameIfCssEnable(tr, 'duice-ui-table__tfoot-tr');
+                    });
+                    tfoot.querySelectorAll('td').forEach(function (td) {
+                        addClassNameIfCssEnable(td, 'duice-ui-table__tfoot-tr-td');
+                    });
                     tfoot = executeExpression(tfoot, new Object());
                     initializeComponent(tfoot, new Object());
                 }
                 return _this;
             }
+            /**
+             * Sets selectable flag
+             * @param selectable
+             */
+            Table.prototype.setSelectable = function (selectable) {
+                this.selectable = selectable;
+            };
             /**
              * Sets enable flag
              * @param editable
@@ -2735,19 +2759,20 @@ var duice;
                     var tbody = this.createTbody(index, map);
                     tbody.dataset.duiceIndex = String(index);
                     // select index
-                    if (index === list.getIndex()) {
-                        tbody.classList.add('duice-ui-table__tbody--index');
-                    }
-                    tbody.addEventListener('click', function (event) {
-                        for (var i = 0; i < $this.tbodies.length; i++) {
-                            $this.tbodies[i].classList.remove('duice-ui-table__tbody--index');
+                    if (this.selectable) {
+                        if (index === list.getIndex()) {
+                            tbody.classList.add('duice-ui-table__tbody--index');
                         }
-                        this.classList.add('duice-ui-table__tbody--index');
-                        list.index = Number(this.dataset.duiceIndex);
-                        console.log(list.getIndex(), list);
-                    }, true);
+                        tbody.addEventListener('click', function (event) {
+                            for (var i = 0; i < $this.tbodies.length; i++) {
+                                $this.tbodies[i].classList.remove('duice-ui-table__tbody--index');
+                            }
+                            this.classList.add('duice-ui-table__tbody--index');
+                            list.index = Number(this.dataset.duiceIndex);
+                        }, true);
+                    }
                     // drag and drop event
-                    if (this.editable === true) {
+                    if (this.editable) {
                         tbody.setAttribute('draggable', 'true');
                         tbody.addEventListener('dragstart', function (event) {
                             event.dataTransfer.setData("text", this.dataset.duiceIndex);
@@ -2828,10 +2853,10 @@ var duice;
                     uList.setHierarchy(hirearchy[0], hirearchy[1]);
                 }
                 if (element.dataset.duiceFoldable) {
-                    uList.setFoldable(Boolean(element.dataset.duiceFoldable));
+                    uList.setFoldable(element.dataset.duiceFoldable === 'true' ? true : false);
                 }
                 if (element.dataset.duiceEditable) {
-                    uList.setEditable(Boolean(element.dataset.duiceEditable));
+                    uList.setEditable(element.dataset.duiceEditable === 'true' ? true : false);
                 }
                 var bind = element.dataset.duiceBind.split(',');
                 uList.bind(this.getContextProperty(bind[0]), bind[1]);
@@ -2967,7 +2992,6 @@ var duice;
                     }
                     this.classList.add('duice-ui-ul__li--index');
                     $this.list.index = Number(this.dataset.duiceIndex);
-                    console.log($this.list.getIndex(), $this.list);
                 });
                 // editable
                 if (this.editable) {

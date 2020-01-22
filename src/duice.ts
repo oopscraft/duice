@@ -1463,7 +1463,6 @@ namespace duice {
             
             this.confirmButton = this.createButton('confirm');
             this.confirmButton.addEventListener('click', function(event){
-                console.log(this);
                 $this.close(); 
             });
             this.buttonDiv.appendChild(this.confirmButton);
@@ -1508,19 +1507,19 @@ namespace duice {
             this.buttonDiv = document.createElement('div');
             this.buttonDiv.classList.add('duice-confirm__buttonDiv');
             
-            // cancel button
-            this.cancelButton = this.createButton('cancel');
-            this.cancelButton.addEventListener('click', function(event){
-               $this.close(); 
-            });
-            this.buttonDiv.appendChild(this.cancelButton);
-            
             // confirm button
             this.confirmButton = this.createButton('confirm');
             this.confirmButton.addEventListener('click', function(event){
                $this.confirm(); 
             });
             this.buttonDiv.appendChild(this.confirmButton);
+
+            // cancel button
+            this.cancelButton = this.createButton('cancel');
+            this.cancelButton.addEventListener('click', function(event){
+               $this.close(); 
+            });
+            this.buttonDiv.appendChild(this.cancelButton);
             
             // appends parts to bodyDiv
             this.addContent(this.iconDiv);
@@ -1529,7 +1528,7 @@ namespace duice {
         }
         open():boolean {
             if(super.open()){
-                this.cancelButton.focus();    
+                this.confirmButton.focus();    
             }else{
                 return false;
             }
@@ -1569,19 +1568,19 @@ namespace duice {
             this.buttonDiv = document.createElement('div');
             this.buttonDiv.classList.add('duice-prompt__buttonDiv');
             
-            // cancel button
-            this.cancelButton = this.createButton('cancel');
-            this.cancelButton.addEventListener('click', function(event){
-               $this.close(); 
-            });
-            this.buttonDiv.appendChild(this.cancelButton);
-            
             // confirm button
             this.confirmButton = this.createButton('confirm');
             this.confirmButton.addEventListener('click', function(event){
                $this.confirm(); 
             });
             this.buttonDiv.appendChild(this.confirmButton);
+
+            // cancel button
+            this.cancelButton = this.createButton('cancel');
+            this.cancelButton.addEventListener('click', function(event){
+               $this.close(); 
+            });
+            this.buttonDiv.appendChild(this.cancelButton);
             
             // appends parts to bodyDiv
             this.addContent(this.iconDiv);
@@ -1638,7 +1637,7 @@ namespace duice {
             }
         }
         confirm(...args:any[]):boolean {
-            if(super.confirm(args)){
+            if(super.confirm(...args)){
                 this.dialog.style.display = 'none';
                 this.parentNode.appendChild(this.dialog);
                 return true;
@@ -1687,6 +1686,7 @@ namespace duice {
             constructor(element:HTMLElement){
                 super(element);
                 this.expression = element.innerHTML;
+                this.element.classList.add('duice-ui-scriptlet');
             }
             bind(context:any):void {
                 this.context = context;
@@ -2704,9 +2704,8 @@ namespace duice {
         export class TableFactory extends ListUiComponentFactory {
             getInstance(element:HTMLTableElement):Table {
                 var table = new Table(element);
-                if(element.dataset.duiceEditable){
-                    table.setEditable(element.dataset.duiceEditable === 'true');
-                }
+                table.setSelectable(element.dataset.duiceSelectable === 'true');
+                table.setEditable(element.dataset.duiceEditable === 'true');
                 var bind = element.dataset.duiceBind.split(',');
                 table.bind(this.getContextProperty(bind[0]), bind[1]);
                 return table;
@@ -2720,6 +2719,7 @@ namespace duice {
             table:HTMLTableElement;
             tbody:HTMLTableSectionElement;
             tbodies:Array<HTMLTableSectionElement> = new Array<HTMLTableSectionElement>();
+            selectable:boolean;
             editable:boolean;
         
             /**
@@ -2734,7 +2734,7 @@ namespace duice {
                 // initializes caption
                 var caption = <HTMLTableCaptionElement>this.table.querySelector('caption');
                 if(caption){
-					addClassNameIfCssEnable(caption,'duice-ui-table__caption');
+                    addClassNameIfCssEnable(caption,'duice-ui-table__caption');
                     caption = executeExpression(<HTMLElement>caption, new Object());
                     initializeComponent(caption, new Object());
                 }
@@ -2742,7 +2742,13 @@ namespace duice {
                 // initializes head
                 var thead = <HTMLTableSectionElement>this.table.querySelector('thead');
                 if(thead){
-					addClassNameIfCssEnable(thead,'duice-ui-table__thead');
+                    addClassNameIfCssEnable(thead,'duice-ui-table__thead');
+                    thead.querySelectorAll('tr').forEach(function(tr){
+                        addClassNameIfCssEnable(tr,'duice-ui-table__thead-tr');
+                    });
+                    thead.querySelectorAll('th').forEach(function(th){
+                        addClassNameIfCssEnable(th,'duice-ui-table__thead-tr-th');
+                    });
                     thead = executeExpression(<HTMLElement>thead, new Object());
                     initializeComponent(thead, new Object());
                 }
@@ -2750,16 +2756,36 @@ namespace duice {
                 // clones body
                 var tbody = this.table.querySelector('tbody');
                 this.tbody = <HTMLTableSectionElement>tbody.cloneNode(true);
-				addClassNameIfCssEnable(this.tbody,'duice-ui-table__tbody');
+                addClassNameIfCssEnable(this.tbody,'duice-ui-table__tbody');
+                this.tbody.querySelectorAll('tr').forEach(function(tr){
+                    addClassNameIfCssEnable(tr,'duice-ui-table__tbody-tr');
+                });
+                this.tbody.querySelectorAll('td').forEach(function(th){
+                    addClassNameIfCssEnable(th,'duice-ui-table__tbody-tr-td');
+                });
                 this.table.removeChild(tbody);
                 
                 // initializes foot
                 var tfoot = <HTMLTableSectionElement>this.table.querySelector('tfoot');
                 if(tfoot){
-					addClassNameIfCssEnable(tfoot,'duice-ui-table__tfoot');
+                    addClassNameIfCssEnable(tfoot,'duice-ui-table__tfoot');
+                    tfoot.querySelectorAll('tr').forEach(function(tr){
+                        addClassNameIfCssEnable(tr,'duice-ui-table__tfoot-tr');
+                    });
+                    tfoot.querySelectorAll('td').forEach(function(td){
+                        addClassNameIfCssEnable(td,'duice-ui-table__tfoot-tr-td');
+                    });
                     tfoot = executeExpression(<HTMLElement>tfoot, new Object());
                     initializeComponent(tfoot, new Object());
                 }
+            }
+
+            /**
+             * Sets selectable flag
+             * @param selectable 
+             */
+            setSelectable(selectable:boolean):void {
+                this.selectable = selectable;
             }
             
             /**
@@ -2797,20 +2823,21 @@ namespace duice {
                     tbody.dataset.duiceIndex = String(index);
                     
                     // select index
-                    if(index === list.getIndex()){
-                        tbody.classList.add('duice-ui-table__tbody--index');
-                    }
-                    tbody.addEventListener('click', function(event){
-                        for(var i = 0; i < $this.tbodies.length; i ++ ) {
-                            $this.tbodies[i].classList.remove('duice-ui-table__tbody--index');
+                    if(this.selectable){
+                        if(index === list.getIndex()){
+                            tbody.classList.add('duice-ui-table__tbody--index');
                         }
-                        this.classList.add('duice-ui-table__tbody--index');
-                        list.index = Number(this.dataset.duiceIndex);
-                        console.log(list.getIndex(), list);
-                    }, true);
+                        tbody.addEventListener('click', function(event){
+                            for(var i = 0; i < $this.tbodies.length; i ++ ) {
+                                $this.tbodies[i].classList.remove('duice-ui-table__tbody--index');
+                            }
+                            this.classList.add('duice-ui-table__tbody--index');
+                            list.index = Number(this.dataset.duiceIndex);
+                        }, true);
+                    }
                     
                     // drag and drop event
-                    if(this.editable === true) {
+                    if(this.editable) {
                         tbody.setAttribute('draggable', 'true');
                         tbody.addEventListener('dragstart', function(event){
                             event.dataTransfer.setData("text", this.dataset.duiceIndex);
@@ -2890,10 +2917,10 @@ namespace duice {
                     uList.setHierarchy(hirearchy[0], hirearchy[1]);
                 }
                 if(element.dataset.duiceFoldable){
-                    uList.setFoldable(Boolean(element.dataset.duiceFoldable));
+                    uList.setFoldable(element.dataset.duiceFoldable === 'true' ? true : false);
                 }
                 if(element.dataset.duiceEditable){
-                    uList.setEditable(Boolean(element.dataset.duiceEditable));
+                    uList.setEditable(element.dataset.duiceEditable === 'true' ? true: false);
                 }
                 var bind = element.dataset.duiceBind.split(',');
                 uList.bind(this.getContextProperty(bind[0]), bind[1]);
@@ -3045,7 +3072,6 @@ namespace duice {
                     }
                     this.classList.add('duice-ui-ul__li--index');
                     $this.list.index = Number(this.dataset.duiceIndex);
-                    console.log($this.list.getIndex(), $this.list);
                 });
 
                 // editable
