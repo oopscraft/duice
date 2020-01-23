@@ -118,12 +118,13 @@ namespace duice {
     abstract class Observable {
         observers:Array<Observer> = new Array<Observer>();
         changed:boolean = false;
+        notifiable:boolean = true;
+
         /**
          * Adds observer instance
          * @param observer
          */
         addObserver(observer:Observer):void {
-            
             for(var i = 0, size = this.observers.length; i < size; i++){
                 if(this.observers[i] === observer){
                     return;
@@ -148,7 +149,7 @@ namespace duice {
          * @param obj object to transfer to observer
          */
         notifyObservers(obj:object):void {
-            if(this.hasChanged()){
+            if(this.notifiable && this.hasChanged()){
                 this.clearUnavailableObservers();
                 for(var i = 0, size = this.observers.length; i < size; i++){
                     try {
@@ -160,6 +161,15 @@ namespace duice {
                 this.clearChanged();
             }
         }
+
+        /**
+         * Sets notifiable
+         * @param notifiable 
+         */
+        enableNotify(notifiable:boolean){
+            this.notifiable = notifiable;
+        }
+
         /**
          * Sets changed flag 
          */
@@ -416,7 +426,8 @@ namespace duice {
         data:Array<duice.Map> = new Array<duice.Map>();
         originData:string;
         index:number = -1;
-        constructor(jsonArray?:Array<any>, __childName?:string) {
+        on:any = {};
+        constructor(jsonArray?:Array<any>) {
             super();
             if(jsonArray){
                 this.fromJson(jsonArray);
@@ -439,7 +450,7 @@ namespace duice {
             this.setChanged();
             this.notifyObservers(this);
         }
-        toJson(__childName?:string):Array<object> {
+        toJson():Array<object> {
             var jsonArray = new Array();
             for(var i = 0; i < this.data.length; i ++){
                 jsonArray.push(this.data[i].toJson());
@@ -457,10 +468,27 @@ namespace duice {
             var originJson = JSON.parse(this.originData);
             this.fromJson(originJson);
         }
-        setIndex(index:number):void {
+        setIndex(index:number):boolean {
+
+            // calls beforeIndexChanged 
+            if(this.on.beforeIndexChanged){
+                if(this.on.beforeIndexChanged.call(this,index) === false){
+                    return false;
+                }
+            }
+
+            // changes index
             this.index = index;
             this.setChanged();
             this.notifyObservers(this);
+
+            // calls 
+            if(this.on.afterIndexChanged){
+                this.on.afterIndexChanged.call(this,index);
+            }
+
+            // returns true
+            return true;
         }
         getIndex():number {
             return this.index;
@@ -509,7 +537,7 @@ namespace duice {
         }
 		indexOf(handler:Function){
 			for(var i = 0, size = this.data.length; i < size; i ++){
-				if(handler.call(this, this.data[i]) == true){
+				if(handler.call(this, this.data[i]) === true){
 					return i;
 				}
 			}
@@ -524,7 +552,9 @@ namespace duice {
 		}
         forEach(handler:Function){
             for(var i = 0, size = this.data.length; i < size; i ++){
-                handler.call(this, this.data[i]);
+                if(handler.call(this, this.data[i], i) === false){
+                    break;
+                }
             }
         }
         sort(name:string, ascending:boolean):void {
@@ -535,6 +565,12 @@ namespace duice {
             });
             this.setChanged();
             this.notifyObservers(this);
+        }
+        onBeforeIndexChanged(listener:Function):void {
+            this.on.beforeIndexChanged = listener;
+        }
+        onAfterIndexChanged(listener:Function):void {
+            this.on.afterIndexChanged = listener;
         }
     }
     
@@ -1295,7 +1331,7 @@ namespace duice {
         headerDiv:HTMLDivElement;
         bodyDiv:HTMLDivElement;
         blocker:Blocker;
-        listener:any = {};
+        on:any = {};
         constructor(){
             var $this = this;
             this.container = document.createElement('div');
@@ -1376,63 +1412,63 @@ namespace duice {
             this.blocker.unblock();
         }
         open(...args:any[]):boolean {
-            if(this.listener.beforeOpen){
-                if(this.listener.beforeOpen.call(this, ...args) === false){
+            if(this.on.beforeOpen){
+                if(this.on.beforeOpen.call(this, ...args) === false){
                     return false;
                 }
             }
             this.show();
-            if(this.listener.afterOpen){
-                delayCall(200, this.listener.afterOpen, this, ...args);
+            if(this.on.afterOpen){
+                delayCall(200, this.on.afterOpen, this, ...args);
             }
             return true;
         }
-        beforeOpen(listener:Function):any {
-            this.listener.beforeOpen = listener;
+        onBeforeOpen(listener:Function):any {
+            this.on.beforeOpen = listener;
             return this;
         }
-        afterOpen(listener:Function):any {
-            this.listener.afterOpen = listener;
+        onAfterOpen(listener:Function):any {
+            this.on.afterOpen = listener;
             return this;
         }
         close(...args:any[]):boolean {
-            if(this.listener.beforeClose){
-                if(this.listener.beforeClose.call(this, ...args) === false){
+            if(this.on.beforeClose){
+                if(this.on.beforeClose.call(this, ...args) === false){
                     return false;
                 }
             }
             this.hide();
-            if(this.listener.afterClose){
-                delayCall(200, this.listener.afterClose, this, ...args);
+            if(this.on.afterClose){
+                delayCall(200, this.on.afterClose, this, ...args);
             }
             return true;
         }
-        beforeClose(listener:Function):any{
-            this.listener.beforeClose = listener;
+        onBeforeClose(listener:Function):any{
+            this.on.beforeClose = listener;
             return this;
         }
-        afterClose(listener:Function):any {
-            this.listener.afterClose = listener;
+        onAfterClose(listener:Function):any {
+            this.on.afterClose = listener;
             return this;
         }
         confirm(...args: any[]):boolean {
-            if(this.listener.beforeConfirm){
-                if(this.listener.beforeConfirm.call(this, ...args) === false){
+            if(this.on.beforeConfirm){
+                if(this.on.beforeConfirm.call(this, ...args) === false){
                     return false;
                 }
             }
             this.hide();
-            if(this.listener.afterConfirm){
-                delayCall(200, this.listener.afterConfirm, this, ...args);
+            if(this.on.afterConfirm){
+                delayCall(200, this.on.afterConfirm, this, ...args);
             }
             return true;
         }
-        beforeConfirm(listener:Function):any {
-            this.listener.beforeConfirm = listener;
+        onBeforeConfirm(listener:Function):any {
+            this.on.beforeConfirm = listener;
             return this;
         }
-        afterConfirm(listener:Function):any {
-            this.listener.afterConfirm = listener;
+        onAfterConfirm(listener:Function):any {
+            this.on.afterConfirm = listener;
             return this;
         }
     }
@@ -2828,11 +2864,8 @@ namespace duice {
                             tbody.classList.add('duice-ui-table__tbody--index');
                         }
                         tbody.addEventListener('click', function(event){
-                            for(var i = 0; i < $this.tbodies.length; i ++ ) {
-                                $this.tbodies[i].classList.remove('duice-ui-table__tbody--index');
-                            }
-                            this.classList.add('duice-ui-table__tbody--index');
-                            list.index = Number(this.dataset.duiceIndex);
+                            var index = Number(this.dataset.duiceIndex);
+                            $this.selectTbody(index);
                         }, true);
                     }
                     
@@ -2867,6 +2900,25 @@ namespace duice {
                     this.table.appendChild(emptyTbody);
                     this.tbodies.push(emptyTbody);
                 }
+            }
+
+            /**
+             * Selects tbody element
+             * @param tbody 
+             */
+            selectTbody(index:number):void {
+                this.getList().enableNotify(false);
+                if(this.getList().setIndex(index)){
+                    // handles class                
+                    for(var i = 0; i < this.tbodies.length; i ++ ) {
+                        if(i === index){
+                            this.tbodies[i].classList.add('duice-ui-table__tbody--index');
+                        }else{
+                            this.tbodies[i].classList.remove('duice-ui-table__tbody--index');
+                        }
+                    }
+                }
+                this.getList().enableNotify(true);
             }
             
             /**

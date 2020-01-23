@@ -133,6 +133,7 @@ var duice;
         function Observable() {
             this.observers = new Array();
             this.changed = false;
+            this.notifiable = true;
         }
         /**
          * Adds observer instance
@@ -163,7 +164,7 @@ var duice;
          * @param obj object to transfer to observer
          */
         Observable.prototype.notifyObservers = function (obj) {
-            if (this.hasChanged()) {
+            if (this.notifiable && this.hasChanged()) {
                 this.clearUnavailableObservers();
                 for (var i = 0, size = this.observers.length; i < size; i++) {
                     try {
@@ -175,6 +176,13 @@ var duice;
                 }
                 this.clearChanged();
             }
+        };
+        /**
+         * Sets notifiable
+         * @param notifiable
+         */
+        Observable.prototype.enableNotify = function (notifiable) {
+            this.notifiable = notifiable;
         };
         /**
          * Sets changed flag
@@ -383,10 +391,11 @@ var duice;
      */
     var List = /** @class */ (function (_super) {
         __extends(List, _super);
-        function List(jsonArray, __childName) {
+        function List(jsonArray) {
             var _this = _super.call(this) || this;
             _this.data = new Array();
             _this.index = -1;
+            _this.on = {};
             if (jsonArray) {
                 _this.fromJson(jsonArray);
             }
@@ -409,7 +418,7 @@ var duice;
             this.setChanged();
             this.notifyObservers(this);
         };
-        List.prototype.toJson = function (__childName) {
+        List.prototype.toJson = function () {
             var jsonArray = new Array();
             for (var i = 0; i < this.data.length; i++) {
                 jsonArray.push(this.data[i].toJson());
@@ -429,9 +438,22 @@ var duice;
             this.fromJson(originJson);
         };
         List.prototype.setIndex = function (index) {
+            // calls beforeIndexChanged 
+            if (this.on.beforeIndexChanged) {
+                if (this.on.beforeIndexChanged.call(this, index) === false) {
+                    return false;
+                }
+            }
+            // changes index
             this.index = index;
             this.setChanged();
             this.notifyObservers(this);
+            // calls 
+            if (this.on.afterIndexChanged) {
+                this.on.afterIndexChanged.call(this, index);
+            }
+            // returns true
+            return true;
         };
         List.prototype.getIndex = function () {
             return this.index;
@@ -480,7 +502,7 @@ var duice;
         };
         List.prototype.indexOf = function (handler) {
             for (var i = 0, size = this.data.length; i < size; i++) {
-                if (handler.call(this, this.data[i]) == true) {
+                if (handler.call(this, this.data[i]) === true) {
                     return i;
                 }
             }
@@ -496,7 +518,9 @@ var duice;
         };
         List.prototype.forEach = function (handler) {
             for (var i = 0, size = this.data.length; i < size; i++) {
-                handler.call(this, this.data[i]);
+                if (handler.call(this, this.data[i], i) === false) {
+                    break;
+                }
             }
         };
         List.prototype.sort = function (name, ascending) {
@@ -507,6 +531,12 @@ var duice;
             });
             this.setChanged();
             this.notifyObservers(this);
+        };
+        List.prototype.onBeforeIndexChanged = function (listener) {
+            this.on.beforeIndexChanged = listener;
+        };
+        List.prototype.onAfterIndexChanged = function (listener) {
+            this.on.afterIndexChanged = listener;
         };
         return List;
     }(DataObject));
@@ -1237,7 +1267,7 @@ var duice;
       */
     var Modal = /** @class */ (function () {
         function Modal() {
-            this.listener = {};
+            this.on = {};
             var $this = this;
             this.container = document.createElement('div');
             this.container.classList.add('duice-modal');
@@ -1312,23 +1342,23 @@ var duice;
             for (var _i = 0; _i < arguments.length; _i++) {
                 args[_i] = arguments[_i];
             }
-            if (this.listener.beforeOpen) {
-                if ((_a = this.listener.beforeOpen).call.apply(_a, __spreadArrays([this], args)) === false) {
+            if (this.on.beforeOpen) {
+                if ((_a = this.on.beforeOpen).call.apply(_a, __spreadArrays([this], args)) === false) {
                     return false;
                 }
             }
             this.show();
-            if (this.listener.afterOpen) {
-                delayCall.apply(void 0, __spreadArrays([200, this.listener.afterOpen, this], args));
+            if (this.on.afterOpen) {
+                delayCall.apply(void 0, __spreadArrays([200, this.on.afterOpen, this], args));
             }
             return true;
         };
-        Modal.prototype.beforeOpen = function (listener) {
-            this.listener.beforeOpen = listener;
+        Modal.prototype.onBeforeOpen = function (listener) {
+            this.on.beforeOpen = listener;
             return this;
         };
-        Modal.prototype.afterOpen = function (listener) {
-            this.listener.afterOpen = listener;
+        Modal.prototype.onAfterOpen = function (listener) {
+            this.on.afterOpen = listener;
             return this;
         };
         Modal.prototype.close = function () {
@@ -1337,23 +1367,23 @@ var duice;
             for (var _i = 0; _i < arguments.length; _i++) {
                 args[_i] = arguments[_i];
             }
-            if (this.listener.beforeClose) {
-                if ((_a = this.listener.beforeClose).call.apply(_a, __spreadArrays([this], args)) === false) {
+            if (this.on.beforeClose) {
+                if ((_a = this.on.beforeClose).call.apply(_a, __spreadArrays([this], args)) === false) {
                     return false;
                 }
             }
             this.hide();
-            if (this.listener.afterClose) {
-                delayCall.apply(void 0, __spreadArrays([200, this.listener.afterClose, this], args));
+            if (this.on.afterClose) {
+                delayCall.apply(void 0, __spreadArrays([200, this.on.afterClose, this], args));
             }
             return true;
         };
-        Modal.prototype.beforeClose = function (listener) {
-            this.listener.beforeClose = listener;
+        Modal.prototype.onBeforeClose = function (listener) {
+            this.on.beforeClose = listener;
             return this;
         };
-        Modal.prototype.afterClose = function (listener) {
-            this.listener.afterClose = listener;
+        Modal.prototype.onAfterClose = function (listener) {
+            this.on.afterClose = listener;
             return this;
         };
         Modal.prototype.confirm = function () {
@@ -1362,23 +1392,23 @@ var duice;
             for (var _i = 0; _i < arguments.length; _i++) {
                 args[_i] = arguments[_i];
             }
-            if (this.listener.beforeConfirm) {
-                if ((_a = this.listener.beforeConfirm).call.apply(_a, __spreadArrays([this], args)) === false) {
+            if (this.on.beforeConfirm) {
+                if ((_a = this.on.beforeConfirm).call.apply(_a, __spreadArrays([this], args)) === false) {
                     return false;
                 }
             }
             this.hide();
-            if (this.listener.afterConfirm) {
-                delayCall.apply(void 0, __spreadArrays([200, this.listener.afterConfirm, this], args));
+            if (this.on.afterConfirm) {
+                delayCall.apply(void 0, __spreadArrays([200, this.on.afterConfirm, this], args));
             }
             return true;
         };
-        Modal.prototype.beforeConfirm = function (listener) {
-            this.listener.beforeConfirm = listener;
+        Modal.prototype.onBeforeConfirm = function (listener) {
+            this.on.beforeConfirm = listener;
             return this;
         };
-        Modal.prototype.afterConfirm = function (listener) {
-            this.listener.afterConfirm = listener;
+        Modal.prototype.onAfterConfirm = function (listener) {
+            this.on.afterConfirm = listener;
             return this;
         };
         return Modal;
@@ -2764,11 +2794,8 @@ var duice;
                             tbody.classList.add('duice-ui-table__tbody--index');
                         }
                         tbody.addEventListener('click', function (event) {
-                            for (var i = 0; i < $this.tbodies.length; i++) {
-                                $this.tbodies[i].classList.remove('duice-ui-table__tbody--index');
-                            }
-                            this.classList.add('duice-ui-table__tbody--index');
-                            list.index = Number(this.dataset.duiceIndex);
+                            var index = Number(this.dataset.duiceIndex);
+                            $this.selectTbody(index);
                         }, true);
                     }
                     // drag and drop event
@@ -2800,6 +2827,25 @@ var duice;
                     this.table.appendChild(emptyTbody);
                     this.tbodies.push(emptyTbody);
                 }
+            };
+            /**
+             * Selects tbody element
+             * @param tbody
+             */
+            Table.prototype.selectTbody = function (index) {
+                this.getList().enableNotify(false);
+                if (this.getList().setIndex(index)) {
+                    // handles class                
+                    for (var i = 0; i < this.tbodies.length; i++) {
+                        if (i === index) {
+                            this.tbodies[i].classList.add('duice-ui-table__tbody--index');
+                        }
+                        else {
+                            this.tbodies[i].classList.remove('duice-ui-table__tbody--index');
+                        }
+                    }
+                }
+                this.getList().enableNotify(true);
             };
             /**
              * Creates table body element

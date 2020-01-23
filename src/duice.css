@@ -10,7 +10,7 @@
 /**
  * duice.Blocker
  */
-.duice-blocker {
+ .duice-blocker {
 	padding: 0px;
 	margin: 0px;
 	overflow: hidden;
@@ -195,15 +195,11 @@
 }
 
 /**
- * duice.ui.Scriptlet
+ *duice.ui.Scriptlet
  */
 *[is="duice-ui-scriptlet"] {
 	display:none;
 }
-
-/**
- *duice.ui.Scriptlet
- */
 .duice-ui-scriptlet {
 	height: inherit;
 	line-height: inherit;
@@ -214,6 +210,7 @@
 /**
  * duice.ui.Span
  */
+span[is="duice-ui-span"],
 .duice-ui-span {
 	height: inherit;
 	line-height: inherit;
@@ -230,6 +227,7 @@
 /**
  * duice.ui.TextInput
  */
+input[is="duice-ui-input"][type="text"],
 .duice-ui-textInput {
 	width: 100%;
 	height: inherit;
@@ -258,6 +256,7 @@
 /**
  * duice.ui.NumberInput
  */
+input[is="duice-ui-input"][type="number"],
 .duice-ui-numberInput {
 	width: 100%;
 	height: inherit;
@@ -288,6 +287,7 @@
 /**
  * duice.ui.CheckboxInput
  */
+input[is="duice-ui-input"][type="checkbox"],
 .duice-ui-checkboxInput {
 	height: inherit;
 	line-height: inherit;
@@ -301,6 +301,7 @@
 /**
  * duice.ui.RadioInput
  */
+input[is="duice-ui-input"][type="radio"],
 .duice-ui-radioInput {
 	height: inherit;
 	line-height: inherit;
@@ -314,6 +315,8 @@
 /**
  * duice.ui.DateInput
  */
+input[is="duice-ui-input"][type="date"],
+input[is="duice-ui-input"][type="datetime"],
 .duice-ui-dateInput {
 	width: 100%;
 	height: inherit;
@@ -531,11 +534,13 @@
 /**
  * duice.ui.GenericInput
  */
-.duice-ui-genericInput[type="password"],
-.duice-ui-genericInput[type="time"],
-.duice-ui-genericInput[type="url"],
-.duice-ui-genericInput[type="email"],
-.duice-ui-genericInput[type="tel"] {
+input[is="duice-ui-input"][type="password"],
+input[is="duice-ui-input"][type="time"],
+input[is="duice-ui-input"][type="url"],
+input[is="duice-ui-input"][type="email"],
+input[is="duice-ui-input"][type="tel"],
+.duice-ui-genericInput {
+	
 	width: 100%;
 	height: inherit;
 	line-height: inherit;
@@ -581,6 +586,7 @@
 /**
  * duice.ui.select
  */
+select[is="duice-ui-select"],
 .duice-ui-select {
 	width: 100%;
 	height: inherit;
@@ -620,6 +626,7 @@
 /**
  * duice.ui.Textarea
  */
+textarea[is="duice-ui-textarea"],
 .duice-ui-textarea {
 	width: 100%;
 	height: inherit;
@@ -654,6 +661,7 @@
 /**
  * duice.ui.Image
  */
+img[is="duice-ui-img"],
 .duice-ui-img {
 	margin: 0px;
 	padding: 0rem 0.3rem;
@@ -664,6 +672,7 @@
 /**
  * duice.ui.Pagination
  */
+ul[is="duice-ui-pagination"],
 .duice-ui-pagination {
 	list-style: none;
 	text-align: center;
@@ -702,6 +711,7 @@
 /**
  * duice.ui.Table
  */
+table[is="duice-ui-table"],
 .duice-ui-table {
 	border-collapse: collapse;
 	border: solid 1px #ccc;
@@ -735,7 +745,7 @@
 	border: 0px;
 }
 .duice-ui-table__tbody:hover {
-	background: #f7f7f7;
+	background: #eee;
 	transition: all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
 .duice-ui-table__tbody-tr {
@@ -750,7 +760,7 @@
 	text-align: left;
 }
 .duice-ui-table__tbody--index {
-	background: #f7f7f7;
+	background: #eee;
 }
 .duice-ui-table__tbody--empty {
 	margin: 0px;
@@ -776,6 +786,7 @@
 /**
  * duice.ui.UList
  */
+ul[is="duice-ui-ul"],
 .duice-ui-ul {
 	list-style: none;
 	margin: 0px;
