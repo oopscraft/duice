@@ -314,10 +314,10 @@ users.fromJson([
         color: '#ff0000'
     }
 ]);
-users.onBeforeIndexChanged(function(index){
+users.onBeforeIndexChange(function(index){
 	//console.log('onBeforeIndexChanged',index);
 });
-users.onAfterIndexChanged(function(index){
+users.onAfterIndexChange(function(index){
 	console.log('onAfterIndexChanged',index);
 	console.log('user', users.get(index));
 });

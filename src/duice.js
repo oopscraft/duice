@@ -532,10 +532,10 @@ var duice;
             this.setChanged();
             this.notifyObservers(this);
         };
-        List.prototype.onBeforeIndexChanged = function (listener) {
+        List.prototype.onBeforeIndexChange = function (listener) {
             this.on.beforeIndexChanged = listener;
         };
-        List.prototype.onAfterIndexChanged = function (listener) {
+        List.prototype.onAfterIndexChange = function (listener) {
             this.on.afterIndexChanged = listener;
         };
         return List;

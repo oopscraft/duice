@@ -786,7 +786,9 @@ table[is="duice-ui-table"],
 /**
  * duice.ui.UList
  */
-ul[is="duice-ui-ul"],
+ul[is="duice-ui-ul"] {
+	list-style: none;
+}
 .duice-ui-ul {
 	list-style: none;
 	margin: 0px;

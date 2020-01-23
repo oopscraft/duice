@@ -566,10 +566,10 @@ namespace duice {
             this.setChanged();
             this.notifyObservers(this);
         }
-        onBeforeIndexChanged(listener:Function):void {
+        onBeforeIndexChange(listener:Function):void {
             this.on.beforeIndexChanged = listener;
         }
-        onAfterIndexChanged(listener:Function):void {
+        onAfterIndexChange(listener:Function):void {
             this.on.afterIndexChanged = listener;
         }
     }
