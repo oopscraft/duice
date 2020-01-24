@@ -322,6 +322,15 @@ namespace duice {
             }
             return json;
         }
+
+        /**
+         * Clears data
+         */
+        clear():void {
+            this.data = new Object();
+            this.setChanged();
+            this.notifyObservers(this);
+        }
         
         /**
          * Checks original data is changed
@@ -342,7 +351,7 @@ namespace duice {
             var originJson = JSON.parse(this.originData);
             this.fromJson(originJson);
         }
-        
+
         /**
          * Sets property as input value
          * @param name
@@ -446,7 +455,7 @@ namespace duice {
                 this.data.push(map);
             }
             this.originData = JSON.stringify(this.toJson());
-            this.clearIndex();
+            this.index = -1;
             this.setChanged();
             this.notifyObservers(this);
         }
@@ -457,6 +466,20 @@ namespace duice {
             }
             return jsonArray;
         }
+
+        /**
+         * Clears data
+         */
+        clear():void {
+            this.data = new Array<duice.Map>();
+            this.index = -1;
+            this.setChanged();
+            this.notifyObservers(this);
+        }
+
+        /**
+         * Returns if changed
+         */
         isDirty():boolean {
             if(JSON.stringify(this.toJson()) === this.originData){
                 return false;
@@ -464,10 +487,19 @@ namespace duice {
                 return true;
             }
         }
+
+        /**
+         * Resets data from original data.
+         */
         reset():void {
             var originJson = JSON.parse(this.originData);
             this.fromJson(originJson);
         }
+
+        /**
+         * Sets index.
+         * @param index 
+         */
         setIndex(index:number):boolean {
 
             // calls beforeIndexChanged 
@@ -2541,7 +2573,11 @@ namespace duice {
          */
         export class Image extends MapUiComponent {
             img:HTMLImageElement;
-            input:HTMLInputElement;
+            originSrc:string;
+            value:string;
+            preview:HTMLImageElement;
+            blocker:duice.Blocker;
+            menuDiv:HTMLDivElement;
             editable:boolean;
         
             /**
@@ -2551,34 +2587,23 @@ namespace duice {
             constructor(img:HTMLImageElement) {
                 super(img);
                 this.img = img;
+                this.originSrc = this.img.src;
                 this.img.classList.add('duice-ui-img');
                 this.img.addEventListener('error', function() {
-                    console.log('error');
+                    this.src = '//:0';
+                    console.log('image error');
                 });
                 var $this = this;
-                
-                // adds click event
-                this.img.addEventListener('click', function() {
-                    $this.input.click();
+
+                // listener for click
+                this.img.addEventListener('click', function(event){
+                    $this.openPreview();
                 });
-            
-                // creates file input element
-                this.input = document.createElement('input');
-                this.input.setAttribute("type", "file");
-                this.input.setAttribute("accept", "image/gif, image/jpeg, image/png");
-                this.input.addEventListener('change', function(e){
-                    var fileReader = new FileReader();
-                    if (this.files && this.files[0]) {
-                        fileReader.addEventListener("load", function(event:any) {
-                            var value = event.target.result;
-                            $this.img.src = value;
-                            $this.setChanged();
-                            $this.notifyObservers($this);
-                        }); 
-                        fileReader.readAsDataURL(this.files[0]);
-                    }
-                    e.preventDefault();
-                    e.stopPropagation();
+
+                // listener for contextmenu event
+                this.img.addEventListener('contextmenu', function(event){
+                    $this.openMenuDiv(event.pageX,event.pageY);
+                    event.preventDefault();
                 });
             }
             
@@ -2589,7 +2614,8 @@ namespace duice {
              */
             update(map:duice.Map, obj:object):void {
                 var value = map.get(this.getName());
-                this.img.src = value;
+                this.value = defaultIfEmpty(value,this.originSrc);
+                this.img.src = this.value;
             }
             
             /**
@@ -2597,7 +2623,134 @@ namespace duice {
              * @return base64 data or image URL
              */
             getValue():any {
-                return this.img.src;
+                return this.value;
+            }
+
+            /**
+             * Opens preview
+             */
+            openPreview():void {
+                var $this = this;
+                var parentNode = getCurrentWindow().document.body;
+
+                // creates preview
+                this.preview = document.createElement('img');
+                this.preview.src = this.img.src;
+                this.preview.addEventListener('click', function(event){
+                    $this.closePreview();
+                });
+
+                // creates blocker
+                this.blocker = new duice.Blocker(parentNode);
+                this.blocker.getBlockDiv().addEventListener('click',function(event){
+                    $this.closePreview();
+                });
+                this.blocker.block();
+                
+                // shows preview
+                this.preview.style.position = 'absolute';
+                this.preview.style.zIndex = String(getCurrentMaxZIndex() + 2);
+                parentNode.appendChild(this.preview);
+                setPositionCentered(this.preview);
+            }
+
+            closePreview(){
+                if(this.preview){
+                    this.blocker.unblock();
+                    this.preview.parentNode.removeChild(this.preview);
+                    this.preview = null;
+                }
+            }
+
+            /**
+             * Opens menu division.
+             */
+            openMenuDiv(x:number,y:number):void {
+                // checks if already menu exists.
+                if(this.menuDiv){
+                    return;
+                }
+                // defines variables
+                var $this = this;
+
+                // creates menu div
+                this.menuDiv = document.createElement('div');
+                this.menuDiv.classList.add('duice-ui-img__menuDiv');
+                
+                // creates change button
+                var changeButton = document.createElement('button');
+                changeButton.classList.add('duice-ui-img__menuDiv-changeButton');
+                changeButton.addEventListener('click', function(event:any) {
+                    $this.changeImage();
+                }, true);
+                this.menuDiv.appendChild(changeButton);
+
+                // creates view button
+                var clearButton = document.createElement('button');
+                clearButton.classList.add('duice-ui-img__menuDiv-clearButton');
+                clearButton.addEventListener('click', function(event:any) {
+                    $this.clearImage();
+                }, true);
+                this.menuDiv.appendChild(clearButton);
+                
+                // appends menu div
+                this.img.parentNode.appendChild(this.menuDiv);
+                this.menuDiv.style.position = 'absolute';
+                this.menuDiv.style.zIndex = String(getCurrentMaxZIndex() + 1);
+                this.menuDiv.style.top = y + 'px';
+                this.menuDiv.style.left = x + 'px';
+
+                // listens mouse leaves from menu div.
+                this.menuDiv.addEventListener('mouseleave', function(event:any){
+                    $this.closeMenuDiv();
+                });
+            }
+
+            /**
+             * Closes menu division
+             */
+            closeMenuDiv():void {
+                if(this.menuDiv) {
+                    console.log('closeMenuDiv');
+                    this.menuDiv.parentNode.removeChild(this.menuDiv);         
+                    this.menuDiv = null;
+                }
+            }
+
+            /**
+             * Changes image
+             */
+            changeImage():void {
+                // creates file input element
+                var $this = this;
+                var input = document.createElement('input');
+                input.setAttribute("type", "file");
+                input.setAttribute("accept", "image/gif, image/jpeg, image/png");
+                input.addEventListener('change', function(e){
+                    var fileReader = new FileReader();
+                    if (this.files && this.files[0]) {
+                        fileReader.addEventListener("load", function(event:any) {
+                            var value = event.target.result;
+                            $this.value = value;
+                            $this.img.src = value;
+                            $this.setChanged();
+                            $this.notifyObservers($this);
+                        }); 
+                        fileReader.readAsDataURL(this.files[0]);
+                    }
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+                input.click();
+            }
+
+            /**
+             * Clears image
+             */
+            clearImage():void {
+                this.value = null;
+                this.setChanged();
+                this.notifyObservers(this);
             }
         }
 

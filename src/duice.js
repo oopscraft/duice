@@ -296,6 +296,14 @@ var duice;
             return json;
         };
         /**
+         * Clears data
+         */
+        Map.prototype.clear = function () {
+            this.data = new Object();
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        /**
          * Checks original data is changed
          * @return whether original data is changed or not
          */
@@ -414,7 +422,7 @@ var duice;
                 this.data.push(map);
             }
             this.originData = JSON.stringify(this.toJson());
-            this.clearIndex();
+            this.index = -1;
             this.setChanged();
             this.notifyObservers(this);
         };
@@ -425,6 +433,18 @@ var duice;
             }
             return jsonArray;
         };
+        /**
+         * Clears data
+         */
+        List.prototype.clear = function () {
+            this.data = new Array();
+            this.index = -1;
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        /**
+         * Returns if changed
+         */
         List.prototype.isDirty = function () {
             if (JSON.stringify(this.toJson()) === this.originData) {
                 return false;
@@ -433,10 +453,17 @@ var duice;
                 return true;
             }
         };
+        /**
+         * Resets data from original data.
+         */
         List.prototype.reset = function () {
             var originJson = JSON.parse(this.originData);
             this.fromJson(originJson);
         };
+        /**
+         * Sets index.
+         * @param index
+         */
         List.prototype.setIndex = function (index) {
             // calls beforeIndexChanged 
             if (this.on.beforeIndexChanged) {
@@ -2491,32 +2518,21 @@ var duice;
             function Image(img) {
                 var _this = _super.call(this, img) || this;
                 _this.img = img;
+                _this.originSrc = _this.img.src;
                 _this.img.classList.add('duice-ui-img');
                 _this.img.addEventListener('error', function () {
-                    console.log('error');
+                    this.src = '//:0';
+                    console.log('image error');
                 });
                 var $this = _this;
-                // adds click event
-                _this.img.addEventListener('click', function () {
-                    $this.input.click();
+                // listener for click
+                _this.img.addEventListener('click', function (event) {
+                    $this.openPreview();
                 });
-                // creates file input element
-                _this.input = document.createElement('input');
-                _this.input.setAttribute("type", "file");
-                _this.input.setAttribute("accept", "image/gif, image/jpeg, image/png");
-                _this.input.addEventListener('change', function (e) {
-                    var fileReader = new FileReader();
-                    if (this.files && this.files[0]) {
-                        fileReader.addEventListener("load", function (event) {
-                            var value = event.target.result;
-                            $this.img.src = value;
-                            $this.setChanged();
-                            $this.notifyObservers($this);
-                        });
-                        fileReader.readAsDataURL(this.files[0]);
-                    }
-                    e.preventDefault();
-                    e.stopPropagation();
+                // listener for contextmenu event
+                _this.img.addEventListener('contextmenu', function (event) {
+                    $this.openMenuDiv(event.pageX, event.pageY);
+                    event.preventDefault();
                 });
                 return _this;
             }
@@ -2527,14 +2543,128 @@ var duice;
              */
             Image.prototype.update = function (map, obj) {
                 var value = map.get(this.getName());
-                this.img.src = value;
+                this.value = defaultIfEmpty(value, this.originSrc);
+                this.img.src = this.value;
             };
             /**
              * Return value of image element
              * @return base64 data or image URL
              */
             Image.prototype.getValue = function () {
-                return this.img.src;
+                return this.value;
+            };
+            /**
+             * Opens preview
+             */
+            Image.prototype.openPreview = function () {
+                var $this = this;
+                var parentNode = getCurrentWindow().document.body;
+                // creates preview
+                this.preview = document.createElement('img');
+                this.preview.src = this.img.src;
+                this.preview.addEventListener('click', function (event) {
+                    $this.closePreview();
+                });
+                // creates blocker
+                this.blocker = new duice.Blocker(parentNode);
+                this.blocker.getBlockDiv().addEventListener('click', function (event) {
+                    $this.closePreview();
+                });
+                this.blocker.block();
+                // shows preview
+                this.preview.style.position = 'absolute';
+                this.preview.style.zIndex = String(getCurrentMaxZIndex() + 2);
+                parentNode.appendChild(this.preview);
+                setPositionCentered(this.preview);
+            };
+            Image.prototype.closePreview = function () {
+                if (this.preview) {
+                    this.blocker.unblock();
+                    this.preview.parentNode.removeChild(this.preview);
+                    this.preview = null;
+                }
+            };
+            /**
+             * Opens menu division.
+             */
+            Image.prototype.openMenuDiv = function (x, y) {
+                // checks if already menu exists.
+                if (this.menuDiv) {
+                    return;
+                }
+                // defines variables
+                var $this = this;
+                // creates menu div
+                this.menuDiv = document.createElement('div');
+                this.menuDiv.classList.add('duice-ui-img__menuDiv');
+                // creates change button
+                var changeButton = document.createElement('button');
+                changeButton.classList.add('duice-ui-img__menuDiv-changeButton');
+                changeButton.addEventListener('click', function (event) {
+                    $this.changeImage();
+                }, true);
+                this.menuDiv.appendChild(changeButton);
+                // creates view button
+                var clearButton = document.createElement('button');
+                clearButton.classList.add('duice-ui-img__menuDiv-clearButton');
+                clearButton.addEventListener('click', function (event) {
+                    $this.clearImage();
+                }, true);
+                this.menuDiv.appendChild(clearButton);
+                // appends menu div
+                this.img.parentNode.appendChild(this.menuDiv);
+                this.menuDiv.style.position = 'absolute';
+                this.menuDiv.style.zIndex = String(getCurrentMaxZIndex() + 1);
+                this.menuDiv.style.top = y + 'px';
+                this.menuDiv.style.left = x + 'px';
+                // listens mouse leaves from menu div.
+                this.menuDiv.addEventListener('mouseleave', function (event) {
+                    $this.closeMenuDiv();
+                });
+            };
+            /**
+             * Closes menu division
+             */
+            Image.prototype.closeMenuDiv = function () {
+                if (this.menuDiv) {
+                    console.log('closeMenuDiv');
+                    this.menuDiv.parentNode.removeChild(this.menuDiv);
+                    this.menuDiv = null;
+                }
+            };
+            /**
+             * Changes image
+             */
+            Image.prototype.changeImage = function () {
+                // creates file input element
+                var $this = this;
+                var input = document.createElement('input');
+                input.setAttribute("type", "file");
+                input.setAttribute("accept", "image/gif, image/jpeg, image/png");
+                input.addEventListener('change', function (e) {
+                    var fileReader = new FileReader();
+                    if (this.files && this.files[0]) {
+                        fileReader.addEventListener("load", function (event) {
+                            var value = event.target.result;
+                            $this.value = value;
+                            $this.img.src = value;
+                            $this.setChanged();
+                            $this.notifyObservers($this);
+                        });
+                        fileReader.readAsDataURL(this.files[0]);
+                    }
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+                input.click();
+            };
+            /**
+             * Clears image
+             */
+            Image.prototype.clearImage = function () {
+                this.value = null;
+                this.setChanged();
+                this.notifyObservers(this);
             };
             return Image;
         }(MapUiComponent));
