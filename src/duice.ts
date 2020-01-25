@@ -23,7 +23,7 @@ namespace duice {
 	export function initialize() {
 		
 		// prints configuration
-		console.log(Configuration);
+		console.debug(Configuration);
 		
 		// initializes component
 	    var $context:any = typeof self !== 'undefined' ? self : 
@@ -118,7 +118,7 @@ namespace duice {
     abstract class Observable {
         observers:Array<Observer> = new Array<Observer>();
         changed:boolean = false;
-        notifiable:boolean = true;
+        notifyEnable:boolean = true;
 
         /**
          * Adds observer instance
@@ -149,7 +149,8 @@ namespace duice {
          * @param obj object to transfer to observer
          */
         notifyObservers(obj:object):void {
-            if(this.notifiable && this.hasChanged()){
+            console.debug('Observable.observers.length',this.observers.length);
+            if(this.notifyEnable && this.hasChanged()){
                 this.clearUnavailableObservers();
                 for(var i = 0, size = this.observers.length; i < size; i++){
                     try {
@@ -163,11 +164,17 @@ namespace duice {
         }
 
         /**
-         * Sets notifiable
-         * @param notifiable 
+         * Suspends notify
          */
-        enableNotify(notifiable:boolean){
-            this.notifiable = notifiable;
+        suspendNotify():void {
+            this.notifyEnable = false;
+        }
+
+        /**
+         * Resumes notify
+         */
+        resumeNotify():void {
+            this.notifyEnable = true;
         }
 
         /**
@@ -218,7 +225,11 @@ namespace duice {
      * extends from Observable and implements Observer interface.
      */
     export abstract class DataObject extends Observable implements Observer {
-        
+
+        available:boolean = true;
+        enable:boolean = true;
+        readonly:any = new Object();
+
         /**
          * Updates self data object from observable instance 
          * @param observable
@@ -238,7 +249,7 @@ namespace duice {
          * @return JSON object
          */
         abstract toJson(...args: any[]):object;
-        
+
         /**
          * Checks original data is changed.
          * @return whether original data is changed
@@ -256,6 +267,46 @@ namespace duice {
         isAvailable():boolean {
             return true;
         }
+
+        /**
+         * Sets enable
+         * @param enable 
+         */
+        setEnable(enable:boolean):void {
+            this.enable = enable;
+            this.setChanged();
+            this.notifyObservers(this);
+        }
+
+        /**
+         * Returns enable
+         */
+        getEnable():boolean {
+            return this.enable;
+        }
+
+        /**
+         * Sets read-only
+         * @param name 
+         */
+        setReadonly(name:string,readonly:boolean):void {
+            this.readonly[name] = readonly;
+            this.setChanged();
+            this.notifyObservers(this);
+        }
+
+        /**
+         * Returns read-only
+         * @param name 
+         */
+        getReadonly(name:string):boolean {
+            if(this.readonly[name]){
+                return true;
+            }else{
+                return false;
+            }
+        }
+
     }
 
     /**
@@ -263,10 +314,9 @@ namespace duice {
      * @param JSON object
      */
     export class Map extends DataObject {
+
         data:any = new Object();    // internal data object
         originData:string;          // original string JSON data
-        enable:boolean = true;      // enable
-        readonly:Array<string> = new Array<string>();   // read only names
     
         /**
          * constructor 
@@ -285,7 +335,7 @@ namespace duice {
          * @param obj
          */
         update(UiComponent:MapUiComponent, obj:object):void {
-            console.info('Map.update', UiComponent, obj);
+            console.debug('Map.update', UiComponent, obj);
             var name = UiComponent.getName();
             var value = UiComponent.getValue();
             this.set(name, value);
@@ -382,60 +432,24 @@ namespace duice {
             }
             return names;
         }
-        
-        /**
-         * Sets instance to be enabled.
-         * @param whether enable or not
-         */
-        setEnable(enable:boolean):void {
-            this.enable = enable;
-            this.setChanged();
-            this.notifyObservers(this);
-        }
-        
-        /**
-         * Returns instance is enabled.
-         * @return whether enable or not
-         */
-        isEnable():boolean {
-            return this.enable;
-        }
-        
-        /**
-         * Sets read-only specified name
-         * @param name
-         * @param readonly
-         */
-        setReadonly(name:string, readonly:boolean):void {
-            if(this.readonly.indexOf(name) == -1){
-                this.readonly.push(name);
-            }
-            this.setChanged();
-            this.notifyObservers(this);
-        }
-        
-        /**
-         * Returns specified name is read-only
-         * @param name
-         * @return whether specified property is read-only or not
-         */
-        isReadonly(name:string):boolean {
-            if(this.readonly.indexOf(name) >= 0){
-                return true;
-            }else{
-                return false;
-            }
-        }
+
     }
     
     /**
      * duice.List
      */
     export class List extends DataObject {
+
         data:Array<duice.Map> = new Array<duice.Map>();
         originData:string;
         index:number = -1;
         on:any = {};
+        readonly:any = new Object();
+
+        /**
+         * constructor
+         * @param jsonArray
+         */
         constructor(jsonArray?:Array<any>) {
             super();
             if(jsonArray){
@@ -443,12 +457,12 @@ namespace duice {
             }
         }
         update(observable:Observable, obj:object):void {
-            console.log('List.update', observable, obj);
+            console.debug('List.update', observable, obj);
             this.setChanged();
             this.notifyObservers(obj);
         }
         fromJson(jsonArray:Array<any>):void {
-            this.data = new Array<duice.Map>();
+            this.clear();
             for(var i = 0; i < jsonArray.length; i ++ ) {
                 var map = new duice.Map(jsonArray[i]);
                 map.addObserver(this);
@@ -459,6 +473,10 @@ namespace duice {
             this.setChanged();
             this.notifyObservers(this);
         }
+
+        /**
+         * toJson
+         */
         toJson():Array<object> {
             var jsonArray = new Array();
             for(var i = 0; i < this.data.length; i ++){
@@ -471,6 +489,9 @@ namespace duice {
          * Clears data
          */
         clear():void {
+            for(var i = 0, size = this.data.length; i < size; i ++ ){
+                this.data[i].removeObserver(this);
+            }
             this.data = new Array<duice.Map>();
             this.index = -1;
             this.setChanged();
@@ -494,6 +515,31 @@ namespace duice {
         reset():void {
             var originJson = JSON.parse(this.originData);
             this.fromJson(originJson);
+        }
+
+        /**
+         * Overrides duice.DataObject.setEnable
+         * @param enable
+         */
+        setEnable(enable: boolean): void {
+            this.forEach(function(map:duice.Map){
+                map.enable = enable;
+            });
+            super.setEnable(enable);
+        }
+
+        /**
+         * Sets read-only
+         * @param name 
+         * @param readonly 
+         */
+        setReadonly(name:string, readonly:boolean):void {
+            this.forEach(function(map:duice.Map){
+                map.suspendNotify();
+                map.setReadonly(name, readonly);
+                map.resumeNotify();
+            });
+            super.setReadonly(name, true);
         }
 
         /**
@@ -1924,6 +1970,20 @@ namespace duice {
             validate(value:string):boolean {
                 return true;
             }
+            setEnable(enable:boolean):void {
+                if(enable === false){
+                    this.input.setAttribute('disabled','true');                    
+                }else{
+                    this.input.removeAttribute('disabled');
+                }
+            }
+            setReadonly(readonly:boolean):void {
+                if(readonly === true){
+                    this.input.setAttribute('readonly', 'readonly');
+                }else{
+                    this.input.removeAttribute('readonly');
+                }
+            }
         }
         
         /**
@@ -1937,6 +1997,8 @@ namespace duice {
             update(map:duice.Map, obj:object):void {
                 var value = map.get(this.getName());
                 this.input.value = defaultIfEmpty(value, '');
+                this.setEnable(map.getEnable());
+                this.setReadonly(map.getReadonly(this.getName()));
             }
             getValue():any {
                 var value:any = this.input.value;
@@ -1970,6 +2032,8 @@ namespace duice {
                 value = defaultIfEmpty(value, '');
                 value = this.format.encode(value);
                 this.input.value = value;
+                this.setEnable(map.getEnable());
+                this.setReadonly(map.getReadonly(this.getName()));
             }
             getValue():string {
                 var value = this.input.value;
@@ -2005,6 +2069,8 @@ namespace duice {
                 var value = map.get(this.getName());
                 value = this.format.encode(value);
                 this.input.value = value;
+                this.setEnable(map.getEnable());
+                this.setReadonly(map.getReadonly(this.getName()));
             }
             getValue():number {
                 var value:any = this.input.value;
@@ -2028,11 +2094,11 @@ namespace duice {
             constructor(input:HTMLInputElement){
                 super(input);
                 addClassNameIfCssEnable(this.input,'duice-ui-checkboxInput');
-                
+               
                 // stop click event propagation
                 this.input.addEventListener('click', function(event){
                     event.stopPropagation();
-                });
+                },true);
             }
             update(map:duice.Map, obj:object):void {
                 var value = map.get(this.getName());
@@ -2041,9 +2107,18 @@ namespace duice {
                 }else{
                     this.input.checked = false;
                 }
+                this.setEnable(map.getEnable());
+                this.setReadonly(map.getReadonly(this.getName()));
             }
             getValue():boolean {
                 return this.input.checked;
+            }
+            setReadonly(readonly:boolean) {
+                if(readonly){
+                    this.input.style.pointerEvents = 'none';
+                }else{
+                    this.input.style.pointerEvents = '';
+                }
             }
         }
         
@@ -2062,9 +2137,18 @@ namespace duice {
                 }else{
                     this.input.checked = false;
                 }
+                this.setEnable(map.getEnable());
+                this.setReadonly(map.getReadonly(this.getName()));
             }
             getValue():string {
                 return this.input.value;
+            }
+            setReadonly(readonly:boolean) {
+                if(readonly){
+                    this.input.style.pointerEvents = 'none';
+                }else{
+                    this.input.style.pointerEvents = '';
+                }
             }
         }
         
@@ -2072,6 +2156,7 @@ namespace duice {
          * duice.ui.DatetimeInput
          */
         export class DateInput extends Input {
+            readonly:boolean = false;
             pickerDiv:HTMLDivElement;
             type:string;
             format:DateFormat;
@@ -2085,7 +2170,9 @@ namespace duice {
                 // adds click event listener
                 var $this = this;
                 this.input.addEventListener('click', function(event){
-                    $this.openPicker();
+                    if($this.readonly !== true){
+                        $this.openPicker();
+                    }
                 },true);
 
                 // sets default format
@@ -2104,6 +2191,8 @@ namespace duice {
                 value = defaultIfEmpty(value,'');
                 value = this.format.encode(value);
                 this.input.value = value;
+                this.setEnable(map.getEnable());
+                this.setReadonly(map.getReadonly(this.getName()));
             }
             getValue():string {
                 var value = this.input.value;
@@ -2121,6 +2210,10 @@ namespace duice {
                     return false;
                 }
                 return true;
+            }
+            setReadonly(readonly:boolean):void {
+                this.readonly = readonly;
+                super.setReadonly(readonly);
             }
             openPicker():void {
                 
@@ -2512,11 +2605,29 @@ namespace duice {
 					if(this.defaultOptions.length > 0){
 						this.defaultOptions[0].selected = true;
 					}
-				}
+                }
+                this.setEnable(map.getEnable());
+                this.setReadonly(map.getReadonly(this.getName()));
             }
             getValue():any {
                 var value = this.select.value;
                 return defaultIfEmpty(value, null);
+            }
+            setEnable(enable: boolean): void {
+                if(enable === false){
+                    this.select.setAttribute('disabled', 'true');
+                }else{
+                    this.select.removeAttribute('disabled');
+                }
+            }
+            setReadonly(readonly:boolean):void {
+                if(readonly === true){
+                    this.select.style.pointerEvents = 'none';
+                    this.select.classList.add('duice-ui-select--readonly');
+                }else{
+                    this.select.style.pointerEvents = '';
+                    this.select.classList.remove('duice-ui-select--readonly');
+                }
             }
         }
         
@@ -2550,9 +2661,25 @@ namespace duice {
             update(map:duice.Map, obj:object):void {
                 var value = map.get(this.getName());
                 this.textarea.value = defaultIfEmpty(value, '');
+                this.setEnable(map.getEnable());
+                this.setReadonly(map.getReadonly(this.getName()));
             }
             getValue():any {
                 return defaultIfEmpty(this.textarea.value, null);
+            }
+            setEnable(enable: boolean): void {
+                if(enable === false){
+                    this.textarea.setAttribute('disabled', 'true');
+                }else{
+                    this.textarea.removeAttribute('disabled');
+                }
+            }
+            setReadonly(readonly:boolean):void {
+                if(readonly){
+                    this.textarea.setAttribute('readonly', 'readonly');
+                }else{
+                    this.textarea.removeAttribute('readonly');
+                }
             }
         }
         
@@ -2575,11 +2702,11 @@ namespace duice {
             img:HTMLImageElement;
             originSrc:string;
             value:string;
+            enable:boolean;
             preview:HTMLImageElement;
             blocker:duice.Blocker;
             menuDiv:HTMLDivElement;
-            editable:boolean;
-        
+
             /**
              * Constructor
              * @param img
@@ -2589,10 +2716,6 @@ namespace duice {
                 this.img = img;
                 this.originSrc = this.img.src;
                 this.img.classList.add('duice-ui-img');
-                this.img.addEventListener('error', function() {
-                    this.src = '//:0';
-                    console.log('image error');
-                });
                 var $this = this;
 
                 // listener for click
@@ -2602,8 +2725,10 @@ namespace duice {
 
                 // listener for contextmenu event
                 this.img.addEventListener('contextmenu', function(event){
-                    $this.openMenuDiv(event.pageX,event.pageY);
-                    event.preventDefault();
+                    if($this.enable){
+                        $this.openMenuDiv(event.pageX,event.pageY);
+                        event.preventDefault();
+                    }
                 });
             }
             
@@ -2616,6 +2741,7 @@ namespace duice {
                 var value = map.get(this.getName());
                 this.value = defaultIfEmpty(value,this.originSrc);
                 this.img.src = this.value;
+                this.enable = map.getEnable();
             }
             
             /**
@@ -2654,6 +2780,9 @@ namespace duice {
                 setPositionCentered(this.preview);
             }
 
+            /**
+             * Closes preview
+             */
             closePreview(){
                 if(this.preview){
                     this.blocker.unblock();
@@ -2711,7 +2840,6 @@ namespace duice {
              */
             closeMenuDiv():void {
                 if(this.menuDiv) {
-                    console.log('closeMenuDiv');
                     this.menuDiv.parentNode.removeChild(this.menuDiv);         
                     this.menuDiv = null;
                 }
@@ -2800,6 +2928,9 @@ namespace duice {
             setSize(size:number):void{
                 this.size = size;
             }
+            setEnable(enable:boolean):void {
+                return;
+            }
 			update(map:duice.Map, obj:object):void {
                 this.page = Number(defaultIfEmpty(map.get(this.pageName),1));
                 var rows = Number(defaultIfEmpty(map.get(this.rowsName),1));
@@ -2884,7 +3015,7 @@ namespace duice {
 				li = executeExpression(li, $context);
 				li.appendChild(document.createTextNode(text));
 				return li;
-			}
+            }
 		}
         
         /**
@@ -2984,6 +3115,14 @@ namespace duice {
             setEditable(editable:boolean):void {
                 this.editable = editable;
             }
+
+            /**
+             * Sets enable
+             * @param enable 
+             */
+            setEnable(enable: boolean): void {
+                return;
+            }
             
             /**
              * Updates table
@@ -3060,7 +3199,7 @@ namespace duice {
              * @param tbody 
              */
             selectTbody(index:number):void {
-                this.getList().enableNotify(false);
+                this.getList().suspendNotify();
                 if(this.getList().setIndex(index)){
                     // handles class                
                     for(var i = 0; i < this.tbodies.length; i ++ ) {
@@ -3071,7 +3210,7 @@ namespace duice {
                         }
                     }
                 }
-                this.getList().enableNotify(true);
+                this.getList().resumeNotify();
             }
             
             /**
@@ -3155,6 +3294,14 @@ namespace duice {
                 this.ul.classList.add('duice-ui-ul');
                 var li = <HTMLLIElement>this.ul.querySelector('li');
                 this.li = <HTMLLIElement>li.cloneNode(true);
+            }
+
+            /**
+             * Sets enable
+             * @param enable 
+             */
+            setEnable(enable: boolean): void {
+                return;
             }
             
             /**

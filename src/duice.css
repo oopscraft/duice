@@ -225,6 +225,64 @@ span[is="duice-ui-span"],
 }
 
 /**
+ * duice.ui.GenericInput
+ */
+ input[is="duice-ui-input"][type="password"],
+ input[is="duice-ui-input"][type="time"],
+ input[is="duice-ui-input"][type="url"],
+ input[is="duice-ui-input"][type="email"],
+ input[is="duice-ui-input"][type="tel"] {
+	 width: 100%;
+	 height: inherit;
+	 line-height: inherit;
+	 margin: 0;
+	 padding: 0rem 0.3rem;
+	 box-sizing: border-box;
+	 -moz-box-sizing: border-box;
+	 -webkit-box-sizing: border-box;
+	 border: 1px solid #ddd;
+	 border-radius: 1px;
+	 transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+	 font-family:inherit;
+	 font-size:inherit;
+ }
+ .duice-ui-genericInput[type="password"]:disabled, 
+ .duice-ui-genericInput[type="time"]:disabled,
+ .duice-ui-genericInput[type="url"]:disabled,
+ .duice-ui-genericInput[type="email"]:disabled,
+ .duice-ui-genericInput[type="tel"]:disabled { 
+	 background-color: #fafafa;
+	 opacity: 0.8;
+ }
+ /* For Firefox */
+ .duice-ui-genericInput[type="password"]:-moz-read-only, 
+ .duice-ui-genericInput[type="time"]:-moz-read-only,
+ .duice-ui-genericInput[type="url"]:-moz-read-only,
+ .duice-ui-genericInput[type="email"]:-moz-read-only,
+ .duice-ui-genericInput[type="tel"]:-moz-read-only { 
+	background-color: #fafafa;
+ }
+ .duice-ui-genericInput[type="password"]:read-only,
+ .duice-ui-genericInput[type="time"]:read-only,
+ .duice-ui-genericInput[type="url"]:read-only, 
+ .duice-ui-genericInput[type="email"]:read-only, 
+ .duice-ui-genericInput[type="tel"]:read-only { 
+	background-color: #fafafa;
+ }
+ .duice-ui-genericInput[type="password"]:focus,
+ .duice-ui-genericInput[type="time"]:focus,
+ .duice-ui-genericInput[type="url"]:focus,
+ .duice-ui-genericInput[type="email"]:focus,
+ .duice-ui-genericInput[type="tel"]:focus {
+	 outline: none;
+	 border: solid 1px gray;
+ }
+ .duice-ui-genericInput[type="time"]::-webkit-inner-spin-button,
+ .duice-ui-genericInput[type="time"]::-webkit-outer-spin-button {
+	 -webkit-appearance: none; 
+ }
+
+/**
  * duice.ui.TextInput
  */
 input[is="duice-ui-input"][type="text"],
@@ -242,11 +300,15 @@ input[is="duice-ui-input"][type="text"],
 	border-radius: 1px;
 	transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
 }
-.duice-ui-textInput:-moz-read-only { /* For Firefox */
-    background-color: #f7f7f7;
+.duice-ui-textInput:disabled { 
+	background-color: #fafafa;
+	opacity: 0.8;
 }
 .duice-ui-textInput:read-only { 
-    background-color: #f7f7f7;
+    background-color: #fafafa;
+}
+.duice-ui-textInput:-moz-read-only { /* For Firefox */
+    background-color: #fafafa;
 }
 .duice-ui-textInput:focus {
 	outline: none;
@@ -273,11 +335,15 @@ input[is="duice-ui-input"][type="number"],
 	font-size:inherit;
 	text-align: right;
 }
+.duice-ui-numberInput:disabled { 
+	background-color: #fafafa;
+	opacity: 0.8;
+}
 .duice-ui-numberInput:-moz-read-only { /* For Firefox */
-    background-color: #f7f7f7;
+    background-color: #fafafa;
 }
 .duice-ui-numberInput:read-only { 
-    background-color: #f7f7f7;
+    background-color: #fafafa;
 }
 .duice-ui-numberInput:focus {
 	outline: none;
@@ -344,6 +410,13 @@ input[is="duice-ui-input"][type="datetime"],
 	font-size: inherit;
 }
 .duice-ui-dateInput:disabled { 
+	background-color: #fafafa;
+	opacity: 0.8;
+}
+.duice-ui-dateInput:-moz-read-only { /* For Firefox */
+    background-color: #fafafa;
+}
+.duice-ui-dateInput:read-only { 
     background-color: #fafafa;
 }
 .duice-ui-dateInput:focus {
@@ -535,56 +608,6 @@ input[is="duice-ui-input"][type="datetime"],
 }
 
 /**
- * duice.ui.GenericInput
- */
-input[is="duice-ui-input"][type="password"],
-input[is="duice-ui-input"][type="time"],
-input[is="duice-ui-input"][type="url"],
-input[is="duice-ui-input"][type="email"],
-input[is="duice-ui-input"][type="tel"] {
-	width: 100%;
-	height: inherit;
-	line-height: inherit;
-	margin: 0;
-	padding: 0rem 0.3rem;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-	border: 1px solid #ddd;
-	border-radius: 1px;
-	transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
-	font-family:inherit;
-	font-size:inherit;
-}
-/* For Firefox */
-.duice-ui-genericInput[type="password"]:-moz-read-only, 
-.duice-ui-genericInput[type="time"]:-moz-read-only,
-.duice-ui-genericInput[type="url"]:-moz-read-only,
-.duice-ui-genericInput[type="email"]:-moz-read-only,
-.duice-ui-genericInput[type="tel"]:-moz-read-only { 
-    background-color: #f7f7f7;
-}
-.duice-ui-genericInput[type="password"]:read-only,
-.duice-ui-genericInput[type="time"]:read-only,
-.duice-ui-genericInput[type="url"]:read-only, 
-.duice-ui-genericInput[type="email"]:read-only, 
-.duice-ui-genericInput[type="tel"]:read-only { 
-    background-color: #f7f7f7;
-}
-.duice-ui-genericInput[type="password"]:focus,
-.duice-ui-genericInput[type="time"]:focus,
-.duice-ui-genericInput[type="url"]:focus,
-.duice-ui-genericInput[type="email"]:focus,
-.duice-ui-genericInput[type="tel"]:focus {
-	outline: none;
-	border: solid 1px gray;
-}
-.duice-ui-genericInput[type="time"]::-webkit-inner-spin-button,
-.duice-ui-genericInput[type="time"]::-webkit-outer-spin-button {
-	-webkit-appearance: none; 
-}
-
-/**
  * duice.ui.select
  */
 select[is="duice-ui-select"],
@@ -608,16 +631,19 @@ select[is="duice-ui-select"],
     background-clip: padding-box;
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 	overflow: hidden;
-	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAGdJREFUOI3tzjsOwjAURNGDUqSgTxU5K2AVrJtswjUsgHSR0qdxAZZFPrS+3ZvRzBsqf9MUtBtazJk+oMe0VTriiZCFX8nbpENMgfARjsn74vKj5IFruhfc8d6zIF9S/Hyk5HS4spMVeFcOjszaOwMAAAAASUVORK5CYII=');
+	background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAGdJREFUOI3tzjsOwjAURNGDUqSgTxU5K2AVrJtswjUsgHSR0qdxAZZFPrS+3ZvRzBsqf9MUtBtazJk+oMe0VTriiZCFX8nbpENMgfARjsn74vKj5IFruhfc8d6zIF9S/Hyk5HS4spMVeFcOjszaOwMAAAAASUVORK5CYII=');
 	background-repeat: no-repeat;
 	background-position: right 0.5rem center;
-	background-color: white;
 	padding-right:2em;
 	font-family:inherit;
 	font-size:inherit;
 }
 .duice-ui-select:disabled { 
-    background-color: #fafafa;
+	background-color: #fafafa;
+	opacity: 0.8;
+}
+.duice-ui-select--readonly {
+	background-color: #fafafa;
 }
 .duice-ui-select:focus {
 	outline: none;
@@ -646,12 +672,16 @@ textarea[is="duice-ui-textarea"],
     justify-content: center;
     overflow-y: scroll;
 }
+.duice-ui-textarea:disabled { 
+	background-color: #fafafa;
+	opacity: 0.8;
+}
 .duice-ui-textarea:-moz-read-only { /* For Firefox */
-    background-color: #f7f7f7;
+    background-color: #fafafa;
     outline: none;
 }
 .duice-ui-textarea:read-only {
-	background-color: #f7f7f7;
+	background-color: #fafafa;
 	outline: none;
 }
 .duice-ui-textarea:focus {

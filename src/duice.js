@@ -41,7 +41,7 @@ var duice;
     };
     function initialize() {
         // prints configuration
-        console.log(duice.Configuration);
+        console.debug(duice.Configuration);
         // initializes component
         var $context = typeof self !== 'undefined' ? self :
             typeof window !== 'undefined' ? window :
@@ -133,7 +133,7 @@ var duice;
         function Observable() {
             this.observers = new Array();
             this.changed = false;
-            this.notifiable = true;
+            this.notifyEnable = true;
         }
         /**
          * Adds observer instance
@@ -164,7 +164,8 @@ var duice;
          * @param obj object to transfer to observer
          */
         Observable.prototype.notifyObservers = function (obj) {
-            if (this.notifiable && this.hasChanged()) {
+            console.debug('Observable.observers.length', this.observers.length);
+            if (this.notifyEnable && this.hasChanged()) {
                 this.clearUnavailableObservers();
                 for (var i = 0, size = this.observers.length; i < size; i++) {
                     try {
@@ -178,11 +179,16 @@ var duice;
             }
         };
         /**
-         * Sets notifiable
-         * @param notifiable
+         * Suspends notify
          */
-        Observable.prototype.enableNotify = function (notifiable) {
-            this.notifiable = notifiable;
+        Observable.prototype.suspendNotify = function () {
+            this.notifyEnable = false;
+        };
+        /**
+         * Resumes notify
+         */
+        Observable.prototype.resumeNotify = function () {
+            this.notifyEnable = true;
         };
         /**
          * Sets changed flag
@@ -226,13 +232,53 @@ var duice;
     var DataObject = /** @class */ (function (_super) {
         __extends(DataObject, _super);
         function DataObject() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.available = true;
+            _this.enable = true;
+            _this.readonly = new Object();
+            return _this;
         }
         /**
          * Returns whether instance is active
          */
         DataObject.prototype.isAvailable = function () {
             return true;
+        };
+        /**
+         * Sets enable
+         * @param enable
+         */
+        DataObject.prototype.setEnable = function (enable) {
+            this.enable = enable;
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        /**
+         * Returns enable
+         */
+        DataObject.prototype.getEnable = function () {
+            return this.enable;
+        };
+        /**
+         * Sets read-only
+         * @param name
+         */
+        DataObject.prototype.setReadonly = function (name, readonly) {
+            this.readonly[name] = readonly;
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        /**
+         * Returns read-only
+         * @param name
+         */
+        DataObject.prototype.getReadonly = function (name) {
+            if (this.readonly[name]) {
+                return true;
+            }
+            else {
+                return false;
+            }
         };
         return DataObject;
     }(Observable));
@@ -250,8 +296,6 @@ var duice;
         function Map(json) {
             var _this = _super.call(this) || this;
             _this.data = new Object(); // internal data object
-            _this.enable = true; // enable
-            _this.readonly = new Array(); // read only names
             if (json) {
                 _this.fromJson(json);
             }
@@ -263,7 +307,7 @@ var duice;
          * @param obj
          */
         Map.prototype.update = function (UiComponent, obj) {
-            console.info('Map.update', UiComponent, obj);
+            console.debug('Map.update', UiComponent, obj);
             var name = UiComponent.getName();
             var value = UiComponent.getValue();
             this.set(name, value);
@@ -350,47 +394,6 @@ var duice;
             }
             return names;
         };
-        /**
-         * Sets instance to be enabled.
-         * @param whether enable or not
-         */
-        Map.prototype.setEnable = function (enable) {
-            this.enable = enable;
-            this.setChanged();
-            this.notifyObservers(this);
-        };
-        /**
-         * Returns instance is enabled.
-         * @return whether enable or not
-         */
-        Map.prototype.isEnable = function () {
-            return this.enable;
-        };
-        /**
-         * Sets read-only specified name
-         * @param name
-         * @param readonly
-         */
-        Map.prototype.setReadonly = function (name, readonly) {
-            if (this.readonly.indexOf(name) == -1) {
-                this.readonly.push(name);
-            }
-            this.setChanged();
-            this.notifyObservers(this);
-        };
-        /**
-         * Returns specified name is read-only
-         * @param name
-         * @return whether specified property is read-only or not
-         */
-        Map.prototype.isReadonly = function (name) {
-            if (this.readonly.indexOf(name) >= 0) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        };
         return Map;
     }(DataObject));
     duice.Map = Map;
@@ -399,23 +402,28 @@ var duice;
      */
     var List = /** @class */ (function (_super) {
         __extends(List, _super);
+        /**
+         * constructor
+         * @param jsonArray
+         */
         function List(jsonArray) {
             var _this = _super.call(this) || this;
             _this.data = new Array();
             _this.index = -1;
             _this.on = {};
+            _this.readonly = new Object();
             if (jsonArray) {
                 _this.fromJson(jsonArray);
             }
             return _this;
         }
         List.prototype.update = function (observable, obj) {
-            console.log('List.update', observable, obj);
+            console.debug('List.update', observable, obj);
             this.setChanged();
             this.notifyObservers(obj);
         };
         List.prototype.fromJson = function (jsonArray) {
-            this.data = new Array();
+            this.clear();
             for (var i = 0; i < jsonArray.length; i++) {
                 var map = new duice.Map(jsonArray[i]);
                 map.addObserver(this);
@@ -426,6 +434,9 @@ var duice;
             this.setChanged();
             this.notifyObservers(this);
         };
+        /**
+         * toJson
+         */
         List.prototype.toJson = function () {
             var jsonArray = new Array();
             for (var i = 0; i < this.data.length; i++) {
@@ -437,6 +448,9 @@ var duice;
          * Clears data
          */
         List.prototype.clear = function () {
+            for (var i = 0, size = this.data.length; i < size; i++) {
+                this.data[i].removeObserver(this);
+            }
             this.data = new Array();
             this.index = -1;
             this.setChanged();
@@ -459,6 +473,29 @@ var duice;
         List.prototype.reset = function () {
             var originJson = JSON.parse(this.originData);
             this.fromJson(originJson);
+        };
+        /**
+         * Overrides duice.DataObject.setEnable
+         * @param enable
+         */
+        List.prototype.setEnable = function (enable) {
+            this.forEach(function (map) {
+                map.enable = enable;
+            });
+            _super.prototype.setEnable.call(this, enable);
+        };
+        /**
+         * Sets read-only
+         * @param name
+         * @param readonly
+         */
+        List.prototype.setReadonly = function (name, readonly) {
+            this.forEach(function (map) {
+                map.suspendNotify();
+                map.setReadonly(name, readonly);
+                map.resumeNotify();
+            });
+            _super.prototype.setReadonly.call(this, name, true);
         };
         /**
          * Sets index.
@@ -1864,6 +1901,22 @@ var duice;
             Input.prototype.validate = function (value) {
                 return true;
             };
+            Input.prototype.setEnable = function (enable) {
+                if (enable === false) {
+                    this.input.setAttribute('disabled', 'true');
+                }
+                else {
+                    this.input.removeAttribute('disabled');
+                }
+            };
+            Input.prototype.setReadonly = function (readonly) {
+                if (readonly === true) {
+                    this.input.setAttribute('readonly', 'readonly');
+                }
+                else {
+                    this.input.removeAttribute('readonly');
+                }
+            };
             return Input;
         }(MapUiComponent));
         ui.Input = Input;
@@ -1880,6 +1933,8 @@ var duice;
             GenericInput.prototype.update = function (map, obj) {
                 var value = map.get(this.getName());
                 this.input.value = defaultIfEmpty(value, '');
+                this.setEnable(map.getEnable());
+                this.setReadonly(map.getReadonly(this.getName()));
             };
             GenericInput.prototype.getValue = function () {
                 var value = this.input.value;
@@ -1917,6 +1972,8 @@ var duice;
                 value = defaultIfEmpty(value, '');
                 value = this.format.encode(value);
                 this.input.value = value;
+                this.setEnable(map.getEnable());
+                this.setReadonly(map.getReadonly(this.getName()));
             };
             TextInput.prototype.getValue = function () {
                 var value = this.input.value;
@@ -1955,6 +2012,8 @@ var duice;
                 var value = map.get(this.getName());
                 value = this.format.encode(value);
                 this.input.value = value;
+                this.setEnable(map.getEnable());
+                this.setReadonly(map.getReadonly(this.getName()));
             };
             NumberInput.prototype.getValue = function () {
                 var value = this.input.value;
@@ -1984,7 +2043,7 @@ var duice;
                 // stop click event propagation
                 _this.input.addEventListener('click', function (event) {
                     event.stopPropagation();
-                });
+                }, true);
                 return _this;
             }
             CheckboxInput.prototype.update = function (map, obj) {
@@ -1995,9 +2054,19 @@ var duice;
                 else {
                     this.input.checked = false;
                 }
+                this.setEnable(map.getEnable());
+                this.setReadonly(map.getReadonly(this.getName()));
             };
             CheckboxInput.prototype.getValue = function () {
                 return this.input.checked;
+            };
+            CheckboxInput.prototype.setReadonly = function (readonly) {
+                if (readonly) {
+                    this.input.style.pointerEvents = 'none';
+                }
+                else {
+                    this.input.style.pointerEvents = '';
+                }
             };
             return CheckboxInput;
         }(Input));
@@ -2020,9 +2089,19 @@ var duice;
                 else {
                     this.input.checked = false;
                 }
+                this.setEnable(map.getEnable());
+                this.setReadonly(map.getReadonly(this.getName()));
             };
             RadioInput.prototype.getValue = function () {
                 return this.input.value;
+            };
+            RadioInput.prototype.setReadonly = function (readonly) {
+                if (readonly) {
+                    this.input.style.pointerEvents = 'none';
+                }
+                else {
+                    this.input.style.pointerEvents = '';
+                }
             };
             return RadioInput;
         }(Input));
@@ -2034,13 +2113,16 @@ var duice;
             __extends(DateInput, _super);
             function DateInput(input) {
                 var _this = _super.call(this, input) || this;
+                _this.readonly = false;
                 _this.type = _this.input.getAttribute('type').toLowerCase();
                 _this.input.setAttribute('type', 'text');
                 addClassNameIfCssEnable(_this.input, 'duice-ui-dateInput');
                 // adds click event listener
                 var $this = _this;
                 _this.input.addEventListener('click', function (event) {
-                    $this.openPicker();
+                    if ($this.readonly !== true) {
+                        $this.openPicker();
+                    }
                 }, true);
                 // sets default format
                 _this.format = new DateFormat();
@@ -2060,6 +2142,8 @@ var duice;
                 value = defaultIfEmpty(value, '');
                 value = this.format.encode(value);
                 this.input.value = value;
+                this.setEnable(map.getEnable());
+                this.setReadonly(map.getReadonly(this.getName()));
             };
             DateInput.prototype.getValue = function () {
                 var value = this.input.value;
@@ -2078,6 +2162,10 @@ var duice;
                     return false;
                 }
                 return true;
+            };
+            DateInput.prototype.setReadonly = function (readonly) {
+                this.readonly = readonly;
+                _super.prototype.setReadonly.call(this, readonly);
             };
             DateInput.prototype.openPicker = function () {
                 // checks pickerDiv is open.
@@ -2438,10 +2526,30 @@ var duice;
                         this.defaultOptions[0].selected = true;
                     }
                 }
+                this.setEnable(map.getEnable());
+                this.setReadonly(map.getReadonly(this.getName()));
             };
             Select.prototype.getValue = function () {
                 var value = this.select.value;
                 return defaultIfEmpty(value, null);
+            };
+            Select.prototype.setEnable = function (enable) {
+                if (enable === false) {
+                    this.select.setAttribute('disabled', 'true');
+                }
+                else {
+                    this.select.removeAttribute('disabled');
+                }
+            };
+            Select.prototype.setReadonly = function (readonly) {
+                if (readonly === true) {
+                    this.select.style.pointerEvents = 'none';
+                    this.select.classList.add('duice-ui-select--readonly');
+                }
+                else {
+                    this.select.style.pointerEvents = '';
+                    this.select.classList.remove('duice-ui-select--readonly');
+                }
             };
             return Select;
         }(MapUiComponent));
@@ -2482,9 +2590,27 @@ var duice;
             Textarea.prototype.update = function (map, obj) {
                 var value = map.get(this.getName());
                 this.textarea.value = defaultIfEmpty(value, '');
+                this.setEnable(map.getEnable());
+                this.setReadonly(map.getReadonly(this.getName()));
             };
             Textarea.prototype.getValue = function () {
                 return defaultIfEmpty(this.textarea.value, null);
+            };
+            Textarea.prototype.setEnable = function (enable) {
+                if (enable === false) {
+                    this.textarea.setAttribute('disabled', 'true');
+                }
+                else {
+                    this.textarea.removeAttribute('disabled');
+                }
+            };
+            Textarea.prototype.setReadonly = function (readonly) {
+                if (readonly) {
+                    this.textarea.setAttribute('readonly', 'readonly');
+                }
+                else {
+                    this.textarea.removeAttribute('readonly');
+                }
             };
             return Textarea;
         }(MapUiComponent));
@@ -2520,10 +2646,6 @@ var duice;
                 _this.img = img;
                 _this.originSrc = _this.img.src;
                 _this.img.classList.add('duice-ui-img');
-                _this.img.addEventListener('error', function () {
-                    this.src = '//:0';
-                    console.log('image error');
-                });
                 var $this = _this;
                 // listener for click
                 _this.img.addEventListener('click', function (event) {
@@ -2531,8 +2653,10 @@ var duice;
                 });
                 // listener for contextmenu event
                 _this.img.addEventListener('contextmenu', function (event) {
-                    $this.openMenuDiv(event.pageX, event.pageY);
-                    event.preventDefault();
+                    if ($this.enable) {
+                        $this.openMenuDiv(event.pageX, event.pageY);
+                        event.preventDefault();
+                    }
                 });
                 return _this;
             }
@@ -2545,6 +2669,7 @@ var duice;
                 var value = map.get(this.getName());
                 this.value = defaultIfEmpty(value, this.originSrc);
                 this.img.src = this.value;
+                this.enable = map.getEnable();
             };
             /**
              * Return value of image element
@@ -2577,6 +2702,9 @@ var duice;
                 parentNode.appendChild(this.preview);
                 setPositionCentered(this.preview);
             };
+            /**
+             * Closes preview
+             */
             Image.prototype.closePreview = function () {
                 if (this.preview) {
                     this.blocker.unblock();
@@ -2627,7 +2755,6 @@ var duice;
              */
             Image.prototype.closeMenuDiv = function () {
                 if (this.menuDiv) {
-                    console.log('closeMenuDiv');
                     this.menuDiv.parentNode.removeChild(this.menuDiv);
                     this.menuDiv = null;
                 }
@@ -2715,6 +2842,9 @@ var duice;
             };
             Pagination.prototype.setSize = function (size) {
                 this.size = size;
+            };
+            Pagination.prototype.setEnable = function (enable) {
+                return;
             };
             Pagination.prototype.update = function (map, obj) {
                 this.page = Number(defaultIfEmpty(map.get(this.pageName), 1));
@@ -2898,6 +3028,13 @@ var duice;
                 this.editable = editable;
             };
             /**
+             * Sets enable
+             * @param enable
+             */
+            Table.prototype.setEnable = function (enable) {
+                return;
+            };
+            /**
              * Updates table
              * @param list
              * @param obj
@@ -2963,7 +3100,7 @@ var duice;
              * @param tbody
              */
             Table.prototype.selectTbody = function (index) {
-                this.getList().enableNotify(false);
+                this.getList().suspendNotify();
                 if (this.getList().setIndex(index)) {
                     // handles class                
                     for (var i = 0; i < this.tbodies.length; i++) {
@@ -2975,7 +3112,7 @@ var duice;
                         }
                     }
                 }
-                this.getList().enableNotify(true);
+                this.getList().resumeNotify();
             };
             /**
              * Creates table body element
@@ -3060,6 +3197,13 @@ var duice;
                 _this.li = li.cloneNode(true);
                 return _this;
             }
+            /**
+             * Sets enable
+             * @param enable
+             */
+            UList.prototype.setEnable = function (enable) {
+                return;
+            };
             /**
              * Sets hierarchy function options.
              * @param idName
