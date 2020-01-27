@@ -296,6 +296,7 @@ var duice;
         function Map(json) {
             var _this = _super.call(this) || this;
             _this.data = new Object(); // internal data object
+            _this.originData = JSON.stringify(new Object()); // original string JSON data
             if (json) {
                 _this.fromJson(json);
             }
@@ -393,6 +394,21 @@ var duice;
                 names.push(name);
             }
             return names;
+        };
+        /**
+         * Sets focus
+         * @param name
+         */
+        Map.prototype.setFocus = function (name) {
+            for (var i = 0, size = this.observers.length; i < size; i++) {
+                var observer = this.observers[i];
+                if (observer instanceof MapUiComponent) {
+                    if (observer.getName() === name && observer.element.focus) {
+                        observer.element.focus();
+                        break;
+                    }
+                }
+            }
         };
         return Map;
     }(DataObject));

@@ -315,8 +315,8 @@ namespace duice {
      */
     export class Map extends DataObject {
 
-        data:any = new Object();    // internal data object
-        originData:string;          // original string JSON data
+        data:any = new Object();                            // internal data object
+        originData:string = JSON.stringify(new Object());   // original string JSON data
     
         /**
          * constructor 
@@ -431,6 +431,22 @@ namespace duice {
                 names.push(name);
             }
             return names;
+        }
+
+        /**
+         * Sets focus
+         * @param name 
+         */
+        setFocus(name:string):void {
+            for(var i = 0, size = this.observers.length; i < size; i ++){
+                var observer = this.observers[i];
+                if(observer instanceof MapUiComponent){
+                    if(observer.getName() === name && observer.element.focus){
+                        observer.element.focus();
+                        break;
+                    }
+                }
+            }
         }
 
     }

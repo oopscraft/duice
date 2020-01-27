@@ -480,6 +480,7 @@ body {
 				<div style="display:flex; justify-content:space-between; align-items: flex-end;">
 					<h3>duice.ui.MapUIElement <small>(binding to user)</small></h3>
 					<div>
+						<button onclick="user.setFocus('name');">setFocus('name')</button>
 						<button onclick="
 							user.getNames().forEach(function(name){
 								user.setReadonly(name,true);
