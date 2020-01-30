@@ -817,7 +817,7 @@ table[is="duice-ui-table"],
 	border: 0px;
 }
 .duice-ui-table__tbody:hover {
-	background: #eee;
+	background: #f7f7f7;
 	transition: all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
 .duice-ui-table__tbody-tr {
@@ -832,7 +832,7 @@ table[is="duice-ui-table"],
 	text-align: left;
 }
 .duice-ui-table__tbody--index {
-	background: #eee;
+	background: #f7f7f7;
 }
 .duice-ui-table__tbody--empty {
 	margin: 0px;
@@ -884,6 +884,7 @@ ul[is="duice-ui-ul"] {
 .duice-ui-ul__li--index {
 	padding-left: 1px;
 	border-left: solid 2px #ccc;
+	background-color: #f7f7f7;
 }
 .duice-ui-ul__li--indent {
 	padding-left: 24px;

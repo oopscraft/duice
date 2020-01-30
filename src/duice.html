@@ -314,11 +314,11 @@ users.fromJson([
         color: '#ff0000'
     }
 ]);
-users.onBeforeIndexChange(function(index){
-	//console.log('onBeforeIndexChanged',index);
+users.onBeforeChangeIndex(function(index){
+	console.log('onBeforeChangeIndex',index);
 });
-users.onAfterIndexChange(function(index){
-	console.log('onAfterIndexChanged',index);
+users.onAfterChangeIndex(function(index){
+	console.log('onAfterChangeIndex',index);
 	console.log('user', users.get(index));
 });
 
@@ -495,8 +495,12 @@ body {
 						">
 							setReadonly([name],false)
 						</button>
-						<button onclick="user.setEnable(true);">setEnable(true)</button>
-						<button onclick="user.setEnable(false);">setEnable(false)</button>
+						<button onclick="user.setDisable(true);">
+							setDisable(true)
+						</button>
+						<button onclick="user.setDisable(false);">
+							setDisable(false)
+						</button>
 						<button onclick="alert(JSON.stringify(user.toJson(),null,2));">toJson()</button>
 						<button onclick="alert(user.isDirty());">isDirty()</button>
 						<button onclick="user.reset();">reset()</button>
@@ -792,8 +796,12 @@ body {
 							">
 								setReadonly([name],false)
 							</button>
-							<button onclick="users.setEnable(true);">setEnable(true)</button>
-							<button onclick="users.setEnable(false);">setEnable(false)</button>
+							<button onclick="users.setDisable(true);">
+								setDisable(true)
+							</button>
+							<button onclick="users.setDisable(false);">
+								setDisable(false)
+							</button>
 							<button onclick="users.add(new duice.Map({}));">add(map)</button>
 							<button onclick="users.insert(users.getIndex(), new duice.Map({}));">insert(map)</button>
 							<button onclick="users.remove(users.getIndex());">remove(index)</button>
@@ -908,6 +916,7 @@ body {
 					<div>
 						<ul is="duice-ui-ul" 
 							data-duice-bind="users,user" 
+							data-duice-selectable="true"
 							data-duice-editable="true">
 							<li style="display: inline-block;">
 								<div style="width:250px; border:solid 1px #ccc; border-radius:2px; padding:10px;">
@@ -1006,6 +1015,7 @@ body {
 						<div style="width:49%;">
 							<ul is="duice-ui-ul" 
 							data-duice-bind="users,user" 
+							data-duice-selectable="true"
 							data-duice-editable="true"
 							data-duice-hierarchy="id,parentId">
 								<li style="line-height:2.4;">
@@ -1061,7 +1071,8 @@ body {
 						<!-- ================================================================ -->
 						<div style="width:49%;">
 							<ul is="duice-ui-ul" 
-							data-duice-bind="users,user" 
+							data-duice-bind="users,user"
+							data-duice-selectable="true" 
 							data-duice-editable="true"
 							data-duice-hierarchy="id,parentId"
 							data-duice-foldable="true">
@@ -1196,7 +1207,7 @@ body {
 					.open();
 				">duice.dialog.Prompt</button>
 				<button onclick="
-					new duice.Dialog(document.getElementById('dialog'))
+					var dialog = new duice.Dialog(document.getElementById('dialog'))
 					.onBeforeOpen(function(){
 						return confirm('beforeOpen');
 					})

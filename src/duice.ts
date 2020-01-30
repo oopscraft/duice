@@ -28,10 +28,13 @@ namespace duice {
 		// initializes component
 	    var $context:any = typeof self !== 'undefined' ? self : 
 	                        typeof window !== 'undefined' ? window :
-	                        {};
-	    duice.initializeComponent(document, $context);
-	}
-    
+                            {};
+
+        // initializes component
+        duice.initializeComponent(document, $context);
+
+    }
+
     /**
      * Component definition registry
      */
@@ -227,7 +230,7 @@ namespace duice {
     export abstract class DataObject extends Observable implements Observer {
 
         available:boolean = true;
-        enable:boolean = true;
+        disable:boolean = false;
         readonly:any = new Object();
 
         /**
@@ -269,20 +272,20 @@ namespace duice {
         }
 
         /**
-         * Sets enable
-         * @param enable 
+         * Sets disable
+         * @param disable 
          */
-        setEnable(enable:boolean):void {
-            this.enable = enable;
+        setDisable(disable:boolean):void {
+            this.disable = disable;
             this.setChanged();
             this.notifyObservers(this);
         }
 
         /**
-         * Returns enable
+         * Returns if disabled
          */
-        getEnable():boolean {
-            return this.enable;
+        isDisable():boolean {
+            return this.disable;
         }
 
         /**
@@ -299,14 +302,13 @@ namespace duice {
          * Returns read-only
          * @param name 
          */
-        getReadonly(name:string):boolean {
+        isReadonly(name:string):boolean {
             if(this.readonly[name]){
                 return true;
             }else{
                 return false;
             }
         }
-
     }
 
     /**
@@ -316,7 +318,11 @@ namespace duice {
     export class Map extends DataObject {
 
         data:any = new Object();                            // internal data object
-        originData:string = JSON.stringify(new Object());   // original string JSON data
+        originData:string = JSON.stringify(this.data);      // original string JSON data
+        on:any = {
+             beforeChange:Function
+            ,afterChange:Function
+        };
     
         /**
          * constructor 
@@ -449,6 +455,22 @@ namespace duice {
             }
         }
 
+        /**
+         * Sets listener before change
+         * @param listener 
+         */
+        onBeforeChange(listener:Function):void {
+            this.on.beforeChange = listener;
+        }
+
+        /**
+         * Sets listener after change
+         * @param listener 
+         */
+        onAfterChange(listener:Function):void {
+            this.on.afterChange = listener;
+        }
+
     }
     
     /**
@@ -457,10 +479,14 @@ namespace duice {
     export class List extends DataObject {
 
         data:Array<duice.Map> = new Array<duice.Map>();
-        originData:string;
+        originData:string = JSON.stringify(this.data);
         index:number = -1;
-        on:any = {};
-        readonly:any = new Object();
+        on:any = {
+             beforeChangeIndex:Function
+            ,afterChangeIndex:Function
+            ,beforeChange:Function
+            ,afterChange:Function
+        }
 
         /**
          * constructor
@@ -481,6 +507,10 @@ namespace duice {
             this.clear();
             for(var i = 0; i < jsonArray.length; i ++ ) {
                 var map = new duice.Map(jsonArray[i]);
+                map.disable = this.disable;
+                map.readonly = clone(this.readonly);
+                map.onBeforeChange(this.on.beforeChange);
+                map.onAfterChange(this.on.afterChange);
                 map.addObserver(this);
                 this.data.push(map);
             }
@@ -534,39 +564,14 @@ namespace duice {
         }
 
         /**
-         * Overrides duice.DataObject.setEnable
-         * @param enable
-         */
-        setEnable(enable: boolean): void {
-            this.forEach(function(map:duice.Map){
-                map.enable = enable;
-            });
-            super.setEnable(enable);
-        }
-
-        /**
-         * Sets read-only
-         * @param name 
-         * @param readonly 
-         */
-        setReadonly(name:string, readonly:boolean):void {
-            this.forEach(function(map:duice.Map){
-                map.suspendNotify();
-                map.setReadonly(name, readonly);
-                map.resumeNotify();
-            });
-            super.setReadonly(name, true);
-        }
-
-        /**
          * Sets index.
          * @param index 
          */
         setIndex(index:number):boolean {
 
             // calls beforeIndexChanged 
-            if(this.on.beforeIndexChanged){
-                if(this.on.beforeIndexChanged.call(this,index) === false){
+            if(this.on.beforeChangeIndex){
+                if(this.on.beforeChangeIndex.call(this,index) === false){
                     return false;
                 }
             }
@@ -577,8 +582,8 @@ namespace duice {
             this.notifyObservers(this);
 
             // calls 
-            if(this.on.afterIndexChanged){
-                this.on.afterIndexChanged.call(this,index);
+            if(this.on.afterChangeIndex){
+                this.on.afterChangeIndex.call(this,index);
             }
 
             // returns true
@@ -599,6 +604,10 @@ namespace duice {
             return this.data[index];
         }
         add(map:Map):void {
+            map.disable = this.disable;
+            map.readonly = clone(this.readonly);
+            map.onBeforeChange(this.on.beforeChange);
+            map.onAfterChange(this.on.afterChange);
             map.addObserver(this);
             this.data.push(map);
             this.index = this.getSize()-1;
@@ -607,6 +616,10 @@ namespace duice {
         }
         insert(index:number, map:Map):void {
             if(0 <= index && index < this.data.length) {
+                map.disable = this.disable;
+                map.readonly = clone(this.readonly);
+                map.onBeforeChange(this.on.beforeChange);
+                map.onAfterChange(this.on.afterChange);
                 map.addObserver(this);
                 this.data.splice(index, 0, map);
                 this.index = index;
@@ -660,11 +673,29 @@ namespace duice {
             this.setChanged();
             this.notifyObservers(this);
         }
-        onBeforeIndexChange(listener:Function):void {
-            this.on.beforeIndexChanged = listener;
+        setDisable(disable:boolean):void{
+            this.data.forEach(function(map){
+                map.setDisable(disable);
+            });
+            super.setDisable(disable);
         }
-        onAfterIndexChange(listener:Function):void {
-            this.on.afterIndexChanged = listener;
+        setReadonly(name:string,readonly:boolean):void {
+            this.data.forEach(function(map){
+                map.setReadonly(name,readonly);
+            });
+            super.setReadonly(name,readonly);
+        }
+        onBeforeChangeIndex(listener:Function):void {
+            this.on.beforeChangeIndex = listener;
+        }
+        onAfterChangeIndex(listener:Function):void {
+            this.on.afterChangeIndex = listener;
+        }
+        onBeforeChange(listener:Function):void {
+            this.on.beforeChange = listener;
+        }
+        onAfterChange(listener:Function):void {
+            this.on.afterChange = listener;
         }
     }
     
@@ -1002,6 +1033,14 @@ namespace duice {
         }else{
             return window;
         }
+    }
+
+    /**
+     * clones object
+     * @param obj 
+     */
+    function clone(obj:object){
+        return JSON.parse(JSON.stringify(obj));
     }
     
     /**
@@ -1776,7 +1815,6 @@ namespace duice {
             }
         }
     }
-
     
     /**
      * duice.ui
@@ -1986,8 +2024,8 @@ namespace duice {
             validate(value:string):boolean {
                 return true;
             }
-            setEnable(enable:boolean):void {
-                if(enable === false){
+            setDisable(disable:boolean):void {
+                if(disable){
                     this.input.setAttribute('disabled','true');                    
                 }else{
                     this.input.removeAttribute('disabled');
@@ -2013,8 +2051,8 @@ namespace duice {
             update(map:duice.Map, obj:object):void {
                 var value = map.get(this.getName());
                 this.input.value = defaultIfEmpty(value, '');
-                this.setEnable(map.getEnable());
-                this.setReadonly(map.getReadonly(this.getName()));
+                this.setDisable(map.isDisable());
+                this.setReadonly(map.isReadonly(this.getName()));
             }
             getValue():any {
                 var value:any = this.input.value;
@@ -2048,8 +2086,8 @@ namespace duice {
                 value = defaultIfEmpty(value, '');
                 value = this.format.encode(value);
                 this.input.value = value;
-                this.setEnable(map.getEnable());
-                this.setReadonly(map.getReadonly(this.getName()));
+                this.setDisable(map.isDisable());
+                this.setReadonly(map.isReadonly(this.getName()));
             }
             getValue():string {
                 var value = this.input.value;
@@ -2085,8 +2123,8 @@ namespace duice {
                 var value = map.get(this.getName());
                 value = this.format.encode(value);
                 this.input.value = value;
-                this.setEnable(map.getEnable());
-                this.setReadonly(map.getReadonly(this.getName()));
+                this.setDisable(map.isDisable());
+                this.setReadonly(map.isReadonly(this.getName()));
             }
             getValue():number {
                 var value:any = this.input.value;
@@ -2123,8 +2161,8 @@ namespace duice {
                 }else{
                     this.input.checked = false;
                 }
-                this.setEnable(map.getEnable());
-                this.setReadonly(map.getReadonly(this.getName()));
+                this.setDisable(map.isDisable());
+                this.setReadonly(map.isReadonly(this.getName()));
             }
             getValue():boolean {
                 return this.input.checked;
@@ -2153,8 +2191,8 @@ namespace duice {
                 }else{
                     this.input.checked = false;
                 }
-                this.setEnable(map.getEnable());
-                this.setReadonly(map.getReadonly(this.getName()));
+                this.setDisable(map.isDisable());
+                this.setReadonly(map.isReadonly(this.getName()));
             }
             getValue():string {
                 return this.input.value;
@@ -2207,8 +2245,8 @@ namespace duice {
                 value = defaultIfEmpty(value,'');
                 value = this.format.encode(value);
                 this.input.value = value;
-                this.setEnable(map.getEnable());
-                this.setReadonly(map.getReadonly(this.getName()));
+                this.setDisable(map.isDisable());
+                this.setReadonly(map.isReadonly(this.getName()));
             }
             getValue():string {
                 var value = this.input.value;
@@ -2622,15 +2660,15 @@ namespace duice {
 						this.defaultOptions[0].selected = true;
 					}
                 }
-                this.setEnable(map.getEnable());
-                this.setReadonly(map.getReadonly(this.getName()));
+                this.setDisable(map.isDisable());
+                this.setReadonly(map.isReadonly(this.getName()));
             }
             getValue():any {
                 var value = this.select.value;
                 return defaultIfEmpty(value, null);
             }
-            setEnable(enable: boolean): void {
-                if(enable === false){
+            setDisable(disable: boolean): void {
+                if(disable){
                     this.select.setAttribute('disabled', 'true');
                 }else{
                     this.select.removeAttribute('disabled');
@@ -2677,14 +2715,14 @@ namespace duice {
             update(map:duice.Map, obj:object):void {
                 var value = map.get(this.getName());
                 this.textarea.value = defaultIfEmpty(value, '');
-                this.setEnable(map.getEnable());
-                this.setReadonly(map.getReadonly(this.getName()));
+                this.setDisable(map.isDisable());
+                this.setReadonly(map.isReadonly(this.getName()));
             }
             getValue():any {
                 return defaultIfEmpty(this.textarea.value, null);
             }
-            setEnable(enable: boolean): void {
-                if(enable === false){
+            setDisable(disable:boolean): void {
+                if(disable){
                     this.textarea.setAttribute('disabled', 'true');
                 }else{
                     this.textarea.removeAttribute('disabled');
@@ -2718,7 +2756,7 @@ namespace duice {
             img:HTMLImageElement;
             originSrc:string;
             value:string;
-            enable:boolean;
+            disable:boolean;
             preview:HTMLImageElement;
             blocker:duice.Blocker;
             menuDiv:HTMLDivElement;
@@ -2741,10 +2779,11 @@ namespace duice {
 
                 // listener for contextmenu event
                 this.img.addEventListener('contextmenu', function(event){
-                    if($this.enable){
-                        $this.openMenuDiv(event.pageX,event.pageY);
-                        event.preventDefault();
+                    if($this.disable){
+                        return;
                     }
+                    $this.openMenuDiv(event.pageX,event.pageY);
+                    event.preventDefault();
                 });
             }
             
@@ -2757,7 +2796,7 @@ namespace duice {
                 var value = map.get(this.getName());
                 this.value = defaultIfEmpty(value,this.originSrc);
                 this.img.src = this.value;
-                this.enable = map.getEnable();
+                this.disable = map.isDisable();
             }
             
             /**
@@ -3131,14 +3170,6 @@ namespace duice {
             setEditable(editable:boolean):void {
                 this.editable = editable;
             }
-
-            /**
-             * Sets enable
-             * @param enable 
-             */
-            setEnable(enable: boolean): void {
-                return;
-            }
             
             /**
              * Updates table
@@ -3272,16 +3303,13 @@ namespace duice {
         export class UListFactory extends ListUiComponentFactory {
             getInstance(element:HTMLUListElement):UList {
                 var uList = new UList(element);
+                uList.setSelectable(element.dataset.duiceSelectable === 'true');
+                uList.setEditable(element.dataset.duiceEditable === 'true');
                 if(element.dataset.duiceHierarchy){
                     var hirearchy = element.dataset.duiceHierarchy.split(',');
                     uList.setHierarchy(hirearchy[0], hirearchy[1]);
                 }
-                if(element.dataset.duiceFoldable){
-                    uList.setFoldable(element.dataset.duiceFoldable === 'true' ? true : false);
-                }
-                if(element.dataset.duiceEditable){
-                    uList.setEditable(element.dataset.duiceEditable === 'true' ? true: false);
-                }
+                uList.setFoldable(element.dataset.duiceFoldable === 'true');
                 var bind = element.dataset.duiceBind.split(',');
                 uList.bind(this.getContextProperty(bind[0]), bind[1]);
                 return uList;
@@ -3295,10 +3323,11 @@ namespace duice {
             ul:HTMLUListElement;
             li:HTMLLIElement;
             lis:Array<HTMLLIElement> = new Array<HTMLLIElement>();
+            selectable:boolean;
+            editable:boolean;
             hierarchy:{ idName:string, parentIdName:string }
             foldable:boolean;
             foldName:any = {};
-            editable:boolean;
         
             /**
              * Constructor
@@ -3313,11 +3342,19 @@ namespace duice {
             }
 
             /**
-             * Sets enable
-             * @param enable 
+             * Sets selectable flag
+             * @param selectable 
              */
-            setEnable(enable: boolean): void {
-                return;
+            setSelectable(selectable:boolean):void {
+                this.selectable = selectable;
+            }  
+
+            /**
+             * Sets editable flag.
+             * @param editable
+             */
+            setEditable(editable:boolean):void {
+                this.editable = editable;
             }
             
             /**
@@ -3359,14 +3396,6 @@ namespace duice {
              */
             setFoldable(foldable:boolean):void {
                 this.foldable = foldable;
-            }
-            
-            /**
-             * Sets editable flag.
-             * @param editable
-             */
-            setEditable(editable:boolean):void {
-                this.editable = editable;
             }
             
             /**
@@ -3433,14 +3462,23 @@ namespace duice {
                 li.dataset.duiceIndex = String(index);
                 
                 // sets index
-                li.addEventListener('mousedown', function(event){
-                    event.stopPropagation();
-                    for(var i = 0; i < $this.lis.length; i ++ ) {
-                        $this.lis[i].classList.remove('duice-ui-ul__li--index');
+                if(this.selectable){
+                    if(index === this.getList().getIndex()){
+                        li.classList.add('duice-ui-ul__li--index');
                     }
-                    this.classList.add('duice-ui-ul__li--index');
-                    $this.list.index = Number(this.dataset.duiceIndex);
-                });
+                    li.addEventListener('mousedown', function(event){
+                        $this.getList().suspendNotify();
+                        if($this.getList().setIndex(index)){
+                            event.stopPropagation();
+                            for(var i = 0; i < $this.lis.length; i ++ ) {
+                                $this.lis[i].classList.remove('duice-ui-ul__li--index');
+                            }
+                            this.classList.add('duice-ui-ul__li--index');
+                            $this.list.index = Number(this.dataset.duiceIndex);
+                        }
+                        $this.getList().resumeNotify();
+                    });
+                }
 
                 // editable
                 if(this.editable){

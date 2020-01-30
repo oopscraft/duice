@@ -46,6 +46,7 @@ var duice;
         var $context = typeof self !== 'undefined' ? self :
             typeof window !== 'undefined' ? window :
                 {};
+        // initializes component
         duice.initializeComponent(document, $context);
     }
     duice.initialize = initialize;
@@ -234,7 +235,7 @@ var duice;
         function DataObject() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.available = true;
-            _this.enable = true;
+            _this.disable = false;
             _this.readonly = new Object();
             return _this;
         }
@@ -245,19 +246,19 @@ var duice;
             return true;
         };
         /**
-         * Sets enable
-         * @param enable
+         * Sets disable
+         * @param disable
          */
-        DataObject.prototype.setEnable = function (enable) {
-            this.enable = enable;
+        DataObject.prototype.setDisable = function (disable) {
+            this.disable = disable;
             this.setChanged();
             this.notifyObservers(this);
         };
         /**
-         * Returns enable
+         * Returns if disabled
          */
-        DataObject.prototype.getEnable = function () {
-            return this.enable;
+        DataObject.prototype.isDisable = function () {
+            return this.disable;
         };
         /**
          * Sets read-only
@@ -272,7 +273,7 @@ var duice;
          * Returns read-only
          * @param name
          */
-        DataObject.prototype.getReadonly = function (name) {
+        DataObject.prototype.isReadonly = function (name) {
             if (this.readonly[name]) {
                 return true;
             }
@@ -296,7 +297,11 @@ var duice;
         function Map(json) {
             var _this = _super.call(this) || this;
             _this.data = new Object(); // internal data object
-            _this.originData = JSON.stringify(new Object()); // original string JSON data
+            _this.originData = JSON.stringify(_this.data); // original string JSON data
+            _this.on = {
+                beforeChange: Function,
+                afterChange: Function
+            };
             if (json) {
                 _this.fromJson(json);
             }
@@ -410,6 +415,20 @@ var duice;
                 }
             }
         };
+        /**
+         * Sets listener before change
+         * @param listener
+         */
+        Map.prototype.onBeforeChange = function (listener) {
+            this.on.beforeChange = listener;
+        };
+        /**
+         * Sets listener after change
+         * @param listener
+         */
+        Map.prototype.onAfterChange = function (listener) {
+            this.on.afterChange = listener;
+        };
         return Map;
     }(DataObject));
     duice.Map = Map;
@@ -425,9 +444,14 @@ var duice;
         function List(jsonArray) {
             var _this = _super.call(this) || this;
             _this.data = new Array();
+            _this.originData = JSON.stringify(_this.data);
             _this.index = -1;
-            _this.on = {};
-            _this.readonly = new Object();
+            _this.on = {
+                beforeChangeIndex: Function,
+                afterChangeIndex: Function,
+                beforeChange: Function,
+                afterChange: Function
+            };
             if (jsonArray) {
                 _this.fromJson(jsonArray);
             }
@@ -442,6 +466,10 @@ var duice;
             this.clear();
             for (var i = 0; i < jsonArray.length; i++) {
                 var map = new duice.Map(jsonArray[i]);
+                map.disable = this.disable;
+                map.readonly = clone(this.readonly);
+                map.onBeforeChange(this.on.beforeChange);
+                map.onAfterChange(this.on.afterChange);
                 map.addObserver(this);
                 this.data.push(map);
             }
@@ -491,36 +519,13 @@ var duice;
             this.fromJson(originJson);
         };
         /**
-         * Overrides duice.DataObject.setEnable
-         * @param enable
-         */
-        List.prototype.setEnable = function (enable) {
-            this.forEach(function (map) {
-                map.enable = enable;
-            });
-            _super.prototype.setEnable.call(this, enable);
-        };
-        /**
-         * Sets read-only
-         * @param name
-         * @param readonly
-         */
-        List.prototype.setReadonly = function (name, readonly) {
-            this.forEach(function (map) {
-                map.suspendNotify();
-                map.setReadonly(name, readonly);
-                map.resumeNotify();
-            });
-            _super.prototype.setReadonly.call(this, name, true);
-        };
-        /**
          * Sets index.
          * @param index
          */
         List.prototype.setIndex = function (index) {
             // calls beforeIndexChanged 
-            if (this.on.beforeIndexChanged) {
-                if (this.on.beforeIndexChanged.call(this, index) === false) {
+            if (this.on.beforeChangeIndex) {
+                if (this.on.beforeChangeIndex.call(this, index) === false) {
                     return false;
                 }
             }
@@ -529,8 +534,8 @@ var duice;
             this.setChanged();
             this.notifyObservers(this);
             // calls 
-            if (this.on.afterIndexChanged) {
-                this.on.afterIndexChanged.call(this, index);
+            if (this.on.afterChangeIndex) {
+                this.on.afterChangeIndex.call(this, index);
             }
             // returns true
             return true;
@@ -550,6 +555,10 @@ var duice;
             return this.data[index];
         };
         List.prototype.add = function (map) {
+            map.disable = this.disable;
+            map.readonly = clone(this.readonly);
+            map.onBeforeChange(this.on.beforeChange);
+            map.onAfterChange(this.on.afterChange);
             map.addObserver(this);
             this.data.push(map);
             this.index = this.getSize() - 1;
@@ -558,6 +567,10 @@ var duice;
         };
         List.prototype.insert = function (index, map) {
             if (0 <= index && index < this.data.length) {
+                map.disable = this.disable;
+                map.readonly = clone(this.readonly);
+                map.onBeforeChange(this.on.beforeChange);
+                map.onAfterChange(this.on.afterChange);
                 map.addObserver(this);
                 this.data.splice(index, 0, map);
                 this.index = index;
@@ -612,11 +625,29 @@ var duice;
             this.setChanged();
             this.notifyObservers(this);
         };
-        List.prototype.onBeforeIndexChange = function (listener) {
-            this.on.beforeIndexChanged = listener;
+        List.prototype.setDisable = function (disable) {
+            this.data.forEach(function (map) {
+                map.setDisable(disable);
+            });
+            _super.prototype.setDisable.call(this, disable);
         };
-        List.prototype.onAfterIndexChange = function (listener) {
-            this.on.afterIndexChanged = listener;
+        List.prototype.setReadonly = function (name, readonly) {
+            this.data.forEach(function (map) {
+                map.setReadonly(name, readonly);
+            });
+            _super.prototype.setReadonly.call(this, name, readonly);
+        };
+        List.prototype.onBeforeChangeIndex = function (listener) {
+            this.on.beforeChangeIndex = listener;
+        };
+        List.prototype.onAfterChangeIndex = function (listener) {
+            this.on.afterChangeIndex = listener;
+        };
+        List.prototype.onBeforeChange = function (listener) {
+            this.on.beforeChange = listener;
+        };
+        List.prototype.onAfterChange = function (listener) {
+            this.on.afterChange = listener;
         };
         return List;
     }(DataObject));
@@ -962,6 +993,13 @@ var duice;
         else {
             return window;
         }
+    }
+    /**
+     * clones object
+     * @param obj
+     */
+    function clone(obj) {
+        return JSON.parse(JSON.stringify(obj));
     }
     /**
      * Sets element position to be centered
@@ -1917,8 +1955,8 @@ var duice;
             Input.prototype.validate = function (value) {
                 return true;
             };
-            Input.prototype.setEnable = function (enable) {
-                if (enable === false) {
+            Input.prototype.setDisable = function (disable) {
+                if (disable) {
                     this.input.setAttribute('disabled', 'true');
                 }
                 else {
@@ -1949,8 +1987,8 @@ var duice;
             GenericInput.prototype.update = function (map, obj) {
                 var value = map.get(this.getName());
                 this.input.value = defaultIfEmpty(value, '');
-                this.setEnable(map.getEnable());
-                this.setReadonly(map.getReadonly(this.getName()));
+                this.setDisable(map.isDisable());
+                this.setReadonly(map.isReadonly(this.getName()));
             };
             GenericInput.prototype.getValue = function () {
                 var value = this.input.value;
@@ -1988,8 +2026,8 @@ var duice;
                 value = defaultIfEmpty(value, '');
                 value = this.format.encode(value);
                 this.input.value = value;
-                this.setEnable(map.getEnable());
-                this.setReadonly(map.getReadonly(this.getName()));
+                this.setDisable(map.isDisable());
+                this.setReadonly(map.isReadonly(this.getName()));
             };
             TextInput.prototype.getValue = function () {
                 var value = this.input.value;
@@ -2028,8 +2066,8 @@ var duice;
                 var value = map.get(this.getName());
                 value = this.format.encode(value);
                 this.input.value = value;
-                this.setEnable(map.getEnable());
-                this.setReadonly(map.getReadonly(this.getName()));
+                this.setDisable(map.isDisable());
+                this.setReadonly(map.isReadonly(this.getName()));
             };
             NumberInput.prototype.getValue = function () {
                 var value = this.input.value;
@@ -2070,8 +2108,8 @@ var duice;
                 else {
                     this.input.checked = false;
                 }
-                this.setEnable(map.getEnable());
-                this.setReadonly(map.getReadonly(this.getName()));
+                this.setDisable(map.isDisable());
+                this.setReadonly(map.isReadonly(this.getName()));
             };
             CheckboxInput.prototype.getValue = function () {
                 return this.input.checked;
@@ -2105,8 +2143,8 @@ var duice;
                 else {
                     this.input.checked = false;
                 }
-                this.setEnable(map.getEnable());
-                this.setReadonly(map.getReadonly(this.getName()));
+                this.setDisable(map.isDisable());
+                this.setReadonly(map.isReadonly(this.getName()));
             };
             RadioInput.prototype.getValue = function () {
                 return this.input.value;
@@ -2158,8 +2196,8 @@ var duice;
                 value = defaultIfEmpty(value, '');
                 value = this.format.encode(value);
                 this.input.value = value;
-                this.setEnable(map.getEnable());
-                this.setReadonly(map.getReadonly(this.getName()));
+                this.setDisable(map.isDisable());
+                this.setReadonly(map.isReadonly(this.getName()));
             };
             DateInput.prototype.getValue = function () {
                 var value = this.input.value;
@@ -2542,15 +2580,15 @@ var duice;
                         this.defaultOptions[0].selected = true;
                     }
                 }
-                this.setEnable(map.getEnable());
-                this.setReadonly(map.getReadonly(this.getName()));
+                this.setDisable(map.isDisable());
+                this.setReadonly(map.isReadonly(this.getName()));
             };
             Select.prototype.getValue = function () {
                 var value = this.select.value;
                 return defaultIfEmpty(value, null);
             };
-            Select.prototype.setEnable = function (enable) {
-                if (enable === false) {
+            Select.prototype.setDisable = function (disable) {
+                if (disable) {
                     this.select.setAttribute('disabled', 'true');
                 }
                 else {
@@ -2606,14 +2644,14 @@ var duice;
             Textarea.prototype.update = function (map, obj) {
                 var value = map.get(this.getName());
                 this.textarea.value = defaultIfEmpty(value, '');
-                this.setEnable(map.getEnable());
-                this.setReadonly(map.getReadonly(this.getName()));
+                this.setDisable(map.isDisable());
+                this.setReadonly(map.isReadonly(this.getName()));
             };
             Textarea.prototype.getValue = function () {
                 return defaultIfEmpty(this.textarea.value, null);
             };
-            Textarea.prototype.setEnable = function (enable) {
-                if (enable === false) {
+            Textarea.prototype.setDisable = function (disable) {
+                if (disable) {
                     this.textarea.setAttribute('disabled', 'true');
                 }
                 else {
@@ -2669,10 +2707,11 @@ var duice;
                 });
                 // listener for contextmenu event
                 _this.img.addEventListener('contextmenu', function (event) {
-                    if ($this.enable) {
-                        $this.openMenuDiv(event.pageX, event.pageY);
-                        event.preventDefault();
+                    if ($this.disable) {
+                        return;
                     }
+                    $this.openMenuDiv(event.pageX, event.pageY);
+                    event.preventDefault();
                 });
                 return _this;
             }
@@ -2685,7 +2724,7 @@ var duice;
                 var value = map.get(this.getName());
                 this.value = defaultIfEmpty(value, this.originSrc);
                 this.img.src = this.value;
-                this.enable = map.getEnable();
+                this.disable = map.isDisable();
             };
             /**
              * Return value of image element
@@ -3044,13 +3083,6 @@ var duice;
                 this.editable = editable;
             };
             /**
-             * Sets enable
-             * @param enable
-             */
-            Table.prototype.setEnable = function (enable) {
-                return;
-            };
-            /**
              * Updates table
              * @param list
              * @param obj
@@ -3177,16 +3209,13 @@ var duice;
             }
             UListFactory.prototype.getInstance = function (element) {
                 var uList = new UList(element);
+                uList.setSelectable(element.dataset.duiceSelectable === 'true');
+                uList.setEditable(element.dataset.duiceEditable === 'true');
                 if (element.dataset.duiceHierarchy) {
                     var hirearchy = element.dataset.duiceHierarchy.split(',');
                     uList.setHierarchy(hirearchy[0], hirearchy[1]);
                 }
-                if (element.dataset.duiceFoldable) {
-                    uList.setFoldable(element.dataset.duiceFoldable === 'true' ? true : false);
-                }
-                if (element.dataset.duiceEditable) {
-                    uList.setEditable(element.dataset.duiceEditable === 'true' ? true : false);
-                }
+                uList.setFoldable(element.dataset.duiceFoldable === 'true');
                 var bind = element.dataset.duiceBind.split(',');
                 uList.bind(this.getContextProperty(bind[0]), bind[1]);
                 return uList;
@@ -3214,11 +3243,18 @@ var duice;
                 return _this;
             }
             /**
-             * Sets enable
-             * @param enable
+             * Sets selectable flag
+             * @param selectable
              */
-            UList.prototype.setEnable = function (enable) {
-                return;
+            UList.prototype.setSelectable = function (selectable) {
+                this.selectable = selectable;
+            };
+            /**
+             * Sets editable flag.
+             * @param editable
+             */
+            UList.prototype.setEditable = function (editable) {
+                this.editable = editable;
             };
             /**
              * Sets hierarchy function options.
@@ -3257,13 +3293,6 @@ var duice;
              */
             UList.prototype.setFoldable = function (foldable) {
                 this.foldable = foldable;
-            };
-            /**
-             * Sets editable flag.
-             * @param editable
-             */
-            UList.prototype.setEditable = function (editable) {
-                this.editable = editable;
             };
             /**
              * Updates instance
@@ -3321,14 +3350,23 @@ var duice;
                 this.lis.push(li);
                 li.dataset.duiceIndex = String(index);
                 // sets index
-                li.addEventListener('mousedown', function (event) {
-                    event.stopPropagation();
-                    for (var i = 0; i < $this.lis.length; i++) {
-                        $this.lis[i].classList.remove('duice-ui-ul__li--index');
+                if (this.selectable) {
+                    if (index === this.getList().getIndex()) {
+                        li.classList.add('duice-ui-ul__li--index');
                     }
-                    this.classList.add('duice-ui-ul__li--index');
-                    $this.list.index = Number(this.dataset.duiceIndex);
-                });
+                    li.addEventListener('mousedown', function (event) {
+                        $this.getList().suspendNotify();
+                        if ($this.getList().setIndex(index)) {
+                            event.stopPropagation();
+                            for (var i = 0; i < $this.lis.length; i++) {
+                                $this.lis[i].classList.remove('duice-ui-ul__li--index');
+                            }
+                            this.classList.add('duice-ui-ul__li--index');
+                            $this.list.index = Number(this.dataset.duiceIndex);
+                        }
+                        $this.getList().resumeNotify();
+                    });
+                }
                 // editable
                 if (this.editable) {
                     li.setAttribute('draggable', 'true');
