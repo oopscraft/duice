@@ -232,6 +232,7 @@ namespace duice {
         available:boolean = true;
         disable:boolean = false;
         readonly:any = new Object();
+        visible:boolean = true;
 
         /**
          * Updates self data object from observable instance 
@@ -309,6 +310,31 @@ namespace duice {
                 return false;
             }
         }
+
+        /**
+         * Sets visible flag
+         * @param visible 
+         */
+        setVisible(visible:boolean):void {
+            this.visible = visible;
+            for(var i = 0, size = this.observers.length; i < size; i++){
+                try {
+                    if(this.observers[i] instanceof UiComponent){
+                        var uiComponent = <UiComponent>this.observers[i];
+                        uiComponent.setVisible(visible);
+                    }
+                }catch(e){
+                    console.error(e, this.observers[i]);
+                }
+            }
+        }
+
+        /**
+         * Returns is visible.
+         */
+        isVisible():boolean {
+            return this.visible;
+        }
     }
 
     /**
@@ -320,8 +346,8 @@ namespace duice {
         data:any = new Object();                            // internal data object
         originData:string = JSON.stringify(this.data);      // original string JSON data
         on:any = {
-             beforeChange:Function
-            ,afterChange:Function
+             beforeChange:null
+            ,afterChange:null
         };
     
         /**
@@ -413,10 +439,27 @@ namespace duice {
          * @param name
          * @param value
          */
-        set(name:string, value:any):void {
+        set(name:string, value:any):boolean {
+
+            // calls beforeChange
+            if(this.on.beforeChange){
+                if(this.on.beforeChange.call(this,name,value) === false){
+                    return false;
+                }
+            }
+
+            // changes value
             this.data[name] = value;
             this.setChanged();
             this.notifyObservers(this);
+
+            // calls 
+            if(this.on.afterChange){
+                this.on.afterChange.call(this,name,value);
+            }
+
+            // return true
+            return true;
         }
         
         /**
@@ -482,10 +525,10 @@ namespace duice {
         originData:string = JSON.stringify(this.data);
         index:number = -1;
         on:any = {
-             beforeChangeIndex:Function
-            ,afterChangeIndex:Function
-            ,beforeChange:Function
-            ,afterChange:Function
+             beforeChangeIndex:null
+            ,afterChangeIndex:null
+            ,beforeChange:null
+            ,afterChange:null
         }
 
         /**
@@ -569,7 +612,7 @@ namespace duice {
          */
         setIndex(index:number):boolean {
 
-            // calls beforeIndexChanged 
+            // calls beforeChangeIndex 
             if(this.on.beforeChangeIndex){
                 if(this.on.beforeChangeIndex.call(this,index) === false){
                     return false;
@@ -729,6 +772,14 @@ namespace duice {
             }else{
                 return false;
             }
+        }
+
+        /**
+         * Sets element visible
+         * @param visible 
+         */
+        setVisible(visible:boolean){
+            this.element.style.display = (visible ? '' : 'none');
         }
     }
     

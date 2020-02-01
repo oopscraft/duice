@@ -237,6 +237,7 @@ var duice;
             _this.available = true;
             _this.disable = false;
             _this.readonly = new Object();
+            _this.visible = true;
             return _this;
         }
         /**
@@ -281,6 +282,30 @@ var duice;
                 return false;
             }
         };
+        /**
+         * Sets visible flag
+         * @param visible
+         */
+        DataObject.prototype.setVisible = function (visible) {
+            this.visible = visible;
+            for (var i = 0, size = this.observers.length; i < size; i++) {
+                try {
+                    if (this.observers[i] instanceof UiComponent) {
+                        var uiComponent = this.observers[i];
+                        uiComponent.setVisible(visible);
+                    }
+                }
+                catch (e) {
+                    console.error(e, this.observers[i]);
+                }
+            }
+        };
+        /**
+         * Returns is visible.
+         */
+        DataObject.prototype.isVisible = function () {
+            return this.visible;
+        };
         return DataObject;
     }(Observable));
     duice.DataObject = DataObject;
@@ -299,8 +324,8 @@ var duice;
             _this.data = new Object(); // internal data object
             _this.originData = JSON.stringify(_this.data); // original string JSON data
             _this.on = {
-                beforeChange: Function,
-                afterChange: Function
+                beforeChange: null,
+                afterChange: null
             };
             if (json) {
                 _this.fromJson(json);
@@ -378,9 +403,22 @@ var duice;
          * @param value
          */
         Map.prototype.set = function (name, value) {
+            // calls beforeChange
+            if (this.on.beforeChange) {
+                if (this.on.beforeChange.call(this, name, value) === false) {
+                    return false;
+                }
+            }
+            // changes value
             this.data[name] = value;
             this.setChanged();
             this.notifyObservers(this);
+            // calls 
+            if (this.on.afterChange) {
+                this.on.afterChange.call(this, name, value);
+            }
+            // return true
+            return true;
         };
         /**
          * Gets specified property value.
@@ -447,10 +485,10 @@ var duice;
             _this.originData = JSON.stringify(_this.data);
             _this.index = -1;
             _this.on = {
-                beforeChangeIndex: Function,
-                afterChangeIndex: Function,
-                beforeChange: Function,
-                afterChange: Function
+                beforeChangeIndex: null,
+                afterChangeIndex: null,
+                beforeChange: null,
+                afterChange: null
             };
             if (jsonArray) {
                 _this.fromJson(jsonArray);
@@ -523,7 +561,7 @@ var duice;
          * @param index
          */
         List.prototype.setIndex = function (index) {
-            // calls beforeIndexChanged 
+            // calls beforeChangeIndex 
             if (this.on.beforeChangeIndex) {
                 if (this.on.beforeChangeIndex.call(this, index) === false) {
                     return false;
@@ -681,6 +719,13 @@ var duice;
             else {
                 return false;
             }
+        };
+        /**
+         * Sets element visible
+         * @param visible
+         */
+        UiComponent.prototype.setVisible = function (visible) {
+            this.element.style.display = (visible ? '' : 'none');
         };
         return UiComponent;
     }(Observable));
