@@ -2,4 +2,5 @@
 *.log
 *.pid
 *.swp
-
+/dist
+/doc

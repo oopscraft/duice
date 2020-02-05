@@ -41,7 +41,7 @@ case ${1} in
 		;;
 	*)
 		update
-		compile
+		#compile
 		doc
 		dist
 		;;
