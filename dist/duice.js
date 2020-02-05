@@ -33,6 +33,24 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
 var duice;
 (function (duice) {
     /**
+     * Configuration
+     */
+    duice.Configuration = {
+        version: '0.9',
+        cssEnable: true
+    };
+    function initialize() {
+        // prints configuration
+        console.debug(duice.Configuration);
+        // initializes component
+        var $context = typeof self !== 'undefined' ? self :
+            typeof window !== 'undefined' ? window :
+                {};
+        // initializes component
+        duice.initializeComponent(document, $context);
+    }
+    duice.initialize = initialize;
+    /**
      * Component definition registry
      */
     duice.ComponentDefinitionRegistry = {
@@ -71,7 +89,7 @@ var duice;
      * @param $context
      */
     function initializeComponent(container, $context) {
-        [ModalUiComponentFactory, CompositeUiComponentFactory, ListUiComponentFactory, MapUiComponentFactory]
+        [ListUiComponentFactory, MapUiComponentFactory]
             .forEach(function (factoryType) {
             duice.ComponentDefinitionRegistry.getComponentDefinitions().forEach(function (componentDefinition) {
                 var elements = container.querySelectorAll(componentDefinition.getTagName() + '[is="' + componentDefinition.getIsAttribute() + '"][data-duice-bind]:not([data-duice-id])');
@@ -88,6 +106,27 @@ var duice;
     }
     duice.initializeComponent = initializeComponent;
     /**
+     * Loads external style
+     * @param href
+     */
+    function loadExternalStyle(href) {
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = href;
+        document.head.appendChild(link);
+    }
+    duice.loadExternalStyle = loadExternalStyle;
+    /**
+     * Loads external script
+     * @param src
+     */
+    function loadExternalScript(src) {
+        var script = document.createElement('script');
+        script.src = src;
+        document.head.appendChild(script);
+    }
+    duice.loadExternalScript = loadExternalScript;
+    /**
      * duice.Observable
      * Observable abstract class of Observer Pattern
      */
@@ -95,6 +134,7 @@ var duice;
         function Observable() {
             this.observers = new Array();
             this.changed = false;
+            this.notifyEnable = true;
         }
         /**
          * Adds observer instance
@@ -125,7 +165,8 @@ var duice;
          * @param obj object to transfer to observer
          */
         Observable.prototype.notifyObservers = function (obj) {
-            if (this.hasChanged()) {
+            console.debug('Observable.observers.length', this.observers.length);
+            if (this.notifyEnable && this.hasChanged()) {
                 this.clearUnavailableObservers();
                 for (var i = 0, size = this.observers.length; i < size; i++) {
                     try {
@@ -137,6 +178,18 @@ var duice;
                 }
                 this.clearChanged();
             }
+        };
+        /**
+         * Suspends notify
+         */
+        Observable.prototype.suspendNotify = function () {
+            this.notifyEnable = false;
+        };
+        /**
+         * Resumes notify
+         */
+        Observable.prototype.resumeNotify = function () {
+            this.notifyEnable = true;
         };
         /**
          * Sets changed flag
@@ -180,13 +233,78 @@ var duice;
     var DataObject = /** @class */ (function (_super) {
         __extends(DataObject, _super);
         function DataObject() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.available = true;
+            _this.disable = false;
+            _this.readonly = new Object();
+            _this.visible = true;
+            return _this;
         }
         /**
          * Returns whether instance is active
          */
         DataObject.prototype.isAvailable = function () {
             return true;
+        };
+        /**
+         * Sets disable
+         * @param disable
+         */
+        DataObject.prototype.setDisable = function (disable) {
+            this.disable = disable;
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        /**
+         * Returns if disabled
+         */
+        DataObject.prototype.isDisable = function () {
+            return this.disable;
+        };
+        /**
+         * Sets read-only
+         * @param name
+         */
+        DataObject.prototype.setReadonly = function (name, readonly) {
+            this.readonly[name] = readonly;
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        /**
+         * Returns read-only
+         * @param name
+         */
+        DataObject.prototype.isReadonly = function (name) {
+            if (this.readonly[name]) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+        /**
+         * Sets visible flag
+         * @param visible
+         */
+        DataObject.prototype.setVisible = function (visible) {
+            this.visible = visible;
+            for (var i = 0, size = this.observers.length; i < size; i++) {
+                try {
+                    if (this.observers[i] instanceof UiComponent) {
+                        var uiComponent = this.observers[i];
+                        uiComponent.setVisible(visible);
+                    }
+                }
+                catch (e) {
+                    console.error(e, this.observers[i]);
+                }
+            }
+        };
+        /**
+         * Returns is visible.
+         */
+        DataObject.prototype.isVisible = function () {
+            return this.visible;
         };
         return DataObject;
     }(Observable));
@@ -204,8 +322,11 @@ var duice;
         function Map(json) {
             var _this = _super.call(this) || this;
             _this.data = new Object(); // internal data object
-            _this.enable = true; // enable
-            _this.readonly = new Array(); // read only names
+            _this.originData = JSON.stringify(_this.data); // original string JSON data
+            _this.on = {
+                beforeChange: null,
+                afterChange: null
+            };
             if (json) {
                 _this.fromJson(json);
             }
@@ -217,7 +338,7 @@ var duice;
          * @param obj
          */
         Map.prototype.update = function (UiComponent, obj) {
-            console.info('Map.update', UiComponent, obj);
+            console.debug('Map.update', UiComponent, obj);
             var name = UiComponent.getName();
             var value = UiComponent.getValue();
             this.set(name, value);
@@ -250,6 +371,14 @@ var duice;
             return json;
         };
         /**
+         * Clears data
+         */
+        Map.prototype.clear = function () {
+            this.data = new Object();
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        /**
          * Checks original data is changed
          * @return whether original data is changed or not
          */
@@ -274,9 +403,22 @@ var duice;
          * @param value
          */
         Map.prototype.set = function (name, value) {
+            // calls beforeChange
+            if (this.on.beforeChange) {
+                if (this.on.beforeChange.call(this, name, value) === false) {
+                    return false;
+                }
+            }
+            // changes value
             this.data[name] = value;
             this.setChanged();
             this.notifyObservers(this);
+            // calls 
+            if (this.on.afterChange) {
+                this.on.afterChange.call(this, name, value);
+            }
+            // return true
+            return true;
         };
         /**
          * Gets specified property value.
@@ -297,45 +439,33 @@ var duice;
             return names;
         };
         /**
-         * Sets instance to be enabled.
-         * @param whether enable or not
-         */
-        Map.prototype.setEnable = function (enable) {
-            this.enable = enable;
-            this.setChanged();
-            this.notifyObservers(this);
-        };
-        /**
-         * Returns instance is enabled.
-         * @return whether enable or not
-         */
-        Map.prototype.isEnable = function () {
-            return this.enable;
-        };
-        /**
-         * Sets read-only specified name
+         * Sets focus
          * @param name
-         * @param readonly
          */
-        Map.prototype.setReadonly = function (name, readonly) {
-            if (this.readonly.indexOf(name) == -1) {
-                this.readonly.push(name);
+        Map.prototype.setFocus = function (name) {
+            for (var i = 0, size = this.observers.length; i < size; i++) {
+                var observer = this.observers[i];
+                if (observer instanceof MapUiComponent) {
+                    if (observer.getName() === name && observer.element.focus) {
+                        observer.element.focus();
+                        break;
+                    }
+                }
             }
-            this.setChanged();
-            this.notifyObservers(this);
         };
         /**
-         * Returns specified name is read-only
-         * @param name
-         * @return whether specified property is read-only or not
+         * Sets listener before change
+         * @param listener
          */
-        Map.prototype.isReadonly = function (name) {
-            if (this.readonly.indexOf(name) >= 0) {
-                return true;
-            }
-            else {
-                return false;
-            }
+        Map.prototype.onBeforeChange = function (listener) {
+            this.on.beforeChange = listener;
+        };
+        /**
+         * Sets listener after change
+         * @param listener
+         */
+        Map.prototype.onAfterChange = function (listener) {
+            this.on.afterChange = listener;
         };
         return Map;
     }(DataObject));
@@ -345,39 +475,72 @@ var duice;
      */
     var List = /** @class */ (function (_super) {
         __extends(List, _super);
-        function List(jsonArray, __childName) {
+        /**
+         * constructor
+         * @param jsonArray
+         */
+        function List(jsonArray) {
             var _this = _super.call(this) || this;
             _this.data = new Array();
+            _this.originData = JSON.stringify(_this.data);
             _this.index = -1;
+            _this.on = {
+                beforeChangeIndex: null,
+                afterChangeIndex: null,
+                beforeChange: null,
+                afterChange: null
+            };
             if (jsonArray) {
                 _this.fromJson(jsonArray);
             }
             return _this;
         }
         List.prototype.update = function (observable, obj) {
-            console.log('List.update', observable, obj);
+            console.debug('List.update', observable, obj);
             this.setChanged();
             this.notifyObservers(obj);
         };
         List.prototype.fromJson = function (jsonArray) {
-            this.data = new Array();
+            this.clear();
             for (var i = 0; i < jsonArray.length; i++) {
                 var map = new duice.Map(jsonArray[i]);
+                map.disable = this.disable;
+                map.readonly = clone(this.readonly);
+                map.onBeforeChange(this.on.beforeChange);
+                map.onAfterChange(this.on.afterChange);
                 map.addObserver(this);
                 this.data.push(map);
             }
             this.originData = JSON.stringify(this.toJson());
-            this.clearIndex();
+            this.index = -1;
             this.setChanged();
             this.notifyObservers(this);
         };
-        List.prototype.toJson = function (__childName) {
+        /**
+         * toJson
+         */
+        List.prototype.toJson = function () {
             var jsonArray = new Array();
             for (var i = 0; i < this.data.length; i++) {
                 jsonArray.push(this.data[i].toJson());
             }
             return jsonArray;
         };
+        /**
+         * Clears data
+         */
+        List.prototype.clear = function () {
+            for (var i = 0, size = this.data.length; i < size; i++) {
+                this.data[i].removeObserver(this);
+            }
+            this.data = new Array();
+            this.index = -1;
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        /**
+         * Returns if changed
+         */
         List.prototype.isDirty = function () {
             if (JSON.stringify(this.toJson()) === this.originData) {
                 return false;
@@ -386,14 +549,34 @@ var duice;
                 return true;
             }
         };
+        /**
+         * Resets data from original data.
+         */
         List.prototype.reset = function () {
             var originJson = JSON.parse(this.originData);
             this.fromJson(originJson);
         };
+        /**
+         * Sets index.
+         * @param index
+         */
         List.prototype.setIndex = function (index) {
+            // calls beforeChangeIndex 
+            if (this.on.beforeChangeIndex) {
+                if (this.on.beforeChangeIndex.call(this, index) === false) {
+                    return false;
+                }
+            }
+            // changes index
             this.index = index;
             this.setChanged();
             this.notifyObservers(this);
+            // calls 
+            if (this.on.afterChangeIndex) {
+                this.on.afterChangeIndex.call(this, index);
+            }
+            // returns true
+            return true;
         };
         List.prototype.getIndex = function () {
             return this.index;
@@ -410,6 +593,10 @@ var duice;
             return this.data[index];
         };
         List.prototype.add = function (map) {
+            map.disable = this.disable;
+            map.readonly = clone(this.readonly);
+            map.onBeforeChange(this.on.beforeChange);
+            map.onAfterChange(this.on.afterChange);
             map.addObserver(this);
             this.data.push(map);
             this.index = this.getSize() - 1;
@@ -418,6 +605,10 @@ var duice;
         };
         List.prototype.insert = function (index, map) {
             if (0 <= index && index < this.data.length) {
+                map.disable = this.disable;
+                map.readonly = clone(this.readonly);
+                map.onBeforeChange(this.on.beforeChange);
+                map.onAfterChange(this.on.afterChange);
                 map.addObserver(this);
                 this.data.splice(index, 0, map);
                 this.index = index;
@@ -440,9 +631,27 @@ var duice;
             this.setChanged();
             this.notifyObservers(this);
         };
+        List.prototype.indexOf = function (handler) {
+            for (var i = 0, size = this.data.length; i < size; i++) {
+                if (handler.call(this, this.data[i]) === true) {
+                    return i;
+                }
+            }
+            return -1;
+        };
+        List.prototype.contains = function (handler) {
+            if (this.indexOf(handler) > -1) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
         List.prototype.forEach = function (handler) {
             for (var i = 0, size = this.data.length; i < size; i++) {
-                handler.call(this, this.data[i]);
+                if (handler.call(this, this.data[i], i) === false) {
+                    break;
+                }
             }
         };
         List.prototype.sort = function (name, ascending) {
@@ -453,6 +662,30 @@ var duice;
             });
             this.setChanged();
             this.notifyObservers(this);
+        };
+        List.prototype.setDisable = function (disable) {
+            this.data.forEach(function (map) {
+                map.setDisable(disable);
+            });
+            _super.prototype.setDisable.call(this, disable);
+        };
+        List.prototype.setReadonly = function (name, readonly) {
+            this.data.forEach(function (map) {
+                map.setReadonly(name, readonly);
+            });
+            _super.prototype.setReadonly.call(this, name, readonly);
+        };
+        List.prototype.onBeforeChangeIndex = function (listener) {
+            this.on.beforeChangeIndex = listener;
+        };
+        List.prototype.onAfterChangeIndex = function (listener) {
+            this.on.afterChangeIndex = listener;
+        };
+        List.prototype.onBeforeChange = function (listener) {
+            this.on.beforeChange = listener;
+        };
+        List.prototype.onAfterChange = function (listener) {
+            this.on.afterChange = listener;
         };
         return List;
     }(DataObject));
@@ -487,6 +720,13 @@ var duice;
                 return false;
             }
         };
+        /**
+         * Sets element visible
+         * @param visible
+         */
+        UiComponent.prototype.setVisible = function (visible) {
+            this.element.style.display = (visible ? '' : 'none');
+        };
         return UiComponent;
     }(Observable));
     /**
@@ -498,6 +738,10 @@ var duice;
             return _super !== null && _super.apply(this, arguments) || this;
         }
         MapUiComponent.prototype.bind = function (map, name) {
+            var args = [];
+            for (var _i = 2; _i < arguments.length; _i++) {
+                args[_i - 2] = arguments[_i];
+            }
             this.map = map;
             this.name = name;
             this.map.addObserver(this);
@@ -514,7 +758,7 @@ var duice;
     }(UiComponent));
     duice.MapUiComponent = MapUiComponent;
     /**
-     * duice.ui.ListUiComponent
+     * duice.ListUiComponent
      */
     var ListUiComponent = /** @class */ (function (_super) {
         __extends(ListUiComponent, _super);
@@ -585,22 +829,6 @@ var duice;
         return ListUiComponentFactory;
     }(UiComponentFactory));
     duice.ListUiComponentFactory = ListUiComponentFactory;
-    var CompositeUiComponentFactory = /** @class */ (function (_super) {
-        __extends(CompositeUiComponentFactory, _super);
-        function CompositeUiComponentFactory() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        return CompositeUiComponentFactory;
-    }(UiComponentFactory));
-    duice.CompositeUiComponentFactory = CompositeUiComponentFactory;
-    var ModalUiComponentFactory = /** @class */ (function (_super) {
-        __extends(ModalUiComponentFactory, _super);
-        function ModalUiComponentFactory() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        return ModalUiComponentFactory;
-    }(UiComponentFactory));
-    duice.ModalUiComponentFactory = ModalUiComponentFactory;
     /**
      * Generates random UUID value
      * @return  UUID string
@@ -613,6 +841,14 @@ var duice;
             return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
         });
         return uuid;
+    }
+    /**
+     * Adds class
+     */
+    function addClassNameIfCssEnable(element, className) {
+        if (duice.Configuration.cssEnable) {
+            element.classList.add(className);
+        }
     }
     /**
      * Checks mobile browser
@@ -632,6 +868,22 @@ var duice;
         }
     }
     duice.isMobile = isMobile;
+    /**
+     * Returns Query Variables
+     */
+    function getQueryVariables() {
+        var queryVariables = new Object();
+        var queryString = window.location.search.substring(1);
+        var vars = queryString.split('&');
+        for (var i = 0; i < vars.length; i++) {
+            var pair = vars[i].split('=');
+            var key = decodeURIComponent(pair[0]);
+            var value = decodeURIComponent(pair[1]);
+            queryVariables[key] = value;
+        }
+        return queryVariables;
+    }
+    duice.getQueryVariables = getQueryVariables;
     /**
      * Check if value is empty
      * @param value
@@ -788,6 +1040,13 @@ var duice;
         }
     }
     /**
+     * clones object
+     * @param obj
+     */
+    function clone(obj) {
+        return JSON.parse(JSON.stringify(obj));
+    }
+    /**
      * Sets element position to be centered
      * @param element
      */
@@ -835,6 +1094,7 @@ var duice;
             }
         }, millis);
     }
+    duice.delayCall = delayCall;
     /**
      * Returns current max z-index value.
      * @return max z-index value
@@ -1088,6 +1348,436 @@ var duice;
     }());
     duice.DateFormat = DateFormat;
     /**
+     * duice.ui.Blocker
+     */
+    var Blocker = /** @class */ (function () {
+        function Blocker(element) {
+            this.opacity = 0.2;
+            this.element = element;
+            this.div = document.createElement('div');
+            this.div.classList.add('duice-blocker');
+        }
+        Blocker.prototype.setOpacity = function (opacity) {
+            this.opacity = opacity;
+        };
+        Blocker.prototype.block = function () {
+            // adjusting position
+            this.div.style.position = 'fixed';
+            this.div.style.zIndex = String(getCurrentMaxZIndex() + 1);
+            this.div.style.background = 'rgba(0, 0, 0, ' + this.opacity + ')';
+            this.takePosition();
+            // adds events
+            var $this = this;
+            getCurrentWindow().addEventListener('scroll', function () {
+                $this.takePosition();
+            });
+            // append
+            this.element.appendChild(this.div);
+        };
+        Blocker.prototype.unblock = function () {
+            this.element.removeChild(this.div);
+        };
+        Blocker.prototype.takePosition = function () {
+            // full blocking in case of BODY
+            if (this.element.tagName == 'BODY') {
+                this.div.style.width = '100%';
+                this.div.style.height = '100%';
+                this.div.style.top = '0px';
+                this.div.style.left = '0px';
+            }
+            // otherwise adjusting to parent element
+            else {
+                var boundingClientRect = this.element.getBoundingClientRect();
+                var width = boundingClientRect.width;
+                var height = boundingClientRect.height;
+                var left = boundingClientRect.left;
+                var top = boundingClientRect.top;
+                this.div.style.width = width + "px";
+                this.div.style.height = height + "px";
+                this.div.style.top = top + 'px';
+                this.div.style.left = left + 'px';
+            }
+        };
+        Blocker.prototype.getBlockDiv = function () {
+            return this.div;
+        };
+        return Blocker;
+    }());
+    duice.Blocker = Blocker;
+    /**
+     * duice.ui.Progress
+     */
+    var Progress = /** @class */ (function () {
+        function Progress(element) {
+            this.blocker = new Blocker(element);
+            this.blocker.setOpacity(0.0);
+        }
+        Progress.prototype.start = function () {
+            this.blocker.block();
+            this.div = document.createElement('div');
+            this.div.classList.add('duice-progress');
+            this.blocker.getBlockDiv().appendChild(this.div);
+        };
+        Progress.prototype.stop = function () {
+            this.blocker.getBlockDiv().removeChild(this.div);
+            this.blocker.unblock();
+        };
+        return Progress;
+    }());
+    duice.Progress = Progress;
+    /**
+      * duice.ui.Modal
+      */
+    var Modal = /** @class */ (function () {
+        function Modal() {
+            this.on = {};
+            var $this = this;
+            this.container = document.createElement('div');
+            this.container.classList.add('duice-modal');
+            this.headerDiv = document.createElement('div');
+            this.headerDiv.classList.add('duice-modal__headerDiv');
+            this.container.appendChild(this.headerDiv);
+            // drag
+            this.headerDiv.style.cursor = 'move';
+            this.headerDiv.onmousedown = function (ev) {
+                var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+                pos3 = ev.clientX;
+                pos4 = ev.clientY;
+                getCurrentWindow().document.onmouseup = function (ev) {
+                    getCurrentWindow().document.onmousemove = null;
+                    getCurrentWindow().document.onmouseup = null;
+                };
+                getCurrentWindow().document.onmousemove = function (ev) {
+                    pos1 = pos3 - ev.clientX;
+                    pos2 = pos4 - ev.clientY;
+                    pos3 = ev.clientX;
+                    pos4 = ev.clientY;
+                    $this.container.style.left = ($this.container.offsetLeft - pos1) + 'px';
+                    $this.container.style.top = ($this.container.offsetTop - pos2) + 'px';
+                };
+            };
+            var titleIcon = document.createElement('span');
+            titleIcon.classList.add('duice-modal__headerDiv-titleIcon');
+            this.headerDiv.appendChild(titleIcon);
+            var closeButton = document.createElement('span');
+            closeButton.classList.add('duice-modal__headerDiv-closeButton');
+            closeButton.addEventListener('click', function (event) {
+                $this.close();
+            });
+            this.headerDiv.appendChild(closeButton);
+            // creates body
+            this.bodyDiv = document.createElement('div');
+            this.container.appendChild(this.bodyDiv);
+            // adds blocker
+            this.blocker = new Blocker(getCurrentWindow().document.body);
+        }
+        Modal.prototype.addContent = function (content) {
+            this.bodyDiv.appendChild(content);
+        };
+        Modal.prototype.removeContent = function (content) {
+            this.bodyDiv.removeChild(content);
+        };
+        Modal.prototype.createButton = function (type) {
+            var button = document.createElement('button');
+            button.classList.add('duice-modal__button--' + type);
+            return button;
+        };
+        Modal.prototype.show = function () {
+            // block
+            this.blocker.block();
+            // opens modal
+            this.container.style.display = 'block';
+            this.container.style.position = 'absolute';
+            this.container.style.zIndex = String(getCurrentMaxZIndex() + 1);
+            getCurrentWindow().document.body.appendChild(this.container);
+            setPositionCentered(this.container);
+        };
+        Modal.prototype.hide = function () {
+            // closes modal
+            this.container.style.display = 'none';
+            getCurrentWindow().document.body.removeChild(this.container);
+            // unblock
+            this.blocker.unblock();
+        };
+        Modal.prototype.open = function () {
+            var _a;
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            if (this.on.beforeOpen) {
+                if ((_a = this.on.beforeOpen).call.apply(_a, __spreadArrays([this], args)) === false) {
+                    return false;
+                }
+            }
+            this.show();
+            if (this.on.afterOpen) {
+                delayCall.apply(void 0, __spreadArrays([200, this.on.afterOpen, this], args));
+            }
+            return true;
+        };
+        Modal.prototype.onBeforeOpen = function (listener) {
+            this.on.beforeOpen = listener;
+            return this;
+        };
+        Modal.prototype.onAfterOpen = function (listener) {
+            this.on.afterOpen = listener;
+            return this;
+        };
+        Modal.prototype.close = function () {
+            var _a;
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            if (this.on.beforeClose) {
+                if ((_a = this.on.beforeClose).call.apply(_a, __spreadArrays([this], args)) === false) {
+                    return false;
+                }
+            }
+            this.hide();
+            if (this.on.afterClose) {
+                delayCall.apply(void 0, __spreadArrays([200, this.on.afterClose, this], args));
+            }
+            return true;
+        };
+        Modal.prototype.onBeforeClose = function (listener) {
+            this.on.beforeClose = listener;
+            return this;
+        };
+        Modal.prototype.onAfterClose = function (listener) {
+            this.on.afterClose = listener;
+            return this;
+        };
+        Modal.prototype.confirm = function () {
+            var _a;
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            if (this.on.beforeConfirm) {
+                if ((_a = this.on.beforeConfirm).call.apply(_a, __spreadArrays([this], args)) === false) {
+                    return false;
+                }
+            }
+            this.hide();
+            if (this.on.afterConfirm) {
+                delayCall.apply(void 0, __spreadArrays([200, this.on.afterConfirm, this], args));
+            }
+            return true;
+        };
+        Modal.prototype.onBeforeConfirm = function (listener) {
+            this.on.beforeConfirm = listener;
+            return this;
+        };
+        Modal.prototype.onAfterConfirm = function (listener) {
+            this.on.afterConfirm = listener;
+            return this;
+        };
+        return Modal;
+    }());
+    duice.Modal = Modal;
+    /**
+     * duice.ui.Alert
+     */
+    var Alert = /** @class */ (function (_super) {
+        __extends(Alert, _super);
+        function Alert(message) {
+            var _this = _super.call(this) || this;
+            _this.message = message;
+            var $this = _this;
+            _this.iconDiv = document.createElement('div');
+            _this.iconDiv.classList.add('duice-alert__iconDiv');
+            _this.messageDiv = document.createElement('div');
+            _this.messageDiv.classList.add('duice-alert__messageDiv');
+            _this.messageDiv.appendChild(document.createTextNode(_this.message));
+            _this.buttonDiv = document.createElement('div');
+            _this.buttonDiv.classList.add('duice-alert__buttonDiv');
+            _this.confirmButton = _this.createButton('confirm');
+            _this.confirmButton.addEventListener('click', function (event) {
+                $this.close();
+            });
+            _this.buttonDiv.appendChild(_this.confirmButton);
+            // appends parts to bodyDiv
+            _this.addContent(_this.iconDiv);
+            _this.addContent(_this.messageDiv);
+            _this.addContent(_this.buttonDiv);
+            return _this;
+        }
+        Alert.prototype.open = function () {
+            if (_super.prototype.open.call(this)) {
+                this.confirmButton.focus();
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+        return Alert;
+    }(Modal));
+    duice.Alert = Alert;
+    /**
+     * duice.ui.Confirm
+     */
+    var Confirm = /** @class */ (function (_super) {
+        __extends(Confirm, _super);
+        function Confirm(message) {
+            var _this = _super.call(this) || this;
+            _this.message = message;
+            var $this = _this;
+            _this.iconDiv = document.createElement('div');
+            _this.iconDiv.classList.add('duice-confirm__iconDiv');
+            _this.messageDiv = document.createElement('div');
+            _this.messageDiv.classList.add('duice-confirm__messageDiv');
+            _this.messageDiv.appendChild(document.createTextNode(_this.message));
+            _this.buttonDiv = document.createElement('div');
+            _this.buttonDiv.classList.add('duice-confirm__buttonDiv');
+            // confirm button
+            _this.confirmButton = _this.createButton('confirm');
+            _this.confirmButton.addEventListener('click', function (event) {
+                $this.confirm();
+            });
+            _this.buttonDiv.appendChild(_this.confirmButton);
+            // cancel button
+            _this.cancelButton = _this.createButton('cancel');
+            _this.cancelButton.addEventListener('click', function (event) {
+                $this.close();
+            });
+            _this.buttonDiv.appendChild(_this.cancelButton);
+            // appends parts to bodyDiv
+            _this.addContent(_this.iconDiv);
+            _this.addContent(_this.messageDiv);
+            _this.addContent(_this.buttonDiv);
+            return _this;
+        }
+        Confirm.prototype.open = function () {
+            if (_super.prototype.open.call(this)) {
+                this.confirmButton.focus();
+            }
+            else {
+                return false;
+            }
+        };
+        return Confirm;
+    }(Modal));
+    duice.Confirm = Confirm;
+    /**
+     * duice.ui.Prompt
+     */
+    var Prompt = /** @class */ (function (_super) {
+        __extends(Prompt, _super);
+        function Prompt(message) {
+            var _this = _super.call(this) || this;
+            _this.message = message;
+            var $this = _this;
+            _this.iconDiv = document.createElement('div');
+            _this.iconDiv.classList.add('duice-prompt__iconDiv');
+            _this.messageDiv = document.createElement('div');
+            _this.messageDiv.classList.add('duice-prompt__messageDiv');
+            _this.messageDiv.appendChild(document.createTextNode(_this.message));
+            _this.inputDiv = document.createElement('div');
+            _this.inputDiv.classList.add('duice-prompt__inputDiv');
+            _this.input = document.createElement('input');
+            _this.input.classList.add('duice-prompt__inputDiv-input');
+            _this.inputDiv.appendChild(_this.input);
+            _this.buttonDiv = document.createElement('div');
+            _this.buttonDiv.classList.add('duice-prompt__buttonDiv');
+            // confirm button
+            _this.confirmButton = _this.createButton('confirm');
+            _this.confirmButton.addEventListener('click', function (event) {
+                $this.confirm();
+            });
+            _this.buttonDiv.appendChild(_this.confirmButton);
+            // cancel button
+            _this.cancelButton = _this.createButton('cancel');
+            _this.cancelButton.addEventListener('click', function (event) {
+                $this.close();
+            });
+            _this.buttonDiv.appendChild(_this.cancelButton);
+            // appends parts to bodyDiv
+            _this.addContent(_this.iconDiv);
+            _this.addContent(_this.messageDiv);
+            _this.addContent(_this.inputDiv);
+            _this.addContent(_this.buttonDiv);
+            return _this;
+        }
+        Prompt.prototype.open = function () {
+            if (_super.prototype.open.call(this)) {
+                this.input.focus();
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+        Prompt.prototype.getValue = function () {
+            return this.input.value;
+        };
+        return Prompt;
+    }(Modal));
+    duice.Prompt = Prompt;
+    /**
+     * duice.ui.Dialog
+     * @param dialog
+     */
+    var Dialog = /** @class */ (function (_super) {
+        __extends(Dialog, _super);
+        function Dialog(dialog) {
+            var _this = _super.call(this) || this;
+            _this.dialog = dialog;
+            _this.dialog.classList.add('duice-dialog');
+            _this.parentNode = _this.dialog.parentNode;
+            return _this;
+        }
+        Dialog.prototype.open = function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            this.dialog.style.display = 'block';
+            this.addContent(this.dialog);
+            // opens dialog
+            if (_super.prototype.open.apply(this, args)) {
+                return true;
+            }
+            else {
+                this.dialog.style.display = 'none';
+                this.parentNode.appendChild(this.dialog);
+                return false;
+            }
+        };
+        Dialog.prototype.close = function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            if (_super.prototype.close.apply(this, args)) {
+                this.dialog.style.display = 'none';
+                this.parentNode.appendChild(this.dialog);
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+        Dialog.prototype.confirm = function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            if (_super.prototype.confirm.apply(this, args)) {
+                this.dialog.style.display = 'none';
+                this.parentNode.appendChild(this.dialog);
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+        return Dialog;
+    }(Modal));
+    duice.Dialog = Dialog;
+    /**
      * duice.ui
      */
     var ui;
@@ -1130,6 +1820,7 @@ var duice;
             function Scriptlet(element) {
                 var _this = _super.call(this, element) || this;
                 _this.expression = element.innerHTML;
+                _this.element.classList.add('duice-ui-scriptlet');
                 return _this;
             }
             ;
@@ -1309,6 +2000,22 @@ var duice;
             Input.prototype.validate = function (value) {
                 return true;
             };
+            Input.prototype.setDisable = function (disable) {
+                if (disable) {
+                    this.input.setAttribute('disabled', 'true');
+                }
+                else {
+                    this.input.removeAttribute('disabled');
+                }
+            };
+            Input.prototype.setReadonly = function (readonly) {
+                if (readonly === true) {
+                    this.input.setAttribute('readonly', 'readonly');
+                }
+                else {
+                    this.input.removeAttribute('readonly');
+                }
+            };
             return Input;
         }(MapUiComponent));
         ui.Input = Input;
@@ -1319,12 +2026,14 @@ var duice;
             __extends(GenericInput, _super);
             function GenericInput(input) {
                 var _this = _super.call(this, input) || this;
-                _this.input.classList.add('duice-ui-genericInput');
+                addClassNameIfCssEnable(_this.input, 'duice-ui-genericInput');
                 return _this;
             }
             GenericInput.prototype.update = function (map, obj) {
                 var value = map.get(this.getName());
                 this.input.value = defaultIfEmpty(value, '');
+                this.setDisable(map.isDisable());
+                this.setReadonly(map.isReadonly(this.getName()));
             };
             GenericInput.prototype.getValue = function () {
                 var value = this.input.value;
@@ -1350,7 +2059,7 @@ var duice;
             __extends(TextInput, _super);
             function TextInput(input) {
                 var _this = _super.call(this, input) || this;
-                _this.input.classList.add('duice-ui-textInput');
+                addClassNameIfCssEnable(_this.input, 'duice-ui-textInput');
                 _this.format = new StringFormat();
                 return _this;
             }
@@ -1362,6 +2071,8 @@ var duice;
                 value = defaultIfEmpty(value, '');
                 value = this.format.encode(value);
                 this.input.value = value;
+                this.setDisable(map.isDisable());
+                this.setReadonly(map.isReadonly(this.getName()));
             };
             TextInput.prototype.getValue = function () {
                 var value = this.input.value;
@@ -1388,7 +2099,7 @@ var duice;
             __extends(NumberInput, _super);
             function NumberInput(input) {
                 var _this = _super.call(this, input) || this;
-                _this.input.classList.add('duice-ui-numberInput');
+                addClassNameIfCssEnable(_this.input, 'duice-ui-numberInput');
                 _this.input.setAttribute('type', 'text');
                 _this.format = new NumberFormat();
                 return _this;
@@ -1400,6 +2111,8 @@ var duice;
                 var value = map.get(this.getName());
                 value = this.format.encode(value);
                 this.input.value = value;
+                this.setDisable(map.isDisable());
+                this.setReadonly(map.isReadonly(this.getName()));
             };
             NumberInput.prototype.getValue = function () {
                 var value = this.input.value;
@@ -1425,11 +2138,11 @@ var duice;
             __extends(CheckboxInput, _super);
             function CheckboxInput(input) {
                 var _this = _super.call(this, input) || this;
-                _this.input.classList.add('duice-ui-checkboxInput');
+                addClassNameIfCssEnable(_this.input, 'duice-ui-checkboxInput');
                 // stop click event propagation
                 _this.input.addEventListener('click', function (event) {
                     event.stopPropagation();
-                });
+                }, true);
                 return _this;
             }
             CheckboxInput.prototype.update = function (map, obj) {
@@ -1440,9 +2153,19 @@ var duice;
                 else {
                     this.input.checked = false;
                 }
+                this.setDisable(map.isDisable());
+                this.setReadonly(map.isReadonly(this.getName()));
             };
             CheckboxInput.prototype.getValue = function () {
                 return this.input.checked;
+            };
+            CheckboxInput.prototype.setReadonly = function (readonly) {
+                if (readonly) {
+                    this.input.style.pointerEvents = 'none';
+                }
+                else {
+                    this.input.style.pointerEvents = '';
+                }
             };
             return CheckboxInput;
         }(Input));
@@ -1454,7 +2177,7 @@ var duice;
             __extends(RadioInput, _super);
             function RadioInput(input) {
                 var _this = _super.call(this, input) || this;
-                _this.input.classList.add('duice-ui-radioInput');
+                addClassNameIfCssEnable(_this.input, 'duice-ui-radioInput');
                 return _this;
             }
             RadioInput.prototype.update = function (map, obj) {
@@ -1465,9 +2188,19 @@ var duice;
                 else {
                     this.input.checked = false;
                 }
+                this.setDisable(map.isDisable());
+                this.setReadonly(map.isReadonly(this.getName()));
             };
             RadioInput.prototype.getValue = function () {
                 return this.input.value;
+            };
+            RadioInput.prototype.setReadonly = function (readonly) {
+                if (readonly) {
+                    this.input.style.pointerEvents = 'none';
+                }
+                else {
+                    this.input.style.pointerEvents = '';
+                }
             };
             return RadioInput;
         }(Input));
@@ -1479,13 +2212,16 @@ var duice;
             __extends(DateInput, _super);
             function DateInput(input) {
                 var _this = _super.call(this, input) || this;
+                _this.readonly = false;
                 _this.type = _this.input.getAttribute('type').toLowerCase();
                 _this.input.setAttribute('type', 'text');
-                _this.input.classList.add('duice-ui-dateInput');
+                addClassNameIfCssEnable(_this.input, 'duice-ui-dateInput');
                 // adds click event listener
                 var $this = _this;
                 _this.input.addEventListener('click', function (event) {
-                    $this.openPicker();
+                    if ($this.readonly !== true) {
+                        $this.openPicker();
+                    }
                 }, true);
                 // sets default format
                 _this.format = new DateFormat();
@@ -1505,6 +2241,8 @@ var duice;
                 value = defaultIfEmpty(value, '');
                 value = this.format.encode(value);
                 this.input.value = value;
+                this.setDisable(map.isDisable());
+                this.setReadonly(map.isReadonly(this.getName()));
             };
             DateInput.prototype.getValue = function () {
                 var value = this.input.value;
@@ -1523,6 +2261,10 @@ var duice;
                     return false;
                 }
                 return true;
+            };
+            DateInput.prototype.setReadonly = function (readonly) {
+                this.readonly = readonly;
+                _super.prototype.setReadonly.call(this, readonly);
             };
             DateInput.prototype.openPicker = function () {
                 // checks pickerDiv is open.
@@ -1878,10 +2620,35 @@ var duice;
             Select.prototype.update = function (map, obj) {
                 var value = map.get(this.getName());
                 this.select.value = defaultIfEmpty(value, '');
+                if (this.select.selectedIndex < 0) {
+                    if (this.defaultOptions.length > 0) {
+                        this.defaultOptions[0].selected = true;
+                    }
+                }
+                this.setDisable(map.isDisable());
+                this.setReadonly(map.isReadonly(this.getName()));
             };
             Select.prototype.getValue = function () {
                 var value = this.select.value;
                 return defaultIfEmpty(value, null);
+            };
+            Select.prototype.setDisable = function (disable) {
+                if (disable) {
+                    this.select.setAttribute('disabled', 'true');
+                }
+                else {
+                    this.select.removeAttribute('disabled');
+                }
+            };
+            Select.prototype.setReadonly = function (readonly) {
+                if (readonly === true) {
+                    this.select.style.pointerEvents = 'none';
+                    this.select.classList.add('duice-ui-select--readonly');
+                }
+                else {
+                    this.select.style.pointerEvents = '';
+                    this.select.classList.remove('duice-ui-select--readonly');
+                }
             };
             return Select;
         }(MapUiComponent));
@@ -1922,9 +2689,27 @@ var duice;
             Textarea.prototype.update = function (map, obj) {
                 var value = map.get(this.getName());
                 this.textarea.value = defaultIfEmpty(value, '');
+                this.setDisable(map.isDisable());
+                this.setReadonly(map.isReadonly(this.getName()));
             };
             Textarea.prototype.getValue = function () {
                 return defaultIfEmpty(this.textarea.value, null);
+            };
+            Textarea.prototype.setDisable = function (disable) {
+                if (disable) {
+                    this.textarea.setAttribute('disabled', 'true');
+                }
+                else {
+                    this.textarea.removeAttribute('disabled');
+                }
+            };
+            Textarea.prototype.setReadonly = function (readonly) {
+                if (readonly) {
+                    this.textarea.setAttribute('readonly', 'readonly');
+                }
+                else {
+                    this.textarea.removeAttribute('readonly');
+                }
             };
             return Textarea;
         }(MapUiComponent));
@@ -1958,32 +2743,20 @@ var duice;
             function Image(img) {
                 var _this = _super.call(this, img) || this;
                 _this.img = img;
+                _this.originSrc = _this.img.src;
                 _this.img.classList.add('duice-ui-img');
-                _this.img.addEventListener('error', function () {
-                    console.log('error');
-                });
                 var $this = _this;
-                // adds click event
-                _this.img.addEventListener('click', function () {
-                    $this.input.click();
+                // listener for click
+                _this.img.addEventListener('click', function (event) {
+                    $this.openPreview();
                 });
-                // creates file input element
-                _this.input = document.createElement('input');
-                _this.input.setAttribute("type", "file");
-                _this.input.setAttribute("accept", "image/gif, image/jpeg, image/png");
-                _this.input.addEventListener('change', function (e) {
-                    var fileReader = new FileReader();
-                    if (this.files && this.files[0]) {
-                        fileReader.addEventListener("load", function (event) {
-                            var value = event.target.result;
-                            $this.img.src = value;
-                            $this.setChanged();
-                            $this.notifyObservers($this);
-                        });
-                        fileReader.readAsDataURL(this.files[0]);
+                // listener for contextmenu event
+                _this.img.addEventListener('contextmenu', function (event) {
+                    if ($this.disable) {
+                        return;
                     }
-                    e.preventDefault();
-                    e.stopPropagation();
+                    $this.openMenuDiv(event.pageX, event.pageY);
+                    event.preventDefault();
                 });
                 return _this;
             }
@@ -1994,18 +2767,273 @@ var duice;
              */
             Image.prototype.update = function (map, obj) {
                 var value = map.get(this.getName());
-                this.img.src = value;
+                this.value = defaultIfEmpty(value, this.originSrc);
+                this.img.src = this.value;
+                this.disable = map.isDisable();
             };
             /**
              * Return value of image element
              * @return base64 data or image URL
              */
             Image.prototype.getValue = function () {
-                return this.img.src;
+                return this.value;
+            };
+            /**
+             * Opens preview
+             */
+            Image.prototype.openPreview = function () {
+                var $this = this;
+                var parentNode = getCurrentWindow().document.body;
+                // creates preview
+                this.preview = document.createElement('img');
+                this.preview.src = this.img.src;
+                this.preview.addEventListener('click', function (event) {
+                    $this.closePreview();
+                });
+                // creates blocker
+                this.blocker = new duice.Blocker(parentNode);
+                this.blocker.getBlockDiv().addEventListener('click', function (event) {
+                    $this.closePreview();
+                });
+                this.blocker.block();
+                // shows preview
+                this.preview.style.position = 'absolute';
+                this.preview.style.zIndex = String(getCurrentMaxZIndex() + 2);
+                parentNode.appendChild(this.preview);
+                setPositionCentered(this.preview);
+            };
+            /**
+             * Closes preview
+             */
+            Image.prototype.closePreview = function () {
+                if (this.preview) {
+                    this.blocker.unblock();
+                    this.preview.parentNode.removeChild(this.preview);
+                    this.preview = null;
+                }
+            };
+            /**
+             * Opens menu division.
+             */
+            Image.prototype.openMenuDiv = function (x, y) {
+                // checks if already menu exists.
+                if (this.menuDiv) {
+                    return;
+                }
+                // defines variables
+                var $this = this;
+                // creates menu div
+                this.menuDiv = document.createElement('div');
+                this.menuDiv.classList.add('duice-ui-img__menuDiv');
+                // creates change button
+                var changeButton = document.createElement('button');
+                changeButton.classList.add('duice-ui-img__menuDiv-changeButton');
+                changeButton.addEventListener('click', function (event) {
+                    $this.changeImage();
+                }, true);
+                this.menuDiv.appendChild(changeButton);
+                // creates view button
+                var clearButton = document.createElement('button');
+                clearButton.classList.add('duice-ui-img__menuDiv-clearButton');
+                clearButton.addEventListener('click', function (event) {
+                    $this.clearImage();
+                }, true);
+                this.menuDiv.appendChild(clearButton);
+                // appends menu div
+                this.img.parentNode.appendChild(this.menuDiv);
+                this.menuDiv.style.position = 'absolute';
+                this.menuDiv.style.zIndex = String(getCurrentMaxZIndex() + 1);
+                this.menuDiv.style.top = y + 'px';
+                this.menuDiv.style.left = x + 'px';
+                // listens mouse leaves from menu div.
+                this.menuDiv.addEventListener('mouseleave', function (event) {
+                    $this.closeMenuDiv();
+                });
+            };
+            /**
+             * Closes menu division
+             */
+            Image.prototype.closeMenuDiv = function () {
+                if (this.menuDiv) {
+                    this.menuDiv.parentNode.removeChild(this.menuDiv);
+                    this.menuDiv = null;
+                }
+            };
+            /**
+             * Changes image
+             */
+            Image.prototype.changeImage = function () {
+                // creates file input element
+                var $this = this;
+                var input = document.createElement('input');
+                input.setAttribute("type", "file");
+                input.setAttribute("accept", "image/gif, image/jpeg, image/png");
+                input.addEventListener('change', function (e) {
+                    var fileReader = new FileReader();
+                    if (this.files && this.files[0]) {
+                        fileReader.addEventListener("load", function (event) {
+                            var value = event.target.result;
+                            $this.value = value;
+                            $this.img.src = value;
+                            $this.setChanged();
+                            $this.notifyObservers($this);
+                        });
+                        fileReader.readAsDataURL(this.files[0]);
+                    }
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+                input.click();
+            };
+            /**
+             * Clears image
+             */
+            Image.prototype.clearImage = function () {
+                this.value = null;
+                this.setChanged();
+                this.notifyObservers(this);
             };
             return Image;
         }(MapUiComponent));
         ui.Image = Image;
+        /**
+         * duice.ui.PaginationFactory
+         */
+        var PaginationFactory = /** @class */ (function (_super) {
+            __extends(PaginationFactory, _super);
+            function PaginationFactory() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            PaginationFactory.prototype.getInstance = function (element) {
+                var pagination = new Pagination(element);
+                if (element.dataset.duiceSize) {
+                    pagination.setSize(Number(element.dataset.duiceSize));
+                }
+                var bind = element.dataset.duiceBind.split(',');
+                pagination.bind(this.getContextProperty(bind[0]), bind[1], bind[2], bind[3]);
+                return pagination;
+            };
+            return PaginationFactory;
+        }(MapUiComponentFactory));
+        ui.PaginationFactory = PaginationFactory;
+        /**
+         * duice.ui.Pagination
+         */
+        var Pagination = /** @class */ (function (_super) {
+            __extends(Pagination, _super);
+            function Pagination(ul) {
+                var _this = _super.call(this, ul) || this;
+                _this.lis = new Array();
+                _this.size = 1;
+                _this.page = 1;
+                _this.ul = ul;
+                addClassNameIfCssEnable(_this.ul, 'duice-ui-pagination');
+                // clones li
+                var li = _this.ul.querySelector('li');
+                _this.li = li.cloneNode(true);
+                li.parentNode.removeChild(li);
+                return _this;
+            }
+            Pagination.prototype.bind = function (map, pageName, rowsName, totalCountName) {
+                this.pageName = pageName;
+                this.rowsName = rowsName;
+                this.totalCountName = totalCountName;
+                _super.prototype.bind.call(this, map, pageName);
+            };
+            Pagination.prototype.setSize = function (size) {
+                this.size = size;
+            };
+            Pagination.prototype.setEnable = function (enable) {
+                return;
+            };
+            Pagination.prototype.update = function (map, obj) {
+                this.page = Number(defaultIfEmpty(map.get(this.pageName), 1));
+                var rows = Number(defaultIfEmpty(map.get(this.rowsName), 1));
+                var totalCount = Number(defaultIfEmpty(map.get(this.totalCountName), 1));
+                var totalPage = Math.max(Math.ceil(totalCount / rows), 1);
+                var startPage = Math.floor((this.page - 1) / this.size) * this.size + 1;
+                var endPage = Math.min(startPage + this.size - 1, totalPage);
+                var $this = this;
+                // clear lis
+                for (var i = this.lis.length - 1; i >= 0; i--) {
+                    this.lis[i].parentNode.removeChild(this.lis[i]);
+                }
+                this.lis.length = 0;
+                // creates previous item
+                var prevPage = startPage - 1;
+                var prevLi = this.createPageItem(prevPage, '');
+                prevLi.classList.add('duice-ui-pagination__li--prev');
+                this.ul.appendChild(prevLi);
+                this.lis.push(prevLi);
+                prevLi.addEventListener('mousedown', function (event) {
+                    $this.page = prevPage;
+                    $this.setChanged();
+                    $this.notifyObservers($this);
+                    this.click();
+                });
+                if (prevPage < 1) {
+                    prevLi.onclick = null;
+                    prevLi.style.pointerEvents = 'none';
+                    prevLi.style.opacity = '0.5';
+                }
+                var _loop_1 = function () {
+                    var page = i;
+                    li = this_1.createPageItem(page, String(page));
+                    // add event listener
+                    li.addEventListener('mousedown', function (event) {
+                        $this.page = page;
+                        $this.setChanged();
+                        $this.notifyObservers($this);
+                        this.click();
+                    }, true);
+                    this_1.ul.appendChild(li);
+                    this_1.lis.push(li);
+                    if (page === this_1.page) {
+                        addClassNameIfCssEnable(li, 'duice-ui-pagination__li--current');
+                        li.onclick = null;
+                        li.style.pointerEvents = 'none';
+                    }
+                };
+                var this_1 = this, li;
+                // creates page items
+                for (var i = startPage; i <= endPage; i++) {
+                    _loop_1();
+                }
+                // creates next item
+                var nextPage = endPage + 1;
+                var nextLi = this.createPageItem(nextPage, '');
+                nextLi.classList.add('duice-ui-pagination__li--next');
+                this.ul.appendChild(nextLi);
+                this.lis.push(nextLi);
+                nextLi.addEventListener('mousedown', function (event) {
+                    $this.page = nextPage;
+                    $this.setChanged();
+                    $this.notifyObservers($this);
+                    this.click();
+                });
+                if (nextPage > totalPage) {
+                    nextLi.onclick = null;
+                    nextLi.style.pointerEvents = 'none';
+                    nextLi.style.opacity = '0.5';
+                }
+            };
+            Pagination.prototype.getValue = function () {
+                return this.page;
+            };
+            Pagination.prototype.createPageItem = function (page, text) {
+                var li = this.li.cloneNode(true);
+                addClassNameIfCssEnable(li, 'duice-ui-pagination__li');
+                var $this = this;
+                var $context = {};
+                $context['page'] = Number(page);
+                $context['text'] = String(text);
+                li = executeExpression(li, $context);
+                li.appendChild(document.createTextNode(text));
+                return li;
+            };
+            return Pagination;
+        }(MapUiComponent));
+        ui.Pagination = Pagination;
         /**
          * duice.ui.TableFactory
          */
@@ -2016,9 +3044,8 @@ var duice;
             }
             TableFactory.prototype.getInstance = function (element) {
                 var table = new Table(element);
-                if (element.dataset.duiceEditable) {
-                    table.setEditable(element.dataset.duiceEditable === 'true');
-                }
+                table.setSelectable(element.dataset.duiceSelectable === 'true');
+                table.setEditable(element.dataset.duiceEditable === 'true');
                 var bind = element.dataset.duiceBind.split(',');
                 table.bind(this.getContextProperty(bind[0]), bind[1]);
                 return table;
@@ -2039,35 +3066,60 @@ var duice;
                 var _this = _super.call(this, table) || this;
                 _this.tbodies = new Array();
                 _this.table = table;
-                _this.table.classList.add('duice-ui-table');
+                addClassNameIfCssEnable(_this.table, 'duice-ui-table');
                 // initializes caption
                 var caption = _this.table.querySelector('caption');
                 if (caption) {
-                    caption.classList.add('duice-ui-table__caption');
+                    addClassNameIfCssEnable(caption, 'duice-ui-table__caption');
                     caption = executeExpression(caption, new Object());
                     initializeComponent(caption, new Object());
                 }
                 // initializes head
                 var thead = _this.table.querySelector('thead');
                 if (thead) {
-                    thead.classList.add('duice-ui-table__thead');
+                    addClassNameIfCssEnable(thead, 'duice-ui-table__thead');
+                    thead.querySelectorAll('tr').forEach(function (tr) {
+                        addClassNameIfCssEnable(tr, 'duice-ui-table__thead-tr');
+                    });
+                    thead.querySelectorAll('th').forEach(function (th) {
+                        addClassNameIfCssEnable(th, 'duice-ui-table__thead-tr-th');
+                    });
                     thead = executeExpression(thead, new Object());
                     initializeComponent(thead, new Object());
                 }
                 // clones body
                 var tbody = _this.table.querySelector('tbody');
                 _this.tbody = tbody.cloneNode(true);
-                _this.tbody.classList.add('duice-ui-table__tbody');
+                addClassNameIfCssEnable(_this.tbody, 'duice-ui-table__tbody');
+                _this.tbody.querySelectorAll('tr').forEach(function (tr) {
+                    addClassNameIfCssEnable(tr, 'duice-ui-table__tbody-tr');
+                });
+                _this.tbody.querySelectorAll('td').forEach(function (th) {
+                    addClassNameIfCssEnable(th, 'duice-ui-table__tbody-tr-td');
+                });
                 _this.table.removeChild(tbody);
                 // initializes foot
                 var tfoot = _this.table.querySelector('tfoot');
                 if (tfoot) {
-                    tfoot.classList.add('duice-ui-table__tfoot');
+                    addClassNameIfCssEnable(tfoot, 'duice-ui-table__tfoot');
+                    tfoot.querySelectorAll('tr').forEach(function (tr) {
+                        addClassNameIfCssEnable(tr, 'duice-ui-table__tfoot-tr');
+                    });
+                    tfoot.querySelectorAll('td').forEach(function (td) {
+                        addClassNameIfCssEnable(td, 'duice-ui-table__tfoot-tr-td');
+                    });
                     tfoot = executeExpression(tfoot, new Object());
                     initializeComponent(tfoot, new Object());
                 }
                 return _this;
             }
+            /**
+             * Sets selectable flag
+             * @param selectable
+             */
+            Table.prototype.setSelectable = function (selectable) {
+                this.selectable = selectable;
+            };
             /**
              * Sets enable flag
              * @param editable
@@ -2097,19 +3149,17 @@ var duice;
                     var tbody = this.createTbody(index, map);
                     tbody.dataset.duiceIndex = String(index);
                     // select index
-                    if (index === list.getIndex()) {
-                        tbody.classList.add('duice-ui-table__tbody--index');
-                    }
-                    tbody.addEventListener('click', function (event) {
-                        for (var i = 0; i < $this.tbodies.length; i++) {
-                            $this.tbodies[i].classList.remove('duice-ui-table__tbody--index');
+                    if (this.selectable) {
+                        if (index === list.getIndex()) {
+                            tbody.classList.add('duice-ui-table__tbody--index');
                         }
-                        this.classList.add('duice-ui-table__tbody--index');
-                        list.index = Number(this.dataset.duiceIndex);
-                        console.log(list.getIndex(), list);
-                    }, true);
+                        tbody.addEventListener('click', function (event) {
+                            var index = Number(this.dataset.duiceIndex);
+                            $this.selectTbody(index);
+                        }, true);
+                    }
                     // drag and drop event
-                    if (this.editable === true) {
+                    if (this.editable) {
                         tbody.setAttribute('draggable', 'true');
                         tbody.addEventListener('dragstart', function (event) {
                             event.dataTransfer.setData("text", this.dataset.duiceIndex);
@@ -2129,13 +3179,33 @@ var duice;
                     // appends body
                     this.table.appendChild(tbody);
                     this.tbodies.push(tbody);
-                    // not found row
-                    if (list.getSize() < 1) {
-                        var emptyTbody = this.createEmptyTbody();
-                        this.table.appendChild(emptyTbody);
-                        this.tbodies.push(emptyTbody);
+                }
+                // not found row
+                if (list.getSize() < 1) {
+                    var emptyTbody = this.createEmptyTbody();
+                    emptyTbody.style.pointerEvents = 'none';
+                    this.table.appendChild(emptyTbody);
+                    this.tbodies.push(emptyTbody);
+                }
+            };
+            /**
+             * Selects tbody element
+             * @param tbody
+             */
+            Table.prototype.selectTbody = function (index) {
+                this.getList().suspendNotify();
+                if (this.getList().setIndex(index)) {
+                    // handles class                
+                    for (var i = 0; i < this.tbodies.length; i++) {
+                        if (i === index) {
+                            this.tbodies[i].classList.add('duice-ui-table__tbody--index');
+                        }
+                        else {
+                            this.tbodies[i].classList.remove('duice-ui-table__tbody--index');
+                        }
                     }
                 }
+                this.getList().resumeNotify();
             };
             /**
              * Creates table body element
@@ -2145,7 +3215,7 @@ var duice;
             Table.prototype.createTbody = function (index, map) {
                 var $this = this;
                 var tbody = this.tbody.cloneNode(true);
-                tbody.classList.add('duice-ui-table__tbody');
+                addClassNameIfCssEnable(tbody, 'duice-ui-table__tbody');
                 var $context = new Object;
                 $context['index'] = index;
                 $context[this.item] = map;
@@ -2161,10 +3231,13 @@ var duice;
                 removeChildNodes(emptyTbody);
                 emptyTbody.classList.add('duice-ui-table__tbody--empty');
                 var tr = document.createElement('tr');
+                addClassNameIfCssEnable(tr, 'duice-ui-table__tbody-tr');
                 var td = document.createElement('td');
+                addClassNameIfCssEnable(td, 'duice-ui-table__tbody-tr-td');
                 var colspan = this.tbody.querySelectorAll('tr > td').length;
                 td.setAttribute('colspan', String(colspan));
                 var emptyMessage = document.createElement('div');
+                emptyMessage.style.textAlign = 'center';
                 emptyMessage.classList.add('duice-ui-table__tbody--empty-message');
                 td.appendChild(emptyMessage);
                 tr.appendChild(td);
@@ -2184,16 +3257,13 @@ var duice;
             }
             UListFactory.prototype.getInstance = function (element) {
                 var uList = new UList(element);
+                uList.setSelectable(element.dataset.duiceSelectable === 'true');
+                uList.setEditable(element.dataset.duiceEditable === 'true');
                 if (element.dataset.duiceHierarchy) {
                     var hirearchy = element.dataset.duiceHierarchy.split(',');
                     uList.setHierarchy(hirearchy[0], hirearchy[1]);
                 }
-                if (element.dataset.duiceFoldable) {
-                    uList.setFoldable(Boolean(element.dataset.duiceFoldable));
-                }
-                if (element.dataset.duiceEditable) {
-                    uList.setEditable(Boolean(element.dataset.duiceEditable));
-                }
+                uList.setFoldable(element.dataset.duiceFoldable === 'true');
                 var bind = element.dataset.duiceBind.split(',');
                 uList.bind(this.getContextProperty(bind[0]), bind[1]);
                 return uList;
@@ -2220,6 +3290,20 @@ var duice;
                 _this.li = li.cloneNode(true);
                 return _this;
             }
+            /**
+             * Sets selectable flag
+             * @param selectable
+             */
+            UList.prototype.setSelectable = function (selectable) {
+                this.selectable = selectable;
+            };
+            /**
+             * Sets editable flag.
+             * @param editable
+             */
+            UList.prototype.setEditable = function (editable) {
+                this.editable = editable;
+            };
             /**
              * Sets hierarchy function options.
              * @param idName
@@ -2257,13 +3341,6 @@ var duice;
              */
             UList.prototype.setFoldable = function (foldable) {
                 this.foldable = foldable;
-            };
-            /**
-             * Sets editable flag.
-             * @param editable
-             */
-            UList.prototype.setEditable = function (editable) {
-                this.editable = editable;
             };
             /**
              * Updates instance
@@ -2321,15 +3398,23 @@ var duice;
                 this.lis.push(li);
                 li.dataset.duiceIndex = String(index);
                 // sets index
-                li.addEventListener('mousedown', function (event) {
-                    event.stopPropagation();
-                    for (var i = 0; i < $this.lis.length; i++) {
-                        $this.lis[i].classList.remove('duice-ui-ul__li--index');
+                if (this.selectable) {
+                    if (index === this.getList().getIndex()) {
+                        li.classList.add('duice-ui-ul__li--index');
                     }
-                    this.classList.add('duice-ui-ul__li--index');
-                    $this.list.index = Number(this.dataset.duiceIndex);
-                    console.log($this.list.getIndex(), $this.list);
-                });
+                    li.addEventListener('mousedown', function (event) {
+                        $this.getList().suspendNotify();
+                        if ($this.getList().setIndex(index)) {
+                            event.stopPropagation();
+                            for (var i = 0; i < $this.lis.length; i++) {
+                                $this.lis[i].classList.remove('duice-ui-ul__li--index');
+                            }
+                            this.classList.add('duice-ui-ul__li--index');
+                            $this.list.index = Number(this.dataset.duiceIndex);
+                        }
+                        $this.getList().resumeNotify();
+                    });
+                }
                 // editable
                 if (this.editable) {
                     li.setAttribute('draggable', 'true');
@@ -2506,356 +3591,6 @@ var duice;
         }(ListUiComponent));
         ui.UList = UList;
         /**
-         * new duice.dialog.Blocker(this.div).block().unblock();
-         *
-         */
-        var Blocker = /** @class */ (function () {
-            function Blocker(element) {
-                this.element = element;
-                this.div = document.createElement('div');
-                this.div.classList.add('duice-ui-blocker');
-            }
-            Blocker.prototype.block = function () {
-                // adjusting position
-                this.div.style.position = 'fixed';
-                this.div.style.zIndex = String(getCurrentMaxZIndex() + 1);
-                // full blocking in case of BODY
-                if (this.element.tagName == 'BODY') {
-                    this.div.style.width = '100%';
-                    this.div.style.height = '100%';
-                    this.div.style.top = '0px';
-                    this.div.style.left = '0px';
-                }
-                // otherwise adjusting to parent element
-                else {
-                    var boundingClientRect = this.element.getBoundingClientRect();
-                    var width = boundingClientRect.width;
-                    var height = boundingClientRect.height;
-                    var left = boundingClientRect.left;
-                    var top = boundingClientRect.top;
-                    this.div.style.width = width + "px";
-                    this.div.style.height = height + "px";
-                    this.div.style.top = top + 'px';
-                    this.div.style.left = left + 'px';
-                }
-                // append
-                this.element.appendChild(this.div);
-            };
-            Blocker.prototype.unblock = function () {
-                this.element.removeChild(this.div);
-            };
-            return Blocker;
-        }());
-        ui.Blocker = Blocker;
-        /**
-         * duice.ui.Modal
-         */
-        var Modal = /** @class */ (function () {
-            function Modal() {
-                this.listener = {};
-                var $this = this;
-                this.container = document.createElement('div');
-                this.container.classList.add('duice-ui-model');
-                this.headerDiv = document.createElement('div');
-                this.headerDiv.classList.add('duice-ui-modal__headerDiv');
-                this.container.appendChild(this.headerDiv);
-                // drag
-                this.headerDiv.style.cursor = 'move';
-                this.headerDiv.onmousedown = function (ev) {
-                    var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-                    pos3 = ev.clientX;
-                    pos4 = ev.clientY;
-                    getCurrentWindow().document.onmouseup = function (ev) {
-                        getCurrentWindow().document.onmousemove = null;
-                        getCurrentWindow().document.onmouseup = null;
-                    };
-                    getCurrentWindow().document.onmousemove = function (ev) {
-                        pos1 = pos3 - ev.clientX;
-                        pos2 = pos4 - ev.clientY;
-                        pos3 = ev.clientX;
-                        pos4 = ev.clientY;
-                        $this.container.style.left = ($this.container.offsetLeft - pos1) + 'px';
-                        $this.container.style.top = ($this.container.offsetTop - pos2) + 'px';
-                    };
-                };
-                var titleIcon = document.createElement('span');
-                titleIcon.classList.add('duice-ui-modal__headerDiv-titleIcon');
-                this.headerDiv.appendChild(titleIcon);
-                var closeButton = document.createElement('span');
-                closeButton.classList.add('duice-ui-modal__headerDiv-closeButton');
-                closeButton.addEventListener('click', function (event) {
-                    $this.close();
-                });
-                this.headerDiv.appendChild(closeButton);
-                // creates body
-                this.bodyDiv = document.createElement('div');
-                this.container.appendChild(this.bodyDiv);
-                // adds blocker
-                this.blocker = new Blocker(getCurrentWindow().document.body);
-            }
-            Modal.prototype.addContent = function (content) {
-                this.bodyDiv.appendChild(content);
-            };
-            Modal.prototype.createButton = function (type) {
-                var button = document.createElement('button');
-                button.classList.add('duice-ui-modal__button--' + type);
-                return button;
-            };
-            Modal.prototype.show = function () {
-                // block
-                this.blocker.block();
-                // opens modal
-                this.container.style.display = 'block';
-                this.container.style.position = 'absolute';
-                this.container.style.zIndex = String(getCurrentMaxZIndex() + 1);
-                getCurrentWindow().document.body.appendChild(this.container);
-                setPositionCentered(this.container);
-            };
-            Modal.prototype.hide = function () {
-                // closes modal
-                this.container.style.display = 'none';
-                getCurrentWindow().document.body.removeChild(this.container);
-                // unblock
-                this.blocker.unblock();
-            };
-            Modal.prototype.open = function () {
-                if (this.listener.beforeOpen) {
-                    if (this.listener.beforeOpen.call(this) === false) {
-                        return false;
-                    }
-                }
-                this.show();
-                if (this.listener.afterOpen) {
-                    delayCall(200, this.listener.afterOpen, this);
-                }
-                return true;
-            };
-            Modal.prototype.beforeOpen = function (listener) {
-                this.listener.beforeOpen = listener;
-                return this;
-            };
-            Modal.prototype.afterOpen = function (listener) {
-                this.listener.afterOpen = listener;
-                return this;
-            };
-            Modal.prototype.close = function () {
-                if (this.listener.beforeClose) {
-                    if (this.listener.beforeClose.call(this) === false) {
-                        return false;
-                    }
-                }
-                this.hide();
-                if (this.listener.afterClose) {
-                    delayCall(200, this.listener.afterClose, this);
-                }
-                return true;
-            };
-            Modal.prototype.beforeClose = function (listener) {
-                this.listener.beforeClose = listener;
-                return this;
-            };
-            Modal.prototype.afterClose = function (listener) {
-                this.listener.afterClose = listener;
-                return this;
-            };
-            Modal.prototype.confirm = function () {
-                if (this.listener.beforeConfirm) {
-                    if (this.listener.beforeConfirm.call(this) === false) {
-                        return false;
-                    }
-                }
-                this.hide();
-                if (this.listener.afterConfirm) {
-                    delayCall(200, this.listener.afterConfirm, this);
-                }
-                return true;
-            };
-            Modal.prototype.beforeConfirm = function (listener) {
-                this.listener.beforeConfirm = listener;
-                return this;
-            };
-            Modal.prototype.afterConfirm = function (listener) {
-                this.listener.afterConfirm = listener;
-                return this;
-            };
-            return Modal;
-        }());
-        ui.Modal = Modal;
-        /**
-         * duice.ui.Alert
-         */
-        var Alert = /** @class */ (function (_super) {
-            __extends(Alert, _super);
-            function Alert(message) {
-                var _this = _super.call(this) || this;
-                _this.message = message;
-                var $this = _this;
-                _this.iconDiv = document.createElement('div');
-                _this.iconDiv.classList.add('duice-ui-alert__iconDiv');
-                _this.messageDiv = document.createElement('div');
-                _this.messageDiv.classList.add('duice-ui-alert__messageDiv');
-                _this.messageDiv.appendChild(document.createTextNode(_this.message));
-                _this.buttonDiv = document.createElement('div');
-                _this.buttonDiv.classList.add('duice-ui-alert__buttonDiv');
-                _this.confirmButton = _this.createButton('confirm');
-                _this.confirmButton.addEventListener('click', function (event) {
-                    console.log(this);
-                    $this.close();
-                });
-                _this.buttonDiv.appendChild(_this.confirmButton);
-                // appends parts to bodyDiv
-                _this.addContent(_this.iconDiv);
-                _this.addContent(_this.messageDiv);
-                _this.addContent(_this.buttonDiv);
-                return _this;
-            }
-            Alert.prototype.open = function () {
-                if (_super.prototype.open.call(this)) {
-                    this.confirmButton.focus();
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            };
-            return Alert;
-        }(Modal));
-        ui.Alert = Alert;
-        /**
-         * duice.ui.Confirm
-         */
-        var Confirm = /** @class */ (function (_super) {
-            __extends(Confirm, _super);
-            function Confirm(message) {
-                var _this = _super.call(this) || this;
-                _this.message = message;
-                var $this = _this;
-                _this.iconDiv = document.createElement('div');
-                _this.iconDiv.classList.add('duice-ui-confirm__iconDiv');
-                _this.messageDiv = document.createElement('div');
-                _this.messageDiv.classList.add('duice-ui-confirm__messageDiv');
-                _this.messageDiv.appendChild(document.createTextNode(_this.message));
-                _this.buttonDiv = document.createElement('div');
-                _this.buttonDiv.classList.add('duice-ui-confirm__buttonDiv');
-                // cancel button
-                _this.cancelButton = _this.createButton('cancel');
-                _this.cancelButton.addEventListener('click', function (event) {
-                    $this.close();
-                });
-                _this.buttonDiv.appendChild(_this.cancelButton);
-                // confirm button
-                _this.confirmButton = _this.createButton('confirm');
-                _this.confirmButton.addEventListener('click', function (event) {
-                    $this.confirm();
-                });
-                _this.buttonDiv.appendChild(_this.confirmButton);
-                // appends parts to bodyDiv
-                _this.addContent(_this.iconDiv);
-                _this.addContent(_this.messageDiv);
-                _this.addContent(_this.buttonDiv);
-                return _this;
-            }
-            Confirm.prototype.open = function () {
-                if (_super.prototype.open.call(this)) {
-                    this.cancelButton.focus();
-                }
-                else {
-                    return false;
-                }
-            };
-            return Confirm;
-        }(Modal));
-        ui.Confirm = Confirm;
-        /**
-         * duice.ui.Prompt
-         */
-        var Prompt = /** @class */ (function (_super) {
-            __extends(Prompt, _super);
-            function Prompt(message) {
-                var _this = _super.call(this) || this;
-                _this.message = message;
-                var $this = _this;
-                _this.iconDiv = document.createElement('div');
-                _this.iconDiv.classList.add('duice-ui-prompt__iconDiv');
-                _this.messageDiv = document.createElement('div');
-                _this.messageDiv.classList.add('duice-ui-prompt__messageDiv');
-                _this.messageDiv.appendChild(document.createTextNode(_this.message));
-                _this.inputDiv = document.createElement('div');
-                _this.inputDiv.classList.add('duice-ui-prompt__inputDiv');
-                _this.input = document.createElement('input');
-                _this.input.classList.add('duice-ui-prompt__inputDiv-input');
-                _this.inputDiv.appendChild(_this.input);
-                _this.buttonDiv = document.createElement('div');
-                _this.buttonDiv.classList.add('duice-ui-prompt__buttonDiv');
-                // cancel button
-                _this.cancelButton = _this.createButton('cancel');
-                _this.cancelButton.addEventListener('click', function (event) {
-                    $this.close();
-                });
-                _this.buttonDiv.appendChild(_this.cancelButton);
-                // confirm button
-                _this.confirmButton = _this.createButton('confirm');
-                _this.confirmButton.addEventListener('click', function (event) {
-                    $this.confirm();
-                });
-                _this.buttonDiv.appendChild(_this.confirmButton);
-                // appends parts to bodyDiv
-                _this.addContent(_this.iconDiv);
-                _this.addContent(_this.messageDiv);
-                _this.addContent(_this.inputDiv);
-                _this.addContent(_this.buttonDiv);
-                return _this;
-            }
-            Prompt.prototype.open = function () {
-                if (_super.prototype.open.call(this)) {
-                    this.input.focus();
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            };
-            Prompt.prototype.getValue = function () {
-                return this.input.value;
-            };
-            return Prompt;
-        }(Modal));
-        ui.Prompt = Prompt;
-        var Dialog = /** @class */ (function (_super) {
-            __extends(Dialog, _super);
-            function Dialog(dialog) {
-                var _this = _super.call(this) || this;
-                _this.dialog = dialog;
-                _this.dialog.classList.add('duice-ui-dialog');
-                _this.parentNode = _this.dialog.parentNode;
-                return _this;
-            }
-            Dialog.prototype.open = function () {
-                this.dialog.style.display = 'block';
-                this.addContent(this.dialog);
-                if (_super.prototype.open.call(this)) {
-                    return true;
-                }
-                else {
-                    this.dialog.style.display = 'none';
-                    this.parentNode.appendChild(this.dialog);
-                    return false;
-                }
-            };
-            Dialog.prototype.close = function () {
-                if (_super.prototype.close.call(this)) {
-                    this.dialog.style.display = 'none';
-                    this.parentNode.appendChild(this.dialog);
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            };
-            return Dialog;
-        }(Modal));
-        ui.Dialog = Dialog;
-        /**
          * Adds components
          */
         duice.ComponentDefinitionRegistry.add(new ComponentDefinition('table', 'duice-ui-table', duice.ui.TableFactory));
@@ -2866,14 +3601,12 @@ var duice;
         duice.ComponentDefinitionRegistry.add(new ComponentDefinition('select', 'duice-ui-select', duice.ui.SelectFactory));
         duice.ComponentDefinitionRegistry.add(new ComponentDefinition('textarea', 'duice-ui-textarea', duice.ui.TextareaFactory));
         duice.ComponentDefinitionRegistry.add(new ComponentDefinition('img', 'duice-ui-img', duice.ui.ImageFactory));
+        duice.ComponentDefinitionRegistry.add(new ComponentDefinition('ul', 'duice-ui-pagination', duice.ui.PaginationFactory));
     })(ui = duice.ui || (duice.ui = {})); // end of duice.ui
 })(duice || (duice = {})); // end
 /**
  * DOMContentLoaded event process
  */
 document.addEventListener("DOMContentLoaded", function (event) {
-    var $context = typeof self !== 'undefined' ? self :
-        typeof window !== 'undefined' ? window :
-            {};
-    duice.initializeComponent(document, $context);
+    duice.initialize();
 });

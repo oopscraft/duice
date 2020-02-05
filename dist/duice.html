@@ -15,6 +15,29 @@
 <link rel="stylesheet" type="text/css" href="plugin/suneditor/css/suneditor.min.css">
 <script>
 /**
+ * integrateWith
+ */
+function integrateWith(integrate){
+	if(integrate){
+		window.location.href = window.location.href.split('?')[0] + '?integrate=' + integrate;
+	}else{
+		window.location.href = window.location.href;
+	}
+}
+/**
+ * Load integrated library or framework
+ */
+switch(duice.getQueryVariables().integrate){
+case 'bootstrap':
+	duice.Configuration.cssEnable = false;
+	duice.loadExternalScript('integrate/bootstrap/jquery.slim.min.js');
+	duice.loadExternalScript('integrate/bootstrap/popper.min.js');
+	duice.loadExternalStyle('integrate/bootstrap/css/bootstrap.min.css');
+	duice.loadExternalScript('integrate/bootstrap/js/bootstrap.min.js');
+break;
+}
+
+/**
  * user(duice.Map)
  */
 var user = new duice.Map();
@@ -39,7 +62,10 @@ user.fromJson({
 	tel: '08-1234-5678',
 	time: '13:00',
 	range: 60,
-	color: '#ff0000'
+	color: '#ff0000',
+	page: 1,
+	rows: 10,
+	totalCount: 89
 });
 
 /**
@@ -288,11 +314,21 @@ users.fromJson([
         color: '#ff0000'
     }
 ]);
+users.onBeforeChangeIndex(function(index){
+	console.log('onBeforeChangeIndex',index);
+});
+users.onAfterChangeIndex(function(index){
+	console.log('onAfterChangeIndex',index);
+	console.log('user', users.get(index));
+});
 
 /**
  * DOMContentLoaded
  */
 document.addEventListener("DOMContentLoaded", function(event) {
+	
+	// integrate select
+	document.getElementById('integrate').value = duice.getQueryVariables().integrate;
 	
 	// prints user as JSON
 	var userTextarea = document.getElementById('userTextarea')
@@ -335,7 +371,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 body {
 	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
 	font-size: 12px;
-	line-height: 1.6;
+	line-height: 2.4;
 	margin: 0px;
 	padding: 20px;
 	overflow-x: hidden;
@@ -379,6 +415,7 @@ body {
 .textarea:focus {
 	outline: none;
 }
+/*
 .table {
 	border-collapse: collapse;
 	border: solid 1px #ccc;
@@ -408,11 +445,21 @@ body {
 	padding: 1px;
 	text-overflow: ellipsis;
 }
+*/
 </style>
 </head>
 <body>
-	<div>
-		<h1 >DUICE <small>(Data-oriented UI Component Engine)</small></h1>
+	<div style="display:flex; justify-content:space-between;">
+		<h1 >DUICE 
+			<small>
+				(Data-oriented UI Component Engine)
+				Integrate with 
+				<select id="integrate" onchange="integrateWith(this.value);">
+					<option> N/A </option>
+					<option value="bootstrap"> bootstrap </option>
+				</select>
+			</small>
+		</h1>
 	</div>
 	<hr/>
 	<!-- ================================================================ -->
@@ -433,12 +480,33 @@ body {
 				<div style="display:flex; justify-content:space-between; align-items: flex-end;">
 					<h3>duice.ui.MapUIElement <small>(binding to user)</small></h3>
 					<div>
+						<button onclick="user.setFocus('name');">setFocus('name')</button>
+						<button onclick="
+							user.getNames().forEach(function(name){
+								user.setReadonly(name,true);
+							});
+						">
+							setReadonly([name],true)
+						</button>
+						<button onclick="
+							user.getNames().forEach(function(name){
+								user.setReadonly(name,false);
+							});
+						">
+							setReadonly([name],false)
+						</button>
+						<button onclick="user.setDisable(true);">
+							setDisable(true)
+						</button>
+						<button onclick="user.setDisable(false);">
+							setDisable(false)
+						</button>
 						<button onclick="alert(JSON.stringify(user.toJson(),null,2));">toJson()</button>
 						<button onclick="alert(user.isDirty());">isDirty()</button>
 						<button onclick="user.reset();">reset()</button>
 					</div>
 				</div>
-				<table class="table" style="width:100%;">
+				<table class="table table-bordered" border="1" style="width:100%; border-collapse:collapse; border:solid 1px #ccc;">
 					<col align="left" />
 					<col align="left" />
 					<col align="right" />
@@ -483,13 +551,13 @@ body {
 						<!-- ================================================================ -->
 						<tr>
 							<th rowspan="2">duice.ui.TextInput</th>
-							<td><input is="duice-ui-input" type="text" data-duice-bind="user,name"/></td>
+							<td><input is="duice-ui-input" type="text" data-duice-bind="user,name" class="form-control"/></td>
 							<td>
 								&lt;input is="duice-ui-input" type="text" ...
 							</td>
 						</tr>
 						<tr>
-							<td><input is="duice-ui-input" type="text" data-duice-bind="user,socialNo" data-duice-format="######-#######"/></td>
+							<td><input is="duice-ui-input" type="text" data-duice-bind="user,socialNo" data-duice-format="######-#######" class="form-control"/></td>
 							<td>
 								&lt;input is="duice-ui-input" type="text" data-duice-bind="user,socialNo" data-duice-format="######-#######" ...
 							</td>
@@ -499,14 +567,14 @@ body {
 						<!-- ================================================================ -->
 						<tr>
 							<th rowspan="2">duice.ui.NumberInput</th>
-							<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance"/></td>
+							<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance" class="form-control"/></td>
 							<td>
 								&lt;input is="duice-ui-input" type="number" data-duice-bind="user,balance"
 							</td>
 						</tr>
 						<tr>
 							<td>
-								<input is="duice-ui-input" type="number" data-duice-bind="user,balance" data-duice-format="2"/>
+								<input is="duice-ui-input" type="number" data-duice-bind="user,balance" data-duice-format="2" class="form-control"/>
 							</td>
 							<td>
 								&lt;input is="duice-ui-input" type="number" data-duice-bind="user,balance" data-duice-format="2"
@@ -518,7 +586,7 @@ body {
 						<tr>
 							<th rowspan="4">duice.ui.DatetimeInput</th>
 							<td align="center">
-								<input is="duice-ui-input" type="datetime-local" data-duice-bind="user,hireDate"/>
+								<input is="duice-ui-input" type="datetime-local" data-duice-bind="user,hireDate" class="form-control"/>
 							</td>
 							<td>
 								&lt;input is="duice-ui-input" type="datetime-local" data-duice-bind="user,hireDate" ...
@@ -526,7 +594,7 @@ body {
 						</tr>
 						<tr>
 							<td align="center">
-								<input is="duice-ui-input" type="datetime-local" data-duice-bind="user,hireDate" data-duice-format="yyyy.MM.dd HH:mm:ss"/>
+								<input is="duice-ui-input" type="datetime-local" data-duice-bind="user,hireDate" data-duice-format="yyyy.MM.dd HH:mm:ss" class="form-control"/>
 							</td>
 							<td>
 								&lt;input is="duice-ui-input" type="datetime" data-duice-bind="user,hireDate" data-duice-format="yyyy.MM.dd HH:mm:ss" ...
@@ -534,7 +602,7 @@ body {
 						</tr>
 						<tr>
 							<td align="center">
-								<input is="duice-ui-input" type="date" data-duice-bind="user,birthday"/>
+								<input is="duice-ui-input" type="date" data-duice-bind="user,birthday" class="form-control"/>
 							</td>
 							<td>
 								&lt;input is="duice-ui-input" type="date" data-duice-bind="user,birthday" ...
@@ -542,7 +610,7 @@ body {
 						</tr>
 						<tr>
 							<td align="center">
-								<input is="duice-ui-input" type="date" data-duice-bind="user,birthday" data-duice-format="yyyy.MM.dd"/>
+								<input is="duice-ui-input" type="date" data-duice-bind="user,birthday" data-duice-format="yyyy.MM.dd" class="form-control"/>
 							</td>
 							<td>
 								&lt;input is="duice-ui-input" type="date" data-duice-bind="user,birthday" data-duice-format="yyyy.MM.dd" ...
@@ -554,7 +622,7 @@ body {
 						<tr>
 							<th>duice.ui.CheckboxInput</th>
 							<td align="center">
-								<input is="duice-ui-input" type="checkbox" data-duice-bind="user,active"/>
+								<input is="duice-ui-input" type="checkbox" data-duice-bind="user,active" class="form-check-input"/>
 							</td>
 							<td>
 								&lt;input is="duice-ui-input" type="checkbox" data-duice-bind="user,active" ...
@@ -566,8 +634,12 @@ body {
 						<tr>
 							<th>duice.ui.RadioInput</th>
 							<td align="center">
-								<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="M"/>Male
-								<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="F"/>Female
+								<div>
+									<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="M" class="form-check-input position-static"/>
+								</div>
+								<div>
+									<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="F" class="form-check-input position-static"/>
+								</div>
 							</td>
 							<td>
 								&lt;input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="M" ...
@@ -579,8 +651,8 @@ body {
 						<tr>
 							<th>duice.ui.Select</th>
 							<td>
-								<select is="duice-ui-select" data-duice-bind="user,groupId">
-									<option value=""> - select - </option>
+								<select is="duice-ui-select" data-duice-bind="user,groupId" class="form-control">
+									<option value> - select - </option>
 									<option value="animal">Animal</option>
 									<option value="fruit">Fruit</option>
 									<option value="human">Human</option>
@@ -595,7 +667,7 @@ body {
 						<!-- ================================================================ -->
 						<tr>
 							<th>duice.ui.Textarea</th>
-							<td><textarea is="duice-ui-textarea" data-duice-bind="user,profile"></textarea></td>
+							<td><textarea is="duice-ui-textarea" data-duice-bind="user,profile" class="form-control" id="abc"></textarea></td>
 							<td>
 								&lt;textarea is="duice-ui-textarea" ...
 							</td>
@@ -613,43 +685,57 @@ body {
 							</td>
 						</tr>
 						<!-- ================================================================ -->
+						<!-- duice.ui.Pagination			   								  -->
+						<!-- ================================================================ -->
+						<tr>
+							<th>duice.ui.Pagination</th>
+							<td>
+								<ul is="duice-ui-pagination" data-duice-bind="user,page,rows,totalCount" data-duice-size="5" class="pagination">
+									<li data-page="[[$context.page]]" onclick="alert(user.get('page'));" class="page-link"></li>
+								</ul>
+							</td>
+							<td>
+								&lt;img is="duice-ui-img" data-duice-bind="user,image" ...
+							</td>
+						</tr>
+						<!-- ================================================================ -->
 						<!-- duice.ui.GenericInput			   								  -->
 						<!-- ================================================================ -->
 						<tr>
 							<th rowspan="7">duice.ui.GenericInput</th>
 							<td>
-								<input is="duice-ui-input" type="password" data-duice-bind="user,password"/>
+								<input is="duice-ui-input" type="password" data-duice-bind="user,password" class="form-control"/>
 							</td>
 							<td>
 								&lt;input is="duice-ui-input" type="password" data-duice-bind="user,password" ...
 							</td>
 						</tr>
 						<tr>
-							<td><input is="duice-ui-input" type="url" data-duice-bind="user,url"/></td>
+							<td><input is="duice-ui-input" type="url" data-duice-bind="user,url" class="form-control"/></td>
 							<td>
 								&lt;input is="duice-ui-input" type="url" data-duice-bind="user,url" ...
 							</td>
 						</tr>
 						<tr>
-							<td><input is="duice-ui-input" type="email" data-duice-bind="user,email"/></td>
+							<td><input is="duice-ui-input" type="email" data-duice-bind="user,email" class="form-control"/></td>
 							<td>
 								&lt;input is="duice-ui-input" type="email" data-duice-bind="user,email" ...
 							</td>
 						</tr>
 						<tr>
-							<td><input is="duice-ui-input" type="tel" data-duice-bind="user,tel" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"/></td>
+							<td><input is="duice-ui-input" type="tel" data-duice-bind="user,tel" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}" class="form-control"/></td>
 							<td>
 								&lt;input is="duice-ui-input" type="tel" data-duice-bind="user,tel" ...
 							</td>
 						</tr>
 						<tr>
-							<td><input is="duice-ui-input" type="time" data-duice-bind="user,time"/></td>
+							<td><input is="duice-ui-input" type="time" data-duice-bind="user,time" class="form-control"/></td>
 							<td>
 								&lt;input is="duice-ui-input" type="time" data-duice-bind="user,time" ...
 							</td>
 						</tr>
 						<tr>
-							<td><input is="duice-ui-input" type="range" data-duice-bind="user,range" min="0" max="100" step="10"/></td>
+							<td><input is="duice-ui-input" type="range" data-duice-bind="user,range" min="0" max="100" step="10" class="custom-range"/></td>
 							<td>
 								&lt;input is="duice-ui-input" type="range" data-duice-bind="user,range" min="0" max="100" step="10" ...
 							</td>
@@ -698,6 +784,30 @@ body {
 							</h3>
 						</div>
 						<div>
+							<button onclick="users.setVisible(true);">
+								setVisible(true)
+							</button>
+							<button onclick="users.setVisible(false);">
+								setVisible(false)
+							</button>
+							<button onclick="
+								users.setReadonly('name', true);
+								users.setReadonly('socialNo', true);
+							">
+								setReadonly([name],true)
+							</button>
+							<button onclick="
+								users.setReadonly('name', false);
+								users.setReadonly('socialNo', false);
+							">
+								setReadonly([name],false)
+							</button>
+							<button onclick="users.setDisable(true);">
+								setDisable(true)
+							</button>
+							<button onclick="users.setDisable(false);">
+								setDisable(false)
+							</button>
 							<button onclick="users.add(new duice.Map({}));">add(map)</button>
 							<button onclick="users.insert(users.getIndex(), new duice.Map({}));">insert(map)</button>
 							<button onclick="users.remove(users.getIndex());">remove(index)</button>
@@ -705,13 +815,16 @@ body {
 							<button onclick="alert(users.isDirty());">isDirty()</button>
 							<button onclick="users.reset();">reset()</button>
 						</div>
+
 					</div>
 					<div>
 						<table is="duice-ui-table" 
 							data-duice-bind="users,user" 
+							data-duice-selectable="true"
 							data-duice-editable="true"
+							class="table table-bordered"
 							style="width:100%;">
-							<thead style="line-height:2.4;">
+							<thead class="thead-light">
 								<tr>
 									<th>no</th>
 									<th>id</th>
@@ -730,29 +843,29 @@ body {
 									<th>groupId</th>
 								</tr>
 							</thead>
-							<tbody style="line-height:2.4;" data-index="[[$context.index]]" onclick="console.log(this.dataset.index + ':' + users.get(users.getIndex()).get('id'));">
+							<tbody>
 								<tr>
-									<td>[[$context.index + 1]]</td>
-									<td><span is="duice-ui-span" data-duice-bind="user,id"></span></td>
+									<td><span is="duice-ui-scriptlet" data-duice-bind="user">return $context.index + 1;</span></td>
+									<td><span is="duice-ui-span" data-duice-bind="user,id" class="form-control"></span></td>
 									<td><span is="duice-ui-span" data-duice-bind="user,parentId"></span></td>
-									<td><img is="duice-ui-img" data-duice-bind="user,image" src="//:0" style="height:24px;"/></td>
-									<td><input is="duice-ui-input" type="text" data-duice-bind="user,name"/></td>
+									<td><img is="duice-ui-img" data-duice-bind="user,image" src="//:0" style="height:16px;"/></td>
+									<td><input is="duice-ui-input" type="text" data-duice-bind="user,name" class="form-control"/></td>
 									<td><span is="duice-ui-span" data-duice-bind="user,socialNo"></span></td>
-									<td><input is="duice-ui-input" type="text" data-duice-bind="user,socialNo"/></td>
+									<td><input is="duice-ui-input" type="text" data-duice-bind="user,socialNo" class="form-control"/></td>
 									<td><span is="duice-ui-span" data-duice-bind="user,balance" data-duice-format="number,2"></span></td>
-									<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance" data-duice-format="2"/></td>
+									<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance" data-duice-format="2" class="form-control"/></td>
 									<td><span is="duice-ui-span" data-duice-bind="user,hireDate" data-duice-format="date,yyyy.MM.dd HH:mm:ss"></span></td>
-									<td><input is="duice-ui-input" type="datetime-local" data-duice-bind="user,hireDate"/></td>
+									<td><input is="duice-ui-input" type="datetime-local" data-duice-bind="user,hireDate" class="form-control"/></td>
 									<td><input is="duice-ui-input" type="date" data-duice-bind="user,birthday"/></td>
 									<td><input is="duice-ui-input" type="checkbox" data-duice-bind="user,active"/></td>
 									<td>
-										<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="M"/>M
-										<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="F"/>F
+										<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="M" class="form-check-input"/>M
+										<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="F" class="form-check-input"/>F
 									</td>
 									<td><select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"></select></td>
 								</tr>
 							</tbody>
-							<tfoot style="line-height:2.4;">
+							<tfoot>
 								<tr>
 									<td colspan="20" style="text-align:right;">
 										Average Balance :
@@ -809,6 +922,7 @@ body {
 					<div>
 						<ul is="duice-ui-ul" 
 							data-duice-bind="users,user" 
+							data-duice-selectable="true"
 							data-duice-editable="true">
 							<li style="display: inline-block;">
 								<div style="width:250px; border:solid 1px #ccc; border-radius:2px; padding:10px;">
@@ -907,6 +1021,7 @@ body {
 						<div style="width:49%;">
 							<ul is="duice-ui-ul" 
 							data-duice-bind="users,user" 
+							data-duice-selectable="true"
 							data-duice-editable="true"
 							data-duice-hierarchy="id,parentId">
 								<li style="line-height:2.4;">
@@ -962,7 +1077,8 @@ body {
 						<!-- ================================================================ -->
 						<div style="width:49%;">
 							<ul is="duice-ui-ul" 
-							data-duice-bind="users,user" 
+							data-duice-bind="users,user"
+							data-duice-selectable="true" 
 							data-duice-editable="true"
 							data-duice-hierarchy="id,parentId"
 							data-duice-foldable="true">
@@ -1030,82 +1146,95 @@ body {
 		<div class="chapter__bodyDiv">
 			<div>
 				<button onclick="
-					new duice.ui.Alert('alert message...')
-					.beforeOpen(function(){
+					var progress = new duice.Progress(document.body);
+					progress.start();
+					duice.delayCall(2000, progress.stop, progress);
+				">
+				progress
+				</button>
+				<button onclick="
+					new duice.Alert('alert message...')
+					.onBeforeOpen(function(){
 						return confirm('beforeOpen');
 					})
-					.afterOpen(function(){
+					.onAfterOpen(function(){
 						alert('afterOpen');
 					})
-					.beforeClose(function(){
+					.onBeforeClose(function(){
 						return confirm('beforeClose');
 					})
-					.afterClose(function(){
+					.onAfterClose(function(){
 						alert('afterClose');
 					})
 					.open();
 				">duice.dialog.Alert</button>
 				<button onclick="
-					new duice.ui.Confirm('confirm message...')
-					.beforeOpen(function(){
+					new duice.Confirm('confirm message...')
+					.onBeforeOpen(function(){
 						return confirm('beforeOpen');
 					})
-					.afterOpen(function(){
+					.onAfterOpen(function(){
 						alert('afterOpen');
 					})
-					.beforeClose(function(){
+					.onBeforeClose(function(){
 						return confirm('beforeClose');
 					})
-					.afterClose(function(){
+					.onAfterClose(function(){
 						alert('afterClose');
 					})
-					.beforeConfirm(function(){
+					.onBeforeConfirm(function(){
 						return confirm('beforeConfirm');
 					})
-					.afterConfirm(function(){
+					.onAfterConfirm(function(){
 						alert('afterConfirm');
 					})
 					.open();
 				">duice.ui.Confirm</button>
 				<button onclick="
-					new duice.ui.Prompt('enter value...')
-					.beforeOpen(function(){
+					new duice.Prompt('enter value...')
+					.onBeforeOpen(function(){
 						return confirm('beforeOpen');
 					})
-					.afterOpen(function(){
+					.onAfterOpen(function(){
 						alert('afterOpen');
 					})
-					.beforeClose(function(){
+					.onBeforeClose(function(){
 						return confirm('beforeClose');
 					})
-					.afterClose(function(){
+					.onAfterClose(function(){
 						alert('afterClose');
 					})
-					.beforeConfirm(function(){
+					.onBeforeConfirm(function(){
 						return confirm('beforeConfirm');
 					})
-					.afterConfirm(function(){
+					.onAfterConfirm(function(){
 						alert('afterConfirm:' + this.getValue());
 					})
 					.open();
 				">duice.dialog.Prompt</button>
 				<button onclick="
-					new duice.ui.Dialog(document.getElementById('dialog'))
-					.beforeOpen(function(){
+					var dialog = new duice.Dialog(document.getElementById('dialog'))
+					.onBeforeOpen(function(){
 						return confirm('beforeOpen');
 					})
-					.afterOpen(function(){
+					.onAfterOpen(function(){
 						alert('afterOpen');
 					})
-					.beforeClose(function(){
+					.onBeforeClose(function(){
 						return confirm('beforeClose');
 					})
-					.afterClose(function(){
+					.onAfterClose(function(){
 						alert('afterClose');
+					})
+					.onBeforeConfirm(function(){
+						alert('beforeConfirm');
+					})
+					.onAfterConfirm(function(){
+						alert('afterConfirm');
 					})
 					.open();
 				">duice.dialog.Dialog</button>
-				<dialog id="dialog" style="width:600px; padding:1rem; display:none;">
+				<dialog id="dialog" style="width:600px; padding:1rem;">
 					<div style="text-align:center;">
 						<img is="duice-ui-img" data-duice-bind="user,image" style="height:64px;"/>
 					</div>
@@ -1169,6 +1298,7 @@ body {
 			<textarea is="duice-integrate-suneditor" data-duice-bind="user,profile" style="width:100%;height:200px;">11111</textarea>
 		</div>
 	</section>
+
 
 </body>
 </html>
