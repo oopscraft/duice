@@ -925,7 +925,7 @@ body {
 							data-duice-selectable="true"
 							data-duice-editable="true">
 							<li style="display: inline-block;">
-								<div style="width:250px; border:solid 1px #ccc; border-radius:2px; padding:10px;">
+								<div style="width:250px; border:solid 1px #ccc; border-radius:2px; margin:1px; padding:10px;">
 									<div style="font-weight:bold; border-bottom: dotted 1px #ccc; margin-bottom: 5px;">
 										[[$context.index + 1]]
 										.
@@ -1018,12 +1018,15 @@ body {
 						<!-- ================================================================ -->
 						<!-- duice.ui.UList(hierarchy)									  -->
 						<!-- ================================================================ -->
-						<div style="width:49%;">
+						<div style="width:49%; border:solid 1px #ccc; border-radius:5px; margin:1px; padding:10px;">
+							<div style="border-bottom:solid 1px #ccc; font-weight:bold;">
+								Foldable Disabled
+							</div>
 							<ul is="duice-ui-ul" 
 							data-duice-bind="users,user" 
+							data-duice-hierarchy="id,parentId"
 							data-duice-selectable="true"
-							data-duice-editable="true"
-							data-duice-hierarchy="id,parentId">
+							data-duice-editable="true">
 								<li style="line-height:2.4;">
 									<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:dotted 1px #ccc;padding:2px;">
 										<div>
@@ -1075,12 +1078,15 @@ body {
 						<!-- ================================================================ -->
 						<!-- duice.ui.UList(hierarchy,foldable)								  -->
 						<!-- ================================================================ -->
-						<div style="width:49%;">
+						<div style="width:49%; border:solid 1px #ccc; border-radius:5px; margin:1px; padding:10px;">
+							<div style="border-bottom:solid 1px #ccc; font-weight:bold;">
+								Foldable Enabled
+							</div>
 							<ul is="duice-ui-ul" 
 							data-duice-bind="users,user"
+							data-duice-hierarchy="id,parentId"
 							data-duice-selectable="true" 
 							data-duice-editable="true"
-							data-duice-hierarchy="id,parentId"
 							data-duice-foldable="true">
 								<li style="line-height:2.4;">
 									<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:dotted 1px #ccc;padding:2px;">

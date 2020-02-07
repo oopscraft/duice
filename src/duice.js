@@ -3311,29 +3311,6 @@ var duice;
              */
             UList.prototype.setHierarchy = function (idName, parentIdName) {
                 this.hierarchy = { idName: idName, parentIdName: parentIdName };
-                this.ul.classList.add('duice-ui-ul--hierarchy');
-                // add root event
-                var $this = this;
-                this.ul.addEventListener('dragover', function (event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    $this.ul.classList.add('duice-ui-ul--hierarchy-dragover');
-                });
-                this.ul.addEventListener('dragleave', function (event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    $this.ul.classList.remove('duice-ui-ul--hierarchy-dragover');
-                });
-                this.ul.addEventListener('drop', function (event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    var fromIndex = parseInt(event.dataTransfer.getData('text'));
-                    var fromMap = $this.list.get(fromIndex);
-                    fromMap.set($this.hierarchy.parentIdName, null);
-                    $this.ul.classList.remove('duice-ui-ul--hierarchy-dragover');
-                    $this.setChanged();
-                    $this.notifyObservers(this);
-                });
             };
             /**
              * Sets foldable flag.
@@ -3356,6 +3333,11 @@ var duice;
                 var $this = this;
                 this.ul.innerHTML = '';
                 this.lis.length = 0;
+                // root style
+                this.ul.style.paddingLeft = '0px';
+                if (this.hierarchy && this.editable) {
+                    this.createRoot();
+                }
                 // creates new rows
                 for (var index = 0; index < list.getSize(); index++) {
                     var map = list.get(index);
@@ -3380,6 +3362,41 @@ var duice;
                         }
                     }
                 }
+            };
+            /**
+             * Creates root
+             */
+            UList.prototype.createRoot = function () {
+                // sets root style
+                this.ul.classList.add('duice-ui-ul--root');
+                if (this.foldable) {
+                    this.ul.style.paddingLeft = '64px';
+                }
+                else {
+                    this.ul.style.paddingLeft = '32px';
+                }
+                // add root event
+                var $this = this;
+                this.ul.addEventListener('dragover', function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    $this.ul.classList.add('duice-ui-ul--root-dragover');
+                });
+                this.ul.addEventListener('dragleave', function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    $this.ul.classList.remove('duice-ui-ul--root-dragover');
+                });
+                this.ul.addEventListener('drop', function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    var fromIndex = parseInt(event.dataTransfer.getData('text'));
+                    var fromMap = $this.list.get(fromIndex);
+                    fromMap.set($this.hierarchy.parentIdName, null);
+                    $this.ul.classList.remove('duice-ui-ul--root-dragover');
+                    $this.setChanged();
+                    $this.notifyObservers(this);
+                });
             };
             /**
              * Creates LI element reference to specified map includes child nodes.
@@ -3448,7 +3465,6 @@ var duice;
                         }
                         if (hierarchyParentIdValue === hierarchyIdValue) {
                             var childLi = this.createLi(i, element);
-                            childLi.classList.add('duice-ui-ul__li--indent');
                             childUl.appendChild(childLi);
                             hasChild = true;
                         }
