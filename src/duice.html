@@ -691,7 +691,7 @@ body {
 							<th>duice.ui.Pagination</th>
 							<td>
 								<ul is="duice-ui-pagination" data-duice-bind="user,page,rows,totalCount" data-duice-size="5" class="pagination">
-									<li data-page="[[$context.page]]" onclick="alert(user.get('page'));" class="page-link"></li>
+									<li data-page="{{$context.page}}" onclick="alert(user.get('page'));" class="page-link"></li>
 								</ul>
 							</td>
 							<td>
@@ -927,7 +927,7 @@ body {
 							<li style="display: inline-block;">
 								<div style="width:250px; border:solid 1px #ccc; border-radius:2px; margin:1px; padding:10px;">
 									<div style="font-weight:bold; border-bottom: dotted 1px #ccc; margin-bottom: 5px;">
-										[[$context.index + 1]]
+										{{$context.index + 1}}
 										.
 										<span is="duice-ui-span" data-duice-bind="user,id"></span>
 									</div>
@@ -1019,8 +1019,116 @@ body {
 						<!-- duice.ui.UList(hierarchy)									  -->
 						<!-- ================================================================ -->
 						<div style="width:49%; border:solid 1px #ccc; border-radius:5px; margin:1px; padding:10px;">
-							<div style="border-bottom:solid 1px #ccc; font-weight:bold;">
-								Foldable Disabled
+							<div style="border-bottom:solid 1px #eee; font-weight:bold;">
+								Plain
+							</div>
+							<ul is="duice-ui-ul" 
+							data-duice-bind="users,user" 
+							data-duice-hierarchy="id,parentId"
+							data-duice-selectable="true">
+								<li style="line-height:2.4;">
+									<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:dotted 1px #ccc;padding:2px;">
+										<div>
+											<img is="duice-ui-img" data-duice-bind="user,image" style="height:32px;"/>
+											<span is="duice-ui-span" data-duice-bind="user,name" style="font-weight:bold;"></span>
+											<span is="duice-ui-span" data-duice-bind="user,parentId" style="font-size:10px;color:#aaa;"></span>
+											<small>(depth:{{$context.depth}}, hasChild:{{$context.hasChild}})</small>
+										</div>
+										<div>
+											<table>
+												<col width="100px"/>
+												<col width="80px"/>
+												<tr>
+													<td><input is="duice-ui-input" type="date" data-duice-bind="user,birthday"/></td>
+													<td><select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"><option>- select -</option></select></td>
+												</tr>
+											</table>
+										</div>
+									</div>
+									<ul data-depth="{{$context.depth}}"></ul>
+								</li>
+							</ul>
+							<div style="text-align:right;padding:10px;">
+								Average Balance :
+								<span is="duice-ui-scriptlet" data-duice-bind="users">
+									var totalBalance = 0;
+									$context.users.forEach(function(item){
+										totalBalance += isNaN(item.get('balance')) ? 0 : Number(item.get('balance'));
+									});
+									return Math.ceil(totalBalance/$context.users.getSize());
+								</span>
+								|
+								Total Balance :
+								<span is="duice-ui-scriptlet" data-duice-bind="users">
+									var totalBalance = 0;
+									$context.users.forEach(function(item){
+										totalBalance += isNaN(item.get('balance')) ? 0 : Number(item.get('balance'));
+									});
+									return totalBalance;
+								</span>
+							</div>
+						</div>
+						<!-- ================================================================ -->
+						<!-- duice.ui.UList(hierarchy,foldable)								  -->
+						<!-- ================================================================ -->
+						<div style="width:49%; border:solid 1px #ccc; border-radius:5px; margin:1px; padding:10px;">
+							<div style="border-bottom:solid 1px #eee; font-weight:bold;">
+								Foldable
+							</div>
+							<ul is="duice-ui-ul" 
+							data-duice-bind="users,user"
+							data-duice-hierarchy="id,parentId"
+							data-duice-selectable="true" 
+							data-duice-foldable="true">
+								<li style="line-height:2.4;">
+									<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:dotted 1px #ccc;padding:2px;">
+										<div>
+											<img is="duice-ui-img" data-duice-bind="user,image" style="height:32px;"/>
+											<span is="duice-ui-span" data-duice-bind="user,name" style="font-weight:bold;"></span>
+											<span is="duice-ui-span" data-duice-bind="user,parentId" style="font-size:10px;color:#aaa;"></span>
+											<small>(depth:{{$context.depth}}, hasChild:{{$context.hasChild}})</small>
+										</div>
+										<div>
+											<table>
+												<col width="100px"/>
+												<col width="80px"/>
+												<tr>
+													<td><input is="duice-ui-input" type="date" data-duice-bind="user,birthday"/></td>
+													<td><select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"><option>- select -</option></select></td>
+												</tr>
+											</table>
+										</div>
+									</div>
+								</li>
+							</ul>
+							<div style="text-align:right;padding:10px;">
+								Average Balance :
+								<span is="duice-ui-scriptlet" data-duice-bind="users">
+									var totalBalance = 0;
+									$context.users.forEach(function(item){
+										totalBalance += isNaN(item.get('balance')) ? 0 : Number(item.get('balance'));
+									});
+									return Math.ceil(totalBalance/$context.users.getSize());
+								</span>
+								|
+								Total Balance :
+								<span is="duice-ui-scriptlet" data-duice-bind="users">
+									var totalBalance = 0;
+									$context.users.forEach(function(item){
+										totalBalance += isNaN(item.get('balance')) ? 0 : Number(item.get('balance'));
+									});
+									return totalBalance;
+								</span>
+							</div>
+						</div>
+					</div>
+					<div style="display:flex; justify-content:space-between;">
+						<!-- ================================================================ -->
+						<!-- duice.ui.UList(hierarchy,editable)							  	  -->
+						<!-- ================================================================ -->
+						<div style="width:49%; border:solid 1px #ccc; border-radius:5px; margin:1px; padding:10px;">
+							<div style="border-bottom:solid 1px #eee; font-weight:bold;">
+								Editable
 							</div>
 							<ul is="duice-ui-ul" 
 							data-duice-bind="users,user" 
@@ -1033,21 +1141,14 @@ body {
 											<img is="duice-ui-img" data-duice-bind="user,image" style="height:32px;"/>
 											<span is="duice-ui-span" data-duice-bind="user,name" style="font-weight:bold;"></span>
 											<span is="duice-ui-span" data-duice-bind="user,parentId" style="font-size:10px;color:#aaa;"></span>
+											<small>(depth:{{$context.depth}}, hasChild:{{$context.hasChild}})</small>
 										</div>
 										<div>
 											<table>
-												<col/>
-												<col width="80px"/>
-												<col/>
 												<col width="100px"/>
-												<col/>
 												<col width="80px"/>
 												<tr>
-													<td>balance</td>
-													<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance"/></td>
-													<td>birthday</td>
 													<td><input is="duice-ui-input" type="date" data-duice-bind="user,birthday"/></td>
-													<td>groupId</td>
 													<td><select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"><option>- select -</option></select></td>
 												</tr>
 											</table>
@@ -1076,11 +1177,11 @@ body {
 							</div>
 						</div>
 						<!-- ================================================================ -->
-						<!-- duice.ui.UList(hierarchy,foldable)								  -->
+						<!-- duice.ui.UList(hierarchy,foldable,editable)					  -->
 						<!-- ================================================================ -->
 						<div style="width:49%; border:solid 1px #ccc; border-radius:5px; margin:1px; padding:10px;">
-							<div style="border-bottom:solid 1px #ccc; font-weight:bold;">
-								Foldable Enabled
+							<div style="border-bottom:solid 1px #eee; font-weight:bold;">
+								Foldable + Enabled
 							</div>
 							<ul is="duice-ui-ul" 
 							data-duice-bind="users,user"
@@ -1091,24 +1192,18 @@ body {
 								<li style="line-height:2.4;">
 									<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:dotted 1px #ccc;padding:2px;">
 										<div>
+											{{$context.depth}}
 											<img is="duice-ui-img" data-duice-bind="user,image" style="height:32px;"/>
 											<span is="duice-ui-span" data-duice-bind="user,name" style="font-weight:bold;"></span>
 											<span is="duice-ui-span" data-duice-bind="user,parentId" style="font-size:10px;color:#aaa;"></span>
+											<small>(depth:{{$context.depth}}, hasChild:{{$context.hasChild}})</small>
 										</div>
 										<div>
 											<table>
-												<col/>
-												<col width="80px"/>
-												<col/>
 												<col width="100px"/>
-												<col/>
 												<col width="80px"/>
 												<tr>
-													<td>balance</td>
-													<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance"/></td>
-													<td>birthday</td>
 													<td><input is="duice-ui-input" type="date" data-duice-bind="user,birthday"/></td>
-													<td>groupId</td>
 													<td><select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"><option>- select -</option></select></td>
 												</tr>
 											</table>

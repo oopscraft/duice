@@ -1000,7 +1000,7 @@ namespace duice {
      */
     function executeExpression(element:HTMLElement, $context:any):any {
         var string = element.outerHTML;
-        string = string.replace(/\[\[([\s\S]*?)\]\]/mgi,function(match, command){
+        string = string.replace(/\{\{([\s\S]*?)\}\}/mgi,function(match, command){
             try {
                 command = command.replace('&amp;', '&');
                 command = command.replace('&lt;', '<');
@@ -3376,6 +3376,7 @@ namespace duice {
         export class UList extends ListUiComponent {
             ul:HTMLUListElement;
             li:HTMLLIElement;
+            childUl:HTMLUListElement;
             lis:Array<HTMLLIElement> = new Array<HTMLLIElement>();
             selectable:boolean;
             editable:boolean;
@@ -3391,7 +3392,17 @@ namespace duice {
                 super(ul);
                 this.ul = ul;
                 this.ul.classList.add('duice-ui-ul');
-                var li = <HTMLLIElement>this.ul.querySelector('li');
+                var li = <HTMLLIElement>ul.querySelector('li');
+
+                // checks child UList
+                var childUl = <HTMLUListElement>li.querySelector('li > ul');
+                if(childUl){
+                    this.childUl = li.removeChild(childUl);
+                }else{
+                    this.childUl = document.createElement('ul');
+                }
+
+                // clone li
                 this.li = <HTMLLIElement>li.cloneNode(true);
             }
 
@@ -3447,8 +3458,8 @@ namespace duice {
 
                 // root style
                 this.ul.style.paddingLeft = '0px';
-                if(this.hierarchy && this.editable){
-                    this.createRoot();
+                if(this.hierarchy){
+                    this.createHierarchyRoot();
                 }
 
                 // creates new rows
@@ -3464,7 +3475,7 @@ namespace duice {
                     }
                     
                     // creates LI element
-                    var li = this.createLi(index, map);
+                    var li = this.createLi(index, map, Number(0));
                     this.ul.appendChild(li);
                 }
                 
@@ -3472,7 +3483,7 @@ namespace duice {
                 if(this.hierarchy){
                     for(var index = 0, size = list.getSize(); index < size; index ++ ) {
                         if(this.isLiCreated(index) === false){
-                            var orphanLi = this.createLi(index, list.get(index));
+                            var orphanLi = this.createLi(index, list.get(index), Number(0));
                             orphanLi.classList.add('duice-ui-ul__li--orphan');
                             this.ul.appendChild(orphanLi);
                         }
@@ -3481,41 +3492,43 @@ namespace duice {
             }
 
             /**
-             * Creates root
+             * Creates hierarchy root
              */
-            createRoot():void {
+            createHierarchyRoot():void {
 
-                // sets root style
-                this.ul.classList.add('duice-ui-ul--root');
-                if(this.foldable){
-                    this.ul.style.paddingLeft = '64px';
-                }else{
-                    this.ul.style.paddingLeft = '32px'; 
+                // depth
+                var depth:number = 0;
+                if(this.editable) depth += 32;
+                if(this.foldable) depth += 32;
+                if(depth > 0){
+                    this.ul.style.paddingLeft = depth + 'px';
                 }
 
-                // add root event
-                var $this = this;
-                this.ul.addEventListener('dragover', function(event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    $this.ul.classList.add('duice-ui-ul--root-dragover');
-                });
-                this.ul.addEventListener('dragleave', function(event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    $this.ul.classList.remove('duice-ui-ul--root-dragover');
-                });
-                this.ul.addEventListener('drop', function(event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    var fromIndex = parseInt(event.dataTransfer.getData('text'));
-                    var fromMap = $this.list.get(fromIndex);
-                    fromMap.set($this.hierarchy.parentIdName, null);
-                    $this.ul.classList.remove('duice-ui-ul--root-dragover');
-                    $this.setChanged();
-                    $this.notifyObservers(this);
-                });
-
+                // add editable event
+                if(this.editable){
+                    var $this = this;
+                    this.ul.classList.add('duice-ui-ul--root');
+                    this.ul.addEventListener('dragover', function(event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        $this.ul.classList.add('duice-ui-ul--root-dragover');
+                    });
+                    this.ul.addEventListener('dragleave', function(event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        $this.ul.classList.remove('duice-ui-ul--root-dragover');
+                    });
+                    this.ul.addEventListener('drop', function(event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        var fromIndex = parseInt(event.dataTransfer.getData('text'));
+                        var fromMap = $this.list.get(fromIndex);
+                        fromMap.set($this.hierarchy.parentIdName, null);
+                        $this.ul.classList.remove('duice-ui-ul--root-dragover');
+                        $this.setChanged();
+                        $this.notifyObservers(this);
+                    });
+                }
             }
             
             /**
@@ -3523,12 +3536,14 @@ namespace duice {
              * @param index
              * @param map
              */
-            createLi(index:number, map:duice.Map):HTMLLIElement {
+            createLi(index:number, map:duice.Map, depth:number):HTMLLIElement {
                 var $this = this;
                 var li:HTMLLIElement = <HTMLLIElement>this.li.cloneNode(true);
                 li.classList.add('duice-ui-ul__li');
                 var $context:any = new Object;
                 $context['index'] = index;
+                $context['depth'] = Number(depth);
+                $context['hasChild'] = (this.hierarchy ? this.hasChild(map) : false);
                 $context[this.item] = map;
                 li = executeExpression(<HTMLElement>li,$context);
                 initializeComponent(li,$context);
@@ -3576,23 +3591,26 @@ namespace duice {
 
                 // creates child node
                 if(this.hierarchy) {
-                    var childUl = document.createElement('ul');
+                    depth ++;
+                    var childUl = <HTMLUListElement>this.childUl.cloneNode(true);
                     childUl.classList.add('duice-ui-ul');
+                    $context['depth'] = Number(depth);
+                    childUl = executeExpression(childUl,$context);
                     var hasChild:boolean = false;
                     var hierarchyIdValue = map.get(this.hierarchy.idName);
                     for(var i = 0, size = this.list.getSize(); i < size; i ++ ){
                         var element = this.list.get(i);
                         var hierarchyParentIdValue = element.get(this.hierarchy.parentIdName);
-                        if(isEmpty(hierarchyParentIdValue) === true){
-                            continue;
-                        }
-                        if(hierarchyParentIdValue === hierarchyIdValue){
-                            var childLi = this.createLi(i, element);
+                        if(!isEmpty(hierarchyParentIdValue)
+                        && hierarchyParentIdValue === hierarchyIdValue){
+                            var childLi = this.createLi(i, element, Number(depth));
                             childUl.appendChild(childLi);
                             hasChild = true;
                         }
                     }
-                    li.appendChild(childUl);
+                    if(hasChild){
+                        li.appendChild(childUl);
+                    }
                     
                     // sets fold 
                     if(this.foldable === true) {
@@ -3621,6 +3639,23 @@ namespace duice {
 
                 // return node element
                 return li;
+            }
+
+            /**
+             * hasChild
+             * @param map 
+             */
+            hasChild(map:duice.Map):boolean {
+                var hierarchyIdValue = map.get(this.hierarchy.idName);
+                for(var i = 0, size = this.list.getSize(); i < size; i ++ ){
+                    var element = this.list.get(i);
+                    var hierarchyParentIdValue = element.get(this.hierarchy.parentIdName);
+                    if(!isEmpty(hierarchyParentIdValue) 
+                    && hierarchyParentIdValue === hierarchyIdValue){
+                        return true;
+                    }
+                }
+                return false;
             }
             
             /**
