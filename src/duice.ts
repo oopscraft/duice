@@ -1792,14 +1792,14 @@ namespace duice {
      * duice.ModalEventListener
      */
     class ModalEventListener {
-        opening:Function;
-        opened:Function;
-        closing:Function;
-        closed:Function;
-        confirming:Function;
-        confirmed:Function;
-        canceling:Function;
-        canceled:Function;
+        onPreOpen:Function;
+        onPostOpen:Function;
+        onPreClose:Function;
+        onPostClose:Function;
+        onPreConfirm:Function;
+        onPostConfirm:Function;
+        onPreCancel:Function;
+        onPostCancel:Function;
     }
 	
    /**
@@ -1891,63 +1891,63 @@ namespace duice {
             this.blocker.unblock();
         }
         open(...args:any[]):boolean {
-            if(this.eventListener.opening){
-                if(this.eventListener.opening.call(this, ...args) === false){
+            if(this.eventListener.onPreOpen){
+                if(this.eventListener.onPreOpen.call(this, ...args) === false){
                     return false;
                 }
             }
             this.show();
-            if(this.eventListener.opened){
-                delayCall(200, this.eventListener.opened, this, ...args);
+            if(this.eventListener.onPostOpen){
+                delayCall(200, this.eventListener.onPostOpen, this, ...args);
             }
             return true;
         }
         close(...args:any[]):boolean {
-            if(this.eventListener.closing){
-                if(this.eventListener.closing.call(this, ...args) === false){
+            if(this.eventListener.onPreClose){
+                if(this.eventListener.onPreClose.call(this, ...args) === false){
                     return false;
                 }
             }
             this.hide();
-            if(this.eventListener.closed){
-                delayCall(200, this.eventListener.closed, this, ...args);
+            if(this.eventListener.onPostClose){
+                delayCall(200, this.eventListener.onPostClose, this, ...args);
             }
             return true;
         }
         confirm(...args: any[]):boolean {
-            if(this.eventListener.confirming){
-                if(this.eventListener.confirming.call(this, ...args) === false){
+            if(this.eventListener.onPreConfirm){
+                if(this.eventListener.onPreConfirm.call(this, ...args) === false){
                     return false;
                 }
             }
             this.hide();
-            if(this.eventListener.confirmed){
-                delayCall(200, this.eventListener.confirmed, this, ...args);
+            if(this.eventListener.onPostConfirm){
+                delayCall(200, this.eventListener.onPostConfirm, this, ...args);
             }
             return true;
         }
-        onOpening(listener:Function):any {
-            this.eventListener.opening = listener;
+        onPreOpen(listener:Function):any {
+            this.eventListener.onPreOpen = listener;
             return this;
         }
-        onOpened(listener:Function):any {
-            this.eventListener.opened = listener;
+        onPostOpen(listener:Function):any {
+            this.eventListener.onPostOpen = listener;
             return this;
         }
-        onClosing(listener:Function):any{
-            this.eventListener.closing = listener;
+        onPreClose(listener:Function):any{
+            this.eventListener.onPreClose = listener;
             return this;
         }
-        onClosed(listener:Function):any {
-            this.eventListener.closed = listener;
+        onPostClose(listener:Function):any {
+            this.eventListener.onPostClose = listener;
             return this;
         }
-        onConfirming(listener:Function):any {
-            this.eventListener.confirming = listener;
+        onPreConfirm(listener:Function):any {
+            this.eventListener.onPreConfirm = listener;
             return this;
         }
-        onConfirmed(listener:Function):any {
-            this.eventListener.confirmed = listener;
+        onPostConfirm(listener:Function):any {
+            this.eventListener.onPostConfirm = listener;
             return this;
         }
     }
@@ -2208,8 +2208,7 @@ namespace duice {
                 this.context = context;
                 for(var name in this.context){
                     var obj = this.context[name];
-                    if(typeof obj === 'object'
-                    && obj instanceof duice.DataObject){
+                    if(typeof obj === 'object' && obj instanceof duice.DataObject){
                         obj.addObserver(this);
                         this.addObserver(obj);
                         this.update(obj, obj);

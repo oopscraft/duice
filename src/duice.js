@@ -1748,14 +1748,14 @@ var duice;
             for (var _i = 0; _i < arguments.length; _i++) {
                 args[_i] = arguments[_i];
             }
-            if (this.eventListener.opening) {
-                if ((_a = this.eventListener.opening).call.apply(_a, __spreadArrays([this], args)) === false) {
+            if (this.eventListener.onPreOpen) {
+                if ((_a = this.eventListener.onPreOpen).call.apply(_a, __spreadArrays([this], args)) === false) {
                     return false;
                 }
             }
             this.show();
-            if (this.eventListener.opened) {
-                delayCall.apply(void 0, __spreadArrays([200, this.eventListener.opened, this], args));
+            if (this.eventListener.onPostOpen) {
+                delayCall.apply(void 0, __spreadArrays([200, this.eventListener.onPostOpen, this], args));
             }
             return true;
         };
@@ -1765,14 +1765,14 @@ var duice;
             for (var _i = 0; _i < arguments.length; _i++) {
                 args[_i] = arguments[_i];
             }
-            if (this.eventListener.closing) {
-                if ((_a = this.eventListener.closing).call.apply(_a, __spreadArrays([this], args)) === false) {
+            if (this.eventListener.onPreClose) {
+                if ((_a = this.eventListener.onPreClose).call.apply(_a, __spreadArrays([this], args)) === false) {
                     return false;
                 }
             }
             this.hide();
-            if (this.eventListener.closed) {
-                delayCall.apply(void 0, __spreadArrays([200, this.eventListener.closed, this], args));
+            if (this.eventListener.onPostClose) {
+                delayCall.apply(void 0, __spreadArrays([200, this.eventListener.onPostClose, this], args));
             }
             return true;
         };
@@ -1782,39 +1782,39 @@ var duice;
             for (var _i = 0; _i < arguments.length; _i++) {
                 args[_i] = arguments[_i];
             }
-            if (this.eventListener.confirming) {
-                if ((_a = this.eventListener.confirming).call.apply(_a, __spreadArrays([this], args)) === false) {
+            if (this.eventListener.onPreConfirm) {
+                if ((_a = this.eventListener.onPreConfirm).call.apply(_a, __spreadArrays([this], args)) === false) {
                     return false;
                 }
             }
             this.hide();
-            if (this.eventListener.confirmed) {
-                delayCall.apply(void 0, __spreadArrays([200, this.eventListener.confirmed, this], args));
+            if (this.eventListener.onPostConfirm) {
+                delayCall.apply(void 0, __spreadArrays([200, this.eventListener.onPostConfirm, this], args));
             }
             return true;
         };
-        Modal.prototype.onOpening = function (listener) {
-            this.eventListener.opening = listener;
+        Modal.prototype.onPreOpen = function (listener) {
+            this.eventListener.onPreOpen = listener;
             return this;
         };
-        Modal.prototype.onOpened = function (listener) {
-            this.eventListener.opened = listener;
+        Modal.prototype.onPostOpen = function (listener) {
+            this.eventListener.onPostOpen = listener;
             return this;
         };
-        Modal.prototype.onClosing = function (listener) {
-            this.eventListener.closing = listener;
+        Modal.prototype.onPreClose = function (listener) {
+            this.eventListener.onPreClose = listener;
             return this;
         };
-        Modal.prototype.onClosed = function (listener) {
-            this.eventListener.closed = listener;
+        Modal.prototype.onPostClose = function (listener) {
+            this.eventListener.onPostClose = listener;
             return this;
         };
-        Modal.prototype.onConfirming = function (listener) {
-            this.eventListener.confirming = listener;
+        Modal.prototype.onPreConfirm = function (listener) {
+            this.eventListener.onPreConfirm = listener;
             return this;
         };
-        Modal.prototype.onConfirmed = function (listener) {
-            this.eventListener.confirmed = listener;
+        Modal.prototype.onPostConfirm = function (listener) {
+            this.eventListener.onPostConfirm = listener;
             return this;
         };
         return Modal;
@@ -2073,8 +2073,7 @@ var duice;
                 this.context = context;
                 for (var name in this.context) {
                     var obj = this.context[name];
-                    if (typeof obj === 'object'
-                        && obj instanceof duice.DataObject) {
+                    if (typeof obj === 'object' && obj instanceof duice.DataObject) {
                         obj.addObserver(this);
                         this.addObserver(obj);
                         this.update(obj, obj);
