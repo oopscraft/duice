@@ -165,7 +165,6 @@ var duice;
          * @param obj object to transfer to observer
          */
         Observable.prototype.notifyObservers = function (obj) {
-            console.debug('Observable.observers.length', this.observers.length);
             if (this.notifyEnable && this.hasChanged()) {
                 this.clearUnavailableObservers();
                 for (var i = 0, size = this.observers.length; i < size; i++) {
@@ -310,6 +309,14 @@ var duice;
     }(Observable));
     duice.DataObject = DataObject;
     /**
+     * duice.MapEventListener
+     */
+    var MapEventListener = /** @class */ (function () {
+        function MapEventListener() {
+        }
+        return MapEventListener;
+    }());
+    /**
      * Map data structure
      * @param JSON object
      */
@@ -323,13 +330,8 @@ var duice;
             var _this = _super.call(this) || this;
             _this.data = new Object(); // internal data object
             _this.originData = JSON.stringify(_this.data); // original string JSON data
-            _this.on = {
-                beforeChange: null,
-                afterChange: null
-            };
-            if (json) {
-                _this.fromJson(json);
-            }
+            _this.eventListener = new MapEventListener();
+            _this.fromJson(json || {});
             return _this;
         }
         /**
@@ -353,8 +355,8 @@ var duice;
             for (var name in json) {
                 this.data[name] = json[name];
             }
-            // saves original data.
-            this.originData = JSON.stringify(this.toJson());
+            // save point
+            this.save();
             // notify to observers
             this.setChanged();
             this.notifyObservers(this);
@@ -379,6 +381,18 @@ var duice;
             this.notifyObservers(this);
         };
         /**
+         * Save point
+         */
+        Map.prototype.save = function () {
+            this.originData = JSON.stringify(this.toJson());
+        };
+        /**
+         * Restores instance as original data
+         */
+        Map.prototype.reset = function () {
+            this.fromJson(JSON.parse(this.originData));
+        };
+        /**
          * Checks original data is changed
          * @return whether original data is changed or not
          */
@@ -391,21 +405,14 @@ var duice;
             }
         };
         /**
-         * Restores instance as original data
-         */
-        Map.prototype.reset = function () {
-            var originJson = JSON.parse(this.originData);
-            this.fromJson(originJson);
-        };
-        /**
          * Sets property as input value
          * @param name
          * @param value
          */
         Map.prototype.set = function (name, value) {
             // calls beforeChange
-            if (this.on.beforeChange) {
-                if (this.on.beforeChange.call(this, name, value) === false) {
+            if (this.eventListener.onPreChange) {
+                if (this.eventListener.onPreChange.call(this, name, value) === false) {
                     return false;
                 }
             }
@@ -414,8 +421,8 @@ var duice;
             this.setChanged();
             this.notifyObservers(this);
             // calls 
-            if (this.on.afterChange) {
-                this.on.afterChange.call(this, name, value);
+            if (this.eventListener.onPostChange) {
+                this.eventListener.onPostChange.call(this, name, value);
             }
             // return true
             return true;
@@ -439,16 +446,18 @@ var duice;
             return names;
         };
         /**
-         * Sets focus
+         * Sets focus with message
          * @param name
          */
-        Map.prototype.setFocus = function (name) {
+        Map.prototype.setFocus = function (name, message) {
             for (var i = 0, size = this.observers.length; i < size; i++) {
                 var observer = this.observers[i];
                 if (observer instanceof MapUiComponent) {
-                    if (observer.getName() === name && observer.element.focus) {
-                        observer.element.focus();
-                        break;
+                    var mapUuiComponent = this.observers[i];
+                    if (observer.getName() === name) {
+                        if (mapUuiComponent.setFocus(message)) {
+                            break;
+                        }
                     }
                 }
             }
@@ -457,19 +466,27 @@ var duice;
          * Sets listener before change
          * @param listener
          */
-        Map.prototype.onBeforeChange = function (listener) {
-            this.on.beforeChange = listener;
+        Map.prototype.onPreChange = function (listener) {
+            this.eventListener.onPreChange = listener;
         };
         /**
          * Sets listener after change
          * @param listener
          */
-        Map.prototype.onAfterChange = function (listener) {
-            this.on.afterChange = listener;
+        Map.prototype.onPostChange = function (listener) {
+            this.eventListener.onPostChange = listener;
         };
         return Map;
     }(DataObject));
     duice.Map = Map;
+    /**
+     * duice.ListEvent
+     */
+    var ListEventListener = /** @class */ (function () {
+        function ListEventListener() {
+        }
+        return ListEventListener;
+    }());
     /**
      * duice.List
      */
@@ -484,37 +501,37 @@ var duice;
             _this.data = new Array();
             _this.originData = JSON.stringify(_this.data);
             _this.index = -1;
-            _this.on = {
-                beforeChangeIndex: null,
-                afterChangeIndex: null,
-                beforeChange: null,
-                afterChange: null
-            };
-            if (jsonArray) {
-                _this.fromJson(jsonArray);
-            }
+            _this.eventListener = new ListEventListener();
+            _this.fromJson(jsonArray || []);
             return _this;
         }
+        /**
+         * Updates
+         * @param observable
+         * @param obj
+         */
         List.prototype.update = function (observable, obj) {
             console.debug('List.update', observable, obj);
             this.setChanged();
             this.notifyObservers(obj);
         };
+        /**
+         * Loads data from JSON array
+         * @param jsonArray
+         */
         List.prototype.fromJson = function (jsonArray) {
             this.clear();
             for (var i = 0; i < jsonArray.length; i++) {
                 var map = new duice.Map(jsonArray[i]);
                 map.disable = this.disable;
                 map.readonly = clone(this.readonly);
-                map.onBeforeChange(this.on.beforeChange);
-                map.onAfterChange(this.on.afterChange);
+                map.onPreChange(this.eventListener.onPreChangeRow);
+                map.onPostChange(this.eventListener.onPostChangeRow);
                 map.addObserver(this);
                 this.data.push(map);
             }
-            this.originData = JSON.stringify(this.toJson());
-            this.index = -1;
-            this.setChanged();
-            this.notifyObservers(this);
+            this.save();
+            this.setIndex(-1);
         };
         /**
          * toJson
@@ -534,9 +551,19 @@ var duice;
                 this.data[i].removeObserver(this);
             }
             this.data = new Array();
-            this.index = -1;
-            this.setChanged();
-            this.notifyObservers(this);
+            this.setIndex(-1);
+        };
+        /**
+         * Save point
+         */
+        List.prototype.save = function () {
+            this.originData = JSON.stringify(this.toJson());
+        };
+        /**
+         * Resets data from original data.
+         */
+        List.prototype.reset = function () {
+            this.fromJson(JSON.parse(this.originData));
         };
         /**
          * Returns if changed
@@ -550,87 +577,118 @@ var duice;
             }
         };
         /**
-         * Resets data from original data.
+         * Sets only row index
+         * @param index
          */
-        List.prototype.reset = function () {
-            var originJson = JSON.parse(this.originData);
-            this.fromJson(originJson);
+        List.prototype.setIndex = function (index) {
+            this.index = index;
+            this.setChanged();
+            this.notifyObservers(this);
+        };
+        /**
+         * Returns row index.
+         */
+        List.prototype.getIndex = function () {
+            return this.index;
+        };
+        /**
+         * Returns row count
+         */
+        List.prototype.getRowCount = function () {
+            return this.data.length;
+        };
+        /**
+         * Return row specified index
+         * @param index
+         */
+        List.prototype.getRow = function (index) {
+            return this.data[index];
         };
         /**
          * Sets index.
          * @param index
          */
-        List.prototype.setIndex = function (index) {
+        List.prototype.selectRow = function (index) {
             // calls beforeChangeIndex 
-            if (this.on.beforeChangeIndex) {
-                if (this.on.beforeChangeIndex.call(this, index) === false) {
+            if (this.eventListener.onPreSelectRow) {
+                if (this.eventListener.onPreSelectRow.call(this, index) === false) {
                     return false;
                 }
             }
             // changes index
-            this.index = index;
-            this.setChanged();
-            this.notifyObservers(this);
+            this.setIndex(index);
             // calls 
-            if (this.on.afterChangeIndex) {
-                this.on.afterChangeIndex.call(this, index);
+            if (this.eventListener.onPostSelectRow) {
+                this.eventListener.onPostSelectRow.call(this, index);
             }
             // returns true
             return true;
         };
-        List.prototype.getIndex = function () {
-            return this.index;
+        /**
+         * moveRow
+         * @param fromIndex
+         * @param toIndex
+         */
+        List.prototype.moveRow = function (fromIndex, toIndex) {
+            // calls beforeChangeIndex 
+            if (this.eventListener.onPreMoveRow) {
+                if (this.eventListener.onPreMoveRow.call(this, fromIndex, toIndex) === false) {
+                    return;
+                }
+            }
+            // moves row
+            this.index = fromIndex;
+            this.data.splice(toIndex, 0, this.data.splice(fromIndex, 1)[0]);
+            this.setIndex(toIndex);
+            // calls 
+            if (this.eventListener.onPostMoveRow) {
+                this.eventListener.onPostMoveRow.call(this, fromIndex, toIndex);
+            }
         };
-        List.prototype.clearIndex = function () {
-            this.index = -1;
-            this.setChanged();
-            this.notifyObservers(this);
-        };
-        List.prototype.getSize = function () {
-            return this.data.length;
-        };
-        List.prototype.get = function (index) {
-            return this.data[index];
-        };
-        List.prototype.add = function (map) {
+        /**
+         * Adds row
+         * @param map
+         */
+        List.prototype.addRow = function (map) {
             map.disable = this.disable;
             map.readonly = clone(this.readonly);
-            map.onBeforeChange(this.on.beforeChange);
-            map.onAfterChange(this.on.afterChange);
+            map.onPreChange(this.eventListener.onPreChangeRow);
+            map.onPostChange(this.eventListener.onPostChangeRow);
             map.addObserver(this);
             this.data.push(map);
-            this.index = this.getSize() - 1;
-            this.setChanged();
-            this.notifyObservers(this);
+            this.setIndex(this.getRowCount() - 1);
         };
-        List.prototype.insert = function (index, map) {
+        /**
+         * Inserts row
+         * @param index
+         * @param map
+         */
+        List.prototype.insertRow = function (index, map) {
             if (0 <= index && index < this.data.length) {
                 map.disable = this.disable;
                 map.readonly = clone(this.readonly);
-                map.onBeforeChange(this.on.beforeChange);
-                map.onAfterChange(this.on.afterChange);
+                map.onPreChange(this.eventListener.onPreChangeRow);
+                map.onPostChange(this.eventListener.onPostChangeRow);
                 map.addObserver(this);
                 this.data.splice(index, 0, map);
-                this.index = index;
-                this.setChanged();
-                this.notifyObservers(this);
+                this.setIndex(index);
             }
         };
-        List.prototype.remove = function (index) {
+        /**
+         * Removes row by specified index
+         * @param index
+         */
+        List.prototype.removeRow = function (index) {
             if (0 <= index && index < this.data.length) {
                 this.data.splice(index, 1);
-                this.index = Math.min(this.index, this.data.length - 1);
-                this.setChanged();
-                this.notifyObservers(this);
+                var index = Math.min(this.index, this.data.length - 1);
+                this.setIndex(index);
             }
         };
-        List.prototype.move = function (fromIndex, toIndex) {
-            this.index = fromIndex;
-            this.data.splice(toIndex, 0, this.data.splice(fromIndex, 1)[0]);
-            this.index = toIndex;
-            this.setChanged();
-            this.notifyObservers(this);
-        };
+        /**
+         * indexOf
+         * @param handler
+         */
         List.prototype.indexOf = function (handler) {
             for (var i = 0, size = this.data.length; i < size; i++) {
                 if (handler.call(this, this.data[i]) === true) {
@@ -639,6 +697,10 @@ var duice;
             }
             return -1;
         };
+        /**
+         * contains
+         * @param handler
+         */
         List.prototype.contains = function (handler) {
             if (this.indexOf(handler) > -1) {
                 return true;
@@ -647,6 +709,10 @@ var duice;
                 return false;
             }
         };
+        /**
+         * forEach
+         * @param handler
+         */
         List.prototype.forEach = function (handler) {
             for (var i = 0, size = this.data.length; i < size; i++) {
                 if (handler.call(this, this.data[i], i) === false) {
@@ -654,38 +720,68 @@ var duice;
                 }
             }
         };
-        List.prototype.sort = function (name, ascending) {
-            this.data.sort(function (a, b) {
-                var aValue = a.get(name);
-                var bValue = b.get(name);
-                return (aValue > bValue ? 1 : aValue < bValue ? -1 : 0) * (ascending == false ? -1 : 1);
-            });
-            this.setChanged();
-            this.notifyObservers(this);
-        };
+        /**
+         * Sets diabled
+         * @param disable
+         */
         List.prototype.setDisable = function (disable) {
             this.data.forEach(function (map) {
                 map.setDisable(disable);
             });
             _super.prototype.setDisable.call(this, disable);
         };
+        /**
+         * Sets readonly flag
+         * @param name
+         * @param readonly
+         */
         List.prototype.setReadonly = function (name, readonly) {
             this.data.forEach(function (map) {
                 map.setReadonly(name, readonly);
             });
             _super.prototype.setReadonly.call(this, name, readonly);
         };
-        List.prototype.onBeforeChangeIndex = function (listener) {
-            this.on.beforeChangeIndex = listener;
+        /**
+         * onPreSelectRow
+         * @param listener
+         */
+        List.prototype.onPreSelectRow = function (listener) {
+            this.eventListener.onPreSelectRow = listener;
         };
-        List.prototype.onAfterChangeIndex = function (listener) {
-            this.on.afterChangeIndex = listener;
+        /**
+         * onPostSelectRow
+         * @param listener onPostSelectRow event listener
+         */
+        List.prototype.onPostSelectRow = function (listener) {
+            this.eventListener.onPostSelectRow = listener;
         };
-        List.prototype.onBeforeChange = function (listener) {
-            this.on.beforeChange = listener;
+        /**
+         * onPreMoveRow
+         * @param listener onPreMoveRow event listener
+         */
+        List.prototype.onPreMoveRow = function (listener) {
+            this.eventListener.onPreMoveRow = listener;
         };
-        List.prototype.onAfterChange = function (listener) {
-            this.on.afterChange = listener;
+        /**
+         * onPostMoveRow
+         * @param listener
+         */
+        List.prototype.onPostMoveRow = function (listener) {
+            this.eventListener.onPostMoveRow = listener;
+        };
+        /**
+         * onPreChangeRow
+         * @param listener
+         */
+        List.prototype.onPreChangeRow = function (listener) {
+            this.eventListener.onPreChangeRow = listener;
+        };
+        /**
+         * onPostChangeRow
+         * @param listener
+         */
+        List.prototype.onPostChangeRow = function (listener) {
+            this.eventListener.onPostChangeRow = listener;
         };
         return List;
     }(DataObject));
@@ -727,6 +823,23 @@ var duice;
         UiComponent.prototype.setVisible = function (visible) {
             this.element.style.display = (visible ? '' : 'none');
         };
+        /**
+         * Sets element focus
+         * @param message
+         */
+        UiComponent.prototype.setFocus = function (message) {
+            if (this.element.focus) {
+                if (!isEmpty(message)) {
+                    var tooltip = new Tooltip(this.element, message);
+                    tooltip.create();
+                    this.element.addEventListener('blur', function (event) {
+                        tooltip.destroy();
+                    }, { once: true });
+                }
+                this.element.focus();
+                return true;
+            }
+        };
         return UiComponent;
     }(Observable));
     /**
@@ -756,7 +869,6 @@ var duice;
         };
         return MapUiComponent;
     }(UiComponent));
-    duice.MapUiComponent = MapUiComponent;
     /**
      * duice.ListUiComponent
      */
@@ -780,7 +892,6 @@ var duice;
         };
         return ListUiComponent;
     }(UiComponent));
-    duice.ListUiComponent = ListUiComponent;
     /**
      * duice.ui.UiComponentFactory
      */
@@ -820,7 +931,6 @@ var duice;
         }
         return MapUiComponentFactory;
     }(UiComponentFactory));
-    duice.MapUiComponentFactory = MapUiComponentFactory;
     var ListUiComponentFactory = /** @class */ (function (_super) {
         __extends(ListUiComponentFactory, _super);
         function ListUiComponentFactory() {
@@ -828,7 +938,6 @@ var duice;
         }
         return ListUiComponentFactory;
     }(UiComponentFactory));
-    duice.ListUiComponentFactory = ListUiComponentFactory;
     /**
      * Generates random UUID value
      * @return  UUID string
@@ -892,26 +1001,24 @@ var duice;
     function isEmpty(value) {
         if (value === undefined
             || value === null
-            || value === '') {
+            || value === ''
+            || trim(value) === '') {
             return true;
         }
         else {
             return false;
         }
     }
+    duice.isEmpty = isEmpty;
     /**
      * Check if value is not empty
      * @param value
      * @return whether value is not empty
      */
     function isNotEmpty(value) {
-        if (isEmpty(value)) {
-            return false;
-        }
-        else {
-            return true;
-        }
+        return !isEmpty(value);
     }
+    duice.isNotEmpty = isNotEmpty;
     /**
      * Checks if value is empty and return specified value as default
      * @param value to check
@@ -925,6 +1032,71 @@ var duice;
             return value;
         }
     }
+    duice.defaultIfEmpty = defaultIfEmpty;
+    /**
+     * Checks value is number
+     * @param value
+     */
+    function isNumeric(value) {
+        return !Array.isArray(value) && (value - parseFloat(value) + 1) >= 0;
+    }
+    duice.isNumeric = isNumeric;
+    /**
+     * Checks generic ID (alphabet + number + -,_)
+     * @param value
+     */
+    function isIdFormat(value) {
+        if (value) {
+            var pattern = /^[a-zA-Z0-9\-\_]{1,}$/;
+            return pattern.test(value);
+        }
+        return false;
+    }
+    duice.isIdFormat = isIdFormat;
+    /**
+     * Checks generic password (At least 1 alphabet, 1 number, 1 special char)
+     * @param value
+     */
+    function isPasswordFormat(value) {
+        if (value) {
+            var pattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$/;
+            return pattern.test(value);
+        }
+        return false;
+    }
+    duice.isPasswordFormat = isPasswordFormat;
+    /**
+     * Checks valid email address pattern
+     * @param value
+     */
+    function isEmailFormat(value) {
+        if (value) {
+            var pattern = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+            return pattern.test(value);
+        }
+        return false;
+    }
+    duice.isEmailFormat = isEmailFormat;
+    /**
+     * Checks if value is URL address format
+     * @param value
+     */
+    function isUrlFormat(value) {
+        if (value) {
+            var pattern = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+            return pattern.test(value);
+        }
+        return false;
+    }
+    duice.isUrlFormat = isUrlFormat;
+    /**
+     * trim string
+     * @param value
+     */
+    function trim(value) {
+        return (value + "").trim();
+    }
+    duice.trim = trim;
     /**
      * converts value to left-padded value
      * @param original value
@@ -938,6 +1110,7 @@ var duice;
         }
         return value;
     }
+    duice.lpad = lpad;
     /**
      * converts value to right-padded value
      * @param original value
@@ -951,6 +1124,39 @@ var duice;
         }
         return value;
     }
+    duice.rpad = rpad;
+    /**
+     * Gets cookie value
+     * @param name
+     */
+    function getCookie(name) {
+        var value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+        return value ? value[2] : null;
+    }
+    duice.getCookie = getCookie;
+    ;
+    /**
+     * Sets cookie value
+     * @param name
+     * @param value
+     * @param day
+     */
+    function setCookie(name, value, day) {
+        var date = new Date();
+        date.setTime(date.getTime() + day * 60 * 60 * 24 * 1000);
+        document.cookie = name + '=' + value + ';expires=' + date.toUTCString() + ';path=/';
+    }
+    duice.setCookie = setCookie;
+    ;
+    /**
+     * Deletes cookie
+     * @param name
+     */
+    function deleteCookie(name) {
+        var date = new Date();
+        document.cookie = name + "= " + "; expires=" + date.toUTCString() + "; path=/";
+    }
+    duice.deleteCookie = deleteCookie;
     /**
      * Executes custom expression in HTML element and returns.
      * @param element
@@ -959,7 +1165,7 @@ var duice;
      */
     function executeExpression(element, $context) {
         var string = element.outerHTML;
-        string = string.replace(/\{\{([\s\S]*?)\}\}/mgi, function (match, command) {
+        string = string.replace(/\[@duice\[([\s\S]*?)\]\]/mgi, function (match, command) {
             try {
                 command = command.replace('&amp;', '&');
                 command = command.replace('&lt;', '<');
@@ -1006,6 +1212,7 @@ var duice;
             return htmlMap[m];
         });
     }
+    duice.escapeHTML = escapeHTML;
     /**
      * Removes child elements from HTML element.
      * @param element
@@ -1094,7 +1301,6 @@ var duice;
             }
         }, millis);
     }
-    duice.delayCall = delayCall;
     /**
      * Returns current max z-index value.
      * @return max z-index value
@@ -1405,6 +1611,35 @@ var duice;
     }());
     duice.Blocker = Blocker;
     /**
+     * duice.Tooltip
+     */
+    var Tooltip = /** @class */ (function () {
+        function Tooltip(element, message) {
+            this.element = element;
+            this.message = message;
+        }
+        /**
+         * Creates tooltip
+         */
+        Tooltip.prototype.create = function () {
+            this.div = document.createElement('div');
+            this.div.classList.add('duice-tooltip');
+            this.div.appendChild(document.createTextNode(this.message));
+            this.element.parentNode.insertBefore(this.div, this.element.nextSibling);
+            // adjusting position
+            this.div.style.position = 'absolute';
+            this.div.style.zIndex = String(getCurrentMaxZIndex() + 1);
+        };
+        /**
+         * Destroy tooltip
+         */
+        Tooltip.prototype.destroy = function () {
+            this.element.parentNode.removeChild(this.div);
+        };
+        return Tooltip;
+    }());
+    duice.Tooltip = Tooltip;
+    /**
      * duice.ui.Progress
      */
     var Progress = /** @class */ (function () {
@@ -1426,11 +1661,19 @@ var duice;
     }());
     duice.Progress = Progress;
     /**
+     * duice.ModalEventListener
+     */
+    var ModalEventListener = /** @class */ (function () {
+        function ModalEventListener() {
+        }
+        return ModalEventListener;
+    }());
+    /**
       * duice.ui.Modal
       */
     var Modal = /** @class */ (function () {
         function Modal() {
-            this.on = {};
+            this.eventListener = new ModalEventListener();
             var $this = this;
             this.container = document.createElement('div');
             this.container.classList.add('duice-modal');
@@ -1505,24 +1748,16 @@ var duice;
             for (var _i = 0; _i < arguments.length; _i++) {
                 args[_i] = arguments[_i];
             }
-            if (this.on.beforeOpen) {
-                if ((_a = this.on.beforeOpen).call.apply(_a, __spreadArrays([this], args)) === false) {
+            if (this.eventListener.opening) {
+                if ((_a = this.eventListener.opening).call.apply(_a, __spreadArrays([this], args)) === false) {
                     return false;
                 }
             }
             this.show();
-            if (this.on.afterOpen) {
-                delayCall.apply(void 0, __spreadArrays([200, this.on.afterOpen, this], args));
+            if (this.eventListener.opened) {
+                delayCall.apply(void 0, __spreadArrays([200, this.eventListener.opened, this], args));
             }
             return true;
-        };
-        Modal.prototype.onBeforeOpen = function (listener) {
-            this.on.beforeOpen = listener;
-            return this;
-        };
-        Modal.prototype.onAfterOpen = function (listener) {
-            this.on.afterOpen = listener;
-            return this;
         };
         Modal.prototype.close = function () {
             var _a;
@@ -1530,24 +1765,16 @@ var duice;
             for (var _i = 0; _i < arguments.length; _i++) {
                 args[_i] = arguments[_i];
             }
-            if (this.on.beforeClose) {
-                if ((_a = this.on.beforeClose).call.apply(_a, __spreadArrays([this], args)) === false) {
+            if (this.eventListener.closing) {
+                if ((_a = this.eventListener.closing).call.apply(_a, __spreadArrays([this], args)) === false) {
                     return false;
                 }
             }
             this.hide();
-            if (this.on.afterClose) {
-                delayCall.apply(void 0, __spreadArrays([200, this.on.afterClose, this], args));
+            if (this.eventListener.closed) {
+                delayCall.apply(void 0, __spreadArrays([200, this.eventListener.closed, this], args));
             }
             return true;
-        };
-        Modal.prototype.onBeforeClose = function (listener) {
-            this.on.beforeClose = listener;
-            return this;
-        };
-        Modal.prototype.onAfterClose = function (listener) {
-            this.on.afterClose = listener;
-            return this;
         };
         Modal.prototype.confirm = function () {
             var _a;
@@ -1555,23 +1782,39 @@ var duice;
             for (var _i = 0; _i < arguments.length; _i++) {
                 args[_i] = arguments[_i];
             }
-            if (this.on.beforeConfirm) {
-                if ((_a = this.on.beforeConfirm).call.apply(_a, __spreadArrays([this], args)) === false) {
+            if (this.eventListener.confirming) {
+                if ((_a = this.eventListener.confirming).call.apply(_a, __spreadArrays([this], args)) === false) {
                     return false;
                 }
             }
             this.hide();
-            if (this.on.afterConfirm) {
-                delayCall.apply(void 0, __spreadArrays([200, this.on.afterConfirm, this], args));
+            if (this.eventListener.confirmed) {
+                delayCall.apply(void 0, __spreadArrays([200, this.eventListener.confirmed, this], args));
             }
             return true;
         };
-        Modal.prototype.onBeforeConfirm = function (listener) {
-            this.on.beforeConfirm = listener;
+        Modal.prototype.onOpening = function (listener) {
+            this.eventListener.opening = listener;
             return this;
         };
-        Modal.prototype.onAfterConfirm = function (listener) {
-            this.on.afterConfirm = listener;
+        Modal.prototype.onOpened = function (listener) {
+            this.eventListener.opened = listener;
+            return this;
+        };
+        Modal.prototype.onClosing = function (listener) {
+            this.eventListener.closing = listener;
+            return this;
+        };
+        Modal.prototype.onClosed = function (listener) {
+            this.eventListener.closed = listener;
+            return this;
+        };
+        Modal.prototype.onConfirming = function (listener) {
+            this.eventListener.confirming = listener;
+            return this;
+        };
+        Modal.prototype.onConfirmed = function (listener) {
+            this.eventListener.confirmed = listener;
             return this;
         };
         return Modal;
@@ -1820,6 +2063,8 @@ var duice;
             function Scriptlet(element) {
                 var _this = _super.call(this, element) || this;
                 _this.expression = element.innerHTML;
+                _this.expression = _this.expression.replace(/<!--\[CDATA\[/gim, "");
+                _this.expression = _this.expression.replace(/\]\]-->/gim, "");
                 _this.element.classList.add('duice-ui-scriptlet');
                 return _this;
             }
@@ -1837,8 +2082,14 @@ var duice;
                 }
             };
             Scriptlet.prototype.update = function (dataObject, obj) {
-                var func = Function('$context', '"use strict";' + this.expression + '');
-                var result = func(this.context);
+                try {
+                    var func = Function('$context', '"use strict";' + this.expression + '');
+                    var result = func(this.context);
+                }
+                catch (e) {
+                    console.error(this.expression);
+                    throw e;
+                }
                 this.element.innerHTML = '';
                 this.element.appendChild(document.createTextNode(result));
                 this.element.style.display = 'inline-block';
@@ -1980,14 +2231,14 @@ var duice;
                 _this.input.addEventListener('keypress', function (event) {
                     var inputChars = String.fromCharCode(event.keyCode);
                     var newValue = this.value.substr(0, this.selectionStart) + inputChars + this.value.substr(this.selectionEnd);
-                    if ($this.validate(newValue) === false) {
+                    if ($this.checkFormat(newValue) === false) {
                         event.preventDefault();
                     }
                 }, true);
                 _this.input.addEventListener('paste', function (event) {
                     var inputChars = event.clipboardData.getData('text/plain');
                     var newValue = this.value.substr(0, this.selectionStart) + inputChars + this.value.substr(this.selectionEnd);
-                    if ($this.validate(newValue) === false) {
+                    if ($this.checkFormat(newValue) === false) {
                         event.preventDefault();
                     }
                 }, true);
@@ -1995,9 +2246,11 @@ var duice;
                     $this.setChanged();
                     $this.notifyObservers(this);
                 }, true);
+                // turn off autocomplete
+                $this.input.setAttribute('autocomplete', 'off');
                 return _this;
             }
-            Input.prototype.validate = function (value) {
+            Input.prototype.checkFormat = function (value) {
                 return true;
             };
             Input.prototype.setDisable = function (disable) {
@@ -2080,7 +2333,7 @@ var duice;
                 value = this.format.decode(value);
                 return value;
             };
-            TextInput.prototype.validate = function (value) {
+            TextInput.prototype.checkFormat = function (value) {
                 try {
                     this.format.decode(value);
                 }
@@ -2119,7 +2372,7 @@ var duice;
                 value = this.format.decode(value);
                 return value;
             };
-            NumberInput.prototype.validate = function (value) {
+            NumberInput.prototype.checkFormat = function (value) {
                 try {
                     this.format.decode(value);
                 }
@@ -2253,7 +2506,7 @@ var duice;
                 }
                 return value;
             };
-            DateInput.prototype.validate = function (value) {
+            DateInput.prototype.checkFormat = function (value) {
                 try {
                     var s = this.format.decode(value);
                 }
@@ -2470,7 +2723,6 @@ var duice;
                 this.pickerDiv.style.position = 'absolute';
                 this.pickerDiv.style.zIndex = String(getCurrentMaxZIndex() + 1);
                 this.pickerDiv.style.left = getElementPosition(this.input).left + 'px';
-                this.pickerDiv.style.margin = '0px';
                 // updates date
                 function updateDate(date) {
                     var yyyy = date.getFullYear();
@@ -2607,8 +2859,8 @@ var duice;
                         $this.select.appendChild($this.defaultOptions[i]);
                     }
                     // update data options
-                    for (var i = 0, size = optionList.getSize(); i < size; i++) {
-                        var optionMap = optionList.get(i);
+                    for (var i = 0, size = optionList.getRowCount(); i < size; i++) {
+                        var optionMap = optionList.getRow(i);
                         var option = document.createElement('option');
                         option.value = optionMap.get($this.optionValue);
                         option.appendChild(document.createTextNode(optionMap.get($this.optionText)));
@@ -3144,16 +3396,17 @@ var duice;
                 }
                 this.tbodies.length = 0;
                 // creates new rows
-                for (var index = 0; index < list.getSize(); index++) {
-                    var map = list.get(index);
+                for (var index = 0; index < list.getRowCount(); index++) {
+                    var map = list.getRow(index);
                     var tbody = this.createTbody(index, map);
                     tbody.dataset.duiceIndex = String(index);
                     // select index
                     if (this.selectable) {
+                        tbody.classList.add('duice-ui-table__tbody--selectable');
                         if (index === list.getIndex()) {
                             tbody.classList.add('duice-ui-table__tbody--index');
                         }
-                        tbody.addEventListener('click', function (event) {
+                        tbody.addEventListener('mousedown', function (event) {
                             var index = Number(this.dataset.duiceIndex);
                             $this.selectTbody(index);
                         }, true);
@@ -3173,7 +3426,7 @@ var duice;
                             event.stopPropagation();
                             var fromIndex = parseInt(event.dataTransfer.getData('text'));
                             var toIndex = parseInt(this.dataset.duiceIndex);
-                            list.move(fromIndex, toIndex);
+                            list.moveRow(fromIndex, toIndex);
                         });
                     }
                     // appends body
@@ -3181,7 +3434,7 @@ var duice;
                     this.tbodies.push(tbody);
                 }
                 // not found row
-                if (list.getSize() < 1) {
+                if (list.getRowCount() < 1) {
                     var emptyTbody = this.createEmptyTbody();
                     emptyTbody.style.pointerEvents = 'none';
                     this.table.appendChild(emptyTbody);
@@ -3194,7 +3447,7 @@ var duice;
              */
             Table.prototype.selectTbody = function (index) {
                 this.getList().suspendNotify();
-                if (this.getList().setIndex(index)) {
+                if (this.getList().selectRow(index)) {
                     // handles class                
                     for (var i = 0; i < this.tbodies.length; i++) {
                         if (i === index) {
@@ -3348,8 +3601,8 @@ var duice;
                     this.createHierarchyRoot();
                 }
                 // creates new rows
-                for (var index = 0; index < list.getSize(); index++) {
-                    var map = list.get(index);
+                for (var index = 0; index < list.getRowCount(); index++) {
+                    var map = list.getRow(index);
                     var path = [];
                     // checks hierarchy
                     if (this.hierarchy) {
@@ -3359,13 +3612,16 @@ var duice;
                     }
                     // creates LI element
                     var li = this.createLi(index, map, Number(0));
+                    if (this.selectable) {
+                        li.classList.add('duice-ui-ul__li--selectable');
+                    }
                     this.ul.appendChild(li);
                 }
                 // creates orphans
                 if (this.hierarchy) {
-                    for (var index = 0, size = list.getSize(); index < size; index++) {
+                    for (var index = 0, size = list.getRowCount(); index < size; index++) {
                         if (this.isLiCreated(index) === false) {
-                            var orphanLi = this.createLi(index, list.get(index), Number(0));
+                            var orphanLi = this.createLi(index, list.getRow(index), Number(0));
                             orphanLi.classList.add('duice-ui-ul__li--orphan');
                             this.ul.appendChild(orphanLi);
                         }
@@ -3403,7 +3659,7 @@ var duice;
                         event.preventDefault();
                         event.stopPropagation();
                         var fromIndex = parseInt(event.dataTransfer.getData('text'));
-                        var fromMap = $this.list.get(fromIndex);
+                        var fromMap = $this.list.getRow(fromIndex);
                         fromMap.set($this.hierarchy.parentIdName, null);
                         $this.ul.classList.remove('duice-ui-ul--root-dragover');
                         $this.setChanged();
@@ -3436,7 +3692,7 @@ var duice;
                     }
                     li.addEventListener('mousedown', function (event) {
                         $this.getList().suspendNotify();
-                        if ($this.getList().setIndex(index)) {
+                        if ($this.getList().selectRow(index)) {
                             event.stopPropagation();
                             for (var i = 0; i < $this.lis.length; i++) {
                                 $this.lis[i].classList.remove('duice-ui-ul__li--index');
@@ -3475,8 +3731,8 @@ var duice;
                     childUl = executeExpression(childUl, $context);
                     var hasChild = false;
                     var hierarchyIdValue = map.get(this.hierarchy.idName);
-                    for (var i = 0, size = this.list.getSize(); i < size; i++) {
-                        var element = this.list.get(i);
+                    for (var i = 0, size = this.list.getRowCount(); i < size; i++) {
+                        var element = this.list.getRow(i);
                         var hierarchyParentIdValue = element.get(this.hierarchy.parentIdName);
                         if (!isEmpty(hierarchyParentIdValue)
                             && hierarchyParentIdValue === hierarchyIdValue) {
@@ -3524,8 +3780,8 @@ var duice;
              */
             UList.prototype.hasChild = function (map) {
                 var hierarchyIdValue = map.get(this.hierarchy.idName);
-                for (var i = 0, size = this.list.getSize(); i < size; i++) {
-                    var element = this.list.get(i);
+                for (var i = 0, size = this.list.getRowCount(); i < size; i++) {
+                    var element = this.list.getRow(i);
                     var hierarchyParentIdValue = element.get(this.hierarchy.parentIdName);
                     if (!isEmpty(hierarchyParentIdValue)
                         && hierarchyParentIdValue === hierarchyIdValue) {
@@ -3587,23 +3843,33 @@ var duice;
                     return;
                 }
                 //defines map
-                var fromMap = this.list.get(fromIndex);
-                var toMap = this.list.get(toIndex);
+                var fromMap = this.list.getRow(fromIndex);
+                var toMap = this.list.getRow(toIndex);
                 // moving action
                 if (this.hierarchy) {
                     // checks circular reference
                     if (this.isCircularReference(toMap, fromMap.get(this.hierarchy.idName))) {
                         throw 'Not allow to movem, becuase of Circular Reference.';
                     }
+                    // calls beforeChangeIndex 
+                    if (this.list.eventListener.onPreMoveRow) {
+                        if (this.list.eventListener.onPreMoveRow.call(this.list, fromIndex, toIndex) === false) {
+                            return;
+                        }
+                    }
                     // change parents
                     fromMap.set(this.hierarchy.parentIdName, toMap.get(this.hierarchy.idName));
+                    // calls 
+                    if (this.list.eventListener.onPostMoveRow) {
+                        this.list.eventListener.onPostMoveRow.call(this.list, fromIndex, toIndex);
+                    }
                     // notifies observers.
                     this.setChanged();
                     this.notifyObservers(this);
                 }
                 else {
                     // changes row position
-                    this.list.move(fromIndex, toIndex);
+                    this.list.moveRow(fromIndex, toIndex);
                 }
             };
             /**
@@ -3612,8 +3878,8 @@ var duice;
              */
             UList.prototype.getParentMap = function (map) {
                 var parentIdValue = map.get(this.hierarchy.parentIdName);
-                for (var i = 0, size = this.list.getSize(); i < size; i++) {
-                    var element = this.list.get(i);
+                for (var i = 0, size = this.list.getRowCount(); i < size; i++) {
+                    var element = this.list.getRow(i);
                     if (element.get(this.hierarchy.idName) === parentIdValue) {
                         return element;
                     }

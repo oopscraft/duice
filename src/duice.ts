@@ -152,7 +152,6 @@ namespace duice {
          * @param obj object to transfer to observer
          */
         notifyObservers(obj:object):void {
-            console.debug('Observable.observers.length',this.observers.length);
             if(this.notifyEnable && this.hasChanged()){
                 this.clearUnavailableObservers();
                 for(var i = 0, size = this.observers.length; i < size; i++){
@@ -255,16 +254,26 @@ namespace duice {
         abstract toJson(...args: any[]):object;
 
         /**
-         * Checks original data is changed.
-         * @return whether original data is changed
+         * Clears data
          */
-        abstract isDirty():boolean;
-        
+        abstract clear():void;
+
+        /**
+         * save point
+         */
+        abstract save():void;
+
         /**
          * Restores data as original data.
          */
         abstract reset():void;
-        
+
+        /**
+         * Checks original data is changed.
+         * @return whether original data is changed
+         */
+        abstract isDirty():boolean;
+
         /**
          * Returns whether instance is active 
          */
@@ -335,6 +344,15 @@ namespace duice {
         isVisible():boolean {
             return this.visible;
         }
+
+    }
+
+    /**
+     * duice.MapEventListener
+     */
+    class MapEventListener {
+        onPreChange:Function;
+        onPostChange:Function;
     }
 
     /**
@@ -342,13 +360,9 @@ namespace duice {
      * @param JSON object
      */
     export class Map extends DataObject {
-
         data:any = new Object();                            // internal data object
         originData:string = JSON.stringify(this.data);      // original string JSON data
-        on:any = {
-             beforeChange:null
-            ,afterChange:null
-        };
+        eventListener:MapEventListener = new MapEventListener();
     
         /**
          * constructor 
@@ -356,9 +370,7 @@ namespace duice {
          */
         constructor(json?:any) {
             super();
-            if(json){
-                this.fromJson(json);
-            }
+            this.fromJson(json || {});
         }
         
         /**
@@ -378,15 +390,14 @@ namespace duice {
          * @param json
          */
         fromJson(json:any): void {
-            
             // sets data
             this.data = new Object();
             for(var name in json){
                 this.data[name] = json[name];
             }
-            
-            // saves original data.
-            this.originData = JSON.stringify(this.toJson());
+
+            // save point
+            this.save();
             
             // notify to observers
             this.setChanged();
@@ -413,6 +424,20 @@ namespace duice {
             this.setChanged();
             this.notifyObservers(this);
         }
+
+        /**
+         * Save point
+         */
+        save():void {
+            this.originData = JSON.stringify(this.toJson());
+        }
+
+        /**
+         * Restores instance as original data
+         */
+        reset():void {
+            this.fromJson(JSON.parse(this.originData));
+        }
         
         /**
          * Checks original data is changed
@@ -427,14 +452,6 @@ namespace duice {
         }
         
         /**
-         * Restores instance as original data
-         */
-        reset():void {
-            var originJson = JSON.parse(this.originData);
-            this.fromJson(originJson);
-        }
-
-        /**
          * Sets property as input value
          * @param name
          * @param value
@@ -442,8 +459,8 @@ namespace duice {
         set(name:string, value:any):boolean {
 
             // calls beforeChange
-            if(this.on.beforeChange){
-                if(this.on.beforeChange.call(this,name,value) === false){
+            if(this.eventListener.onPreChange){
+                if(this.eventListener.onPreChange.call(this,name,value) === false){
                     return false;
                 }
             }
@@ -454,8 +471,8 @@ namespace duice {
             this.notifyObservers(this);
 
             // calls 
-            if(this.on.afterChange){
-                this.on.afterChange.call(this,name,value);
+            if(this.eventListener.onPostChange){
+                this.eventListener.onPostChange.call(this,name,value);
             }
 
             // return true
@@ -483,16 +500,18 @@ namespace duice {
         }
 
         /**
-         * Sets focus
+         * Sets focus with message
          * @param name 
          */
-        setFocus(name:string):void {
-            for(var i = 0, size = this.observers.length; i < size; i ++){
+        setFocus(name:string, message:string):void {
+            for(var i = 0, size = this.observers.length; i < size; i++){
                 var observer = this.observers[i];
                 if(observer instanceof MapUiComponent){
-                    if(observer.getName() === name && observer.element.focus){
-                        observer.element.focus();
-                        break;
+                    var mapUuiComponent = <MapUiComponent>this.observers[i];
+                    if(observer.getName() === name){
+                        if(mapUuiComponent.setFocus(message)){
+                            break;
+                        }
                     }
                 }
             }
@@ -502,18 +521,30 @@ namespace duice {
          * Sets listener before change
          * @param listener 
          */
-        onBeforeChange(listener:Function):void {
-            this.on.beforeChange = listener;
+        onPreChange(listener:Function):void {
+            this.eventListener.onPreChange = listener;
         }
 
         /**
          * Sets listener after change
          * @param listener 
          */
-        onAfterChange(listener:Function):void {
-            this.on.afterChange = listener;
+        onPostChange(listener:Function):void {
+            this.eventListener.onPostChange = listener;
         }
 
+    }
+
+    /**
+     * duice.ListEvent
+     */
+    class ListEventListener {
+        onPreSelectRow:Function;
+        onPostSelectRow:Function;
+        onPreMoveRow:Function;
+        onPostMoveRow:Function;
+        onPreChangeRow:Function;
+        onPostChangeRow:Function;
     }
     
     /**
@@ -524,12 +555,7 @@ namespace duice {
         data:Array<duice.Map> = new Array<duice.Map>();
         originData:string = JSON.stringify(this.data);
         index:number = -1;
-        on:any = {
-             beforeChangeIndex:null
-            ,afterChangeIndex:null
-            ,beforeChange:null
-            ,afterChange:null
-        }
+        eventListener:ListEventListener = new ListEventListener();
 
         /**
          * constructor
@@ -537,30 +563,37 @@ namespace duice {
          */
         constructor(jsonArray?:Array<any>) {
             super();
-            if(jsonArray){
-                this.fromJson(jsonArray);
-            }
+            this.fromJson(jsonArray || []);
         }
+
+        /**
+         * Updates
+         * @param observable
+         * @param obj 
+         */
         update(observable:Observable, obj:object):void {
             console.debug('List.update', observable, obj);
             this.setChanged();
             this.notifyObservers(obj);
         }
+
+        /**
+         * Loads data from JSON array
+         * @param jsonArray 
+         */
         fromJson(jsonArray:Array<any>):void {
             this.clear();
             for(var i = 0; i < jsonArray.length; i ++ ) {
                 var map = new duice.Map(jsonArray[i]);
                 map.disable = this.disable;
                 map.readonly = clone(this.readonly);
-                map.onBeforeChange(this.on.beforeChange);
-                map.onAfterChange(this.on.afterChange);
+                map.onPreChange(this.eventListener.onPreChangeRow);
+                map.onPostChange(this.eventListener.onPostChangeRow);
                 map.addObserver(this);
                 this.data.push(map);
             }
-            this.originData = JSON.stringify(this.toJson());
-            this.index = -1;
-            this.setChanged();
-            this.notifyObservers(this);
+            this.save();
+            this.setIndex(-1);
         }
 
         /**
@@ -582,9 +615,21 @@ namespace duice {
                 this.data[i].removeObserver(this);
             }
             this.data = new Array<duice.Map>();
-            this.index = -1;
-            this.setChanged();
-            this.notifyObservers(this);
+            this.setIndex(-1);
+        }
+
+        /**
+         * Save point
+         */
+        save():void {
+            this.originData = JSON.stringify(this.toJson());
+        }
+
+        /**
+         * Resets data from original data.
+         */
+        reset():void {
+            this.fromJson(JSON.parse(this.originData));
         }
 
         /**
@@ -599,92 +644,135 @@ namespace duice {
         }
 
         /**
-         * Resets data from original data.
+         * Sets only row index
+         * @param index 
          */
-        reset():void {
-            var originJson = JSON.parse(this.originData);
-            this.fromJson(originJson);
+        setIndex(index:number):void {
+            this.index = index;
+            this.setChanged();
+            this.notifyObservers(this);
         }
+
+        /**
+         * Returns row index.
+         */
+        getIndex():number {
+            return this.index;
+        }
+
+        /**
+         * Returns row count
+         */
+        getRowCount():number {
+            return this.data.length;
+        }
+
+        /**
+         * Return row specified index
+         * @param index 
+         */
+        getRow(index:number):Map {
+            return this.data[index];
+        }
+
 
         /**
          * Sets index.
          * @param index 
          */
-        setIndex(index:number):boolean {
+        selectRow(index:number):boolean {
 
             // calls beforeChangeIndex 
-            if(this.on.beforeChangeIndex){
-                if(this.on.beforeChangeIndex.call(this,index) === false){
+            if(this.eventListener.onPreSelectRow){
+                if(this.eventListener.onPreSelectRow.call(this,index) === false){
                     return false;
                 }
             }
 
             // changes index
-            this.index = index;
-            this.setChanged();
-            this.notifyObservers(this);
+            this.setIndex(index);
 
             // calls 
-            if(this.on.afterChangeIndex){
-                this.on.afterChangeIndex.call(this,index);
+            if(this.eventListener.onPostSelectRow){
+                this.eventListener.onPostSelectRow.call(this,index);
             }
 
             // returns true
             return true;
         }
-        getIndex():number {
-            return this.index;
+
+        /**
+         * moveRow
+         * @param fromIndex 
+         * @param toIndex 
+         */
+        moveRow(fromIndex:number, toIndex:number):void {
+            
+            // calls beforeChangeIndex 
+            if(this.eventListener.onPreMoveRow){
+                if(this.eventListener.onPreMoveRow.call(this, fromIndex, toIndex) === false){
+                    return;
+                }
+            }
+
+            // moves row
+            this.index = fromIndex;
+            this.data.splice(toIndex, 0, this.data.splice(fromIndex, 1)[0]);
+            this.setIndex(toIndex);
+
+            // calls 
+            if(this.eventListener.onPostMoveRow){
+                this.eventListener.onPostMoveRow.call(this, fromIndex, toIndex);
+            }
         }
-        clearIndex():void {
-            this.index = -1;
-            this.setChanged();
-            this.notifyObservers(this);
-        }
-        getSize():number {
-            return this.data.length;
-        }
-        get(index:number):Map {
-            return this.data[index];
-        }
-        add(map:Map):void {
+
+        /**
+         * Adds row
+         * @param map 
+         */
+        addRow(map:Map):void {
             map.disable = this.disable;
             map.readonly = clone(this.readonly);
-            map.onBeforeChange(this.on.beforeChange);
-            map.onAfterChange(this.on.afterChange);
+            map.onPreChange(this.eventListener.onPreChangeRow);
+            map.onPostChange(this.eventListener.onPostChangeRow);
             map.addObserver(this);
             this.data.push(map);
-            this.index = this.getSize()-1;
-            this.setChanged();
-            this.notifyObservers(this);
+            this.setIndex(this.getRowCount() - 1);
         }
-        insert(index:number, map:Map):void {
+
+        /**
+         * Inserts row
+         * @param index 
+         * @param map 
+         */
+        insertRow(index:number, map:Map):void {
             if(0 <= index && index < this.data.length) {
                 map.disable = this.disable;
                 map.readonly = clone(this.readonly);
-                map.onBeforeChange(this.on.beforeChange);
-                map.onAfterChange(this.on.afterChange);
+                map.onPreChange(this.eventListener.onPreChangeRow);
+                map.onPostChange(this.eventListener.onPostChangeRow);
                 map.addObserver(this);
                 this.data.splice(index, 0, map);
-                this.index = index;
-                this.setChanged();
-                this.notifyObservers(this);
+                this.setIndex(index);
             }
         }
-        remove(index:number):void {
+
+        /**
+         * Removes row by specified index
+         * @param index 
+         */
+        removeRow(index:number):void {
             if(0 <= index && index < this.data.length) {
                 this.data.splice(index, 1);
-                this.index = Math.min(this.index, this.data.length -1);
-                this.setChanged();
-                this.notifyObservers(this);
+                var index = Math.min(this.index, this.data.length -1);
+                this.setIndex(index);
             }
         }
-        move(fromIndex:number, toIndex:number):void {
-            this.index = fromIndex;
-            this.data.splice(toIndex, 0, this.data.splice(fromIndex, 1)[0]);
-            this.index = toIndex;
-            this.setChanged();
-            this.notifyObservers(this);
-        }
+
+        /**
+         * indexOf
+         * @param handler 
+         */
 		indexOf(handler:Function){
 			for(var i = 0, size = this.data.length; i < size; i ++){
 				if(handler.call(this, this.data[i]) === true){
@@ -692,14 +780,24 @@ namespace duice {
 				}
 			}
 			return -1;
-		}
+        }
+        
+        /**
+         * contains
+         * @param handler 
+         */
 		contains(handler:Function){
 			if(this.indexOf(handler) > -1){
 				return true;
 			}else{
 				return false;
 			}
-		}
+        }
+        
+        /**
+         * forEach
+         * @param handler 
+         */
         forEach(handler:Function){
             for(var i = 0, size = this.data.length; i < size; i ++){
                 if(handler.call(this, this.data[i], i) === false){
@@ -707,39 +805,78 @@ namespace duice {
                 }
             }
         }
-        sort(name:string, ascending:boolean):void {
-            this.data.sort(function(a:duice.Map,b:duice.Map):number {
-                var aValue = a.get(name);
-                var bValue = b.get(name);
-                return (aValue > bValue ? 1 : aValue < bValue ? -1 : 0) * (ascending == false ? -1 : 1);
-            });
-            this.setChanged();
-            this.notifyObservers(this);
-        }
+
+        /**
+         * Sets diabled
+         * @param disable 
+         */
         setDisable(disable:boolean):void{
             this.data.forEach(function(map){
                 map.setDisable(disable);
             });
             super.setDisable(disable);
         }
+
+        /**
+         * Sets readonly flag
+         * @param name 
+         * @param readonly 
+         */
         setReadonly(name:string,readonly:boolean):void {
             this.data.forEach(function(map){
                 map.setReadonly(name,readonly);
             });
             super.setReadonly(name,readonly);
         }
-        onBeforeChangeIndex(listener:Function):void {
-            this.on.beforeChangeIndex = listener;
+
+        /**
+         * onPreSelectRow
+         * @param listener
+         */
+        onPreSelectRow(listener:Function):void {
+            this.eventListener.onPreSelectRow = listener;
         }
-        onAfterChangeIndex(listener:Function):void {
-            this.on.afterChangeIndex = listener;
+
+        /**
+         * onPostSelectRow
+         * @param listener onPostSelectRow event listener
+         */
+        onPostSelectRow(listener:Function):void {
+            this.eventListener.onPostSelectRow = listener;
         }
-        onBeforeChange(listener:Function):void {
-            this.on.beforeChange = listener;
+
+        /**
+         * onPreMoveRow
+         * @param listener onPreMoveRow event listener
+         */
+        onPreMoveRow(listener:Function):void {
+            this.eventListener.onPreMoveRow = listener;
         }
-        onAfterChange(listener:Function):void {
-            this.on.afterChange = listener;
+
+        /**
+         * onPostMoveRow
+         * @param listener 
+         */
+        onPostMoveRow(listener:Function):void {
+            this.eventListener.onPostMoveRow = listener;
         }
+
+        /**
+         * onPreChangeRow
+         * @param listener 
+         */
+        onPreChangeRow(listener:Function):void {
+            this.eventListener.onPreChangeRow = listener;
+        }
+
+        /**
+         * onPostChangeRow
+         * @param listener 
+         */
+        onPostChangeRow(listener:Function):void {
+            this.eventListener.onPostChangeRow = listener;
+        }
+
     }
     
     /**
@@ -781,12 +918,31 @@ namespace duice {
         setVisible(visible:boolean){
             this.element.style.display = (visible ? '' : 'none');
         }
+
+        /**
+         * Sets element focus
+         * @param message 
+         */
+        setFocus(message:string){
+            if(this.element.focus){
+                if(!isEmpty(message)){
+                    var tooltip = new Tooltip(this.element, message);
+                    tooltip.create();
+                    this.element.addEventListener('blur', function(event){
+                        tooltip.destroy();
+                    }, { once: true });
+                }
+                this.element.focus();
+                return true;
+            }
+        }
+
     }
     
     /**
      * duice.MapUiComponent
      */
-    export abstract class MapUiComponent extends UiComponent {
+    abstract class MapUiComponent extends UiComponent {
         map:duice.Map;
         name:string;
         bind(map:duice.Map, name:string, ...args:any[]):void {
@@ -809,7 +965,7 @@ namespace duice {
     /**
      * duice.ListUiComponent
      */
-    export abstract class ListUiComponent extends UiComponent {
+    abstract class ListUiComponent extends UiComponent {
         list:duice.List;
         item:string;
         bind(list:duice.List, item:string):void {
@@ -861,9 +1017,9 @@ namespace duice {
         abstract getInstance(element:HTMLElement):UiComponent;
     }
     
-    export abstract class MapUiComponentFactory extends UiComponentFactory { }
+    abstract class MapUiComponentFactory extends UiComponentFactory { }
     
-    export abstract class ListUiComponentFactory extends UiComponentFactory { }
+    abstract class ListUiComponentFactory extends UiComponentFactory { }
     
     /**
      * Generates random UUID value
@@ -927,10 +1083,11 @@ namespace duice {
      * @param value
      * @return whether value is empty
      */
-    function isEmpty(value:any){
+    export function isEmpty(value:any){
         if(value === undefined
         || value === null
         || value === ''
+        || trim(value) === ''
         ){
             return true;
         }else{
@@ -943,12 +1100,8 @@ namespace duice {
      * @param value
      * @return whether value is not empty
      */
-    function isNotEmpty(value:any) {
-        if(isEmpty(value)){
-            return false;
-        }else{
-            return true;
-        }
+    export function isNotEmpty(value:any) {
+        return !isEmpty(value);
     }
     
     /**
@@ -956,12 +1109,76 @@ namespace duice {
      * @param value to check
      * @param default value if value is empty
      */
-    function defaultIfEmpty(value:any, defaultValue:any) {
+    export function defaultIfEmpty(value:any, defaultValue:any) {
         if(isEmpty(value) === true) {
             return defaultValue;
         }else{
             return value;
         }
+    }
+
+    /**
+     * Checks value is number
+     * @param value
+     */
+    export function isNumeric(value:any):boolean {
+        return !Array.isArray( value ) && (value - parseFloat(value) + 1) >= 0;
+    }
+
+    /**
+     * Checks generic ID (alphabet + number + -,_)
+     * @param value 
+     */
+    export function isIdFormat(value:any):boolean {
+        if(value){
+            var pattern = /^[a-zA-Z0-9\-\_]{1,}$/;
+            return pattern.test(value);
+        }
+        return false;
+    }
+
+    /**
+     * Checks generic password (At least 1 alphabet, 1 number, 1 special char)
+     * @param value 
+     */
+    export function isPasswordFormat(value:any):boolean {
+        if(value){
+            var pattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$/;
+            return pattern.test(value);
+        }
+        return false;
+    }
+
+    /**
+     * Checks valid email address pattern
+     * @param value 
+     */
+    export function isEmailFormat(value:any):boolean {
+        if(value){
+            var pattern = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+            return pattern.test(value);
+        }
+        return false;
+    }
+
+    /**
+     * Checks if value is URL address format
+     * @param value 
+     */
+    export function isUrlFormat(value:any):boolean {
+        if(value){
+            var pattern = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+            return pattern.test(value);
+        }
+        return false;
+    }
+
+    /**
+     * trim string
+     * @param value 
+     */
+    export function trim(value:string):string {
+        return (value + "").trim();
     }
     
     /**
@@ -971,7 +1188,7 @@ namespace duice {
      * @param pading character
      * @return left-padded value
      */
-    function lpad(value:string, length:number, padChar:string) {
+    export function lpad(value:string, length:number, padChar:string) {
         for(var i = 0, size = (length-value.length); i < size; i ++ ) {
             value = padChar + value;
         }
@@ -985,11 +1202,41 @@ namespace duice {
      * @param pading character
      * @return right-padded string
      */
-    function rpad(value:string, length:number, padChar:string) {
+    export function rpad(value:string, length:number, padChar:string) {
         for(var i = 0, size = (length-value.length); i < size; i ++ ) {
             value = value + padChar;
         }
         return value;
+    }
+
+    /**
+     * Gets cookie value
+     * @param name 
+     */
+    export function getCookie(name:string):string {
+        var value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+        return value? value[2] : null;
+    };
+
+    /**
+     * Sets cookie value
+     * @param name
+     * @param value 
+     * @param day 
+     */
+    export function setCookie(name:string, value:string, day:number):void {
+        var date = new Date();
+        date.setTime(date.getTime() + day * 60 * 60 * 24 * 1000);
+        document.cookie = name + '=' + value + ';expires=' + date.toUTCString() + ';path=/';
+    };
+
+    /**
+     * Deletes cookie
+     * @param name 
+     */
+    export function deleteCookie(name:string):void {
+        var date = new Date();
+        document.cookie = name + "= " + "; expires=" + date.toUTCString() + "; path=/";
     }
     
     /**
@@ -1000,7 +1247,7 @@ namespace duice {
      */
     function executeExpression(element:HTMLElement, $context:any):any {
         var string = element.outerHTML;
-        string = string.replace(/\{\{([\s\S]*?)\}\}/mgi,function(match, command){
+        string = string.replace(/\[@duice\[([\s\S]*?)\]\]/mgi,function(match, command){
             try {
                 command = command.replace('&amp;', '&');
                 command = command.replace('&lt;', '<');
@@ -1028,7 +1275,7 @@ namespace duice {
      * @param value
      * @return escaped string value
      */
-    function escapeHTML(value:string):string {
+    export function escapeHTML(value:string):string {
         
         // checks value is valid.
         if(!value || typeof value !== 'string'){
@@ -1127,7 +1374,7 @@ namespace duice {
      * Delays specified milliseconds and calls specified function
      * @param callback
      */
-    export function delayCall(millis:number, callback:Function, $this:any, ...args:any[]){
+    function delayCall(millis:number, callback:Function, $this:any, ...args:any[]){
 			var interval = setInterval(function() {
             try {
                 callback.call($this, ...args);
@@ -1158,7 +1405,7 @@ namespace duice {
     /**
      * duice.Format interface
      */
-    interface Format {
+    export interface Format {
         
         /**
          * Encodes original value as formatted value
@@ -1485,6 +1732,40 @@ namespace duice {
     }
 
     /**
+     * duice.Tooltip
+     */
+    export class Tooltip {
+        element:HTMLElement;
+        div:HTMLDivElement;
+        message:string;
+        constructor(element:HTMLElement, message:string){
+            this.element = element;
+            this.message = message;
+        }
+
+        /**
+         * Creates tooltip
+         */
+        create():void {
+            this.div = document.createElement('div');
+            this.div.classList.add('duice-tooltip');
+            this.div.appendChild(document.createTextNode(this.message));
+            this.element.parentNode.insertBefore(this.div, this.element.nextSibling);
+
+            // adjusting position
+            this.div.style.position = 'absolute';
+            this.div.style.zIndex = String(getCurrentMaxZIndex() + 1);
+        }
+
+        /**
+         * Destroy tooltip
+         */
+        destroy():void {
+            this.element.parentNode.removeChild(this.div);
+        }
+    }
+
+    /**
      * duice.ui.Progress
      */
 	export class Progress {
@@ -1505,7 +1786,21 @@ namespace duice {
 			this.blocker.getBlockDiv().removeChild(this.div);
 			this.blocker.unblock();
 		}
-	}
+    }
+
+    /**
+     * duice.ModalEventListener
+     */
+    class ModalEventListener {
+        opening:Function;
+        opened:Function;
+        closing:Function;
+        closed:Function;
+        confirming:Function;
+        confirmed:Function;
+        canceling:Function;
+        canceled:Function;
+    }
 	
    /**
      * duice.ui.Modal
@@ -1515,7 +1810,7 @@ namespace duice {
         headerDiv:HTMLDivElement;
         bodyDiv:HTMLDivElement;
         blocker:Blocker;
-        on:any = {};
+        eventListener:ModalEventListener = new ModalEventListener();
         constructor(){
             var $this = this;
             this.container = document.createElement('div');
@@ -1596,63 +1891,63 @@ namespace duice {
             this.blocker.unblock();
         }
         open(...args:any[]):boolean {
-            if(this.on.beforeOpen){
-                if(this.on.beforeOpen.call(this, ...args) === false){
+            if(this.eventListener.opening){
+                if(this.eventListener.opening.call(this, ...args) === false){
                     return false;
                 }
             }
             this.show();
-            if(this.on.afterOpen){
-                delayCall(200, this.on.afterOpen, this, ...args);
+            if(this.eventListener.opened){
+                delayCall(200, this.eventListener.opened, this, ...args);
             }
             return true;
-        }
-        onBeforeOpen(listener:Function):any {
-            this.on.beforeOpen = listener;
-            return this;
-        }
-        onAfterOpen(listener:Function):any {
-            this.on.afterOpen = listener;
-            return this;
         }
         close(...args:any[]):boolean {
-            if(this.on.beforeClose){
-                if(this.on.beforeClose.call(this, ...args) === false){
+            if(this.eventListener.closing){
+                if(this.eventListener.closing.call(this, ...args) === false){
                     return false;
                 }
             }
             this.hide();
-            if(this.on.afterClose){
-                delayCall(200, this.on.afterClose, this, ...args);
+            if(this.eventListener.closed){
+                delayCall(200, this.eventListener.closed, this, ...args);
             }
             return true;
-        }
-        onBeforeClose(listener:Function):any{
-            this.on.beforeClose = listener;
-            return this;
-        }
-        onAfterClose(listener:Function):any {
-            this.on.afterClose = listener;
-            return this;
         }
         confirm(...args: any[]):boolean {
-            if(this.on.beforeConfirm){
-                if(this.on.beforeConfirm.call(this, ...args) === false){
+            if(this.eventListener.confirming){
+                if(this.eventListener.confirming.call(this, ...args) === false){
                     return false;
                 }
             }
             this.hide();
-            if(this.on.afterConfirm){
-                delayCall(200, this.on.afterConfirm, this, ...args);
+            if(this.eventListener.confirmed){
+                delayCall(200, this.eventListener.confirmed, this, ...args);
             }
             return true;
         }
-        onBeforeConfirm(listener:Function):any {
-            this.on.beforeConfirm = listener;
+        onOpening(listener:Function):any {
+            this.eventListener.opening = listener;
             return this;
         }
-        onAfterConfirm(listener:Function):any {
-            this.on.afterConfirm = listener;
+        onOpened(listener:Function):any {
+            this.eventListener.opened = listener;
+            return this;
+        }
+        onClosing(listener:Function):any{
+            this.eventListener.closing = listener;
+            return this;
+        }
+        onClosed(listener:Function):any {
+            this.eventListener.closed = listener;
+            return this;
+        }
+        onConfirming(listener:Function):any {
+            this.eventListener.confirming = listener;
+            return this;
+        }
+        onConfirmed(listener:Function):any {
+            this.eventListener.confirmed = listener;
             return this;
         }
     }
@@ -1905,6 +2200,8 @@ namespace duice {
             constructor(element:HTMLElement){
                 super(element);
                 this.expression = element.innerHTML;
+                this.expression = this.expression.replace(/<!--\[CDATA\[/gim,"");
+                this.expression = this.expression.replace(/\]\]-->/gim,"");
                 this.element.classList.add('duice-ui-scriptlet');
             }
             bind(context:any):void {
@@ -1920,8 +2217,13 @@ namespace duice {
                 }
             }
             update(dataObject:duice.DataObject, obj:object) {
-                const func = Function('$context', '"use strict";' + this.expression + '');
-                var result = func(this.context);
+                try {
+                    const func = Function('$context', '"use strict";' + this.expression + '');
+                    var result = func(this.context);
+                }catch(e){
+                    console.error(this.expression);
+                    throw e;
+                }
                 this.element.innerHTML = '';
                 this.element.appendChild(document.createTextNode(result));
                 this.element.style.display = 'inline-block';
@@ -2054,14 +2356,14 @@ namespace duice {
                 this.input.addEventListener('keypress', function(event:any){
                     var inputChars = String.fromCharCode(event.keyCode);
                     var newValue = this.value.substr(0,this.selectionStart) + inputChars + this.value.substr(this.selectionEnd);
-                    if($this.validate(newValue) === false){
+                    if($this.checkFormat(newValue) === false){
                         event.preventDefault();
                     }
                 }, true);
                 this.input.addEventListener('paste', function(event:any){
                     var inputChars = event.clipboardData.getData('text/plain');
                     var newValue = this.value.substr(0,this.selectionStart) + inputChars + this.value.substr(this.selectionEnd);
-                    if($this.validate(newValue) === false){
+                    if($this.checkFormat(newValue) === false){
                         event.preventDefault();
                     }
                 }, true);
@@ -2069,10 +2371,13 @@ namespace duice {
                     $this.setChanged();
                     $this.notifyObservers(this);
                 },true);
+
+                // turn off autocomplete
+                $this.input.setAttribute('autocomplete','off');
             }
             abstract update(map:duice.Map, obj:object):void;
             abstract getValue():any;
-            validate(value:string):boolean {
+            checkFormat(value:string):boolean {
                 return true;
             }
             setDisable(disable:boolean):void {
@@ -2146,7 +2451,7 @@ namespace duice {
                 value = this.format.decode(value);
                 return value;
             }
-            validate(value:string):boolean {
+            checkFormat(value:string):boolean {
                 try {
                     this.format.decode(value);
                 }catch(e){
@@ -2182,7 +2487,7 @@ namespace duice {
                 value = this.format.decode(value);
                 return value;
             }
-            validate(value:string):boolean {
+            checkFormat(value:string):boolean {
                 try {
                     this.format.decode(value);
                 }catch(e){
@@ -2308,7 +2613,7 @@ namespace duice {
                 }
                 return value;
             }
-            validate(value:string):boolean {
+            checkFormat(value:string):boolean {
                 try {
                     var s = this.format.decode(value);
                 }catch(e){
@@ -2550,7 +2855,6 @@ namespace duice {
                 this.pickerDiv.style.position = 'absolute';
                 this.pickerDiv.style.zIndex = String(getCurrentMaxZIndex() + 1);
                 this.pickerDiv.style.left = getElementPosition(this.input).left + 'px';
-                this.pickerDiv.style.margin = '0px';
                 
                 // updates date
                 function updateDate(date:Date):void {
@@ -2693,8 +2997,8 @@ namespace duice {
                     }
                     
                     // update data options
-                    for(var i = 0, size = optionList.getSize(); i < size; i ++){
-                        var optionMap = optionList.get(i);
+                    for(var i = 0, size = optionList.getRowCount(); i < size; i ++){
+                        var optionMap = optionList.getRow(i);
                         var option = document.createElement('option');
                         option.value = optionMap.get($this.optionValue);
                         option.appendChild(document.createTextNode(optionMap.get($this.optionText)));
@@ -3243,17 +3547,18 @@ namespace duice {
                 this.tbodies.length = 0;
                 
                 // creates new rows
-                for(var index = 0; index < list.getSize(); index ++ ) {
-                    var map = list.get(index);
+                for(var index = 0; index < list.getRowCount(); index ++ ) {
+                    var map = list.getRow(index);
                     var tbody = this.createTbody(index,map);
                     tbody.dataset.duiceIndex = String(index);
                     
                     // select index
                     if(this.selectable){
+                        tbody.classList.add('duice-ui-table__tbody--selectable');
                         if(index === list.getIndex()){
                             tbody.classList.add('duice-ui-table__tbody--index');
                         }
-                        tbody.addEventListener('click', function(event){
+                        tbody.addEventListener('mousedown', function(event){
                             var index = Number(this.dataset.duiceIndex);
                             $this.selectTbody(index);
                         }, true);
@@ -3274,7 +3579,7 @@ namespace duice {
                             event.stopPropagation();
                             var fromIndex = parseInt(event.dataTransfer.getData('text'));
                             var toIndex = parseInt(this.dataset.duiceIndex);
-                            list.move(fromIndex, toIndex);
+                            list.moveRow(fromIndex, toIndex);
                         });
                     }
                     
@@ -3284,7 +3589,7 @@ namespace duice {
                 }
 
                 // not found row
-                if(list.getSize() < 1) {
+                if(list.getRowCount() < 1) {
                     var emptyTbody = this.createEmptyTbody();
                     emptyTbody.style.pointerEvents = 'none';
                     this.table.appendChild(emptyTbody);
@@ -3298,7 +3603,7 @@ namespace duice {
              */
             selectTbody(index:number):void {
                 this.getList().suspendNotify();
-                if(this.getList().setIndex(index)){
+                if(this.getList().selectRow(index)){
                     // handles class                
                     for(var i = 0; i < this.tbodies.length; i ++ ) {
                         if(i === index){
@@ -3463,8 +3768,8 @@ namespace duice {
                 }
 
                 // creates new rows
-                for(var index = 0; index < list.getSize(); index ++ ) {
-                    var map = list.get(index);
+                for(var index = 0; index < list.getRowCount(); index ++ ) {
+                    var map = list.getRow(index);
                     var path:Array<number> = [];
                     
                     // checks hierarchy
@@ -3476,14 +3781,17 @@ namespace duice {
                     
                     // creates LI element
                     var li = this.createLi(index, map, Number(0));
+                    if(this.selectable){
+                        li.classList.add('duice-ui-ul__li--selectable');
+                    }
                     this.ul.appendChild(li);
                 }
                 
                 // creates orphans
                 if(this.hierarchy){
-                    for(var index = 0, size = list.getSize(); index < size; index ++ ) {
+                    for(var index = 0, size = list.getRowCount(); index < size; index ++ ) {
                         if(this.isLiCreated(index) === false){
-                            var orphanLi = this.createLi(index, list.get(index), Number(0));
+                            var orphanLi = this.createLi(index, list.getRow(index), Number(0));
                             orphanLi.classList.add('duice-ui-ul__li--orphan');
                             this.ul.appendChild(orphanLi);
                         }
@@ -3522,7 +3830,7 @@ namespace duice {
                         event.preventDefault();
                         event.stopPropagation();
                         var fromIndex = parseInt(event.dataTransfer.getData('text'));
-                        var fromMap = $this.list.get(fromIndex);
+                        var fromMap = $this.list.getRow(fromIndex);
                         fromMap.set($this.hierarchy.parentIdName, null);
                         $this.ul.classList.remove('duice-ui-ul--root-dragover');
                         $this.setChanged();
@@ -3557,7 +3865,7 @@ namespace duice {
                     }
                     li.addEventListener('mousedown', function(event){
                         $this.getList().suspendNotify();
-                        if($this.getList().setIndex(index)){
+                        if($this.getList().selectRow(index)){
                             event.stopPropagation();
                             for(var i = 0; i < $this.lis.length; i ++ ) {
                                 $this.lis[i].classList.remove('duice-ui-ul__li--index');
@@ -3598,8 +3906,8 @@ namespace duice {
                     childUl = executeExpression(childUl,$context);
                     var hasChild:boolean = false;
                     var hierarchyIdValue = map.get(this.hierarchy.idName);
-                    for(var i = 0, size = this.list.getSize(); i < size; i ++ ){
-                        var element = this.list.get(i);
+                    for(var i = 0, size = this.list.getRowCount(); i < size; i ++ ){
+                        var element = this.list.getRow(i);
                         var hierarchyParentIdValue = element.get(this.hierarchy.parentIdName);
                         if(!isEmpty(hierarchyParentIdValue)
                         && hierarchyParentIdValue === hierarchyIdValue){
@@ -3647,8 +3955,8 @@ namespace duice {
              */
             hasChild(map:duice.Map):boolean {
                 var hierarchyIdValue = map.get(this.hierarchy.idName);
-                for(var i = 0, size = this.list.getSize(); i < size; i ++ ){
-                    var element = this.list.get(i);
+                for(var i = 0, size = this.list.getRowCount(); i < size; i ++ ){
+                    var element = this.list.getRow(i);
                     var hierarchyParentIdValue = element.get(this.hierarchy.parentIdName);
                     if(!isEmpty(hierarchyParentIdValue) 
                     && hierarchyParentIdValue === hierarchyIdValue){
@@ -3714,8 +4022,8 @@ namespace duice {
                 }
                 
                 //defines map
-                var fromMap = this.list.get(fromIndex);
-                var toMap = this.list.get(toIndex);
+                var fromMap = this.list.getRow(fromIndex);
+                var toMap = this.list.getRow(toIndex);
                 
                 // moving action
                 if(this.hierarchy){
@@ -3724,16 +4032,28 @@ namespace duice {
                     if(this.isCircularReference(toMap, fromMap.get(this.hierarchy.idName))){
                         throw 'Not allow to movem, becuase of Circular Reference.';
                     }
+
+                    // calls beforeChangeIndex 
+                    if(this.list.eventListener.onPreMoveRow){
+                        if(this.list.eventListener.onPreMoveRow.call(this.list, fromIndex, toIndex) === false){
+                            return;
+                        }
+                    }
                     
                     // change parents
                     fromMap.set(this.hierarchy.parentIdName, toMap.get(this.hierarchy.idName));
+                    
+                    // calls 
+                    if(this.list.eventListener.onPostMoveRow){
+                        this.list.eventListener.onPostMoveRow.call(this.list, fromIndex, toIndex);
+                    }
                     
                     // notifies observers.
                     this.setChanged();
                     this.notifyObservers(this);
                 }else{
                     // changes row position
-                    this.list.move(fromIndex, toIndex);
+                    this.list.moveRow(fromIndex, toIndex);
                 }
             }
             
@@ -3743,8 +4063,8 @@ namespace duice {
              */
             getParentMap(map:duice.Map):duice.Map {
                 var parentIdValue = map.get(this.hierarchy.parentIdName);
-                for(var i = 0, size = this.list.getSize(); i < size; i ++){
-                    var element = this.list.get(i);
+                for(var i = 0, size = this.list.getRowCount(); i < size; i ++){
+                    var element = this.list.getRow(i);
                     if(element.get(this.hierarchy.idName) === parentIdValue){
                         return element;
                     }
