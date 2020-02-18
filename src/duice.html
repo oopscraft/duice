@@ -9,10 +9,11 @@
 <script src="polyfill/classList.js"></script>
 <script src="duice.js"></script>
 <link rel="stylesheet" type="text/css" href="duice.css">
-<!-- suneditor -->
+<!-- suneditor 
 <script src="plugin/duice-plugin-suneditor.js"></script>
 <script src="plugin/suneditor/suneditor.min.js"></script>
 <link rel="stylesheet" type="text/css" href="plugin/suneditor/css/suneditor.min.css">
+-->
 <script>
 /**
  * integrateWith
@@ -66,6 +67,28 @@ user.fromJson({
 	page: 1,
 	rows: 10,
 	totalCount: 89
+});
+
+user.onPreChange(function(name, value){
+	console.log('Map.onPreChange', name, value);
+
+	// case sync
+	// if(confirm('ok?') === false){
+	// 	return false;
+	// }
+
+	// case async (return Promise)
+	return new Promise(function(resolve, reject){
+		new duice.Confirm('Do you want to change ['+name+'] is ['+ value +']')
+		.onPostConfirm(function(e){
+			resolve(true);
+		})
+		.onPostClose(function(e){
+			reject(false);
+		})
+		.open();
+	});
+
 });
 
 /**
@@ -314,27 +337,61 @@ users.fromJson([
         color: '#ff0000'
     }
 ]);
+
+/**
+ * Tests users event listener
+ */
+// before select row event
 users.onPreSelectRow(function(index){
 	console.log('onPreSelectRow', index, this.getRow(index).get('id'));
 });
+// after select row event
 users.onPostSelectRow(function(index){
 	console.log('onPostSelectRow', index, this.getRow(index).get('id'));
 });
+// before move row event
 users.onPreMoveRow(function(fromIndex, toIndex){
-	if(confirm('onPreMoveRow ' + this.getRow(fromIndex).get('id') + '->' + this.getRow(toIndex).get('id')) === false){
-		return false;
-	}
+	console.log('onPreMoveRow ' + this.getRow(fromIndex).get('id') + '->' + (toIndex < 0 ? toIndex : this.getRow(toIndex).get('id')));
+	return new Promise(function(resolve, reject){
+		new duice.Confirm('do you want to move?')
+		.onPostConfirm(function(){
+			resolve(true);
+		})
+		.onPostClose(function(){
+			reject(false);
+		})
+		.open();
+	});
 });
+// after move row event
 users.onPostMoveRow(function(fromIndex, toIndex){
-	alert('onRowMoved ' + this.getRow(fromIndex).get('id') + '->' + this.getRow(toIndex).get('id'));
+	console.log('onRowMoved ' + this.getRow(fromIndex).get('id') + '->' + (toIndex < 0 ? toIndex : this.getRow(toIndex).get('id')));
 });
+// before change row event
 users.onPreChangeRow(function(name, value){
-	if(confirm('onPreChangeRow ' + name + ' is ' + value) === false){
-		return false;
-	}
+	console.log('name', name, 'value', value);
+
+	// in case sync
+	// if(confirm('ok?') === false){
+	// 	return false;
+	// }
+
+	// case async (return Promise)
+	return new Promise(function(resolve, reject){
+		new duice.Confirm('Do you want to change ['+name+'] is ['+ value +']')
+		.onPostConfirm(function(e){
+			resolve(true);
+		})
+		.onPostClose(function(e){
+			reject(false);
+		})
+		.open();
+	});
+
 });
+// after change row event
 users.onPostChangeRow(function(name, value){
-	alert('onPostChangeRow ' + name + ' is ' + value);
+	console.log('onPostChangeRow ' + name + ' is ' + value);
 });
 
 /**
@@ -433,37 +490,6 @@ body {
 .textarea:focus {
 	outline: none;
 }
-/*
-.table {
-	border-collapse: collapse;
-	border: solid 1px #ccc;
-}
-.table > tr ,
-.table > thead > tr ,
-.table > tbody > tr {
-	line-height: 2.4;
-}
-.table > tr > th ,
-.table > thead > tr > th ,
-.table > tbody > tr > th {
-	line-height: inherit;
-	font-weight: bold;
-	margin: 0rem;
-	padding: 0.2rem 0.5rem;
-	border: solid 1px #ddd;
-	background: #f7f7f7;
-	text-align: center;
-	text-overflow: ellipsis;
-}
-.table > tr > td ,
-.table > tbody > tr > td {
-	height: inherit;
-	line-height: inherit;
-	border: dotted 1px #ccc;
-	padding: 1px;
-	text-overflow: ellipsis;
-}
-*/
 </style>
 </head>
 <body>
@@ -1285,83 +1311,77 @@ body {
 				</button>
 				<button onclick="
 					new duice.Alert('alert message...')
-					.onOpening(function(){
-						return confirm('onOpening');
+					.onPreClose(function(){
+						return confirm('onPreClose');
 					})
-					.onOpened(function(){
-						alert('onOpened');
-					})
-					.onClosing(function(){
-						return confirm('onClosing');
-					})
-					.onClosed(function(){
-						alert('onClosed');
+					.onPostClose(function(){
+						alert('onPostClose');
 					})
 					.open();
 				">duice.dialog.Alert</button>
 				<button onclick="
 					new duice.Confirm('confirm message...')
-					.onOpening(function(){
-						return confirm('onOpening');
+					.onPreOpen(function(){
+						return confirm('onPreOpen');
 					})
-					.onOpened(function(){
-						alert('onOpened');
+					.onPostOpen(function(){
+						alert('onPostOpen');
 					})
-					.onClosing(function(){
-						return confirm('onClosing');
+					.onPreClose(function(){
+						return confirm('onPreClose');
 					})
-					.onClosed(function(){
-						alert('onClosed');
+					.onPostClose(function(){
+						alert('onPostClose');
 					})
-					.onConfirming(function(){
-						return confirm('onConfirming');
+					.onPreConfirm(function(){
+						return confirm('onPreConfirm');
 					})
-					.onConfirmed(function(){
-						alert('onConfirmed');
+					.onPostConfirm(function(){
+						alert('onPostConfirm');
 					})
 					.open();
 				">duice.ui.Confirm</button>
 				<button onclick="
 					new duice.Prompt('enter value...')
-					.onOpening(function(){
-						return confirm('onOpening');
+					.onPreOpen(function(){
+						return confirm('onPreOpen');
 					})
-					.onOpened(function(){
-						alert('onOpened');
+					.onPostOpen(function(){
+						alert('onPostOpen');
 					})
-					.onClosing(function(){
-						return confirm('onClosing');
+					.onPreClose(function(){
+						return confirm('onPreClose');
 					})
-					.onClosed(function(){
-						alert('onClosed');
+					.onPostClose(function(){
+						alert('onPostClose');
 					})
-					.onConfirming(function(){
-						return confirm('onConfirming');
+					.onPreConfirm(function(){
+						return confirm('onPreConfirm:' + this.getValue());
 					})
-					.onConfirmed(function(){
-						alert('onConfirmed:' + this.getValue());
+					.onPostConfirm(function(){
+						alert('onPostConfirm:' + this.getValue());
 					})
 					.open();
 				">duice.dialog.Prompt</button>
 				<button onclick="
 					var dialog = new duice.Dialog(document.getElementById('dialog'))
-					.onOpening(function(){
-						return confirm('onOpening');
+					.onPreOpen(function(){
+						return confirm('onPreOpen');
 					})
-					.onOpened(function(){
-						alert('onOpened');
+					.onPostOpen(function(){
+						alert('onPostOpen');
 					})
-					.onClosing(function(){
-						return confirm('onClosing');
+					.onPreClose(function(){
+						return confirm('onPreClose');
 					})
-					.onClosed(function(){
-						alert('onClosed');
+					.onPostClose(function(){
+						alert('onPostClose');
 					})
-					.onConfirming(function(){
-						alert('onConfirming');
+					.onPreConfirm(function(){
+						return confirm('onPreConfirm');
 					})
-					.onConfirmed(function(){
-						alert('onConfirmed');
+					.onPostConfirm(function(){
+						alert('onPostConfirm');
 					})
 					.open();
 				">duice.dialog.Dialog</button>

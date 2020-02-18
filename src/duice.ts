@@ -84,9 +84,9 @@ namespace duice {
                 for(var i = 0, size = elements.length; i < size; i ++ ){
                     var element = elements[i];
                     if(componentDefinition.getFactoryClass().prototype instanceof factoryType){
-                        var factoryClass = Object.create(componentDefinition.getFactoryClass().prototype);
-                        var factoryInstance = factoryClass.constructor.call(factoryClass, $context);
-                        factoryInstance.getInstance(element);
+                        var factoryInstance = Object.create(componentDefinition.getFactoryClass().prototype);
+                        factoryInstance.setContext($context);
+                        factoryInstance.getComponent(element);
                     }
                 }
             });
@@ -456,12 +456,18 @@ namespace duice {
          * @param name
          * @param value
          */
-        set(name:string, value:any):boolean {
+        async set(name:string, value:any) {
 
             // calls beforeChange
             if(this.eventListener.onPreChange){
-                if(this.eventListener.onPreChange.call(this,name,value) === false){
-                    return false;
+                try {
+                    if(await this.eventListener.onPreChange.call(this,name,value) === false){
+                        throw 'canceled';
+                    }
+                }catch(e){
+                    this.setChanged();
+                    this.notifyObservers(this);
+                    throw e;
                 }
             }
 
@@ -680,12 +686,12 @@ namespace duice {
          * Sets index.
          * @param index 
          */
-        selectRow(index:number):boolean {
+        async selectRow(index:number) {
 
             // calls beforeChangeIndex 
             if(this.eventListener.onPreSelectRow){
-                if(this.eventListener.onPreSelectRow.call(this,index) === false){
-                    return false;
+                if(await this.eventListener.onPreSelectRow.call(this,index) === false){
+                    throw 'canceled';
                 }
             }
 
@@ -706,12 +712,12 @@ namespace duice {
          * @param fromIndex 
          * @param toIndex 
          */
-        moveRow(fromIndex:number, toIndex:number):void {
+        async moveRow(fromIndex:number, toIndex:number) {
             
             // calls beforeChangeIndex 
             if(this.eventListener.onPreMoveRow){
-                if(this.eventListener.onPreMoveRow.call(this, fromIndex, toIndex) === false){
-                    return;
+                if(await this.eventListener.onPreMoveRow.call(this, fromIndex, toIndex) === false){
+                    throw 'canceled';
                 }
             }
 
@@ -867,6 +873,9 @@ namespace duice {
          */
         onPreChangeRow(listener:Function):void {
             this.eventListener.onPreChangeRow = listener;
+            this.data.forEach(function(map){
+                map.onPreChange(listener);
+            })
         }
 
         /**
@@ -875,6 +884,9 @@ namespace duice {
          */
         onPostChangeRow(listener:Function):void {
             this.eventListener.onPostChangeRow = listener;
+            this.data.forEach(function(map){
+                map.onPostChange(listener);
+            })
         }
 
     }
@@ -1014,7 +1026,7 @@ namespace duice {
                 throw e;
             }
         }
-        abstract getInstance(element:HTMLElement):UiComponent;
+        abstract getComponent(element:HTMLElement):UiComponent;
     }
     
     abstract class MapUiComponentFactory extends UiComponentFactory { }
@@ -1798,8 +1810,6 @@ namespace duice {
         onPostClose:Function;
         onPreConfirm:Function;
         onPostConfirm:Function;
-        onPreCancel:Function;
-        onPostCancel:Function;
     }
 	
    /**
@@ -1890,62 +1900,95 @@ namespace duice {
             // unblock
             this.blocker.unblock();
         }
-        open(...args:any[]):boolean {
+        async open(...args:any[]) {
             if(this.eventListener.onPreOpen){
-                if(this.eventListener.onPreOpen.call(this, ...args) === false){
-                    return false;
+                if(await this.eventListener.onPreOpen.call(this, ...args) === false){
+                    throw 'canceled';
                 }
             }
             this.show();
             if(this.eventListener.onPostOpen){
-                delayCall(200, this.eventListener.onPostOpen, this, ...args);
+                await delayCall(200, this.eventListener.onPostOpen, this, ...args);
             }
-            return true;
         }
-        close(...args:any[]):boolean {
+        async close(...args:any[]) {
             if(this.eventListener.onPreClose){
-                if(this.eventListener.onPreClose.call(this, ...args) === false){
-                    return false;
+                if(await this.eventListener.onPreClose.call(this, ...args) === false){
+                    throw 'canceled';
                 }
             }
             this.hide();
             if(this.eventListener.onPostClose){
-                delayCall(200, this.eventListener.onPostClose, this, ...args);
+                await delayCall(200, this.eventListener.onPostClose, this, ...args);
             }
-            return true;
+
         }
-        confirm(...args: any[]):boolean {
+
+        /**
+         * confirm
+         * @param args 
+         */
+        async confirm(...args: any[]) {
             if(this.eventListener.onPreConfirm){
-                if(this.eventListener.onPreConfirm.call(this, ...args) === false){
-                    return false;
+                if(await this.eventListener.onPreConfirm.call(this, ...args) === false){
+                    throw 'canceled';
                 }
             }
             this.hide();
             if(this.eventListener.onPostConfirm){
-                delayCall(200, this.eventListener.onPostConfirm, this, ...args);
+                await delayCall(200, this.eventListener.onPostConfirm, this, ...args);
             }
-            return true;
         }
+
+        /**
+         * Adds onPreOpen event listener
+         * @param listener 
+         */
         onPreOpen(listener:Function):any {
             this.eventListener.onPreOpen = listener;
             return this;
         }
+        
+        /**
+         * Adds onPostOpen even listener
+         * @param listener 
+         */
         onPostOpen(listener:Function):any {
             this.eventListener.onPostOpen = listener;
             return this;
         }
+
+        /**
+         * Adds onPreClose event listener
+         * @param listener
+         */
         onPreClose(listener:Function):any{
             this.eventListener.onPreClose = listener;
             return this;
         }
+
+        /**
+         * Adds onPostClose event listener
+         * @param listener 
+         */
         onPostClose(listener:Function):any {
             this.eventListener.onPostClose = listener;
             return this;
         }
+
+        /**
+         * Adds onPreConfirm event listener
+         * @param listener 
+         */
         onPreConfirm(listener:Function):any {
             this.eventListener.onPreConfirm = listener;
             return this;
         }
+
+        /**
+         * Adds onPostConfirm event listener
+         * @param listener 
+         */
         onPostConfirm(listener:Function):any {
             this.eventListener.onPostConfirm = listener;
             return this;
@@ -1987,13 +2030,9 @@ namespace duice {
             this.addContent(this.messageDiv);
             this.addContent(this.buttonDiv);
         }
-        open():boolean {
-            if(super.open()){
-                this.confirmButton.focus();
-                return true;
-            }else{
-                return false;
-            }
+        async open() {
+            super.open();
+            this.confirmButton.focus();
         }
     }
     
@@ -2041,12 +2080,9 @@ namespace duice {
             this.addContent(this.messageDiv);
             this.addContent(this.buttonDiv);
         }
-        open():boolean {
-            if(super.open()){
-                this.confirmButton.focus();    
-            }else{
-                return false;
-            }
+        async open() {
+            super.open();
+            this.confirmButton.focus();
         }
     }
     
@@ -2103,13 +2139,9 @@ namespace duice {
             this.addContent(this.inputDiv);
             this.addContent(this.buttonDiv);
         }
-        open():boolean {
-            if(super.open()){
-                this.input.focus();
-                return true;
-            }else{
-                return false;
-            }
+        async open() {
+            super.open();
+            this.input.focus();
         }
         getValue():string {
             return this.input.value;
@@ -2129,36 +2161,28 @@ namespace duice {
             this.dialog.classList.add('duice-dialog');
             this.parentNode = this.dialog.parentNode;
         }
-        open(...args:any[]):boolean {
+        async open(...args:any[]) {
             this.dialog.style.display = 'block';
             this.addContent(this.dialog);
 
-			// opens dialog
-            if(super.open(...args)){
-                return true;
-            }else{
+            // opens dialog
+            try {
+                super.open(...args);
+            }catch(e){
                 this.dialog.style.display = 'none';
                 this.parentNode.appendChild(this.dialog);
-                return false;
+                throw e;
             }
         }
-        close(...args:any[]):boolean {
-            if(super.close(...args)){
-                this.dialog.style.display = 'none';
-                this.parentNode.appendChild(this.dialog);
-                return true;
-            }else{
-                return false;
-            }
+        async close(...args:any[]) {
+            super.close(...args);
+            this.dialog.style.display = 'none';
+            this.parentNode.appendChild(this.dialog);
         }
-        confirm(...args:any[]):boolean {
-            if(super.confirm(...args)){
-                this.dialog.style.display = 'none';
-                this.parentNode.appendChild(this.dialog);
-                return true;
-            }else{
-                return false;
-            }
+        async confirm(...args:any[]) {
+            super.confirm(...args);
+            this.dialog.style.display = 'none';
+            this.parentNode.appendChild(this.dialog);
         }
     }
     
@@ -2171,7 +2195,7 @@ namespace duice {
          * duice.ui.ScriptletFactory
          */
         export class ScriptletFactory extends MapUiComponentFactory {
-            getInstance(element:HTMLElement):Scriptlet {
+            getComponent(element:HTMLElement):Scriptlet {
                 var scriptlet = new Scriptlet(element);
                 var context:any;
                 if(this.getContext() !== window) {
@@ -2236,7 +2260,7 @@ namespace duice {
          * duice.ui.SpanFactory
          */
         export class SpanFactory extends MapUiComponentFactory {
-            getInstance(element:HTMLInputElement):Span {
+            getComponent(element:HTMLInputElement):Span {
                 var span = new Span(element);
                 
                 // sets format
@@ -2304,7 +2328,7 @@ namespace duice {
          * duice.ui.InputFactory
          */
         export class InputFactory extends MapUiComponentFactory {
-            getInstance(element:HTMLInputElement):Input {
+            getComponent(element:HTMLInputElement):Input {
                 var input;
                 switch(element.getAttribute('type')){
                 case 'text':
@@ -2941,7 +2965,7 @@ namespace duice {
          * duice.ui.SelectFactory
          */
         export class SelectFactory extends MapUiComponentFactory {
-            getInstance(element:HTMLSelectElement):Select {
+            getComponent(element:HTMLSelectElement):Select {
                 var select = new Select(element);
 				if(element.dataset.duiceOption){
 	                var option = element.dataset.duiceOption.split(',');
@@ -3043,7 +3067,7 @@ namespace duice {
          * duice.ui.TextareaFactory
          */
         export class TextareaFactory extends MapUiComponentFactory {
-            getInstance(element:HTMLTextAreaElement):Textarea {
+            getComponent(element:HTMLTextAreaElement):Textarea {
                 var textarea = new Textarea(element);
                 var bind = element.dataset.duiceBind.split(',');
                 textarea.bind(this.getContextProperty(bind[0]), bind[1]);
@@ -3095,7 +3119,7 @@ namespace duice {
          * duice.ui.ImageFactory
          */
         export class ImageFactory extends MapUiComponentFactory {
-            getInstance(element:HTMLImageElement):Image {
+            getComponent(element:HTMLImageElement):Image {
                 var image = new Image(element);
                 var bind = element.dataset.duiceBind.split(',');
                 image.bind(this.getContextProperty(bind[0]), bind[1]);
@@ -3295,7 +3319,7 @@ namespace duice {
          * duice.ui.PaginationFactory
          */
         export class PaginationFactory extends MapUiComponentFactory {
-            getInstance(element:HTMLUListElement):Pagination {
+            getComponent(element:HTMLUListElement):Pagination {
                 var pagination = new Pagination(element);
                 if(element.dataset.duiceSize){
                     pagination.setSize(Number(element.dataset.duiceSize));
@@ -3431,7 +3455,7 @@ namespace duice {
          * duice.ui.TableFactory
          */
         export class TableFactory extends ListUiComponentFactory {
-            getInstance(element:HTMLTableElement):Table {
+            getComponent(element:HTMLTableElement):Table {
                 var table = new Table(element);
                 table.setSelectable(element.dataset.duiceSelectable === 'true');
                 table.setEditable(element.dataset.duiceEditable === 'true');
@@ -3557,9 +3581,9 @@ namespace duice {
                         if(index === list.getIndex()){
                             tbody.classList.add('duice-ui-table__tbody--index');
                         }
-                        tbody.addEventListener('mousedown', function(event){
+                        tbody.addEventListener('mousedown', async function(event){
                             var index = Number(this.dataset.duiceIndex);
-                            $this.selectTbody(index);
+                            await $this.selectTbody(index);
                         }, true);
                     }
                     
@@ -3573,12 +3597,12 @@ namespace duice {
                             event.preventDefault();
                             event.stopPropagation();
                         });
-                        tbody.addEventListener('drop', function(event){
+                        tbody.addEventListener('drop', async function(event){
                             event.preventDefault();
                             event.stopPropagation();
                             var fromIndex = parseInt(event.dataTransfer.getData('text'));
                             var toIndex = parseInt(this.dataset.duiceIndex);
-                            list.moveRow(fromIndex, toIndex);
+                            await list.moveRow(fromIndex, toIndex);
                         });
                     }
                     
@@ -3600,16 +3624,14 @@ namespace duice {
              * Selects tbody element
              * @param tbody 
              */
-            selectTbody(index:number):void {
+            async selectTbody(index:number) {
                 this.getList().suspendNotify();
-                if(this.getList().selectRow(index)){
-                    // handles class                
-                    for(var i = 0; i < this.tbodies.length; i ++ ) {
-                        if(i === index){
-                            this.tbodies[i].classList.add('duice-ui-table__tbody--index');
-                        }else{
-                            this.tbodies[i].classList.remove('duice-ui-table__tbody--index');
-                        }
+                await this.getList().selectRow(index);
+                for(var i = 0; i < this.tbodies.length; i ++ ) {
+                    if(i === index){
+                        this.tbodies[i].classList.add('duice-ui-table__tbody--index');
+                    }else{
+                        this.tbodies[i].classList.remove('duice-ui-table__tbody--index');
                     }
                 }
                 this.getList().resumeNotify();
@@ -3659,7 +3681,7 @@ namespace duice {
          * duice.ui.UListFactory
          */
         export class UListFactory extends ListUiComponentFactory {
-            getInstance(element:HTMLUListElement):UList {
+            getComponent(element:HTMLUListElement):UList {
                 var uList = new UList(element);
                 uList.setSelectable(element.dataset.duiceSelectable === 'true');
                 uList.setEditable(element.dataset.duiceEditable === 'true');
@@ -3814,6 +3836,10 @@ namespace duice {
                 // add editable event
                 if(this.editable){
                     var $this = this;
+                    // if already constructed, skip.
+                    if(this.ul.classList.contains('duice-ui-ul--root')){
+                        return;
+                    }
                     this.ul.classList.add('duice-ui-ul--root');
                     this.ul.addEventListener('dragover', function(event) {
                         event.preventDefault();
@@ -3825,18 +3851,35 @@ namespace duice {
                         event.stopPropagation();
                         $this.ul.classList.remove('duice-ui-ul--root-dragover');
                     });
-                    this.ul.addEventListener('drop', function(event) {
+                    this.ul.addEventListener('drop', async function(event) {
                         event.preventDefault();
                         event.stopPropagation();
                         var fromIndex = parseInt(event.dataTransfer.getData('text'));
-                        var fromMap = $this.list.getRow(fromIndex);
-                        fromMap.set($this.hierarchy.parentIdName, null);
-                        $this.ul.classList.remove('duice-ui-ul--root-dragover');
-                        $this.setChanged();
-                        $this.notifyObservers(this);
+                        await $this.moveLi(fromIndex, -1);
                     });
                 }
             }
+
+            // listenEventRootDragOver(event:any):void {
+            //     event.preventDefault();
+            //     event.stopPropagation();
+            //     this.ul.classList.remove('duice-ui-ul--root-dragover');
+            // }
+
+            // listenEventRootDragLeave(event:any):void {
+            //     event.preventDefault();
+            //     event.stopPropagation();
+            //     this.ul.classList.remove('duice-ui-ul--root-dragover');
+            // }
+
+            // async listenEventRootDrop(event:any){
+            //     event.preventDefault();
+            //     event.stopPropagation();
+            //     var fromIndex = parseInt(event.dataTransfer.getData('text'));
+            //     await this.moveLi(fromIndex, -1);
+            // }
+
+            
             
             /**
              * Creates LI element reference to specified map includes child nodes.
@@ -3862,16 +3905,15 @@ namespace duice {
                     if(index === this.getList().getIndex()){
                         li.classList.add('duice-ui-ul__li--index');
                     }
-                    li.addEventListener('mousedown', function(event){
+                    li.addEventListener('mousedown', async function(event){
+                        var index = Number(this.dataset.duiceIndex);
                         $this.getList().suspendNotify();
-                        if($this.getList().selectRow(index)){
-                            event.stopPropagation();
-                            for(var i = 0; i < $this.lis.length; i ++ ) {
-                                $this.lis[i].classList.remove('duice-ui-ul__li--index');
-                            }
-                            this.classList.add('duice-ui-ul__li--index');
-                            $this.list.index = Number(this.dataset.duiceIndex);
+                        await $this.getList().selectRow(index);
+                        event.stopPropagation();
+                        for(var i = 0; i < $this.lis.length; i ++ ) {
+                            $this.lis[i].classList.remove('duice-ui-ul__li--index');
                         }
+                        this.classList.add('duice-ui-ul__li--index');
                         $this.getList().resumeNotify();
                     });
                 }
@@ -3887,12 +3929,12 @@ namespace duice {
                         event.preventDefault();
                         event.stopPropagation();
                     });
-                    li.addEventListener('drop', function(event){
+                    li.addEventListener('drop', async function(event){
                         event.preventDefault();
                         event.stopPropagation();
                         var fromIndex = parseInt(event.dataTransfer.getData('text'));
                         var toIndex = parseInt(this.dataset.duiceIndex);
-                        $this.moveLi(fromIndex, toIndex);
+                        await $this.moveLi(fromIndex, toIndex);
                     });
                 }
 
@@ -4013,7 +4055,7 @@ namespace duice {
              * @param fromIndex
              * @param toIndex
              */
-            moveLi(fromIndex:number, toIndex:number):void {
+            async moveLi(fromIndex:number, toIndex:number) {
                 
                 // checks same index
                 if(fromIndex === toIndex){
@@ -4022,7 +4064,7 @@ namespace duice {
                 
                 //defines map
                 var fromMap = this.list.getRow(fromIndex);
-                var toMap = this.list.getRow(toIndex);
+                var toMap = this.list.getRow(toIndex) || new duice.Map();;
                 
                 // moving action
                 if(this.hierarchy){
@@ -4034,13 +4076,13 @@ namespace duice {
 
                     // calls beforeChangeIndex 
                     if(this.list.eventListener.onPreMoveRow){
-                        if(this.list.eventListener.onPreMoveRow.call(this.list, fromIndex, toIndex) === false){
-                            return;
+                        if(await this.list.eventListener.onPreMoveRow.call(this.list, fromIndex, toIndex) === false){
+                            throw 'canceled';
                         }
                     }
                     
                     // change parents
-                    fromMap.set(this.hierarchy.parentIdName, toMap.get(this.hierarchy.idName));
+                    await fromMap.set(this.hierarchy.parentIdName, defaultIfEmpty(toMap.get(this.hierarchy.idName), null));
                     
                     // calls 
                     if(this.list.eventListener.onPostMoveRow){
@@ -4052,7 +4094,7 @@ namespace duice {
                     this.notifyObservers(this);
                 }else{
                     // changes row position
-                    this.list.moveRow(fromIndex, toIndex);
+                    await this.list.moveRow(fromIndex, toIndex);
                 }
             }
             
