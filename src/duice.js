@@ -592,9 +592,10 @@ var duice;
          */
         selectRow(index) {
             return __awaiter(this, void 0, void 0, function* () {
+                var selectedRow = this.getRow(index);
                 // calls beforeChangeIndex 
                 if (this.eventListener.onPreSelectRow) {
-                    if ((yield this.eventListener.onPreSelectRow.call(this, index)) === false) {
+                    if ((yield this.eventListener.onPreSelectRow.call(this, selectedRow)) === false) {
                         throw 'canceled';
                     }
                 }
@@ -602,7 +603,7 @@ var duice;
                 this.setIndex(index);
                 // calls 
                 if (this.eventListener.onPostSelectRow) {
-                    this.eventListener.onPostSelectRow.call(this, index);
+                    this.eventListener.onPostSelectRow.call(this, selectedRow);
                 }
                 // returns true
                 return true;
@@ -615,9 +616,11 @@ var duice;
          */
         moveRow(fromIndex, toIndex) {
             return __awaiter(this, void 0, void 0, function* () {
+                var sourceMap = this.getRow(fromIndex);
+                var targetMap = this.getRow(toIndex);
                 // calls beforeChangeIndex 
                 if (this.eventListener.onPreMoveRow) {
-                    if ((yield this.eventListener.onPreMoveRow.call(this, fromIndex, toIndex)) === false) {
+                    if ((yield this.eventListener.onPreMoveRow.call(this, sourceMap, targetMap)) === false) {
                         throw 'canceled';
                     }
                 }
@@ -627,7 +630,7 @@ var duice;
                 this.setIndex(toIndex);
                 // calls 
                 if (this.eventListener.onPostMoveRow) {
-                    this.eventListener.onPostMoveRow.call(this, fromIndex, toIndex);
+                    yield this.eventListener.onPostMoveRow.call(this, sourceMap, targetMap);
                 }
             });
         }
@@ -3526,22 +3529,6 @@ var duice;
                     });
                 }
             }
-            // listenEventRootDragOver(event:any):void {
-            //     event.preventDefault();
-            //     event.stopPropagation();
-            //     this.ul.classList.remove('duice-ui-ul--root-dragover');
-            // }
-            // listenEventRootDragLeave(event:any):void {
-            //     event.preventDefault();
-            //     event.stopPropagation();
-            //     this.ul.classList.remove('duice-ui-ul--root-dragover');
-            // }
-            // async listenEventRootDrop(event:any){
-            //     event.preventDefault();
-            //     event.stopPropagation();
-            //     var fromIndex = parseInt(event.dataTransfer.getData('text'));
-            //     await this.moveLi(fromIndex, -1);
-            // }
             /**
              * Creates LI element reference to specified map includes child nodes.
              * @param index
@@ -3722,26 +3709,25 @@ var duice;
                         return;
                     }
                     //defines map
-                    var fromMap = this.list.getRow(fromIndex);
-                    var toMap = this.list.getRow(toIndex) || new duice.Map();
-                    ;
+                    var sourceRow = this.list.getRow(fromIndex);
+                    var targetRow = this.list.getRow(toIndex) || null;
                     // moving action
                     if (this.hierarchy) {
                         // checks circular reference
-                        if (this.isCircularReference(toMap, fromMap.get(this.hierarchy.idName))) {
+                        if (this.isCircularReference(targetRow, sourceRow.get(this.hierarchy.idName))) {
                             throw 'Not allow to movem, becuase of Circular Reference.';
                         }
                         // calls beforeChangeIndex 
                         if (this.list.eventListener.onPreMoveRow) {
-                            if ((yield this.list.eventListener.onPreMoveRow.call(this.list, fromIndex, toIndex)) === false) {
+                            if ((yield this.list.eventListener.onPreMoveRow.call(this.list, sourceRow, targetRow)) === false) {
                                 throw 'canceled';
                             }
                         }
                         // change parents
-                        yield fromMap.set(this.hierarchy.parentIdName, defaultIfEmpty(toMap.get(this.hierarchy.idName), null));
+                        yield sourceRow.set(this.hierarchy.parentIdName, targetRow === null ? null : targetRow.get(this.hierarchy.idName));
                         // calls 
                         if (this.list.eventListener.onPostMoveRow) {
-                            this.list.eventListener.onPostMoveRow.call(this.list, fromIndex, toIndex);
+                            yield this.list.eventListener.onPostMoveRow.call(this.list, sourceRow, targetRow);
                         }
                         // notifies observers.
                         this.setChanged();
@@ -3774,7 +3760,7 @@ var duice;
              */
             isCircularReference(map, idValue) {
                 var parentMap = map;
-                while (true) {
+                while (parentMap !== null) {
                     parentMap = this.getParentMap(parentMap);
                     if (parentMap === null) {
                         return false;

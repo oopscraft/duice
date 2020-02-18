@@ -688,9 +688,11 @@ namespace duice {
          */
         async selectRow(index:number) {
 
+            var selectedRow = this.getRow(index);
+
             // calls beforeChangeIndex 
             if(this.eventListener.onPreSelectRow){
-                if(await this.eventListener.onPreSelectRow.call(this,index) === false){
+                if(await this.eventListener.onPreSelectRow.call(this, selectedRow) === false){
                     throw 'canceled';
                 }
             }
@@ -700,7 +702,7 @@ namespace duice {
 
             // calls 
             if(this.eventListener.onPostSelectRow){
-                this.eventListener.onPostSelectRow.call(this,index);
+                this.eventListener.onPostSelectRow.call(this, selectedRow);
             }
 
             // returns true
@@ -713,10 +715,13 @@ namespace duice {
          * @param toIndex 
          */
         async moveRow(fromIndex:number, toIndex:number) {
+
+            var sourceMap = this.getRow(fromIndex);
+            var targetMap = this.getRow(toIndex);
             
             // calls beforeChangeIndex 
             if(this.eventListener.onPreMoveRow){
-                if(await this.eventListener.onPreMoveRow.call(this, fromIndex, toIndex) === false){
+                if(await this.eventListener.onPreMoveRow.call(this, sourceMap, targetMap) === false){
                     throw 'canceled';
                 }
             }
@@ -728,7 +733,7 @@ namespace duice {
 
             // calls 
             if(this.eventListener.onPostMoveRow){
-                this.eventListener.onPostMoveRow.call(this, fromIndex, toIndex);
+                await this.eventListener.onPostMoveRow.call(this, sourceMap, targetMap);
             }
         }
 
@@ -3859,27 +3864,6 @@ namespace duice {
                     });
                 }
             }
-
-            // listenEventRootDragOver(event:any):void {
-            //     event.preventDefault();
-            //     event.stopPropagation();
-            //     this.ul.classList.remove('duice-ui-ul--root-dragover');
-            // }
-
-            // listenEventRootDragLeave(event:any):void {
-            //     event.preventDefault();
-            //     event.stopPropagation();
-            //     this.ul.classList.remove('duice-ui-ul--root-dragover');
-            // }
-
-            // async listenEventRootDrop(event:any){
-            //     event.preventDefault();
-            //     event.stopPropagation();
-            //     var fromIndex = parseInt(event.dataTransfer.getData('text'));
-            //     await this.moveLi(fromIndex, -1);
-            // }
-
-            
             
             /**
              * Creates LI element reference to specified map includes child nodes.
@@ -4063,30 +4047,30 @@ namespace duice {
                 }
                 
                 //defines map
-                var fromMap = this.list.getRow(fromIndex);
-                var toMap = this.list.getRow(toIndex) || new duice.Map();;
+                var sourceRow = this.list.getRow(fromIndex);
+                var targetRow = this.list.getRow(toIndex) || null;
                 
                 // moving action
                 if(this.hierarchy){
                     
                     // checks circular reference
-                    if(this.isCircularReference(toMap, fromMap.get(this.hierarchy.idName))){
+                    if(this.isCircularReference(targetRow, sourceRow.get(this.hierarchy.idName))){
                         throw 'Not allow to movem, becuase of Circular Reference.';
                     }
 
                     // calls beforeChangeIndex 
                     if(this.list.eventListener.onPreMoveRow){
-                        if(await this.list.eventListener.onPreMoveRow.call(this.list, fromIndex, toIndex) === false){
+                        if(await this.list.eventListener.onPreMoveRow.call(this.list, sourceRow, targetRow) === false){
                             throw 'canceled';
                         }
                     }
                     
                     // change parents
-                    await fromMap.set(this.hierarchy.parentIdName, defaultIfEmpty(toMap.get(this.hierarchy.idName), null));
+                    await sourceRow.set(this.hierarchy.parentIdName, targetRow === null ? null : targetRow.get(this.hierarchy.idName));
                     
                     // calls 
                     if(this.list.eventListener.onPostMoveRow){
-                        this.list.eventListener.onPostMoveRow.call(this.list, fromIndex, toIndex);
+                        await this.list.eventListener.onPostMoveRow.call(this.list, sourceRow, targetRow);
                     }
                     
                     // notifies observers.
@@ -4120,7 +4104,7 @@ namespace duice {
              */
             isCircularReference(map:duice.Map, idValue:any):boolean {
                 var parentMap = map;
-                while(true){
+                while(parentMap !== null){
                     parentMap = this.getParentMap(parentMap);
                     if(parentMap === null){
                         return false;

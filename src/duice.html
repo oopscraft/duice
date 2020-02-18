@@ -342,18 +342,20 @@ users.fromJson([
  * Tests users event listener
  */
 // before select row event
-users.onPreSelectRow(function(index){
-	console.log('onPreSelectRow', index, this.getRow(index).get('id'));
+users.onPreSelectRow(function(selectedRow){
+	console.log('onPreSelectRow',selectedRow.toJson());
 });
+
 // after select row event
-users.onPostSelectRow(function(index){
-	console.log('onPostSelectRow', index, this.getRow(index).get('id'));
+users.onPostSelectRow(function(selectedRow){
+	console.log('onPostSelectRow', selectedRow.toJson());
 });
+
 // before move row event
-users.onPreMoveRow(function(fromIndex, toIndex){
-	console.log('onPreMoveRow ' + this.getRow(fromIndex).get('id') + '->' + (toIndex < 0 ? toIndex : this.getRow(toIndex).get('id')));
+users.onPreMoveRow(function(sourceRow, targetRow){
+	console.log('onPreMoveRow', sourceRow.toJson(), (targetRow?targetRow.toJson():targetRow));
 	return new Promise(function(resolve, reject){
-		new duice.Confirm('do you want to move?')
+		new duice.Confirm('Do you want to move?')
 		.onPostConfirm(function(){
 			resolve(true);
 		})
@@ -363,20 +365,15 @@ users.onPreMoveRow(function(fromIndex, toIndex){
 		.open();
 	});
 });
+
 // after move row event
-users.onPostMoveRow(function(fromIndex, toIndex){
-	console.log('onRowMoved ' + this.getRow(fromIndex).get('id') + '->' + (toIndex < 0 ? toIndex : this.getRow(toIndex).get('id')));
+users.onPostMoveRow(function(sourceRow, targetRow){
+	console.log('onPostMoveRow', sourceRow.toJson(), (targetRow?targetRow.toJson():targetRow));
 });
+
 // before change row event
 users.onPreChangeRow(function(name, value){
 	console.log('name', name, 'value', value);
-
-	// in case sync
-	// if(confirm('ok?') === false){
-	// 	return false;
-	// }
-
-	// case async (return Promise)
 	return new Promise(function(resolve, reject){
 		new duice.Confirm('Do you want to change ['+name+'] is ['+ value +']')
 		.onPostConfirm(function(e){
@@ -387,8 +384,8 @@ users.onPreChangeRow(function(name, value){
 		})
 		.open();
 	});
-
 });
+
 // after change row event
 users.onPostChangeRow(function(name, value){
 	console.log('onPostChangeRow ' + name + ' is ' + value);
