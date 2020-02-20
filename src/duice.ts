@@ -1825,6 +1825,7 @@ namespace duice {
         headerDiv:HTMLDivElement;
         bodyDiv:HTMLDivElement;
         blocker:Blocker;
+        promise:Promise<any>;
         eventListener:ModalEventListener = new ModalEventListener();
         constructor(){
             var $this = this;
@@ -1926,7 +1927,6 @@ namespace duice {
             if(this.eventListener.onPostClose){
                 await delayCall(200, this.eventListener.onPostClose, this, ...args);
             }
-
         }
 
         /**
