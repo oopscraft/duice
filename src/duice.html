@@ -71,24 +71,16 @@ user.fromJson({
 
 user.onPreChange(function(name, value){
 	console.log('Map.onPreChange', name, value);
-
-	// case sync
-	// if(confirm('ok?') === false){
-	// 	return false;
-	// }
-
-	// case async (return Promise)
 	return new Promise(function(resolve, reject){
 		new duice.Confirm('Do you want to change ['+name+'] is ['+ value +']')
 		.onPostConfirm(function(e){
 			resolve(true);
 		})
 		.onPostClose(function(e){
-			reject(false);
+			resolve(false);
 		})
 		.open();
 	});
-
 });
 
 /**
@@ -380,7 +372,7 @@ users.onPreChangeRow(function(name, value){
 			resolve(true);
 		})
 		.onPostClose(function(e){
-			reject(false);
+			resolve(false);
 		})
 		.open();
 	});
@@ -1039,7 +1031,7 @@ body {
 				<br/>
 				
 				<!-- ================================================================ -->
-				<!-- duice.ui.UList(hierarchy)									  -->
+				<!-- duice.ui.UList(hierarchy)									 	 -->
 				<!-- ================================================================ -->
 				<div>
 					<div style="padding:1px; display:flex; justify-content:space-between; align-items:baseline;">
@@ -1296,6 +1288,9 @@ body {
 		</div>
 		<div class="chapter__bodyDiv">
 			<div>
+				<!-- ============================================================== -->
+				<!-- duice.Progress									  				-->
+				<!-- ============================================================== -->
 				<button onclick="
 					var progress = new duice.Progress(document.body);
 					progress.start();
@@ -1306,82 +1301,126 @@ body {
 				">
 				progress
 				</button>
-				<button onclick="
-					new duice.Alert('alert message...')
-					.onPreClose(function(){
-						return confirm('onPreClose');
-					})
-					.onPostClose(function(){
-						alert('onPostClose');
-					})
-					.open();
-				">duice.dialog.Alert</button>
-				<button onclick="
-					new duice.Confirm('confirm message...')
-					.onPreOpen(function(){
-						return confirm('onPreOpen');
-					})
-					.onPostOpen(function(){
-						alert('onPostOpen');
-					})
-					.onPreClose(function(){
-						return confirm('onPreClose');
-					})
-					.onPostClose(function(){
-						alert('onPostClose');
-					})
-					.onPreConfirm(function(){
-						return confirm('onPreConfirm');
-					})
-					.onPostConfirm(function(){
-						alert('onPostConfirm');
-					})
-					.open();
-				">duice.ui.Confirm</button>
-				<button onclick="
-					new duice.Prompt('enter value...')
-					.onPreOpen(function(){
-						return confirm('onPreOpen');
-					})
-					.onPostOpen(function(){
-						alert('onPostOpen');
-					})
-					.onPreClose(function(){
-						return confirm('onPreClose');
-					})
-					.onPostClose(function(){
-						alert('onPostClose');
-					})
-					.onPreConfirm(function(){
-						return confirm('onPreConfirm:' + this.getValue());
-					})
-					.onPostConfirm(function(){
-						alert('onPostConfirm:' + this.getValue());
-					})
-					.open();
-				">duice.dialog.Prompt</button>
-				<button onclick="
-					var dialog = new duice.Dialog(document.getElementById('dialog'))
-					.onPreOpen(function(){
-						return confirm('onPreOpen');
-					})
-					.onPostOpen(function(){
-						alert('onPostOpen');
-					})
-					.onPreClose(function(){
-						return confirm('onPreClose');
-					})
-					.onPostClose(function(){
-						alert('onPostClose');
-					})
-					.onPreConfirm(function(){
-						return confirm('onPreConfirm');
-					})
-					.onPostConfirm(function(){
-						alert('onPostConfirm');
-					})
-					.open();
-				">duice.dialog.Dialog</button>
+				<!-- ============================================================== -->
+				<!-- duice.Alert									  				-->
+				<!-- ============================================================== -->
+				<script>
+					async function testAlert() {
+						await new duice.Alert('alert message...')
+						.onPreOpen(function(){
+							console.log('onPreOpen');
+							return confirm('onPreOpen');
+						})
+						.onPostOpen(function(){
+							console.log('onPostOpen');
+							alert('onPostOpen');
+						})
+						.onPreClose(function(){
+							console.log('onPreClose');
+							return confirm('onPreClose');
+						})
+						.onPostClose(function(){
+							console.log('onPostClose');
+							alert('onPostClose');
+						})
+						.open();
+						alert('complete');
+					}
+				</script>
+				<button onclick="testAlert();">duice.Alert</button>
+				<!-- ============================================================== -->
+				<!-- duice.Confirm									  				-->
+				<!-- ============================================================== -->
+				<script>
+					async function testConfirm() {
+						await new duice.Confirm('confirm message...')
+						.onPreOpen(function(){
+							console.log('onPreOpen');
+							return confirm('onPreOpen');
+						})
+						.onPostOpen(function(){
+							console.log('onPostOpen');
+							alert('onPostOpen');
+						})
+						.onPreClose(function(){
+							console.log('onPreClose');
+							return confirm('onPreClose');
+						})
+						.onPostClose(function(){
+							console.log('onPostClose');
+							alert('onPostClose');
+						})
+						.onPreConfirm(function(){
+							console.log('onPreConfirm');
+							return confirm('onPreConfirm');
+						})
+						.onPostConfirm(function(){
+							console.log('onPostConfirm');
+							alert('onPostConfirm');
+						})
+						.open();
+						alert('complete');
+					}
+				</script>
+				<!-- ============================================================== -->
+				<!-- duice.Confirm									  				-->
+				<!-- ============================================================== -->
+				<button onclick="testConfirm();">duice.Confirm</button>
+				<script>
+					async function testPrompt() {
+						await new duice.Prompt('enter value...')
+						.onPreOpen(function(){
+							return confirm('onPreOpen');
+						})
+						.onPostOpen(function(){
+							alert('onPostOpen');
+						})
+						.onPreClose(function(){
+							return confirm('onPreClose');
+						})
+						.onPostClose(function(){
+							alert('onPostClose');
+						})
+						.onPreConfirm(function(){
+							return confirm('onPreConfirm:' + this.getValue());
+						})
+						.onPostConfirm(function(){
+							alert('onPostConfirm:' + this.getValue());
+						})
+						.open();
+						alert('complete');
+					}
+				</script>
+				<button onclick="testPrompt();">duice.dialog.Prompt</button>
+				<!-- ============================================================== -->
+				<!-- duice.Dialog									  				-->
+				<!-- ============================================================== -->
+				<script>
+					async function testDialog() {
+						await new duice.Dialog(document.getElementById('dialog'))
+						.onPreOpen(function(){
+							return confirm('onPreOpen');
+						})
+						.onPostOpen(function(){
+							alert('onPostOpen');
+						})
+						.onPreClose(function(){
+							return confirm('onPreClose');
+						})
+						.onPostClose(function(){
+							alert('onPostClose');
+						})
+						.onPreConfirm(function(){
+							return confirm('onPreConfirm');
+						})
+						.onPostConfirm(function(){
+							alert('onPostConfirm');
+						})
+						.open();
+						alert('complete');
+					}
+				</script>
+				<button onclick="testDialog();">duice.dialog.Dialog</button>
 				<dialog id="dialog" style="width:600px; padding:1rem;">
 					<div style="text-align:center;">
 						<img is="duice-ui-img" data-duice-bind="user,image" style="height:64px;"/>

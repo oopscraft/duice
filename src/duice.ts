@@ -462,7 +462,7 @@ namespace duice {
             if(this.eventListener.onPreChange){
                 try {
                     if(await this.eventListener.onPreChange.call(this,name,value) === false){
-                        throw 'canceled';
+                        throw 'Map.set is canceled';
                     }
                 }catch(e){
                     this.setChanged();
@@ -1702,7 +1702,7 @@ namespace duice {
 		setOpacity(opacity:number):void {
 			this.opacity = opacity;
 		}
-        block():void {
+        block() {
             
             // adjusting position
             this.div.style.position = 'fixed';
@@ -1719,7 +1719,7 @@ namespace duice {
             // append
             this.element.appendChild(this.div);
         }
-        unblock():void {
+        unblock() {
             this.element.removeChild(this.div);
         }
 		takePosition() { 
@@ -1825,8 +1825,10 @@ namespace duice {
         headerDiv:HTMLDivElement;
         bodyDiv:HTMLDivElement;
         blocker:Blocker;
-        promise:Promise<any>;
         eventListener:ModalEventListener = new ModalEventListener();
+        promise:Promise<any>;
+        promiseResolve:Function;
+        promiseReject:Function;
         constructor(){
             var $this = this;
             this.container = document.createElement('div');
@@ -1869,23 +1871,43 @@ namespace duice {
             
             // creates body
             this.bodyDiv = document.createElement('div');
+            this.bodyDiv.classList.add('duice-modal__bodyDiv');
             this.container.appendChild(this.bodyDiv);
 
             // adds blocker
             this.blocker = new Blocker(getCurrentWindow().document.body);
         }
+
+        /**
+         * Adds modal content
+         * @param content 
+         */
         addContent(content:HTMLDivElement):void {
             this.bodyDiv.appendChild(content);
         }
+
+        /**
+         * Removes modal content
+         * @param content 
+         */
 		removeContent(content:HTMLDivElement):void {
 			this.bodyDiv.removeChild(content);
-		}
+        }
+        
+        /**
+         * Creates button element for modal
+         * @param type 
+         */
         createButton(type:string):HTMLButtonElement {
             var button = document.createElement('button');
             button.classList.add('duice-modal__button--' + type);
             return button;
         }
-        show():void {
+
+        /**
+         * Shows modal
+         */
+        show() {
             
             // block
             this.blocker.block();
@@ -1896,37 +1918,75 @@ namespace duice {
             this.container.style.zIndex = String(getCurrentMaxZIndex() + 1);
             getCurrentWindow().document.body.appendChild(this.container);
             setPositionCentered(this.container);
-        }
-        hide():void {
 
+            //return promise to delay
+            return new Promise(function(resolve,reject){
+                setTimeout(function(){
+                    resolve(true);
+                }, 100);
+            });
+        }
+
+        /**
+         * Hides modal
+         */
+        hide() {
             // closes modal
             this.container.style.display = 'none';
             getCurrentWindow().document.body.removeChild(this.container);
             
             // unblock
             this.blocker.unblock();
+
+            // return promise to delay
+            return new Promise(function(resolve,reject){
+                setTimeout(function(){
+                    resolve(true);
+                }, 100);
+            });
         }
+
+        /**
+         * open
+         * @param args 
+         */
         async open(...args:any[]) {
             if(this.eventListener.onPreOpen){
                 if(await this.eventListener.onPreOpen.call(this, ...args) === false){
-                    throw 'canceled';
+                    return;
                 }
             }
-            this.show();
+            await this.show();
             if(this.eventListener.onPostOpen){
-                await delayCall(200, this.eventListener.onPostOpen, this, ...args);
+                await this.eventListener.onPostOpen.call(this, ...args);
             }
+
+            // creates promise
+            var $this = this;
+            this.promise = new Promise(function(resolve,reject){
+                $this.promiseResolve = resolve;
+                $this.promiseReject = reject;
+            });
+            return this.promise;
         }
+
+        /**
+         * close
+         * @param args 
+         */
         async close(...args:any[]) {
             if(this.eventListener.onPreClose){
                 if(await this.eventListener.onPreClose.call(this, ...args) === false){
-                    throw 'canceled';
+                    return;
                 }
             }
-            this.hide();
+            await this.hide();
             if(this.eventListener.onPostClose){
-                await delayCall(200, this.eventListener.onPostClose, this, ...args);
+                await this.eventListener.onPostClose.call(this, ...args);
             }
+
+            // resolves promise
+            this.promiseResolve(false);
         }
 
         /**
@@ -1936,13 +1996,16 @@ namespace duice {
         async confirm(...args: any[]) {
             if(this.eventListener.onPreConfirm){
                 if(await this.eventListener.onPreConfirm.call(this, ...args) === false){
-                    throw 'canceled';
+                    return;
                 }
             }
-            this.hide();
+            await this.hide();
             if(this.eventListener.onPostConfirm){
-                await delayCall(200, this.eventListener.onPostConfirm, this, ...args);
+                await this.eventListener.onPostConfirm.call(this, ...args);
             }
+
+            // resolves promise
+            this.promiseResolve(true);
         }
 
         /**
@@ -2035,9 +2098,10 @@ namespace duice {
             this.addContent(this.messageDiv);
             this.addContent(this.buttonDiv);
         }
-        async open() {
-            super.open();
+        open() {
+            var promise = super.open();
             this.confirmButton.focus();
+            return promise;
         }
     }
     
@@ -2085,9 +2149,10 @@ namespace duice {
             this.addContent(this.messageDiv);
             this.addContent(this.buttonDiv);
         }
-        async open() {
-            super.open();
+        open() {
+            var promise = super.open();
             this.confirmButton.focus();
+            return promise;
         }
     }
     
@@ -2144,9 +2209,10 @@ namespace duice {
             this.addContent(this.inputDiv);
             this.addContent(this.buttonDiv);
         }
-        async open() {
-            super.open();
+        open() {
+            var promise = super.open();
             this.input.focus();
+            return promise;
         }
         getValue():string {
             return this.input.value;
@@ -2166,28 +2232,31 @@ namespace duice {
             this.dialog.classList.add('duice-dialog');
             this.parentNode = this.dialog.parentNode;
         }
-        async open(...args:any[]) {
+        open(...args:any[]) {
             this.dialog.style.display = 'block';
             this.addContent(this.dialog);
 
             // opens dialog
             try {
-                super.open(...args);
+                var promise = super.open(...args);
+                return promise;
             }catch(e){
                 this.dialog.style.display = 'none';
                 this.parentNode.appendChild(this.dialog);
                 throw e;
             }
         }
-        async close(...args:any[]) {
-            super.close(...args);
+        close(...args:any[]) {
+            var promise = super.close(...args);
             this.dialog.style.display = 'none';
             this.parentNode.appendChild(this.dialog);
+            return promise;
         }
-        async confirm(...args:any[]) {
-            super.confirm(...args);
+        confirm(...args:any[]) {
+            var promise = super.confirm(...args);
             this.dialog.style.display = 'none';
             this.parentNode.appendChild(this.dialog);
+            return promise;
         }
     }
     

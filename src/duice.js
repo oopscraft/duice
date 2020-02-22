@@ -394,7 +394,7 @@ var duice;
                 if (this.eventListener.onPreChange) {
                     try {
                         if ((yield this.eventListener.onPreChange.call(this, name, value)) === false) {
-                            throw 'canceled';
+                            throw 'Map.set is canceled';
                         }
                     }
                     catch (e) {
@@ -1663,21 +1663,37 @@ var duice;
             this.headerDiv.appendChild(closeButton);
             // creates body
             this.bodyDiv = document.createElement('div');
+            this.bodyDiv.classList.add('duice-modal__bodyDiv');
             this.container.appendChild(this.bodyDiv);
             // adds blocker
             this.blocker = new Blocker(getCurrentWindow().document.body);
         }
+        /**
+         * Adds modal content
+         * @param content
+         */
         addContent(content) {
             this.bodyDiv.appendChild(content);
         }
+        /**
+         * Removes modal content
+         * @param content
+         */
         removeContent(content) {
             this.bodyDiv.removeChild(content);
         }
+        /**
+         * Creates button element for modal
+         * @param type
+         */
         createButton(type) {
             var button = document.createElement('button');
             button.classList.add('duice-modal__button--' + type);
             return button;
         }
+        /**
+         * Shows modal
+         */
         show() {
             // block
             this.blocker.block();
@@ -1687,38 +1703,70 @@ var duice;
             this.container.style.zIndex = String(getCurrentMaxZIndex() + 1);
             getCurrentWindow().document.body.appendChild(this.container);
             setPositionCentered(this.container);
+            //return promise to delay
+            return new Promise(function (resolve, reject) {
+                setTimeout(function () {
+                    resolve(true);
+                }, 100);
+            });
         }
+        /**
+         * Hides modal
+         */
         hide() {
             // closes modal
             this.container.style.display = 'none';
             getCurrentWindow().document.body.removeChild(this.container);
             // unblock
             this.blocker.unblock();
+            // return promise to delay
+            return new Promise(function (resolve, reject) {
+                setTimeout(function () {
+                    resolve(true);
+                }, 100);
+            });
         }
+        /**
+         * open
+         * @param args
+         */
         open(...args) {
             return __awaiter(this, void 0, void 0, function* () {
                 if (this.eventListener.onPreOpen) {
                     if ((yield this.eventListener.onPreOpen.call(this, ...args)) === false) {
-                        throw 'canceled';
+                        return;
                     }
                 }
-                this.show();
+                yield this.show();
                 if (this.eventListener.onPostOpen) {
-                    yield delayCall(200, this.eventListener.onPostOpen, this, ...args);
+                    yield this.eventListener.onPostOpen.call(this, ...args);
                 }
+                // creates promise
+                var $this = this;
+                this.promise = new Promise(function (resolve, reject) {
+                    $this.promiseResolve = resolve;
+                    $this.promiseReject = reject;
+                });
+                return this.promise;
             });
         }
+        /**
+         * close
+         * @param args
+         */
         close(...args) {
             return __awaiter(this, void 0, void 0, function* () {
                 if (this.eventListener.onPreClose) {
                     if ((yield this.eventListener.onPreClose.call(this, ...args)) === false) {
-                        throw 'canceled';
+                        return;
                     }
                 }
-                this.hide();
+                yield this.hide();
                 if (this.eventListener.onPostClose) {
-                    yield delayCall(200, this.eventListener.onPostClose, this, ...args);
+                    yield this.eventListener.onPostClose.call(this, ...args);
                 }
+                // resolves promise
+                this.promiseResolve(false);
             });
         }
         /**
@@ -1729,13 +1777,15 @@ var duice;
             return __awaiter(this, void 0, void 0, function* () {
                 if (this.eventListener.onPreConfirm) {
                     if ((yield this.eventListener.onPreConfirm.call(this, ...args)) === false) {
-                        throw 'canceled';
+                        return;
                     }
                 }
-                this.hide();
+                yield this.hide();
                 if (this.eventListener.onPostConfirm) {
-                    yield delayCall(200, this.eventListener.onPostConfirm, this, ...args);
+                    yield this.eventListener.onPostConfirm.call(this, ...args);
                 }
+                // resolves promise
+                this.promiseResolve(true);
             });
         }
         /**
@@ -1814,13 +1864,9 @@ var duice;
             this.addContent(this.buttonDiv);
         }
         open() {
-            const _super = Object.create(null, {
-                open: { get: () => super.open }
-            });
-            return __awaiter(this, void 0, void 0, function* () {
-                _super.open.call(this);
-                this.confirmButton.focus();
-            });
+            var promise = super.open();
+            this.confirmButton.focus();
+            return promise;
         }
     }
     duice.Alert = Alert;
@@ -1857,13 +1903,9 @@ var duice;
             this.addContent(this.buttonDiv);
         }
         open() {
-            const _super = Object.create(null, {
-                open: { get: () => super.open }
-            });
-            return __awaiter(this, void 0, void 0, function* () {
-                _super.open.call(this);
-                this.confirmButton.focus();
-            });
+            var promise = super.open();
+            this.confirmButton.focus();
+            return promise;
         }
     }
     duice.Confirm = Confirm;
@@ -1906,13 +1948,9 @@ var duice;
             this.addContent(this.buttonDiv);
         }
         open() {
-            const _super = Object.create(null, {
-                open: { get: () => super.open }
-            });
-            return __awaiter(this, void 0, void 0, function* () {
-                _super.open.call(this);
-                this.input.focus();
-            });
+            var promise = super.open();
+            this.input.focus();
+            return promise;
         }
         getValue() {
             return this.input.value;
@@ -1931,42 +1969,30 @@ var duice;
             this.parentNode = this.dialog.parentNode;
         }
         open(...args) {
-            const _super = Object.create(null, {
-                open: { get: () => super.open }
-            });
-            return __awaiter(this, void 0, void 0, function* () {
-                this.dialog.style.display = 'block';
-                this.addContent(this.dialog);
-                // opens dialog
-                try {
-                    _super.open.call(this, ...args);
-                }
-                catch (e) {
-                    this.dialog.style.display = 'none';
-                    this.parentNode.appendChild(this.dialog);
-                    throw e;
-                }
-            });
+            this.dialog.style.display = 'block';
+            this.addContent(this.dialog);
+            // opens dialog
+            try {
+                var promise = super.open(...args);
+                return promise;
+            }
+            catch (e) {
+                this.dialog.style.display = 'none';
+                this.parentNode.appendChild(this.dialog);
+                throw e;
+            }
         }
         close(...args) {
-            const _super = Object.create(null, {
-                close: { get: () => super.close }
-            });
-            return __awaiter(this, void 0, void 0, function* () {
-                _super.close.call(this, ...args);
-                this.dialog.style.display = 'none';
-                this.parentNode.appendChild(this.dialog);
-            });
+            var promise = super.close(...args);
+            this.dialog.style.display = 'none';
+            this.parentNode.appendChild(this.dialog);
+            return promise;
         }
         confirm(...args) {
-            const _super = Object.create(null, {
-                confirm: { get: () => super.confirm }
-            });
-            return __awaiter(this, void 0, void 0, function* () {
-                _super.confirm.call(this, ...args);
-                this.dialog.style.display = 'none';
-                this.parentNode.appendChild(this.dialog);
-            });
+            var promise = super.confirm(...args);
+            this.dialog.style.display = 'none';
+            this.parentNode.appendChild(this.dialog);
+            return promise;
         }
     }
     duice.Dialog = Dialog;

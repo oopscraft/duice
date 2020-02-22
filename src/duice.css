@@ -142,6 +142,7 @@
 	width: 100%;
 	min-height: 64px;
 	text-align: center;
+	white-space: pre-wrap;
 }
 .duice-alert__buttonDiv {
 	text-align: center;
@@ -182,11 +183,13 @@
 	width: 100%;
 	min-height: 32px;
 	text-align: center;
+	white-space: pre-wrap;
 }
 .duice-prompt__inputDiv {
 	width: 100%;
 	height: 32px;
 	text-align: center;
+	white-space: pre-wrap;
 }
 .duice-prompt__inputDiv-input {
 	width: 70%;
@@ -206,6 +209,9 @@
 /**
  * duice.ui.Dialog
  */
+dialog {
+	display: none;
+}
 .duice-dialog {
 	position: static;
 	border: solid 0px;
