@@ -391,9 +391,9 @@ var duice;
         set(name, value) {
             return __awaiter(this, void 0, void 0, function* () {
                 // calls beforeChange
-                if (this.eventListener.onPreChange) {
+                if (this.eventListener.onBeforeChange) {
                     try {
-                        if ((yield this.eventListener.onPreChange.call(this, name, value)) === false) {
+                        if ((yield this.eventListener.onBeforeChange.call(this, name, value)) === false) {
                             throw 'Map.set is canceled';
                         }
                     }
@@ -408,8 +408,8 @@ var duice;
                 this.setChanged();
                 this.notifyObservers(this);
                 // calls 
-                if (this.eventListener.onPostChange) {
-                    this.eventListener.onPostChange.call(this, name, value);
+                if (this.eventListener.onAfterChange) {
+                    this.eventListener.onAfterChange.call(this, name, value);
                 }
                 // return true
                 return true;
@@ -454,15 +454,15 @@ var duice;
          * Sets listener before change
          * @param listener
          */
-        onPreChange(listener) {
-            this.eventListener.onPreChange = listener;
+        onBeforeChange(listener) {
+            this.eventListener.onBeforeChange = listener;
         }
         /**
          * Sets listener after change
          * @param listener
          */
-        onPostChange(listener) {
-            this.eventListener.onPostChange = listener;
+        onAfterChange(listener) {
+            this.eventListener.onAfterChange = listener;
         }
     }
     duice.Map = Map;
@@ -507,8 +507,8 @@ var duice;
                 var map = new duice.Map(jsonArray[i]);
                 map.disable = this.disable;
                 map.readonly = clone(this.readonly);
-                map.onPreChange(this.eventListener.onPreChangeRow);
-                map.onPostChange(this.eventListener.onPostChangeRow);
+                map.onBeforeChange(this.eventListener.onBeforeChangeRow);
+                map.onAfterChange(this.eventListener.onAfterChangeRow);
                 map.addObserver(this);
                 this.data.push(map);
             }
@@ -594,16 +594,16 @@ var duice;
             return __awaiter(this, void 0, void 0, function* () {
                 var selectedRow = this.getRow(index);
                 // calls beforeChangeIndex 
-                if (this.eventListener.onPreSelectRow) {
-                    if ((yield this.eventListener.onPreSelectRow.call(this, selectedRow)) === false) {
+                if (this.eventListener.onBeforeSelectRow) {
+                    if ((yield this.eventListener.onBeforeSelectRow.call(this, selectedRow)) === false) {
                         throw 'canceled';
                     }
                 }
                 // changes index
                 this.setIndex(index);
                 // calls 
-                if (this.eventListener.onPostSelectRow) {
-                    this.eventListener.onPostSelectRow.call(this, selectedRow);
+                if (this.eventListener.onAfterSelectRow) {
+                    this.eventListener.onAfterSelectRow.call(this, selectedRow);
                 }
                 // returns true
                 return true;
@@ -619,8 +619,8 @@ var duice;
                 var sourceMap = this.getRow(fromIndex);
                 var targetMap = this.getRow(toIndex);
                 // calls beforeChangeIndex 
-                if (this.eventListener.onPreMoveRow) {
-                    if ((yield this.eventListener.onPreMoveRow.call(this, sourceMap, targetMap)) === false) {
+                if (this.eventListener.onBeforeMoveRow) {
+                    if ((yield this.eventListener.onBeforeMoveRow.call(this, sourceMap, targetMap)) === false) {
                         throw 'canceled';
                     }
                 }
@@ -629,8 +629,8 @@ var duice;
                 this.data.splice(toIndex, 0, this.data.splice(fromIndex, 1)[0]);
                 this.setIndex(toIndex);
                 // calls 
-                if (this.eventListener.onPostMoveRow) {
-                    yield this.eventListener.onPostMoveRow.call(this, sourceMap, targetMap);
+                if (this.eventListener.onAfterMoveRow) {
+                    yield this.eventListener.onAfterMoveRow.call(this, sourceMap, targetMap);
                 }
             });
         }
@@ -641,8 +641,8 @@ var duice;
         addRow(map) {
             map.disable = this.disable;
             map.readonly = clone(this.readonly);
-            map.onPreChange(this.eventListener.onPreChangeRow);
-            map.onPostChange(this.eventListener.onPostChangeRow);
+            map.onBeforeChange(this.eventListener.onBeforeChangeRow);
+            map.onAfterChange(this.eventListener.onAfterChangeRow);
             map.addObserver(this);
             this.data.push(map);
             this.setIndex(this.getRowCount() - 1);
@@ -656,8 +656,8 @@ var duice;
             if (0 <= index && index < this.data.length) {
                 map.disable = this.disable;
                 map.readonly = clone(this.readonly);
-                map.onPreChange(this.eventListener.onPreChangeRow);
-                map.onPostChange(this.eventListener.onPostChangeRow);
+                map.onBeforeChange(this.eventListener.onBeforeChangeRow);
+                map.onAfterChange(this.eventListener.onAfterChangeRow);
                 map.addObserver(this);
                 this.data.splice(index, 0, map);
                 this.setIndex(index);
@@ -731,51 +731,51 @@ var duice;
             super.setReadonly(name, readonly);
         }
         /**
-         * onPreSelectRow
+         * onBeforeSelectRow
          * @param listener
          */
-        onPreSelectRow(listener) {
-            this.eventListener.onPreSelectRow = listener;
+        onBeforeSelectRow(listener) {
+            this.eventListener.onBeforeSelectRow = listener;
         }
         /**
-         * onPostSelectRow
-         * @param listener onPostSelectRow event listener
+         * onAfterSelectRow
+         * @param listener onAfterSelectRow event listener
          */
-        onPostSelectRow(listener) {
-            this.eventListener.onPostSelectRow = listener;
+        onAfterSelectRow(listener) {
+            this.eventListener.onAfterSelectRow = listener;
         }
         /**
-         * onPreMoveRow
-         * @param listener onPreMoveRow event listener
+         * onBeforeMoveRow
+         * @param listener onBeforeMoveRow event listener
          */
-        onPreMoveRow(listener) {
-            this.eventListener.onPreMoveRow = listener;
+        onBeforeMoveRow(listener) {
+            this.eventListener.onBeforeMoveRow = listener;
         }
         /**
-         * onPostMoveRow
+         * onAfterMoveRow
          * @param listener
          */
-        onPostMoveRow(listener) {
-            this.eventListener.onPostMoveRow = listener;
+        onAfterMoveRow(listener) {
+            this.eventListener.onAfterMoveRow = listener;
         }
         /**
-         * onPreChangeRow
+         * onBeforeChangeRow
          * @param listener
          */
-        onPreChangeRow(listener) {
-            this.eventListener.onPreChangeRow = listener;
+        onBeforeChangeRow(listener) {
+            this.eventListener.onBeforeChangeRow = listener;
             this.data.forEach(function (map) {
-                map.onPreChange(listener);
+                map.onBeforeChange(listener);
             });
         }
         /**
-         * onPostChangeRow
+         * onAfterChangeRow
          * @param listener
          */
-        onPostChangeRow(listener) {
-            this.eventListener.onPostChangeRow = listener;
+        onAfterChangeRow(listener) {
+            this.eventListener.onAfterChangeRow = listener;
             this.data.forEach(function (map) {
-                map.onPostChange(listener);
+                map.onAfterChange(listener);
             });
         }
     }
@@ -1732,14 +1732,14 @@ var duice;
          */
         open(...args) {
             return __awaiter(this, void 0, void 0, function* () {
-                if (this.eventListener.onPreOpen) {
-                    if ((yield this.eventListener.onPreOpen.call(this, ...args)) === false) {
+                if (this.eventListener.onBeforeOpen) {
+                    if ((yield this.eventListener.onBeforeOpen.call(this, ...args)) === false) {
                         return;
                     }
                 }
                 yield this.show();
-                if (this.eventListener.onPostOpen) {
-                    yield this.eventListener.onPostOpen.call(this, ...args);
+                if (this.eventListener.onAfterOpen) {
+                    yield this.eventListener.onAfterOpen.call(this, ...args);
                 }
                 // creates promise
                 var _this = this;
@@ -1756,14 +1756,14 @@ var duice;
          */
         close(...args) {
             return __awaiter(this, void 0, void 0, function* () {
-                if (this.eventListener.onPreClose) {
-                    if ((yield this.eventListener.onPreClose.call(this, ...args)) === false) {
+                if (this.eventListener.onBeforeClose) {
+                    if ((yield this.eventListener.onBeforeClose.call(this, ...args)) === false) {
                         return;
                     }
                 }
                 yield this.hide();
-                if (this.eventListener.onPostClose) {
-                    yield this.eventListener.onPostClose.call(this, ...args);
+                if (this.eventListener.onAfterClose) {
+                    yield this.eventListener.onAfterClose.call(this, ...args);
                 }
                 // resolves promise
                 this.promiseResolve(false);
@@ -1775,65 +1775,65 @@ var duice;
          */
         confirm(...args) {
             return __awaiter(this, void 0, void 0, function* () {
-                if (this.eventListener.onPreConfirm) {
-                    if ((yield this.eventListener.onPreConfirm.call(this, ...args)) === false) {
+                if (this.eventListener.onBeforeConfirm) {
+                    if ((yield this.eventListener.onBeforeConfirm.call(this, ...args)) === false) {
                         return;
                     }
                 }
                 yield this.hide();
-                if (this.eventListener.onPostConfirm) {
-                    yield this.eventListener.onPostConfirm.call(this, ...args);
+                if (this.eventListener.onAfterConfirm) {
+                    yield this.eventListener.onAfterConfirm.call(this, ...args);
                 }
                 // resolves promise
                 this.promiseResolve(true);
             });
         }
         /**
-         * Adds onPreOpen event listener
+         * Adds onBeforeOpen event listener
          * @param listener
          */
-        onPreOpen(listener) {
-            this.eventListener.onPreOpen = listener;
+        onBeforeOpen(listener) {
+            this.eventListener.onBeforeOpen = listener;
             return this;
         }
         /**
-         * Adds onPostOpen even listener
+         * Adds onAfterOpen even listener
          * @param listener
          */
-        onPostOpen(listener) {
-            this.eventListener.onPostOpen = listener;
+        onAfterOpen(listener) {
+            this.eventListener.onAfterOpen = listener;
             return this;
         }
         /**
-         * Adds onPreClose event listener
+         * Adds onBeforeClose event listener
          * @param listener
          */
-        onPreClose(listener) {
-            this.eventListener.onPreClose = listener;
+        onBeforeClose(listener) {
+            this.eventListener.onBeforeClose = listener;
             return this;
         }
         /**
-         * Adds onPostClose event listener
+         * Adds onAfterClose event listener
          * @param listener
          */
-        onPostClose(listener) {
-            this.eventListener.onPostClose = listener;
+        onAfterClose(listener) {
+            this.eventListener.onAfterClose = listener;
             return this;
         }
         /**
-         * Adds onPreConfirm event listener
+         * Adds onBeforeConfirm event listener
          * @param listener
          */
-        onPreConfirm(listener) {
-            this.eventListener.onPreConfirm = listener;
+        onBeforeConfirm(listener) {
+            this.eventListener.onBeforeConfirm = listener;
             return this;
         }
         /**
-         * Adds onPostConfirm event listener
+         * Adds onAfterConfirm event listener
          * @param listener
          */
-        onPostConfirm(listener) {
-            this.eventListener.onPostConfirm = listener;
+        onAfterConfirm(listener) {
+            this.eventListener.onAfterConfirm = listener;
             return this;
         }
     }
@@ -1870,6 +1870,17 @@ var duice;
         }
     }
     duice.Alert = Alert;
+    /**
+     * Help function for duice.Alert class
+     * @param message
+     */
+    function alert(message) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var alertObj = new duice.Alert(message);
+            yield alertObj.open();
+        });
+    }
+    duice.alert = alert;
     /**
      * duice.ui.Confirm
      */
@@ -1909,6 +1920,18 @@ var duice;
         }
     }
     duice.Confirm = Confirm;
+    /**
+     * Help function for duice.Confirm class
+     * @param message
+     */
+    function confirm(message) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var confirmObj = new duice.Confirm(message);
+            var result = yield confirmObj.open();
+            return result;
+        });
+    }
+    duice.confirm = confirm;
     /**
      * duice.ui.Prompt
      */
@@ -1958,6 +1981,23 @@ var duice;
     }
     duice.Prompt = Prompt;
     /**
+     * Help function for duice.Prompt class
+     * @param message
+     */
+    function prompt(message, defaultValue) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var promptObj = new duice.Prompt(message);
+            var result = yield promptObj.open();
+            if (result) {
+                return promptObj.getValue();
+            }
+            else {
+                return defaultValue;
+            }
+        });
+    }
+    duice.prompt = prompt;
+    /**
      * duice.ui.Dialog
      * @param dialog
      */
@@ -1996,6 +2036,17 @@ var duice;
         }
     }
     duice.Dialog = Dialog;
+    /**
+     * Help function for duice.Dialog class
+     * @param message
+     */
+    function dialog(dialog) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var dialogObj = new duice.Dialog(dialog);
+            yield dialogObj.open();
+        });
+    }
+    duice.dialog = dialog;
     /**
      * duice.ui
      */
@@ -2131,6 +2182,40 @@ var duice;
             }
         }
         ui.Span = Span;
+        /**
+         * duice.ui.DivFactory
+         */
+        class DivFactory extends MapUiComponentFactory {
+            getComponent(element) {
+                var div = new Div(element);
+                // binds
+                var bind = element.dataset.duiceBind.split(',');
+                div.bind(this.getContextProperty(bind[0]), bind[1]);
+                return div;
+            }
+        }
+        ui.DivFactory = DivFactory;
+        /**
+         * duice.ui.Div
+         */
+        class Div extends MapUiComponent {
+            constructor(div) {
+                super(div);
+                this.div = div;
+                this.div.classList.add('duice-ui-div');
+            }
+            update(map, obj) {
+                removeChildNodes(this.div);
+                var value = map.get(this.name);
+                value = defaultIfEmpty(value, '');
+                this.div.innerHTML = value;
+            }
+            getValue() {
+                var value = this.div.innerHTML;
+                return value;
+            }
+        }
+        ui.Div = Div;
         /**
          * duice.ui.InputFactory
          */
@@ -3119,12 +3204,6 @@ var duice;
                 prevLi.classList.add('duice-ui-pagination__li--prev');
                 this.ul.appendChild(prevLi);
                 this.lis.push(prevLi);
-                prevLi.addEventListener('click', function (event) {
-                    _this.page = prevPage;
-                    _this.setChanged();
-                    _this.notifyObservers(_this);
-                    this.click();
-                });
                 if (prevPage < 1) {
                     prevLi.onclick = null;
                     prevLi.style.pointerEvents = 'none';
@@ -3134,13 +3213,6 @@ var duice;
                 for (var i = startPage; i <= endPage; i++) {
                     const page = i;
                     var li = this.createPageItem(page, String(page));
-                    // add event listener
-                    li.addEventListener('click', function (event) {
-                        _this.page = page;
-                        _this.setChanged();
-                        _this.notifyObservers(_this);
-                        this.click();
-                    }, true);
                     this.ul.appendChild(li);
                     this.lis.push(li);
                     if (page === this.page) {
@@ -3155,12 +3227,6 @@ var duice;
                 nextLi.classList.add('duice-ui-pagination__li--next');
                 this.ul.appendChild(nextLi);
                 this.lis.push(nextLi);
-                nextLi.addEventListener('click', function (event) {
-                    _this.page = nextPage;
-                    _this.setChanged();
-                    _this.notifyObservers(_this);
-                    this.click();
-                });
                 if (nextPage > totalPage) {
                     nextLi.onclick = null;
                     nextLi.style.pointerEvents = 'none';
@@ -3754,16 +3820,16 @@ var duice;
                             throw 'Not allow to movem, becuase of Circular Reference.';
                         }
                         // calls beforeChangeIndex 
-                        if (this.list.eventListener.onPreMoveRow) {
-                            if ((yield this.list.eventListener.onPreMoveRow.call(this.list, sourceRow, targetRow)) === false) {
+                        if (this.list.eventListener.onBeforeMoveRow) {
+                            if ((yield this.list.eventListener.onBeforeMoveRow.call(this.list, sourceRow, targetRow)) === false) {
                                 throw 'canceled';
                             }
                         }
                         // change parents
                         yield sourceRow.set(this.hierarchy.parentIdName, targetRow === null ? null : targetRow.get(this.hierarchy.idName));
                         // calls 
-                        if (this.list.eventListener.onPostMoveRow) {
-                            yield this.list.eventListener.onPostMoveRow.call(this.list, sourceRow, targetRow);
+                        if (this.list.eventListener.onAfterMoveRow) {
+                            yield this.list.eventListener.onAfterMoveRow.call(this.list, sourceRow, targetRow);
                         }
                         // notifies observers.
                         this.setChanged();
@@ -3815,6 +3881,7 @@ var duice;
         duice.ComponentDefinitionRegistry.add(new ComponentDefinition('ul', 'duice-ui-ul', duice.ui.UListFactory));
         duice.ComponentDefinitionRegistry.add(new ComponentDefinition('*', 'duice-ui-scriptlet', duice.ui.ScriptletFactory));
         duice.ComponentDefinitionRegistry.add(new ComponentDefinition('span', 'duice-ui-span', duice.ui.SpanFactory));
+        duice.ComponentDefinitionRegistry.add(new ComponentDefinition('div', 'duice-ui-div', duice.ui.DivFactory));
         duice.ComponentDefinitionRegistry.add(new ComponentDefinition('input', 'duice-ui-input', duice.ui.InputFactory));
         duice.ComponentDefinitionRegistry.add(new ComponentDefinition('select', 'duice-ui-select', duice.ui.SelectFactory));
         duice.ComponentDefinitionRegistry.add(new ComponentDefinition('textarea', 'duice-ui-textarea', duice.ui.TextareaFactory));

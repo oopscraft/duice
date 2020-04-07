@@ -69,14 +69,14 @@ user.fromJson({
 	totalCount: 89
 });
 
-user.onPreChange(function(name, value){
-	console.log('Map.onPreChange', name, value);
+user.onBeforeChange(function(name, value){
+	console.log('Map.onBeforeChange', name, value);
 	return new Promise(function(resolve, reject){
 		new duice.Confirm('Do you want to change ['+name+'] is ['+ value +']')
-		.onPostConfirm(function(e){
+		.onAfterConfirm(function(e){
 			resolve(true);
 		})
-		.onPostClose(function(e){
+		.onAfterClose(function(e){
 			resolve(false);
 		})
 		.open();
@@ -334,24 +334,24 @@ users.fromJson([
  * Tests users event listener
  */
 // before select row event
-users.onPreSelectRow(function(selectedRow){
-	console.log('onPreSelectRow',selectedRow.toJson());
+users.onBeforeSelectRow(function(selectedRow){
+	console.log('onBeforeSelectRow',selectedRow.toJson());
 });
 
 // after select row event
-users.onPostSelectRow(function(selectedRow){
-	console.log('onPostSelectRow', selectedRow.toJson());
+users.onAfterSelectRow(function(selectedRow){
+	console.log('onAfterSelectRow', selectedRow.toJson());
 });
 
 // before move row event
-users.onPreMoveRow(function(sourceRow, targetRow){
-	console.log('onPreMoveRow', sourceRow.toJson(), (targetRow?targetRow.toJson():targetRow));
+users.onBeforeMoveRow(function(sourceRow, targetRow){
+	console.log('onBeforeMoveRow', sourceRow.toJson(), (targetRow?targetRow.toJson():targetRow));
 	return new Promise(function(resolve, reject){
 		new duice.Confirm('Do you want to move?')
-		.onPostConfirm(function(){
+		.onAfterConfirm(function(){
 			resolve(true);
 		})
-		.onPostClose(function(){
+		.onAfterClose(function(){
 			reject(false);
 		})
 		.open();
@@ -359,19 +359,19 @@ users.onPreMoveRow(function(sourceRow, targetRow){
 });
 
 // after move row event
-users.onPostMoveRow(function(sourceRow, targetRow){
-	console.log('onPostMoveRow', sourceRow.toJson(), (targetRow?targetRow.toJson():targetRow));
+users.onAfterMoveRow(function(sourceRow, targetRow){
+	console.log('onAfterMoveRow', sourceRow.toJson(), (targetRow?targetRow.toJson():targetRow));
 });
 
 // before change row event
-users.onPreChangeRow(function(name, value){
+users.onBeforeChangeRow(function(name, value){
 	console.log('name', name, 'value', value);
 	return new Promise(function(resolve, reject){
 		new duice.Confirm('Do you want to change ['+name+'] is ['+ value +']')
-		.onPostConfirm(function(e){
+		.onAfterConfirm(function(e){
 			resolve(true);
 		})
-		.onPostClose(function(e){
+		.onAfterClose(function(e){
 			resolve(false);
 		})
 		.open();
@@ -379,8 +379,8 @@ users.onPreChangeRow(function(name, value){
 });
 
 // after change row event
-users.onPostChangeRow(function(name, value){
-	console.log('onPostChangeRow ' + name + ' is ' + value);
+users.onAfterChangeRow(function(name, value){
+	console.log('onAfterChangeRow ' + name + ' is ' + value);
 });
 
 /**
@@ -580,6 +580,16 @@ body {
 							</td>
 						</tr>
 						<!-- ================================================================ -->
+						<!-- duice.ui.Div			   										  -->
+						<!-- ================================================================ -->
+						<tr>
+							<th>duice.ui.Div</th>
+							<td><div is="duice-ui-div" data-duice-bind="user,profile"></div></td>
+							<td>
+								&lt;div is="duice-ui-span" data-duice-bind="user,profile" ...
+							</td>
+						</tr>
+						<!-- ================================================================ -->
 						<!-- duice.ui.TextInput		   										  -->
 						<!-- ================================================================ -->
 						<tr>
@@ -724,7 +734,7 @@ body {
 							<th>duice.ui.Pagination</th>
 							<td>
 								<ul is="duice-ui-pagination" data-duice-bind="user,page,rows,totalCount" data-duice-size="5" class="pagination">
-									<li data-page="{{$context.page}}" onclick="alert(user.get('page'));" class="page-link"></li>
+									<li data-page="[@duice[$context.page]]" onclick="alert(this.dataset.page);user.set('page',this.dataset.page);" class="page-link"></li>
 								</ul>
 							</td>
 							<td>
@@ -1307,120 +1317,148 @@ body {
 				<script>
 					async function testAlert() {
 						await new duice.Alert('alert message...')
-						.onPreOpen(function(){
-							console.log('onPreOpen');
-							return confirm('onPreOpen');
+						.onBeforeOpen(function(){
+							console.log('onBeforeOpen');
+							return confirm('onBeforeOpen');
 						})
-						.onPostOpen(function(){
-							console.log('onPostOpen');
-							alert('onPostOpen');
+						.onAfterOpen(function(){
+							console.log('onAfterOpen');
+							alert('onAfterOpen');
 						})
-						.onPreClose(function(){
-							console.log('onPreClose');
-							return confirm('onPreClose');
+						.onBeforeClose(function(){
+							console.log('onBeforeClose');
+							return confirm('onBeforeClose');
 						})
-						.onPostClose(function(){
-							console.log('onPostClose');
-							alert('onPostClose');
+						.onAfterClose(function(){
+							console.log('onAfterClose');
+							alert('onAfterClose');
 						})
 						.open();
 						alert('complete');
 					}
 				</script>
 				<button onclick="testAlert();">duice.Alert</button>
+				<script>
+					async function testAlertFunction() {
+						await duice.alert('alert message...');
+						alert('complete');
+					}
+				</script>
+				<button onclick="testAlertFunction();">duice.alert(message)</button>
 				<!-- ============================================================== -->
 				<!-- duice.Confirm									  				-->
 				<!-- ============================================================== -->
 				<script>
 					async function testConfirm() {
 						await new duice.Confirm('confirm message...')
-						.onPreOpen(function(){
-							console.log('onPreOpen');
-							return confirm('onPreOpen');
+						.onBeforeOpen(function(){
+							console.log('onBeforeOpen');
+							return confirm('onBeforeOpen');
 						})
-						.onPostOpen(function(){
-							console.log('onPostOpen');
-							alert('onPostOpen');
+						.onAfterOpen(function(){
+							console.log('onAfterOpen');
+							alert('onAfterOpen');
 						})
-						.onPreClose(function(){
-							console.log('onPreClose');
-							return confirm('onPreClose');
+						.onBeforeClose(function(){
+							console.log('onBeforeClose');
+							return confirm('onBeforeClose');
 						})
-						.onPostClose(function(){
-							console.log('onPostClose');
-							alert('onPostClose');
+						.onAfterClose(function(){
+							console.log('onAfterClose');
+							alert('onAfterClose');
 						})
-						.onPreConfirm(function(){
-							console.log('onPreConfirm');
-							return confirm('onPreConfirm');
+						.onBeforeConfirm(function(){
+							console.log('onBeforeConfirm');
+							return confirm('onBeforeConfirm');
 						})
-						.onPostConfirm(function(){
-							console.log('onPostConfirm');
-							alert('onPostConfirm');
+						.onAfterConfirm(function(){
+							console.log('onAfterConfirm');
+							alert('onAfterConfirm');
 						})
 						.open();
 						alert('complete');
 					}
 				</script>
-				<!-- ============================================================== -->
-				<!-- duice.Confirm									  				-->
-				<!-- ============================================================== -->
 				<button onclick="testConfirm();">duice.Confirm</button>
+				<script>
+					async function testConfirmFunction() {
+						var result = await duice.confirm('confirm message...');
+						alert('result is ' + result);
+					}
+				</script>
+				<button onclick="testConfirmFunction();">duice.confirm(message)</button>
+				<!-- ============================================================== -->
+				<!-- duice.Prompt									  				-->
+				<!-- ============================================================== -->
 				<script>
 					async function testPrompt() {
 						await new duice.Prompt('enter value...')
-						.onPreOpen(function(){
-							return confirm('onPreOpen');
+						.onBeforeOpen(function(){
+							return confirm('onBeforeOpen');
 						})
-						.onPostOpen(function(){
-							alert('onPostOpen');
+						.onAfterOpen(function(){
+							alert('onAfterOpen');
 						})
-						.onPreClose(function(){
-							return confirm('onPreClose');
+						.onBeforeClose(function(){
+							return confirm('onBeforeClose');
 						})
-						.onPostClose(function(){
-							alert('onPostClose');
+						.onAfterClose(function(){
+							alert('onAfterClose');
 						})
-						.onPreConfirm(function(){
-							return confirm('onPreConfirm:' + this.getValue());
+						.onBeforeConfirm(function(){
+							return confirm('onBeforeConfirm:' + this.getValue());
 						})
-						.onPostConfirm(function(){
-							alert('onPostConfirm:' + this.getValue());
+						.onAfterConfirm(function(){
+							alert('onAfterConfirm:' + this.getValue());
 						})
 						.open();
 						alert('complete');
 					}
 				</script>
 				<button onclick="testPrompt();">duice.dialog.Prompt</button>
+				<script>
+					async function testPromptFunction() {
+						var value = await duice.prompt('prompt message...');
+						alert('value is ' + value);
+					}
+				</script>
+				<button onclick="testPromptFunction();">duice.prompt(message)</button>
 				<!-- ============================================================== -->
 				<!-- duice.Dialog									  				-->
 				<!-- ============================================================== -->
 				<script>
 					async function testDialog() {
 						await new duice.Dialog(document.getElementById('dialog'))
-						.onPreOpen(function(){
-							return confirm('onPreOpen');
+						.onBeforeOpen(function(){
+							return confirm('onBeforeOpen');
 						})
-						.onPostOpen(function(){
-							alert('onPostOpen');
+						.onAfterOpen(function(){
+							alert('onAfterOpen');
 						})
-						.onPreClose(function(){
-							return confirm('onPreClose');
+						.onBeforeClose(function(){
+							return confirm('onBeforeClose');
 						})
-						.onPostClose(function(){
-							alert('onPostClose');
+						.onAfterClose(function(){
+							alert('onAfterClose');
 						})
-						.onPreConfirm(function(){
-							return confirm('onPreConfirm');
+						.onBeforeConfirm(function(){
+							return confirm('onBeforeConfirm');
 						})
-						.onPostConfirm(function(){
-							alert('onPostConfirm');
+						.onAfterConfirm(function(){
+							alert('onAfterConfirm');
 						})
 						.open();
 						alert('complete');
 					}
 				</script>
 				<button onclick="testDialog();">duice.dialog.Dialog</button>
+				<script>
+					async function testDialogFunction() {
+						await duice.dialog(document.getElementById('dialog'));
+						alert('complete');
+					}
+				</script>
+				<button onclick="testDialogFunction();">duice.dialog(HTMLElement)</button>
 				<dialog id="dialog" style="width:600px; padding:1rem;">
 					<div style="text-align:center;">
 						<img is="duice-ui-img" data-duice-bind="user,image" style="height:64px;"/>

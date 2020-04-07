@@ -250,6 +250,23 @@ span[is="duice-ui-span"],
 }
 
 /**
+ * duice.ui.Div
+ */
+ div[is="duice-ui-div"],
+ .duice-ui-div {
+	 height: inherit;
+	 line-height: inherit;
+	 margin: 0;
+	 padding: 0rem 0.3rem;
+	 border: 1px solid transparent;
+	 cursor: inherit;
+	 white-space: pre-line;
+	 font-family: inherit;
+	 font-size: inherit;
+	 font-weight: inherit;
+ }
+
+/**
  * duice.ui.GenericInput
  */
  input[is="duice-ui-input"][type="password"],
@@ -812,6 +829,7 @@ ul[is="duice-ui-pagination"],
 table[is="duice-ui-table"],
 .duice-ui-table {
 	border-collapse: collapse;
+	margin: 0px;
 }
 .duice-ui-table__caption {
 	font-weight: bold;
@@ -874,7 +892,6 @@ table[is="duice-ui-table"],
 	line-height: inherit;
 }
 .duice-ui-table__tfoot-tr-td {
-	border: solid 1px #dee2e6;
 	height: inherit;
 	line-height: inherit;
 	padding: 2px;
