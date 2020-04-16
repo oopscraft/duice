@@ -9,18 +9,17 @@
 <script src="polyfill/classList.js"></script>
 <script src="duice.js"></script>
 <link rel="stylesheet" type="text/css" href="duice.css">
-<!-- suneditor 
-<script src="plugin/duice-plugin-suneditor.js"></script>
-<script src="plugin/suneditor/suneditor.min.js"></script>
-<link rel="stylesheet" type="text/css" href="plugin/suneditor/css/suneditor.min.css">
--->
+<!-- ckeditor -->
+<script src="integrate/ckeditor/ckeditor.js"></script>
+<script src="integrate/duice-ckeditor.js"></script>
+
 <script>
 /**
- * integrateWith
+ * loads framework
  */
-function integrateWith(integrate){
-	if(integrate){
-		window.location.href = window.location.href.split('?')[0] + '?integrate=' + integrate;
+function loadFramework(framework){
+	if(framework){
+		window.location.href = window.location.href.split('?')[0] + '?framework=' + framework;
 	}else{
 		window.location.href = window.location.href;
 	}
@@ -28,20 +27,19 @@ function integrateWith(integrate){
 /**
  * Load integrated library or framework
  */
-switch(duice.getQueryVariables().integrate){
+switch(duice.parseQueryString().framework){
 case 'bootstrap':
-	duice.Configuration.cssEnable = false;
-	duice.loadExternalScript('integrate/bootstrap/jquery.slim.min.js');
-	duice.loadExternalScript('integrate/bootstrap/popper.min.js');
-	duice.loadExternalStyle('integrate/bootstrap/css/bootstrap.min.css');
-	duice.loadExternalScript('integrate/bootstrap/js/bootstrap.min.js');
+	duice.loadExternalScript('framework/bootstrap/jquery.slim.min.js');
+	duice.loadExternalScript('framework/bootstrap/popper.min.js');
+	duice.loadExternalStyle('framework/bootstrap/css/bootstrap.min.css');
+	duice.loadExternalScript('framework/bootstrap/js/bootstrap.min.js');
 break;
 }
 
 /**
  * user(duice.Map)
  */
-var user = new duice.Map();
+const user = new duice.Map();
 user.fromJson({
 	id: 'rabbit',
 	parentId: null,
@@ -69,6 +67,7 @@ user.fromJson({
 	totalCount: 89
 });
 
+// adds map change listener
 user.onBeforeChange(function(name, value){
 	console.log('Map.onBeforeChange', name, value);
 	return new Promise(function(resolve, reject){
@@ -86,7 +85,7 @@ user.onBeforeChange(function(name, value){
 /**
  * groups(duice.List) for select options
  */
-var groups = new duice.List();
+const groups = new duice.List();
 groups.fromJson([
 	{id:"fruit", name:"Fruit"},
 	{id:"animal", name:"Animal"},
@@ -96,7 +95,7 @@ groups.fromJson([
 /**
  * users(duice.List)
  */
-var users = new duice.List();
+const users = new duice.List();
 users.fromJson([
     {
         id: 'rabbit',
@@ -388,8 +387,8 @@ users.onAfterChangeRow(function(name, value){
  */
 document.addEventListener("DOMContentLoaded", function(event) {
 	
-	// integrate select
-	document.getElementById('integrate').value = duice.getQueryVariables().integrate;
+	// framework select
+	document.getElementById('framework').value = duice.parseQueryString().framework;
 	
 	// prints user as JSON
 	var userTextarea = document.getElementById('userTextarea')
@@ -487,7 +486,7 @@ body {
 			<small>
 				(Data-oriented UI Component Engine)
 				Integrate with 
-				<select id="integrate" onchange="integrateWith(this.value);">
+				<select id="framework" onchange="loadFramework(this.value);">
 					<option> N/A </option>
 					<option value="bootstrap"> bootstrap </option>
 				</select>
@@ -539,162 +538,216 @@ body {
 						<button onclick="user.reset();">reset()</button>
 					</div>
 				</div>
-				<table class="table table-bordered" border="1" style="width:100%; border-collapse:collapse; border:solid 1px #ccc;">
+				<table class="table" border="1" style="width:100%; border-collapse:collapse; border:solid 1px #ccc;">
 					<col align="left" />
 					<col align="left" />
 					<col align="right" />
 					<thead style="background-color:#eee;">
 						<tr>
-							<th>UI Element</th>
+							<th>Custom Element</th>
+							<th>View</th>
 							<th>Example</th>
-							<th>HTML Tag</th>
 						</tr>
 					</thead>
 					<tbody>
 						<!-- ================================================================ -->
-						<!-- duice.ui.Span			   										  -->
+						<!-- duice-span				   										  -->
 						<!-- ================================================================ -->
 						<tr>
-							<th rowspan="4">duice.ui.Span</th>
-							<td><span is="duice-ui-span" data-duice-bind="user,id"></span></td>
+							<th rowspan="4">duice-span</th>
+							<td><span is="duice-span" data-duice-bind="user,id"></span></td>
 							<td>
-								&lt;span is="duice-ui-span" data-duice-bind="user,id" ...
+								&lt;span is="duice-span" data-duice-bind="user,id" ...
 							</td>
 						</tr>
 						<tr>
-							<td><span is="duice-ui-span" data-duice-bind="user,socialNo" data-duice-format="string,######-#######"></span></td>
+							<td><span is="duice-span" data-duice-bind="user,socialNo" data-duice-format="string,######-#######"></span></td>
 							<td>
-								&lt;span is="duice-ui-span" data-duice-bind="user,socialNo" data-duice-format="string,######-#######" ...
+								&lt;span is="duice-span" data-duice-bind="user,socialNo" data-duice-format="string,######-#######" ...
 							</td>
 						</tr>
 						<tr>
-							<td align="right"><span is="duice-ui-span" data-duice-bind="user,balance" data-duice-format="number,2"></span></td>
+							<td align="right"><span is="duice-span" data-duice-bind="user,balance" data-duice-format="number,2"></span></td>
 							<td>
-								&lt;span is="duice-ui-span" data-duice-bind="user,balance" date-duice-format="number,2" ...
+								&lt;span is="duice-span" data-duice-bind="user,balance" date-duice-format="number,2" ...
 							</td>
 						</tr>
 						<tr>
-							<td align="center"><span is="duice-ui-span" data-duice-bind="user,hireDate" data-duice-format="date,yyyy.MM.dd HH:mm:ss"></span></td>
+							<td align="center"><span is="duice-span" data-duice-bind="user,hireDate" data-duice-format="date,yyyy.MM.dd HH:mm:ss"></span></td>
 							<td>
-								&lt;span is="duice-ui-span" data-duice-bind="user,hireDate" data-duice-format="date,yyyy.MM.dd HH:mm:ss" ...
+								&lt;span is="duice-span" data-duice-bind="user,hireDate" data-duice-format="date,yyyy.MM.dd HH:mm:ss" ...
 							</td>
 						</tr>
 						<!-- ================================================================ -->
-						<!-- duice.ui.Div			   										  -->
+						<!-- duice-div				   										  -->
 						<!-- ================================================================ -->
 						<tr>
-							<th>duice.ui.Div</th>
-							<td><div is="duice-ui-div" data-duice-bind="user,profile"></div></td>
+							<th>duice-div</th>
+							<td><div is="duice-div" data-duice-bind="user,profile"></div></td>
 							<td>
-								&lt;div is="duice-ui-span" data-duice-bind="user,profile" ...
+								&lt;div is="duice-div" data-duice-bind="user,profile" ...
 							</td>
 						</tr>
 						<!-- ================================================================ -->
-						<!-- duice.ui.TextInput		   										  -->
+						<!-- duice-input-text		   										  -->
 						<!-- ================================================================ -->
 						<tr>
-							<th rowspan="2">duice.ui.TextInput</th>
-							<td><input is="duice-ui-input" type="text" data-duice-bind="user,name" class="form-control"/></td>
+							<th rowspan="2">duice-input-text</th>
+							<td><input is="duice-input-text" type="text" data-duice-bind="user,name" class="form-control"/></td>
 							<td>
-								&lt;input is="duice-ui-input" type="text" ...
+								&lt;input is="duice-input-text" type="text" ...
 							</td>
 						</tr>
 						<tr>
-							<td><input is="duice-ui-input" type="text" data-duice-bind="user,socialNo" data-duice-format="######-#######" class="form-control"/></td>
+							<td><input is="duice-input-text" type="text" data-duice-bind="user,socialNo" data-duice-format="######-#######" class="form-control"/></td>
 							<td>
-								&lt;input is="duice-ui-input" type="text" data-duice-bind="user,socialNo" data-duice-format="######-#######" ...
+								&lt;input is="duice-input" type="text" data-duice-bind="user,socialNo" data-duice-format="######-#######" ...
 							</td>
 						</tr>
 						<!-- ================================================================ -->
-						<!-- duice.ui.NumberInput		   									  -->
+						<!-- duice-input-number			   									  -->
 						<!-- ================================================================ -->
 						<tr>
-							<th rowspan="2">duice.ui.NumberInput</th>
-							<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance" class="form-control"/></td>
+							<th rowspan="2">duice-input-number</th>
+							<td><input is="duice-input-number" type="number" data-duice-bind="user,balance" class="form-control"/></td>
 							<td>
-								&lt;input is="duice-ui-input" type="number" data-duice-bind="user,balance"
+								&lt;input is="duice-input-number" type="number" data-duice-bind="user,balance"
 							</td>
 						</tr>
 						<tr>
 							<td>
-								<input is="duice-ui-input" type="number" data-duice-bind="user,balance" data-duice-format="2" class="form-control"/>
+								<input is="duice-input-number" type="number" data-duice-bind="user,balance" data-duice-format="2" class="form-control"/>
 							</td>
 							<td>
-								&lt;input is="duice-ui-input" type="number" data-duice-bind="user,balance" data-duice-format="2"
+								&lt;input is="duice-input-number" type="number" data-duice-bind="user,balance" data-duice-format="2"
 							</td>
 						</tr>
 						<!-- ================================================================ -->
-						<!-- duice.ui.DatetimeInput			   									  -->
+						<!-- duice-input-checkbox			   								  -->
 						<!-- ================================================================ -->
 						<tr>
-							<th rowspan="4">duice.ui.DatetimeInput</th>
+							<th>duice-input-checkbox</th>
 							<td align="center">
-								<input is="duice-ui-input" type="datetime-local" data-duice-bind="user,hireDate" class="form-control"/>
+								<input is="duice-input-checkbox" type="checkbox" data-duice-bind="user,active" class="form-check-input"/>
 							</td>
 							<td>
-								&lt;input is="duice-ui-input" type="datetime-local" data-duice-bind="user,hireDate" ...
-							</td>
-						</tr>
-						<tr>
-							<td align="center">
-								<input is="duice-ui-input" type="datetime-local" data-duice-bind="user,hireDate" data-duice-format="yyyy.MM.dd HH:mm:ss" class="form-control"/>
-							</td>
-							<td>
-								&lt;input is="duice-ui-input" type="datetime" data-duice-bind="user,hireDate" data-duice-format="yyyy.MM.dd HH:mm:ss" ...
-							</td>
-						</tr>
-						<tr>
-							<td align="center">
-								<input is="duice-ui-input" type="date" data-duice-bind="user,birthday" class="form-control"/>
-							</td>
-							<td>
-								&lt;input is="duice-ui-input" type="date" data-duice-bind="user,birthday" ...
-							</td>
-						</tr>
-						<tr>
-							<td align="center">
-								<input is="duice-ui-input" type="date" data-duice-bind="user,birthday" data-duice-format="yyyy.MM.dd" class="form-control"/>
-							</td>
-							<td>
-								&lt;input is="duice-ui-input" type="date" data-duice-bind="user,birthday" data-duice-format="yyyy.MM.dd" ...
+								&lt;input is="duice-input-checkbox" type="checkbox" data-duice-bind="user,active" ...
 							</td>
 						</tr>
 						<!-- ================================================================ -->
-						<!-- duice.ui.CheckboxInput			   								  -->
+						<!-- duice-input-radio				   								  -->
 						<!-- ================================================================ -->
 						<tr>
-							<th>duice.ui.CheckboxInput</th>
-							<td align="center">
-								<input is="duice-ui-input" type="checkbox" data-duice-bind="user,active" class="form-check-input"/>
-							</td>
-							<td>
-								&lt;input is="duice-ui-input" type="checkbox" data-duice-bind="user,active" ...
-							</td>
-						</tr>
-						<!-- ================================================================ -->
-						<!-- duice.ui.RadioInput			   								  -->
-						<!-- ================================================================ -->
-						<tr>
-							<th>duice.ui.RadioInput</th>
+							<th>duice-input-radio</th>
 							<td align="center">
 								<div>
-									<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="M" class="form-check-input position-static"/>
+									<input is="duice-input-radio" type="radio" data-duice-bind="user,gender" value="M" class="form-check-input position-static"/>
 								</div>
 								<div>
-									<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="F" class="form-check-input position-static"/>
+									<input is="duice-input-radio" type="radio" data-duice-bind="user,gender" value="F" class="form-check-input position-static"/>
 								</div>
 							</td>
 							<td>
-								&lt;input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="M" ...
+								&lt;input is="duice-input" type="radio" data-duice-bind="user,gender" value="M" ...
 							</td>
 						</tr>
 						<!-- ================================================================ -->
-						<!-- duice.ui.Select				   								  -->
+						<!-- duice-input-date			   									  -->
 						<!-- ================================================================ -->
 						<tr>
-							<th>duice.ui.Select</th>
+							<th rowspan="4">duice-input-date</th>
+							<td align="center">
+								<input is="duice-input-date" type="datetime-local" data-duice-bind="user,hireDate" class="form-control"/>
+							</td>
 							<td>
-								<select is="duice-ui-select" data-duice-bind="user,groupId" class="form-control">
+								&lt;input is="duice-input-date" type="datetime-local" data-duice-bind="user,hireDate" ...
+							</td>
+						</tr>
+						<tr>
+							<td align="center">
+								<input is="duice-input-date" type="datetime-local" data-duice-bind="user,hireDate" data-duice-format="yyyy.MM.dd HH:mm:ss" class="form-control"/>
+							</td>
+							<td>
+								&lt;input is="duice-input-date" type="datetime" data-duice-bind="user,hireDate" data-duice-format="yyyy.MM.dd HH:mm:ss" ...
+							</td>
+						</tr>
+						<tr>
+							<td align="center">
+								<input is="duice-input-date" type="date" data-duice-bind="user,birthday" class="form-control"/>
+							</td>
+							<td>
+								&lt;input is="duice-input-date" type="date" data-duice-bind="user,birthday" ...
+							</td>
+						</tr>
+						<tr>
+							<td align="center">
+								<input is="duice-input-date" type="date" data-duice-bind="user,birthday" data-duice-format="yyyy.MM.dd" class="form-control"/>
+							</td>
+							<td>
+								&lt;input is="duice-input-date" type="date" data-duice-bind="user,birthday" data-duice-format="yyyy.MM.dd" ...
+							</td>
+						</tr>
+						<!-- ================================================================ -->
+						<!-- duice-input-*					   								  -->
+						<!-- ================================================================ -->
+						<tr>
+							<th>duice-input-password</th>
+							<td>
+								<input is="duice-input-password" type="password" data-duice-bind="user,password" class="form-control"/>
+							</td>
+							<td>
+								&lt;input is="duice-input-password" type="password" data-duice-bind="user,password" ...
+							</td>
+						</tr>
+						<tr>
+							<th>duice-input-url</th>
+							<td><input is="duice-input-url" type="url" data-duice-bind="user,url" class="form-control"/></td>
+							<td>
+								&lt;input is="duice-input-url" type="url" data-duice-bind="user,url" ...
+							</td>
+						</tr>
+						<tr>
+							<th>duice-input-email</th>
+							<td><input is="duice-input-email" type="email" data-duice-bind="user,email" class="form-control"/></td>
+							<td>
+								&lt;input is="duice-input-email" type="email" data-duice-bind="user,email" ...
+							</td>
+						</tr>
+						<tr>
+							<th>duice-input-tel</th>
+							<td><input is="duice-input-tel" type="tel" data-duice-bind="user,tel" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}" class="form-control"/></td>
+							<td>
+								&lt;input is="duice-input-tel" type="tel" data-duice-bind="user,tel" ...
+							</td>
+						</tr>
+						<tr>
+							<th>duice-input-time</th>
+							<td><input is="duice-input-time" type="time" data-duice-bind="user,time" class="form-control"/></td>
+							<td>
+								&lt;input is="duice-input-time" type="time" data-duice-bind="user,time" ...
+							</td>
+						</tr>
+						<tr>
+							<th>duice-input-range</th>
+							<td><input is="duice-input-range" type="range" data-duice-bind="user,range" min="0" max="100" step="10" class="custom-range"/></td>
+							<td>
+								&lt;input is="duice-input-range" type="range" data-duice-bind="user,range" min="0" max="100" step="10" ...
+							</td>
+						</tr>
+						<tr>
+							<th>duice-input-color</th>
+							<td><input is="duice-input-color" type="color" data-duice-bind="user,color"/></td>
+							<td>
+								&lt;input is="duice-input-color" type="color" data-duice-bind="user,color" ...
+							</td>
+						</tr>
+						<!-- ================================================================ -->
+						<!-- duice-select					   								  -->
+						<!-- ================================================================ -->
+						<tr>
+							<th>duice-select</th>
+							<td>
+								<select is="duice-select" data-duice-bind="user,groupId" class="form-control">
 									<option value> - select - </option>
 									<option value="animal">Animal</option>
 									<option value="fruit">Fruit</option>
@@ -702,91 +755,43 @@ body {
 								</select>
 							</td>
 							<td>
-								&lt;select is="duice-ui-select" ...
+								&lt;select is="duice-select" ...
 							</td>
 						</tr>
 						<!-- ================================================================ -->
-						<!-- duice.ui.Textarea				   								  -->
+						<!-- duice-textarea				   								  -->
 						<!-- ================================================================ -->
 						<tr>
-							<th>duice.ui.Textarea</th>
-							<td><textarea is="duice-ui-textarea" data-duice-bind="user,profile" class="form-control" id="abc"></textarea></td>
+							<th>duice-textarea</th>
+							<td><textarea is="duice-textarea" data-duice-bind="user,profile" class="form-control" id="abc"></textarea></td>
 							<td>
-								&lt;textarea is="duice-ui-textarea" ...
+								&lt;textarea is="duice-textarea" ...
 							</td>
 						</tr>
 						<!-- ================================================================ -->
-						<!-- duice.ui.Image					   								  -->
+						<!-- duice-img						   								  -->
 						<!-- ================================================================ -->
 						<tr>
-							<th>duice.ui.Image</th>
+							<th>duice-img</th>
 							<td>
-								<img is="duice-ui-img" data-duice-bind="user,image"/>
+								<img is="duice-img" data-duice-bind="user,image"/>
 							</td>
 							<td>
-								&lt;img is="duice-ui-img" data-duice-bind="user,image" ...
+								&lt;img is="duice-img" data-duice-bind="user,image" ...
 							</td>
 						</tr>
 						<!-- ================================================================ -->
-						<!-- duice.ui.Pagination			   								  -->
+						<!-- duice-pagination				   								  -->
 						<!-- ================================================================ -->
 						<tr>
-							<th>duice.ui.Pagination</th>
+							<th>duice-pagination</th>
 							<td>
-								<ul is="duice-ui-pagination" data-duice-bind="user,page,rows,totalCount" data-duice-size="5" class="pagination">
-									<li data-page="[@duice[$context.page]]" onclick="alert(this.dataset.page);user.set('page',this.dataset.page);" class="page-link"></li>
+								<ul is="duice-pagination" data-duice-bind="user,page,rows,totalCount" data-duice-size="5" class="pagination">
+									<li data-page="[@duice[$context.page]]" onclick="alert(this.dataset.page);user.set('page',this.dataset.page);" class="page-item page-link"></li>
 								</ul>
 							</td>
 							<td>
-								&lt;img is="duice-ui-img" data-duice-bind="user,image" ...
-							</td>
-						</tr>
-						<!-- ================================================================ -->
-						<!-- duice.ui.GenericInput			   								  -->
-						<!-- ================================================================ -->
-						<tr>
-							<th rowspan="7">duice.ui.GenericInput</th>
-							<td>
-								<input is="duice-ui-input" type="password" data-duice-bind="user,password" class="form-control"/>
-							</td>
-							<td>
-								&lt;input is="duice-ui-input" type="password" data-duice-bind="user,password" ...
-							</td>
-						</tr>
-						<tr>
-							<td><input is="duice-ui-input" type="url" data-duice-bind="user,url" class="form-control"/></td>
-							<td>
-								&lt;input is="duice-ui-input" type="url" data-duice-bind="user,url" ...
-							</td>
-						</tr>
-						<tr>
-							<td><input is="duice-ui-input" type="email" data-duice-bind="user,email" class="form-control"/></td>
-							<td>
-								&lt;input is="duice-ui-input" type="email" data-duice-bind="user,email" ...
-							</td>
-						</tr>
-						<tr>
-							<td><input is="duice-ui-input" type="tel" data-duice-bind="user,tel" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}" class="form-control"/></td>
-							<td>
-								&lt;input is="duice-ui-input" type="tel" data-duice-bind="user,tel" ...
-							</td>
-						</tr>
-						<tr>
-							<td><input is="duice-ui-input" type="time" data-duice-bind="user,time" class="form-control"/></td>
-							<td>
-								&lt;input is="duice-ui-input" type="time" data-duice-bind="user,time" ...
-							</td>
-						</tr>
-						<tr>
-							<td><input is="duice-ui-input" type="range" data-duice-bind="user,range" min="0" max="100" step="10" class="custom-range"/></td>
-							<td>
-								&lt;input is="duice-ui-input" type="range" data-duice-bind="user,range" min="0" max="100" step="10" ...
-							</td>
-						</tr>
-						<tr>
-							<td><input is="duice-ui-input" type="color" data-duice-bind="user,color"/></td>
-							<td>
-								&lt;input is="duice-ui-input" type="color" data-duice-bind="user,color" ...
+								&lt;img is="duice-img" data-duice-bind="user,image" ...
 							</td>
 						</tr>
 					</tbody>
@@ -796,7 +801,7 @@ body {
 	</section>
 	
 	<!-- ================================================================ -->
-	<!-- duice.ui.ListUIElement   										  -->
+	<!-- duice.ListUIElement	   										  -->
 	<!-- ================================================================ -->
 	<section class="chapter">
 		<div class="chapter__headerDiv">
@@ -808,18 +813,17 @@ body {
 				<textarea id="usersTextarea" class="textarea" style="height:1700px;"></textarea>
 			</div>
 			<div class="chapter__bodyDiv-uiDiv">
-			
 				<!-- ================================================================ -->
-				<!-- duice.ui.Table													  -->
+				<!-- duice-table													  -->
 				<!-- ================================================================ -->
 				<div>
 					<div style="padding:1px; display:flex; justify-content:space-between; align-items:baseline;">
 						<div>
-							<h3>duice.ui.Table 
+							<h3>duice-table
 								<small>
 									(binding to users)
 									-
-									<span is="duice-ui-scriptlet" data-duice-bind="users">
+									<span is="duice-scriptlet" data-duice-bind="users">
 										return $context.users.getRowCount();
 									</span>
 									Rows
@@ -861,18 +865,11 @@ body {
 
 					</div>
 					<div>
-						<table is="duice-ui-table" 
+						<table is="duice-table" 
 							data-duice-bind="users,user" 
 							data-duice-selectable="true"
 							data-duice-editable="true"
-							data-duice-onRowSelected="
-							function(index){
-								if(1 > 0){
-									console.log(index);
-								}
-							}
-							"
-							class="table table-bordered"
+							class="table"
 							style="width:100%;">
 							<thead class="thead-light">
 								<tr>
@@ -895,31 +892,31 @@ body {
 							</thead>
 							<tbody>
 								<tr>
-									<td><span is="duice-ui-scriptlet" data-duice-bind="user">return $context.index + 1;</span></td>
-									<td><span is="duice-ui-span" data-duice-bind="user,id" class="form-control"></span></td>
-									<td><span is="duice-ui-span" data-duice-bind="user,parentId"></span></td>
-									<td><img is="duice-ui-img" data-duice-bind="user,image" src="//:0" style="height:16px;"/></td>
-									<td><input is="duice-ui-input" type="text" data-duice-bind="user,name" class="form-control"/></td>
-									<td><span is="duice-ui-span" data-duice-bind="user,socialNo"></span></td>
-									<td><input is="duice-ui-input" type="text" data-duice-bind="user,socialNo" class="form-control"/></td>
-									<td><span is="duice-ui-span" data-duice-bind="user,balance" data-duice-format="number,2"></span></td>
-									<td><input is="duice-ui-input" type="number" data-duice-bind="user,balance" data-duice-format="2" class="form-control"/></td>
-									<td><span is="duice-ui-span" data-duice-bind="user,hireDate" data-duice-format="date,yyyy.MM.dd HH:mm:ss"></span></td>
-									<td><input is="duice-ui-input" type="datetime-local" data-duice-bind="user,hireDate" class="form-control"/></td>
-									<td><input is="duice-ui-input" type="date" data-duice-bind="user,birthday"/></td>
-									<td><input is="duice-ui-input" type="checkbox" data-duice-bind="user,active"/></td>
+									<td><span is="duice-scriptlet" data-duice-bind="user">return $context.index + 1;</span></td>
+									<td><span is="duice-span" data-duice-bind="user,id" class="form-control"></span></td>
+									<td><span is="duice-span" data-duice-bind="user,parentId"></span></td>
+									<td><img is="duice-img" data-duice-bind="user,image" src="//:0" style="height:16px;"/></td>
+									<td><input is="duice-input-text" type="text" data-duice-bind="user,name" class="form-control"/></td>
+									<td><span is="duice-span" data-duice-bind="user,socialNo"></span></td>
+									<td><input is="duice-input-text" type="text" data-duice-bind="user,socialNo" class="form-control"/></td>
+									<td><span is="duice-span" data-duice-bind="user,balance" data-duice-format="number,2"></span></td>
+									<td><input is="duice-input-number" type="number" data-duice-bind="user,balance" data-duice-format="2" class="form-control"/></td>
+									<td><span is="duice-span" data-duice-bind="user,hireDate" data-duice-format="date,yyyy.MM.dd HH:mm:ss"></span></td>
+									<td><input is="duice-input-date" type="datetime-local" data-duice-bind="user,hireDate" class="form-control"/></td>
+									<td><input is="duice-input-date" type="date" data-duice-bind="user,birthday"/></td>
+									<td><input is="duice-input-checkbox" type="checkbox" data-duice-bind="user,active"/></td>
 									<td>
-										<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="M" class="form-check-input"/>M
-										<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="F" class="form-check-input"/>F
+										<input is="duice-input-radio" type="radio" data-duice-bind="user,gender" value="M" class="form-check-input"/>M
+										<input is="duice-input-radio" type="radio" data-duice-bind="user,gender" value="F" class="form-check-input"/>F
 									</td>
-									<td><select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"></select></td>
+									<td><select is="duice-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"></select></td>
 								</tr>
 							</tbody>
 							<tfoot>
 								<tr>
 									<td colspan="20" style="text-align:right;">
 										11Average Balance :
-										<span is="duice-ui-scriptlet" data-duice-bind="users">
+										<span is="duice-scriptlet" data-duice-bind="users">
 											<![CDATA[
 											var totalBalance = 0;
 											$context.users.forEach(function(item){
@@ -930,7 +927,7 @@ body {
 										</span>
 										|
 										Total Balance :
-										<span is="duice-ui-scriptlet" data-duice-bind="users">
+										<span is="duice-scriptlet" data-duice-bind="users">
 											var totalBalance = 0;
 											$context.users.forEach(function(item){
 												totalBalance += isNaN(item.get('balance')) ? 0 : Number(item.get('balance'));
@@ -944,18 +941,17 @@ body {
 					</div>
 				</div>
 				<br/>
-				
 				<!-- ================================================================ -->
-				<!-- duice.ui.UList(no hierarchy)									  -->
+				<!-- duice-ul(no hierarchy)									  -->
 				<!-- ================================================================ -->
 				<div>
 					<div style="padding:1px; display:flex; justify-content:space-between; align-items:baseline;">
 						<div>
-							<h3>duice.ui.UList
+							<h3>duice-ul
 								<small>
 									(binding to users)
 									-
-									<span is="duice-ui-scriptlet" data-duice-bind="users">
+									<span is="duice-scriptlet" data-duice-bind="users">
 										return $context.users.getRowCount();
 									</span>
 									Rows
@@ -972,63 +968,63 @@ body {
 						</div>
 					</div>
 					<div>
-						<ul is="duice-ui-ul" 
+						<ul is="duice-ul" 
 							data-duice-bind="users,user" 
 							data-duice-selectable="true"
 							data-duice-editable="true">
 							<li style="display: inline-block;">
 								<div style="width:250px; border:solid 1px #ccc; border-radius:2px; margin:1px; padding:10px;">
 									<div style="font-weight:bold; border-bottom: dotted 1px #ccc; margin-bottom: 5px;">
-										{{$context.index + 1}}
+										[@duice[$context.index + 1]]
 										.
-										<span is="duice-ui-span" data-duice-bind="user,id"></span>
+										<span is="duice-span" data-duice-bind="user,id"></span>
 									</div>
 									<div style="text-align:center;">
-										<img is="duice-ui-img" data-duice-bind="user,image" style="height:64px;"/>
+										<img is="duice-img" data-duice-bind="user,image" style="height:64px;"/>
 									</div>
 									<div>
 										<table style="width:100%; line-height:2.4;">
 											<tr>
 												<th>name</th>
 												<td>
-													<input is="duice-ui-input" type="text" data-duice-bind="user,name"/>
+													<input is="duice-input-text" type="text" data-duice-bind="user,name"/>
 												</td>
 											</tr>
 											<tr>
 												<th>balance</th>
 												<td>
-													<input is="duice-ui-input" type="number" data-duice-bind="user,balance"/>
+													<input is="duice-input-number" type="number" data-duice-bind="user,balance"/>
 												</td>
 											</tr>
 											<tr>
 												<th>hireDate</th>
 												<td>
-													<input is="duice-ui-input" type="datetime-local" data-duice-bind="user,hireDate" data-duice-format="yyyy-MM-dd HH:mm:ss"/>
+													<input is="duice-input-date" type="datetime-local" data-duice-bind="user,hireDate" data-duice-format="yyyy-MM-dd HH:mm:ss"/>
 												</td>
 											</tr>
 											<tr>
 												<th>active</th>
 												<td>
-													<input is="duice-ui-input" type="checkbox" data-duice-bind="user,active"/>
+													<input is="duice-input-checkbox" type="checkbox" data-duice-bind="user,active"/>
 												</td>
 											</tr>
 											<tr>
 												<th>gender</th>
 												<td>
-													Male<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="M"/>
-													Female<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="F"/>
+													Male<input is="duice-input-radio" type="radio" data-duice-bind="user,gender" value="M"/>
+													Female<input is="duice-input-radio" type="radio" data-duice-bind="user,gender" value="F"/>
 												</td>
 											</tr>
 											<tr>
 												<th>groupId</th>
 												<td>
-													<select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"><option>- select -</option></select>
+													<select is="duice-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"><option>- select -</option></select>
 												</td>
 											</tr>
 											<tr>
 												<th>profile</th>
 												<td>
-													<textarea is="duice-ui-textarea" data-duice-bind="user,profile"></textarea>
+													<textarea is="duice-textarea" data-duice-bind="user,profile"></textarea>
 												<td>
 											</tr>
 										</table>
@@ -1039,18 +1035,17 @@ body {
 					</div>
 				</div>
 				<br/>
-				
 				<!-- ================================================================ -->
-				<!-- duice.ui.UList(hierarchy)									 	 -->
+				<!-- duice-ul(hierarchy)										 	  -->
 				<!-- ================================================================ -->
 				<div>
 					<div style="padding:1px; display:flex; justify-content:space-between; align-items:baseline;">
 						<div>
-							<h3>duice.ui.UList with Hierarchy
+							<h3>duice-ul with Hierarchy
 								<small>
 									(binding to users)
 									-
-									<span is="duice-ui-scriptlet" data-duice-bind="users">
+									<span is="duice-scriptlet" data-duice-bind="users">
 										return $context.users.getRowCount();
 									</span>
 									Rows
@@ -1068,41 +1063,40 @@ body {
 					</div>
 					<div style="display:flex; justify-content:space-between;">
 						<!-- ================================================================ -->
-						<!-- duice.ui.UList(hierarchy)									  -->
+						<!-- duice-ui(hierarchy)											  -->
 						<!-- ================================================================ -->
 						<div style="width:49%; border:solid 1px #ccc; border-radius:5px; margin:1px; padding:10px;">
 							<div style="border-bottom:solid 1px #eee; font-weight:bold;">
 								Plain
 							</div>
-							<ul is="duice-ui-ul" 
+							<ul is="duice-ul" 
 							data-duice-bind="users,user" 
 							data-duice-hierarchy="id,parentId"
 							data-duice-selectable="true">
 								<li style="line-height:2.4;">
 									<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:dotted 1px #ccc;padding:2px;">
 										<div>
-											<img is="duice-ui-img" data-duice-bind="user,image" style="height:32px;"/>
-											<span is="duice-ui-span" data-duice-bind="user,name" style="font-weight:bold;"></span>
-											<span is="duice-ui-span" data-duice-bind="user,parentId" style="font-size:10px;color:#aaa;"></span>
-											<small>(depth:{{$context.depth}}, hasChild:{{$context.hasChild}})</small>
+											<img is="duice-img" data-duice-bind="user,image" style="height:32px;"/>
+											<span is="duice-span" data-duice-bind="user,name" style="font-weight:bold;"></span>
+											<span is="duice-span" data-duice-bind="user,parentId" style="font-size:10px;color:#aaa;"></span>
+											<small>(depth:[@duice[$context.depth]], hasChild:[@duice[$context.hasChild]])</small>
 										</div>
 										<div>
 											<table>
 												<col width="100px"/>
 												<col width="80px"/>
 												<tr>
-													<td><input is="duice-ui-input" type="date" data-duice-bind="user,birthday"/></td>
-													<td><select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"><option>- select -</option></select></td>
+													<td><input is="duice-input-date" type="date" data-duice-bind="user,birthday"/></td>
+													<td><select is="duice-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"><option>- select -</option></select></td>
 												</tr>
 											</table>
 										</div>
 									</div>
-									<ul data-depth="{{$context.depth}}"></ul>
 								</li>
 							</ul>
 							<div style="text-align:right;padding:10px;">
 								Average Balance :
-								<span is="duice-ui-scriptlet" data-duice-bind="users">
+								<span is="duice-scriptlet" data-duice-bind="users">
 									var totalBalance = 0;
 									$context.users.forEach(function(item){
 										totalBalance += isNaN(item.get('balance')) ? 0 : Number(item.get('balance'));
@@ -1111,7 +1105,7 @@ body {
 								</span>
 								|
 								Total Balance :
-								<span is="duice-ui-scriptlet" data-duice-bind="users">
+								<span is="duice-scriptlet" data-duice-bind="users">
 									var totalBalance = 0;
 									$context.users.forEach(function(item){
 										totalBalance += isNaN(item.get('balance')) ? 0 : Number(item.get('balance'));
@@ -1121,13 +1115,13 @@ body {
 							</div>
 						</div>
 						<!-- ================================================================ -->
-						<!-- duice.ui.UList(hierarchy,foldable)								  -->
+						<!-- duice-ul(hierarchy,foldable)									  -->
 						<!-- ================================================================ -->
 						<div style="width:49%; border:solid 1px #ccc; border-radius:5px; margin:1px; padding:10px;">
 							<div style="border-bottom:solid 1px #eee; font-weight:bold;">
 								Foldable
 							</div>
-							<ul is="duice-ui-ul" 
+							<ul is="duice-ul" 
 							data-duice-bind="users,user"
 							data-duice-hierarchy="id,parentId"
 							data-duice-selectable="true" 
@@ -1135,9 +1129,9 @@ body {
 								<li style="line-height:2.4;">
 									<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:dotted 1px #ccc;padding:2px;">
 										<div>
-											<img is="duice-ui-img" data-duice-bind="user,image" style="height:32px;"/>
-											<span is="duice-ui-span" data-duice-bind="user,name" style="font-weight:bold;"></span>
-											<span is="duice-ui-span" data-duice-bind="user,parentId" style="font-size:10px;color:#aaa;"></span>
+											<img is="duice-img" data-duice-bind="user,image" style="height:32px;"/>
+											<span is="duice-span" data-duice-bind="user,name" style="font-weight:bold;"></span>
+											<span is="duice-span" data-duice-bind="user,parentId" style="font-size:10px;color:#aaa;"></span>
 											<small>(depth:[@duice[$context.depth]], hasChild:[@duice[$context.hasChild]])</small>
 										</div>
 										<div>
@@ -1145,8 +1139,8 @@ body {
 												<col width="100px"/>
 												<col width="80px"/>
 												<tr>
-													<td><input is="duice-ui-input" type="date" data-duice-bind="user,birthday"/></td>
-													<td><select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"><option>- select -</option></select></td>
+													<td><input is="duice-input-date" type="date" data-duice-bind="user,birthday"/></td>
+													<td><select is="duice-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"><option>- select -</option></select></td>
 												</tr>
 											</table>
 										</div>
@@ -1155,7 +1149,7 @@ body {
 							</ul>
 							<div style="text-align:right;padding:10px;">
 								Average Balance :
-								<span is="duice-ui-scriptlet" data-duice-bind="users">
+								<span is="duice-scriptlet" data-duice-bind="users">
 									var totalBalance = 0;
 									$context.users.forEach(function(item){
 										totalBalance += isNaN(item.get('balance')) ? 0 : Number(item.get('balance'));
@@ -1164,7 +1158,7 @@ body {
 								</span>
 								|
 								Total Balance :
-								<span is="duice-ui-scriptlet" data-duice-bind="users">
+								<span is="duice-scriptlet" data-duice-bind="users">
 									var totalBalance = 0;
 									$context.users.forEach(function(item){
 										totalBalance += isNaN(item.get('balance')) ? 0 : Number(item.get('balance'));
@@ -1176,13 +1170,13 @@ body {
 					</div>
 					<div style="display:flex; justify-content:space-between;">
 						<!-- ================================================================ -->
-						<!-- duice.ui.UList(hierarchy,editable)							  	  -->
+						<!-- duice-ul(hierarchy,editable)							  	  -->
 						<!-- ================================================================ -->
 						<div style="width:49%; border:solid 1px #ccc; border-radius:5px; margin:1px; padding:10px;">
 							<div style="border-bottom:solid 1px #eee; font-weight:bold;">
 								Editable
 							</div>
-							<ul is="duice-ui-ul" 
+							<ul is="duice-ul" 
 							data-duice-bind="users,user" 
 							data-duice-hierarchy="id,parentId"
 							data-duice-selectable="true"
@@ -1190,18 +1184,18 @@ body {
 								<li style="line-height:2.4;">
 									<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:dotted 1px #ccc;padding:2px;">
 										<div>
-											<img is="duice-ui-img" data-duice-bind="user,image" style="height:32px;"/>
-											<span is="duice-ui-span" data-duice-bind="user,name" style="font-weight:bold;"></span>
-											<span is="duice-ui-span" data-duice-bind="user,parentId" style="font-size:10px;color:#aaa;"></span>
-											<small>(depth:{{$context.depth}}, hasChild:{{$context.hasChild}})</small>
+											<img is="duice-img" data-duice-bind="user,image" style="height:32px;"/>
+											<span is="duice-span" data-duice-bind="user,name" style="font-weight:bold;"></span>
+											<span is="duice-span" data-duice-bind="user,parentId" style="font-size:10px;color:#aaa;"></span>
+											<small>(depth:[@duice[$context.depth]], hasChild:[@duice[$context.hasChild]])</small>
 										</div>
 										<div>
 											<table>
 												<col width="100px"/>
 												<col width="80px"/>
 												<tr>
-													<td><input is="duice-ui-input" type="date" data-duice-bind="user,birthday"/></td>
-													<td><select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"><option>- select -</option></select></td>
+													<td><input is="duice-input-date" type="date" data-duice-bind="user,birthday"/></td>
+													<td><select is="duice-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"><option>- select -</option></select></td>
 												</tr>
 											</table>
 										</div>
@@ -1210,7 +1204,7 @@ body {
 							</ul>
 							<div style="text-align:right;padding:10px;">
 								Average Balance :
-								<span is="duice-ui-scriptlet" data-duice-bind="users">
+								<span is="duice-scriptlet" data-duice-bind="users">
 									var totalBalance = 0;
 									$context.users.forEach(function(item){
 										totalBalance += isNaN(item.get('balance')) ? 0 : Number(item.get('balance'));
@@ -1219,7 +1213,7 @@ body {
 								</span>
 								|
 								Total Balance :
-								<span is="duice-ui-scriptlet" data-duice-bind="users">
+								<span is="duice-scriptlet" data-duice-bind="users">
 									var totalBalance = 0;
 									$context.users.forEach(function(item){
 										totalBalance += isNaN(item.get('balance')) ? 0 : Number(item.get('balance'));
@@ -1229,13 +1223,13 @@ body {
 							</div>
 						</div>
 						<!-- ================================================================ -->
-						<!-- duice.ui.UList(hierarchy,foldable,editable)					  -->
+						<!-- duice-ul(hierarchy,foldable,editable)					  -->
 						<!-- ================================================================ -->
 						<div style="width:49%; border:solid 1px #ccc; border-radius:5px; margin:1px; padding:10px;">
 							<div style="border-bottom:solid 1px #eee; font-weight:bold;">
 								Foldable + Enabled
 							</div>
-							<ul is="duice-ui-ul" 
+							<ul is="duice-ul" 
 							data-duice-bind="users,user"
 							data-duice-hierarchy="id,parentId"
 							data-duice-selectable="true" 
@@ -1245,18 +1239,18 @@ body {
 									<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:dotted 1px #ccc;padding:2px;">
 										<div>
 											{{$context.depth}}
-											<img is="duice-ui-img" data-duice-bind="user,image" style="height:32px;"/>
-											<span is="duice-ui-span" data-duice-bind="user,name" style="font-weight:bold;"></span>
-											<span is="duice-ui-span" data-duice-bind="user,parentId" style="font-size:10px;color:#aaa;"></span>
-											<small>(depth:{{$context.depth}}, hasChild:{{$context.hasChild}})</small>
+											<img is="duice-img" data-duice-bind="user,image" style="height:32px;"/>
+											<span is="duice-span" data-duice-bind="user,name" style="font-weight:bold;"></span>
+											<span is="duice-span" data-duice-bind="user,parentId" style="font-size:10px;color:#aaa;"></span>
+											<small>(depth:[@duice[$context.depth]], hasChild:[@duice[$context.hasChild]])</small>
 										</div>
 										<div>
 											<table>
 												<col width="100px"/>
 												<col width="80px"/>
 												<tr>
-													<td><input is="duice-ui-input" type="date" data-duice-bind="user,birthday"/></td>
-													<td><select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"><option>- select -</option></select></td>
+													<td><input is="duice-input-date" type="date" data-duice-bind="user,birthday"/></td>
+													<td><select is="duice-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"><option>- select -</option></select></td>
 												</tr>
 											</table>
 										</div>
@@ -1265,7 +1259,7 @@ body {
 							</ul>
 							<div style="text-align:right;padding:10px;">
 								Average Balance :
-								<span is="duice-ui-scriptlet" data-duice-bind="users">
+								<span is="duice-scriptlet" data-duice-bind="users">
 									var totalBalance = 0;
 									$context.users.forEach(function(item){
 										totalBalance += isNaN(item.get('balance')) ? 0 : Number(item.get('balance'));
@@ -1274,7 +1268,7 @@ body {
 								</span>
 								|
 								Total Balance :
-								<span is="duice-ui-scriptlet" data-duice-bind="users">
+								<span is="duice-scriptlet" data-duice-bind="users">
 									var totalBalance = 0;
 									$context.users.forEach(function(item){
 										totalBalance += isNaN(item.get('balance')) ? 0 : Number(item.get('balance'));
@@ -1459,52 +1453,52 @@ body {
 					}
 				</script>
 				<button onclick="testDialogFunction();">duice.dialog(HTMLElement)</button>
-				<dialog id="dialog" style="width:600px; padding:1rem;">
+				<dialog is="duice-dialog" id="dialog" style="width:600px; padding:1rem;">
 					<div style="text-align:center;">
-						<img is="duice-ui-img" data-duice-bind="user,image" style="height:64px;"/>
+						<img is="duice-img" data-duice-bind="user,image" style="height:64px;"/>
 					</div>
 					<table style="width:100%; line-height:2.4;">
 						<tr>
 							<th>name</th>
 							<td>
-								<input is="duice-ui-input" type="text" data-duice-bind="user,name"/>
+								<input is="duice-input-text" type="text" data-duice-bind="user,name" class="form-control"/>
 							</td>
 						</tr>
 						<tr>
 							<th>balance</th>
 							<td>
-								<input is="duice-ui-input" type="number" data-duice-bind="user,balance"/>
+								<input is="duice-input-number" type="number" data-duice-bind="user,balance" class="form-control"/>
 							</td>
 						</tr>
 						<tr>
 							<th>hireDate</th>
 							<td>
-								<input is="duice-ui-input" type="datetime" data-duice-bind="user,hireDate"/>
+								<input is="duice-input-date" type="datetime" data-duice-bind="user,hireDate" class="form-control"/>
 							</td>
 						</tr>
 						<tr>
 							<th>active</th>
 							<td>
-								<input is="duice-ui-input" type="checkbox" data-duice-bind="user,active"/>
+								<input is="duice-input-checkbox" type="checkbox" data-duice-bind="user,active"/>
 							</td>
 						</tr>
 						<tr>
 							<th>gender</th>
 							<td>
-								Male<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="M"/>
-								Female<input is="duice-ui-input" type="radio" data-duice-bind="user,gender" value="F"/>
+								<input is="duice-input-radio" type="radio" data-duice-bind="user,gender" value="M"/>Male
+								<input is="duice-input-radio" type="radio" data-duice-bind="user,gender" value="F"/>Female
 							</td>
 						</tr>
 						<tr>
 							<th>groupId</th>
 							<td>
-								<select is="duice-ui-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name"></select>
+								<select is="duice-select" data-duice-bind="user,groupId" data-duice-option="groups,id,name" class="form-control"></select>
 							</td>
 						</tr>
 						<tr>
 							<th>profile</th>
 							<td>
-								<textarea is="duice-ui-textarea" data-duice-bind="user,profile"></textarea>
+								<textarea is="duice-textarea" data-duice-bind="user,profile" class="form-control"></textarea>
 							<td>
 						</tr>
 					</table>
@@ -1512,15 +1506,96 @@ body {
 			</div>
 		</div>
 	</section>
-	
+	<!-- ================================================================ -->
+	<!-- duice.ui.Modal													  -->
+	<!-- ================================================================ -->
 	<section class="chapter">
 		<div class="chapter__headerDiv">
-			<h2>Integrate with SunEditor 
-				<small>(http://suneditor.com)</small>
+			<h2>Tab Example</h2>
+		</div>
+		<style>
+		.tabButton {
+			display: inline-block;
+			margin: 0px;
+			padding: 0.5rem;
+			background-color: #eee;
+			border: solid 1px #ccc;
+			border-bottom: none;
+			cursor: pointer;
+			font-weight: bold;
+		}
+		.tabButton img {
+			vertical-align: middle;
+		}
+		</style>
+		<div class="chapter__bodyDiv">
+			<div style="width:800px;">
+				<div style="padding-bottom:0px; border-bottom:solid 1px #ccc;">
+					<span id="tabButton1" class="tabButton">
+						<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACVklEQVQ4T6WSz0tUURTHP/fNvBlnSGkR2FoXqRD1JwSBiiaJBlGj1KY0ZpFaIjgGko5YY5q/tSyVZtQgxTBFXbkI2hYR2iI3LUwif8zIs5l337sx5iIiIvPA4RzOuedz4HuuGB+fUBzCRDg8pny+S/+FiETGEaOjz1R+fi4XfWUHgjyPhJmfX0Q8HR5RRYUFlF25Sk1lP5quYysN01DImMSxa+OUNk4NpDL5shVn4k0d4dERZmbnEENDT1RR0TmuVdwgUN2F7tZRaJg7kNi00QwLR9xGRhMY0sRIsRheauDxYD8zM68QAwODqrj4PDeramiqu4+e4gJbIKOC+KbC3rLQNhJoloV0WUSFpHvpLp0P25mefono6elTJSXF1AcaaCxvRE9zgqVjGoLv2zYYNimmjWZJEqZkOxan+0OIlmAzU1PTiM7OLlVaWkJTcxB/VhXuo26Uw4G0NaTSEAJcToWQkkQswdb6LpGvfdxpCDA5OYVob+9QF0pLaHvQwdloOZ40N85UN8qjI1M0hAccHgHCwtwwiX7e4bU9yu1b1bxIAkKhtj0NBgceHeiMFZXXf2rQ2npP5eXl4vV60XX9nyCmaWIYBgsLi4hgsOVwX/lPK3t7e4+8ffc+VliQv9eenZvn9KmTqX6/f+f39+KXgpbMQ6GQJyMjI31l5eMnn+/yXjsSGSMr60Tm6urqem1t7e7+jJ2MSUDSjwGpgAoGW1ZzcrJJTz+O2+3CthVSStbW1lheXiYQqM/cB3wDtpPDaUA24AXsYLBl6W9KBgL1ZwAHkASs/AAtJgNHBAu2uwAAAABJRU5ErkJggg=="/>
+						<span>Tab Item 1</span>
+					</span>
+					<span id="tabButton2" class="tabButton">
+						<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAQCAYAAAAmlE46AAAAUUlEQVQ4T2NkIBMwMjAwnGZgYDDBov8MAwODKS5zQRr/MzAw8DEwMHxGUsTLwMDwCYs4XAlMI6kOvkCuRoZRjXjCeogFDqmpBqwe5EeyANkaAbfEENcYbOfbAAAAAElFTkSuQmCC"/>
+						<span>Tab Item 2</span>
+					</span>
+					<span id="tabButton3" class="tabButton">
+						<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACaUlEQVQ4T4WSX0hTcRTHz/nd/3cX3HZ3W9s0dWpEDGbipjLtLSpDGhFBvSaBrad6iAgfeoggInroJSwIfEiiyBAdUYkZgsMSpDTCsHAR6laDzZrb3e4v7igoXes8/Tjnez7ndw5fhDLh7+jwFAr0KrJcFSGsk+eFl4yI12PR6OfNctyc8AUCNQDMLACmCS+6AEACgKwkSx+Bpfs3Q7YAursPTi8nUm21Lmcy/jXtMAcoIq9Xa/YE4YT40ODd9j+HbgEEQ12ZH3ldsVmtVC8aeCLUbBzt3DN1c3TSN7O8Rp4OP7RWBLR0hLK+WnchsNP77VDr7rhqt3mQMHWpdGa+7/ZjbezBPWdFwODArRdhr7WOSsqOv++D+fGV/JvwkXBrRcC7iSeFVRbxvaoW1wnLlW5gFKGtYKxpBnV4/AGmImB+PBp7zRSCE1rN+gdkFVPsEng4mU0v+PTid3dzW7AiYGx2UevfWH0lCdw2IltEU9wocPS4zbqoJo3OliZXoiLALFpiMX+9kevv0dRdBIHxcty0x67dOKDY5v5rpN+C9POhayBIPZQRREayDCnNXefLuXaLD+jIKTmvs7X5qvZLVFQPE46fA4FNWqSFcyDlPmHN2WzZFXKPIseQwBWg4AXAt9SiLucswW4ASmU6P0LsYitwnBsAlpDiBWzqu2+CSj+go6e36zoumb5HFicZSegyaxTgyy+R2aiDrEyBw7kXEDaQoQ1YH1kpAfLDkV4AGDDfROBmCM8Eyu1bynHCFLirQ0hpLzZF7pQA+vCZixRhH2SyDlIlx4gsNPwLQFMZK/r9KUT6DBsjl38CgyfHEdPCJN0AAAAASUVORK5CYII="/>
+						<span>Tab Item 3</span>
+					</span>
+					<span id="tabButton4" class="tabButton">
+						<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAB80lEQVQ4T42STUhUURTHf+e+qXHem7APiiAiaTVBUIQktomYl1SbIIIwqFUfmwhq0bYg6IMIWkQQtbVNBEGKOY5JkUOLaiNujAoXWRiUmu9NpfNO3Blx3oyDeXf3f8753fs/5wjLOYOaYC7IInIUZXu5ROQlTuqKNKx/pi7J4mlEfWALsBlYXcmVLpQeRO19w2JAbuYEIteBTQ3hSgHHHCebGqM/uFoLyIcXUb0NFIHUEu5+4pTamTO7q4BccAi4jPAOOAsY4A3wHLQZpBPYGIMO47ltVUA+uAsyiuodaxS4h++eQ0TLRd2Ta0iuLIBmFiCqJyuA199X8bupFTW9QLJswXPXsUeslerJhZ2IPoopPRVAQVMEof36tvngX5QPi3og5b5sjeljFUB+5hIqN5ezEnU5U0KfepjwM7A+FhwHc+y/QKORkAtOITyoS1bEyeA3jdbofdMZnMTOBa1UmhD6gyfAEeBLzfLYcYocJutaHWyxcV7V/fSMBYwjvGXWnCcRDQPp2Ksh8H5+rG1AojpCRph0d1jABKIX8NNdDAQHiXgMeEv6V0ZYoT770t8soBvlKR3eQ1SFF8V2ougayN4GkGmQ+5Rmb3Cg+YeNC73FFpzoFsIv4BMqg3S4QwwEu1BaiWhB5CuqH5E/Q+xfOxUH/wM3MKVN3jt12QAAAABJRU5ErkJggg=="/>
+						<span>Tab Item 4</span>
+					</span>
+				</div>
+				<div id="tabContent1">
+					Tab Content #1
+				</div>
+				<div id="tabContent2">
+					Tab Content #2
+				</div>
+				<div id="tabContent3">
+					Tab Content #3
+				</div>
+				<div id="tabContent4">
+					Tab Content #4
+				</div>
+			</div>
+			<script>
+				const tabFolder = new duice.TabFolder();
+				tabFolder.addTab(new duice.Tab(document.getElementById('tabButton1'), document.getElementById('tabContent1')));
+				tabFolder.addTab(new duice.Tab(document.getElementById('tabButton2'), document.getElementById('tabContent2')));
+				tabFolder.addTab(new duice.Tab(document.getElementById('tabButton3'), document.getElementById('tabContent3')));
+				tabFolder.addTab(new duice.Tab(document.getElementById('tabButton4'), document.getElementById('tabContent4')));
+				tabFolder.onBeforeSelectTab(function(selectedTab){
+					console.log('onBeforeSelectTab', selectedTab);
+				});
+				tabFolder.onAfterSelectTab(function(selectedTab){
+					console.log('onAfterSelectTab', selectedTab);
+				});
+				tabFolder.selectTab(0);
+			</script>
+		</div>
+	</section>
+	<!-- ================================================================ -->
+	<!-- duice.plugin.Ckeditor											  -->
+	<!-- ================================================================ -->
+	<section class="chapter">
+		<div class="chapter__headerDiv">
+			<h2>Plugin CkEditor 
+				<small>(https://ckeditor.com/ckeditor-4)</small>
 			</h2>
 		</div>
 		<div class="chapter__bodyDiv">
-			<textarea is="duice-integrate-suneditor" data-duice-bind="user,profile" style="width:100%;height:200px;">11111</textarea>
+			<div style="width:33%;">
+				<textarea is="duice-ckeditor" data-duice-bind="user,profile" data-duice-config="{'height':300}"></textarea>
+			</div>
+			<div style="width:33%;">
+				<div is="duice-div" data-duice-bind="user,profile" style="height:100%;"></div>
+			</div>
+			<div style="width:33%;">
+				<textarea is="duice-textarea" data-duice-bind="user,profile" style="height:100%;"></textarea>
+			</div>
 		</div>
 	</section>
 

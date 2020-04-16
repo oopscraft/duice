@@ -5,7 +5,8 @@
 	    "strict": true,
 	    "strictNullChecks": false,
 	    "noImplicitThis": false,
-	    "module":"none",
+		"module":"none",
+		"allowJs": true,
 	    "watch": false
 	},
 	"typedocOptions":{
@@ -15,6 +16,6 @@
 	},
 	"files":[
 		 "./src/duice.ts"
-		//,"./src/plugin/duice-plugin-suneditor.ts"
+		,"./src/integrate/duice-ckeditor.ts"
 	]
 }
