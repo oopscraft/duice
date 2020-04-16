@@ -2374,7 +2374,6 @@ namespace duice {
      */
     export class ScriptletFactory extends MapComponentFactory {
         getComponent(element:HTMLElement):Scriptlet {
-            console.log('---------------------');
             var scriptlet = new Scriptlet(element);
             var context:any;
             if(this.getContext() !== window) {
