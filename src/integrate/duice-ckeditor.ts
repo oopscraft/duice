@@ -25,13 +25,14 @@ namespace duice {
      */
     export class Ckeditor extends duice.MapComponent {
         textarea:HTMLTextAreaElement;
+        config:object;
         ckeditor:object;
         constructor(textarea:HTMLTextAreaElement, config:object){
             super(textarea);
             this.textarea = textarea;
-            this.ckeditor = CKEDITOR.replace(this.textarea, config);
+            this.config = config;
+            this.ckeditor = CKEDITOR.replace(this.textarea, this.config);
             var _this = this;
-            console.log(this.ckeditor);
             this.ckeditor.on('blur', function(event:any){
                 if(_this.map.get(_this.getName()) !== _this.getValue()){
                     _this.setChanged();

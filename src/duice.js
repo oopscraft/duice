@@ -1321,6 +1321,60 @@ var duice;
     }
     duice.Tab = Tab;
     /**
+     * duice.WebSocketClientEventListener
+     */
+    class WebSocketClientEventListener {
+    }
+    /**
+     * duice.WebSocketClient
+     */
+    class WebSocketClient {
+        constructor() {
+            this.eventListener = new WebSocketClientEventListener();
+        }
+        open(url) {
+            this.webSocket = new WebSocket(url);
+            var _this = this;
+            this.webSocket.onopen = function (event) {
+                if (_this.eventListener.onOpen) {
+                    _this.eventListener.onOpen.call(_this, event);
+                }
+            };
+            this.webSocket.onmessage = function (event) {
+                if (_this.eventListener.onMessage) {
+                    _this.eventListener.onMessage.call(_this, event);
+                }
+            };
+            this.webSocket.onerror = function (event) {
+                if (_this.eventListener.onError) {
+                    _this.eventListener.onError.call(_this, event);
+                }
+            };
+            this.webSocket.onclose = function (event) {
+                if (_this.eventListener.onClose) {
+                    _this.eventListener.onClose.call(_this, event);
+                }
+                // reconnect
+                setTimeout(function () {
+                    _this.open(url);
+                }, 1000);
+            };
+        }
+        onOpen(listener) {
+            this.eventListener.onOpen = listener;
+        }
+        onMessage(listener) {
+            this.eventListener.onMessage = listener;
+        }
+        onError(listener) {
+            this.eventListener.onError = listener;
+        }
+        onClose(listener) {
+            this.eventListener.onClose = listener;
+        }
+    }
+    duice.WebSocketClient = WebSocketClient;
+    /**
      * duice.Observable
      * Observable abstract class of Observer Pattern
      */
@@ -1627,6 +1681,13 @@ var duice;
          */
         get(name) {
             return this.data[name];
+        }
+        /**
+         * Returns value is exists
+         * @param name
+         */
+        has(name) {
+            return isNotEmpty(this.get(name));
         }
         /**
          * Returns properties names as array.
@@ -2125,7 +2186,6 @@ var duice;
      */
     class ScriptletFactory extends MapComponentFactory {
         getComponent(element) {
-            console.log('---------------------');
             var scriptlet = new Scriptlet(element);
             var context;
             if (this.getContext() !== window) {
@@ -2152,9 +2212,7 @@ var duice;
     class Scriptlet extends MapComponent {
         constructor(element) {
             super(element);
-            this.expression = element.innerHTML;
-            this.expression = this.expression.replace(/<!--\[CDATA\[/gim, "");
-            this.expression = this.expression.replace(/\]\]-->/gim, "");
+            this.expression = element.dataset.duiceValue;
             this.element.classList.add('duice-scriptlet');
         }
         ;

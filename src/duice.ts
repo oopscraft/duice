@@ -1441,6 +1441,64 @@ namespace duice {
             }
         }
     }
+
+    /**
+     * duice.WebSocketClientEventListener
+     */
+    class WebSocketClientEventListener {
+        onOpen:Function;
+        onMessage:Function;
+        onError:Function;
+        onClose:Function;
+    }
+
+    /**
+     * duice.WebSocketClient
+     */
+    export class WebSocketClient {
+        webSocket:WebSocket;
+        eventListener:WebSocketClientEventListener = new WebSocketClientEventListener();
+        open(url:string){
+            this.webSocket = new WebSocket(url);
+            var _this = this;
+            this.webSocket.onopen = function(event){
+                if(_this.eventListener.onOpen){
+                    _this.eventListener.onOpen.call(_this,event);
+                }
+            }
+            this.webSocket.onmessage = function(event){
+                if(_this.eventListener.onMessage){
+                    _this.eventListener.onMessage.call(_this,event);
+                }
+            }
+            this.webSocket.onerror = function(event){
+                if(_this.eventListener.onError){
+                    _this.eventListener.onError.call(_this,event);
+                }
+            }
+            this.webSocket.onclose = function(event){
+                if(_this.eventListener.onClose){
+                    _this.eventListener.onClose.call(_this,event);
+                }
+                // reconnect
+                setTimeout(function() {
+                    _this.open(url);
+                },1000);
+            }
+        }
+        onOpen(listener:Function) {
+            this.eventListener.onOpen = listener;
+        }
+        onMessage(listener:Function) {
+            this.eventListener.onMessage = listener;
+        }
+        onError(listener:Function) {
+            this.eventListener.onError = listener;
+        }
+        onClose(listener:Function) {
+            this.eventListener.onClose = listener;
+        }
+    }
     
     /**
      * duice.Observable
@@ -1819,6 +1877,14 @@ namespace duice {
          */
         get(name:string):any {
             return this.data[name];
+        }
+
+        /**
+         * Returns value is exists
+         * @param name 
+         */
+        has(name:string):boolean {
+            return isNotEmpty(this.get(name));
         }
         
         /**
@@ -2401,9 +2467,7 @@ namespace duice {
         context:any;;
         constructor(element:HTMLElement){
             super(element);
-            this.expression = element.innerHTML;
-            this.expression = this.expression.replace(/<!--\[CDATA\[/gim,"");
-            this.expression = this.expression.replace(/\]\]-->/gim,"");
+            this.expression = element.dataset.duiceValue;
             this.element.classList.add('duice-scriptlet');
         }
         bind(context:any):void {

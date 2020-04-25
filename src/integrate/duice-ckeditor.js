@@ -26,9 +26,9 @@ var duice;
         constructor(textarea, config) {
             super(textarea);
             this.textarea = textarea;
-            this.ckeditor = CKEDITOR.replace(this.textarea, config);
+            this.config = config;
+            this.ckeditor = CKEDITOR.replace(this.textarea, this.config);
             var _this = this;
-            console.log(this.ckeditor);
             this.ckeditor.on('blur', function (event) {
                 if (_this.map.get(_this.getName()) !== _this.getValue()) {
                     _this.setChanged();
