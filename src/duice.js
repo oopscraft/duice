@@ -21,7 +21,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
  */
 var duice;
 (function (duice) {
-    const version = "0.9";
+    /**
+     * Configuration
+     */
+    duice.Configuration = {
+        version: '0.9',
+        cssEnable: true
+    };
+    /**
+     * Adds class
+     */
+    function addClass(element, className) {
+        if (duice.Configuration.cssEnable) {
+            element.classList.add(className);
+        }
+    }
     function initialize() {
         // initializes component
         var $context = typeof self !== 'undefined' ? self :
@@ -418,8 +432,11 @@ var duice;
         var computedStyle = win.getComputedStyle(element);
         var computedWidth = parseInt(computedStyle.getPropertyValue('width').replace(/px/gi, ''));
         var computedHeight = parseInt(computedStyle.getPropertyValue('height').replace(/px/gi, ''));
-        element.style.left = Math.max(0, win.innerWidth / 2 - computedWidth / 2) + win.scrollX + 'px';
-        element.style.top = Math.max(0, win.innerHeight / 2 - computedHeight / 2) + win.scrollY + 'px';
+        var computedLeft = Math.max(0, win.innerWidth / 2 - computedWidth / 2) + win.scrollX;
+        var computedTop = Math.max(0, win.innerHeight / 2 - computedHeight / 2) + win.scrollY;
+        computedTop = computedTop - computedHeight / 2;
+        element.style.left = computedLeft + 'px';
+        element.style.top = computedTop + 'px';
     }
     /**
      * Returns position info of specified element
@@ -1480,8 +1497,10 @@ var duice;
         constructor() {
             super(...arguments);
             this.available = true;
-            this.disable = false;
+            this.disable = new Object();
+            this.disableAll = false;
             this.readonly = new Object();
+            this.readonlyAll = false;
             this.visible = true;
         }
         /**
@@ -1490,20 +1509,33 @@ var duice;
         isAvailable() {
             return true;
         }
+        setDisable(name, disable) {
+            this.disable[name] = disable;
+            this.setChanged();
+            this.notifyObservers(this);
+        }
         /**
-         * Sets disable
+         * Sets disable all
          * @param disable
          */
-        setDisable(disable) {
-            this.disable = disable;
+        setDisableAll(disable) {
+            this.disableAll = disable;
+            for (var name in this.disable) {
+                this.disable[name] = disable;
+            }
             this.setChanged();
             this.notifyObservers(this);
         }
         /**
          * Returns if disabled
          */
-        isDisable() {
-            return this.disable;
+        isDisable(name) {
+            if (this.disable.hasOwnProperty(name)) {
+                return this.disable[name];
+            }
+            else {
+                return this.disableAll;
+            }
         }
         /**
          * Sets read-only
@@ -1515,15 +1547,27 @@ var duice;
             this.notifyObservers(this);
         }
         /**
+         * Sets read-only all
+         * @param readonly
+         */
+        setReadonlyAll(readonly) {
+            this.readonlyAll = readonly;
+            for (var name in this.readonly) {
+                this.readonly[name] = readonly;
+            }
+            this.setChanged();
+            this.notifyObservers(this);
+        }
+        /**
          * Returns read-only
          * @param name
          */
         isReadonly(name) {
-            if (this.readonly[name]) {
-                return true;
+            if (this.readonly.hasOwnProperty(name)) {
+                return this.readonly[name];
             }
             else {
-                return false;
+                return this.readonlyAll;
             }
         }
         /**
@@ -1772,8 +1816,10 @@ var duice;
             this.clear();
             for (var i = 0; i < jsonArray.length; i++) {
                 var map = new duice.Map(jsonArray[i]);
-                map.disable = this.disable;
+                map.disable = clone(this.disable);
+                map.disableAll = this.disableAll;
                 map.readonly = clone(this.readonly);
+                map.readonlyAll = this.readonlyAll;
                 map.onBeforeChange(this.eventListener.onBeforeChangeRow);
                 map.onAfterChange(this.eventListener.onAfterChangeRow);
                 map.addObserver(this);
@@ -1906,7 +1952,7 @@ var duice;
          * @param map
          */
         addRow(map) {
-            map.disable = this.disable;
+            map.disableAll = this.disableAll;
             map.readonly = clone(this.readonly);
             map.onBeforeChange(this.eventListener.onBeforeChangeRow);
             map.onAfterChange(this.eventListener.onAfterChangeRow);
@@ -1921,7 +1967,7 @@ var duice;
          */
         insertRow(index, map) {
             if (0 <= index && index < this.data.length) {
-                map.disable = this.disable;
+                map.disableAll = this.disableAll;
                 map.readonly = clone(this.readonly);
                 map.onBeforeChange(this.eventListener.onBeforeChangeRow);
                 map.onAfterChange(this.eventListener.onAfterChangeRow);
@@ -1980,11 +2026,21 @@ var duice;
          * Sets diabled
          * @param disable
          */
-        setDisable(disable) {
+        setDisable(name, disable) {
             this.data.forEach(function (map) {
-                map.setDisable(disable);
+                map.setDisable(name, disable);
             });
-            super.setDisable(disable);
+            super.setDisable(name, disable);
+        }
+        /**
+         * Sets disable all
+         * @param disable
+         */
+        setDisableAll(disable) {
+            this.data.forEach(function (map) {
+                map.setDisableAll(disable);
+            });
+            super.setDisableAll(disable);
         }
         /**
          * Sets readonly flag
@@ -1996,6 +2052,16 @@ var duice;
                 map.setReadonly(name, readonly);
             });
             super.setReadonly(name, readonly);
+        }
+        /**
+         * Sets readonly all
+         * @param readonly
+         */
+        setReadonlyAll(readonly) {
+            this.data.forEach(function (map) {
+                map.setReadonlyAll(readonly);
+            });
+            super.setReadonlyAll(readonly);
         }
         /**
          * onBeforeSelectRow
@@ -2212,8 +2278,8 @@ var duice;
     class Scriptlet extends MapComponent {
         constructor(element) {
             super(element);
+            addClass(element, 'duice-scriptlet');
             this.expression = element.dataset.duiceValue;
-            this.element.classList.add('duice-scriptlet');
         }
         ;
         bind(context) {
@@ -2285,7 +2351,7 @@ var duice;
         constructor(span) {
             super(span);
             this.span = span;
-            this.span.classList.add('duice-span');
+            addClass(this.span, 'duice-span');
         }
         setFormat(format) {
             this.format = format;
@@ -2329,7 +2395,7 @@ var duice;
         constructor(div) {
             super(div);
             this.div = div;
-            this.div.classList.add('duice-div');
+            addClass(this.div, 'duice-div');
         }
         update(map, obj) {
             removeChildNodes(this.div);
@@ -2349,27 +2415,28 @@ var duice;
     class InputFactory extends MapComponentFactory {
         getComponent(element) {
             var input;
-            var is = element.getAttribute('is');
-            switch (is) {
-                case 'duice-input-text':
+            var type = element.getAttribute('type');
+            switch (type) {
+                case 'text':
                     input = new InputText(element);
                     if (element.dataset.duiceFormat) {
                         input.setPattern(element.dataset.duiceFormat);
                     }
                     break;
-                case 'duice-input-number':
+                case 'number':
                     input = new InputNumber(element);
                     if (element.dataset.duiceFormat) {
                         input.setScale(parseInt(element.dataset.duiceFormat));
                     }
                     break;
-                case 'duice-input-checkbox':
+                case 'checkbox':
                     input = new InputCheckbox(element);
                     break;
-                case 'duice-input-radio':
+                case 'radio':
                     input = new InputRadio(element);
                     break;
-                case 'duice-input-date':
+                case 'date':
+                case 'datetime-local':
                     input = new InputDate(element);
                     if (element.dataset.duiceFormat) {
                         input.setPattern(element.dataset.duiceFormat);
@@ -2441,11 +2508,12 @@ var duice;
     class InputGeneric extends Input {
         constructor(input) {
             super(input);
+            addClass(this.input, 'duice-input-generic');
         }
         update(map, obj) {
             var value = map.get(this.getName());
             this.input.value = defaultIfEmpty(value, '');
-            this.setDisable(map.isDisable());
+            this.setDisable(map.isDisable(this.getName()));
             this.setReadonly(map.isReadonly(this.getName()));
         }
         getValue() {
@@ -2470,7 +2538,7 @@ var duice;
     class InputText extends Input {
         constructor(input) {
             super(input);
-            this.input.classList.add('duice-input-text');
+            addClass(this.input, 'duice-input-text');
             this.format = new StringFormat();
         }
         setPattern(format) {
@@ -2481,7 +2549,7 @@ var duice;
             value = defaultIfEmpty(value, '');
             value = this.format.encode(value);
             this.input.value = value;
-            this.setDisable(map.isDisable());
+            this.setDisable(map.isDisable(this.getName()));
             this.setReadonly(map.isReadonly(this.getName()));
         }
         getValue() {
@@ -2507,7 +2575,7 @@ var duice;
     class InputNumber extends Input {
         constructor(input) {
             super(input);
-            this.input.classList.add('duice-input-number');
+            addClass(this.input, 'duice-input-number');
             this.input.setAttribute('type', 'text');
             this.format = new NumberFormat();
         }
@@ -2518,7 +2586,7 @@ var duice;
             var value = map.get(this.getName());
             value = this.format.encode(value);
             this.input.value = value;
-            this.setDisable(map.isDisable());
+            this.setDisable(map.isDisable(this.getName()));
             this.setReadonly(map.isReadonly(this.getName()));
         }
         getValue() {
@@ -2543,6 +2611,7 @@ var duice;
     class InputCheckbox extends Input {
         constructor(input) {
             super(input);
+            addClass(this.input, 'duice-input-checkbox');
             // stop click event propagation
             this.input.addEventListener('click', function (event) {
                 event.stopPropagation();
@@ -2556,7 +2625,7 @@ var duice;
             else {
                 this.input.checked = false;
             }
-            this.setDisable(map.isDisable());
+            this.setDisable(map.isDisable(this.getName()));
             this.setReadonly(map.isReadonly(this.getName()));
         }
         getValue() {
@@ -2578,6 +2647,7 @@ var duice;
     class InputRadio extends Input {
         constructor(input) {
             super(input);
+            addClass(this.input, 'duice-input-radio');
         }
         update(map, obj) {
             var value = map.get(this.getName());
@@ -2587,7 +2657,7 @@ var duice;
             else {
                 this.input.checked = false;
             }
-            this.setDisable(map.isDisable());
+            this.setDisable(map.isDisable(this.getName()));
             this.setReadonly(map.isReadonly(this.getName()));
         }
         getValue() {
@@ -2610,6 +2680,7 @@ var duice;
         constructor(input) {
             super(input);
             this.readonly = false;
+            addClass(this.input, 'duice-input-date');
             this.type = this.input.getAttribute('type').toLowerCase();
             this.input.setAttribute('type', 'text');
             // adds click event listener
@@ -2636,7 +2707,7 @@ var duice;
             value = defaultIfEmpty(value, '');
             value = this.format.encode(value);
             this.input.value = value;
-            this.setDisable(map.isDisable());
+            this.setDisable(map.isDisable(this.getName()));
             this.setReadonly(map.isReadonly(this.getName()));
         }
         getValue() {
@@ -2969,6 +3040,7 @@ var duice;
             super(select);
             this.defaultOptions = new Array();
             this.select = select;
+            addClass(this.select, 'duice-select');
             var _this = this;
             this.select.addEventListener('change', function (event) {
                 _this.setChanged();
@@ -3010,7 +3082,7 @@ var duice;
                     this.defaultOptions[0].selected = true;
                 }
             }
-            this.setDisable(map.isDisable());
+            this.setDisable(map.isDisable(this.getName()));
             this.setReadonly(map.isReadonly(this.getName()));
         }
         getValue() {
@@ -3028,11 +3100,11 @@ var duice;
         setReadonly(readonly) {
             if (readonly === true) {
                 this.select.style.pointerEvents = 'none';
-                this.select.classList.add('readonly');
+                this.select.classList.add('duice-select--readonly');
             }
             else {
                 this.select.style.pointerEvents = '';
-                this.select.classList.remove('readonly');
+                this.select.classList.remove('duice-select--readonly');
             }
         }
     }
@@ -3056,6 +3128,7 @@ var duice;
         constructor(textarea) {
             super(textarea);
             this.textarea = textarea;
+            addClass(this.textarea, 'duice-textarea');
             var _this = this;
             this.textarea.addEventListener('change', function (event) {
                 _this.setChanged();
@@ -3065,7 +3138,7 @@ var duice;
         update(map, obj) {
             var value = map.get(this.getName());
             this.textarea.value = defaultIfEmpty(value, '');
-            this.setDisable(map.isDisable());
+            this.setDisable(map.isDisable(this.getName()));
             this.setReadonly(map.isReadonly(this.getName()));
         }
         getValue() {
@@ -3112,6 +3185,7 @@ var duice;
         constructor(img) {
             super(img);
             this.img = img;
+            addClass(this.img, 'duice-img');
             this.originSrc = this.img.src;
             var _this = this;
             // listener for click
@@ -3136,7 +3210,7 @@ var duice;
             var value = map.get(this.getName());
             this.value = defaultIfEmpty(value, this.originSrc);
             this.img.src = this.value;
-            this.disable = map.isDisable();
+            this.disable = map.isDisable(this.getName());
         }
         /**
          * Return value of image element
@@ -3287,6 +3361,7 @@ var duice;
             this.size = 1;
             this.page = 1;
             this.ul = ul;
+            addClass(this.ul, 'duice-ul');
             // clones li
             var li = this.ul.querySelector('li');
             this.li = li.cloneNode(true);
@@ -3397,7 +3472,7 @@ var duice;
             super(table);
             this.tbodies = new Array();
             this.table = table;
-            this.table.classList.add('duice-table');
+            addClass(this.table, 'duice-table');
             // initializes caption
             var caption = this.table.querySelector('caption');
             if (caption) {
@@ -3612,7 +3687,7 @@ var duice;
             this.lis = new Array();
             this.foldName = {};
             this.ul = ul;
-            this.ul.classList.add('duice-ul');
+            addClass(this.ul, 'duice-ul');
             var li = ul.querySelector('li');
             // checks child UList
             var childUl = li.querySelector('li > ul');
@@ -3669,6 +3744,7 @@ var duice;
             this.ul.innerHTML = '';
             this.lis.length = 0;
             // root style
+            this.ul.style.listStyle = 'none';
             this.ul.style.paddingLeft = '0px';
             if (this.hierarchy) {
                 this.createHierarchyRoot();
@@ -4004,7 +4080,7 @@ var duice;
     // map element
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('span[is="duice-span"]', duice.SpanFactory));
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('div[is="duice-div"]', duice.DivFactory));
-    duice.ComponentDefinitionRegistry.add(new ComponentDefinition('input[is^="duice-input-"]', duice.InputFactory));
+    duice.ComponentDefinitionRegistry.add(new ComponentDefinition('input[is="duice-input"]', duice.InputFactory));
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('select[is="duice-select"]', duice.SelectFactory));
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('textarea[is="duice-textarea"]', duice.TextareaFactory));
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('img[is="duice-img"]', duice.ImgFactory));
