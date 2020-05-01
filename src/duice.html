@@ -517,7 +517,7 @@ button {
 		<div class="chapter__bodyDiv">
 			<div class="chapter__bodyDiv-dataDiv">
 				<h3>duice.Map <small>(var user)</small></h3>
-				<textarea id="userTextarea" class="code" style="height:900px;"></textarea>
+				<textarea id="userTextarea" class="code" style="height:600px;"></textarea>
 			</div>
 			<div class="chapter__bodyDiv-uiDiv">
 				<h3>duice.ui.MapUIElement <small>(binding to user)</small></h3>
@@ -539,6 +539,10 @@ button {
 					<button class="code" onclick="alert(JSON.stringify(user.toJson(),null,2));">toJson()</button>
 					<button class="code" onclick="alert(user.isDirty());">isDirty()</button>
 					<button class="code" onclick="user.reset();">reset()</button>
+					|
+					<button class="code" onclick="user.setFocus('name','This is name field.');">setFocus('name',message);</button>
+					<button class="code" onclick="user.setFocus('profile','This is profile field.');">setFocus('profile',message);</button>
+					<button class="code" onclick="user.setFocus('gender','This is profile field.');">setFocus('gender',message);</button>
 				</div>
 				<table class="table" border="1" style="width:100%; border-collapse:collapse; border:solid 1px #ccc;">
 					<thead style="background-color:#efefef;">
@@ -561,18 +565,18 @@ button {
 						</tr>
 						<tr>
 							<td>socialNo</td>
-							<td><span is="duice-span" data-duice-bind="user,socialNo" data-duice-format="string,######-#######"></span></td>
-							<td class="code">&lt;span is="duice-span" data-duice-bind="user,socialNo" data-duice-format="string,######-#######" ...</td>
+							<td><span is="duice-span" data-duice-bind="user,socialNo" data-duice-mask="string,######-#######"></span></td>
+							<td class="code">&lt;span is="duice-span" data-duice-bind="user,socialNo" data-duice-mask="string,######-#######" ...</td>
 						</tr>
 						<tr>
 							<td>balance</td>
-							<td><span is="duice-span" data-duice-bind="user,balance" data-duice-format="number,2"></span></td>
+							<td><span is="duice-span" data-duice-bind="user,balance" data-duice-mask="number,2"></span></td>
 							<td class="code">&lt;span is="duice-span" data-duice-bind="user,balance" date-duice-format="number,2" ...</td class="code">
 						</tr>
 						<tr>
 							<td>hireDate</td>
-							<td align="center"><span is="duice-span" data-duice-bind="user,hireDate" data-duice-format="date,yyyy.MM.dd HH:mm:ss"></span></td>
-							<td class="code">&lt;span is="duice-span" data-duice-bind="user,hireDate" data-duice-format="date,yyyy.MM.dd HH:mm:ss" ...</td class="code">
+							<td align="center"><span is="duice-span" data-duice-bind="user,hireDate" data-duice-mask="date,yyyy.MM.dd HH:mm:ss"></span></td>
+							<td class="code">&lt;span is="duice-span" data-duice-bind="user,hireDate" data-duice-mask="date,yyyy.MM.dd HH:mm:ss" ...</td class="code">
 						</tr>
 						<!-- ================================================================ -->
 						<!-- duice-div				   										  -->
@@ -594,8 +598,8 @@ button {
 						</tr>
 						<tr>
 							<td>socialNo</td>
-							<td><input is="duice-input" type="text" data-duice-bind="user,socialNo" data-duice-format="######-#######" class="form-control"/></td>
-							<td class="code">&lt;input is="duice-input" type="text" data-duice-bind="user,socialNo" data-duice-format="######-#######" ...</td class="code">
+							<td><input is="duice-input" type="text" data-duice-bind="user,socialNo" data-duice-mask="######-#######" class="form-control"/></td>
+							<td class="code">&lt;input is="duice-input" type="text" data-duice-bind="user,socialNo" data-duice-mask="######-#######" ...</td class="code">
 						</tr>
 						<!-- ================================================================ -->
 						<!-- duice-input[type=number]  										  -->
@@ -608,8 +612,8 @@ button {
 						</tr>
 						<tr>
 							<td>balance</td>
-							<td><input is="duice-input" type="number" data-duice-bind="user,balance" data-duice-format="2" class="form-control"/></td>
-							<td class="code">&lt;input is="duice-input" type="number" data-duice-bind="user,balance" data-duice-format="2"</td class="code">
+							<td><input is="duice-input" type="number" data-duice-bind="user,balance" data-duice-mask="2" class="form-control"/></td>
+							<td class="code">&lt;input is="duice-input" type="number" data-duice-bind="user,balance" data-duice-mask="2"</td class="code">
 						</tr>
 						<!-- ================================================================ -->
 						<!-- duice-input[type=checkbox]		   								  -->
@@ -643,8 +647,8 @@ button {
 						</tr>
 						<tr>
 							<td>hireDate</td>
-							<td><input is="duice-input" type="datetime-local" data-duice-bind="user,hireDate" data-duice-format="yyyy.MM.dd HH:mm:ss" class="form-control"/></td>
-							<td class="code">&lt;input is="duice-input" type="datetime" data-duice-bind="user,hireDate" data-duice-format="yyyy.MM.dd HH:mm:ss" ...</td class="code">
+							<td><input is="duice-input" type="datetime-local" data-duice-bind="user,hireDate" data-duice-mask="yyyy.MM.dd HH:mm:ss" class="form-control"/></td>
+							<td class="code">&lt;input is="duice-input" type="datetime" data-duice-bind="user,hireDate" data-duice-mask="yyyy.MM.dd HH:mm:ss" ...</td class="code">
 						</tr>
 						<tr>
 							<td>birthday</td>
@@ -653,8 +657,8 @@ button {
 						</tr>
 						<tr>
 							<td>birthday</td>
-							<td><input is="duice-input" type="date" data-duice-bind="user,birthday" data-duice-format="yyyy.MM.dd" class="form-control"/></td>
-							<td class="code">&lt;input is="duice-input" type="date" data-duice-bind="user,birthday" data-duice-format="yyyy.MM.dd" ...</td class="code">
+							<td><input is="duice-input" type="date" data-duice-bind="user,birthday" data-duice-mask="yyyy.MM.dd" class="form-control"/></td>
+							<td class="code">&lt;input is="duice-input" type="date" data-duice-bind="user,birthday" data-duice-mask="yyyy.MM.dd" ...</td class="code">
 						</tr>
 						<!-- ================================================================ -->
 						<!-- duice-input[type=*]			   								  -->
@@ -734,19 +738,6 @@ button {
 							<td>image</td>
 							<td><img is="duice-img" data-duice-bind="user,image"/></td>
 							<td class="code">&lt;img is="duice-img" data-duice-bind="user,image" ...</td>
-						</tr>
-						<!-- ================================================================ -->
-						<!-- duice-pagination				   								  -->
-						<!-- ================================================================ -->
-						<tr>
-							<th>duice-pagination</th>
-							<td>page,rows,totalCount</td>
-							<td>
-								<ul is="duice-pagination" data-duice-bind="user,page,rows,totalCount" data-duice-size="5" class="pagination">
-									<li data-page="[@duice[$context.page]]" onclick="alert(this.dataset.page);user.set('page',this.dataset.page);" class="page-item page-link"></li>
-								</ul>
-							</td>
-							<td class="code">&lt;img is="duice-img" data-duice-bind="user,image" ...</td class="code">
 						</tr>
 					</tbody>
 				</table>
@@ -834,9 +825,9 @@ button {
 							<td><input is="duice-input" type="text" data-duice-bind="user,name" class="form-control"/></td>
 							<td><span is="duice-span" data-duice-bind="user,socialNo"></span></td>
 							<td><input is="duice-input" type="text" data-duice-bind="user,socialNo" class="form-control"/></td>
-							<td><span is="duice-span" data-duice-bind="user,balance" data-duice-format="number,2"></span></td>
-							<td><input is="duice-input" type="number" data-duice-bind="user,balance" data-duice-format="2" class="form-control"/></td>
-							<td><span is="duice-span" data-duice-bind="user,hireDate" data-duice-format="date,yyyy.MM.dd HH:mm:ss"></span></td>
+							<td><span is="duice-span" data-duice-bind="user,balance" data-duice-mask="number,2"></span></td>
+							<td><input is="duice-input" type="number" data-duice-bind="user,balance" data-duice-mask="2" class="form-control"/></td>
+							<td><span is="duice-span" data-duice-bind="user,hireDate" data-duice-mask="date,yyyy.MM.dd HH:mm:ss"></span></td>
 							<td><input is="duice-input" type="datetime-local" data-duice-bind="user,hireDate" class="form-control"/></td>
 							<td><input is="duice-input" type="date" data-duice-bind="user,birthday" class="form-control"/></td>
 							<td><input is="duice-input" type="checkbox" data-duice-bind="user,active"/></td>
@@ -941,7 +932,7 @@ button {
 									<tr>
 										<th>hireDate</th>
 										<td>
-											<input is="duice-input" type="datetime-local" data-duice-bind="user,hireDate" data-duice-format="yyyy-MM-dd HH:mm:ss" class="form-control"/>
+											<input is="duice-input" type="datetime-local" data-duice-bind="user,hireDate" data-duice-mask="yyyy-MM-dd HH:mm:ss" class="form-control"/>
 										</td>
 									</tr>
 									<tr>
@@ -1556,28 +1547,5 @@ button {
 			</script>
 		</div>
 	</section>
-	<!-- ================================================================ -->
-	<!-- duice.plugin.Ckeditor											  -->
-	<!-- ================================================================ -->
-	<section class="chapter">
-		<div class="chapter__headerDiv">
-			<h2>Plugin CkEditor 
-				<small>(https://ckeditor.com/ckeditor-4)</small>
-			</h2>
-		</div>
-		<div class="chapter__bodyDiv">
-			<div style="width:33%;">
-				<textarea is="duice-ckeditor" data-duice-bind="user,profile" data-duice-config="{'height':300}"></textarea>
-			</div>
-			<div style="width:33%;">
-				<div is="duice-div" data-duice-bind="user,profile" style="height:100%;"></div>
-			</div>
-			<div style="width:33%;">
-				<textarea is="duice-textarea" data-duice-bind="user,profile" class="form-control" style="height:100%;"></textarea>
-			</div>
-		</div>
-	</section>
-
-
 </body>
 </html>

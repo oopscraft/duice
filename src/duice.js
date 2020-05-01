@@ -36,6 +36,7 @@ var duice;
             element.classList.add(className);
         }
     }
+    duice.addClass = addClass;
     function initialize() {
         // initializes component
         var $context = typeof self !== 'undefined' ? self :
@@ -359,6 +360,7 @@ var duice;
             return element;
         }
     }
+    duice.executeExpression = executeExpression;
     /**
      * Escapes HTML tag from string value
      * @param value
@@ -487,21 +489,12 @@ var duice;
      * duice.StringFormat
      * @param string format
      */
-    class StringFormat {
+    class StringMask {
         /**
          * Constructor
          * @param pattern
          */
         constructor(pattern) {
-            if (pattern) {
-                this.setPattern(pattern);
-            }
-        }
-        /**
-         * Sets format string
-         * @param pattern
-         */
-        setPattern(pattern) {
             this.pattern = pattern;
         }
         /**
@@ -551,27 +544,18 @@ var duice;
             return decodedValue;
         }
     }
-    duice.StringFormat = StringFormat;
+    duice.StringMask = StringMask;
     /**
      * duice.NumberFormat
      * @param scale number
      */
-    class NumberFormat {
+    class NumberMask {
         /**
          * Constructor
          * @param scale
          */
         constructor(scale) {
             this.scale = 0;
-            if (scale) {
-                this.setScale(scale);
-            }
-        }
-        /**
-         * Sets number format scale
-         * @param scale
-         */
-        setScale(scale) {
             this.scale = scale;
         }
         /**
@@ -610,26 +594,17 @@ var duice;
             return number;
         }
     }
-    duice.NumberFormat = NumberFormat;
+    duice.NumberMask = NumberMask;
     /**
      * duice.DateFormat
      */
-    class DateFormat {
+    class DateMask {
         /**
          * Constructor
          * @param pattern
          */
         constructor(pattern) {
             this.patternRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
-            if (pattern) {
-                this.setPattern(pattern);
-            }
-        }
-        /**
-         * Sets format string
-         * @param pattern
-         */
-        setPattern(pattern) {
             this.pattern = pattern;
         }
         /**
@@ -718,7 +693,7 @@ var duice;
             return date.toISOString();
         }
     }
-    duice.DateFormat = DateFormat;
+    duice.DateMask = DateMask;
     /**
       * duice.Blocker
       */
@@ -776,17 +751,12 @@ var duice;
     }
     duice.Blocker = Blocker;
     /**
-     * duice.Tooltip
-     */
+    * duice.Tooltip
+    */
     class Tooltip {
         constructor(element, message) {
             this.element = element;
             this.message = message;
-        }
-        /**
-         * Creates tooltip
-         */
-        create() {
             this.div = document.createElement('div');
             this.div.classList.add('duice-tooltip');
             this.div.appendChild(document.createTextNode(this.message));
@@ -794,12 +764,18 @@ var duice;
             // adjusting position
             this.div.style.position = 'absolute';
             this.div.style.zIndex = String(getCurrentMaxZIndex() + 1);
+            var _this = this;
+            this.div.addEventListener('click', function (event) {
+                _this.destroy();
+            });
         }
         /**
          * Destroy tooltip
          */
         destroy() {
-            this.element.parentNode.removeChild(this.div);
+            if (this.element.parentNode.contains(this.div)) {
+                this.element.parentNode.removeChild(this.div);
+            }
         }
     }
     duice.Tooltip = Tooltip;
@@ -1727,13 +1703,6 @@ var duice;
             return this.data[name];
         }
         /**
-         * Returns value is exists
-         * @param name
-         */
-        has(name) {
-            return isNotEmpty(this.get(name));
-        }
-        /**
          * Returns properties names as array.
          * @return array of names
          */
@@ -1752,11 +1721,10 @@ var duice;
             for (var i = 0, size = this.observers.length; i < size; i++) {
                 var observer = this.observers[i];
                 if (observer instanceof MapComponent) {
-                    var mapUuiComponent = this.observers[i];
+                    var mapUiComponent = this.observers[i];
                     if (observer.getName() === name) {
-                        if (mapUuiComponent.setFocus(message)) {
-                            break;
-                        }
+                        mapUiComponent.setFocus(message);
+                        break;
                     }
                 }
             }
@@ -2185,15 +2153,13 @@ var duice;
          */
         setFocus(message) {
             if (this.element.focus) {
-                if (!isEmpty(message)) {
+                if (message) {
                     var tooltip = new Tooltip(this.element, message);
-                    tooltip.create();
                     this.element.addEventListener('blur', function (event) {
                         tooltip.destroy();
                     }, { once: true });
                 }
                 this.element.focus();
-                return true;
             }
         }
     }
@@ -2318,24 +2284,24 @@ var duice;
         getComponent(element) {
             var span = new Span(element);
             // sets format
-            if (element.dataset.duiceFormat) {
-                var duiceFormat = element.dataset.duiceFormat.split(',');
-                var type = duiceFormat[0];
-                var format;
-                switch (type) {
+            if (element.dataset.duiceMask) {
+                var duiceMask = element.dataset.duiceMask.split(',');
+                var maskType = duiceMask[0];
+                var mask;
+                switch (maskType) {
                     case 'string':
-                        format = new StringFormat(duiceFormat[1]);
+                        mask = new StringMask(duiceMask[1]);
                         break;
                     case 'number':
-                        format = new NumberFormat(parseInt(duiceFormat[1]));
+                        mask = new NumberMask(parseInt(duiceMask[1]));
                         break;
                     case 'date':
-                        format = new DateFormat(duiceFormat[1]);
+                        mask = new DateMask(duiceMask[1]);
                         break;
                     default:
-                        throw 'format type[' + type + '] is invalid';
+                        throw 'format type[' + maskType + '] is invalid';
                 }
-                span.setFormat(format);
+                span.setMask(mask);
             }
             // binds
             var bind = element.dataset.duiceBind.split(',');
@@ -2353,23 +2319,23 @@ var duice;
             this.span = span;
             addClass(this.span, 'duice-span');
         }
-        setFormat(format) {
-            this.format = format;
+        setMask(mask) {
+            this.mask = mask;
         }
         update(map, obj) {
             removeChildNodes(this.span);
             var value = map.get(this.name);
             value = defaultIfEmpty(value, '');
-            if (this.format) {
-                value = this.format.encode(value);
+            if (this.mask) {
+                value = this.mask.encode(value);
             }
             this.span.appendChild(document.createTextNode(value));
         }
         getValue() {
             var value = this.span.innerHTML;
             value = defaultIfEmpty(value, null);
-            if (this.format) {
-                value = this.format.decode(value);
+            if (this.mask) {
+                value = this.mask.decode(value);
             }
             return value;
         }
@@ -2419,14 +2385,14 @@ var duice;
             switch (type) {
                 case 'text':
                     input = new InputText(element);
-                    if (element.dataset.duiceFormat) {
-                        input.setPattern(element.dataset.duiceFormat);
+                    if (element.dataset.duiceMask) {
+                        input.setMask(element.dataset.duiceMask);
                     }
                     break;
                 case 'number':
                     input = new InputNumber(element);
-                    if (element.dataset.duiceFormat) {
-                        input.setScale(parseInt(element.dataset.duiceFormat));
+                    if (element.dataset.duiceMask) {
+                        input.setMask(parseInt(element.dataset.duiceMask));
                     }
                     break;
                 case 'checkbox':
@@ -2438,8 +2404,8 @@ var duice;
                 case 'date':
                 case 'datetime-local':
                     input = new InputDate(element);
-                    if (element.dataset.duiceFormat) {
-                        input.setPattern(element.dataset.duiceFormat);
+                    if (element.dataset.duiceMask) {
+                        input.setMask(element.dataset.duiceMask);
                     }
                     break;
                 default:
@@ -2463,14 +2429,14 @@ var duice;
             this.input.addEventListener('keypress', function (event) {
                 var inputChars = String.fromCharCode(event.keyCode);
                 var newValue = this.value.substr(0, this.selectionStart) + inputChars + this.value.substr(this.selectionEnd);
-                if (_this.checkFormat(newValue) === false) {
+                if (_this.checkValue(newValue) === false) {
                     event.preventDefault();
                 }
             }, true);
             this.input.addEventListener('paste', function (event) {
                 var inputChars = event.clipboardData.getData('text/plain');
                 var newValue = this.value.substr(0, this.selectionStart) + inputChars + this.value.substr(this.selectionEnd);
-                if (_this.checkFormat(newValue) === false) {
+                if (_this.checkValue(newValue) === false) {
                     event.preventDefault();
                 }
             }, true);
@@ -2481,7 +2447,7 @@ var duice;
             // turn off autocomplete
             _this.input.setAttribute('autocomplete', 'off');
         }
-        checkFormat(value) {
+        checkValue(value) {
             return true;
         }
         setDisable(disable) {
@@ -2539,15 +2505,16 @@ var duice;
         constructor(input) {
             super(input);
             addClass(this.input, 'duice-input-text');
-            this.format = new StringFormat();
         }
-        setPattern(format) {
-            this.format.setPattern(format);
+        setMask(format) {
+            this.mask = new StringMask(format);
         }
         update(map, obj) {
             var value = map.get(this.getName());
             value = defaultIfEmpty(value, '');
-            value = this.format.encode(value);
+            if (this.mask) {
+                value = this.mask.encode(value);
+            }
             this.input.value = value;
             this.setDisable(map.isDisable(this.getName()));
             this.setReadonly(map.isReadonly(this.getName()));
@@ -2555,15 +2522,28 @@ var duice;
         getValue() {
             var value = this.input.value;
             value = defaultIfEmpty(value, null);
-            value = this.format.decode(value);
+            if (this.mask) {
+                value = this.mask.decode(value);
+            }
             return value;
         }
-        checkFormat(value) {
-            try {
-                this.format.decode(value);
+        checkValue(value) {
+            // test pattern
+            var pattern = this.input.getAttribute('pattern');
+            if (pattern) {
+                var regExp = new RegExp(pattern);
+                if (!regExp.test(value)) {
+                    return false;
+                }
             }
-            catch (e) {
-                return false;
+            // checks format
+            if (this.mask) {
+                try {
+                    this.mask.decode(value);
+                }
+                catch (e) {
+                    return false;
+                }
             }
             return true;
         }
@@ -2577,26 +2557,27 @@ var duice;
             super(input);
             addClass(this.input, 'duice-input-number');
             this.input.setAttribute('type', 'text');
-            this.format = new NumberFormat();
         }
-        setScale(scale) {
-            this.format.setScale(scale);
+        setMask(scale) {
+            this.mask = new NumberMask(scale);
         }
         update(map, obj) {
             var value = map.get(this.getName());
-            value = this.format.encode(value);
+            if (this.mask) {
+                value = this.mask.encode(value);
+            }
             this.input.value = value;
             this.setDisable(map.isDisable(this.getName()));
             this.setReadonly(map.isReadonly(this.getName()));
         }
         getValue() {
             var value = this.input.value;
-            value = this.format.decode(value);
+            value = this.mask.decode(value);
             return value;
         }
-        checkFormat(value) {
+        checkValue(value) {
             try {
-                this.format.decode(value);
+                this.mask.decode(value);
             }
             catch (e) {
                 return false;
@@ -2690,22 +2671,23 @@ var duice;
                     _this.openPicker();
                 }
             }, true);
-            // sets default format
-            this.format = new DateFormat();
+            // default mask
             if (this.type === 'date') {
-                this.format.setPattern('yyyy-MM-dd');
+                this.mask = new DateMask('yyyy-MM-dd');
             }
             else {
-                this.format.setPattern('yyyy-MM-dd HH:mm:ss');
+                this.mask = new DateMask('yyyy-MM-dd HH:mm:ss');
             }
         }
-        setPattern(format) {
-            this.format.setPattern(format);
+        setMask(format) {
+            this.mask = new DateMask(format);
         }
         update(map, obj) {
             var value = map.get(this.getName());
             value = defaultIfEmpty(value, '');
-            value = this.format.encode(value);
+            if (this.mask) {
+                value = this.mask.encode(value);
+            }
             this.input.value = value;
             this.setDisable(map.isDisable(this.getName()));
             this.setReadonly(map.isReadonly(this.getName()));
@@ -2713,15 +2695,17 @@ var duice;
         getValue() {
             var value = this.input.value;
             value = defaultIfEmpty(value, null);
-            value = this.format.decode(value);
+            if (this.mask) {
+                value = this.mask.decode(value);
+            }
             if (this.type === 'date') {
-                value = new DateFormat('yyyy-MM-dd').encode(new Date(value).toISOString());
+                value = new DateMask('yyyy-MM-dd').encode(new Date(value).toISOString());
             }
             return value;
         }
-        checkFormat(value) {
+        checkValue(value) {
             try {
-                var s = this.format.decode(value);
+                var s = this.mask.decode(value);
             }
             catch (e) {
                 return false;
@@ -2926,7 +2910,7 @@ var duice;
             confirmButton.classList.add('duice-input-date__pickerDiv-footerDiv-confirmButton');
             footerDiv.appendChild(confirmButton);
             confirmButton.addEventListener('click', function (event) {
-                _this.input.value = _this.format.encode(date.toISOString());
+                _this.input.value = _this.mask.encode(date.toISOString());
                 _this.setChanged();
                 _this.notifyObservers(this);
                 _this.closePicker();
@@ -3188,17 +3172,10 @@ var duice;
             addClass(this.img, 'duice-img');
             this.originSrc = this.img.src;
             var _this = this;
-            // listener for click
-            this.img.addEventListener('click', function (event) {
-                _this.openPreview();
-            });
             // listener for contextmenu event
-            this.img.addEventListener('contextmenu', function (event) {
-                if (_this.disable) {
-                    return;
-                }
-                _this.openMenuDiv(event.pageX, event.pageY);
-                event.preventDefault();
+            this.img.addEventListener('click', function (event) {
+                var imgPosition = getElementPosition(this);
+                _this.openMenuDiv(imgPosition.top, imgPosition.left);
             });
         }
         /**
@@ -3211,6 +3188,7 @@ var duice;
             this.value = defaultIfEmpty(value, this.originSrc);
             this.img.src = this.value;
             this.disable = map.isDisable(this.getName());
+            this.readonly = map.isReadonly(this.getName());
         }
         /**
          * Return value of image element
@@ -3218,6 +3196,62 @@ var duice;
          */
         getValue() {
             return this.value;
+        }
+        /**
+         * Opens menu division.
+         */
+        openMenuDiv(top, left) {
+            // defines variables
+            var _this = this;
+            // creates menu div
+            this.menuDiv = document.createElement('div');
+            this.menuDiv.classList.add('duice-img__menuDiv');
+            // creates preview button
+            if (!this.disable) {
+                var previewButton = document.createElement('button');
+                previewButton.classList.add('duice-img__menuDiv-previewButton');
+                previewButton.addEventListener('click', function (event) {
+                    _this.openPreview();
+                }, true);
+                this.menuDiv.appendChild(previewButton);
+            }
+            // readonly or disable 
+            if (!this.disable && !this.readonly) {
+                // creates change button
+                var changeButton = document.createElement('button');
+                changeButton.classList.add('duice-img__menuDiv-changeButton');
+                changeButton.addEventListener('click', function (event) {
+                    _this.changeImage();
+                }, true);
+                this.menuDiv.appendChild(changeButton);
+                // creates view button
+                var clearButton = document.createElement('button');
+                clearButton.classList.add('duice-img__menuDiv-clearButton');
+                clearButton.addEventListener('click', function (event) {
+                    _this.clearImage();
+                }, true);
+                this.menuDiv.appendChild(clearButton);
+            }
+            // appends menu div
+            //this.img.parentNode.appendChild(this.menuDiv);
+            this.img.parentNode.insertBefore(this.menuDiv, this.img.nextSibling);
+            this.menuDiv.style.position = 'absolute';
+            this.menuDiv.style.zIndex = String(getCurrentMaxZIndex() + 1);
+            this.menuDiv.style.top = top + 'px';
+            this.menuDiv.style.left = left + 'px';
+            // listens mouse leaves from menu div.
+            this.menuDiv.addEventListener('mouseleave', function (event) {
+                _this.closeMenuDiv();
+            });
+        }
+        /**
+         * Closes menu division
+         */
+        closeMenuDiv() {
+            if (this.menuDiv) {
+                this.menuDiv.parentNode.removeChild(this.menuDiv);
+                this.menuDiv = null;
+            }
         }
         /**
          * Opens preview
@@ -3251,53 +3285,6 @@ var duice;
                 this.blocker.unblock();
                 this.preview.parentNode.removeChild(this.preview);
                 this.preview = null;
-            }
-        }
-        /**
-         * Opens menu division.
-         */
-        openMenuDiv(x, y) {
-            // checks if already menu exists.
-            if (this.menuDiv) {
-                return;
-            }
-            // defines variables
-            var _this = this;
-            // creates menu div
-            this.menuDiv = document.createElement('div');
-            this.menuDiv.classList.add('duice-img__menuDiv');
-            // creates change button
-            var changeButton = document.createElement('button');
-            changeButton.classList.add('duice-img__menuDiv-changeButton');
-            changeButton.addEventListener('click', function (event) {
-                _this.changeImage();
-            }, true);
-            this.menuDiv.appendChild(changeButton);
-            // creates view button
-            var clearButton = document.createElement('button');
-            clearButton.classList.add('duice-img__menuDiv-clearButton');
-            clearButton.addEventListener('click', function (event) {
-                _this.clearImage();
-            }, true);
-            this.menuDiv.appendChild(clearButton);
-            // appends menu div
-            this.img.parentNode.appendChild(this.menuDiv);
-            this.menuDiv.style.position = 'absolute';
-            this.menuDiv.style.zIndex = String(getCurrentMaxZIndex() + 1);
-            this.menuDiv.style.top = y + 'px';
-            this.menuDiv.style.left = x + 'px';
-            // listens mouse leaves from menu div.
-            this.menuDiv.addEventListener('mouseleave', function (event) {
-                _this.closeMenuDiv();
-            });
-        }
-        /**
-         * Closes menu division
-         */
-        closeMenuDiv() {
-            if (this.menuDiv) {
-                this.menuDiv.parentNode.removeChild(this.menuDiv);
-                this.menuDiv = null;
             }
         }
         /**
@@ -3336,116 +3323,6 @@ var duice;
         }
     }
     duice.Img = Img;
-    /**
-     * duice.PaginationFactory
-     */
-    class PaginationFactory extends MapComponentFactory {
-        getComponent(element) {
-            var pagination = new Pagination(element);
-            if (element.dataset.duiceSize) {
-                pagination.setSize(Number(element.dataset.duiceSize));
-            }
-            var bind = element.dataset.duiceBind.split(',');
-            pagination.bind(this.getContextProperty(bind[0]), bind[1], bind[2], bind[3]);
-            return pagination;
-        }
-    }
-    duice.PaginationFactory = PaginationFactory;
-    /**
-     * duice.Pagination
-     */
-    class Pagination extends MapComponent {
-        constructor(ul) {
-            super(ul);
-            this.lis = new Array();
-            this.size = 1;
-            this.page = 1;
-            this.ul = ul;
-            addClass(this.ul, 'duice-ul');
-            // clones li
-            var li = this.ul.querySelector('li');
-            this.li = li.cloneNode(true);
-            li.parentNode.removeChild(li);
-        }
-        bind(map, pageName, rowsName, totalCountName) {
-            this.pageName = pageName;
-            this.rowsName = rowsName;
-            this.totalCountName = totalCountName;
-            super.bind(map, pageName);
-        }
-        setSize(size) {
-            this.size = size;
-        }
-        setEnable(enable) {
-            return;
-        }
-        update(map, obj) {
-            this.page = Number(defaultIfEmpty(map.get(this.pageName), 1));
-            var rows = Number(defaultIfEmpty(map.get(this.rowsName), 1));
-            var totalCount = Number(defaultIfEmpty(map.get(this.totalCountName), 1));
-            var totalPage = Math.max(Math.ceil(totalCount / rows), 1);
-            var startPage = Math.floor((this.page - 1) / this.size) * this.size + 1;
-            var endPage = Math.min(startPage + this.size - 1, totalPage);
-            var _this = this;
-            // clear lis
-            for (var i = this.lis.length - 1; i >= 0; i--) {
-                this.lis[i].parentNode.removeChild(this.lis[i]);
-            }
-            this.lis.length = 0;
-            // creates previous item
-            const prevPage = startPage - 1;
-            var prevLi = this.createPageItem(prevPage, '');
-            prevLi.style.cursor = 'pointer';
-            prevLi.classList.add('duice-pagination__li--prev');
-            this.ul.appendChild(prevLi);
-            this.lis.push(prevLi);
-            if (prevPage < 1) {
-                prevLi.onclick = null;
-                prevLi.style.pointerEvents = 'none';
-                prevLi.style.opacity = '0.5';
-            }
-            // creates page items
-            for (var i = startPage; i <= endPage; i++) {
-                const page = i;
-                var li = this.createPageItem(page, String(page));
-                li.style.cursor = 'pointer';
-                this.ul.appendChild(li);
-                this.lis.push(li);
-                if (page === this.page) {
-                    li.classList.add('duice-pagination__li--current');
-                    li.onclick = null;
-                    li.style.pointerEvents = 'none';
-                }
-            }
-            // creates next item
-            const nextPage = endPage + 1;
-            var nextLi = this.createPageItem(nextPage, '');
-            nextLi.style.cursor = 'pointer';
-            nextLi.classList.add('duice-pagination__li--next');
-            this.ul.appendChild(nextLi);
-            this.lis.push(nextLi);
-            if (nextPage > totalPage) {
-                nextLi.onclick = null;
-                nextLi.style.pointerEvents = 'none';
-                nextLi.style.opacity = '0.5';
-            }
-        }
-        getValue() {
-            return this.page;
-        }
-        createPageItem(page, text) {
-            var li = this.li.cloneNode(true);
-            li.classList.add('duice-pagination__li');
-            var _this = this;
-            var $context = {};
-            $context['page'] = Number(page);
-            $context['text'] = String(text);
-            li = executeExpression(li, $context);
-            li.appendChild(document.createTextNode(text));
-            return li;
-        }
-    }
-    duice.Pagination = Pagination;
     /**
      * duice.TableFactory
      */
@@ -4071,13 +3948,9 @@ var duice;
         }
     }
     duice.Ul = Ul;
-    /**
-     * Adds components
-     */
-    // list element
+    // Adds components
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('table[is="duice-table"]', duice.TableFactory));
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('ul[is="duice-ul"]', duice.UlFactory));
-    // map element
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('span[is="duice-span"]', duice.SpanFactory));
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('div[is="duice-div"]', duice.DivFactory));
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('input[is="duice-input"]', duice.InputFactory));
@@ -4085,7 +3958,6 @@ var duice;
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('textarea[is="duice-textarea"]', duice.TextareaFactory));
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('img[is="duice-img"]', duice.ImgFactory));
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('*[is="duice-scriptlet"]', duice.ScriptletFactory));
-    duice.ComponentDefinitionRegistry.add(new ComponentDefinition('ul[is="duice-pagination"]', duice.PaginationFactory));
 })(duice || (duice = {}));
 /**
  * DOMContentLoaded event process

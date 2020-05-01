@@ -16,6 +16,7 @@
 	},
 	"files":[
 		 "./src/duice.ts"
-		//,"./src/integrate/duice-ckeditor.ts"
+		,"./src/widget/duice.widget.pagination.ts"
+		,"./src/integrate/duice.integrate.ckeditor.ts"
 	]
 }

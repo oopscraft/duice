@@ -23,7 +23,7 @@ namespace duice {
     /**
      * Adds class
      */
-    function addClass(element:HTMLElement, className:string):void {
+    export function addClass(element:HTMLElement, className:string):void {
 		if(Configuration.cssEnable) {
             element.classList.add(className);
         }
@@ -330,7 +330,7 @@ namespace duice {
      * @param $context
      * @return converted HTML element
      */
-    function executeExpression(element:HTMLElement, $context:any):any {
+    export function executeExpression(element:HTMLElement, $context:any):any {
         var string = element.outerHTML;
         string = string.replace(/\[@duice\[([\s\S]*?)\]\]/mgi,function(match, command){
             try {
@@ -491,9 +491,9 @@ namespace duice {
     }
 
     /**
-     * duice.Format interface
+     * duice.Mask interface
      */
-    export interface Format {
+    export interface Mask {
         
         /**
          * Encodes original value as formatted value
@@ -514,7 +514,7 @@ namespace duice {
      * duice.StringFormat
      * @param string format
      */
-    export class StringFormat implements Format {
+    export class StringMask implements Mask {
         pattern:string;
     
         /**
@@ -522,19 +522,9 @@ namespace duice {
          * @param pattern
          */
         constructor(pattern?:string){
-            if(pattern){
-                this.setPattern(pattern);
-            }
-        }
-        
-        /**
-         * Sets format string
-         * @param pattern
-         */
-        setPattern(pattern:string){
             this.pattern = pattern;
         }
-        
+
         /**
          * encode string as format
          * @param value
@@ -586,7 +576,7 @@ namespace duice {
      * duice.NumberFormat
      * @param scale number
      */
-    export class NumberFormat implements Format {
+    export class NumberMask implements Mask {
         scale:number = 0;
     
        /**
@@ -594,16 +584,6 @@ namespace duice {
         * @param scale
         */
         constructor(scale?:number){
-            if(scale){
-                this.setScale(scale);
-            }
-        }
-        
-        /**
-         * Sets number format scale
-         * @param scale
-         */
-        setScale(scale:number){
             this.scale = scale;
         }
         
@@ -648,7 +628,7 @@ namespace duice {
     /**
      * duice.DateFormat
      */
-    export class DateFormat implements Format {
+    export class DateMask implements Mask {
         pattern:string;
         patternRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
         
@@ -657,16 +637,6 @@ namespace duice {
          * @param pattern
          */
         constructor(pattern?:string){
-            if(pattern){
-                this.setPattern(pattern);
-            }
-        }
-        
-        /**
-         * Sets format string
-         * @param pattern
-         */
-        setPattern(pattern:string){
             this.pattern = pattern;
         }
         
@@ -819,7 +789,7 @@ namespace duice {
 		}
     }
 
-    /**
+     /**
      * duice.Tooltip
      */
     export class Tooltip {
@@ -829,12 +799,6 @@ namespace duice {
         constructor(element:HTMLElement, message:string){
             this.element = element;
             this.message = message;
-        }
-
-        /**
-         * Creates tooltip
-         */
-        create():void {
             this.div = document.createElement('div');
             this.div.classList.add('duice-tooltip');
             this.div.appendChild(document.createTextNode(this.message));
@@ -843,13 +807,20 @@ namespace duice {
             // adjusting position
             this.div.style.position = 'absolute';
             this.div.style.zIndex = String(getCurrentMaxZIndex() + 1);
+
+            var _this = this;
+            this.div.addEventListener('click', function(event){
+                _this.destroy();
+            });
         }
 
         /**
          * Destroy tooltip
          */
         destroy():void {
-            this.element.parentNode.removeChild(this.div);
+            if(this.element.parentNode.contains(this.div)){
+                this.element.parentNode.removeChild(this.div);
+            }
         }
     }
 
@@ -1929,14 +1900,6 @@ namespace duice {
         }
 
         /**
-         * Returns value is exists
-         * @param name 
-         */
-        has(name:string):boolean {
-            return isNotEmpty(this.get(name));
-        }
-        
-        /**
          * Returns properties names as array.
          * @return array of names
          */
@@ -1952,15 +1915,14 @@ namespace duice {
          * Sets focus with message
          * @param name 
          */
-        setFocus(name:string, message:string):void {
+        setFocus(name:string, message?:string):void {
             for(var i = 0, size = this.observers.length; i < size; i++){
                 var observer = this.observers[i];
                 if(observer instanceof MapComponent){
-                    var mapUuiComponent = <MapComponent>this.observers[i];
+                    var mapUiComponent = <MapComponent>this.observers[i];
                     if(observer.getName() === name){
-                        if(mapUuiComponent.setFocus(message)){
-                            break;
-                        }
+                        mapUiComponent.setFocus(message);
+                        break;
                     }
                 }
             }
@@ -2438,17 +2400,15 @@ namespace duice {
          * Sets element focus
          * @param message 
          */
-        setFocus(message:string){
+        setFocus(message?:string){
             if(this.element.focus){
-                if(!isEmpty(message)){
+                if(message){
                     var tooltip = new Tooltip(this.element, message);
-                    tooltip.create();
                     this.element.addEventListener('blur', function(event){
                         tooltip.destroy();
                     }, { once: true });
                 }
                 this.element.focus();
-                return true;
             }
         }
     }
@@ -2579,24 +2539,24 @@ namespace duice {
             var span = new Span(element);
             
             // sets format
-            if(element.dataset.duiceFormat){
-                var duiceFormat:Array<string> = element.dataset.duiceFormat.split(',');
-                var type = duiceFormat[0];
-                var format;
-                switch(type){
+            if(element.dataset.duiceMask){
+                var duiceMask:Array<string> = element.dataset.duiceMask.split(',');
+                var maskType = duiceMask[0];
+                var mask;
+                switch(maskType){
                 case 'string':
-                    format = new StringFormat(duiceFormat[1]);
+                    mask = new StringMask(duiceMask[1]);
                     break;
                 case 'number':
-                    format = new NumberFormat(parseInt(duiceFormat[1]));
+                    mask = new NumberMask(parseInt(duiceMask[1]));
                     break;
                 case 'date':
-                    format = new DateFormat(duiceFormat[1]);
+                    mask = new DateMask(duiceMask[1]);
                     break;
                 default:
-                    throw 'format type[' + type + '] is invalid';
+                    throw 'format type[' + maskType + '] is invalid';
                 }
-                span.setFormat(format);
+                span.setMask(mask);
             }
             
             // binds
@@ -2611,29 +2571,29 @@ namespace duice {
      */
     export class Span extends MapComponent {
         span:HTMLSpanElement;
-        format:Format;
+        mask:Mask;
         constructor(span:HTMLSpanElement){
             super(span);
             this.span = span;
             addClass(this.span, 'duice-span');
         }
-        setFormat(format:Format){
-            this.format = format;
+        setMask(mask:Mask){
+            this.mask = mask;
         }
         update(map:Map, obj:object):void {
             removeChildNodes(this.span);
             var value = map.get(this.name);
             value = defaultIfEmpty(value,'');
-            if(this.format){
-                value = this.format.encode(value);
+            if(this.mask){
+                value = this.mask.encode(value);
             }
             this.span.appendChild(document.createTextNode(value));
         }
         getValue():string {
             var value = this.span.innerHTML;
             value = defaultIfEmpty(value, null);
-            if(this.format){
-                value = this.format.decode(value);
+            if(this.mask){
+                value = this.mask.decode(value);
             }
             return value;
         }
@@ -2685,14 +2645,14 @@ namespace duice {
             switch(type){
             case 'text':
                 input = new InputText(element);
-                if(element.dataset.duiceFormat){
-                    input.setPattern(element.dataset.duiceFormat);
+                if(element.dataset.duiceMask){
+                    input.setMask(element.dataset.duiceMask);
                 }
                 break;
             case 'number':
                 input = new InputNumber(element);
-                if(element.dataset.duiceFormat){
-                    input.setScale(parseInt(element.dataset.duiceFormat));
+                if(element.dataset.duiceMask){
+                    input.setMask(parseInt(element.dataset.duiceMask));
                 }
                 break;
             case 'checkbox':
@@ -2704,8 +2664,8 @@ namespace duice {
             case 'date':
             case 'datetime-local':
                 input = new InputDate(element);
-                if(element.dataset.duiceFormat){
-                    input.setPattern(element.dataset.duiceFormat);
+                if(element.dataset.duiceMask){
+                    input.setMask(element.dataset.duiceMask);
                 }
                 break;
             default:
@@ -2731,14 +2691,14 @@ namespace duice {
             this.input.addEventListener('keypress', function(event:any){
                 var inputChars = String.fromCharCode(event.keyCode);
                 var newValue = this.value.substr(0,this.selectionStart) + inputChars + this.value.substr(this.selectionEnd);
-                if(_this.checkFormat(newValue) === false){
+                if(_this.checkValue(newValue) === false){
                     event.preventDefault();
                 }
             }, true);
             this.input.addEventListener('paste', function(event:any){
                 var inputChars = event.clipboardData.getData('text/plain');
                 var newValue = this.value.substr(0,this.selectionStart) + inputChars + this.value.substr(this.selectionEnd);
-                if(_this.checkFormat(newValue) === false){
+                if(_this.checkValue(newValue) === false){
                     event.preventDefault();
                 }
             }, true);
@@ -2752,7 +2712,7 @@ namespace duice {
         }
         abstract update(map:duice.Map, obj:object):void;
         abstract getValue():any;
-        checkFormat(value:string):boolean {
+        checkValue(value:string):boolean {
             return true;
         }
         setDisable(disable:boolean):void {
@@ -2803,19 +2763,21 @@ namespace duice {
      * duice.InputText
      */
     export class InputText extends Input {
-        format:StringFormat;
+        mask:StringMask;
         constructor(input:HTMLInputElement){
             super(input);
             addClass(this.input,'duice-input-text');
-            this.format = new StringFormat();
+            
         }
-        setPattern(format:string){
-            this.format.setPattern(format);
+        setMask(format:string){
+            this.mask = new StringMask(format);
         }
         update(map:duice.Map, obj:object):void {
             var value = map.get(this.getName());
             value = defaultIfEmpty(value, '');
-            value = this.format.encode(value);
+            if(this.mask){
+                value = this.mask.encode(value);
+            }
             this.input.value = value;
             this.setDisable(map.isDisable(this.getName()));
             this.setReadonly(map.isReadonly(this.getName()));
@@ -2823,14 +2785,29 @@ namespace duice {
         getValue():string {
             var value = this.input.value;
             value = defaultIfEmpty(value, null);
-            value = this.format.decode(value);
+            if(this.mask){
+                value = this.mask.decode(value);
+            }
             return value;
         }
-        checkFormat(value:string):boolean {
-            try {
-                this.format.decode(value);
-            }catch(e){
-                return false;
+        checkValue(value:string):boolean {
+
+            // test pattern
+            var pattern = this.input.getAttribute('pattern');
+            if(pattern){
+                var regExp = new RegExp(pattern);
+                if(!regExp.test(value)){
+                    return false;
+                }
+            }
+
+            // checks format
+            if(this.mask){
+                try {
+                    this.mask.decode(value);
+                }catch(e){
+                    return false;
+                }
             }
             return true;
         }
@@ -2840,31 +2817,32 @@ namespace duice {
      * duice.InputNumber
      */
     export class InputNumber extends Input {
-        format:NumberFormat;
+        mask:NumberMask;
         constructor(input:HTMLInputElement){
             super(input);
             addClass(this.input, 'duice-input-number');
             this.input.setAttribute('type','text');
-            this.format = new NumberFormat();
         }
-        setScale(scale:number){
-            this.format.setScale(scale);
+        setMask(scale:number){
+            this.mask = new NumberMask(scale);
         }
         update(map:duice.Map, obj:object):void {
             var value = map.get(this.getName());
-            value = this.format.encode(value);
+            if(this.mask){
+                value = this.mask.encode(value);
+            }
             this.input.value = value;
             this.setDisable(map.isDisable(this.getName()));
             this.setReadonly(map.isReadonly(this.getName()));
         }
         getValue():number {
             var value:any = this.input.value;
-            value = this.format.decode(value);
+            value = this.mask.decode(value);
             return value;
         }
-        checkFormat(value:string):boolean {
+        checkValue(value:string):boolean {
             try {
-                this.format.decode(value);
+                this.mask.decode(value);
             }catch(e){
                 return false;
             }
@@ -2944,7 +2922,7 @@ namespace duice {
         readonly:boolean = false;
         pickerDiv:HTMLDivElement;
         type:string;
-        format:DateFormat;
+        mask:DateMask;
         clickListener:any;
         constructor(input:HTMLInputElement){
             super(input);
@@ -2960,21 +2938,22 @@ namespace duice {
                 }
             },true);
 
-            // sets default format
-            this.format = new DateFormat();
+            // default mask
             if(this.type === 'date'){
-                this.format.setPattern('yyyy-MM-dd');
+                this.mask = new DateMask('yyyy-MM-dd');
             }else{
-                this.format.setPattern('yyyy-MM-dd HH:mm:ss');
+                this.mask = new DateMask('yyyy-MM-dd HH:mm:ss');
             }
         }
-        setPattern(format:string){
-            this.format.setPattern(format);
+        setMask(format:string){
+            this.mask = new DateMask(format);
         }
         update(map:duice.Map, obj:object):void {
             var value:string = map.get(this.getName());
             value = defaultIfEmpty(value,'');
-            value = this.format.encode(value);
+            if(this.mask){
+                value = this.mask.encode(value);
+            }
             this.input.value = value;
             this.setDisable(map.isDisable(this.getName()));
             this.setReadonly(map.isReadonly(this.getName()));
@@ -2982,15 +2961,17 @@ namespace duice {
         getValue():string {
             var value = this.input.value;
             value = defaultIfEmpty(value, null);
-            value = this.format.decode(value);
+            if(this.mask){
+                value = this.mask.decode(value);
+            }
             if(this.type === 'date'){
-                value = new DateFormat('yyyy-MM-dd').encode(new Date(value).toISOString())
+                value = new DateMask('yyyy-MM-dd').encode(new Date(value).toISOString())
             }
             return value;
         }
-        checkFormat(value:string):boolean {
+        checkValue(value:string):boolean {
             try {
-                var s = this.format.decode(value);
+                var s = this.mask.decode(value);
             }catch(e){
                 return false;
             }
@@ -3219,7 +3200,7 @@ namespace duice {
             confirmButton.classList.add('duice-input-date__pickerDiv-footerDiv-confirmButton');
             footerDiv.appendChild(confirmButton);
             confirmButton.addEventListener('click', function(event){
-                _this.input.value = _this.format.encode(date.toISOString());
+                _this.input.value = _this.mask.encode(date.toISOString());
                 _this.setChanged();
                 _this.notifyObservers(this);
                 _this.closePicker();
@@ -3487,6 +3468,7 @@ namespace duice {
         originSrc:string;
         value:string;
         disable:boolean;
+        readonly:boolean;
         preview:HTMLImageElement;
         blocker:duice.Blocker;
         menuDiv:HTMLDivElement;
@@ -3502,18 +3484,10 @@ namespace duice {
             this.originSrc = this.img.src;
             var _this = this;
 
-            // listener for click
-            this.img.addEventListener('click', function(event){
-                _this.openPreview();
-            });
-
             // listener for contextmenu event
-            this.img.addEventListener('contextmenu', function(event){
-                if(_this.disable){
-                    return;
-                }
-                _this.openMenuDiv(event.pageX,event.pageY);
-                event.preventDefault();
+            this.img.addEventListener('click', function(event){
+                var imgPosition = getElementPosition(this);
+                _this.openMenuDiv(imgPosition.top,imgPosition.left);
             });
         }
         
@@ -3527,6 +3501,7 @@ namespace duice {
             this.value = defaultIfEmpty(value,this.originSrc);
             this.img.src = this.value;
             this.disable = map.isDisable(this.getName());
+            this.readonly = map.isReadonly(this.getName());
         }
         
         /**
@@ -3535,6 +3510,72 @@ namespace duice {
          */
         getValue():any {
             return this.value;
+        }
+
+        /**
+         * Opens menu division.
+         */
+        openMenuDiv(top:number, left:number):void {
+
+            // defines variables
+            var _this = this;
+
+            // creates menu div
+            this.menuDiv = document.createElement('div');
+            this.menuDiv.classList.add('duice-img__menuDiv');
+
+            // creates preview button
+            if(!this.disable) {
+                var previewButton = document.createElement('button');
+                previewButton.classList.add('duice-img__menuDiv-previewButton');
+                previewButton.addEventListener('click', function(event:any) {
+                    _this.openPreview();
+                }, true);
+                this.menuDiv.appendChild(previewButton);
+            }
+            
+            // readonly or disable 
+            if(!this.disable && !this.readonly) {
+                // creates change button
+                var changeButton = document.createElement('button');
+                changeButton.classList.add('duice-img__menuDiv-changeButton');
+                changeButton.addEventListener('click', function(event:any) {
+                    _this.changeImage();
+                }, true);
+                this.menuDiv.appendChild(changeButton);
+
+                // creates view button
+                var clearButton = document.createElement('button');
+                clearButton.classList.add('duice-img__menuDiv-clearButton');
+                clearButton.addEventListener('click', function(event:any) {
+                    _this.clearImage();
+                }, true);
+                this.menuDiv.appendChild(clearButton);
+            }
+            
+            // appends menu div
+            //this.img.parentNode.appendChild(this.menuDiv);
+            this.img.parentNode.insertBefore(this.menuDiv, this.img.nextSibling);
+
+            this.menuDiv.style.position = 'absolute';
+            this.menuDiv.style.zIndex = String(getCurrentMaxZIndex() + 1);
+            this.menuDiv.style.top = top + 'px';
+            this.menuDiv.style.left = left + 'px';
+
+            // listens mouse leaves from menu div.
+            this.menuDiv.addEventListener('mouseleave', function(event:any){
+                _this.closeMenuDiv();
+            });
+        }
+
+        /**
+         * Closes menu division
+         */
+        closeMenuDiv():void {
+            if(this.menuDiv) {
+                this.menuDiv.parentNode.removeChild(this.menuDiv);         
+                this.menuDiv = null;
+            }
         }
 
         /**
@@ -3577,60 +3618,6 @@ namespace duice {
         }
 
         /**
-         * Opens menu division.
-         */
-        openMenuDiv(x:number,y:number):void {
-            // checks if already menu exists.
-            if(this.menuDiv){
-                return;
-            }
-            // defines variables
-            var _this = this;
-
-            // creates menu div
-            this.menuDiv = document.createElement('div');
-            this.menuDiv.classList.add('duice-img__menuDiv');
-            
-            // creates change button
-            var changeButton = document.createElement('button');
-            changeButton.classList.add('duice-img__menuDiv-changeButton');
-            changeButton.addEventListener('click', function(event:any) {
-                _this.changeImage();
-            }, true);
-            this.menuDiv.appendChild(changeButton);
-
-            // creates view button
-            var clearButton = document.createElement('button');
-            clearButton.classList.add('duice-img__menuDiv-clearButton');
-            clearButton.addEventListener('click', function(event:any) {
-                _this.clearImage();
-            }, true);
-            this.menuDiv.appendChild(clearButton);
-            
-            // appends menu div
-            this.img.parentNode.appendChild(this.menuDiv);
-            this.menuDiv.style.position = 'absolute';
-            this.menuDiv.style.zIndex = String(getCurrentMaxZIndex() + 1);
-            this.menuDiv.style.top = y + 'px';
-            this.menuDiv.style.left = x + 'px';
-
-            // listens mouse leaves from menu div.
-            this.menuDiv.addEventListener('mouseleave', function(event:any){
-                _this.closeMenuDiv();
-            });
-        }
-
-        /**
-         * Closes menu division
-         */
-        closeMenuDiv():void {
-            if(this.menuDiv) {
-                this.menuDiv.parentNode.removeChild(this.menuDiv);         
-                this.menuDiv = null;
-            }
-        }
-
-        /**
          * Changes image
          */
         changeImage():void {
@@ -3664,126 +3651,6 @@ namespace duice {
             this.value = null;
             this.setChanged();
             this.notifyObservers(this);
-        }
-    }
-
-    /**
-     * duice.PaginationFactory
-     */
-    export class PaginationFactory extends MapComponentFactory {
-        getComponent(element:HTMLUListElement):Pagination {
-            var pagination = new Pagination(element);
-            if(element.dataset.duiceSize){
-                pagination.setSize(Number(element.dataset.duiceSize));
-            }
-            var bind = element.dataset.duiceBind.split(',');
-            pagination.bind(this.getContextProperty(bind[0]), bind[1], bind[2], bind[3]);
-            return pagination;
-        }
-    }
-
-    /**
-     * duice.Pagination
-     */
-    export class Pagination extends MapComponent {
-        ul:HTMLUListElement;
-        li:HTMLLIElement;
-        lis:Array<HTMLLIElement> = new Array<HTMLLIElement>();
-        pageName:string;
-        rowsName:string;
-        totalCountName:string;
-        size:number = 1;
-        page:number = 1;
-        constructor(ul:HTMLUListElement) {
-            super(ul);
-            this.ul = ul;
-            addClass(this.ul, 'duice-ul');
-            
-            // clones li
-            var li = this.ul.querySelector('li');
-            this.li = <HTMLLIElement>li.cloneNode(true);
-            li.parentNode.removeChild(li);
-        }
-        bind(map:duice.Map, pageName:string, rowsName:string, totalCountName:string):void {
-            this.pageName = pageName;
-            this.rowsName = rowsName;
-            this.totalCountName = totalCountName;
-            super.bind(map,pageName);
-        }
-        setSize(size:number):void{
-            this.size = size;
-        }
-        setEnable(enable:boolean):void {
-            return;
-        }
-        update(map:duice.Map, obj:object):void {
-            this.page = Number(defaultIfEmpty(map.get(this.pageName),1));
-            var rows = Number(defaultIfEmpty(map.get(this.rowsName),1));
-            var totalCount = Number(defaultIfEmpty(map.get(this.totalCountName),1));
-            var totalPage = Math.max(Math.ceil(totalCount/rows),1);
-            var startPage = Math.floor((this.page-1)/this.size)*this.size + 1;
-            var endPage = Math.min(startPage+this.size-1, totalPage);
-            var _this = this;
-            
-            // clear lis
-            for(var i = this.lis.length-1; i >= 0; i --){
-                this.lis[i].parentNode.removeChild(this.lis[i]);
-            }
-            this.lis.length = 0;
-            
-            // creates previous item
-            const prevPage = startPage - 1;
-            var prevLi = this.createPageItem(prevPage,'');
-            prevLi.style.cursor = 'pointer';
-            prevLi.classList.add('duice-pagination__li--prev');
-            this.ul.appendChild(prevLi);
-            this.lis.push(prevLi);
-            if(prevPage < 1){
-                prevLi.onclick = null;
-                prevLi.style.pointerEvents = 'none';
-                prevLi.style.opacity = '0.5';
-            }
-            
-            // creates page items
-            for(var i = startPage; i <= endPage; i ++ ){
-                const page = i;
-                var li = this.createPageItem(page, String(page));
-                li.style.cursor = 'pointer';
-                this.ul.appendChild(li);
-                this.lis.push(li);
-                if(page === this.page){
-                    li.classList.add('duice-pagination__li--current');
-                    li.onclick = null;
-                    li.style.pointerEvents = 'none';
-                }
-            }
-            
-            // creates next item
-            const nextPage = endPage + 1;
-            var nextLi = this.createPageItem(nextPage,'');
-            nextLi.style.cursor = 'pointer';
-            nextLi.classList.add('duice-pagination__li--next');
-            this.ul.appendChild(nextLi);
-            this.lis.push(nextLi);
-            if(nextPage > totalPage){
-                nextLi.onclick = null;
-                nextLi.style.pointerEvents = 'none';
-                nextLi.style.opacity = '0.5';
-            }
-        }
-        getValue():any {
-            return this.page;
-        } 
-        createPageItem(page:number, text:string):HTMLLIElement {
-            var li:HTMLLIElement = <HTMLLIElement>this.li.cloneNode(true);
-            li.classList.add('duice-pagination__li');
-            var _this = this;
-            var $context:any = {};
-            $context['page'] = Number(page);
-            $context['text'] = String(text);
-            li = executeExpression(li, $context);
-            li.appendChild(document.createTextNode(text));
-            return li;
         }
     }
     
@@ -4455,15 +4322,10 @@ namespace duice {
             }
         }
     }
-    
-    /**
-     * Adds components
-     */
-    // list element
+
+    // Adds components
     ComponentDefinitionRegistry.add(new ComponentDefinition('table[is="duice-table"]', duice.TableFactory));
     ComponentDefinitionRegistry.add(new ComponentDefinition('ul[is="duice-ul"]', duice.UlFactory));
-
-    // map element
     ComponentDefinitionRegistry.add(new ComponentDefinition('span[is="duice-span"]', duice.SpanFactory));
     ComponentDefinitionRegistry.add(new ComponentDefinition('div[is="duice-div"]', duice.DivFactory));
     ComponentDefinitionRegistry.add(new ComponentDefinition('input[is="duice-input"]', duice.InputFactory));
@@ -4471,10 +4333,8 @@ namespace duice {
     ComponentDefinitionRegistry.add(new ComponentDefinition('textarea[is="duice-textarea"]', duice.TextareaFactory));
     ComponentDefinitionRegistry.add(new ComponentDefinition('img[is="duice-img"]', duice.ImgFactory));
     ComponentDefinitionRegistry.add(new ComponentDefinition('*[is="duice-scriptlet"]', duice.ScriptletFactory));
-    ComponentDefinitionRegistry.add(new ComponentDefinition('ul[is="duice-pagination"]', duice.PaginationFactory));
-
+  
 }
-
 
 /**
  * DOMContentLoaded event process
