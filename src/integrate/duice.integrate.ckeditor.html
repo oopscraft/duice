@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=2048,initial-scale=1">
-        <title>duice.widget.pagination</title>
+        <title>duice.integrate.Ckeditor</title>
         <link rel="stylesheet" type="text/css" href="../polyfill/normalize.css">
         <script src="../polyfill/dataset.js"></script>
         <script src="../polyfill/classList.js"></script>
@@ -25,14 +25,18 @@
         });
         </script>
     </head>
-    <body>
-        <center>
-            <h1>
-                duice.widget.pagination
-                <small>(https://ckeditor.com/ckeditor-4)</small>
-            </h1>
-            <textarea id="mapTextarea" style="width:800px; height:150px;"></textarea>
-            <textarea is="duice-integrate-ckeditor" data-duice-bind="map,contents" data-duice-config="{'width':800,'height':300}"></textarea>
-        </center>
+    <body style="padding:1rem;">
+        <h1>
+            duice.integrate.Ckeditor
+            <small>(https://ckeditor.com/ckeditor-4)</small>
+        </h1>
+        <div style="display:flex;">
+            <div style="width:40%;">
+                <textarea id="mapTextarea" style="width:100%; height:600px"></textarea>
+            </div>
+            <div style="width:40%; padding-left:1rem;">
+                <div is="duice-integrate-ckeditor" data-duice-bind="map,contents" style="width:100%; height:600px;" data-duice-config="{'height':500}"></div>
+            </div>
+        </div>
     </body>
 </html>

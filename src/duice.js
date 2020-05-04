@@ -366,7 +366,7 @@ var duice;
      * @param value
      * @return escaped string value
      */
-    function escapeHTML(value) {
+    function escapeHtml(value) {
         // checks value is valid.
         if (!value || typeof value !== 'string') {
             return value;
@@ -384,7 +384,7 @@ var duice;
             return htmlMap[m];
         });
     }
-    duice.escapeHTML = escapeHTML;
+    duice.escapeHtml = escapeHtml;
     /**
      * Removes child elements from HTML element.
      * @param element
@@ -440,6 +440,7 @@ var duice;
         element.style.left = computedLeft + 'px';
         element.style.top = computedTop + 'px';
     }
+    duice.setPositionCentered = setPositionCentered;
     /**
      * Returns position info of specified element
      * @param element
@@ -455,6 +456,7 @@ var duice;
             height: element.offsetHeight
         };
     }
+    duice.getElementPosition = getElementPosition;
     /**
      * Delays specified milliseconds and calls specified function
      * @param callback
@@ -1409,11 +1411,13 @@ var duice;
             if (this.notifyEnable && this.hasChanged()) {
                 this.clearUnavailableObservers();
                 for (var i = 0, size = this.observers.length; i < size; i++) {
-                    try {
-                        this.observers[i].update(this, obj);
-                    }
-                    catch (e) {
-                        console.error(e, this.observers[i]);
+                    if (this.observers[i] !== obj) {
+                        try {
+                            this.observers[i].update(this, obj);
+                        }
+                        catch (e) {
+                            console.error(e, this.observers[i]);
+                        }
                     }
                 }
                 this.clearChanged();
@@ -2557,6 +2561,8 @@ var duice;
             super(input);
             addClass(this.input, 'duice-input-number');
             this.input.setAttribute('type', 'text');
+            // default mask
+            this.mask = new NumberMask(0);
         }
         setMask(scale) {
             this.mask = new NumberMask(scale);

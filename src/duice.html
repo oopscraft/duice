@@ -9,10 +9,6 @@
 <script src="polyfill/classList.js"></script>
 <script src="duice.js"></script>
 <link rel="stylesheet" type="text/css" href="duice.css">
-<!-- ckeditor -->
-<script src="integrate/ckeditor/ckeditor.js"></script>
-<script src="integrate/duice-ckeditor.js"></script>
-
 <script>
 /**
  * loads framework
@@ -579,15 +575,6 @@ button {
 							<td class="code">&lt;span is="duice-span" data-duice-bind="user,hireDate" data-duice-mask="date,yyyy.MM.dd HH:mm:ss" ...</td class="code">
 						</tr>
 						<!-- ================================================================ -->
-						<!-- duice-div				   										  -->
-						<!-- ================================================================ -->
-						<tr>
-							<th>duice-div</th>
-							<td>profile</td>
-							<td><div is="duice-div" data-duice-bind="user,profile"></div></td>
-							<td class="code">&lt;div is="duice-div" data-duice-bind="user,profile" ...</td class="code">
-						</tr>
-						<!-- ================================================================ -->
 						<!-- duice-input[type=text]		   									  -->
 						<!-- ================================================================ -->
 						<tr>
@@ -729,6 +716,15 @@ button {
 							<td>profile</td>
 							<td><textarea is="duice-textarea" data-duice-bind="user,profile" class="form-control" id="abc"></textarea></td>
 							<td class="code">&lt;textarea is="duice-textarea" ...</td class="code">
+						</tr>
+						<!-- ================================================================ -->
+						<!-- duice-div				   										  -->
+						<!-- ================================================================ -->
+						<tr>
+							<th>duice-div</th>
+							<td>profile</td>
+							<td><div is="duice-div" data-duice-bind="user,profile"></div></td>
+							<td class="code">&lt;div is="duice-div" data-duice-bind="user,profile" ...</td class="code">
 						</tr>
 						<!-- ================================================================ -->
 						<!-- duice-img						   								  -->

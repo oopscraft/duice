@@ -25,10 +25,12 @@ var duice;
          * duice.plugin.Ckeditor
          */
         class Ckeditor extends duice.MapComponent {
-            constructor(textarea, config) {
-                super(textarea);
-                this.textarea = textarea;
+            constructor(div, config) {
+                super(div);
+                this.div = div;
                 this.config = config;
+                this.textarea = document.createElement('textarea');
+                this.div.appendChild(this.textarea);
                 this.ckeditor = CKEDITOR.replace(this.textarea, this.config);
                 var _this = this;
                 this.ckeditor.on('blur', function (event) {
@@ -49,6 +51,6 @@ var duice;
         }
         integrate.Ckeditor = Ckeditor;
         // Adds component definition
-        duice.ComponentDefinitionRegistry.add(new duice.ComponentDefinition('textarea[is="duice-integrate-ckeditor"]', duice.integrate.CkeditorFactory));
+        duice.ComponentDefinitionRegistry.add(new duice.ComponentDefinition('div[is="duice-integrate-ckeditor"]', duice.integrate.CkeditorFactory));
     })(integrate = duice.integrate || (duice.integrate = {}));
 })(duice || (duice = {}));

@@ -360,7 +360,7 @@ namespace duice {
      * @param value
      * @return escaped string value
      */
-    export function escapeHTML(value:string):string {
+    export function escapeHtml(value:string):string {
         
         // checks value is valid.
         if(!value || typeof value !== 'string'){
@@ -430,7 +430,7 @@ namespace duice {
      * Sets element position to be centered
      * @param element
      */
-    function setPositionCentered(element:HTMLElement):void {
+    export function setPositionCentered(element:HTMLElement):void {
         var win = getCurrentWindow();
         var computedStyle = win.getComputedStyle(element);
         var computedWidth = parseInt(computedStyle.getPropertyValue('width').replace(/px/gi, ''));
@@ -446,7 +446,7 @@ namespace duice {
      * Returns position info of specified element
      * @param element
      */
-    function getElementPosition(element:any) {
+    export function getElementPosition(element:any) {
         var pos:any = ('absolute relative').indexOf(getComputedStyle(element).position) == -1;
         var rect1:any = {top: element.offsetTop * pos, left: element.offsetLeft * pos};
         var rect2:any = element.offsetParent ? getElementPosition(element.offsetParent) : {top:0,left:0};
@@ -1530,10 +1530,12 @@ namespace duice {
             if(this.notifyEnable && this.hasChanged()){
                 this.clearUnavailableObservers();
                 for(var i = 0, size = this.observers.length; i < size; i++){
-                    try {
-                        this.observers[i].update(this, obj);
-                    }catch(e){
-                        console.error(e, this.observers[i]);
+                    if(this.observers[i] !== obj){
+                        try {
+                            this.observers[i].update(this, obj);
+                        }catch(e){
+                            console.error(e, this.observers[i]);
+                        }
                     }
                 }
                 this.clearChanged();
@@ -2822,6 +2824,9 @@ namespace duice {
             super(input);
             addClass(this.input, 'duice-input-number');
             this.input.setAttribute('type','text');
+
+            // default mask
+            this.mask = new NumberMask(0);
         }
         setMask(scale:number){
             this.mask = new NumberMask(scale);

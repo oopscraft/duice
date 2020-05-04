@@ -10,7 +10,7 @@ namespace duice {
          * duice.plugin.CkeditorFactory
          */
         export class CkeditorFactory extends duice.MapComponentFactory {
-            getComponent(element:HTMLTextAreaElement):Ckeditor {
+            getComponent(element:HTMLDivElement):Ckeditor {
                 var config = null;
                 if(element.dataset.duiceConfig){
                     config = JSON.parse(element.dataset.duiceConfig.replace(/\'/g, '"'));
@@ -26,13 +26,16 @@ namespace duice {
          * duice.plugin.Ckeditor
          */
         export class Ckeditor extends duice.MapComponent {
-            textarea:HTMLTextAreaElement;
+            div:HTMLDivElement;
             config:object;
+            textarea:HTMLTextAreaElement;
             ckeditor:object;
-            constructor(textarea:HTMLTextAreaElement, config:object){
-                super(textarea);
-                this.textarea = textarea;
+            constructor(div:HTMLDivElement, config:any){
+                super(div);
+                this.div = div;
                 this.config = config;
+                this.textarea = document.createElement('textarea');
+                this.div.appendChild(this.textarea);
                 this.ckeditor = CKEDITOR.replace(this.textarea, this.config);
                 var _this = this;
                 this.ckeditor.on('blur', function(event:any){
@@ -53,7 +56,7 @@ namespace duice {
         }
 
         // Adds component definition
-        duice.ComponentDefinitionRegistry.add(new duice.ComponentDefinition('textarea[is="duice-integrate-ckeditor"]', duice.integrate.CkeditorFactory));
+        duice.ComponentDefinitionRegistry.add(new duice.ComponentDefinition('div[is="duice-integrate-ckeditor"]', duice.integrate.CkeditorFactory));
 
     }
 
