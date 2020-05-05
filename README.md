@@ -24,8 +24,8 @@ You can use it with JQuery, AngularJS and so on, also Responsive UI framework li
 ## References 
 
 ### Demo page
-<a href ="./src/duice.html" target="_blank">
-src/duice.html
+<a href ="https://oopscraft.github.io/duice/src/duice.html" target="_blank">
+	duice.html
 </a>
 
 ### application.oopscraft.net (Standalone Application Platform)
@@ -41,8 +41,8 @@ user/pass : test/test11!!
 ## More Information
 
 ### Official Website
-<a href="http://duice.oopscraft.net" target="_blank">
-	http://duice.oopscraft.net
+<a href="https://oopscraft.github.io/duice" target="_blank">
+	https://oopscraft.github.io/duice
 </a>
 
 ### Source Repository
@@ -51,8 +51,8 @@ user/pass : test/test11!!
 </a>
 
 ### Distribution Download
-<a href="./dist/duice-0.1.2.zip" target="_blank">
-	dist/duice-0.1.2.zip
+<a href="https://oopscraft.github.io/duice/dist/duice-0.1.2.zip" target="_blank">
+	duice-0.1.2.zip
 </a>
 
 ### Licence
