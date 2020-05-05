@@ -2251,7 +2251,6 @@ var duice;
             addClass(element, 'duice-scriptlet');
             this.expression = element.dataset.duiceValue;
         }
-        ;
         bind(context) {
             this.context = context;
             for (var name in this.context) {

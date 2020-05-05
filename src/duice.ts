@@ -2499,7 +2499,7 @@ namespace duice {
      */
     export class Scriptlet extends MapComponent {
         expression:string;
-        context:any;;
+        context:any;
         constructor(element:HTMLElement){
             super(element);
             addClass(element, 'duice-scriptlet');
