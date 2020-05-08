@@ -437,7 +437,8 @@ namespace duice {
         var computedHeight = parseInt(computedStyle.getPropertyValue('height').replace(/px/gi, ''));
         var computedLeft = Math.max(0,win.innerWidth/2 - computedWidth/2) + win.scrollX;
         var computedTop = Math.max(0,win.innerHeight/2 - computedHeight/2) + win.scrollY;
-        computedTop = computedTop - computedHeight/2;
+        computedTop = computedTop - 100;
+        computedTop = Math.max(10,computedTop);
         element.style.left = computedLeft + 'px';
         element.style.top = computedTop + 'px';
     }
@@ -1604,15 +1605,11 @@ namespace duice {
      * extends from Observable and implements Observer interface.
      */
     export abstract class DataObject extends Observable implements Observer {
-
         available:boolean = true;
-        
         disable:any = new Object();
         disableAll:boolean = false;
-
         readonly:any = new Object();
         readonlyAll:boolean = false;
-
         visible:boolean = true;
 
         /**
@@ -2152,6 +2149,8 @@ namespace duice {
          */
         addRow(map:Map):void {
             map.disableAll = this.disableAll;
+            map.disable = clone(this.disable);
+            map.readonlyAll = this.readonlyAll;
             map.readonly = clone(this.readonly);
             map.onBeforeChange(this.eventListener.onBeforeChangeRow);
             map.onAfterChange(this.eventListener.onAfterChangeRow);
@@ -2168,6 +2167,8 @@ namespace duice {
         insertRow(index:number, map:Map):void {
             if(0 <= index && index < this.data.length) {
                 map.disableAll = this.disableAll;
+                map.disable = clone(this.disable);
+                map.readonlyAll = this.readonlyAll;
                 map.readonly = clone(this.readonly);
                 map.onBeforeChange(this.eventListener.onBeforeChangeRow);
                 map.onAfterChange(this.eventListener.onAfterChangeRow);
@@ -3458,10 +3459,14 @@ namespace duice {
      */
     export class ImgFactory extends MapComponentFactory {
         getComponent(element:HTMLImageElement):Img {
-            var image = new Img(element);
+            var img = new Img(element);
             var bind = element.dataset.duiceBind.split(',');
-            image.bind(this.getContextProperty(bind[0]), bind[1]);
-            return image;
+            img.bind(this.getContextProperty(bind[0]), bind[1]);
+            if(element.dataset.duiceSize){
+                var size = element.dataset.duiceSize.split(',');
+                img.setSize(parseInt(size[0]),parseInt(size[1]));
+            }
+            return img;
         }
     }
     
@@ -3470,6 +3475,7 @@ namespace duice {
      */
     export class Img extends MapComponent {
         img:HTMLImageElement;
+        size:{width:number, height:number};
         originSrc:string;
         value:string;
         disable:boolean;
@@ -3491,9 +3497,24 @@ namespace duice {
 
             // listener for contextmenu event
             this.img.addEventListener('click', function(event){
+                if(_this.disable || _this.readonly){
+                    return false;
+                }
                 var imgPosition = getElementPosition(this);
                 _this.openMenuDiv(imgPosition.top,imgPosition.left);
+                event.stopPropagation();
             });
+        }
+
+        /**
+         * Sets size
+         * @param width 
+         * @param height 
+         */
+        setSize(width:number, height:number):void {
+            this.size = {width:width, height:height};
+            this.img.style.width = width + 'px';
+            this.img.style.height = height + 'px';
         }
         
         /**
@@ -3507,6 +3528,16 @@ namespace duice {
             this.img.src = this.value;
             this.disable = map.isDisable(this.getName());
             this.readonly = map.isReadonly(this.getName());
+            if(this.disable){
+                this.img.classList.add('duice-img--disable');
+            }else{
+                this.img.classList.remove('duice-img--disable');
+            }
+            if(this.readonly){
+                this.img.classList.add('duice-img--readonly');
+            }else{
+                this.img.classList.remove('duice-img--readonly');
+            }
         }
         
         /**
@@ -3521,6 +3552,11 @@ namespace duice {
          * Opens menu division.
          */
         openMenuDiv(top:number, left:number):void {
+
+            // check menu div is already pop.
+            if(this.menuDiv){
+                return;
+            }
 
             // defines variables
             var _this = this;
@@ -3559,7 +3595,6 @@ namespace duice {
             }
             
             // appends menu div
-            //this.img.parentNode.appendChild(this.menuDiv);
             this.img.parentNode.insertBefore(this.menuDiv, this.img.nextSibling);
 
             this.menuDiv.style.position = 'absolute';
@@ -3568,9 +3603,9 @@ namespace duice {
             this.menuDiv.style.left = left + 'px';
 
             // listens mouse leaves from menu div.
-            this.menuDiv.addEventListener('mouseleave', function(event:any){
-                _this.closeMenuDiv();
-            });
+            window.addEventListener('click', function(event:any){
+                   _this.closeMenuDiv();
+            }, { once: true });
         }
 
         /**
@@ -3634,8 +3669,13 @@ namespace duice {
             input.addEventListener('change', function(e){
                 var fileReader = new FileReader();
                 if (this.files && this.files[0]) {
-                    fileReader.addEventListener("load", function(event:any) {
+                    fileReader.addEventListener("load", async function(event:any) {
                         var value = event.target.result;
+                        if(_this.size){
+                            value = await _this.convertImage(value, _this.size.width, _this.size.height);
+                        }else{
+                            value = await _this.convertImage(value);
+                        }
                         _this.value = value;
                         _this.img.src = value;
                         _this.setChanged();
@@ -3647,6 +3687,38 @@ namespace duice {
                 e.stopPropagation();
             });
             input.click();
+        }
+
+        /**
+         * Converts image
+         * @param dataUrl 
+         * @param width 
+         * @param height 
+         */
+        convertImage(dataUrl:any, width?:number, height?:number) {
+            return new Promise(function(resolve, reject){
+                try {
+                    var canvas = document.createElement("canvas");
+                    var ctx = canvas.getContext("2d");
+                    var image = new Image();
+                    image.onload = function(){
+                        if(width && height){
+                            canvas.width = width;
+                            canvas.height = height;
+                            ctx.drawImage(image, 0, 0, width, height);
+                        }else{
+                            canvas.width = image.naturalWidth;
+                            canvas.height = image.naturalHeight;
+                            ctx.drawImage(image, 0, 0);
+                        }
+                        var dataUrl = canvas.toDataURL("image/png");
+                        resolve(dataUrl);
+                    };
+                    image.src = dataUrl;
+                }catch(e){
+                    reject(e);
+                }
+            });
         }
 
         /**

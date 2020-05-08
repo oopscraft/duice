@@ -624,13 +624,11 @@
 	height: inherit;
 	line-height: inherit;
 	margin: 0rem;
-	padding-left: 0.3em;
-	padding-right: 0.3rem;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
 	margin: 0px;
-	padding: 0rem 0.3rem;
+	padding: 1px 0.3rem;
     color: #495057;
 	-webkit-appearance: none; 
 	-moz-appearance: none;    
@@ -704,6 +702,12 @@
 	padding: 0rem 0.3rem;
 	vertical-align: middle;
 	cursor: pointer;
+}
+.duice-img--disable {
+	opacity: 0.8;
+}
+.duice-img--readonly {
+	pointer-events: none;
 }
 .duice-img__menuDiv {
 	margin: 0px;

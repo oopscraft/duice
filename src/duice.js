@@ -436,7 +436,8 @@ var duice;
         var computedHeight = parseInt(computedStyle.getPropertyValue('height').replace(/px/gi, ''));
         var computedLeft = Math.max(0, win.innerWidth / 2 - computedWidth / 2) + win.scrollX;
         var computedTop = Math.max(0, win.innerHeight / 2 - computedHeight / 2) + win.scrollY;
-        computedTop = computedTop - computedHeight / 2;
+        computedTop = computedTop - 100;
+        computedTop = Math.max(10, computedTop);
         element.style.left = computedLeft + 'px';
         element.style.top = computedTop + 'px';
     }
@@ -1925,6 +1926,8 @@ var duice;
          */
         addRow(map) {
             map.disableAll = this.disableAll;
+            map.disable = clone(this.disable);
+            map.readonlyAll = this.readonlyAll;
             map.readonly = clone(this.readonly);
             map.onBeforeChange(this.eventListener.onBeforeChangeRow);
             map.onAfterChange(this.eventListener.onAfterChangeRow);
@@ -1940,6 +1943,8 @@ var duice;
         insertRow(index, map) {
             if (0 <= index && index < this.data.length) {
                 map.disableAll = this.disableAll;
+                map.disable = clone(this.disable);
+                map.readonlyAll = this.readonlyAll;
                 map.readonly = clone(this.readonly);
                 map.onBeforeChange(this.eventListener.onBeforeChangeRow);
                 map.onAfterChange(this.eventListener.onAfterChangeRow);
@@ -3156,10 +3161,14 @@ var duice;
      */
     class ImgFactory extends MapComponentFactory {
         getComponent(element) {
-            var image = new Img(element);
+            var img = new Img(element);
             var bind = element.dataset.duiceBind.split(',');
-            image.bind(this.getContextProperty(bind[0]), bind[1]);
-            return image;
+            img.bind(this.getContextProperty(bind[0]), bind[1]);
+            if (element.dataset.duiceSize) {
+                var size = element.dataset.duiceSize.split(',');
+                img.setSize(parseInt(size[0]), parseInt(size[1]));
+            }
+            return img;
         }
     }
     duice.ImgFactory = ImgFactory;
@@ -3179,9 +3188,23 @@ var duice;
             var _this = this;
             // listener for contextmenu event
             this.img.addEventListener('click', function (event) {
+                if (_this.disable || _this.readonly) {
+                    return false;
+                }
                 var imgPosition = getElementPosition(this);
                 _this.openMenuDiv(imgPosition.top, imgPosition.left);
+                event.stopPropagation();
             });
+        }
+        /**
+         * Sets size
+         * @param width
+         * @param height
+         */
+        setSize(width, height) {
+            this.size = { width: width, height: height };
+            this.img.style.width = width + 'px';
+            this.img.style.height = height + 'px';
         }
         /**
          * Updates image instance
@@ -3194,6 +3217,18 @@ var duice;
             this.img.src = this.value;
             this.disable = map.isDisable(this.getName());
             this.readonly = map.isReadonly(this.getName());
+            if (this.disable) {
+                this.img.classList.add('duice-img--disable');
+            }
+            else {
+                this.img.classList.remove('duice-img--disable');
+            }
+            if (this.readonly) {
+                this.img.classList.add('duice-img--readonly');
+            }
+            else {
+                this.img.classList.remove('duice-img--readonly');
+            }
         }
         /**
          * Return value of image element
@@ -3206,6 +3241,10 @@ var duice;
          * Opens menu division.
          */
         openMenuDiv(top, left) {
+            // check menu div is already pop.
+            if (this.menuDiv) {
+                return;
+            }
             // defines variables
             var _this = this;
             // creates menu div
@@ -3238,16 +3277,15 @@ var duice;
                 this.menuDiv.appendChild(clearButton);
             }
             // appends menu div
-            //this.img.parentNode.appendChild(this.menuDiv);
             this.img.parentNode.insertBefore(this.menuDiv, this.img.nextSibling);
             this.menuDiv.style.position = 'absolute';
             this.menuDiv.style.zIndex = String(getCurrentMaxZIndex() + 1);
             this.menuDiv.style.top = top + 'px';
             this.menuDiv.style.left = left + 'px';
             // listens mouse leaves from menu div.
-            this.menuDiv.addEventListener('mouseleave', function (event) {
+            window.addEventListener('click', function (event) {
                 _this.closeMenuDiv();
-            });
+            }, { once: true });
         }
         /**
          * Closes menu division
@@ -3305,11 +3343,19 @@ var duice;
                 var fileReader = new FileReader();
                 if (this.files && this.files[0]) {
                     fileReader.addEventListener("load", function (event) {
-                        var value = event.target.result;
-                        _this.value = value;
-                        _this.img.src = value;
-                        _this.setChanged();
-                        _this.notifyObservers(_this);
+                        return __awaiter(this, void 0, void 0, function* () {
+                            var value = event.target.result;
+                            if (_this.size) {
+                                value = yield _this.convertImage(value, _this.size.width, _this.size.height);
+                            }
+                            else {
+                                value = yield _this.convertImage(value);
+                            }
+                            _this.value = value;
+                            _this.img.src = value;
+                            _this.setChanged();
+                            _this.notifyObservers(_this);
+                        });
                     });
                     fileReader.readAsDataURL(this.files[0]);
                 }
@@ -3317,6 +3363,39 @@ var duice;
                 e.stopPropagation();
             });
             input.click();
+        }
+        /**
+         * Converts image
+         * @param dataUrl
+         * @param width
+         * @param height
+         */
+        convertImage(dataUrl, width, height) {
+            return new Promise(function (resolve, reject) {
+                try {
+                    var canvas = document.createElement("canvas");
+                    var ctx = canvas.getContext("2d");
+                    var image = new Image();
+                    image.onload = function () {
+                        if (width && height) {
+                            canvas.width = width;
+                            canvas.height = height;
+                            ctx.drawImage(image, 0, 0, width, height);
+                        }
+                        else {
+                            canvas.width = image.naturalWidth;
+                            canvas.height = image.naturalHeight;
+                            ctx.drawImage(image, 0, 0);
+                        }
+                        var dataUrl = canvas.toDataURL("image/png");
+                        resolve(dataUrl);
+                    };
+                    image.src = dataUrl;
+                }
+                catch (e) {
+                    reject(e);
+                }
+            });
         }
         /**
          * Clears image
