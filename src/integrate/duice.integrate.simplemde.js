@@ -38,15 +38,31 @@ var duice;
                 this.config.element = this.textarea;
                 this.simpleMDE = new window.SimpleMDE(this.config);
                 var _this = this;
+                
+                this.div.setAttribute('tabindex','0');
+                this.div.addEventListener('blur', function(event){
+                    console.log(_this.simpleMDE.value());
+                    _this.setChanged();
+                    _this.notifyObservers(_this);
+                });
+
+                
+                /*
                 this.simpleMDE.codemirror.on("blur", function () {
                     console.log(_this.simpleMDE.value());
                     _this.setChanged();
                     _this.notifyObservers(_this);
                 });
+                */
             }
             update(map, obj) {
                 var value = map.get(this.getName());
                 this.simpleMDE.value(value);
+                // Fixes CodeMirror bug (#344) - refresh not working after value changed.
+                var codemirror = this.simpleMDE.codemirror;
+                setTimeout(function () {
+                    codemirror.refresh();
+                }.bind(codemirror), 0);
             }
             getValue() {
                 var value = this.simpleMDE.value();

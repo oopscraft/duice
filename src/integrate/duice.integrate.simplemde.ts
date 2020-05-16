@@ -51,6 +51,11 @@ namespace duice {
             update(map:duice.Map, obj:object){
                 var value = map.get(this.getName());
                 this.simpleMDE.value(value);
+                // Fixes CodeMirror bug (#344) - refresh not working after value changed.
+            	var codemirror = this.simpleMDE.codemirror;
+            	setTimeout(function() {
+            		codemirror.refresh();
+            	}.bind(codemirror), 0);
             }
             getValue():any {
                 var value = this.simpleMDE.value();

@@ -28,7 +28,10 @@ namespace duice {
             element.classList.add(className);
         }
 	}
-	
+    
+    /**
+     * initialize
+     */
 	export function initialize() {
 		
 		// initializes component
@@ -85,6 +88,7 @@ namespace duice {
                 for(var i = 0, size = elements.length; i < size; i ++ ){
                     var element = elements[i];
                     if(componentDefinition.getFactoryClass().prototype instanceof factoryType){
+                        // creates component
                         var factoryInstance = Object.create(componentDefinition.getFactoryClass().prototype);
                         factoryInstance.setContext($context);
                         factoryInstance.getComponent(element);
@@ -352,6 +356,22 @@ namespace duice {
             removeChildNodes(element);
             element.innerHTML = string;
             return element;
+        }
+    }
+
+    /**
+     * Executes function from code.
+     * @param code 
+     * @param $context 
+     */
+    export function executeFunction(code:string, $context:any):any {
+        try {
+            const func = Function('$context', '"use strict";' + code + '');
+            var result = func($context);
+            return result;
+        }catch(e){
+            console.error(code);
+            throw e;
         }
     }
     
@@ -790,41 +810,6 @@ namespace duice {
 		}
     }
 
-     /**
-     * duice.Tooltip
-     */
-    export class Tooltip {
-        element:HTMLElement;
-        div:HTMLDivElement;
-        message:string;
-        constructor(element:HTMLElement, message:string){
-            this.element = element;
-            this.message = message;
-            this.div = document.createElement('div');
-            this.div.classList.add('duice-tooltip');
-            this.div.appendChild(document.createTextNode(this.message));
-            this.element.parentNode.insertBefore(this.div, this.element.nextSibling);
-
-            // adjusting position
-            this.div.style.position = 'absolute';
-            this.div.style.zIndex = String(getCurrentMaxZIndex() + 1);
-
-            var _this = this;
-            this.div.addEventListener('click', function(event){
-                _this.destroy();
-            });
-        }
-
-        /**
-         * Destroy tooltip
-         */
-        destroy():void {
-            if(this.element.parentNode.contains(this.div)){
-                this.element.parentNode.removeChild(this.div);
-            }
-        }
-    }
-
     /**
      * duice.Progress
      */
@@ -877,6 +862,7 @@ namespace duice {
             this.container = document.createElement('div');
             this.container.classList.add('duice-modal');
             
+            // creates header div
             this.headerDiv = document.createElement('div');
             this.headerDiv.classList.add('duice-modal__headerDiv');
             this.container.appendChild(this.headerDiv);
@@ -936,16 +922,6 @@ namespace duice {
 		removeContent(content:HTMLDivElement):void {
 			this.bodyDiv.removeChild(content);
         }
-        
-        /**
-         * Creates button element for modal
-         * @param type 
-         */
-        createButton(type:string):HTMLButtonElement {
-            var button = document.createElement('button');
-            button.classList.add('duice-modal__button--' + type);
-            return button;
-        }
 
         /**
          * Shows modal
@@ -957,7 +933,7 @@ namespace duice {
             
             // opens modal
             this.container.style.display = 'block';
-            this.container.style.position = 'absolute';
+            this.container.style.position  = 'absolute';
             this.container.style.zIndex = String(getCurrentMaxZIndex() + 1);
             getCurrentWindow().document.body.appendChild(this.container);
             setPositionCentered(this.container);
@@ -1029,7 +1005,7 @@ namespace duice {
             }
 
             // resolves promise
-            this.promiseResolve(false);
+            this.promiseResolve(...args);
         }
 
         /**
@@ -1048,7 +1024,7 @@ namespace duice {
             }
 
             // resolves promise
-            this.promiseResolve(true);
+            this.promiseResolve(...args);
         }
 
         /**
@@ -1119,18 +1095,24 @@ namespace duice {
             super();
             this.message = message;
             var _this = this;
-            
+
+            // creates icon div
             this.iconDiv = document.createElement('div');
-            this.iconDiv.classList.add('duice-alert__iconDiv');
-            
+            this.iconDiv.classList.add('duice-alert__bodyDiv-iconDiv');
+
+            // creates message div
             this.messageDiv = document.createElement('div');
-            this.messageDiv.classList.add('duice-alert__messageDiv');
-            this.messageDiv.appendChild(document.createTextNode(this.message));
-            
+            this.messageDiv.classList.add('duice-alert__bodyDiv-messageDiv');
+            this.messageDiv.innerHTML = this.message;
+
+            // creates button div
             this.buttonDiv = document.createElement('div');
-            this.buttonDiv.classList.add('duice-alert__buttonDiv');
+            this.buttonDiv.classList.add('duice-alert__bodyDiv-buttonDiv');
             
-            this.confirmButton = this.createButton('confirm');
+            // creates confirm button
+            this.confirmButton = document.createElement('button');
+            this.confirmButton.classList.add('duice-alert__bodyDiv-buttonDiv-button');
+            this.confirmButton.classList.add('duice-alert__bodyDiv-buttonDiv-button--confirm');
             this.confirmButton.addEventListener('click', function(event){
                 _this.close(); 
             });
@@ -1152,9 +1134,8 @@ namespace duice {
      * Help function for duice.Alert class
      * @param message 
      */
-    export async function alert(message:string){
-        var alertObj = new duice.Alert(message);
-        await alertObj.open();
+    export function alert(message:string){
+        return new duice.Alert(message).open();
     }
     
     /**
@@ -1172,27 +1153,34 @@ namespace duice {
             this.message = message;
             var _this = this;
             
+            // creates icon div
             this.iconDiv = document.createElement('div');
-            this.iconDiv.classList.add('duice-confirm__iconDiv');
-            
+            this.iconDiv.classList.add('duice-confirm__bodyDiv-iconDiv');
+
+            // creates message div
             this.messageDiv = document.createElement('div');
-            this.messageDiv.classList.add('duice-confirm__messageDiv');
-            this.messageDiv.appendChild(document.createTextNode(this.message));
-            
+            this.messageDiv.classList.add('duice-confirm__bodyDiv-messageDiv');
+            this.messageDiv.innerHTML = this.message;
+
+            // creates button div
             this.buttonDiv = document.createElement('div');
-            this.buttonDiv.classList.add('duice-confirm__buttonDiv');
+            this.buttonDiv.classList.add('duice-confirm__bodyDiv-buttonDiv');
             
             // confirm button
-            this.confirmButton = this.createButton('confirm');
+            this.confirmButton = document.createElement('button');
+            this.confirmButton.classList.add('duice-confirm__bodyDiv-buttonDiv-button');
+            this.confirmButton.classList.add('duice-confirm__bodyDiv-buttonDiv-button--confirm');
             this.confirmButton.addEventListener('click', function(event){
-               _this.confirm(); 
+               _this.confirm(true); 
             });
             this.buttonDiv.appendChild(this.confirmButton);
 
             // cancel button
-            this.cancelButton = this.createButton('cancel');
+            this.cancelButton = document.createElement('button');
+            this.cancelButton.classList.add('duice-confirm__bodyDiv-buttonDiv-button');
+            this.cancelButton.classList.add('duice-confirm__bodyDiv-buttonDiv-button--cancel');
             this.cancelButton.addEventListener('click', function(event){
-               _this.close(); 
+               _this.close(false); 
             });
             this.buttonDiv.appendChild(this.cancelButton);
             
@@ -1212,10 +1200,8 @@ namespace duice {
      * Help function for duice.Confirm class
      * @param message 
      */
-    export async function confirm(message:string){
-        var confirmObj = new duice.Confirm(message);
-        var result = await confirmObj.open();
-        return result;
+    export function confirm(message:string){
+        return new duice.Confirm(message).open();
     }
     
     /**
@@ -1223,6 +1209,7 @@ namespace duice {
      */
     export class Prompt extends Modal {
         message:string;
+        defaultValue:string;
         iconDiv:HTMLDivElement;
         messageDiv:HTMLDivElement;
         inputDiv:HTMLDivElement;
@@ -1230,38 +1217,50 @@ namespace duice {
         buttonDiv:HTMLDivElement;
         cancelButton:HTMLButtonElement;
         confirmButton:HTMLButtonElement;
-        constructor(message:string) {
+        constructor(message:string, defaultValue:string) {
             super();
             this.message = message;
+            this.defaultValue = defaultValue;
             var _this = this;
             
+            // creates icon div
             this.iconDiv = document.createElement('div');
-            this.iconDiv.classList.add('duice-prompt__iconDiv');
+            this.iconDiv.classList.add('duice-prompt__bodyDiv-iconDiv');
             
+            // creates message div
             this.messageDiv = document.createElement('div');
-            this.messageDiv.classList.add('duice-prompt__messageDiv');
-            this.messageDiv.appendChild(document.createTextNode(this.message));
+            this.messageDiv.classList.add('duice-prompt__bodyDiv-messageDiv');
+            this.messageDiv.innerHTML = this.message;
             
+            // creates input div
             this.inputDiv = document.createElement('div');
-            this.inputDiv.classList.add('duice-prompt__inputDiv');
+            this.inputDiv.classList.add('duice-prompt__bodyDiv-inputDiv');
             this.input = document.createElement('input');
-            this.input.classList.add('duice-prompt__inputDiv-input');
+            this.input.classList.add('duice-prompt__bodyDiv-inputDiv-input');
+            if(this.defaultValue){
+                this.input.value = this.defaultValue;
+            }
             this.inputDiv.appendChild(this.input);
-            
+
+            // creates button div
             this.buttonDiv = document.createElement('div');
-            this.buttonDiv.classList.add('duice-prompt__buttonDiv');
-            
+            this.buttonDiv.classList.add('duice-prompt__bodyDiv-buttonDiv');
+          
             // confirm button
-            this.confirmButton = this.createButton('confirm');
+            this.confirmButton = document.createElement('button');
+            this.confirmButton.classList.add('duice-prompt__bodyDiv-buttonDiv-button');
+            this.confirmButton.classList.add('duice-prompt__bodyDiv-buttonDiv-button--confirm');
             this.confirmButton.addEventListener('click', function(event){
-               _this.confirm(); 
+               _this.confirm(_this.getValue()); 
             });
             this.buttonDiv.appendChild(this.confirmButton);
 
             // cancel button
-            this.cancelButton = this.createButton('cancel');
+            this.cancelButton = document.createElement('button');
+            this.cancelButton.classList.add('duice-prompt__bodyDiv-buttonDiv-button');
+            this.cancelButton.classList.add('duice-prompt__bodyDiv-buttonDiv-button--cancel');
             this.cancelButton.addEventListener('click', function(event){
-               _this.close(); 
+               _this.close(false);
             });
             this.buttonDiv.appendChild(this.cancelButton);
             
@@ -1285,14 +1284,8 @@ namespace duice {
      * Help function for duice.Prompt class
      * @param message 
      */
-    export async function prompt(message:string, defaultValue:string) {
-        var promptObj = new duice.Prompt(message);
-        var result = await promptObj.open();
-        if(result){
-            return promptObj.getValue();            
-        }else{
-            return defaultValue;
-        }
+    export function prompt(message:string, defaultValue:string) {
+        return new duice.Prompt(message, defaultValue).open();
     }
     
 	/**
@@ -1314,8 +1307,7 @@ namespace duice {
 
             // opens dialog
             try {
-                var promise = super.open(...args);
-                return promise;
+                return super.open(...args);
             }catch(e){
                 this.dialog.style.display = 'none';
                 this.parentNode.appendChild(this.dialog);
@@ -1340,9 +1332,8 @@ namespace duice {
      * Help function for duice.Dialog class
      * @param message 
      */
-    export async function dialog(dialog:HTMLDivElement) {
-        var dialogObj = new duice.Dialog(dialog);
-        await dialogObj.open();
+    export function dialog(dialog:HTMLDivElement) {
+        return new duice.Dialog(dialog).open();
     }
 
     /**
@@ -1914,13 +1905,13 @@ namespace duice {
          * Sets focus with message
          * @param name 
          */
-        setFocus(name:string, message?:string):void {
+        setFocus(name:string):void {
             for(var i = 0, size = this.observers.length; i < size; i++){
                 var observer = this.observers[i];
                 if(observer instanceof MapComponent){
                     var mapUiComponent = <MapComponent>this.observers[i];
                     if(observer.getName() === name){
-                        mapUiComponent.setFocus(message);
+                        mapUiComponent.setFocus();
                         break;
                     }
                 }
@@ -2401,16 +2392,9 @@ namespace duice {
 
         /**
          * Sets element focus
-         * @param message 
          */
-        setFocus(message?:string){
+        setFocus(){
             if(this.element.focus){
-                if(message){
-                    var tooltip = new Tooltip(this.element, message);
-                    this.element.addEventListener('blur', function(event){
-                        tooltip.destroy();
-                    }, { once: true });
-                }
                 this.element.focus();
             }
         }
@@ -2518,13 +2502,7 @@ namespace duice {
             }
         }
         update(dataObject:duice.DataObject, obj:object) {
-            try {
-                const func = Function('$context', '"use strict";' + this.expression + '');
-                var result = func(this.context);
-            }catch(e){
-                console.error(this.expression);
-                throw e;
-            }
+            var result = executeFunction(this.expression, this.context);
             this.element.innerHTML = '';
             this.element.appendChild(document.createTextNode(result));
             this.element.style.display = 'unset';
