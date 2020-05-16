@@ -17,7 +17,6 @@
 	"files":[
 		 "./src/duice.ts"
 		,"./src/widget/duice.widget.pagination.ts"
-		,"./src/integrate/duice.integrate.tuieditor.ts"
 		,"./src/integrate/duice.integrate.ckeditor.ts"
 		,"./src/integrate/duice.integrate.simplemde.ts"
 	]

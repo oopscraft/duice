@@ -11,29 +11,6 @@
 <link rel="stylesheet" type="text/css" href="duice.css">
 <script>
 /**
- * loads framework
- */
-function loadFramework(framework){
-	if(framework){
-		window.location.href = window.location.href.split('?')[0] + '?framework=' + framework;
-	}else{
-		window.location.href = window.location.href;
-	}
-}
-/**
- * Load integrated library or framework
- */
-switch(duice.parseQueryString().framework){
-case 'bootstrap':
-	duice.Configuration.cssEnable = false;
-	duice.loadExternalScript('framework/bootstrap/jquery.slim.min.js');
-	duice.loadExternalScript('framework/bootstrap/popper.min.js');
-	duice.loadExternalStyle('framework/bootstrap/css/bootstrap.min.css');
-	duice.loadExternalScript('framework/bootstrap/js/bootstrap.min.js');
-break;
-}
-
-/**
  * user(duice.Map)
  */
 const user = new duice.Map();
@@ -384,9 +361,6 @@ users.onAfterChangeRow(function(name, value){
  */
 document.addEventListener("DOMContentLoaded", function(event) {
 	
-	// framework select
-	document.getElementById('framework').value = duice.parseQueryString().framework;
-	
 	// prints user as JSON
 	var userTextarea = document.getElementById('userTextarea')
 	function printUser() {
@@ -495,10 +469,6 @@ button {
 			<small>
 				(Data-oriented UI Component Engine)
 				Integrate with 
-				<select id="framework" onchange="loadFramework(this.value);">
-					<option> N/A </option>
-					<option value="bootstrap"> bootstrap </option>
-				</select>
 			</small>
 		</h1>
 	</div>

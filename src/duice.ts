@@ -1771,13 +1771,13 @@ namespace duice {
         
         /**
          * Updates data from observable instance
-         * @param UiComponent
+         * @param mapComponent
          * @param obj
          */
-        update(UiComponent:MapComponent, obj:object):void {
-            console.debug('Map.update', UiComponent, obj);
-            var name = UiComponent.getName();
-            var value = UiComponent.getValue();
+        update(mapComponent:MapComponent, obj:object):void {
+            console.debug('Map.update', mapComponent, obj);
+            var name = mapComponent.getName();
+            var value = mapComponent.getValue();
             this.set(name, value);
         }
         
@@ -1972,8 +1972,8 @@ namespace duice {
          * @param observable
          * @param obj 
          */
-        update(observable:Observable, obj:object):void {
-            console.debug('List.update', observable, obj);
+        update(listComponent:ListComponent, obj:object):void {
+            console.debug('List.update', listComponent, obj);
             this.setChanged();
             this.notifyObservers(obj);
         }
