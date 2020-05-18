@@ -2802,7 +2802,7 @@ namespace duice {
         constructor(input:HTMLInputElement){
             super(input);
             addClass(this.input, 'duice-input-number');
-            this.input.setAttribute('type','text');
+            this.input.removeAttribute('type');
 
             // default mask
             this.mask = new NumberMask(0);
@@ -2912,7 +2912,7 @@ namespace duice {
             super(input);
             addClass(this.input, 'duice-input-date');
             this.type = this.input.getAttribute('type').toLowerCase();
-            this.input.setAttribute('type','text');
+            this.input.removeAttribute('type');
             
             // adds click event listener
             var _this = this;
@@ -4337,7 +4337,7 @@ namespace duice {
                 
                 // notifies observers.
                 this.setChanged();
-                this.notifyObservers(this);
+                this.notifyObservers(null);
             }else{
                 // changes row position
                 await this.list.moveRow(fromIndex, toIndex);

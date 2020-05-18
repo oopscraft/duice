@@ -2539,7 +2539,7 @@ var duice;
         constructor(input) {
             super(input);
             addClass(this.input, 'duice-input-number');
-            this.input.setAttribute('type', 'text');
+            this.input.removeAttribute('type');
             // default mask
             this.mask = new NumberMask(0);
         }
@@ -2648,7 +2648,7 @@ var duice;
             this.readonly = false;
             addClass(this.input, 'duice-input-date');
             this.type = this.input.getAttribute('type').toLowerCase();
-            this.input.setAttribute('type', 'text');
+            this.input.removeAttribute('type');
             // adds click event listener
             var _this = this;
             this.input.addEventListener('click', function (event) {
@@ -3966,7 +3966,7 @@ var duice;
                     }
                     // notifies observers.
                     this.setChanged();
-                    this.notifyObservers(this);
+                    this.notifyObservers(null);
                 }
                 else {
                     // changes row position
