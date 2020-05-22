@@ -19,5 +19,6 @@
 		,"./src/widget/duice.widget.pagination.ts"
 		,"src/plugin/duice.plugin.ckeditor.ts"
 		,"src/plugin/duice.plugin.simplemde.ts"
+		,"src/plugin/duice.plugin.marked.ts"
 	]
 }

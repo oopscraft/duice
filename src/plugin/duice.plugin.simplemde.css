@@ -88,6 +88,11 @@
 .duice-plugin-simplemde table th {
     background-color: #eee;
 }
+.duice-plugin-simplemde table th,
+.duice-plugin-simplemde table td {
+    border: solid 1px #aaa;
+    padding: 0.2rem 0.5rem;
+}
 .duice-plugin-simplemde blockquote {
     padding: 0 1rem;
     margin-left: 0;

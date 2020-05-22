@@ -64,7 +64,7 @@ namespace duice {
                 			link: ["[", "](http://)"],
                 			table: ["", "\n\n| Column 1 | Column 2 | Column 3 |\n| -------- | -------- | -------- |\n| Text     | Text      | Text     |\n\n"],
                 		},
-                	}
+                    }
                 }
 
                 // in case of custm config is exists.
