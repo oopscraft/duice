@@ -1,3 +1,6 @@
+.duice-plugin-marked {
+	width: inherit;
+}
 .duice-plugin-marked table {
     border-collapse: collapse;
 }
@@ -18,6 +21,10 @@
 .duice-plugin-marked blockquote p {
     white-space: pre-line;
 }
+.duice-plugin-marked pre,
+.duice-plugin-marked code {
+	overflow: auto;
+}
 .duice-plugin-marked pre[class*="language-"] {
 	background: #2d2d2d !important;
 	line-height: 1rem;
@@ -27,6 +34,3 @@
 .duice-plugin-marked pre[class*="language-"] .line-numbers-rows > span {
 	display: initial;
 }
-
-
-
