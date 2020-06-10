@@ -25,7 +25,6 @@ var duice;
             constructor(div) {
                 super(div);
                 this.div = div;
-                this.div.classList.add('duice-plugin-marked');
             }
             update(map, obj) {
                 this.value = map.get(this.getName());

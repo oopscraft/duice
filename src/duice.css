@@ -269,7 +269,6 @@
 	margin: 0;
 	padding: 0rem 0.3rem;
 	border: 1px solid transparent;
-	display:inline-block;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
@@ -295,6 +294,7 @@
  */
 input[is='duice-input'][type='text'],
 .duice-input-text {
+	margin: 0px;
 	padding: var(--duice-input-padding);
 	border: var(--duice-input-border);
 	border-radius: var(--duice-input-border-radius);
@@ -767,6 +767,7 @@ img[is='duice-img'],
  */
 table[is='duice-table'],
 .duice-table {
+	table-layout: fixed;
 	position: relative;
 	border-collapse: collapse;
 	border-spacing: 0;
@@ -785,6 +786,8 @@ table[is='duice-table'],
 	font-weight: bold;
 	text-align: left;
 	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
 }
 .duice-table__tbody {
 	background-color: var(--duice-table-tbody-color);
@@ -800,6 +803,8 @@ table[is='duice-table'],
 	border: var(--duice-table-border);
 	text-align: left;
 	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
 }
 .duice-table__tbody--selectable {
 	cursor: pointer;
