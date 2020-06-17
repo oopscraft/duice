@@ -1,13 +1,8 @@
 "use strict";
-/// <reference path="../duice.ts" />
-/// <reference path="./ckeditor/ckeditor.js" />
 var duice;
 (function (duice) {
     let plugin;
     (function (plugin) {
-        /**
-         * duice.plugin.CkeditorFactory
-         */
         class CkeditorFactory extends duice.MapComponentFactory {
             getComponent(element) {
                 var config = null;
@@ -21,9 +16,6 @@ var duice;
             }
         }
         plugin.CkeditorFactory = CkeditorFactory;
-        /**
-         * duice.plugin.Ckeditor
-         */
         class Ckeditor extends duice.MapComponent {
             constructor(div, config) {
                 super(div);
@@ -43,11 +35,9 @@ var duice;
             }
             update(map, obj) {
                 var value = map.get(this.getName());
-                // check value is empty
                 if (!value) {
                     value = '';
                 }
-                // sets value
                 if (value !== this.ckeditor.getData()) {
                     this.ckeditor.setData(value);
                 }
@@ -58,7 +48,6 @@ var duice;
             }
         }
         plugin.Ckeditor = Ckeditor;
-        // Adds component definition
         duice.ComponentDefinitionRegistry.add(new duice.ComponentDefinition('div[is="duice-plugin-ckeditor"]', duice.plugin.CkeditorFactory));
     })(plugin = duice.plugin || (duice.plugin = {}));
 })(duice || (duice = {}));

@@ -1,12 +1,4 @@
 "use strict";
-/* =============================================================================
- * DUICE (Data-oriented UI Component Engine)
- * - Anyone can use it freely.
- * - Modify the source or allow re-creation. However, you must state that you have the original creator.
- * - However, we can not grant patents or licenses for reproductives. (Modifications or reproductions must be shared with the public.)
- * Licence: LGPL(GNU Lesser General Public License version 3)
- * Copyright (C) 2017 duice.oopscraft.net
- * ============================================================================= */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -16,38 +8,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-/**
- * project package
- */
 var duice;
 (function (duice) {
-    /**
-     * Configuration
-     */
     duice.Configuration = {
         version: '0.9',
         cssEnable: true
     };
-    /**
-     * Adds class
-     */
     function addClass(element, className) {
         if (duice.Configuration.cssEnable) {
             element.classList.add(className);
         }
     }
     duice.addClass = addClass;
-    /**
-     * initialize
-     */
     function initialize() {
-        // initializes component
         duice.initializeComponent(document, {});
     }
     duice.initialize = initialize;
-    /**
-     * Component definition registry
-     */
     duice.ComponentDefinitionRegistry = {
         componentDefinitions: new Array(),
         add(componentDefinition) {
@@ -57,9 +33,6 @@ var duice;
             return this.componentDefinitions;
         }
     };
-    /**
-     * Component definition
-     */
     class ComponentDefinition {
         constructor(selector, factoryClass) {
             this.selector = selector;
@@ -73,11 +46,6 @@ var duice;
         }
     }
     duice.ComponentDefinition = ComponentDefinition;
-    /**
-     * Initializes component
-     * @param container
-     * @param $context
-     */
     function initializeComponent(container, $context) {
         [ListComponentFactory, MapComponentFactory]
             .forEach(function (factoryType) {
@@ -86,7 +54,6 @@ var duice;
                 for (var i = 0, size = elements.length; i < size; i++) {
                     var element = elements[i];
                     if (componentDefinition.getFactoryClass().prototype instanceof factoryType) {
-                        // creates component
                         var factoryInstance = Object.create(componentDefinition.getFactoryClass().prototype);
                         factoryInstance.setContext($context);
                         factoryInstance.getComponent(element);
@@ -96,10 +63,6 @@ var duice;
         });
     }
     duice.initializeComponent = initializeComponent;
-    /**
-     * Loads external style
-     * @param href
-     */
     function loadExternalStyle(href) {
         var link = document.createElement('link');
         link.rel = 'stylesheet';
@@ -107,20 +70,12 @@ var duice;
         document.head.appendChild(link);
     }
     duice.loadExternalStyle = loadExternalStyle;
-    /**
-     * Loads external script
-     * @param src
-     */
     function loadExternalScript(src) {
         var script = document.createElement('script');
         script.src = src;
         document.head.appendChild(script);
     }
     duice.loadExternalScript = loadExternalScript;
-    /**
-     * Generates random UUID value
-     * @return  UUID string
-     */
     function generateUuid() {
         var dt = new Date().getTime();
         var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -130,9 +85,6 @@ var duice;
         });
         return uuid;
     }
-    /**
-     * Checks mobile browser
-     */
     function isMobile() {
         if (navigator.userAgent.match(/Android/i)
             || navigator.userAgent.match(/webOS/i)
@@ -148,9 +100,6 @@ var duice;
         }
     }
     duice.isMobile = isMobile;
-    /**
-     * Returns Query String as JSON object
-     */
     function parseQueryString() {
         var queryVariables = new Object();
         var queryString = window.location.search.substring(1);
@@ -164,11 +113,6 @@ var duice;
         return queryVariables;
     }
     duice.parseQueryString = parseQueryString;
-    /**
-     * Check if value is empty
-     * @param value
-     * @return whether value is empty
-     */
     function isEmpty(value) {
         if (value === undefined
             || value === null
@@ -181,20 +125,10 @@ var duice;
         }
     }
     duice.isEmpty = isEmpty;
-    /**
-     * Check if value is not empty
-     * @param value
-     * @return whether value is not empty
-     */
     function isNotEmpty(value) {
         return !isEmpty(value);
     }
     duice.isNotEmpty = isNotEmpty;
-    /**
-     * Checks if value is empty and return specified value as default
-     * @param value to check
-     * @param default value if value is empty
-     */
     function defaultIfEmpty(value, defaultValue) {
         if (isEmpty(value) === true) {
             return defaultValue;
@@ -204,18 +138,10 @@ var duice;
         }
     }
     duice.defaultIfEmpty = defaultIfEmpty;
-    /**
-     * Checks value is number
-     * @param value
-     */
     function isNumeric(value) {
         return !Array.isArray(value) && (value - parseFloat(value) + 1) >= 0;
     }
     duice.isNumeric = isNumeric;
-    /**
-     * Checks generic ID (alphabet + number + -,_)
-     * @param value
-     */
     function isIdFormat(value) {
         if (value) {
             var pattern = /^[a-zA-Z0-9\-\_]{1,}$/;
@@ -224,10 +150,6 @@ var duice;
         return false;
     }
     duice.isIdFormat = isIdFormat;
-    /**
-     * Checks generic password (At least 1 alphabet, 1 number, 1 special char)
-     * @param value
-     */
     function isPasswordFormat(value) {
         if (value) {
             var pattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$/;
@@ -236,10 +158,6 @@ var duice;
         return false;
     }
     duice.isPasswordFormat = isPasswordFormat;
-    /**
-     * Checks valid email address pattern
-     * @param value
-     */
     function isEmailFormat(value) {
         if (value) {
             var pattern = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -248,10 +166,6 @@ var duice;
         return false;
     }
     duice.isEmailFormat = isEmailFormat;
-    /**
-     * Checks if value is URL address format
-     * @param value
-     */
     function isUrlFormat(value) {
         if (value) {
             var pattern = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
@@ -260,21 +174,10 @@ var duice;
         return false;
     }
     duice.isUrlFormat = isUrlFormat;
-    /**
-     * trim string
-     * @param value
-     */
     function trim(value) {
         return (value + "").trim();
     }
     duice.trim = trim;
-    /**
-     * converts value to left-padded value
-     * @param original value
-     * @param length to pad
-     * @param pading character
-     * @return left-padded value
-     */
     function lpad(value, length, padChar) {
         for (var i = 0, size = (length - value.length); i < size; i++) {
             value = padChar + value;
@@ -282,13 +185,6 @@ var duice;
         return value;
     }
     duice.lpad = lpad;
-    /**
-     * converts value to right-padded value
-     * @param original value
-     * @param length to pad
-     * @param pading character
-     * @return right-padded string
-     */
     function rpad(value, length, padChar) {
         for (var i = 0, size = (length - value.length); i < size; i++) {
             value = value + padChar;
@@ -296,22 +192,12 @@ var duice;
         return value;
     }
     duice.rpad = rpad;
-    /**
-     * Gets cookie value
-     * @param name
-     */
     function getCookie(name) {
         var value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
         return value ? value[2] : null;
     }
     duice.getCookie = getCookie;
     ;
-    /**
-     * Sets cookie value
-     * @param name
-     * @param value
-     * @param day
-     */
     function setCookie(name, value, day) {
         var date = new Date();
         date.setTime(date.getTime() + day * 60 * 60 * 24 * 1000);
@@ -319,21 +205,11 @@ var duice;
     }
     duice.setCookie = setCookie;
     ;
-    /**
-     * Deletes cookie
-     * @param name
-     */
     function deleteCookie(name) {
         var date = new Date();
         document.cookie = name + "= " + "; expires=" + date.toUTCString() + "; path=/";
     }
     duice.deleteCookie = deleteCookie;
-    /**
-     * Executes custom expression in HTML element and returns.
-     * @param element
-     * @param $context
-     * @return converted HTML element
-     */
     function executeExpression(element, $context) {
         var string = element.outerHTML;
         string = string.replace(/\[@duice\[([\s\S]*?)\]\]/mgi, function (match, command) {
@@ -361,11 +237,6 @@ var duice;
         }
     }
     duice.executeExpression = executeExpression;
-    /**
-     * Executes function from code.
-     * @param code
-     * @param $context
-     */
     function executeFunction(code, $context) {
         try {
             const func = Function('$context', '"use strict";' + code + '');
@@ -378,17 +249,10 @@ var duice;
         }
     }
     duice.executeFunction = executeFunction;
-    /**
-     * Escapes HTML tag from string value
-     * @param value
-     * @return escaped string value
-     */
     function escapeHtml(value) {
-        // checks value is valid.
         if (!value || typeof value !== 'string') {
             return value;
         }
-        // replace tag
         var htmlMap = {
             '&': '&amp;',
             '<': '&lt;',
@@ -396,37 +260,25 @@ var duice;
             '"': '&quot;',
             "'": '&#039;'
         };
-        // replace and returns
         return value.replace(/[&<>"']/g, function (m) {
             return htmlMap[m];
         });
     }
     duice.escapeHtml = escapeHtml;
-    /**
-     * Removes child elements from HTML element.
-     * @param element
-     */
     function removeChildNodes(element) {
-        // Remove element nodes and prevent memory leaks
         var node, nodes = element.childNodes, i = 0;
         while (node = nodes[i++]) {
             if (node.nodeType === 1) {
                 element.removeChild(node);
             }
         }
-        // Remove any remaining nodes
         while (element.firstChild) {
             element.removeChild(element.firstChild);
         }
-        // If this is a select, ensure that it displays empty
         if (element instanceof HTMLSelectElement) {
             element.options.length = 0;
         }
     }
-    /**
-     * Returns current upper window object.
-     * @return window object
-     */
     function getCurrentWindow() {
         if (window.frameElement) {
             return window.parent;
@@ -435,17 +287,9 @@ var duice;
             return window;
         }
     }
-    /**
-     * clones object
-     * @param obj
-     */
     function clone(obj) {
         return JSON.parse(JSON.stringify(obj));
     }
-    /**
-     * Sets element position to be centered
-     * @param element
-     */
     function setPositionCentered(element) {
         var win = getCurrentWindow();
         var computedStyle = win.getComputedStyle(element);
@@ -459,10 +303,6 @@ var duice;
         element.style.top = computedTop + 'px';
     }
     duice.setPositionCentered = setPositionCentered;
-    /**
-     * Returns position info of specified element
-     * @param element
-     */
     function getElementPosition(element) {
         var pos = ('absolute relative').indexOf(getComputedStyle(element).position) == -1;
         var rect1 = { top: element.offsetTop * pos, left: element.offsetLeft * pos };
@@ -475,10 +315,6 @@ var duice;
         };
     }
     duice.getElementPosition = getElementPosition;
-    /**
-     * Delays specified milliseconds and calls specified function
-     * @param callback
-     */
     function delayCall(millis, callback, _this, ...args) {
         var interval = setInterval(function () {
             try {
@@ -492,10 +328,6 @@ var duice;
             }
         }, millis);
     }
-    /**
-     * Returns current max z-index value.
-     * @return max z-index value
-     */
     function getCurrentMaxZIndex() {
         var zIndex, z = 0, all = document.getElementsByTagName('*');
         for (var i = 0, n = all.length; i < n; i++) {
@@ -505,22 +337,10 @@ var duice;
         }
         return z;
     }
-    /**
-     * duice.StringFormat
-     * @param string format
-     */
     class StringMask {
-        /**
-         * Constructor
-         * @param pattern
-         */
         constructor(pattern) {
             this.pattern = pattern;
         }
-        /**
-         * encode string as format
-         * @param value
-         */
         encode(value) {
             if (isEmpty(this.pattern)) {
                 return value;
@@ -540,10 +360,6 @@ var duice;
             }
             return encodedValue;
         }
-        /**
-         * decodes string as format
-         * @param value
-         */
         decode(value) {
             if (isEmpty(this.pattern)) {
                 return value;
@@ -565,23 +381,11 @@ var duice;
         }
     }
     duice.StringMask = StringMask;
-    /**
-     * duice.NumberFormat
-     * @param scale number
-     */
     class NumberMask {
-        /**
-         * Constructor
-         * @param scale
-         */
         constructor(scale) {
             this.scale = 0;
             this.scale = scale;
         }
-        /**
-         * Encodes number as format
-         * @param number
-         */
         encode(number) {
             if (isEmpty(number) || isNaN(Number(number))) {
                 return '';
@@ -594,10 +398,6 @@ var duice;
             }
             return string;
         }
-        /**
-         * Decodes formatted value as original value
-         * @param string
-         */
         decode(string) {
             if (isEmpty(string)) {
                 return null;
@@ -615,22 +415,11 @@ var duice;
         }
     }
     duice.NumberMask = NumberMask;
-    /**
-     * duice.DateFormat
-     */
     class DateMask {
-        /**
-         * Constructor
-         * @param pattern
-         */
         constructor(pattern) {
             this.patternRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
             this.pattern = pattern;
         }
-        /**
-         * Encodes date string
-         * @param string
-         */
         encode(string) {
             if (isEmpty(string)) {
                 return '';
@@ -654,10 +443,6 @@ var duice;
             });
             return string;
         }
-        /**
-         * Decodes formatted date string to ISO date string.
-         * @param string
-         */
         decode(string) {
             if (isEmpty(string)) {
                 return null;
@@ -714,9 +499,6 @@ var duice;
         }
     }
     duice.DateMask = DateMask;
-    /**
-      * duice.Blocker
-      */
     class Blocker {
         constructor(element) {
             this.opacity = 0.2;
@@ -728,31 +510,26 @@ var duice;
             this.opacity = opacity;
         }
         block() {
-            // adjusting position
             this.div.style.position = 'fixed';
             this.div.style.zIndex = String(getCurrentMaxZIndex() + 1);
             this.div.style.background = 'rgba(0, 0, 0, ' + this.opacity + ')';
             this.takePosition();
-            // adds events
             var _this = this;
             getCurrentWindow().addEventListener('scroll', function () {
                 _this.takePosition();
             });
-            // append
             this.element.appendChild(this.div);
         }
         unblock() {
             this.element.removeChild(this.div);
         }
         takePosition() {
-            // full blocking in case of BODY
             if (this.element.tagName == 'BODY') {
                 this.div.style.width = '100%';
                 this.div.style.height = '100%';
                 this.div.style.top = '0px';
                 this.div.style.left = '0px';
             }
-            // otherwise adjusting to parent element
             else {
                 var boundingClientRect = this.element.getBoundingClientRect();
                 var width = boundingClientRect.width;
@@ -770,9 +547,6 @@ var duice;
         }
     }
     duice.Blocker = Blocker;
-    /**
-     * duice.Progress
-     */
     class Progress {
         constructor(element) {
             this.blocker = new Blocker(element);
@@ -790,14 +564,8 @@ var duice;
         }
     }
     duice.Progress = Progress;
-    /**
-     * duice.ModalEventListener
-     */
     class DialogEventListener {
     }
-    /**
-      * duice.Modal
-      */
     class Dialog {
         constructor(contentDiv) {
             this.eventListener = new DialogEventListener();
@@ -805,7 +573,6 @@ var duice;
             this.contentDiv = contentDiv;
             this.dialog = document.createElement('dialog');
             this.dialog.classList.add('duice-dialog');
-            // creates close button
             var closeButton = document.createElement('span');
             closeButton.classList.add('duice-dialog__closeButton');
             closeButton.addEventListener('click', function (event) {
@@ -813,49 +580,32 @@ var duice;
             });
             this.dialog.appendChild(closeButton);
         }
-        /**
-         * Shows modal
-         */
         show() {
-            // set content parent node
             if (this.contentDiv.parentNode) {
                 this.contentParentNode = this.contentDiv.parentNode;
             }
-            // adds contents
             this.dialog.appendChild(this.contentDiv);
-            // show dialog modal
             getCurrentWindow().document.body.appendChild(this.dialog);
             this.contentDiv.style.display = 'block';
             this.dialog.showModal();
-            //return promise to delay
             return new Promise(function (resolve, reject) {
                 setTimeout(function () {
                     resolve(true);
                 }, 100);
             });
         }
-        /**
-         * Hides modal
-         */
         hide() {
-            // restore parent node
             if (this.contentParentNode) {
                 this.contentParentNode.appendChild(this.contentDiv);
             }
-            // closes modal
             this.dialog.close();
             this.contentDiv.style.display = 'none';
-            // return promise to delay
             return new Promise(function (resolve, reject) {
                 setTimeout(function () {
                     resolve(true);
                 }, 100);
             });
         }
-        /**
-         * open
-         * @param args
-         */
         open(...args) {
             return __awaiter(this, void 0, void 0, function* () {
                 if (this.eventListener.onBeforeOpen) {
@@ -867,7 +617,6 @@ var duice;
                 if (this.eventListener.onAfterOpen) {
                     yield this.eventListener.onAfterOpen.call(this, ...args);
                 }
-                // creates promise
                 var _this = this;
                 this.promise = new Promise(function (resolve, reject) {
                     _this.promiseResolve = resolve;
@@ -876,10 +625,6 @@ var duice;
                 return this.promise;
             });
         }
-        /**
-         * close
-         * @param args
-         */
         close(...args) {
             return __awaiter(this, void 0, void 0, function* () {
                 if (this.eventListener.onBeforeClose) {
@@ -891,14 +636,9 @@ var duice;
                 if (this.eventListener.onAfterClose) {
                     yield this.eventListener.onAfterClose.call(this, ...args);
                 }
-                // resolves promise
                 this.promiseResolve(...args);
             });
         }
-        /**
-         * confirm
-         * @param args
-         */
         confirm(...args) {
             return __awaiter(this, void 0, void 0, function* () {
                 if (this.eventListener.onBeforeConfirm) {
@@ -910,80 +650,48 @@ var duice;
                 if (this.eventListener.onAfterConfirm) {
                     yield this.eventListener.onAfterConfirm.call(this, ...args);
                 }
-                // resolves promise
                 this.promiseResolve(...args);
             });
         }
-        /**
-         * Adds onBeforeOpen event listener
-         * @param listener
-         */
         onBeforeOpen(listener) {
             this.eventListener.onBeforeOpen = listener;
             return this;
         }
-        /**
-         * Adds onAfterOpen even listener
-         * @param listener
-         */
         onAfterOpen(listener) {
             this.eventListener.onAfterOpen = listener;
             return this;
         }
-        /**
-         * Adds onBeforeClose event listener
-         * @param listener
-         */
         onBeforeClose(listener) {
             this.eventListener.onBeforeClose = listener;
             return this;
         }
-        /**
-         * Adds onAfterClose event listener
-         * @param listener
-         */
         onAfterClose(listener) {
             this.eventListener.onAfterClose = listener;
             return this;
         }
-        /**
-         * Adds onBeforeConfirm event listener
-         * @param listener
-         */
         onBeforeConfirm(listener) {
             this.eventListener.onBeforeConfirm = listener;
             return this;
         }
-        /**
-         * Adds onAfterConfirm event listener
-         * @param listener
-         */
         onAfterConfirm(listener) {
             this.eventListener.onAfterConfirm = listener;
             return this;
         }
     }
     duice.Dialog = Dialog;
-    /**
-     * duice.Alert
-     */
     class Alert extends Dialog {
         constructor(message) {
             let contentDiv = document.createElement('div');
             super(contentDiv);
             this.message = message;
             var _this = this;
-            // creates icon div
             this.iconDiv = document.createElement('div');
             this.iconDiv.classList.add('duice-alert__iconDiv');
-            // creates message div
             this.messageDiv = document.createElement('div');
             this.messageDiv.classList.add('duice-alert__messageDiv');
             this.messageDiv.innerHTML = this.message;
-            // creates button div
             this.buttonDiv = document.createElement('div');
             this.buttonDiv.classList.add('duice-alert__buttonDiv');
-            // creates confirm button
             this.confirmButton = document.createElement('button');
             this.confirmButton.classList.add('duice-alert__buttonDiv-button');
             this.confirmButton.classList.add('duice-alert__buttonDiv-button--confirm');
@@ -991,7 +699,6 @@ var duice;
                 _this.close();
             });
             this.buttonDiv.appendChild(this.confirmButton);
-            // appends parts to bodyDiv
             contentDiv.appendChild(this.iconDiv);
             contentDiv.appendChild(this.messageDiv);
             contentDiv.appendChild(this.buttonDiv);
@@ -1003,34 +710,23 @@ var duice;
         }
     }
     duice.Alert = Alert;
-    /**
-     * Help function for duice.Alert class
-     * @param message
-     */
     function alert(message) {
         return new duice.Alert(message).open();
     }
     duice.alert = alert;
-    /**
-     * duice.Confirm
-     */
     class Confirm extends Dialog {
         constructor(message) {
             let contentDiv = document.createElement('div');
             super(contentDiv);
             this.message = message;
             var _this = this;
-            // creates icon div
             this.iconDiv = document.createElement('div');
             this.iconDiv.classList.add('duice-confirm__iconDiv');
-            // creates message div
             this.messageDiv = document.createElement('div');
             this.messageDiv.classList.add('duice-confirm__messageDiv');
             this.messageDiv.innerHTML = this.message;
-            // creates button div
             this.buttonDiv = document.createElement('div');
             this.buttonDiv.classList.add('duice-confirm__buttonDiv');
-            // confirm button
             this.confirmButton = document.createElement('button');
             this.confirmButton.classList.add('duice-confirm__buttonDiv-button');
             this.confirmButton.classList.add('duice-confirm__buttonDiv-button--confirm');
@@ -1038,7 +734,6 @@ var duice;
                 _this.confirm(true);
             });
             this.buttonDiv.appendChild(this.confirmButton);
-            // cancel button
             this.cancelButton = document.createElement('button');
             this.cancelButton.classList.add('duice-confirm__buttonDiv-button');
             this.cancelButton.classList.add('duice-confirm__buttonDiv-button--cancel');
@@ -1046,7 +741,6 @@ var duice;
                 _this.close(false);
             });
             this.buttonDiv.appendChild(this.cancelButton);
-            // appends parts to bodyDiv
             contentDiv.appendChild(this.iconDiv);
             contentDiv.appendChild(this.messageDiv);
             contentDiv.appendChild(this.buttonDiv);
@@ -1058,17 +752,10 @@ var duice;
         }
     }
     duice.Confirm = Confirm;
-    /**
-     * Help function for duice.Confirm class
-     * @param message
-     */
     function confirm(message) {
         return new duice.Confirm(message).open();
     }
     duice.confirm = confirm;
-    /**
-     * duice.Prompt
-     */
     class Prompt extends Dialog {
         constructor(message, defaultValue) {
             let contentDiv = document.createElement('div');
@@ -1076,14 +763,11 @@ var duice;
             this.message = message;
             this.defaultValue = defaultValue;
             var _this = this;
-            // creates icon div
             this.iconDiv = document.createElement('div');
             this.iconDiv.classList.add('duice-prompt__iconDiv');
-            // creates message div
             this.messageDiv = document.createElement('div');
             this.messageDiv.classList.add('duice-prompt__messageDiv');
             this.messageDiv.innerHTML = this.message;
-            // creates input div
             this.inputDiv = document.createElement('div');
             this.inputDiv.classList.add('duice-prompt__inputDiv');
             this.input = document.createElement('input');
@@ -1092,10 +776,8 @@ var duice;
                 this.input.value = this.defaultValue;
             }
             this.inputDiv.appendChild(this.input);
-            // creates button div
             this.buttonDiv = document.createElement('div');
             this.buttonDiv.classList.add('duice-prompt__buttonDiv');
-            // confirm button
             this.confirmButton = document.createElement('button');
             this.confirmButton.classList.add('duice-prompt__buttonDiv-button');
             this.confirmButton.classList.add('duice-prompt__buttonDiv-button--confirm');
@@ -1103,7 +785,6 @@ var duice;
                 _this.confirm(_this.getValue());
             });
             this.buttonDiv.appendChild(this.confirmButton);
-            // cancel button
             this.cancelButton = document.createElement('button');
             this.cancelButton.classList.add('duice-prompt__buttonDiv-button');
             this.cancelButton.classList.add('duice-prompt__buttonDiv-button--cancel');
@@ -1111,7 +792,6 @@ var duice;
                 _this.close(false);
             });
             this.buttonDiv.appendChild(this.cancelButton);
-            // appends parts to bodyDiv
             contentDiv.appendChild(this.iconDiv);
             contentDiv.appendChild(this.messageDiv);
             contentDiv.appendChild(this.inputDiv);
@@ -1127,70 +807,12 @@ var duice;
         }
     }
     duice.Prompt = Prompt;
-    /**
-     * Help function for duice.Prompt class
-     * @param message
-     */
     function prompt(message, defaultValue) {
         return new duice.Prompt(message, defaultValue).open();
     }
     duice.prompt = prompt;
-    /**
-     * duice.Dialog
-     * @param dialog
-
-    export class Dialog extends Modal {
-        dialog:HTMLDivElement;
-        parentNode:Node;
-        constructor(dialog:HTMLDivElement) {
-            super();
-            this.dialog = dialog;
-            this.dialog.classList.add('duice-dialog');
-            this.parentNode = this.dialog.parentNode;
-        }
-        open(...args:any[]) {
-            this.dialog.style.display = 'block';
-            this.addContent(this.dialog);
-
-            // opens dialog
-            try {
-                return super.open(...args);
-            }catch(e){
-                this.dialog.style.display = 'none';
-                this.parentNode.appendChild(this.dialog);
-                throw e;
-            }
-        }
-        close(...args:any[]) {
-            var promise = super.close(...args);
-            this.dialog.style.display = 'none';
-            this.parentNode.appendChild(this.dialog);
-            return promise;
-        }
-        confirm(...args:any[]) {
-            var promise = super.confirm(...args);
-            this.dialog.style.display = 'none';
-            this.parentNode.appendChild(this.dialog);
-            return promise;
-        }
-    }
-     */
-    /**
-     * Help function for duice.Dialog class
-     * @param message
-
-    export function dialog(dialog:HTMLDivElement) {
-        return new duice.Dialog(dialog).open();
-    }
-     */
-    /**
-     * duice.TabFolderEventListener
-     */
     class TabFolderEventListener {
     }
-    /**
-     * duice.TabFolder
-     */
     class TabFolder {
         constructor() {
             this.tabs = new Array();
@@ -1198,23 +820,19 @@ var duice;
         }
         addTab(tab) {
             var _this = this;
-            // adds event listener
             const index = Number(this.tabs.length);
             tab.getButton().addEventListener('click', function (event) {
                 _this.selectTab(index);
             });
-            // adds tab
             this.tabs.push(tab);
         }
         selectTab(index) {
             return __awaiter(this, void 0, void 0, function* () {
-                // calls onBeforeSelectTab 
                 if (this.eventListener.onBeforeSelectTab) {
                     if ((yield this.eventListener.onBeforeSelectTab.call(this, this.tabs[index])) === false) {
                         throw 'canceled';
                     }
                 }
-                // activates selected tab
                 for (var i = 0, size = this.tabs.length; i < size; i++) {
                     var tab = this.tabs[i];
                     if (i === index) {
@@ -1224,7 +842,6 @@ var duice;
                         tab.setActive(false);
                     }
                 }
-                // calls 
                 if (this.eventListener.onAfterSelectTab) {
                     this.eventListener.onAfterSelectTab.call(this, this.tabs[index]);
                 }
@@ -1240,9 +857,6 @@ var duice;
         }
     }
     duice.TabFolder = TabFolder;
-    /**
-     * duice.Tab
-     */
     class Tab {
         constructor(button, content) {
             this.button = button;
@@ -1266,14 +880,8 @@ var duice;
         }
     }
     duice.Tab = Tab;
-    /**
-     * duice.WebSocketClientEventListener
-     */
     class WebSocketClientEventListener {
     }
-    /**
-     * duice.WebSocketClient
-     */
     class WebSocketClient {
         constructor() {
             this.eventListener = new WebSocketClientEventListener();
@@ -1300,7 +908,6 @@ var duice;
                 if (_this.eventListener.onClose) {
                     _this.eventListener.onClose.call(_this, event);
                 }
-                // reconnect
                 setTimeout(function () {
                     _this.open(url);
                 }, 1000);
@@ -1320,20 +927,12 @@ var duice;
         }
     }
     duice.WebSocketClient = WebSocketClient;
-    /**
-     * duice.Observable
-     * Observable abstract class of Observer Pattern
-     */
     class Observable {
         constructor() {
             this.observers = new Array();
             this.changed = false;
             this.notifyEnable = true;
         }
-        /**
-         * Adds observer instance
-         * @param observer
-         */
         addObserver(observer) {
             for (var i = 0, size = this.observers.length; i < size; i++) {
                 if (this.observers[i] === observer) {
@@ -1342,10 +941,6 @@ var duice;
             }
             this.observers.push(observer);
         }
-        /**
-         * Removes specified observer instance from observer instances
-         * @param observer
-         */
         removeObserver(observer) {
             for (var i = 0, size = this.observers.length; i < size; i++) {
                 if (this.observers[i] === observer) {
@@ -1354,10 +949,6 @@ var duice;
                 }
             }
         }
-        /**
-         * Notifies changes to observers
-         * @param obj object to transfer to observer
-         */
         notifyObservers(obj) {
             if (this.notifyEnable && this.hasChanged()) {
                 this.clearUnavailableObservers();
@@ -1374,39 +965,21 @@ var duice;
                 this.clearChanged();
             }
         }
-        /**
-         * Suspends notify
-         */
         suspendNotify() {
             this.notifyEnable = false;
         }
-        /**
-         * Resumes notify
-         */
         resumeNotify() {
             this.notifyEnable = true;
         }
-        /**
-         * Sets changed flag
-         */
         setChanged() {
             this.changed = true;
         }
-        /**
-         * Returns changed flag
-         */
         hasChanged() {
             return this.changed;
         }
-        /**
-         * Clears changed flag
-         */
         clearChanged() {
             this.changed = false;
         }
-        /**
-         * Clears unavailable observers to prevent memory leak
-         */
         clearUnavailableObservers() {
             for (var i = this.observers.length - 1; i >= 0; i--) {
                 try {
@@ -1420,10 +993,6 @@ var duice;
             }
         }
     }
-    /**
-     * Abstract data object
-     * extends from Observable and implements Observer interface.
-     */
     class DataObject extends Observable {
         constructor() {
             super(...arguments);
@@ -1434,9 +1003,6 @@ var duice;
             this.readonlyAll = false;
             this.visible = true;
         }
-        /**
-         * Returns whether instance is active
-         */
         isAvailable() {
             return true;
         }
@@ -1445,10 +1011,6 @@ var duice;
             this.setChanged();
             this.notifyObservers(this);
         }
-        /**
-         * Sets disable all
-         * @param disable
-         */
         setDisableAll(disable) {
             this.disableAll = disable;
             for (var name in this.disable) {
@@ -1457,9 +1019,6 @@ var duice;
             this.setChanged();
             this.notifyObservers(this);
         }
-        /**
-         * Returns if disabled
-         */
         isDisable(name) {
             if (this.disable.hasOwnProperty(name)) {
                 return this.disable[name];
@@ -1468,19 +1027,11 @@ var duice;
                 return this.disableAll;
             }
         }
-        /**
-         * Sets read-only
-         * @param name
-         */
         setReadonly(name, readonly) {
             this.readonly[name] = readonly;
             this.setChanged();
             this.notifyObservers(this);
         }
-        /**
-         * Sets read-only all
-         * @param readonly
-         */
         setReadonlyAll(readonly) {
             this.readonlyAll = readonly;
             for (var name in this.readonly) {
@@ -1489,10 +1040,6 @@ var duice;
             this.setChanged();
             this.notifyObservers(this);
         }
-        /**
-         * Returns read-only
-         * @param name
-         */
         isReadonly(name) {
             if (this.readonly.hasOwnProperty(name)) {
                 return this.readonly[name];
@@ -1501,10 +1048,6 @@ var duice;
                 return this.readonlyAll;
             }
         }
-        /**
-         * Sets visible flag
-         * @param visible
-         */
         setVisible(visible) {
             this.visible = visible;
             for (var i = 0, size = this.observers.length; i < size; i++) {
@@ -1519,66 +1062,36 @@ var duice;
                 }
             }
         }
-        /**
-         * Returns is visible.
-         */
         isVisible() {
             return this.visible;
         }
     }
     duice.DataObject = DataObject;
-    /**
-     * duice.MapEventListener
-     */
     class MapEventListener {
     }
-    /**
-     * Map data structure
-     * @param JSON object
-     */
     class Map extends DataObject {
-        /**
-         * constructor
-         * @param json
-         */
         constructor(json) {
             super();
-            this.data = new Object(); // internal data object
-            this.originData = JSON.stringify(this.data); // original string JSON data
+            this.data = new Object();
+            this.originData = JSON.stringify(this.data);
             this.eventListener = new MapEventListener();
             this.fromJson(json || {});
         }
-        /**
-         * Updates data from observable instance
-         * @param mapComponent
-         * @param obj
-         */
         update(mapComponent, obj) {
             console.debug('Map.update', mapComponent, obj);
             var name = mapComponent.getName();
             var value = mapComponent.getValue();
             this.set(name, value);
         }
-        /**
-         * Loads data from JSON object.
-         * @param json
-         */
         fromJson(json) {
-            // sets data
             this.data = new Object();
             for (var name in json) {
                 this.data[name] = json[name];
             }
-            // save point
             this.save();
-            // notify to observers
             this.setChanged();
             this.notifyObservers(this);
         }
-        /**
-         * Convert data to JSON object
-         * @return JSON object
-         */
         toJson() {
             var json = new Object();
             for (var name in this.data) {
@@ -1586,30 +1099,17 @@ var duice;
             }
             return json;
         }
-        /**
-         * Clears data
-         */
         clear() {
             this.data = new Object();
             this.setChanged();
             this.notifyObservers(this);
         }
-        /**
-         * Save point
-         */
         save() {
             this.originData = JSON.stringify(this.toJson());
         }
-        /**
-         * Restores instance as original data
-         */
         reset() {
             this.fromJson(JSON.parse(this.originData));
         }
-        /**
-         * Checks original data is changed
-         * @return whether original data is changed or not
-         */
         isDirty() {
             if (JSON.stringify(this.toJson()) === this.originData) {
                 return false;
@@ -1618,14 +1118,8 @@ var duice;
                 return true;
             }
         }
-        /**
-         * Sets property as input value
-         * @param name
-         * @param value
-         */
         set(name, value) {
             return __awaiter(this, void 0, void 0, function* () {
-                // calls beforeChange
                 if (this.eventListener.onBeforeChange) {
                     try {
                         if ((yield this.eventListener.onBeforeChange.call(this, name, value)) === false) {
@@ -1638,29 +1132,18 @@ var duice;
                         throw e;
                     }
                 }
-                // changes value
                 this.data[name] = value;
                 this.setChanged();
                 this.notifyObservers(this);
-                // calls 
                 if (this.eventListener.onAfterChange) {
                     this.eventListener.onAfterChange.call(this, name, value);
                 }
-                // return true
                 return true;
             });
         }
-        /**
-         * Gets specified property value.
-         * @param name
-         */
         get(name) {
             return this.data[name];
         }
-        /**
-         * Returns properties names as array.
-         * @return array of names
-         */
         getNames() {
             var names = new Array();
             for (var name in this.data) {
@@ -1668,10 +1151,6 @@ var duice;
             }
             return names;
         }
-        /**
-         * Sets focus with message
-         * @param name
-         */
         setFocus(name) {
             for (var i = 0, size = this.observers.length; i < size; i++) {
                 var observer = this.observers[i];
@@ -1684,35 +1163,17 @@ var duice;
                 }
             }
         }
-        /**
-         * Sets listener before change
-         * @param listener
-         */
         onBeforeChange(listener) {
             this.eventListener.onBeforeChange = listener;
         }
-        /**
-         * Sets listener after change
-         * @param listener
-         */
         onAfterChange(listener) {
             this.eventListener.onAfterChange = listener;
         }
     }
     duice.Map = Map;
-    /**
-     * duice.ListEvent
-     */
     class ListEventListener {
     }
-    /**
-     * duice.List
-     */
     class List extends DataObject {
-        /**
-         * constructor
-         * @param jsonArray
-         */
         constructor(jsonArray) {
             super();
             this.data = new Array();
@@ -1721,20 +1182,11 @@ var duice;
             this.eventListener = new ListEventListener();
             this.fromJson(jsonArray || []);
         }
-        /**
-         * Updates
-         * @param observable
-         * @param obj
-         */
         update(listComponent, obj) {
             console.debug('List.update', listComponent, obj);
             this.setChanged();
             this.notifyObservers(obj);
         }
-        /**
-         * Loads data from JSON array
-         * @param jsonArray
-         */
         fromJson(jsonArray) {
             this.clear();
             for (var i = 0; i < jsonArray.length; i++) {
@@ -1751,9 +1203,6 @@ var duice;
             this.save();
             this.setIndex(-1);
         }
-        /**
-         * toJson
-         */
         toJson() {
             var jsonArray = new Array();
             for (var i = 0; i < this.data.length; i++) {
@@ -1761,9 +1210,6 @@ var duice;
             }
             return jsonArray;
         }
-        /**
-         * Clears data
-         */
         clear() {
             for (var i = 0, size = this.data.length; i < size; i++) {
                 this.data[i].removeObserver(this);
@@ -1771,21 +1217,12 @@ var duice;
             this.data = new Array();
             this.setIndex(-1);
         }
-        /**
-         * Save point
-         */
         save() {
             this.originData = JSON.stringify(this.toJson());
         }
-        /**
-         * Resets data from original data.
-         */
         reset() {
             this.fromJson(JSON.parse(this.originData));
         }
-        /**
-         * Returns if changed
-         */
         isDirty() {
             if (JSON.stringify(this.toJson()) === this.originData) {
                 return false;
@@ -1794,86 +1231,52 @@ var duice;
                 return true;
             }
         }
-        /**
-         * Sets only row index
-         * @param index
-         */
         setIndex(index) {
             this.index = index;
             this.setChanged();
             this.notifyObservers(this);
         }
-        /**
-         * Returns row index.
-         */
         getIndex() {
             return this.index;
         }
-        /**
-         * Returns row count
-         */
         getRowCount() {
             return this.data.length;
         }
-        /**
-         * Return row specified index
-         * @param index
-         */
         getRow(index) {
             return this.data[index];
         }
-        /**
-         * Sets index.
-         * @param index
-         */
         selectRow(index) {
             return __awaiter(this, void 0, void 0, function* () {
                 var selectedRow = this.getRow(index);
-                // calls beforeChangeIndex 
                 if (this.eventListener.onBeforeSelectRow) {
                     if ((yield this.eventListener.onBeforeSelectRow.call(this, selectedRow)) === false) {
                         throw 'canceled';
                     }
                 }
-                // changes index
                 this.setIndex(index);
-                // calls 
                 if (this.eventListener.onAfterSelectRow) {
                     this.eventListener.onAfterSelectRow.call(this, selectedRow);
                 }
-                // returns true
                 return true;
             });
         }
-        /**
-         * moveRow
-         * @param fromIndex
-         * @param toIndex
-         */
         moveRow(fromIndex, toIndex) {
             return __awaiter(this, void 0, void 0, function* () {
                 var sourceMap = this.getRow(fromIndex);
                 var targetMap = this.getRow(toIndex);
-                // calls beforeChangeIndex 
                 if (this.eventListener.onBeforeMoveRow) {
                     if ((yield this.eventListener.onBeforeMoveRow.call(this, sourceMap, targetMap)) === false) {
                         throw 'canceled';
                     }
                 }
-                // moves row
                 this.index = fromIndex;
                 this.data.splice(toIndex, 0, this.data.splice(fromIndex, 1)[0]);
                 this.setIndex(toIndex);
-                // calls 
                 if (this.eventListener.onAfterMoveRow) {
                     yield this.eventListener.onAfterMoveRow.call(this, sourceMap, targetMap);
                 }
             });
         }
-        /**
-         * Adds row
-         * @param map
-         */
         addRow(map) {
             map.disableAll = this.disableAll;
             map.disable = clone(this.disable);
@@ -1885,11 +1288,6 @@ var duice;
             this.data.push(map);
             this.setIndex(this.getRowCount() - 1);
         }
-        /**
-         * Inserts row
-         * @param index
-         * @param map
-         */
         insertRow(index, map) {
             if (0 <= index && index < this.data.length) {
                 map.disableAll = this.disableAll;
@@ -1903,10 +1301,6 @@ var duice;
                 this.setIndex(index);
             }
         }
-        /**
-         * Removes row by specified index
-         * @param index
-         */
         removeRow(index) {
             if (0 <= index && index < this.data.length) {
                 this.data.splice(index, 1);
@@ -1914,10 +1308,6 @@ var duice;
                 this.setIndex(index);
             }
         }
-        /**
-         * indexOf
-         * @param handler
-         */
         indexOf(handler) {
             for (var i = 0, size = this.data.length; i < size; i++) {
                 if (handler.call(this, this.data[i]) === true) {
@@ -1926,10 +1316,6 @@ var duice;
             }
             return -1;
         }
-        /**
-         * contains
-         * @param handler
-         */
         contains(handler) {
             if (this.indexOf(handler) > -1) {
                 return true;
@@ -1938,10 +1324,6 @@ var duice;
                 return false;
             }
         }
-        /**
-         * forEach
-         * @param handler
-         */
         forEach(handler) {
             for (var i = 0, size = this.data.length; i < size; i++) {
                 if (handler.call(this, this.data[i], i) === false) {
@@ -1949,89 +1331,48 @@ var duice;
                 }
             }
         }
-        /**
-         * Sets diabled
-         * @param disable
-         */
         setDisable(name, disable) {
             this.data.forEach(function (map) {
                 map.setDisable(name, disable);
             });
             super.setDisable(name, disable);
         }
-        /**
-         * Sets disable all
-         * @param disable
-         */
         setDisableAll(disable) {
             this.data.forEach(function (map) {
                 map.setDisableAll(disable);
             });
             super.setDisableAll(disable);
         }
-        /**
-         * Sets readonly flag
-         * @param name
-         * @param readonly
-         */
         setReadonly(name, readonly) {
             this.data.forEach(function (map) {
                 map.setReadonly(name, readonly);
             });
             super.setReadonly(name, readonly);
         }
-        /**
-         * Sets readonly all
-         * @param readonly
-         */
         setReadonlyAll(readonly) {
             this.data.forEach(function (map) {
                 map.setReadonlyAll(readonly);
             });
             super.setReadonlyAll(readonly);
         }
-        /**
-         * onBeforeSelectRow
-         * @param listener
-         */
         onBeforeSelectRow(listener) {
             this.eventListener.onBeforeSelectRow = listener;
         }
-        /**
-         * onAfterSelectRow
-         * @param listener onAfterSelectRow event listener
-         */
         onAfterSelectRow(listener) {
             this.eventListener.onAfterSelectRow = listener;
         }
-        /**
-         * onBeforeMoveRow
-         * @param listener onBeforeMoveRow event listener
-         */
         onBeforeMoveRow(listener) {
             this.eventListener.onBeforeMoveRow = listener;
         }
-        /**
-         * onAfterMoveRow
-         * @param listener
-         */
         onAfterMoveRow(listener) {
             this.eventListener.onAfterMoveRow = listener;
         }
-        /**
-         * onBeforeChangeRow
-         * @param listener
-         */
         onBeforeChangeRow(listener) {
             this.eventListener.onBeforeChangeRow = listener;
             this.data.forEach(function (map) {
                 map.onBeforeChange(listener);
             });
         }
-        /**
-         * onAfterChangeRow
-         * @param listener
-         */
         onAfterChangeRow(listener) {
             this.eventListener.onAfterChangeRow = listener;
             this.data.forEach(function (map) {
@@ -2040,9 +1381,6 @@ var duice;
         }
     }
     duice.List = List;
-    /**
-     * duice.ComponentFactory
-     */
     class ComponentFactory {
         constructor(context) {
             if (context) {
@@ -2071,9 +1409,6 @@ var duice;
             }
         }
     }
-    /**
-     * duice.Component
-     */
     class Component extends Observable {
         constructor(element) {
             super();
@@ -2081,7 +1416,6 @@ var duice;
             this.element.dataset.duiceId = generateUuid();
         }
         isAvailable() {
-            // contains method not support(IE)
             if (!Node.prototype.contains) {
                 Node.prototype.contains = function (el) {
                     while (el = el.parentNode) {
@@ -2091,7 +1425,6 @@ var duice;
                     return false;
                 };
             }
-            // checks contains element
             if (document.contains(this.element)) {
                 return true;
             }
@@ -2099,31 +1432,18 @@ var duice;
                 return false;
             }
         }
-        /**
-         * Sets element visible
-         * @param visible
-         */
         setVisible(visible) {
             this.element.style.display = (visible ? '' : 'none');
         }
-        /**
-         * Sets element focus
-         */
         setFocus() {
             if (this.element.focus) {
                 this.element.focus();
             }
         }
     }
-    /**
-     * duice.MapComponentFactory
-     */
     class MapComponentFactory extends ComponentFactory {
     }
     duice.MapComponentFactory = MapComponentFactory;
-    /**
-     * duice.MapComponent
-     */
     class MapComponent extends Component {
         bind(map, name, ...args) {
             this.map = map;
@@ -2140,15 +1460,9 @@ var duice;
         }
     }
     duice.MapComponent = MapComponent;
-    /**
-     * duice.ListComponentFactory
-     */
     class ListComponentFactory extends ComponentFactory {
     }
     duice.ListComponentFactory = ListComponentFactory;
-    /**
-     * duice.ListComponent
-     */
     class ListComponent extends Component {
         bind(list, item) {
             this.list = list;
@@ -2165,9 +1479,6 @@ var duice;
         }
     }
     duice.ListComponent = ListComponent;
-    /**
-     * duice.ScriptletFactory
-     */
     class ScriptletFactory extends MapComponentFactory {
         getComponent(element) {
             var scriptlet = new Scriptlet(element);
@@ -2190,9 +1501,6 @@ var duice;
         }
     }
     duice.ScriptletFactory = ScriptletFactory;
-    /**
-     * duice.Scriptlet
-     */
     class Scriptlet extends MapComponent {
         constructor(element) {
             super(element);
@@ -2221,13 +1529,9 @@ var duice;
         }
     }
     duice.Scriptlet = Scriptlet;
-    /**
-     * duice.SpanFactory
-     */
     class SpanFactory extends MapComponentFactory {
         getComponent(element) {
             var span = new Span(element);
-            // sets format
             if (element.dataset.duiceMask) {
                 var duiceMask = element.dataset.duiceMask.split(',');
                 var maskType = duiceMask[0];
@@ -2247,16 +1551,12 @@ var duice;
                 }
                 span.setMask(mask);
             }
-            // binds
             var bind = element.dataset.duiceBind.split(',');
             span.bind(this.getContextProperty(bind[0]), bind[1]);
             return span;
         }
     }
     duice.SpanFactory = SpanFactory;
-    /**
-     * duice.Span
-     */
     class Span extends MapComponent {
         constructor(span) {
             super(span);
@@ -2285,22 +1585,15 @@ var duice;
         }
     }
     duice.Span = Span;
-    /**
-     * duice.DivFactory
-     */
     class DivFactory extends MapComponentFactory {
         getComponent(element) {
             var div = new Div(element);
-            // binds
             var bind = element.dataset.duiceBind.split(',');
             div.bind(this.getContextProperty(bind[0]), bind[1]);
             return div;
         }
     }
     duice.DivFactory = DivFactory;
-    /**
-     * duice.Div
-     */
     class Div extends MapComponent {
         constructor(div) {
             super(div);
@@ -2319,9 +1612,6 @@ var duice;
         }
     }
     duice.Div = Div;
-    /**
-     * duice.InputFactory
-     */
     class InputFactory extends MapComponentFactory {
         getComponent(element) {
             var input;
@@ -2355,16 +1645,12 @@ var duice;
                 default:
                     input = new InputGeneric(element);
             }
-            // bind
             var bind = element.dataset.duiceBind.split(',');
             input.bind(this.getContextProperty(bind[0]), bind[1]);
             return input;
         }
     }
     duice.InputFactory = InputFactory;
-    /**
-     * duice.Input
-     */
     class Input extends MapComponent {
         constructor(input) {
             super(input);
@@ -2388,7 +1674,6 @@ var duice;
                 _this.setChanged();
                 _this.notifyObservers(this);
             }, true);
-            // turn off autocomplete
             _this.input.setAttribute('autocomplete', 'off');
         }
         checkValue(value) {
@@ -2412,9 +1697,6 @@ var duice;
         }
     }
     duice.Input = Input;
-    /**
-     * duice.InputGeneric
-     */
     class InputGeneric extends Input {
         constructor(input) {
             super(input);
@@ -2442,9 +1724,6 @@ var duice;
         }
     }
     duice.InputGeneric = InputGeneric;
-    /**
-     * duice.InputText
-     */
     class InputText extends Input {
         constructor(input) {
             super(input);
@@ -2472,7 +1751,6 @@ var duice;
             return value;
         }
         checkValue(value) {
-            // test pattern
             var pattern = this.input.getAttribute('pattern');
             if (pattern) {
                 var regExp = new RegExp(pattern);
@@ -2480,7 +1758,6 @@ var duice;
                     return false;
                 }
             }
-            // checks format
             if (this.mask) {
                 try {
                     this.mask.decode(value);
@@ -2493,15 +1770,11 @@ var duice;
         }
     }
     duice.InputText = InputText;
-    /**
-     * duice.InputNumber
-     */
     class InputNumber extends Input {
         constructor(input) {
             super(input);
             addClass(this.input, 'duice-input-number');
             this.input.removeAttribute('type');
-            // default mask
             this.mask = new NumberMask(0);
         }
         setMask(scale) {
@@ -2532,14 +1805,10 @@ var duice;
         }
     }
     duice.InputNumber = InputNumber;
-    /**
-     * duice.InputCheckbox
-     */
     class InputCheckbox extends Input {
         constructor(input) {
             super(input);
             addClass(this.input, 'duice-input-checkbox');
-            // stop click event propagation
             this.input.addEventListener('click', function (event) {
                 event.stopPropagation();
             }, true);
@@ -2568,9 +1837,6 @@ var duice;
         }
     }
     duice.InputCheckbox = InputCheckbox;
-    /**
-     * duice.InputRadio
-     */
     class InputRadio extends Input {
         constructor(input) {
             super(input);
@@ -2600,9 +1866,6 @@ var duice;
         }
     }
     duice.InputRadio = InputRadio;
-    /**
-     * duice.InputDate
-     */
     class InputDate extends Input {
         constructor(input) {
             super(input);
@@ -2610,14 +1873,12 @@ var duice;
             addClass(this.input, 'duice-input-date');
             this.type = this.input.getAttribute('type').toLowerCase();
             this.input.removeAttribute('type');
-            // adds click event listener
             var _this = this;
             this.input.addEventListener('click', function (event) {
                 if (_this.readonly !== true) {
                     _this.openPicker();
                 }
             }, true);
-            // default mask
             if (this.type === 'date') {
                 this.mask = new DateMask('yyyy-MM-dd');
             }
@@ -2663,14 +1924,12 @@ var duice;
             super.setReadonly(readonly);
         }
         openPicker() {
-            // checks pickerDiv is open.
             if (this.pickerDiv) {
                 return;
             }
             var _this = this;
             this.pickerDiv = document.createElement('div');
             this.pickerDiv.classList.add('duice-input-date__pickerDiv');
-            // parses parts
             var date;
             if (isEmpty(this.getValue)) {
                 date = new Date();
@@ -2684,37 +1943,30 @@ var duice;
             var hh = date.getHours();
             var mi = date.getMinutes();
             var ss = date.getSeconds();
-            // click event listener
             this.clickListener = function (event) {
                 if (!_this.input.contains(event.target) && !_this.pickerDiv.contains(event.target)) {
                     _this.closePicker();
                 }
             };
             window.addEventListener('click', this.clickListener);
-            // header
             var headerDiv = document.createElement('div');
             headerDiv.classList.add('duice-input-date__pickerDiv-headerDiv');
             this.pickerDiv.appendChild(headerDiv);
-            // titleIcon
             var titleSpan = document.createElement('span');
             titleSpan.classList.add('duice-input-date__pickerDiv-headerDiv-titleSpan');
             headerDiv.appendChild(titleSpan);
-            // closeButton
             var closeButton = document.createElement('button');
             closeButton.classList.add('duice-input-date__pickerDiv-headerDiv-closeButton');
             headerDiv.appendChild(closeButton);
             closeButton.addEventListener('click', function (event) {
                 _this.closePicker();
             });
-            // bodyDiv
             var bodyDiv = document.createElement('div');
             bodyDiv.classList.add('duice-input-date__pickerDiv-bodyDiv');
             this.pickerDiv.appendChild(bodyDiv);
-            // daySelector
             var dateDiv = document.createElement('div');
             dateDiv.classList.add('duice-input-date__pickerDiv-bodyDiv-dateDiv');
             bodyDiv.appendChild(dateDiv);
-            // previous month button
             var prevMonthButton = document.createElement('button');
             prevMonthButton.classList.add('duice-input-date__pickerDiv-bodyDiv-dateDiv-prevMonthButton');
             dateDiv.appendChild(prevMonthButton);
@@ -2722,7 +1974,6 @@ var duice;
                 date.setMonth(date.getMonth() - 1);
                 updateDate(date);
             });
-            // todayButton
             var todayButton = document.createElement('button');
             todayButton.classList.add('duice-input-date__pickerDiv-bodyDiv-dateDiv-todayButton');
             dateDiv.appendChild(todayButton);
@@ -2733,7 +1984,6 @@ var duice;
                 date.setDate(newDate.getDate());
                 updateDate(date);
             });
-            // year select
             var yearSelect = document.createElement('select');
             yearSelect.classList.add('duice-input-date__pickerDiv-bodyDiv-dateDiv-yearSelect');
             dateDiv.appendChild(yearSelect);
@@ -2741,9 +1991,7 @@ var duice;
                 date.setFullYear(parseInt(this.value));
                 updateDate(date);
             });
-            // divider
             dateDiv.appendChild(document.createTextNode('-'));
-            // month select
             var monthSelect = document.createElement('select');
             monthSelect.classList.add('duice-input-date__pickerDiv-bodyDiv-dateDiv-monthSelect');
             dateDiv.appendChild(monthSelect);
@@ -2757,7 +2005,6 @@ var duice;
                 date.setMonth(parseInt(this.value));
                 updateDate(date);
             });
-            // next month button
             var nextMonthButton = document.createElement('button');
             nextMonthButton.classList.add('duice-input-date__pickerDiv-bodyDiv-dateDiv-nextMonthButton');
             dateDiv.appendChild(nextMonthButton);
@@ -2765,7 +2012,6 @@ var duice;
                 date.setMonth(date.getMonth() + 1);
                 updateDate(date);
             });
-            // calendar table
             var calendarTable = document.createElement('table');
             calendarTable.classList.add('duice-input-date__pickerDiv-bodyDiv-calendarTable');
             bodyDiv.appendChild(calendarTable);
@@ -2782,18 +2028,15 @@ var duice;
             });
             var calendarTbody = document.createElement('tbody');
             calendarTable.appendChild(calendarTbody);
-            // timeDiv
             var timeDiv = document.createElement('div');
             timeDiv.classList.add('duice-input-date__pickerDiv-bodyDiv-timeDiv');
             bodyDiv.appendChild(timeDiv);
-            // check input type is date
             if (this.type === 'date') {
                 date.setHours(0);
                 date.setMinutes(0);
                 date.setSeconds(0);
                 timeDiv.style.display = 'none';
             }
-            // now
             var nowButton = document.createElement('button');
             nowButton.classList.add('duice-input-date__pickerDiv-bodyDiv-timeDiv-nowButton');
             timeDiv.appendChild(nowButton);
@@ -2804,7 +2047,6 @@ var duice;
                 date.setSeconds(newDate.getSeconds());
                 updateDate(date);
             });
-            // hourSelect
             var hourSelect = document.createElement('select');
             hourSelect.classList.add('duice-input-date__pickerDiv-bodyDiv-timeDiv-hourSelect');
             for (var i = 0; i <= 23; i++) {
@@ -2817,9 +2059,7 @@ var duice;
             hourSelect.addEventListener('change', function (event) {
                 date.setHours(parseInt(this.value));
             });
-            // divider
             timeDiv.appendChild(document.createTextNode(':'));
-            // minuteSelect
             var minuteSelect = document.createElement('select');
             minuteSelect.classList.add('duice-input-date__pickerDiv-bodyDiv-timeDiv-minuteSelect');
             for (var i = 0; i <= 59; i++) {
@@ -2832,9 +2072,7 @@ var duice;
             minuteSelect.addEventListener('change', function (event) {
                 date.setMinutes(parseInt(this.value));
             });
-            // divider
             timeDiv.appendChild(document.createTextNode(':'));
-            // secondsSelect
             var secondSelect = document.createElement('select');
             secondSelect.classList.add('duice-input-date__pickerDiv-bodyDiv-timeDiv-secondSelect');
             for (var i = 0; i <= 59; i++) {
@@ -2847,11 +2085,9 @@ var duice;
             secondSelect.addEventListener('change', function (event) {
                 date.setSeconds(parseInt(this.value));
             });
-            // footer
             var footerDiv = document.createElement('div');
             footerDiv.classList.add('duice-input-date__pickerDiv-footerDiv');
             this.pickerDiv.appendChild(footerDiv);
-            // confirm
             var confirmButton = document.createElement('button');
             confirmButton.classList.add('duice-input-date__pickerDiv-footerDiv-confirmButton');
             footerDiv.appendChild(confirmButton);
@@ -2861,12 +2097,10 @@ var duice;
                 _this.notifyObservers(this);
                 _this.closePicker();
             });
-            // show
             this.input.parentNode.insertBefore(this.pickerDiv, this.input.nextSibling);
             this.pickerDiv.style.position = 'absolute';
             this.pickerDiv.style.zIndex = String(getCurrentMaxZIndex() + 1);
             this.pickerDiv.style.left = getElementPosition(this.input).left + 'px';
-            // updates date
             function updateDate(date) {
                 var yyyy = date.getFullYear();
                 var mm = date.getMonth();
@@ -2874,7 +2108,6 @@ var duice;
                 var hh = date.getHours();
                 var mi = date.getMinutes();
                 var ss = date.getSeconds();
-                // updates yearSelect
                 for (var i = yyyy - 5, end = yyyy + 5; i <= end; i++) {
                     var option = document.createElement('option');
                     option.value = String(i);
@@ -2882,9 +2115,7 @@ var duice;
                     yearSelect.appendChild(option);
                 }
                 yearSelect.value = String(yyyy);
-                // updates monthSelect
                 monthSelect.value = String(mm);
-                // updates dateTbody
                 var startDay = new Date(yyyy, mm, 1).getDay();
                 var lastDates = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
                 if (yyyy % 4 && yyyy % 100 != 0 || yyyy % 400 === 0) {
@@ -2909,7 +2140,6 @@ var duice;
                             dNum++;
                             dateTd.appendChild(document.createTextNode(String(dNum)));
                             dateTd.dataset.date = String(dNum);
-                            // checks selected
                             if (currentDate.getFullYear() === yyyy
                                 && currentDate.getMonth() === mm
                                 && currentDate.getDate() === dNum) {
@@ -2929,7 +2159,6 @@ var duice;
                     }
                     calendarTbody.appendChild(dateTr);
                 }
-                // updates times
                 hourSelect.value = String(hh);
                 minuteSelect.value = String(mi);
                 secondSelect.value = String(ss);
@@ -2943,9 +2172,6 @@ var duice;
         }
     }
     duice.InputDate = InputDate;
-    /**
-     * duice.SelectFactory
-     */
     class SelectFactory extends MapComponentFactory {
         getComponent(element) {
             var select = new Select(element);
@@ -2962,9 +2188,6 @@ var duice;
         }
     }
     duice.SelectFactory = SelectFactory;
-    /**
-     * duice.Select
-     */
     class Select extends MapComponent {
         constructor(select) {
             super(select);
@@ -2976,7 +2199,6 @@ var duice;
                 _this.setChanged();
                 _this.notifyObservers(this);
             });
-            // stores default options
             for (var i = 0, size = this.select.options.length; i < size; i++) {
                 this.defaultOptions.push(this.select.options[i]);
             }
@@ -2987,13 +2209,10 @@ var duice;
             this.optionText = text;
             var _this = this;
             function updateOption(optionList) {
-                // removes all options
                 removeChildNodes(_this.select);
-                // adds default options
                 for (var i = 0, size = _this.defaultOptions.length; i < size; i++) {
                     _this.select.appendChild(_this.defaultOptions[i]);
                 }
-                // update data options
                 for (var i = 0, size = optionList.getRowCount(); i < size; i++) {
                     var optionMap = optionList.getRow(i);
                     var option = document.createElement('option');
@@ -3039,9 +2258,6 @@ var duice;
         }
     }
     duice.Select = Select;
-    /**
-     * duice.TextareaFactory
-     */
     class TextareaFactory extends MapComponentFactory {
         getComponent(element) {
             var textarea = new Textarea(element);
@@ -3051,9 +2267,6 @@ var duice;
         }
     }
     duice.TextareaFactory = TextareaFactory;
-    /**
-     * duice.Textarea
-     */
     class Textarea extends MapComponent {
         constructor(textarea) {
             super(textarea);
@@ -3092,9 +2305,6 @@ var duice;
         }
     }
     duice.Textarea = Textarea;
-    /**
-     * duice.ImageFactory
-     */
     class ImgFactory extends MapComponentFactory {
         getComponent(element) {
             var img = new Img(element);
@@ -3108,21 +2318,13 @@ var duice;
         }
     }
     duice.ImgFactory = ImgFactory;
-    /**
-     * duice.Img
-     */
     class Img extends MapComponent {
-        /**
-         * Constructor
-         * @param img
-         */
         constructor(img) {
             super(img);
             this.img = img;
             addClass(this.img, 'duice-img');
             this.originSrc = this.img.src;
             var _this = this;
-            // listener for contextmenu event
             this.img.addEventListener('click', function (event) {
                 if (_this.disable || _this.readonly) {
                     return false;
@@ -3132,21 +2334,11 @@ var duice;
                 event.stopPropagation();
             });
         }
-        /**
-         * Sets size
-         * @param width
-         * @param height
-         */
         setSize(width, height) {
             this.size = { width: width, height: height };
             this.img.style.width = width + 'px';
             this.img.style.height = height + 'px';
         }
-        /**
-         * Updates image instance
-         * @param map
-         * @param obj
-         */
         update(map, obj) {
             var value = map.get(this.getName());
             this.value = defaultIfEmpty(value, this.originSrc);
@@ -3166,27 +2358,16 @@ var duice;
                 this.img.classList.remove('duice-img--readonly');
             }
         }
-        /**
-         * Return value of image element
-         * @return base64 data or image URL
-         */
         getValue() {
             return this.value;
         }
-        /**
-         * Opens menu division.
-         */
         openMenuDiv(top, left) {
-            // check menu div is already pop.
             if (this.menuDiv) {
                 return;
             }
-            // defines variables
             var _this = this;
-            // creates menu div
             this.menuDiv = document.createElement('div');
             this.menuDiv.classList.add('duice-img__menuDiv');
-            // creates preview button
             if (!this.disable) {
                 var previewButton = document.createElement('button');
                 previewButton.classList.add('duice-img__menuDiv-previewButton');
@@ -3195,16 +2376,13 @@ var duice;
                 }, true);
                 this.menuDiv.appendChild(previewButton);
             }
-            // readonly or disable 
             if (!this.disable && !this.readonly) {
-                // creates change button
                 var changeButton = document.createElement('button');
                 changeButton.classList.add('duice-img__menuDiv-changeButton');
                 changeButton.addEventListener('click', function (event) {
                     _this.changeImage();
                 }, true);
                 this.menuDiv.appendChild(changeButton);
-                // creates view button
                 var clearButton = document.createElement('button');
                 clearButton.classList.add('duice-img__menuDiv-clearButton');
                 clearButton.addEventListener('click', function (event) {
@@ -3212,53 +2390,39 @@ var duice;
                 }, true);
                 this.menuDiv.appendChild(clearButton);
             }
-            // appends menu div
             this.img.parentNode.insertBefore(this.menuDiv, this.img.nextSibling);
             this.menuDiv.style.position = 'absolute';
             this.menuDiv.style.zIndex = String(getCurrentMaxZIndex() + 1);
             this.menuDiv.style.top = top + 'px';
             this.menuDiv.style.left = left + 'px';
-            // listens mouse leaves from menu div.
             window.addEventListener('click', function (event) {
                 _this.closeMenuDiv();
             }, { once: true });
         }
-        /**
-         * Closes menu division
-         */
         closeMenuDiv() {
             if (this.menuDiv) {
                 this.menuDiv.parentNode.removeChild(this.menuDiv);
                 this.menuDiv = null;
             }
         }
-        /**
-         * Opens preview
-         */
         openPreview() {
             var _this = this;
             var parentNode = getCurrentWindow().document.body;
-            // creates preview
             this.preview = document.createElement('img');
             this.preview.src = this.img.src;
             this.preview.addEventListener('click', function (event) {
                 _this.closePreview();
             });
-            // creates blocker
             this.blocker = new duice.Blocker(parentNode);
             this.blocker.getBlockDiv().addEventListener('click', function (event) {
                 _this.closePreview();
             });
             this.blocker.block();
-            // shows preview
             this.preview.style.position = 'absolute';
             this.preview.style.zIndex = String(getCurrentMaxZIndex() + 2);
             parentNode.appendChild(this.preview);
             setPositionCentered(this.preview);
         }
-        /**
-         * Closes preview
-         */
         closePreview() {
             if (this.preview) {
                 this.blocker.unblock();
@@ -3266,11 +2430,7 @@ var duice;
                 this.preview = null;
             }
         }
-        /**
-         * Changes image
-         */
         changeImage() {
-            // creates file input element
             var _this = this;
             var input = document.createElement('input');
             input.setAttribute("type", "file");
@@ -3300,12 +2460,6 @@ var duice;
             });
             input.click();
         }
-        /**
-         * Converts image
-         * @param dataUrl
-         * @param width
-         * @param height
-         */
         convertImage(dataUrl, width, height) {
             return new Promise(function (resolve, reject) {
                 try {
@@ -3333,9 +2487,6 @@ var duice;
                 }
             });
         }
-        /**
-         * Clears image
-         */
         clearImage() {
             this.value = null;
             this.setChanged();
@@ -3343,9 +2494,6 @@ var duice;
         }
     }
     duice.Img = Img;
-    /**
-     * duice.TableFactory
-     */
     class TableFactory extends ListComponentFactory {
         getComponent(element) {
             var table = new Table(element);
@@ -3357,26 +2505,17 @@ var duice;
         }
     }
     duice.TableFactory = TableFactory;
-    /**
-     * duice.Table
-     */
     class Table extends ListComponent {
-        /**
-         * constructor table
-         * @param table
-         */
         constructor(table) {
             super(table);
             this.tbodies = new Array();
             this.table = table;
             addClass(this.table, 'duice-table');
-            // initializes caption
             var caption = this.table.querySelector('caption');
             if (caption) {
                 caption = executeExpression(caption, new Object());
                 initializeComponent(caption, new Object());
             }
-            // initializes head
             var thead = this.table.querySelector('thead');
             if (thead) {
                 thead.classList.add('duice-table__thead');
@@ -3389,7 +2528,6 @@ var duice;
                 thead = executeExpression(thead, new Object());
                 initializeComponent(thead, new Object());
             }
-            // clones body
             var tbody = this.table.querySelector('tbody');
             this.tbody = tbody.cloneNode(true);
             this.tbody.classList.add('duice-table__tbody');
@@ -3400,7 +2538,6 @@ var duice;
                 th.classList.add('duice-table__tbody-tr-td');
             });
             this.table.removeChild(tbody);
-            // initializes foot
             var tfoot = this.table.querySelector('tfoot');
             if (tfoot) {
                 tfoot.classList.add('duice-table__tfoot');
@@ -3414,42 +2551,25 @@ var duice;
                 initializeComponent(tfoot, new Object());
             }
         }
-        /**
-         * Sets selectable flag
-         * @param selectable
-         */
         setSelectable(selectable) {
             this.selectable = selectable;
         }
-        /**
-         * Sets enable flag
-         * @param editable
-         */
         setEditable(editable) {
             this.editable = editable;
         }
-        /**
-         * Updates table
-         * @param list
-         * @param obj
-         */
         update(list, obj) {
-            // checks changed source instance
             if (obj instanceof duice.Map) {
                 return;
             }
             var _this = this;
-            // remove previous rows
             for (var i = 0; i < this.tbodies.length; i++) {
                 this.table.removeChild(this.tbodies[i]);
             }
             this.tbodies.length = 0;
-            // creates new rows
             for (var index = 0; index < list.getRowCount(); index++) {
                 var map = list.getRow(index);
                 var tbody = this.createTbody(index, map);
                 tbody.dataset.duiceIndex = String(index);
-                // select index
                 if (this.selectable) {
                     tbody.classList.add('duice-table__tbody--selectable');
                     if (index === list.getIndex()) {
@@ -3462,7 +2582,6 @@ var duice;
                         });
                     }, true);
                 }
-                // drag and drop event
                 if (this.editable) {
                     tbody.setAttribute('draggable', 'true');
                     tbody.addEventListener('dragstart', function (event) {
@@ -3482,11 +2601,9 @@ var duice;
                         });
                     });
                 }
-                // appends body
                 this.table.appendChild(tbody);
                 this.tbodies.push(tbody);
             }
-            // not found row
             if (list.getRowCount() < 1) {
                 var emptyTbody = this.createEmptyTbody();
                 emptyTbody.style.pointerEvents = 'none';
@@ -3494,10 +2611,6 @@ var duice;
                 this.tbodies.push(emptyTbody);
             }
         }
-        /**
-         * Selects tbody element
-         * @param tbody
-         */
         selectTbody(index) {
             return __awaiter(this, void 0, void 0, function* () {
                 this.getList().suspendNotify();
@@ -3513,11 +2626,6 @@ var duice;
                 this.getList().resumeNotify();
             });
         }
-        /**
-         * Creates table body element
-         * @param index
-         * @param map
-         */
         createTbody(index, map) {
             var _this = this;
             var tbody = this.tbody.cloneNode(true);
@@ -3529,9 +2637,6 @@ var duice;
             initializeComponent(tbody, $context);
             return tbody;
         }
-        /**
-         * Creates empty table body element
-         */
         createEmptyTbody() {
             var emptyTbody = this.tbody.cloneNode(true);
             removeChildNodes(emptyTbody);
@@ -3540,16 +2645,14 @@ var duice;
             tr.classList.add('duice-table__tbody-tr');
             var td = document.createElement('td');
             td.classList.add('duice-table__tbody-tr-td');
-            // calculates colspan
             var colspan = 0;
-            var childNodes = this.tbody.querySelector('tr').childNodes;
+            var childNodes = this.tbody.querySelector('tr').children;
             for (var i = 0; i < childNodes.length; i++) {
                 if (childNodes[i].tagName === 'TH' || childNodes[i].tagName === 'TD') {
                     colspan++;
                 }
             }
             td.setAttribute('colspan', String(colspan));
-            // creates empty mesage
             var emptyMessage = document.createElement('div');
             emptyMessage.style.textAlign = 'center';
             emptyMessage.classList.add('duice-table__tbody--empty-message');
@@ -3560,9 +2663,6 @@ var duice;
         }
     }
     duice.Table = Table;
-    /**
-     * duice.UListFactory
-     */
     class UlFactory extends ListComponentFactory {
         getComponent(element) {
             var ul = new Ul(element);
@@ -3579,14 +2679,7 @@ var duice;
         }
     }
     duice.UlFactory = UlFactory;
-    /**
-     * duice.Ul
-     */
     class Ul extends ListComponent {
-        /**
-         * Constructor
-         * @param ul
-         */
         constructor(ul) {
             super(ul);
             this.lis = new Array();
@@ -3594,7 +2687,6 @@ var duice;
             this.ul = ul;
             addClass(this.ul, 'duice-ul');
             var li = ul.querySelector('li');
-            // checks child UList
             var childUl = li.querySelector('li > ul');
             if (childUl) {
                 this.childUl = li.removeChild(childUl);
@@ -3602,76 +2694,46 @@ var duice;
             else {
                 this.childUl = document.createElement('ul');
             }
-            // clone li
             this.li = li.cloneNode(true);
         }
-        /**
-         * Sets selectable flag
-         * @param selectable
-         */
         setSelectable(selectable) {
             this.selectable = selectable;
         }
-        /**
-         * Sets editable flag.
-         * @param editable
-         */
         setEditable(editable) {
             this.editable = editable;
         }
-        /**
-         * Sets hierarchy function options.
-         * @param idName
-         * @param parentIdName
-         */
         setHierarchy(idName, parentIdName) {
             this.hierarchy = { idName: idName, parentIdName: parentIdName };
         }
-        /**
-         * Sets foldable flag.
-         * @param foldable
-         */
         setFoldable(foldable) {
             this.foldable = foldable;
         }
-        /**
-         * Updates instance
-         * @param list
-         * @param obj
-         */
         update(list, obj) {
-            // checks changed source instance
             if (obj instanceof duice.Map) {
                 return;
             }
-            // initiates
             var _this = this;
             this.ul.innerHTML = '';
             this.lis.length = 0;
-            // root style
             this.ul.style.listStyle = 'none';
             this.ul.style.paddingLeft = '0px';
             if (this.hierarchy) {
                 this.createHierarchyRoot();
             }
-            // creates new rows
             for (var index = 0; index < list.getRowCount(); index++) {
                 var map = list.getRow(index);
                 var path = [];
-                // checks hierarchy
                 if (this.hierarchy) {
                     if (isNotEmpty(map.get(this.hierarchy.parentIdName))) {
                         continue;
                     }
                 }
-                // creates LI element
                 var li = this.createLi(index, map, Number(0));
                 if (this.selectable) {
                     li.classList.add('duice-ul__li--selectable');
                 }
                 this.ul.appendChild(li);
             }
-            // creates orphans
             if (this.hierarchy) {
                 for (var index = 0, size = list.getRowCount(); index < size; index++) {
                     if (this.isLiCreated(index) === false) {
@@ -3682,11 +2744,7 @@ var duice;
                 }
             }
         }
-        /**
-         * Creates hierarchy root
-         */
         createHierarchyRoot() {
-            // depth
             var depth = 0;
             if (this.editable)
                 depth += 24;
@@ -3695,10 +2753,8 @@ var duice;
             if (depth > 0) {
                 this.ul.style.paddingLeft = depth + 'px';
             }
-            // add editable event
             if (this.editable) {
                 var _this = this;
-                // if already constructed, skip.
                 if (this.ul.classList.contains('duice-ul--root')) {
                     return;
                 }
@@ -3723,11 +2779,6 @@ var duice;
                 });
             }
         }
-        /**
-         * Creates LI element reference to specified map includes child nodes.
-         * @param index
-         * @param map
-         */
         createLi(index, map, depth) {
             var _this = this;
             var li = this.li.cloneNode(true);
@@ -3741,7 +2792,6 @@ var duice;
             initializeComponent(li, $context);
             this.lis.push(li);
             li.dataset.duiceIndex = String(index);
-            // sets index
             if (this.selectable) {
                 if (index === this.getList().getIndex()) {
                     li.classList.add('duice-ul__li--index');
@@ -3754,7 +2804,6 @@ var duice;
                     });
                 });
             }
-            // editable
             if (this.editable) {
                 li.setAttribute('draggable', 'true');
                 li.addEventListener('dragstart', function (event) {
@@ -3775,7 +2824,6 @@ var duice;
                     });
                 });
             }
-            // creates child node
             if (this.hierarchy) {
                 depth++;
                 var childUl = this.childUl.cloneNode(true);
@@ -3797,7 +2845,6 @@ var duice;
                 if (hasChild) {
                     li.appendChild(childUl);
                 }
-                // sets fold 
                 if (this.foldable === true) {
                     if (hasChild) {
                         if (this.isFoldLi(map)) {
@@ -3824,14 +2871,8 @@ var duice;
                     }
                 }
             }
-            // return node element
             return li;
         }
-        /**
-         * selectLi
-         * @param index
-         * @param li
-         */
         selectLi(index, li) {
             return __awaiter(this, void 0, void 0, function* () {
                 this.getList().suspendNotify();
@@ -3843,10 +2884,6 @@ var duice;
                 this.getList().resumeNotify();
             });
         }
-        /**
-         * hasChild
-         * @param map
-         */
         hasChild(map) {
             var hierarchyIdValue = map.get(this.hierarchy.idName);
             for (var i = 0, size = this.list.getRowCount(); i < size; i++) {
@@ -3859,10 +2896,6 @@ var duice;
             }
             return false;
         }
-        /**
-         * Returns specified index is already creates LI element.
-         * @param index
-         */
         isLiCreated(index) {
             for (var i = 0, size = this.lis.length; i < size; i++) {
                 if (parseInt(this.lis[i].dataset.duiceIndex) === index) {
@@ -3871,10 +2904,6 @@ var duice;
             }
             return false;
         }
-        /**
-         * Return specified map is fold.
-         * @param map
-         */
         isFoldLi(map) {
             if (this.foldName[map.get(this.hierarchy.idName)] === true) {
                 return true;
@@ -3883,12 +2912,6 @@ var duice;
                 return false;
             }
         }
-        /**
-         * folds child nodes
-         * @param map
-         * @param li
-         * @param fold
-         */
         foldLi(map, li, fold) {
             if (fold) {
                 this.foldName[map.get(this.hierarchy.idName)] = true;
@@ -3901,52 +2924,34 @@ var duice;
                 li.classList.add('duice-ul__li--unfold');
             }
         }
-        /**
-         * Modes map element from index to index.
-         * @param fromIndex
-         * @param toIndex
-         */
         moveLi(fromIndex, toIndex) {
             return __awaiter(this, void 0, void 0, function* () {
-                // checks same index
                 if (fromIndex === toIndex) {
                     return;
                 }
-                //defines map
                 var sourceRow = this.list.getRow(fromIndex);
                 var targetRow = this.list.getRow(toIndex) || null;
-                // moving action
                 if (this.hierarchy) {
-                    // checks circular reference
                     if (this.isCircularReference(targetRow, sourceRow.get(this.hierarchy.idName))) {
                         throw 'Not allow to movem, becuase of Circular Reference.';
                     }
-                    // calls beforeChangeIndex 
                     if (this.list.eventListener.onBeforeMoveRow) {
                         if ((yield this.list.eventListener.onBeforeMoveRow.call(this.list, sourceRow, targetRow)) === false) {
                             throw 'canceled';
                         }
                     }
-                    // change parents
                     yield sourceRow.set(this.hierarchy.parentIdName, targetRow === null ? null : targetRow.get(this.hierarchy.idName));
-                    // calls 
                     if (this.list.eventListener.onAfterMoveRow) {
                         yield this.list.eventListener.onAfterMoveRow.call(this.list, sourceRow, targetRow);
                     }
-                    // notifies observers.
                     this.setChanged();
                     this.notifyObservers(null);
                 }
                 else {
-                    // changes row position
                     yield this.list.moveRow(fromIndex, toIndex);
                 }
             });
         }
-        /**
-         * Gets parent map
-         * @param map
-         */
         getParentMap(map) {
             var parentIdValue = map.get(this.hierarchy.parentIdName);
             for (var i = 0, size = this.list.getRowCount(); i < size; i++) {
@@ -3957,11 +2962,6 @@ var duice;
             }
             return null;
         }
-        /**
-         * Returns whether circular reference or not
-         * @param map
-         * @param idValue
-         */
         isCircularReference(map, idValue) {
             var parentMap = map;
             while (parentMap !== null) {
@@ -3976,7 +2976,6 @@ var duice;
         }
     }
     duice.Ul = Ul;
-    // Adds components
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('table[is="duice-table"]', duice.TableFactory));
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('ul[is="duice-ul"]', duice.UlFactory));
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('input[is="duice-input"]', duice.InputFactory));
@@ -3987,9 +2986,6 @@ var duice;
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('div[is="duice-div"]', duice.DivFactory));
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('*[is="duice-scriptlet"]', duice.ScriptletFactory));
 })(duice || (duice = {}));
-/**
- * DOMContentLoaded event process
- */
 document.addEventListener("DOMContentLoaded", function (event) {
     duice.initialize();
 });

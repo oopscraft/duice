@@ -1,12 +1,8 @@
 "use strict";
-/// <reference path="../duice.ts" />
 var duice;
 (function (duice) {
     let widget;
     (function (widget) {
-        /**
-         * duice.PaginationFactory
-         */
         class PaginationFactory extends duice.MapComponentFactory {
             getComponent(element) {
                 var pagination = new Pagination(element);
@@ -19,9 +15,6 @@ var duice;
             }
         }
         widget.PaginationFactory = PaginationFactory;
-        /**
-         * duice.Pagination
-         */
         class Pagination extends duice.MapComponent {
             constructor(ul) {
                 super(ul);
@@ -30,7 +23,6 @@ var duice;
                 this.page = 1;
                 this.ul = ul;
                 duice.addClass(this.ul, 'duice-widget-pagination');
-                // clones li
                 var li = this.ul.querySelector('li');
                 this.li = li.cloneNode(true);
                 li.parentNode.removeChild(li);
@@ -55,12 +47,10 @@ var duice;
                 var startPage = Math.floor((this.page - 1) / this.size) * this.size + 1;
                 var endPage = Math.min(startPage + this.size - 1, totalPage);
                 var _this = this;
-                // clear lis
                 for (var i = this.lis.length - 1; i >= 0; i--) {
                     this.lis[i].parentNode.removeChild(this.lis[i]);
                 }
                 this.lis.length = 0;
-                // creates previous item
                 const prevPage = startPage - 1;
                 var prevLi = this.createPageItem(prevPage, '');
                 prevLi.style.cursor = 'pointer';
@@ -72,7 +62,6 @@ var duice;
                     prevLi.style.pointerEvents = 'none';
                     prevLi.style.opacity = '0.5';
                 }
-                // creates page items
                 for (var i = startPage; i <= endPage; i++) {
                     const page = i;
                     var li = this.createPageItem(page, String(page));
@@ -85,7 +74,6 @@ var duice;
                         li.style.pointerEvents = 'none';
                     }
                 }
-                // creates next item
                 const nextPage = endPage + 1;
                 var nextLi = this.createPageItem(nextPage, '');
                 nextLi.style.cursor = 'pointer';
@@ -114,7 +102,6 @@ var duice;
             }
         }
         widget.Pagination = Pagination;
-        // Adds components
         duice.ComponentDefinitionRegistry.add(new duice.ComponentDefinition('ul[is="duice-widget-pagination"]', duice.widget.PaginationFactory));
     })(widget = duice.widget || (duice.widget = {}));
 })(duice || (duice = {}));

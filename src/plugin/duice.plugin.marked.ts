@@ -1,6 +1,6 @@
 /// <reference path="../duice.ts" />
-/// <reference path="./marked/marked.min.js"/>
-/// <reference path="./prism/prism.js" />
+declare var Prism:any;
+declare var marked:any;
 
 namespace duice {
 
@@ -31,7 +31,7 @@ namespace duice {
             update(map:duice.Map, obj:object){
                 this.value = map.get(this.getName());
                 this.div.innerHTML = marked(duice.defaultIfEmpty(this.value,''));
-                this.div.querySelectorAll('[class^=language-]').forEach(function(pre:HTMLElement){
+                this.div.querySelectorAll('[class^=language-]').forEach(function(pre:Element){
                     pre.classList.add('line-numbers');
                 });
                 // highlight

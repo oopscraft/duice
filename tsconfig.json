@@ -6,19 +6,18 @@
 	    "strictNullChecks": false,
 	    "noImplicitThis": false,
 		"module":"none",
+		"removeComments": true,
 		"allowJs": true,
-	    "watch": false
+		"watch": false,
 	},
 	"typedocOptions":{
 		"mode": "modules",
 		"out": "doc",
-		"theme": "typedoc-duice-theme"
+		/*"theme": "typedoc-duice-theme"*/
 	},
-	"files":[
-		 "./src/duice.ts"
-		,"./src/widget/duice.widget.pagination.ts"
-		,"src/plugin/duice.plugin.ckeditor.ts"
-		,"src/plugin/duice.plugin.simplemde.ts"
-		,"src/plugin/duice.plugin.marked.ts"
-	]
+	"include": ["./src/**/*.ts"]
+	// "files":[
+	// 	 "./src/duice.ts" 
+	// 	,"./src/plugin/duice.plugin.simplemde.ts"
+	// ]
 }

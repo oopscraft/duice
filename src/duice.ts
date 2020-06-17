@@ -3874,7 +3874,7 @@ namespace duice {
 
             // calculates colspan
             var colspan = 0;
-            var childNodes = this.tbody.querySelector('tr').childNodes;
+            var childNodes:HTMLCollection = this.tbody.querySelector('tr').children;
             for(var i = 0; i < childNodes.length; i ++ ){
                 if(childNodes[i].tagName === 'TH' || childNodes[i].tagName === 'TD'){
                     colspan ++;

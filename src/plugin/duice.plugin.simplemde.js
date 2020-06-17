@@ -1,15 +1,8 @@
 "use strict";
-/// <reference path="../duice.ts" />
-/// <reference path="./simplemde/simplemde.min.js" />
-/// <reference path="./marked/marked.min.js"/>
-/// <reference path="./prism/prism.js" />
 var duice;
 (function (duice) {
     let plugin;
     (function (plugin) {
-        /**
-         * duice.integrate.SimplemdeFactory
-         */
         class SimplemdeFactory extends duice.MapComponentFactory {
             getComponent(element) {
                 var config = null;
@@ -24,9 +17,6 @@ var duice;
             }
         }
         plugin.SimplemdeFactory = SimplemdeFactory;
-        /**
-         * duice.plugin.Ckeditor
-         */
         class Simplemde extends duice.MapComponent {
             constructor(div, config) {
                 super(div);
@@ -34,20 +24,15 @@ var duice;
                 this.div.classList.add('duice-plugin-simplemde');
                 this.textarea = document.createElement('textarea');
                 this.div.appendChild(this.textarea);
-                // setting default config
                 this.config = {
                     element: this.textarea,
                     autoDownloadFontAwesome: false,
-                    previewRender: function (plainText) {
-                        return marked(plainText); // Returns HTML from a custom parser
-                    },
                     previewRender: function (plainText, preview) {
                         preview.innerHTML = marked(plainText);
                         preview.querySelectorAll('[class^=language-]').forEach(function (pre) {
                             console.debug(pre);
                             pre.classList.add('line-numbers');
                         });
-                        // highlight
                         Prism.highlightAll();
                         return preview.innerHTML;
                     },
@@ -61,14 +46,12 @@ var duice;
                         },
                     }
                 };
-                // in case of custm config is exists.
                 if (config) {
                     for (var property in config) {
                         this.config[property] = config[property];
                     }
                 }
-                // creates simpleMDE
-                this.simpleMDE = new window.SimpleMDE(this.config);
+                this.simpleMDE = new SimpleMDE(this.config);
                 var _this = this;
                 this.simpleMDE.codemirror.on("blur", function () {
                     console.debug(_this.simpleMDE.value());
@@ -78,21 +61,16 @@ var duice;
             }
             update(map, obj) {
                 var value = map.get(this.getName());
-                // check value is empty
                 if (!value) {
                     value = '';
                 }
-                // checks value is changed
                 if (value !== this.simpleMDE.value()) {
-                    // sets value
                     this.simpleMDE.value(value);
-                    // Fixes CodeMirror bug (#344) - refresh not working after value changed.
                     var codemirror = this.simpleMDE.codemirror;
                     setTimeout(function () {
                         codemirror.refresh();
                     }.bind(codemirror), 0);
                 }
-                // handles readonly and disable
                 this.setDisable(map.isDisable(this.getName()));
                 this.setReadonly(map.isReadonly(this.getName()));
             }
@@ -113,7 +91,6 @@ var duice;
             }
         }
         plugin.Simplemde = Simplemde;
-        // Adds component definition
         duice.ComponentDefinitionRegistry.add(new duice.ComponentDefinition('div[is="duice-plugin-simplemde"]', duice.plugin.SimplemdeFactory));
     })(plugin = duice.plugin || (duice.plugin = {}));
 })(duice || (duice = {}));

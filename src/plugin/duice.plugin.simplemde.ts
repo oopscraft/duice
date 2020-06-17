@@ -1,7 +1,7 @@
 /// <reference path="../duice.ts" />
-/// <reference path="./simplemde/simplemde.min.js" />
-/// <reference path="./marked/marked.min.js"/>
-/// <reference path="./prism/prism.js" />
+declare var SimpleMDE:any;
+declare var Prism:any;
+declare var marked:any;
 
 namespace duice {
 
@@ -43,9 +43,9 @@ namespace duice {
                 this.config = {
                     element: this.textarea,
                     autoDownloadFontAwesome: false,
-                	previewRender: function(plainText:string):string {
-                		return marked(plainText); // Returns HTML from a custom parser
-                	},
+                	// previewRender: function(plainText:string):string {
+                	// 	return marked(plainText); // Returns HTML from a custom parser
+                	// },
                 	previewRender: function(plainText:string, preview:any):string { // Async method
                         preview.innerHTML = marked(plainText);
                         preview.querySelectorAll('[class^=language-]').forEach(function(pre:HTMLElement){
@@ -75,7 +75,7 @@ namespace duice {
                 }
 
                 // creates simpleMDE
-                this.simpleMDE = new window.SimpleMDE(this.config);
+                this.simpleMDE = new SimpleMDE(this.config);
                 var _this = this;
                 this.simpleMDE.codemirror.on("blur", function(){
                     console.debug(_this.simpleMDE.value());

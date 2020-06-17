@@ -1,6 +1,5 @@
 /// <reference path="../duice.ts" />
-/// <reference path="./ckeditor/ckeditor.js" />
-
+declare var CKEDITOR:any;
 
 namespace duice {
 
@@ -29,7 +28,7 @@ namespace duice {
             div:HTMLDivElement;
             config:object;
             textarea:HTMLTextAreaElement;
-            ckeditor:object;
+            ckeditor:any;
             constructor(div:HTMLDivElement, config:any){
                 super(div);
                 this.div = div;
