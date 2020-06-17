@@ -13,11 +13,9 @@
 	"typedocOptions":{
 		"mode": "modules",
 		"out": "doc",
-		/*"theme": "typedoc-duice-theme"*/
+		"theme": "minimal"
 	},
-	"include": ["./src/**/*.ts"]
-	// "files":[
-	// 	 "./src/duice.ts" 
-	// 	,"./src/plugin/duice.plugin.simplemde.ts"
-	// ]
+	"include": [
+		"./src/**/*.ts"
+	]
 }
