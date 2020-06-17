@@ -1,7 +1,6 @@
 /.settings
-/.dist
-/.doc
+/doc/
+/dist/
 *.log
 *.pid
 *.swp
-

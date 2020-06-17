@@ -13,7 +13,7 @@
 	"typedocOptions":{
 		"mode": "modules",
 		"out": "doc",
-		"theme": "minimal"
+		"theme": "default"
 	},
 	"include": [
 		"./src/**/*.ts"
