@@ -7,6 +7,8 @@
 <link rel="stylesheet" type="text/css" href="polyfill/normalize.css">
 <script src="polyfill/dataset.js"></script>
 <script src="polyfill/classList.js"></script>
+<link rel="stylesheet" type="text/css" href="polyfill/dialog.css">
+<script src="polyfill/dialog.js"></script>
 <script src="duice.js"></script>
 <link rel="stylesheet" type="text/css" href="duice.css">
 <script>
@@ -1386,7 +1388,7 @@ button {
 						console.err(e);
 					});
 				">duice.dialog</button>
-				<dialog is="duice-dialog" id="dialog" style="width:600px; padding:1rem;">
+				<div id="dialog" style="display:none; width:600px;">
 					<div style="text-align:center;">
 						<img is="duice-img" data-duice-bind="user,image" style="height:64px;"/>
 					</div>
@@ -1437,7 +1439,7 @@ button {
 					</table>
 					<button onclick="dialog.confirm();">confirm</button>
 					<button onclick="dialog.cancel();">cancel</button>
-				</dialog>
+				</div>
 			</div>
 		</div>
 	</section>

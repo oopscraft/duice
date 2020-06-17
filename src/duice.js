@@ -793,82 +793,40 @@ var duice;
     /**
      * duice.ModalEventListener
      */
-    class ModalEventListener {
+    class DialogEventListener {
     }
     /**
       * duice.Modal
       */
-    class Modal {
-        constructor() {
-            this.eventListener = new ModalEventListener();
+    class Dialog {
+        constructor(contentDiv) {
+            this.eventListener = new DialogEventListener();
             var _this = this;
-            this.container = document.createElement('div');
-            this.container.classList.add('duice-modal');
-            // creates header div
-            this.headerDiv = document.createElement('div');
-            this.headerDiv.classList.add('duice-modal__headerDiv');
-            this.container.appendChild(this.headerDiv);
-            // drag
-            this.headerDiv.style.cursor = 'move';
-            this.headerDiv.onmousedown = function (ev) {
-                var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-                pos3 = ev.clientX;
-                pos4 = ev.clientY;
-                getCurrentWindow().document.onmouseup = function (ev) {
-                    getCurrentWindow().document.onmousemove = null;
-                    getCurrentWindow().document.onmouseup = null;
-                };
-                getCurrentWindow().document.onmousemove = function (ev) {
-                    pos1 = pos3 - ev.clientX;
-                    pos2 = pos4 - ev.clientY;
-                    pos3 = ev.clientX;
-                    pos4 = ev.clientY;
-                    _this.container.style.left = (_this.container.offsetLeft - pos1) + 'px';
-                    _this.container.style.top = (_this.container.offsetTop - pos2) + 'px';
-                };
-            };
-            var titleIcon = document.createElement('span');
-            titleIcon.classList.add('duice-modal__headerDiv-titleIcon');
-            this.headerDiv.appendChild(titleIcon);
+            this.contentDiv = contentDiv;
+            this.dialog = document.createElement('dialog');
+            this.dialog.classList.add('duice-dialog');
+            // creates close button
             var closeButton = document.createElement('span');
-            closeButton.classList.add('duice-modal__headerDiv-closeButton');
+            closeButton.classList.add('duice-dialog__closeButton');
             closeButton.addEventListener('click', function (event) {
                 _this.close();
             });
-            this.headerDiv.appendChild(closeButton);
-            // creates body
-            this.bodyDiv = document.createElement('div');
-            this.bodyDiv.classList.add('duice-modal__bodyDiv');
-            this.container.appendChild(this.bodyDiv);
-            // adds blocker
-            this.blocker = new Blocker(getCurrentWindow().document.body);
-        }
-        /**
-         * Adds modal content
-         * @param content
-         */
-        addContent(content) {
-            this.bodyDiv.appendChild(content);
-        }
-        /**
-         * Removes modal content
-         * @param content
-         */
-        removeContent(content) {
-            this.bodyDiv.removeChild(content);
+            this.dialog.appendChild(closeButton);
         }
         /**
          * Shows modal
          */
         show() {
-            // block
-            this.blocker.block();
-            // opens modal
-            this.container.style.display = 'block';
-            this.container.style.position = 'absolute';
-            this.container.style.zIndex = String(getCurrentMaxZIndex() + 1);
-            getCurrentWindow().document.body.appendChild(this.container);
-            setPositionCentered(this.container);
+            // set content parent node
+            if (this.contentDiv.parentNode) {
+                this.contentParentNode = this.contentDiv.parentNode;
+            }
+            // adds contents
+            this.dialog.appendChild(this.contentDiv);
+            // show dialog modal
+            getCurrentWindow().document.body.appendChild(this.dialog);
+            this.contentDiv.style.display = 'block';
+            this.dialog.showModal();
             //return promise to delay
             return new Promise(function (resolve, reject) {
                 setTimeout(function () {
@@ -880,11 +838,13 @@ var duice;
          * Hides modal
          */
         hide() {
+            // restore parent node
+            if (this.contentParentNode) {
+                this.contentParentNode.appendChild(this.contentDiv);
+            }
             // closes modal
-            this.container.style.display = 'none';
-            getCurrentWindow().document.body.removeChild(this.container);
-            // unblock
-            this.blocker.unblock();
+            this.dialog.close();
+            this.contentDiv.style.display = 'none';
             // return promise to delay
             return new Promise(function (resolve, reject) {
                 setTimeout(function () {
@@ -1003,37 +963,38 @@ var duice;
             return this;
         }
     }
-    duice.Modal = Modal;
+    duice.Dialog = Dialog;
     /**
      * duice.Alert
      */
-    class Alert extends Modal {
+    class Alert extends Dialog {
         constructor(message) {
-            super();
+            let contentDiv = document.createElement('div');
+            super(contentDiv);
             this.message = message;
             var _this = this;
             // creates icon div
             this.iconDiv = document.createElement('div');
-            this.iconDiv.classList.add('duice-alert__bodyDiv-iconDiv');
+            this.iconDiv.classList.add('duice-alert__iconDiv');
             // creates message div
             this.messageDiv = document.createElement('div');
-            this.messageDiv.classList.add('duice-alert__bodyDiv-messageDiv');
+            this.messageDiv.classList.add('duice-alert__messageDiv');
             this.messageDiv.innerHTML = this.message;
             // creates button div
             this.buttonDiv = document.createElement('div');
-            this.buttonDiv.classList.add('duice-alert__bodyDiv-buttonDiv');
+            this.buttonDiv.classList.add('duice-alert__buttonDiv');
             // creates confirm button
             this.confirmButton = document.createElement('button');
-            this.confirmButton.classList.add('duice-alert__bodyDiv-buttonDiv-button');
-            this.confirmButton.classList.add('duice-alert__bodyDiv-buttonDiv-button--confirm');
+            this.confirmButton.classList.add('duice-alert__buttonDiv-button');
+            this.confirmButton.classList.add('duice-alert__buttonDiv-button--confirm');
             this.confirmButton.addEventListener('click', function (event) {
                 _this.close();
             });
             this.buttonDiv.appendChild(this.confirmButton);
             // appends parts to bodyDiv
-            this.addContent(this.iconDiv);
-            this.addContent(this.messageDiv);
-            this.addContent(this.buttonDiv);
+            contentDiv.appendChild(this.iconDiv);
+            contentDiv.appendChild(this.messageDiv);
+            contentDiv.appendChild(this.buttonDiv);
         }
         open() {
             var promise = super.open();
@@ -1053,41 +1014,42 @@ var duice;
     /**
      * duice.Confirm
      */
-    class Confirm extends Modal {
+    class Confirm extends Dialog {
         constructor(message) {
-            super();
+            let contentDiv = document.createElement('div');
+            super(contentDiv);
             this.message = message;
             var _this = this;
             // creates icon div
             this.iconDiv = document.createElement('div');
-            this.iconDiv.classList.add('duice-confirm__bodyDiv-iconDiv');
+            this.iconDiv.classList.add('duice-confirm__iconDiv');
             // creates message div
             this.messageDiv = document.createElement('div');
-            this.messageDiv.classList.add('duice-confirm__bodyDiv-messageDiv');
+            this.messageDiv.classList.add('duice-confirm__messageDiv');
             this.messageDiv.innerHTML = this.message;
             // creates button div
             this.buttonDiv = document.createElement('div');
-            this.buttonDiv.classList.add('duice-confirm__bodyDiv-buttonDiv');
+            this.buttonDiv.classList.add('duice-confirm__buttonDiv');
             // confirm button
             this.confirmButton = document.createElement('button');
-            this.confirmButton.classList.add('duice-confirm__bodyDiv-buttonDiv-button');
-            this.confirmButton.classList.add('duice-confirm__bodyDiv-buttonDiv-button--confirm');
+            this.confirmButton.classList.add('duice-confirm__buttonDiv-button');
+            this.confirmButton.classList.add('duice-confirm__buttonDiv-button--confirm');
             this.confirmButton.addEventListener('click', function (event) {
                 _this.confirm(true);
             });
             this.buttonDiv.appendChild(this.confirmButton);
             // cancel button
             this.cancelButton = document.createElement('button');
-            this.cancelButton.classList.add('duice-confirm__bodyDiv-buttonDiv-button');
-            this.cancelButton.classList.add('duice-confirm__bodyDiv-buttonDiv-button--cancel');
+            this.cancelButton.classList.add('duice-confirm__buttonDiv-button');
+            this.cancelButton.classList.add('duice-confirm__buttonDiv-button--cancel');
             this.cancelButton.addEventListener('click', function (event) {
                 _this.close(false);
             });
             this.buttonDiv.appendChild(this.cancelButton);
             // appends parts to bodyDiv
-            this.addContent(this.iconDiv);
-            this.addContent(this.messageDiv);
-            this.addContent(this.buttonDiv);
+            contentDiv.appendChild(this.iconDiv);
+            contentDiv.appendChild(this.messageDiv);
+            contentDiv.appendChild(this.buttonDiv);
         }
         open() {
             var promise = super.open();
@@ -1107,52 +1069,53 @@ var duice;
     /**
      * duice.Prompt
      */
-    class Prompt extends Modal {
+    class Prompt extends Dialog {
         constructor(message, defaultValue) {
-            super();
+            let contentDiv = document.createElement('div');
+            super(contentDiv);
             this.message = message;
             this.defaultValue = defaultValue;
             var _this = this;
             // creates icon div
             this.iconDiv = document.createElement('div');
-            this.iconDiv.classList.add('duice-prompt__bodyDiv-iconDiv');
+            this.iconDiv.classList.add('duice-prompt__iconDiv');
             // creates message div
             this.messageDiv = document.createElement('div');
-            this.messageDiv.classList.add('duice-prompt__bodyDiv-messageDiv');
+            this.messageDiv.classList.add('duice-prompt__messageDiv');
             this.messageDiv.innerHTML = this.message;
             // creates input div
             this.inputDiv = document.createElement('div');
-            this.inputDiv.classList.add('duice-prompt__bodyDiv-inputDiv');
+            this.inputDiv.classList.add('duice-prompt__inputDiv');
             this.input = document.createElement('input');
-            this.input.classList.add('duice-prompt__bodyDiv-inputDiv-input');
+            this.input.classList.add('duice-prompt__inputDiv-input');
             if (this.defaultValue) {
                 this.input.value = this.defaultValue;
             }
             this.inputDiv.appendChild(this.input);
             // creates button div
             this.buttonDiv = document.createElement('div');
-            this.buttonDiv.classList.add('duice-prompt__bodyDiv-buttonDiv');
+            this.buttonDiv.classList.add('duice-prompt__buttonDiv');
             // confirm button
             this.confirmButton = document.createElement('button');
-            this.confirmButton.classList.add('duice-prompt__bodyDiv-buttonDiv-button');
-            this.confirmButton.classList.add('duice-prompt__bodyDiv-buttonDiv-button--confirm');
+            this.confirmButton.classList.add('duice-prompt__buttonDiv-button');
+            this.confirmButton.classList.add('duice-prompt__buttonDiv-button--confirm');
             this.confirmButton.addEventListener('click', function (event) {
                 _this.confirm(_this.getValue());
             });
             this.buttonDiv.appendChild(this.confirmButton);
             // cancel button
             this.cancelButton = document.createElement('button');
-            this.cancelButton.classList.add('duice-prompt__bodyDiv-buttonDiv-button');
-            this.cancelButton.classList.add('duice-prompt__bodyDiv-buttonDiv-button--cancel');
+            this.cancelButton.classList.add('duice-prompt__buttonDiv-button');
+            this.cancelButton.classList.add('duice-prompt__buttonDiv-button--cancel');
             this.cancelButton.addEventListener('click', function (event) {
                 _this.close(false);
             });
             this.buttonDiv.appendChild(this.cancelButton);
             // appends parts to bodyDiv
-            this.addContent(this.iconDiv);
-            this.addContent(this.messageDiv);
-            this.addContent(this.inputDiv);
-            this.addContent(this.buttonDiv);
+            contentDiv.appendChild(this.iconDiv);
+            contentDiv.appendChild(this.messageDiv);
+            contentDiv.appendChild(this.inputDiv);
+            contentDiv.appendChild(this.buttonDiv);
         }
         open() {
             var promise = super.open();
@@ -1175,49 +1138,51 @@ var duice;
     /**
      * duice.Dialog
      * @param dialog
-     */
-    class Dialog extends Modal {
-        constructor(dialog) {
+
+    export class Dialog extends Modal {
+        dialog:HTMLDivElement;
+        parentNode:Node;
+        constructor(dialog:HTMLDivElement) {
             super();
             this.dialog = dialog;
             this.dialog.classList.add('duice-dialog');
             this.parentNode = this.dialog.parentNode;
         }
-        open(...args) {
+        open(...args:any[]) {
             this.dialog.style.display = 'block';
             this.addContent(this.dialog);
+
             // opens dialog
             try {
                 return super.open(...args);
-            }
-            catch (e) {
+            }catch(e){
                 this.dialog.style.display = 'none';
                 this.parentNode.appendChild(this.dialog);
                 throw e;
             }
         }
-        close(...args) {
+        close(...args:any[]) {
             var promise = super.close(...args);
             this.dialog.style.display = 'none';
             this.parentNode.appendChild(this.dialog);
             return promise;
         }
-        confirm(...args) {
+        confirm(...args:any[]) {
             var promise = super.confirm(...args);
             this.dialog.style.display = 'none';
             this.parentNode.appendChild(this.dialog);
             return promise;
         }
     }
-    duice.Dialog = Dialog;
+     */
     /**
      * Help function for duice.Dialog class
      * @param message
-     */
-    function dialog(dialog) {
+
+    export function dialog(dialog:HTMLDivElement) {
         return new duice.Dialog(dialog).open();
     }
-    duice.dialog = dialog;
+     */
     /**
      * duice.TabFolderEventListener
      */
@@ -4014,12 +3979,12 @@ var duice;
     // Adds components
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('table[is="duice-table"]', duice.TableFactory));
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('ul[is="duice-ul"]', duice.UlFactory));
-    duice.ComponentDefinitionRegistry.add(new ComponentDefinition('span[is="duice-span"]', duice.SpanFactory));
-    duice.ComponentDefinitionRegistry.add(new ComponentDefinition('div[is="duice-div"]', duice.DivFactory));
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('input[is="duice-input"]', duice.InputFactory));
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('select[is="duice-select"]', duice.SelectFactory));
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('textarea[is="duice-textarea"]', duice.TextareaFactory));
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('img[is="duice-img"]', duice.ImgFactory));
+    duice.ComponentDefinitionRegistry.add(new ComponentDefinition('span[is="duice-span"]', duice.SpanFactory));
+    duice.ComponentDefinitionRegistry.add(new ComponentDefinition('div[is="duice-div"]', duice.DivFactory));
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('*[is="duice-scriptlet"]', duice.ScriptletFactory));
 })(duice || (duice = {}));
 /**
