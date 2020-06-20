@@ -68,12 +68,6 @@ Contact <chomookun@gmail.com>
 ## duice.Map
 The Map object holds key-value pairs and remembers the original insertion order of the keys. Any value (both objects and primitive values) may be used as either a key or a value.
 
-| Method                                   | Description                                                                 |
-| ---------------------------------------- |:---------------------------------------------------------------------------:|
-| set(name:string, value:any):void         | Associates the specified value with the specified key in this map           |
-| get(name:string):any                     | Returns the value to which the specified key is mapped                      |
-
-
 <p class="codepen" data-height="478" data-theme-id="dark" data-default-tab="js,result" data-user="chomookun" data-slug-hash="rNxyaGQ" style="height: 478px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;" data-pen-title="duice.Map">
   <span>See the Pen <a href="https://codepen.io/chomookun/pen/rNxyaGQ">
   duice.Map</a> by chomookun (<a href="https://codepen.io/chomookun">@chomookun</a>)
@@ -84,17 +78,26 @@ The Map object holds key-value pairs and remembers the original insertion order 
 ## duice.List
 The duice.List class is a resizable array.
 
-| Tables        | Are           | Cool  |
-| ------------- |:-------------:| -----:|
-| col 3 is      | right-aligned | $1600 |
-| col 2 is      | centered      |   $12 |
-| zebra stripes | are neat      |    $1 |
-
-
 <p class="codepen" data-height="411" data-theme-id="dark" data-default-tab="js,result" data-user="chomookun" data-slug-hash="ZEQeGzZ" style="height: 411px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;" data-pen-title="duice.List">
   <span>See the Pen <a href="https://codepen.io/chomookun/pen/ZEQeGzZ">
   duice.List</a> by chomookun (<a href="https://codepen.io/chomookun">@chomookun</a>)
   on <a href="https://codepen.io">CodePen</a>.</span>
 </p>
 <script async src="https://static.codepen.io/assets/embed/ei.js"></script>
+
+## <span is="duice-span" data-duice-bind="map,name" ...></span>
+span custom tag.
+
+<p class="codepen" data-height="267" data-theme-id="dark" data-default-tab="html,result" data-user="chomookun" data-slug-hash="dyGvoJR" style="height: 267px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;" data-pen-title="&amp;lt;span is=&amp;quot;duice-span&amp;quot; data-duice-bind=&amp;quot;map,name&amp;quot; ...">
+  <span>See the Pen <a href="https://codepen.io/chomookun/pen/dyGvoJR">
+  &lt;span is=&quot;duice-span&quot; data-duice-bind=&quot;map,name&quot; ...</a> by chomookun (<a href="https://codepen.io/chomookun">@chomookun</a>)
+  on <a href="https://codepen.io">CodePen</a>.</span>
+</p>
+<script async src="https://static.codepen.io/assets/embed/ei.js"></script>
+
+
+
+
+
+
 
