@@ -73,6 +73,7 @@ The Map object holds key-value pairs and remembers the original insertion order 
 | set(name:string, value:any):void         | Associates the specified value with the specified key in this map           |
 | get(name:string):any                     | Returns the value to which the specified key is mapped                      |
 
+
 <p class="codepen" data-height="478" data-theme-id="dark" data-default-tab="js,result" data-user="chomookun" data-slug-hash="rNxyaGQ" style="height: 478px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;" data-pen-title="duice.Map">
   <span>See the Pen <a href="https://codepen.io/chomookun/pen/rNxyaGQ">
   duice.Map</a> by chomookun (<a href="https://codepen.io/chomookun">@chomookun</a>)
@@ -89,7 +90,8 @@ The duice.List class is a resizable array.
 | col 2 is      | centered      |   $12 |
 | zebra stripes | are neat      |    $1 |
 
-<p class="codepen" data-height="265" data-theme-id="dark" data-default-tab="js,result" data-user="chomookun" data-slug-hash="ZEQeGzZ" style="height: 265px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;" data-pen-title="duice.List">
+
+<p class="codepen" data-height="411" data-theme-id="dark" data-default-tab="js,result" data-user="chomookun" data-slug-hash="ZEQeGzZ" style="height: 411px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;" data-pen-title="duice.List">
   <span>See the Pen <a href="https://codepen.io/chomookun/pen/ZEQeGzZ">
   duice.List</a> by chomookun (<a href="https://codepen.io/chomookun">@chomookun</a>)
   on <a href="https://codepen.io">CodePen</a>.</span>
