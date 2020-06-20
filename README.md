@@ -113,7 +113,7 @@ data-bindable div custom element
 
 ------------------------------------------------------------------------------------------
 
-## <input is="duice-input" type="text" data-duice-bind="[map],[name]" ...
+## <input is="duice-input" type="text" data-duice-bind="[map],[name]" .../>
 data-bindable input custom element.
 
 <p class="codepen" data-height="265" data-theme-id="dark" data-default-tab="js,result" data-user="chomookun" data-slug-hash="XWXMbwj" style="height: 265px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;" data-pen-title="&amp;lt;input is=&amp;quot;duice-input&amp;quot; type=&amp;quot;text&amp;quot; data-duice-bind=&amp;quot;[map],[name]&amp;quot; ...">
