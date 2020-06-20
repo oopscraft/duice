@@ -68,13 +68,13 @@ Contact <chomookun@gmail.com>
 ## Examples
 
 ### duice.Map
-<iframe height="268" style="width: 100%;" scrolling="no" title="duice.Map" src="https://codepen.io/chomookun/embed/rNxyaGQ?height=400&theme-id=dark&default-tab=js,result" frameborder="no" allowtransparency="true" allowfullscreen="true">
+<iframe height="268" style="width: 100%;" scrolling="no" title="duice.Map" src="https://codepen.io/chomookun/embed/rNxyaGQ?height=400&theme-id=dark&default-tab=js" frameborder="no" allowtransparency="true" allowfullscreen="true">
   See the Pen <a href='https://codepen.io/chomookun/pen/rNxyaGQ'>duice.Map</a> by chomookun
   (<a href='https://codepen.io/chomookun'>@chomookun</a>) on <a href='https://codepen.io'>CodePen</a>.
 </iframe>
 
 ### duice.List
-<iframe height="395" style="width: 100%;" scrolling="no" title="duice.List" src="https://codepen.io/chomookun/embed/ZEQeGzZ?height=395&theme-id=dark&default-tab=js,result" frameborder="no" allowtransparency="true" allowfullscreen="true">
+<iframe height="395" style="width: 100%;" scrolling="no" title="duice.List" src="https://codepen.io/chomookun/embed/ZEQeGzZ?height=395&theme-id=dark&default-tab=js" frameborder="no" allowtransparency="true" allowfullscreen="true">
   See the Pen <a href='https://codepen.io/chomookun/pen/ZEQeGzZ'>duice.List</a> by chomookun
   (<a href='https://codepen.io/chomookun'>@chomookun</a>) on <a href='https://codepen.io'>CodePen</a>.
 </iframe>
