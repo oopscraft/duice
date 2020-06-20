@@ -75,6 +75,8 @@ The Map object holds key-value pairs and remembers the original insertion order 
 </p>
 <script async src="https://static.codepen.io/assets/embed/ei.js"></script>
 
+------------------------------------------------------------------------------------------
+
 ## duice.List
 The duice.List class is a resizable array.
 
@@ -85,6 +87,8 @@ The duice.List class is a resizable array.
 </p>
 <script async src="https://static.codepen.io/assets/embed/ei.js"></script>
 
+------------------------------------------------------------------------------------------
+
 ## <span is="duice-span" data-duice-bind="[map],[name]" ...></span>
 data-bindable span custom element.
 
@@ -94,6 +98,8 @@ data-bindable span custom element.
   on <a href="https://codepen.io">CodePen</a>.</span>
 </p>
 <script async src="https://static.codepen.io/assets/embed/ei.js"></script>
+
+------------------------------------------------------------------------------------------
 
 ## <div is="duice-div" data-duice-bind="[map],[name]" ...></div>
 data-bindable div custom element
