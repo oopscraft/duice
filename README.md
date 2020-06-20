@@ -65,15 +65,17 @@ Contact <chomookun@gmail.com>
 
 ------------------------------------------------------------------------------------------
 
-## Examples
+## duice.Map
+The Map object holds key-value pairs and remembers the original insertion order of the keys. Any value (both objects and primitive values) may be used as either a key or a value.
 
-### duice.Map
 <iframe height="268" style="width: 100%;" scrolling="no" title="duice.Map" src="https://codepen.io/chomookun/embed/rNxyaGQ?height=400&theme-id=dark&default-tab=js" frameborder="no" allowtransparency="true" allowfullscreen="true">
   See the Pen <a href='https://codepen.io/chomookun/pen/rNxyaGQ'>duice.Map</a> by chomookun
   (<a href='https://codepen.io/chomookun'>@chomookun</a>) on <a href='https://codepen.io'>CodePen</a>.
 </iframe>
 
-### duice.List
+## duice.List
+The duice.List class is a resizable array.
+
 <iframe height="395" style="width: 100%;" scrolling="no" title="duice.List" src="https://codepen.io/chomookun/embed/ZEQeGzZ?height=395&theme-id=dark&default-tab=js" frameborder="no" allowtransparency="true" allowfullscreen="true">
   See the Pen <a href='https://codepen.io/chomookun/pen/ZEQeGzZ'>duice.List</a> by chomookun
   (<a href='https://codepen.io/chomookun'>@chomookun</a>) on <a href='https://codepen.io'>CodePen</a>.
