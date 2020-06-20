@@ -68,7 +68,7 @@ Contact <chomookun@gmail.com>
 ## duice.Map
 The Map object holds key-value pairs and remembers the original insertion order of the keys. Any value (both objects and primitive values) may be used as either a key or a value.
 
-<p class="codepen" data-height="478" data-theme-id="dark" data-default-tab="js,result" data-user="chomookun" data-slug-hash="rNxyaGQ" style="height: 478px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;" data-pen-title="duice.Map">
+<p class="codepen" data-height="478" data-theme-id="dark" data-default-tab="js" data-user="chomookun" data-slug-hash="rNxyaGQ" style="height: 478px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;" data-pen-title="duice.Map">
   <span>See the Pen <a href="https://codepen.io/chomookun/pen/rNxyaGQ">
   duice.Map</a> by chomookun (<a href="https://codepen.io/chomookun">@chomookun</a>)
   on <a href="https://codepen.io">CodePen</a>.</span>
@@ -78,7 +78,7 @@ The Map object holds key-value pairs and remembers the original insertion order 
 ## duice.List
 The duice.List class is a resizable array.
 
-<p class="codepen" data-height="411" data-theme-id="dark" data-default-tab="js,result" data-user="chomookun" data-slug-hash="ZEQeGzZ" style="height: 411px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;" data-pen-title="duice.List">
+<p class="codepen" data-height="411" data-theme-id="dark" data-default-tab="js" data-user="chomookun" data-slug-hash="ZEQeGzZ" style="height: 411px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;" data-pen-title="duice.List">
   <span>See the Pen <a href="https://codepen.io/chomookun/pen/ZEQeGzZ">
   duice.List</a> by chomookun (<a href="https://codepen.io/chomookun">@chomookun</a>)
   on <a href="https://codepen.io">CodePen</a>.</span>
