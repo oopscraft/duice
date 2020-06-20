@@ -67,9 +67,10 @@ Contact <chomookun@gmail.com>
 
 ## duice.Map
 The Map object holds key-value pairs and remembers the original insertion order of the keys. Any value (both objects and primitive values) may be used as either a key or a value.
-| Method                           | Description                                   |
-| -------------------------------- |:---------------------------------------------:|
-| set(name:string, value:any)      | right-aligned                                 |
+| Method                                   | Description                                                                 |
+| ---------------------------------------- |:---------------------------------------------------------------------------:|
+| set(name:string, value:any):void         | Associates the specified value with the specified key in this map           |
+| get(name:string):any                     | Returns the value to which the specified key is mapped                      |
 
 <iframe height="400" style="width: 100%;" scrolling="no" title="duice.Map" src="https://codepen.io/chomookun/embed/rNxyaGQ?height=400&theme-id=dark&default-tab=js" frameborder="no" allowtransparency="true" allowfullscreen="true">
   See the Pen <a href='https://codepen.io/chomookun/pen/rNxyaGQ'>duice.Map</a> by chomookun
