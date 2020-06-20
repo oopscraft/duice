@@ -21,6 +21,16 @@ You can use it with JQuery, AngularJS and so on, also Responsive UI framework li
 
 ------------------------------------------------------------------------------------------
 
+## Examples
+
+### duice.Map
+<iframe height="265" style="width: 100%;" scrolling="no" title="duice.Map" src="https://codepen.io/chomookun/embed/rNxyaGQ?height=265&theme-id=dark&default-tab=js,result" frameborder="no" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href='https://codepen.io/chomookun/pen/rNxyaGQ'>duice.Map</a> by chomookun
+  (<a href='https://codepen.io/chomookun'>@chomookun</a>) on <a href='https://codepen.io'>CodePen</a>.
+</iframe>
+
+------------------------------------------------------------------------------------------
+
 ## References 
 
 ### Demo page
@@ -63,14 +73,5 @@ Licence: LGPL(GNU Lesser General Public License version 3)
 Copyright (C) 2017 duice.oopscraft.net
 Contact <chomookun@gmail.com>
 
-------------------------------------------------------------------------------------------
-
-## Examples
-
-### duice.Map
-<iframe height="265" style="width: 100%;" scrolling="no" title="duice.Map" src="https://codepen.io/chomookun/embed/rNxyaGQ?height=265&theme-id=dark&default-tab=js,result" frameborder="no" allowtransparency="true" allowfullscreen="true">
-  See the Pen <a href='https://codepen.io/chomookun/pen/rNxyaGQ'>duice.Map</a> by chomookun
-  (<a href='https://codepen.io/chomookun'>@chomookun</a>) on <a href='https://codepen.io'>CodePen</a>.
-</iframe>
 
 
