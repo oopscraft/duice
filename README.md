@@ -65,7 +65,9 @@ Contact <chomookun@gmail.com>
 
 ------------------------------------------------------------------------------------------
 
-## duice.Map
+## Data Structure
+
+### duice.Map
 The Map object holds key-value pairs and remembers the original insertion order of the keys. Any value (both objects and primitive values) may be used as either a key or a value.
 
 <p class="codepen" data-height="478" data-theme-id="dark" data-default-tab="js" data-user="chomookun" data-slug-hash="rNxyaGQ" style="height: 478px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;" data-pen-title="duice.Map">
@@ -75,9 +77,7 @@ The Map object holds key-value pairs and remembers the original insertion order 
 </p>
 <script async src="https://static.codepen.io/assets/embed/ei.js"></script>
 
-------------------------------------------------------------------------------------------
-
-## duice.List
+### duice.List
 The duice.List class is a resizable array.
 
 <p class="codepen" data-height="411" data-theme-id="dark" data-default-tab="js" data-user="chomookun" data-slug-hash="ZEQeGzZ" style="height: 411px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;" data-pen-title="duice.List">
@@ -89,7 +89,9 @@ The duice.List class is a resizable array.
 
 ------------------------------------------------------------------------------------------
 
-## <span is="duice-span" data-duice-bind="[map],[name]" ...></span>
+## Map Component
+
+### <span is="duice-span" data-duice-bind="[map],[name]" ...></span>
 data-bindable span custom element.
 
 <p class="codepen" data-height="267" data-theme-id="dark" data-default-tab="html,result" data-user="chomookun" data-slug-hash="dyGvoJR" style="height: 267px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;" data-pen-title="&amp;lt;span is=&amp;quot;duice-span&amp;quot; data-duice-bind=&amp;quot;map,name&amp;quot; ...">
@@ -99,9 +101,7 @@ data-bindable span custom element.
 </p>
 <script async src="https://static.codepen.io/assets/embed/ei.js"></script>
 
-------------------------------------------------------------------------------------------
-
-## <div is="duice-div" data-duice-bind="[map],[name]" ...></div>
+### <div is="duice-div" data-duice-bind="[map],[name]" ...></div>
 data-bindable div custom element
 
 <p class="codepen" data-height="260" data-theme-id="dark" data-default-tab="html,result" data-user="chomookun" data-slug-hash="XWXMbYX" style="height: 260px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;" data-pen-title="&amp;lt;div is=&amp;quot;duice-div&amp;quot; data-duice-bind=&amp;quot;map,name&amp;quot; ...">
@@ -111,9 +111,7 @@ data-bindable div custom element
 </p>
 <script async src="https://static.codepen.io/assets/embed/ei.js"></script>
 
-------------------------------------------------------------------------------------------
-
-## <input is="duice-input" type="text" data-duice-bind="[map],[name]" .../>
+### <input is="duice-input" type="text" data-duice-bind="[map],[name]" .../>
 data-bindable input custom element.
 
 <p class="codepen" data-height="265" data-theme-id="dark" data-default-tab="js,result" data-user="chomookun" data-slug-hash="XWXMbwj" style="height: 265px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;" data-pen-title="&amp;lt;input is=&amp;quot;duice-input&amp;quot; type=&amp;quot;text&amp;quot; data-duice-bind=&amp;quot;[map],[name]&amp;quot; ...">
