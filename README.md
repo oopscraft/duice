@@ -67,6 +67,7 @@ Contact <chomookun@gmail.com>
 
 ## duice.Map
 The Map object holds key-value pairs and remembers the original insertion order of the keys. Any value (both objects and primitive values) may be used as either a key or a value.
+
 | Method                                   | Description                                                                 |
 | ---------------------------------------- |:---------------------------------------------------------------------------:|
 | set(name:string, value:any):void         | Associates the specified value with the specified key in this map           |
@@ -79,6 +80,7 @@ The Map object holds key-value pairs and remembers the original insertion order 
 
 ## duice.List
 The duice.List class is a resizable array.
+
 | Tables        | Are           | Cool  |
 | ------------- |:-------------:| -----:|
 | col 3 is      | right-aligned | $1600 |
