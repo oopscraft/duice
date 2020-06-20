@@ -73,10 +73,12 @@ The Map object holds key-value pairs and remembers the original insertion order 
 | set(name:string, value:any):void         | Associates the specified value with the specified key in this map           |
 | get(name:string):any                     | Returns the value to which the specified key is mapped                      |
 
-<iframe height="400" style="width: 100%;" scrolling="no" title="duice.Map" src="https://codepen.io/chomookun/embed/rNxyaGQ?height=400&theme-id=dark&default-tab=js" frameborder="no" allowtransparency="true" allowfullscreen="true">
-  See the Pen <a href='https://codepen.io/chomookun/pen/rNxyaGQ'>duice.Map</a> by chomookun
-  (<a href='https://codepen.io/chomookun'>@chomookun</a>) on <a href='https://codepen.io'>CodePen</a>.
-</iframe>
+<p class="codepen" data-height="478" data-theme-id="dark" data-default-tab="js,result" data-user="chomookun" data-slug-hash="rNxyaGQ" style="height: 478px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;" data-pen-title="duice.Map">
+  <span>See the Pen <a href="https://codepen.io/chomookun/pen/rNxyaGQ">
+  duice.Map</a> by chomookun (<a href="https://codepen.io/chomookun">@chomookun</a>)
+  on <a href="https://codepen.io">CodePen</a>.</span>
+</p>
+<script async src="https://static.codepen.io/assets/embed/ei.js"></script>
 
 ## duice.List
 The duice.List class is a resizable array.
@@ -86,12 +88,6 @@ The duice.List class is a resizable array.
 | col 3 is      | right-aligned | $1600 |
 | col 2 is      | centered      |   $12 |
 | zebra stripes | are neat      |    $1 |
-
-<iframe height="395" style="width: 100%;" scrolling="no" title="duice.List" src="https://codepen.io/chomookun/embed/ZEQeGzZ?height=395&theme-id=dark&default-tab=js" frameborder="no" allowtransparency="true" allowfullscreen="true">
-  See the Pen <a href='https://codepen.io/chomookun/pen/ZEQeGzZ'>duice.List</a> by chomookun
-  (<a href='https://codepen.io/chomookun'>@chomookun</a>) on <a href='https://codepen.io'>CodePen</a>.
-</iframe>
-
 
 <p class="codepen" data-height="265" data-theme-id="dark" data-default-tab="js,result" data-user="chomookun" data-slug-hash="ZEQeGzZ" style="height: 265px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;" data-pen-title="duice.List">
   <span>See the Pen <a href="https://codepen.io/chomookun/pen/ZEQeGzZ">
