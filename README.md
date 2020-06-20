@@ -85,8 +85,8 @@ The duice.List class is a resizable array.
 </p>
 <script async src="https://static.codepen.io/assets/embed/ei.js"></script>
 
-## <span is="duice-span" data-duice-bind="map,name" ...></span>
-span custom tag.
+## <span is="duice-span" data-duice-bind="[map],[name]" ...></span>
+data-bindable span custom element.
 
 <p class="codepen" data-height="267" data-theme-id="dark" data-default-tab="html,result" data-user="chomookun" data-slug-hash="dyGvoJR" style="height: 267px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;" data-pen-title="&amp;lt;span is=&amp;quot;duice-span&amp;quot; data-duice-bind=&amp;quot;map,name&amp;quot; ...">
   <span>See the Pen <a href="https://codepen.io/chomookun/pen/dyGvoJR">
@@ -95,9 +95,15 @@ span custom tag.
 </p>
 <script async src="https://static.codepen.io/assets/embed/ei.js"></script>
 
+## <div is="duice-div" data-duice-bind="[map],[name]" ...></div>
+data-bindable div custom element
 
-
-
+<p class="codepen" data-height="260" data-theme-id="dark" data-default-tab="result" data-user="chomookun" data-slug-hash="XWXMbYX" style="height: 260px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;" data-pen-title="&amp;lt;div is=&amp;quot;duice-div&amp;quot; data-duice-bind=&amp;quot;map,name&amp;quot; ...">
+  <span>See the Pen <a href="https://codepen.io/chomookun/pen/XWXMbYX">
+  &lt;div is=&quot;duice-div&quot; data-duice-bind=&quot;map,name&quot; ...</a> by chomookun (<a href="https://codepen.io/chomookun">@chomookun</a>)
+  on <a href="https://codepen.io">CodePen</a>.</span>
+</p>
+<script async src="https://static.codepen.io/assets/embed/ei.js"></script>
 
 
 
