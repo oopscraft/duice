@@ -1,1 +1,5 @@
 theme: jekyll-theme-architect
+
+# Disqus
+disqus: True
+disqus_shortname: xxxxxxxx
