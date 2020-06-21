@@ -32,13 +32,7 @@ You can use it with JQuery, AngularJS and so on, also Responsive UI framework li
 <a href ="http://application.oopscraft.net/admin" target="_blank">
 	http://application.oopscraft.net/admin
 </a>
-
 user/pass : test/test11!!
-
-
-------------------------------------------------------------------------------------------
-
-## More Information
 
 ### Official Website
 <a href="https://oopscraft.github.io/duice" target="_blank">
