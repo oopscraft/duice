@@ -125,5 +125,20 @@ data-bindable input number custom tag.
 </p>
 <script async src="https://static.codepen.io/assets/embed/ei.js"></script>
 
+### <input is="duice-input" type="checkbox" data-duice-bind="[map],[name]" .../>
+input checkbox
+
+<p class="codepen" data-height="323" data-theme-id="dark" data-default-tab="js,result" data-user="chomookun" data-slug-hash="dyGvWPX" style="height: 323px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;" data-pen-title="&amp;lt;input is=&amp;quot;duice-input&amp;quot; type=&amp;quot;checkbox&amp;quot; data-duice-bind=&amp;quot;[map],[name]&amp;quot; .../&amp;gt;">
+  <span>See the Pen <a href="https://codepen.io/chomookun/pen/dyGvWPX">
+  &lt;input is=&quot;duice-input&quot; type=&quot;checkbox&quot; data-duice-bind=&quot;[map],[name]&quot; .../&gt;</a> by chomookun (<a href="https://codepen.io/chomookun">@chomookun</a>)
+  on <a href="https://codepen.io">CodePen</a>.</span>
+</p>
+<script async src="https://static.codepen.io/assets/embed/ei.js"></script>
+
+
+
+
+
+
 
 
