@@ -28,14 +28,6 @@ namespace duice {
             element.classList.add(className);
         }
 	}
-    
-    /**
-     * initialize
-     */
-	export function initialize() {
-        // initializes component
-        duice.initializeComponent(document, {});
-    }
 
     /**
      * Component definition registry
@@ -2570,40 +2562,40 @@ namespace duice {
      */
     export class InputFactory extends MapComponentFactory {
         getComponent(element:HTMLInputElement):Input {
-            var input;
-            var type = element.getAttribute('type');
+            let input = null;
+            let type = element.getAttribute('type');
             switch(type){
-            case 'text':
-                input = new InputText(element);
-                if(element.dataset.duiceMask){
-                    input.setMask(element.dataset.duiceMask);
-                }
-                break;
-            case 'number':
-                input = new InputNumber(element);
-                if(element.dataset.duiceMask){
-                    input.setMask(parseInt(element.dataset.duiceMask));
-                }
-                break;
-            case 'checkbox':
-                input = new InputCheckbox(element);
-                break;
-            case 'radio':
-                input = new InputRadio(element);
-                break;
-            case 'date':
-            case 'datetime-local':
-                input = new InputDate(element);
-                if(element.dataset.duiceMask){
-                    input.setMask(element.dataset.duiceMask);
-                }
-                break;
-            default:
-                input = new InputGeneric(element);
+                case 'text':
+                    input = new InputText(element);
+                    if(element.dataset.duiceMask){
+                        input.setMask(element.dataset.duiceMask);
+                    }
+                    break;
+                case 'number':
+                    input = new InputNumber(element);
+                    if(element.dataset.duiceMask){
+                        input.setMask(parseInt(element.dataset.duiceMask));
+                    }
+                    break;
+                case 'checkbox':
+                    input = new InputCheckbox(element);
+                    break;
+                case 'radio':
+                    input = new InputRadio(element);
+                    break;
+                case 'date':
+                case 'datetime-local':
+                    input = new InputDate(element);
+                    if(element.dataset.duiceMask){
+                        input.setMask(element.dataset.duiceMask);
+                    }
+                    break;
+                default:
+                    input = new InputGeneric(element);
             }
             
             // bind
-            var bind = element.dataset.duiceBind.split(',');
+            let bind = element.dataset.duiceBind.split(',');
             input.bind(this.getContextProperty(bind[0]), bind[1]);
             return input;
         }
@@ -3695,7 +3687,7 @@ namespace duice {
             var caption = <HTMLTableCaptionElement>this.table.querySelector('caption');
             if(caption){
                 caption = executeExpression(<HTMLElement>caption, new Object());
-                initializeComponent(caption, new Object());
+                duice.initializeComponent(caption, new Object());
             }
             
             // initializes head
@@ -3709,7 +3701,7 @@ namespace duice {
                     th.classList.add('duice-table__thead-tr-th');
                 });
                 thead = executeExpression(<HTMLElement>thead, new Object());
-                initializeComponent(thead, new Object());
+                duice.initializeComponent(thead, new Object());
             }
             
             // clones body
@@ -3735,7 +3727,7 @@ namespace duice {
                     td.classList.add('duice-table__tfoot-tr-td');
                 });
                 tfoot = executeExpression(<HTMLElement>tfoot, new Object());
-                initializeComponent(tfoot, new Object());
+                duice.initializeComponent(tfoot, new Object());
             }
         }
 
@@ -3856,7 +3848,7 @@ namespace duice {
             $context['index'] = index;
             $context[this.item] = map;
             tbody = executeExpression(<HTMLElement>tbody,$context);
-            initializeComponent(tbody,$context);
+            duice.initializeComponent(tbody,$context);
             return tbody;
         }
         
@@ -4092,7 +4084,7 @@ namespace duice {
             $context['hasChild'] = (this.hierarchy ? this.hasChild(map) : false);
             $context[this.item] = map;
             li = executeExpression(<HTMLElement>li,$context);
-            initializeComponent(li,$context);
+            duice.initializeComponent(li,$context);
             this.lis.push(li);
             li.dataset.duiceIndex = String(index);
             
@@ -4354,7 +4346,7 @@ namespace duice {
  * DOMContentLoaded event process
  */
 document.addEventListener("DOMContentLoaded", function(event) {
-    duice.initialize();
+    duice.initializeComponent(document, {});
 });
 
 

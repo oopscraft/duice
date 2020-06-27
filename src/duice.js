@@ -20,10 +20,6 @@ var duice;
         }
     }
     duice.addClass = addClass;
-    function initialize() {
-        duice.initializeComponent(document, {});
-    }
-    duice.initialize = initialize;
     duice.ComponentDefinitionRegistry = {
         componentDefinitions: new Array(),
         add(componentDefinition) {
@@ -1614,8 +1610,8 @@ var duice;
     duice.Div = Div;
     class InputFactory extends MapComponentFactory {
         getComponent(element) {
-            var input;
-            var type = element.getAttribute('type');
+            let input = null;
+            let type = element.getAttribute('type');
             switch (type) {
                 case 'text':
                     input = new InputText(element);
@@ -1645,7 +1641,7 @@ var duice;
                 default:
                     input = new InputGeneric(element);
             }
-            var bind = element.dataset.duiceBind.split(',');
+            let bind = element.dataset.duiceBind.split(',');
             input.bind(this.getContextProperty(bind[0]), bind[1]);
             return input;
         }
@@ -2514,7 +2510,7 @@ var duice;
             var caption = this.table.querySelector('caption');
             if (caption) {
                 caption = executeExpression(caption, new Object());
-                initializeComponent(caption, new Object());
+                duice.initializeComponent(caption, new Object());
             }
             var thead = this.table.querySelector('thead');
             if (thead) {
@@ -2526,7 +2522,7 @@ var duice;
                     th.classList.add('duice-table__thead-tr-th');
                 });
                 thead = executeExpression(thead, new Object());
-                initializeComponent(thead, new Object());
+                duice.initializeComponent(thead, new Object());
             }
             var tbody = this.table.querySelector('tbody');
             this.tbody = tbody.cloneNode(true);
@@ -2548,7 +2544,7 @@ var duice;
                     td.classList.add('duice-table__tfoot-tr-td');
                 });
                 tfoot = executeExpression(tfoot, new Object());
-                initializeComponent(tfoot, new Object());
+                duice.initializeComponent(tfoot, new Object());
             }
         }
         setSelectable(selectable) {
@@ -2634,7 +2630,7 @@ var duice;
             $context['index'] = index;
             $context[this.item] = map;
             tbody = executeExpression(tbody, $context);
-            initializeComponent(tbody, $context);
+            duice.initializeComponent(tbody, $context);
             return tbody;
         }
         createEmptyTbody() {
@@ -2789,7 +2785,7 @@ var duice;
             $context['hasChild'] = (this.hierarchy ? this.hasChild(map) : false);
             $context[this.item] = map;
             li = executeExpression(li, $context);
-            initializeComponent(li, $context);
+            duice.initializeComponent(li, $context);
             this.lis.push(li);
             li.dataset.duiceIndex = String(index);
             if (this.selectable) {
@@ -2987,5 +2983,5 @@ var duice;
     duice.ComponentDefinitionRegistry.add(new ComponentDefinition('*[is="duice-scriptlet"]', duice.ScriptletFactory));
 })(duice || (duice = {}));
 document.addEventListener("DOMContentLoaded", function (event) {
-    duice.initialize();
+    duice.initializeComponent(document, {});
 });
