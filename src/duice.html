@@ -27,6 +27,7 @@ user.fromJson({
 	gender: 'F',
 	hireDate: '2020-01-05T08:16:18.643Z',
 	birthday: '1996-12-24',
+	schedule: '0 0 * * *',
 	score: 20,
 	groupId: 'animal',
 	profile: 'I am Bunny',
@@ -615,6 +616,15 @@ button {
 							<td>birthday</td>
 							<td><input is="duice-input" type="date" data-duice-bind="user,birthday" data-duice-mask="yyyy.MM.dd" class="form-control"/></td>
 							<td class="code">&lt;input is="duice-input" type="date" data-duice-bind="user,birthday" data-duice-mask="yyyy.MM.dd" ...</td>
+						</tr>
+						<!-- ================================================================ -->
+						<!-- duice-input[type=cron]		   									  -->
+						<!-- ================================================================ -->
+						<tr>
+							<th>duice-input[type=cron]</th>
+							<td>schedule</td>
+							<td><input is="duice-input" type="cron" data-duice-bind="user,schedule" class="form-control"/></td>
+							<td class="code">&lt;input is="duice-input" type="cron" data-duice-bind="user,schedule" ...</td>
 						</tr>
 						<!-- ================================================================ -->
 						<!-- duice-input[type=*]			   								  -->
