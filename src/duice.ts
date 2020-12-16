@@ -3380,9 +3380,10 @@ namespace duice {
             });
             
             // show
+            this.input.parentNode.insertBefore(this.pickerDiv, this.input.nextSibling);
             this.pickerDiv.style.position = 'absolute';
             this.pickerDiv.style.zIndex = String(getCurrentMaxZIndex() + 1);
-            this.input.parentNode.appendChild(this.pickerDiv);
+            this.pickerDiv.style.left = getElementPosition(this.input).left + 'px';
         }
         decodeCronExpression(value:string) {
             var values = value.split(/[\s]{1}/);
