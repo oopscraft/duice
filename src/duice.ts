@@ -3322,7 +3322,6 @@ namespace duice {
             
             // daySelectorDiv
             var dayOptions = new Array();
-            dayOptions.push({value:'?', text:'-'});
             dayOptions.push({value:'*', text:'Every'});
             dayOptions.push({value:'L', text:'Last Day'});
             dayOptions.push({value:'LW', text:'Last Weekday'});
@@ -3343,7 +3342,7 @@ namespace duice {
 
             // weekSelectorDiv
             var weekOptions = new Array();
-            weekOptions.push({value:'*', text:'-'});
+            weekOptions.push({value:'*', text:'Every'});
             weekOptions.push({value:'1-5', text:'Weekday'});
             weekOptions.push({value:'6-7', text:'Weekend'});
             weekOptions.push({value:'1', text:'MON'});

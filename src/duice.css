@@ -606,7 +606,7 @@ input[is='duice-input'][type='cron'],
 .duice-input-cron__pickerDiv select {
 	margin: 0px;
 	height: 24px !important;
-	border: solid 1px #eee;
+	border: solid 1px #ccc;
 	border-radius: 1px;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
