@@ -2245,8 +2245,6 @@ var duice;
             bodyDiv.appendChild(hourSelectorPart);
             var dayOptions = new Array();
             dayOptions.push({ value: '*', text: 'Every' });
-            dayOptions.push({ value: 'L', text: 'Last Day' });
-            dayOptions.push({ value: 'LW', text: 'Last Weekday' });
             for (var i = 1; i <= 31; i++) {
                 dayOptions.push({ value: String(i), text: String(i) });
             }
@@ -2262,14 +2260,13 @@ var duice;
             var weekOptions = new Array();
             weekOptions.push({ value: '*', text: 'Every' });
             weekOptions.push({ value: '1-5', text: 'Weekday' });
-            weekOptions.push({ value: '6-7', text: 'Weekend' });
+            weekOptions.push({ value: '0', text: 'SUN' });
             weekOptions.push({ value: '1', text: 'MON' });
             weekOptions.push({ value: '2', text: 'TUE' });
             weekOptions.push({ value: '3', text: 'WED' });
             weekOptions.push({ value: '4', text: 'THU' });
             weekOptions.push({ value: '5', text: 'FRI' });
             weekOptions.push({ value: '6', text: 'SAT' });
-            weekOptions.push({ value: '7', text: 'SUN' });
             var weekSelectorPart = this.createSelectorPart('Week', weekOptions, cronExpression.week);
             bodyDiv.appendChild(weekSelectorPart);
             var footerDiv = document.createElement('div');
