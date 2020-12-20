@@ -2245,6 +2245,7 @@ var duice;
             bodyDiv.appendChild(hourSelectorPart);
             var dayOptions = new Array();
             dayOptions.push({ value: '*', text: 'Every' });
+            dayOptions.push({ value: 'L', text: 'Last Day' });
             for (var i = 1; i <= 31; i++) {
                 dayOptions.push({ value: String(i), text: String(i) });
             }
