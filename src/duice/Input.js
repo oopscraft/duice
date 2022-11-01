@@ -1,4 +1,3 @@
-"use strict";
 class Input extends HTMLInputElement {
     constructor() {
         super();
@@ -8,15 +7,9 @@ class Input extends HTMLInputElement {
             console.log("== _this.value:" + _this.value);
         }, true);
     }
-    connectedCallback() {
-        console.log("== connectedCallback");
-        this.value = "test";
-    }
-    static get observedAttributes() {
-        return ['value'];
-    }
-    attributeChangedCallback(name, oldValue, newValue) {
-        console.log('Custom square element attributes changed.');
+    update(value) {
+        console.log("== update");
     }
 }
 customElements.define('duice-input', Input, { extends: 'input' });
+export {};

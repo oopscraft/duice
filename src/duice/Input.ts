@@ -1,4 +1,6 @@
-class Input extends HTMLInputElement {
+import { AbstractMapElement } from './AbstractMapElement';
+
+class Input extends HTMLInputElement implements AbstractMapElement {
     constructor() {
         super();
         console.log("== create");
@@ -15,18 +17,23 @@ class Input extends HTMLInputElement {
         }, true);
     }
 
-    connectedCallback() {
-        console.log("== connectedCallback");
-        this.value = "test";
+    update(value:string) {
+        console.log("== update");
     }
 
-    static get observedAttributes() {
-        return ['value']
-    }
 
-    attributeChangedCallback(name:any, oldValue:any, newValue:any) {
-        console.log('Custom square element attributes changed.');
-    }
+    // connectedCallback() {
+    //     console.log("== connectedCallback");
+    //     this.value = "test";
+    // }
+    //
+    // static get observedAttributes() {
+    //     return ['value']
+    // }
+    //
+    // attributeChangedCallback(name:any, oldValue:any, newValue:any) {
+    //     console.log('Custom square element attributes changed.');
+    // }
 
 }
 
