@@ -1,4 +1,4 @@
-import { AbstractMapElement } from './AbstractMapElement';
+import { AbstractMapElement } from '../core/MapElement';
 
 class Input extends HTMLInputElement implements AbstractMapElement {
     constructor() {
