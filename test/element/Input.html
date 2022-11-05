@@ -5,10 +5,14 @@
     <title>Title</title>
     <script type="module" src="AbstractMapElement.js"></script>
     <script type="module" src="Input.js"></script>
+    <script>
+        let user = new Map();
+        user.set("name", "james");
+    </script>
 </head>
 <body>
 
-    <input is="duice-input" onchange="console.log('@@@@@@@@@@@@@@@@@@@@@@');"/>
+    <input id="input" is="duice-input" duice-bind-map="user" duice-bind-key="name" onchange="console.log('@@@@@@111@@@@@@@@@@@@@@@@');"/>
 
 </body>
 </html>
