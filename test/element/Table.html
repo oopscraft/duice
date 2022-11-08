@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../../build/duice.js"></script>
+    <script>
+        let set = new duice.Set();
+        set.add(new duice.Map(Object.entries({
+           name: "james",
+           age: 19
+        })));
+        set.add(new duice.Map(Object.entries({
+            name: "Tom",
+            age: 21
+        })));
+    </script>
+</head>
+<body>
+
+    <table is="duice-table" data-set="set" data-item="map" border="1">
+        <thead>
+            <tr>
+                <td>Name</td>
+                <td>Age</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <input is="duice-input" data-map="map" data-key="name"/>
+                </td>
+                <td>
+                    <input is="duice-input" data-map="map" data-key="age"/>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

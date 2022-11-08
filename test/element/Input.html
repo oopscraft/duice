@@ -3,16 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script type="module" src="AbstractMapElement.js"></script>
-    <script type="module" src="Input.js"></script>
+    <script src="../../build/duice.js"></script>
     <script>
-        let user = new Map();
-        user.set("name", "james");
+        let map = new duice.Map();
+        console.log("map", map);
+        map.set("name", "James Smith");
     </script>
+    <style>
+        .duice-input {
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
 
-    <input id="input" is="duice-input" duice-bind-map="user" duice-bind-key="name" onchange="console.log('@@@@@@111@@@@@@@@@@@@@@@@');"/>
+    <input is="duice-input" data-map="map" data-key="name" onchange="console.log('@@@@@@111@@@@@@@@@@@@@@@@');"/>
 
 </body>
 </html>
