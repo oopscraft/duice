@@ -33,11 +33,17 @@ namespace duice.element {
             }, true);
 
             // update
-            this.update(this.map);
+            this.onChange(this.map);
         }
 
-        update(map:Map): void {
+        onChange(map:Map): void {
             this.value = map.get(this.key);
+        }
+
+        onDisable(): void {
+        }
+
+        onReadonly(): void {
         }
     }
 

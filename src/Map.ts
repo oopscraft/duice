@@ -16,7 +16,7 @@ namespace duice {
 
         notifyChange(): void {
             this.components.forEach(component =>{
-                component.update(this);
+                component.onChange(this);
             });
         }
 

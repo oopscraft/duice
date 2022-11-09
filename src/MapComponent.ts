@@ -4,7 +4,11 @@ namespace duice {
 
     export interface MapComponent extends Component {
 
-        update(map:Map): void;
+        onChange(map:Map): void;
+
+        onReadonly(): void;
+
+        onDisable(): void;
 
     }
 
