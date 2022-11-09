@@ -1,22 +1,23 @@
 
 namespace duice {
 
-    export class ComponentDefinition {
+    export abstract class ComponentDefinition {
 
-        name: string;
+        componentConstructor: CustomElementConstructor;
 
-        type: CustomElementConstructor;
+        tagName: string;
 
-        tag: string;
+        isAttribute: string;
 
-        constructor(name: string, type: CustomElementConstructor, tag?: string) {
-            this.name = name;
-            this.type = type;
-            this.tag = tag;
+        constructor(componentConstructor: CustomElementConstructor, tagName: string, isAttribute?: string){
+            this.componentConstructor = componentConstructor;
+            this.tagName = tagName;
+            this.isAttribute = isAttribute;
         }
 
         getSelector(): string {
-            return `${this.tag}[is="${this.name}"]`;
+            return `${this.tagName}`
+                + (this.isAttribute ? `[is="${this.isAttribute}"]` : '');
         }
 
     }

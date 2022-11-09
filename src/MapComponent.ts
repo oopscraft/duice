@@ -1,9 +1,8 @@
+/// <reference path="Component.ts"/>
 
 namespace duice {
 
-    export interface MapComponent extends HTMLElement {
-
-        initialize(context: object): void;
+    export interface MapComponent extends Component {
 
         update(map:Map): void;
 

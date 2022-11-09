@@ -1,5 +1,7 @@
+/// <reference path="../index.ts"/>
 /// <reference path="../Map.ts"/>
 /// <reference path="../MapComponent.ts"/>
+/// <reference path="../MapComponentDefinition.ts"/>
 
 namespace duice.element {
 
@@ -39,7 +41,7 @@ namespace duice.element {
         }
     }
 
-    defineMapComponent("duice-input", Input, {extends:"input"});
+    defineComponent(new MapComponentDefinition(Input, "input", "duice-input"));
 
 }
 
