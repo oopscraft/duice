@@ -43,7 +43,7 @@ namespace duice {
         return uuid;
     }
 
-    export function findObject(context: object, name: string): Map {
+    export function findObject(context: object, name: string): any {
         if(context[name]){
             return context[name];
         }
