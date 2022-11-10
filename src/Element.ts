@@ -1,9 +1,11 @@
 
 namespace duice {
 
-    export interface Component {
+    export interface Element {
 
         initialize(context: object): void;
+
+        update(): void;
 
     }
 

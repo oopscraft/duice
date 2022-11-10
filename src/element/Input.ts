@@ -1,11 +1,11 @@
 /// <reference path="../index.ts"/>
 /// <reference path="../Map.ts"/>
-/// <reference path="../MapComponent.ts"/>
-/// <reference path="../MapComponentDefinition.ts"/>
+/// <reference path="../MapElement.ts"/>
+/// <reference path="../MapElementDefinition.ts"/>
 
 namespace duice.element {
 
-    export class Input extends HTMLInputElement implements MapComponent {
+    export class Input extends HTMLInputElement implements MapElement {
 
         map:Map;
 
@@ -21,10 +21,10 @@ namespace duice.element {
             this.classList.add("duice-input");
         }
 
-        initialize(context: object) {
-            this.map = findMap(context, this.dataset.map);
+        initialize(context: object): void {
+            this.map = findObject(context, this.dataset.map);
             this.key = this.dataset.key;
-            this.map.addComponent(this);
+            this.map.addElement(this);
 
             // adds listener
             let _this = this;
@@ -33,21 +33,25 @@ namespace duice.element {
             }, true);
 
             // update
-            this.onChange(this.map);
+            this.update();
         }
 
-        onChange(map:Map): void {
-            this.value = map.get(this.key);
+        update(): void {
+            this.value = this.map.get(this.key);
         }
 
-        onDisable(): void {
+        setEnable(enable: boolean): void {
         }
 
-        onReadonly(): void {
+        setFocus(focus: boolean): void {
         }
+
+        setReadonly(readonly: boolean): void {
+        }
+
     }
 
-    defineComponent(new MapComponentDefinition(Input, "input", "duice-input"));
+    defineElement(new MapElementDefinition(Input, "input", "duice-input"));
 
 }
 

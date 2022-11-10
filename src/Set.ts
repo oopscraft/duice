@@ -1,22 +1,18 @@
-/// <reference path="SetComponent.ts"/>
+/// <reference path="SetElement.ts"/>
 
 namespace duice {
 
     export class Set extends window.Set {
 
-        components:Array<SetComponent> = new Array<SetComponent>();
+        elements:Array<SetElement> = new Array<SetElement>();
 
-        constructor() {
-            super();
-        }
-
-        addComponent(component: SetComponent): void {
-            this.components.push(component);
+        addElement(element: SetElement): void {
+            this.elements.push(element);
         }
 
         notifyChange(): void {
-            this.components.forEach(component => {
-               component.update(this);
+            this.elements.forEach(element => {
+               element.update();
             });
         }
 

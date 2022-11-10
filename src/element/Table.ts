@@ -1,8 +1,9 @@
-/// <reference path="../SetComponent.ts"/>
+///<reference path="../SetElement.ts"/>
+///<reference path="../SetElementDefinition.ts"/>
 
 namespace duice.element {
 
-    export class Table extends HTMLTableElement implements SetComponent {
+    export class Table extends HTMLTableElement implements SetElement {
 
         set: Set;
 
@@ -18,36 +19,31 @@ namespace duice.element {
         }
 
         initialize(context: object): void {
-            this.set = findSet(context, this.dataset.set);
+            this.set = findObject(context, this.dataset.set);
+            console.log("== this.set:", this.set);
             this.item = this.dataset.item;
-            this.set.addComponent(this);
+            this.set.addElement(this);
             this.tBodyTemplate = this.removeChild(this.querySelector("tbody"));
 
             // update
-            this.update(this.set);
+            this.update();
         }
 
-        update(set: Set): void {
+        update(): void {
             this.set.forEach(map => {
-                console.log("map", map);
+                console.log("==> map", map);
                 let tBody: HTMLTableSectionElement = <HTMLTableSectionElement>this.tBodyTemplate.cloneNode(true);
-                let context = {};
-                context[this.item] = map;
-                //initializeComponent(context);
+                let context = {
+                    'map': map
+                };
+                //context[this.item] = map;
+                initializeElement(tBody, context);
                 console.log("tBody", tBody);
                 this.appendChild(tBody);
-                //initializeComponent()
-                //this.createTBody()
-                //this.appendChild(tBody);
             });
         }
-
-
-
-
     }
 
-    customElements.define('duice-table', Table, { extends: 'table' });
-
+    defineElement(new SetElementDefinition(Table, "table", "duice-table"));
 
 }

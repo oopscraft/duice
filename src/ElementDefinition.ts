@@ -1,16 +1,16 @@
 
 namespace duice {
 
-    export abstract class ComponentDefinition {
+    export abstract class ElementDefinition {
 
-        componentConstructor: CustomElementConstructor;
+        elementConstructor: CustomElementConstructor;
 
         tagName: string;
 
         isAttribute: string;
 
-        constructor(componentConstructor: CustomElementConstructor, tagName: string, isAttribute?: string){
-            this.componentConstructor = componentConstructor;
+        protected constructor(elementConstructor: CustomElementConstructor, tagName: string, isAttribute?: string){
+            this.elementConstructor = elementConstructor;
             this.tagName = tagName;
             this.isAttribute = isAttribute;
         }

@@ -6,14 +6,20 @@
     <script src="../../build/duice.js"></script>
     <script>
         let set = new duice.Set();
-        set.add(new duice.Map(Object.entries({
-           name: "james",
-           age: 19
-        })));
-        set.add(new duice.Map(Object.entries({
-            name: "Tom",
-            age: 21
-        })));
+        // set.add(new duice.Map(Object.entries({
+        //    name: "james",
+        //    age: 19
+        // })));
+        // set.add(new duice.Map(Object.entries({
+        //     name: "Tom",
+        //     age: 21
+        // })));
+        for(let i = 0; i < 2; i ++){
+            let map = new duice.Map();
+            map.set('name', 'name' + i);
+            map.set('age', i);
+            set.add(map);
+        }
     </script>
 </head>
 <body>

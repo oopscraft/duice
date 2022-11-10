@@ -1,40 +1,60 @@
 namespace duice {
 
-    export const componentDefinitions: Array<ComponentDefinition> = new Array<ComponentDefinition>();
+    export const elementDefinitions: Array<ElementDefinition> = new Array<ElementDefinition>();
 
-    export function defineComponent(componentDefinition: ComponentDefinition) {
-        componentDefinitions.push(componentDefinition);
-        if(componentDefinition.isAttribute) {
-            customElements.define(componentDefinition.isAttribute, componentDefinition.componentConstructor, {extends: componentDefinition.tagName});
+    export function defineElement(elementDefinition: ElementDefinition) {
+        elementDefinitions.push(elementDefinition);
+        if(elementDefinition.isAttribute) {
+            customElements.define(elementDefinition.isAttribute, elementDefinition.elementConstructor, {extends: elementDefinition.tagName});
         }else{
-            customElements.define(componentDefinition.tagName, componentDefinition.componentConstructor);
+            customElements.define(elementDefinition.tagName, elementDefinition.elementConstructor);
         }
     }
 
-    export function initializeComponent(container: any, context: object): void {
-        [SetComponentDefinition, MapComponentDefinition].forEach(componentType => {
-            componentDefinitions.forEach(componentDefinition => {
-                if(componentDefinition instanceof componentType) {
-                    let selector = componentDefinition.getSelector();
+    export function initializeElement(container: any, context: object): void {
+        [SetElementDefinition, MapElementDefinition].forEach(elementDefinitionType => {
+            elementDefinitions.forEach(elementDefinition => {
+                if(elementDefinition instanceof elementDefinitionType) {
+                    let selector = elementDefinition.getSelector();
                     let elements = container.querySelectorAll(selector);
                     elements.forEach(element => {
-                         element.initialize(context);
+                        if(!element.getAttribute("duice-id")){
+                            console.log("== element.initialize", element);
+                            element.initialize(context);
+                            element.setAttribute("duice-id", generateUuid());
+                        }
                     });
                 }
             });
         });
     }
 
-    export function findMap(context: object, name: string): Map {
-       return eval.call(context, name);
+    /**
+     * Generates random UUID value
+     * @return  UUID string
+     */
+    export function generateUuid():string {
+        let dt = new Date().getTime();
+        let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            let r = (dt + Math.random()*16)%16 | 0;
+            dt = Math.floor(dt/16);
+            return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+        });
+        return uuid;
     }
 
-    export function findSet(context: object, name: string): Set {
+    export function findObject(context: object, name: string): Map {
+        if(context[name]){
+            return context[name];
+        }
+        if((<any>window).hasOwnProperty(name)){
+            return (<any>window)[name];
+        }
         return eval.call(context, name);
     }
 
     document.addEventListener("DOMContentLoaded", event => {
-        initializeComponent(document, {});
+        initializeElement(document, {});
     });
 
 }

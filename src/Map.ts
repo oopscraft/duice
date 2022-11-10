@@ -1,22 +1,24 @@
-/// <reference path="MapComponent.ts" />
+/// <reference path="MapElement.ts" />
 
 namespace duice {
 
-    export class Map extends window.Map {
+    export class Map extends window.Map<string,any> {
 
-        components:Array<MapComponent> = new Array<MapComponent>();
+        elements:Array<MapElement> = new Array<MapElement>();
 
-        constructor() {
-            super();
+        constructor(iterator?: any){
+            super(iterator);
         }
 
-        addComponent(component: MapComponent): void {
-            this.components.push(component);
+        addElement(element: MapElement): void {
+            this.elements.push(element);
         }
 
         notifyChange(): void {
-            this.components.forEach(component =>{
-                component.onChange(this);
+            console.log("==this", this);
+            console.log("this.elements", this.elements);
+            this.elements.forEach(element =>{
+                element.update();
             });
         }
 
