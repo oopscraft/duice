@@ -33,10 +33,8 @@ namespace duice.element {
             this.set.forEach(map => {
                 console.log("==> map", map);
                 let tBody: HTMLTableSectionElement = <HTMLTableSectionElement>this.tBodyTemplate.cloneNode(true);
-                let context = {
-                    'map': map
-                };
-                //context[this.item] = map;
+                let context = {};
+                context[this.item] = map;
                 initializeElement(tBody, context);
                 console.log("tBody", tBody);
                 this.appendChild(tBody);

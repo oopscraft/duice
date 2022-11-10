@@ -29,6 +29,7 @@ namespace duice.element {
             // adds listener
             let _this = this;
             this.addEventListener('change', function (event: any) {
+                console.log("input.change", event);
                 _this.map.internalSet(_this.key, _this.value);
             }, true);
 

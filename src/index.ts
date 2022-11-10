@@ -1,7 +1,36 @@
+/* =============================================================================
+ * DUICE (Data-oriented UI Component Engine)
+ * - Anyone can use it freely.
+ * - Modify the source or allow re-creation. However, you must state that you have the original creator.
+ * - However, we can not grant patents or licenses for reproductives. (Modifications or reproductions must be shared with the public.)
+ * Licence: LGPL(GNU Lesser General Public License version 3)
+ * Copyright (C) 2016 chomookun@gmail.com
+ * ============================================================================= */
 namespace duice {
+
+    let alias = 'duice';
 
     export const elementDefinitions: Array<ElementDefinition> = new Array<ElementDefinition>();
 
+    /**
+     * sets alias
+     * @param value
+     */
+    export function setAlias(value:string): void {
+        alias = value;
+    }
+
+    /**
+     * gets alias
+     */
+    export function getAlias(): string {
+        return alias;
+    }
+
+    /**
+     * defineElement
+     * @param elementDefinition
+     */
     export function defineElement(elementDefinition: ElementDefinition) {
         elementDefinitions.push(elementDefinition);
         if(elementDefinition.isAttribute) {
@@ -11,6 +40,11 @@ namespace duice {
         }
     }
 
+    /**
+     * initializeElement
+     * @param container
+     * @param context
+     */
     export function initializeElement(container: any, context: object): void {
         [SetElementDefinition, MapElementDefinition].forEach(elementDefinitionType => {
             elementDefinitions.forEach(elementDefinition => {
@@ -43,6 +77,11 @@ namespace duice {
         return uuid;
     }
 
+    /**
+     * find object in context
+     * @param context
+     * @param name
+     */
     export function findObject(context: object, name: string): any {
         if(context[name]){
             return context[name];
@@ -53,6 +92,9 @@ namespace duice {
         return eval.call(context, name);
     }
 
+    /**
+     * listens DOMContentLoaded event
+     */
     document.addEventListener("DOMContentLoaded", event => {
         initializeElement(document, {});
     });

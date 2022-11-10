@@ -1,8 +1,9 @@
-/// <reference path="SetElement.ts"/>
+///<reference path="SetElement.ts"/>
+///<reference path="Map.ts"/>
 
 namespace duice {
 
-    export class Set extends window.Set {
+    export class Set extends window.Set<Map> {
 
         elements:Array<SetElement> = new Array<SetElement>();
 
