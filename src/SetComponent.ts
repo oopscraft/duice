@@ -1,8 +1,11 @@
 namespace duice {
 
+    /**
+     * SetComponent
+     */
     export class SetComponent implements Observer<Set>, Observable<Set> {
 
-        element: SetElement;
+        element: HTMLElement;
 
         set: Set;
 
@@ -10,7 +13,11 @@ namespace duice {
 
         observers: Array<Set> = new Array<Set>();
 
-        constructor(element: SetElement) {
+        /**
+         * constructor
+         * @param element
+         */
+        constructor(element: HTMLElement) {
             this.element = element;
             console.log("SetComponent.constructor", element);
         }
@@ -37,7 +44,6 @@ namespace duice {
         }
 
         update(observable: Set): void {
-            this.element.update(observable);
         }
 
     }

@@ -22,11 +22,6 @@ namespace duice {
 
     export function defineComponent(componentDefinition: ComponentDefinition) {
         componentDefinitions.push(componentDefinition);
-        if(componentDefinition.isAttribute) {
-            customElements.define(componentDefinition.isAttribute, componentDefinition.elementConstructor, {extends: componentDefinition.tagName});
-        }else{
-            customElements.define(componentDefinition.tagName, componentDefinition.elementConstructor);
-        }
     }
 
     /**
@@ -35,24 +30,15 @@ namespace duice {
      * @param context
      */
     export function initializeComponent(container: any, context: object): void {
-        [SetComponent, MapComponent].forEach(componentType => {
-            console.log("== initializeComponent-componentType", componentType);
+        [SetComponentDefinition, MapComponentDefinition].forEach(componentDefinitionType => {
             componentDefinitions.forEach(componentDefinition => {
-                console.log("###", componentDefinition.componentType, componentType);
-                console.log(componentDefinition.componentType.toString() === componentType.toString());
-                //if(componentDefinition.componentType === componentType) {
+                if(componentDefinition instanceof componentDefinitionType) {
                     let selector = componentDefinition.getSelector();
-                    console.log("== initializeComponent.selector", selector);
                     let elements = container.querySelectorAll(selector);
                     elements.forEach(element => {
-                        console.log("== initializeComponent.element", element);
-                        //if(!element.hasAttribute(`${getAlias()}-id`)) {
-                            //Object.create(componentDefinition.componentType, element);
-                            Reflect.construct(componentDefinition.componentType, [element, {}]);
-
-                        //}
+                        Reflect.construct(componentDefinition.componentType, [element, {}]);
                     });
-                //}
+                }
             });
         });
     }

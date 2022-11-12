@@ -1,6 +1,9 @@
 namespace duice {
 
-    export class ComponentDefinition {
+    /**
+     * ComponentDefinition
+     */
+    export abstract class ComponentDefinition {
 
         componentType: any;
 
@@ -8,17 +11,26 @@ namespace duice {
 
         isAttribute: string;
 
-        elementConstructor: CustomElementConstructor;
-
-        constructor(componentType: any, tagName: string, isAttribute: string, elementConstructor: CustomElementConstructor)  {
+        /**
+         * constructor
+         * @param componentType
+         * @param tagName
+         * @param isAttribute
+         * @protected
+         */
+        protected constructor(componentType: any, tagName: string, isAttribute?: string)  {
             this.componentType = componentType;
             this.tagName = tagName;
             this.isAttribute = isAttribute;
-            this.elementConstructor = elementConstructor;
         }
 
+        /**
+         * getSelector
+         */
         getSelector(): string {
-            return `${this.tagName}` + (this.isAttribute ? `[is="${this.isAttribute}"]` : '');
+            return `${this.tagName}`
+                + (this.isAttribute ? `[is="${this.isAttribute}"]` : '')
+                + `:not([${getAlias()}-id])`;
         }
 
     }

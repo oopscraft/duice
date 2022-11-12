@@ -1,6 +1,7 @@
 ///<reference path="../index.ts"/>
 ///<reference path="../MapComponent.ts"/>
 ///<reference path="../ComponentDefinition.ts"/>
+///<reference path="../MapComponentDefinition.ts"/>
 
 namespace duice.element {
 
@@ -24,11 +25,9 @@ namespace duice.element {
             return this.element.value;
         }
 
-
     }
 
-    defineComponent(new ComponentDefinition(Input, "input", `${getAlias()}-input`, HTMLInputElement));
-
+    defineComponent(new MapComponentDefinition(Input, "input", `${getAlias()}-input`));
 
 }
 

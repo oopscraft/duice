@@ -28,16 +28,27 @@ namespace duice {
            this.notifyObservers();
         }
 
+        /**
+         * addObserver
+         * @param observer
+         */
         addObserver(observer: MapComponent): void {
             this.observers.push(observer);
         }
 
+        /**
+         * notifyObservers
+         */
         notifyObservers(): void {
             this.observers.forEach(observer => {
                 observer.update(this);
             });
         }
 
+        /**
+         * update
+         * @param observable
+         */
         update(observable: MapComponent): void {
             let key = observable.getKey();
             let value = observable.getValue();
