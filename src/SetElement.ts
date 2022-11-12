@@ -1,9 +1,8 @@
 namespace duice {
 
-    /**
-     * SetElement
-     */
-    export interface SetElement extends Element {
+    export interface SetElement extends HTMLElement {
+
+        update(set: Set): void;
 
     }
 

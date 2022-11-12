@@ -10,55 +10,49 @@ namespace duice {
 
     let alias = 'duice';
 
-    export const elementDefinitions: Array<ElementDefinition> = new Array<ElementDefinition>();
+    const componentDefinitions: Array<ComponentDefinition> = new Array<ComponentDefinition>();
 
-    /**
-     * sets alias
-     * @param value
-     */
     export function setAlias(value:string): void {
         alias = value;
     }
 
-    /**
-     * gets alias
-     */
     export function getAlias(): string {
         return alias;
     }
 
-    /**
-     * defineElement
-     * @param elementDefinition
-     */
-    export function defineElement(elementDefinition: ElementDefinition) {
-        elementDefinitions.push(elementDefinition);
-        if(elementDefinition.isAttribute) {
-            customElements.define(elementDefinition.isAttribute, elementDefinition.elementConstructor, {extends: elementDefinition.tagName});
+    export function defineComponent(componentDefinition: ComponentDefinition) {
+        componentDefinitions.push(componentDefinition);
+        if(componentDefinition.isAttribute) {
+            customElements.define(componentDefinition.isAttribute, componentDefinition.elementConstructor, {extends: componentDefinition.tagName});
         }else{
-            customElements.define(elementDefinition.tagName, elementDefinition.elementConstructor);
+            customElements.define(componentDefinition.tagName, componentDefinition.elementConstructor);
         }
     }
 
     /**
-     * initializeElement
+     * initializeComponent
      * @param container
      * @param context
      */
-    export function initializeElement(container: any, context: object): void {
-        [SetElementDefinition, MapElementDefinition].forEach(elementDefinitionType => {
-            elementDefinitions.forEach(elementDefinition => {
-                if(elementDefinition instanceof elementDefinitionType) {
-                    let selector = elementDefinition.getSelector();
+    export function initializeComponent(container: any, context: object): void {
+        [SetComponent, MapComponent].forEach(componentType => {
+            console.log("== initializeComponent-componentType", componentType);
+            componentDefinitions.forEach(componentDefinition => {
+                console.log("###", componentDefinition.componentType, componentType);
+                console.log(componentDefinition.componentType.toString() === componentType.toString());
+                //if(componentDefinition.componentType === componentType) {
+                    let selector = componentDefinition.getSelector();
+                    console.log("== initializeComponent.selector", selector);
                     let elements = container.querySelectorAll(selector);
                     elements.forEach(element => {
-                        if(!element.getAttribute("duice-id")){
-                            console.log("== element.initialize", element);
-                            element.initialize(context);
-                            element.setAttribute("duice-id", generateUuid());
-                        }
+                        console.log("== initializeComponent.element", element);
+                        //if(!element.hasAttribute(`${getAlias()}-id`)) {
+                            //Object.create(componentDefinition.componentType, element);
+                            Reflect.construct(componentDefinition.componentType, [element, {}]);
+
+                        //}
                     });
-                }
+                //}
             });
         });
     }
@@ -96,7 +90,7 @@ namespace duice {
      * listens DOMContentLoaded event
      */
     document.addEventListener("DOMContentLoaded", event => {
-        initializeElement(document, {});
+        initializeComponent(document, {});
     });
 
 }

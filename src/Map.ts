@@ -1,12 +1,12 @@
-/// <reference path="MapElement.ts" />
+/// <reference path="MapComponent.ts" />
 namespace duice {
 
     /**
      * Map data structure
      */
-    export class Map extends window.Map<string,any> {
+    export class Map extends window.Map<string,any> implements Observer<MapComponent>, Observable<MapComponent> {
 
-        elements:Array<MapElement> = new Array<MapElement>();
+        observers: Array<MapComponent> = new Array<MapComponent>();
 
         /**
          * constructor
@@ -14,25 +14,7 @@ namespace duice {
          */
         constructor(iterator?: any){
             super(iterator);
-        }
-
-        /**
-         * adds element to bind
-         * @param element
-         */
-        addElement(element: MapElement): void {
-            this.elements.push(element);
-        }
-
-        /**
-         * notifyElements
-         */
-        notifyElements(): void {
-            console.log("==this", this);
-            console.log("this.elements", this.elements);
-            this.elements.forEach(element =>{
-                element.update();
-            });
+            console.log("Map.construct", iterator);
         }
 
         /**
@@ -41,19 +23,28 @@ namespace duice {
          * @param value
          */
         // @ts-ignore
-        set(key: string, value: any):void {
+        set(key: string, value: any): void {
            super.set(key, value);
-           this.notifyElements();
+           this.notifyObservers();
         }
 
-        /**
-         * getter
-         * @param key
-         * @param value
-         */
-        internalSet(key: string, value: any): void {
+        addObserver(observer: MapComponent): void {
+            this.observers.push(observer);
+        }
+
+        notifyObservers(): void {
+            this.observers.forEach(observer => {
+                observer.update(this);
+            });
+        }
+
+        update(observable: MapComponent): void {
+            let key = observable.getKey();
+            let value = observable.getValue();
+            console.log("Map.update", key, value);
             super.set(key, value);
         }
 
     }
+
 }

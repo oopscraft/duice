@@ -1,58 +1,34 @@
-/// <reference path="../index.ts"/>
-/// <reference path="../Map.ts"/>
-/// <reference path="../MapElement.ts"/>
-/// <reference path="../MapElementDefinition.ts"/>
+///<reference path="../index.ts"/>
+///<reference path="../MapComponent.ts"/>
+///<reference path="../ComponentDefinition.ts"/>
 
 namespace duice.element {
 
-    export class Input extends HTMLInputElement implements MapElement {
+    export class Input extends MapComponent {
 
-        map:Map;
+        element: HTMLInputElement;
 
-        key:string;
-
-        /**
-         * constructor
-         */
-        constructor() {
-            super();
-            console.log(this);
-            this.style.background = "red";
-            this.classList.add("duice-input");
-        }
-
-        initialize(context: object): void {
-            this.map = findObject(context, this.dataset.map);
-            this.key = this.dataset.key;
-            this.map.addElement(this);
-
-            // adds listener
+        constructor(element: HTMLInputElement, context: object) {
+            super(element, context);
             let _this = this;
-            this.addEventListener('change', function (event: any) {
-                console.log("input.change", event);
-                _this.map.internalSet(_this.key, _this.value);
-            }, true);
-
-            // update
-            this.update();
+            this.element.addEventListener('change', function(event){
+                _this.notifyObservers();
+            },true);
         }
 
-        update(): void {
-            this.value = this.map.get(this.key);
+        setValue(value: any): void {
+            this.element.value = value;
         }
 
-        setEnable(enable: boolean): void {
+        getValue() {
+            return this.element.value;
         }
 
-        setFocus(focus: boolean): void {
-        }
-
-        setReadonly(readonly: boolean): void {
-        }
 
     }
 
-    defineElement(new MapElementDefinition(Input, "input", "duice-input"));
+    defineComponent(new ComponentDefinition(Input, "input", `${getAlias()}-input`, HTMLInputElement));
+
 
 }
 
