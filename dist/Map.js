@@ -1,61 +1,54 @@
 /// <reference path="MapComponent.ts" />
-namespace duice {
-
+var duice;
+(function (duice) {
     /**
      * Map data structure
      */
-    export class Map extends window.Map<string,any> implements Observer<MapComponent>, Observable<MapComponent> {
-
-        observers: Array<MapComponent> = new Array<MapComponent>();
-
+    class Map extends window.Map {
         /**
          * constructor
          * @param iterator
          */
-        constructor(iterator?: any){
+        constructor(iterator) {
             super(iterator);
+            this.observers = new Array();
             console.log("Map.construct", iterator);
         }
-
         /**
          * setter
          * @param key
          * @param value
          */
         // @ts-ignore
-        set(key: string, value: any): void {
-           super.set(key, value);
-           this.notifyObservers();
+        set(key, value) {
+            super.set(key, value);
+            this.notifyObservers();
         }
-
         /**
          * addObserver
          * @param observer
          */
-        addObserver(observer: MapComponent): void {
+        addObserver(observer) {
             this.observers.push(observer);
         }
-
         /**
          * notifyObservers
          */
-        notifyObservers(): void {
+        notifyObservers() {
             this.observers.forEach(observer => {
                 observer.update(this);
             });
         }
-
         /**
          * update
          * @param observable
          */
-        update(observable: MapComponent): void {
+        update(observable) {
             let key = observable.getKey();
             let value = observable.getValue();
             console.log("Map.update", key, value);
             super.set(key, value);
         }
-
     }
-
-}
+    duice.Map = Map;
+})(duice || (duice = {}));

@@ -30,13 +30,14 @@ namespace duice {
      * @param context
      */
     export function initializeComponent(container: any, context: object): void {
-        [SetComponentDefinition, MapComponentDefinition].forEach(componentDefinitionType => {
+        [ArrayComponentDefinition, ObjectComponentDefinition].forEach(componentDefinitionType => {
             componentDefinitions.forEach(componentDefinition => {
                 if(componentDefinition instanceof componentDefinitionType) {
                     let selector = componentDefinition.getSelector();
                     let elements = container.querySelectorAll(selector);
                     elements.forEach(element => {
-                        Reflect.construct(componentDefinition.componentType, [element, {}]);
+                        console.log("initializeComponent", element);
+                        Reflect.construct(componentDefinition.componentType, [element, context]);
                     });
                 }
             });
@@ -70,6 +71,14 @@ namespace duice {
             return (<any>window)[name];
         }
         return eval.call(context, name);
+    }
+
+    /**
+     * getProxyHandler
+     * @param obj
+     */
+    export function getProxyHandler(obj: object) {
+        return Object.getOwnPropertyDescriptor(obj, '[[handler]]').value;
     }
 
     /**

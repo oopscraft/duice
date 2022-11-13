@@ -5,28 +5,21 @@
     <title>Title</title>
     <script src="../../build/duice.js"></script>
     <script>
-        let set = new duice.Set();
-        // set.add(new duice.Map(Object.entries({
-        //    name: "james",
-        //    age: 19
-        // })));
-        // set.add(new duice.Map(Object.entries({
-        //     name: "Tom",
-        //     age: 21
-        // })));
-        for(let i = 0; i < 2; i ++){
-            let map = new duice.Map();
-            map.set('name', 'name' + i);
-            map.set('age', i);
-            set.add(map);
-        }
-    </script>
+        const array = new duice.ArrayProxy([
+            { name: 'james', age: 13 },
+            { name: 'tommy', age: 27 },
+            { name: 'orange', age: 21 },
+            { name: 'apple', age: 18 },
+        ]);
+        console.log(array);
+   </script>
 </head>
 <body>
 
-    <table is="duice-table" duice-set="set" duice-item="map" border="1">
+    <table is="duice-table" duice:items="array" duice:item="object" border="1">
         <thead>
             <tr>
+                <td>No</td>
                 <td>Name</td>
                 <td>Age</td>
             </tr>
@@ -34,10 +27,13 @@
         <tbody>
             <tr>
                 <td>
-                    <input is="duice-input" duice-map="map" duice-key="name"/>
+                    <input is="duice-input" duice:item="status" duice:property="index"/>
                 </td>
                 <td>
-                    <input is="duice-input" duice-map="map" duice-key="age"/>
+                    <input is="duice-input" duice:item="object" duice:property="name"/>
+                </td>
+                <td>
+                    <input is="duice-input" duice:item="object" duice:property="age"/>
                 </td>
             </tr>
         </tbody>

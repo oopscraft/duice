@@ -30,7 +30,7 @@ namespace duice {
         getSelector(): string {
             return `${this.tagName}`
                 + (this.isAttribute ? `[is="${this.isAttribute}"]` : '')
-                + `:not([${getAlias()}-id])`;
+                + `:not([${getAlias()}\\:id])`;
         }
 
     }

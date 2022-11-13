@@ -1,65 +1,47 @@
-///<reference path="../SetElement.ts"/>
-///<reference path="../SetComponent.ts"/>
+///<reference path="../ArrayComponent.ts"/>
 ///<reference path="../ComponentDefinition.ts"/>
+///<reference path="../ArrayComponentDefinition.ts"/>
 
 namespace duice.element {
 
-    export class Table extends HTMLTableElement implements SetElement {
+    /**
+     * Table
+     */
+    export class Table extends ArrayComponent {
 
         tBodyTemplate: HTMLTableSectionElement;
 
-        constructor() {
-            super();
+        /**
+         * constructor
+         * @param element
+         * @param context
+         */
+        constructor(element: HTMLInputElement, context: object) {
+            super(element, context);
+            this.tBodyTemplate = this.element.querySelector("tbody");
+            this.element.removeChild(this.tBodyTemplate);
+            this.setArray(this.getArray())
         }
 
-        initialize(): void {
-            this.tBodyTemplate = this.querySelector("tbody");
-            console.log("##", this.tBodyTemplate);
-        }
-
-        update(set: Set): void {
-            console.log("Table.update", set);
+        /**
+         * setArray
+         * @param array
+         */
+        setArray(array: object[]): void {
+            let length = array.length;
+            let index = -1;
+            array.forEach(object => {
+                index ++;
+                let tBody: HTMLTableSectionElement = <HTMLTableSectionElement>this.tBodyTemplate.cloneNode(true);
+                let context = {};
+                context[this.getItem()] = object;
+                context[this.getStatus()] = new ObjectProxy({'index':index,'length':length});
+                initializeComponent(tBody, context);
+                this.element.appendChild(tBody);
+            });
         }
     }
 
-    //defineComponent(new ComponentDefinition(SetComponent, Table, "table", `${getAlias()}-table`));
-
-    //     set: Set;
-    //
-    //     item: string;
-    //
-    //     tBodyTemplate: HTMLTableSectionElement;
-    //
-    //     /**
-    //      * constructor
-    //      */
-    //     constructor() {
-    //         super();
-    //     }
-    //
-    //     initialize(context: object): void {
-    //         this.set = findObject(context, this.dataset.set);
-    //         console.log("== this.set:", this.set);
-    //         this.item = this.dataset.item;
-    //         //this.set.addElement(this);
-    //         this.tBodyTemplate = this.removeChild(this.querySelector("tbody"));
-    //
-    //         // update
-    //         this.update();
-    //     }
-    //
-    //     update(): void {
-    //         this.set.forEach(map => {
-    //             console.log("==> map", map);
-    //             let tBody: HTMLTableSectionElement = <HTMLTableSectionElement>this.tBodyTemplate.cloneNode(true);
-    //             let context = {};
-    //             context[this.item] = map;
-    //             initializeComponent(tBody, context);
-    //             console.log("tBody", tBody);
-    //             this.appendChild(tBody);
-    //         });
-    //     }
-    // }
-
+    defineComponent(new ArrayComponentDefinition(Table, "table", `${getAlias()}-table`));
 
 }

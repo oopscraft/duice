@@ -23,7 +23,7 @@ namespace duice {
          * @param name
          */
         hasAttribute(name: string): boolean {
-            return this.element.hasAttribute(`${getAlias()}-${name}`)
+            return this.element.hasAttribute(`${getAlias()}:${name}`)
         }
 
         /**
@@ -31,7 +31,7 @@ namespace duice {
          * @param name
          */
         getAttribute(name: string): string {
-            return this.element.getAttribute(`${getAlias()}-${name}`);
+            return this.element.getAttribute(`${getAlias()}:${name}`);
         }
 
         /**
@@ -40,7 +40,7 @@ namespace duice {
          * @param value
          */
         setAttribute(name: string, value: string): void {
-            this.element.setAttribute(`${getAlias()}-${name}`, value);
+            this.element.setAttribute(`${getAlias()}:${name}`, value);
         }
 
     }

@@ -2,28 +2,21 @@
 ///<reference path="Observer.ts"/>
 ///<reference path="Observable.ts"/>
 ///<reference path="Component.ts"/>
-
-namespace duice {
-
+var duice;
+(function (duice) {
     /**
      * MapComponent
      */
-    export abstract class MapComponent extends Component<Map> implements Observer<Map>, Observable<Map> {
-
-        map: Map;
-
-        key: string;
-
-        observers: Array<Map> = new Array<Map>();
-
+    class MapComponent extends duice.Component {
         /**
          * constructor
          * @param element
          * @param context
          * @protected
          */
-        protected constructor(element: HTMLElement, context: any) {
+        constructor(element, context) {
             super(element);
+            this.observers = new Array();
             console.log("MapComponent.constructor", element);
             this.map = findObject(context, this.getAttribute("map"));
             this.key = this.getAttribute("key");
@@ -31,51 +24,35 @@ namespace duice {
             this.map.addObserver(this);
             this.update(this.map);
         }
-
         /**
          * addObserver
          * @param observer
          */
-        addObserver(observer: Map): void {
+        addObserver(observer) {
             this.observers.push(observer);
         }
-
         /**
          * notifyObserver
          */
-        notifyObservers(): void {
+        notifyObservers() {
             this.observers.forEach(observer => {
                 observer.update(this);
-            })
+            });
         }
-
         /**
          * getKey
          */
-        getKey(): string {
+        getKey() {
             return this.key;
         }
-
         /**
          * update
          * @param observable
          */
-        update(observable: Map): void {
+        update(observable) {
             let value = observable.get(this.key);
             this.setValue(value);
         }
-
-        /**
-         * setValue
-         * @param value
-         */
-        abstract setValue(value: any): void;
-
-        /**
-         * getValue
-         */
-        abstract getValue(): any;
-
     }
-
-}
+    duice.ObjectComponent = MapComponent;
+})(duice || (duice = {}));

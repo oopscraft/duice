@@ -1,15 +1,16 @@
 ///<reference path="../index.ts"/>
-///<reference path="../MapComponent.ts"/>
+///<reference path="../ObjectComponent.ts"/>
 ///<reference path="../ComponentDefinition.ts"/>
-///<reference path="../MapComponentDefinition.ts"/>
+///<reference path="../ObjectComponentDefinition.ts"/>
 
 namespace duice.element {
 
-    export class Input extends MapComponent {
+    export class Input extends ObjectComponent {
 
         element: HTMLInputElement;
 
         constructor(element: HTMLInputElement, context: object) {
+            console.log("Input", element, context);
             super(element, context);
             let _this = this;
             this.element.addEventListener('change', function(event){
@@ -27,7 +28,7 @@ namespace duice.element {
 
     }
 
-    defineComponent(new MapComponentDefinition(Input, "input", `${getAlias()}-input`));
+    defineComponent(new ObjectComponentDefinition(Input, "input", `${getAlias()}-input`));
 
 }
 

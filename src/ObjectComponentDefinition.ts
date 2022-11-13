@@ -1,9 +1,9 @@
 namespace duice {
 
     /**
-     * MapComponentDefinition
+     * ObjectComponentDefinition
      */
-    export class MapComponentDefinition extends ComponentDefinition {
+    export class ObjectComponentDefinition extends ComponentDefinition {
 
         /**
          * constructor

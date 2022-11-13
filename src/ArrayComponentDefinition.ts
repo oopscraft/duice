@@ -1,9 +1,9 @@
 namespace duice {
 
     /**
-     * SetComponentDefinition
+     * ArrayComponentDefinition
      */
-    export class SetComponentDefinition extends ComponentDefinition {
+    export class ArrayComponentDefinition extends ComponentDefinition {
 
         /**
          * constructor

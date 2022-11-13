@@ -5,9 +5,10 @@
     <title>Title</title>
     <script src="../../build/duice.js"></script>
     <script>
-        let map = new duice.Map();
-        console.log("map", map);
-        map.set("name", "James Smith");
+        const object = new duice.ObjectProxy({
+            name: "james smith"
+        });
+        console.log("object", object);
     </script>
     <style>
         .duice-input {
@@ -17,8 +18,7 @@
 </head>
 <body>
 
-    <input is="duice-input" duice-map="map" duice-key="name" onchange="console.log('@@@@@@111@@@@@@@@@@@@@@@@');"/>
-
+    <input is="duice-input" duice:item="object" duice:property="name" onchange="console.log('@@@@@@111@@@@@@@@@@@@@@@@');"/>
 
 </body>
 </html>
