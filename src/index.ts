@@ -82,6 +82,34 @@ namespace duice {
     }
 
     /**
+     * converts value to left-padded value
+     * @param value value
+     * @param length to pad
+     * @param padChar character
+     * @return left-padded value
+     */
+    export function padLeft(value:string, length:number, padChar:string) {
+        for(let i = 0, size = (length-value.length); i < size; i ++ ) {
+            value = padChar + value;
+        }
+        return value;
+    }
+
+    /**
+     * converts value to right-padded value
+     * @param value value
+     * @param length to pad
+     * @param padChar character
+     * @return right-padded string
+     */
+    export function padRight(value:string, length:number, padChar:string) {
+        for(let i = 0, size = (length-value.length); i < size; i ++ ) {
+            value = value + padChar;
+        }
+        return value;
+    }
+
+    /**
      * listens DOMContentLoaded event
      */
     document.addEventListener("DOMContentLoaded", event => {
