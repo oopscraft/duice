@@ -6,9 +6,16 @@
     <script src="../../build/duice.js"></script>
     <script>
         const object = new duice.ObjectProxy({
-            name: "james smith"
+            name: "james smith",
+            setName: function(value){
+                this.name = value;
+            }
         });
         console.log("object", object);
+
+        function testReadonly(){
+
+        }
     </script>
     <style>
         .duice-input {
@@ -18,7 +25,7 @@
 </head>
 <body>
 
-    <input is="duice-input" duice:item="object" duice:property="name" onchange="console.log('@@@@@@111@@@@@@@@@@@@@@@@');"/>
+    <input is="duice-input" duice:item="object" duice:property="name" onchange="console.log(object);"/>
 
 </body>
 </html>

@@ -1,3 +1,5 @@
+///<reference path="ComponentDefinition.ts"/>
+
 namespace duice {
 
     /**
