@@ -2,21 +2,28 @@
 
 namespace duice {
 
+    /**
+     * ObjectHandler
+     */
     export class ObjectHandler extends Handler<Object> {
 
-        constructor(target: object) {
-            super(target);
+        /**
+         * constructor
+         * @param object
+         */
+        constructor(object: Object) {
+            super(object);
         }
 
         update(objectComponent: ObjectComponent): void {
-            console.log("Set.update", objectComponent);
+            console.debug('ObjectHandler.update', objectComponent);
             let name = objectComponent.getName();
             let value = objectComponent.getValue();
             Reflect.set(this.getTarget(), name, value);
         }
 
         set(target: Object, property: string, value: any): boolean {
-            console.log("ArrayHandler.change", target, property, value);
+            console.debug("ObjectHandler.set", target, property, value);
             Reflect.set(target, property, value);
             this.notifyObservers();
             return true;

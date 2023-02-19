@@ -1,5 +1,4 @@
 ///<reference path="Handler.ts"/>
-
 namespace duice {
 
     /**
@@ -11,16 +10,16 @@ namespace duice {
          * constructor
          * @param target
          */
-        constructor(target: Array) {
-            super(target);
+        constructor(array: Array) {
+            super(array);
         }
 
         /**
          * update
-         * @param observable
+         * @param arrayComponent
          */
-        update(observable: ArrayComponent): void {
-            console.log("Set.update", observable);
+        update(arrayComponent: ArrayComponent): void {
+            console.log("Set.update", arrayComponent);
         }
 
         set(target: Object, property: string, value: any): boolean {

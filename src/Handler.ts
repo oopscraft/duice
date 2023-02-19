@@ -3,12 +3,17 @@ namespace duice {
     /**
      * Handler
      */
-    export abstract class Handler<T> implements Observer, Observable {
+    export abstract class Handler<T> implements ProxyHandler<any>, Observer, Observable {
 
         target: T;
 
         observers: Component<T>[] = [];
 
+        /**
+         * constructor
+         * @param target
+         * @protected
+         */
         protected constructor(target: T) {
             this.target = target;
 
@@ -19,22 +24,27 @@ namespace duice {
             });
         }
 
+        /**
+         * getTarget
+         */
         getTarget(): T {
             return this.target;
         }
 
         /**
-         * getOwnPropertyDescriptor
+         * get
          * @param target
-         * @param prop
+         * @param property
+         * @param receiver
          */
-        getOwnPropertyDescriptor(target, prop) {
-            if(prop == "[[handler]]"){
-                return { configurable: true, enumerable: true, value: this };
-            }
-            return undefined;
+        get(target: any, property: any, receiver: any): any {
+            return Reflect.get(target, property, receiver);
         }
 
+        /**
+         * addObserver
+         * @param observer
+         */
         addObserver(observer: Component<T>): void {
             this.observers.push(observer);
         }

@@ -20,7 +20,14 @@ namespace duice {
         return alias;
     }
 
+    /**
+     * defineComponent
+     * @param componentType
+     * @param tagName
+     * @param isAttribute
+     */
     export function defineComponent(componentType: any, tagName: string, isAttribute: string) {
+        console.debug("defineComponent", componentType, tagName, isAttribute);
         let componentDefinition = new ComponentDefinition(componentType, tagName, isAttribute);
         componentDefinitions.push(componentDefinition);
     }
@@ -37,7 +44,7 @@ namespace duice {
                     let selector = componentDefinition.getSelector();
                     let elements = container.querySelectorAll(selector);
                     elements.forEach(element => {
-                        console.log("initializeComponent", element);
+                        console.debug("initializeComponent", element);
                         Reflect.construct(componentDefinition.componentType, [element, context]);
                     });
                 }

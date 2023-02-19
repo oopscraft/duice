@@ -1,14 +1,21 @@
-///<reference path="Observer.ts"/>
 ///<reference path="Component.ts"/>
-
 namespace duice {
 
+    /**
+     * ArrayComponent
+     */
     export abstract class ArrayComponent extends Component<Array> {
 
         item: string;
 
         status: string;
 
+        /**
+         * constructor
+         * @param element
+         * @param context
+         * @protected
+         */
         protected constructor(element: HTMLElement, context: object) {
             super(element, context);
             console.log("SetComponent.constructor", element);
@@ -17,24 +24,40 @@ namespace duice {
 
             // bind
             let array = findObject(context, this.getAttribute("bind"));
-            let arrayHandler = getProxyHandler(array);
-            arrayHandler.addObserver(this);
+            this.bind(array._handler_);
+
+            // update
+            this.update(array._handler_);
         }
 
+        /**
+         * update
+         * @param arrayHandler
+         */
         update(arrayHandler: ArrayHandler) {
             console.debug(arguments.callee.toString());
             let array = arrayHandler.getTarget();
             this.setArray(array);
         }
 
+        /**
+         * getItem
+         */
         getItem(): string {
             return this.item;
         }
 
+        /**
+         * getStatus
+         */
         getStatus(): string {
             return this.status;
         }
 
+        /**
+         * setArray
+         * @param array
+         */
         abstract setArray(array:object[]);
 
     }

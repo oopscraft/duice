@@ -1,7 +1,5 @@
 ///<reference path="../ArrayComponent.ts"/>
 ///<reference path="../ComponentDefinition.ts"/>
-///<reference path="../ArrayComponentDefinition.ts"/>
-
 namespace duice.element {
 
     /**

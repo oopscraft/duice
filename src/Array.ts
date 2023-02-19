@@ -1,3 +1,4 @@
+///<reference path="ArrayHandler.ts"/>
 namespace duice {
 
     /**
@@ -7,11 +8,11 @@ namespace duice {
 
         /**
          * constructor
-         * @param target
+         * @param json
          */
-        constructor(target: object[]) {
+        constructor(json: object[]) {
             super();
-            target.forEach(element => {
+            json.forEach(element => {
                this.push(new duice.Object(element));
             });
             return new Proxy(this, new ArrayHandler(this));
