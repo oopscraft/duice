@@ -17,8 +17,8 @@ namespace duice {
          * @protected
          */
         protected constructor(element: HTMLElement, context: object) {
+            console.debug("ArrayComponent.constructor", element);
             super(element, context);
-            console.log("SetComponent.constructor", element);
             this.item = this.getAttribute("item");
             this.status = this.getAttribute("status");
 
@@ -35,7 +35,7 @@ namespace duice {
          * @param arrayHandler
          */
         update(arrayHandler: ArrayHandler) {
-            console.debug(arguments.callee.toString());
+            console.debug("ArrayComponent.update", arrayHandler);
             let array = arrayHandler.getTarget();
             this.setArray(array);
         }

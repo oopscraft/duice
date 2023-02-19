@@ -5,18 +5,18 @@
     <title>Title</title>
     <script src="../../build/duice.js"></script>
     <script>
-        const array = new duice.Array([
+        let myArray = new duice.Array([
             { name: 'james', age: 13 },
             { name: 'tommy', age: 27 },
             { name: 'orange', age: 21 },
             { name: 'apple', age: 18 },
         ]);
-        console.log(array);
+        console.log(myArray);
    </script>
 </head>
 <body>
 
-    <table is="duice-table" duice:bind="array" duice:var="object" border="1">
+    <table is="duice-table" duice:bind="myArray" duice:item="myObject" border="1">
         <thead>
             <tr>
                 <td>Name</td>
@@ -26,10 +26,10 @@
         <tbody>
             <tr>
                 <td>
-                    <input is="duice-input" duice:bind="object" duice:key="name"/>
+                    <input is="duice-input" duice:bind="myObject" duice:name="name"/>
                 </td>
                 <td>
-                    <input is="duice-input" duice:bind="object" duice:key="age"/>
+                    <input is="duice-input" duice:bind="myObject" duice:name="age"/>
                 </td>
             </tr>
         </tbody>

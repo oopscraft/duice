@@ -14,13 +14,15 @@ namespace duice.element {
          * @param element
          * @param context
          */
-        constructor(element: HTMLInputElement, context: object) {
+        constructor(element: HTMLTableElement, context: object) {
+            console.debug("Table.constructor", element, context);
             super(element, context);
-            this.tBodyTemplate = this.element.querySelector("tbody");
+            this.tBodyTemplate = <HTMLTableSectionElement>this.element.querySelector("tbody");
             this.element.removeChild(this.tBodyTemplate);
         }
 
         setArray(array: object[]): void {
+            console.debug("Table.setArray", array);
             let length = array.length;
             let index = -1;
             array.forEach(object => {
