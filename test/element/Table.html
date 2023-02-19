@@ -5,7 +5,7 @@
     <title>Title</title>
     <script src="../../build/duice.js"></script>
     <script>
-        const array = new duice.ArrayProxy([
+        const array = new duice.Array([
             { name: 'james', age: 13 },
             { name: 'tommy', age: 27 },
             { name: 'orange', age: 21 },
@@ -16,10 +16,9 @@
 </head>
 <body>
 
-    <table is="duice-table" duice:items="array" duice:item="object" border="1">
+    <table is="duice-table" duice:bind="array" duice:var="object" border="1">
         <thead>
             <tr>
-                <td>No</td>
                 <td>Name</td>
                 <td>Age</td>
             </tr>
@@ -27,13 +26,10 @@
         <tbody>
             <tr>
                 <td>
-                    <input is="duice-input" duice:item="status" duice:property="index"/>
+                    <input is="duice-input" duice:bind="object" duice:key="name"/>
                 </td>
                 <td>
-                    <input is="duice-input" duice:item="object" duice:property="name"/>
-                </td>
-                <td>
-                    <input is="duice-input" duice:item="object" duice:property="age"/>
+                    <input is="duice-input" duice:bind="object" duice:key="age"/>
                 </td>
             </tr>
         </tbody>

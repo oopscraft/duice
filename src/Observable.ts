@@ -1,21 +1,10 @@
 namespace duice {
 
-    /**
-     * Observable
-     */
-    export interface Observable<T> {
+    export interface Observable {
 
-        /**
-         * addObserver
-         * @param observer
-         */
-        addObserver(observer: T): void;
+        addObserver(observer: Observer): void;
 
-        /**
-         * notifyObservers
-         */
         notifyObservers(): void;
-
     }
 
 }

@@ -35,7 +35,7 @@ namespace duice.element {
                 let tBody: HTMLTableSectionElement = <HTMLTableSectionElement>this.tBodyTemplate.cloneNode(true);
                 let context = {};
                 context[this.getItem()] = object;
-                context[this.getStatus()] = new ObjectProxy({'index':index,'length':length});
+                context[this.getStatus()] = new MapProxy({'index':index,'length':length});
                 initializeComponent(tBody, context);
                 this.element.appendChild(tBody);
             });

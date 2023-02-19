@@ -3,13 +3,9 @@ namespace duice {
     /**
      * Observer
      */
-    export interface Observer<T> {
+    export interface Observer {
 
-        /**
-         * update
-         * @param observable
-         */
-        update(observable: T): void;
+        update(observable: Observable): void;
 
     }
 

@@ -10,7 +10,7 @@ namespace duice {
 
     let alias = 'duice';
 
-    const componentDefinitions: Array<ComponentDefinition> = new Array<ComponentDefinition>();
+    const componentDefinitions: ComponentDefinition[] = [];
 
     export function setAlias(value:string): void {
         alias = value;
@@ -30,7 +30,7 @@ namespace duice {
      * @param context
      */
     export function initializeComponent(container: any, context: object): void {
-        [ArrayComponentDefinition, ObjectComponentDefinition].forEach(componentDefinitionType => {
+        [ArrayComponentDefinition, MapComponentDefinition].forEach(componentDefinitionType => {
             componentDefinitions.forEach(componentDefinition => {
                 if(componentDefinition instanceof componentDefinitionType) {
                     let selector = componentDefinition.getSelector();
@@ -112,8 +112,10 @@ namespace duice {
     /**
      * listens DOMContentLoaded event
      */
-    document.addEventListener("DOMContentLoaded", event => {
-        initializeComponent(document, {});
-    });
+    if(globalThis.document) {
+        document.addEventListener("DOMContentLoaded", event => {
+            initializeComponent(document, {});
+        });
+    }
 
 }

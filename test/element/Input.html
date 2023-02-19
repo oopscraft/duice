@@ -5,27 +5,15 @@
     <title>Title</title>
     <script src="../../build/duice.js"></script>
     <script>
-        const object = new duice.ObjectProxy({
-            name: "james smith",
-            setName: function(value){
-                this.name = value;
-            }
+        const myObject = new duice.Object({
+            id: "james",
+            name: "james smith"
         });
-        console.log("object", object);
-
-        function testReadonly(){
-
-        }
     </script>
-    <style>
-        .duice-input {
-            font-weight: bold;
-        }
-    </style>
 </head>
 <body>
 
-    <input is="duice-input" duice:item="object" duice:property="name" onchange="console.log(object);"/>
+    <input is="duice-input" duice:bind="myObject" duice:name="id" onchange="console.log(myObject);"/>
 
 </body>
 </html>

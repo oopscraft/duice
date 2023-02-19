@@ -4,19 +4,41 @@ namespace duice {
     /**
      * Component
      */
-    export abstract class Component<T> {
+    export abstract class Component<T> implements Observer, Observable {
 
         element: HTMLElement;
+
+        observers: Handler<T>[] = [];
 
         /**
          * constructor
          * @param element
+         * @param context
          * @protected
          */
-        protected constructor(element: HTMLElement) {
+        protected constructor(element: HTMLElement, context: object) {
             this.element = element;
             this.setAttribute("id", generateUuid());
         }
+
+        bind(handler: Handler<T>): void {
+            this.addObserver(handler);
+            handler.addObserver(this);
+        }
+
+
+        addObserver(observer: Handler<T>): void {
+            this.observers.push(observer);
+        }
+
+        notifyObservers(): void {
+            let _this = this;
+            this.observers.forEach(observer =>{
+                observer.update(_this);
+            });
+        }
+
+        abstract update(observable: Observable): void;
 
         /**
          * hasAttribute

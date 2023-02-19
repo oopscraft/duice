@@ -1,4 +1,15 @@
-/// <reference path="../src/Map.ts"/>
-let map = new duice.Map();
-map.set("name", "james");
-console.log(map);
+import fs from "fs";
+import vm from "vm";
+vm.runInThisContext(fs.readFileSync("../build/duice.js"));
+
+// create
+let object = new duice.Object({
+    name:'james',
+    age: 18
+});
+console.log("object", object);
+
+// handler
+console.log("handler", object._handler_);
+
+

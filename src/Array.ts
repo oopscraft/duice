@@ -3,18 +3,18 @@ namespace duice {
     /**
      * ArrayProxy
      */
-    export class ArrayProxy {
+    export class Array extends globalThis.Array {
 
         /**
          * constructor
          * @param target
          */
         constructor(target: object[]) {
-            let targetCopy = new Array();
+            super();
             target.forEach(element => {
-               targetCopy.push(new ObjectProxy(element));
+               this.push(new Map(element));
             });
-            return new Proxy(targetCopy, new ArrayHandler(target));
+            return new Proxy(this, new ArrayHandler(this));
         }
 
     }

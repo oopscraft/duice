@@ -1,16 +1,15 @@
 ///<reference path="../index.ts"/>
-///<reference path="../ObjectComponent.ts"/>
+///<reference path="../MapComponent.ts"/>
 ///<reference path="../ComponentDefinition.ts"/>
-///<reference path="../ObjectComponentDefinition.ts"/>
+///<reference path="../MapComponentDefinition.ts"/>
 
 namespace duice.element {
 
-    export class Input extends ObjectComponent {
+    export class Input extends MapComponent {
 
         element: HTMLInputElement;
 
         constructor(element: HTMLInputElement, context: object) {
-            console.log("Input", element, context);
             super(element, context);
             let _this = this;
             this.element.addEventListener('change', function(event){
@@ -22,13 +21,27 @@ namespace duice.element {
             this.element.value = value;
         }
 
+        /**
+         * getValue
+         */
         getValue() {
             return this.element.value;
         }
 
+        /**
+         * setReadonly
+         * @param readonly
+         */
+        setReadonly(readonly: boolean) {
+            if(readonly) {
+                this.element.readOnly = readonly;
+            }
+        }
+
+
     }
 
-    defineComponent(new ObjectComponentDefinition(Input, "input", `${getAlias()}-input`));
+    defineComponent(new MapComponentDefinition(Input, "input", `${getAlias()}-input`));
 
 }
 
