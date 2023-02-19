@@ -1,11 +1,6 @@
-///<reference path="../index.ts"/>
-///<reference path="../MapComponent.ts"/>
-///<reference path="../ComponentDefinition.ts"/>
-///<reference path="../MapComponentDefinition.ts"/>
-
 namespace duice.element {
 
-    export class Input extends MapComponent {
+    export class Input extends ObjectComponent {
 
         element: HTMLInputElement;
 
@@ -41,7 +36,8 @@ namespace duice.element {
 
     }
 
-    defineComponent(new MapComponentDefinition(Input, "input", `${getAlias()}-input`));
+    // defines component
+    defineComponent(Input, "input", `${getAlias()}-input`);
 
 }
 

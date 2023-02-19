@@ -1,7 +1,8 @@
-/// <reference path="MapComponent.ts" />
-
 namespace duice {
 
+    /**
+     * Handler
+     */
     export abstract class Handler<T> implements Observer, Observable {
 
         target: T;

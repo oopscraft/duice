@@ -12,7 +12,7 @@ namespace duice {
         constructor(target: object[]) {
             super();
             target.forEach(element => {
-               this.push(new Map(element));
+               this.push(new duice.Object(element));
             });
             return new Proxy(this, new ArrayHandler(this));
         }

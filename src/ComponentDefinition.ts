@@ -3,7 +3,7 @@ namespace duice {
     /**
      * ComponentDefinition
      */
-    export abstract class ComponentDefinition {
+    export class ComponentDefinition {
 
         componentType: any;
 
@@ -18,7 +18,7 @@ namespace duice {
          * @param isAttribute
          * @protected
          */
-        protected constructor(componentType: any, tagName: string, isAttribute?: string)  {
+        public constructor(componentType: any, tagName: string, isAttribute?: string)  {
             this.componentType = componentType;
             this.tagName = tagName;
             this.isAttribute = isAttribute;

@@ -20,13 +20,8 @@ namespace duice.element {
             super(element, context);
             this.tBodyTemplate = this.element.querySelector("tbody");
             this.element.removeChild(this.tBodyTemplate);
-            this.setArray(this.getArray())
         }
 
-        /**
-         * setArray
-         * @param array
-         */
         setArray(array: object[]): void {
             let length = array.length;
             let index = -1;
@@ -35,13 +30,14 @@ namespace duice.element {
                 let tBody: HTMLTableSectionElement = <HTMLTableSectionElement>this.tBodyTemplate.cloneNode(true);
                 let context = {};
                 context[this.getItem()] = object;
-                context[this.getStatus()] = new MapProxy({'index':index,'length':length});
+                context[this.getStatus()] = {'index':index,'length':length};
                 initializeComponent(tBody, context);
                 this.element.appendChild(tBody);
             });
         }
     }
 
-    defineComponent(new ArrayComponentDefinition(Table, "table", `${getAlias()}-table`));
+    // defines component
+    defineComponent(Table, "table", `${getAlias()}-table`);
 
 }

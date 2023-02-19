@@ -20,7 +20,8 @@ namespace duice {
         return alias;
     }
 
-    export function defineComponent(componentDefinition: ComponentDefinition) {
+    export function defineComponent(componentType: any, tagName: string, isAttribute: string) {
+        let componentDefinition = new ComponentDefinition(componentType, tagName, isAttribute);
         componentDefinitions.push(componentDefinition);
     }
 
@@ -30,9 +31,9 @@ namespace duice {
      * @param context
      */
     export function initializeComponent(container: any, context: object): void {
-        [ArrayComponentDefinition, MapComponentDefinition].forEach(componentDefinitionType => {
+        [ArrayComponent, ObjectComponent].forEach(componentType => {
             componentDefinitions.forEach(componentDefinition => {
-                if(componentDefinition instanceof componentDefinitionType) {
+                if(componentDefinition.componentType.prototype instanceof componentType) {
                     let selector = componentDefinition.getSelector();
                     let elements = container.querySelectorAll(selector);
                     elements.forEach(element => {

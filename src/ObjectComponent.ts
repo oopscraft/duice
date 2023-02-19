@@ -3,7 +3,7 @@
 
 namespace duice {
 
-    export abstract class ObjectComponent extends Component<Map> {
+    export abstract class ObjectComponent extends Component<Object> {
 
         name: string;
 
