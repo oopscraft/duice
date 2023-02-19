@@ -24,7 +24,7 @@ namespace duice {
 
         set(target: Object, property: string, value: any): boolean {
             console.log("ArrayHandler.change", target, property, value);
-            //this.notifyObservers();
+            this.notifyObservers();
             return true;
         }
     }
