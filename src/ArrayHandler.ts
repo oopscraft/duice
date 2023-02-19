@@ -22,6 +22,12 @@ namespace duice {
             console.log("Set.update", arrayComponent);
         }
 
+        /**
+         * set
+         * @param target
+         * @param property
+         * @param value
+         */
         set(target: Object, property: string, value: any): boolean {
             console.log("ArrayHandler.change", target, property, value);
             this.notifyObservers();

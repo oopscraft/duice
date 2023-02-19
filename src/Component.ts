@@ -1,4 +1,3 @@
-
 namespace duice {
 
     /**
@@ -21,16 +20,26 @@ namespace duice {
             this.setAttribute("id", generateUuid());
         }
 
+        /**
+         * bind
+         * @param handler
+         */
         bind(handler: Handler<T>): void {
             this.addObserver(handler);
             handler.addObserver(this);
         }
 
-
+        /**
+         * adds observer
+         * @param observer
+         */
         addObserver(observer: Handler<T>): void {
             this.observers.push(observer);
         }
 
+        /**
+         * notifies observers
+         */
         notifyObservers(): void {
             let _this = this;
             this.observers.forEach(observer =>{
@@ -38,6 +47,10 @@ namespace duice {
             });
         }
 
+        /**
+         * update
+         * @param observable
+         */
         abstract update(observable: Observable): void;
 
         /**
