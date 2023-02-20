@@ -18,7 +18,7 @@ namespace duice {
          * update
          * @param arrayComponent
          */
-        update(arrayComponent: ArrayComponent, event: object): void {
+        doUpdate(arrayComponent: ArrayComponent, event: object): void {
             console.log("Set.update", arrayComponent, event);
         }
 

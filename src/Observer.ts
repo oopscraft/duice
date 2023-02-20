@@ -5,7 +5,7 @@ namespace duice {
      */
     export interface Observer {
 
-        update(observable: Observable, event: Event): void;
+        doUpdate(observable: Observable, event: Event): void;
 
     }
 

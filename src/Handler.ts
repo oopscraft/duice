@@ -29,7 +29,7 @@ namespace duice {
          * @param component
          * @param event
          */
-        abstract update(component: Component, event: Event): void;
+        abstract doUpdate(component: Component, event: Event): void;
 
         /**
          * getTarget

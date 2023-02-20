@@ -6,11 +6,31 @@ namespace duice.element {
 
         constructor(element: HTMLInputElement) {
             super(element);
+        }
+
+        override doInitialize(context: object): void {
             let _this = this;
             this.element.addEventListener('change', function(event){
                 _this.notifyObservers(new Event(_this,{}));
             },true);
         }
+
+        /**
+         * update
+         * @param objectHandler
+         */
+        override doUpdate(objectHandler: ObjectHandler, event: object): void {
+            console.debug("ObjectComponent.update", objectHandler, event);
+            let object = objectHandler.getTarget();
+            let value = object[this.name];
+            this.setValue(value);
+        }
+
+        override doDestroy(): void {
+            // no-op
+        }
+
+
 
         setValue(value: any): void {
             this.element.value = value;

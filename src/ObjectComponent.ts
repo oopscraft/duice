@@ -22,17 +22,6 @@ namespace duice {
         }
 
         /**
-         * update
-         * @param objectHandler
-         */
-        override update(objectHandler: ObjectHandler, event: object): void {
-            console.debug("ObjectComponent.update", objectHandler, event);
-            let object = objectHandler.getTarget();
-            let value = object[this.name];
-            this.setValue(value);
-        }
-
-        /**
          * getName
          */
         getName(): string {

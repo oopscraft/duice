@@ -15,7 +15,7 @@ namespace duice {
             super(object);
         }
 
-        update(objectComponent: ObjectComponent, event: object): void {
+        doUpdate(objectComponent: ObjectComponent, event: object): void {
             console.debug('ObjectHandler.update', objectComponent, event);
             let name = objectComponent.getName();
             let value = objectComponent.getValue();

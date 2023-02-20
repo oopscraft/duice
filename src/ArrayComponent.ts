@@ -27,7 +27,7 @@ namespace duice {
          * update
          * @param arrayHandler
          */
-        update(arrayHandler: ArrayHandler, event: object) {
+        doUpdate(arrayHandler: ArrayHandler, event: object) {
             console.debug("ArrayComponent.update", arrayHandler, event);
             let array = arrayHandler.getTarget();
             this.setArray(array);

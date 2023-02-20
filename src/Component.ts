@@ -27,23 +27,47 @@ namespace duice {
             this.addObserver(bind._handler_);
             bind._handler_.addObserver(this);
 
+            // initialize
+            this.doInitialize(context);
+
             // update
-            this.update(bind._handler_, null);
+            this.doUpdate(bind._handler_, null);
         }
+
+        /**
+         * doInitialize
+         * @param context
+         */
+        abstract doInitialize(context: object): void;
 
         /**
          * update
          * @param handler
          * @param event
          */
-        abstract update(handler: Handler, event: Event): void;
+        update(handler: Handler, event: Event): void {
+            this.doUpdate(handler, event);
+        }
+
+        /**
+         * doUpdate
+         * @param handler
+         * @param event
+         */
+        abstract doUpdate(handler: Handler, event: Event): void;
 
         /**
          * destroy
          */
         destroy(): void {
             console.debug("Component.destroy", this);
+            this.doDestroy();
         }
+
+        /**
+         * doDestroy
+         */
+        abstract doDestroy(): void;
 
         /**
          * hasAttribute
