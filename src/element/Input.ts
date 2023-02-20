@@ -4,11 +4,11 @@ namespace duice.element {
 
         element: HTMLInputElement;
 
-        constructor(element: HTMLInputElement, context: object) {
-            super(element, context);
+        constructor(element: HTMLInputElement) {
+            super(element);
             let _this = this;
             this.element.addEventListener('change', function(event){
-                _this.notifyObservers();
+                _this.notifyObservers(new Event(_this,{}));
             },true);
         }
 

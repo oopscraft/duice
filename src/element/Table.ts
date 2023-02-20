@@ -14,9 +14,11 @@ namespace duice.element {
          * @param element
          * @param context
          */
-        constructor(element: HTMLTableElement, context: object) {
-            console.debug("Table.constructor", element, context);
-            super(element, context);
+        constructor(element: HTMLTableElement) {
+            console.debug("Table.constructor", element);
+            super(element);
+            console.log(this.element);
+            alert(this.element);
             this.tBodyTemplate = <HTMLTableSectionElement>this.element.querySelector("tbody");
             this.element.removeChild(this.tBodyTemplate);
         }

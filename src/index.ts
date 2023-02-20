@@ -45,7 +45,8 @@ namespace duice {
                     let elements = container.querySelectorAll(selector);
                     elements.forEach(element => {
                         console.debug("initializeComponent", element);
-                        Reflect.construct(componentDefinition.componentType, [element, context]);
+                        let component = Reflect.construct(componentDefinition.componentType, [element]);
+                        component.initialize(context);
                     });
                 }
             });

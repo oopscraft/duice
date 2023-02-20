@@ -3,55 +3,47 @@ namespace duice {
     /**
      * Component
      */
-    export abstract class Component<T> implements Observer, Observable {
+    export abstract class Component extends Observable implements Observer {
+
+        id: string;
 
         element: HTMLElement;
 
-        observers: Handler<T>[] = [];
-
-        /**
-         * constructor
-         * @param element
-         * @param context
-         * @protected
-         */
-        protected constructor(element: HTMLElement, context: object) {
+        protected constructor(element: HTMLElement) {
+            super();
             this.element = element;
-            this.setAttribute("id", generateUuid());
+            this.id = generateUuid();
+            this.setAttribute("id", this.id);
         }
 
         /**
-         * bind
-         * @param handler
+         * initialize
          */
-        bind(handler: Handler<T>): void {
-            this.addObserver(handler);
-            handler.addObserver(this);
-        }
+        initialize(context: object): void {
+            console.debug("Component.initialize", this);
 
-        /**
-         * adds observer
-         * @param observer
-         */
-        addObserver(observer: Handler<T>): void {
-            this.observers.push(observer);
-        }
+            // bind
+            let bind = findObject(context, this.getAttribute("bind"));
+            this.addObserver(bind._handler_);
+            bind._handler_.addObserver(this);
 
-        /**
-         * notifies observers
-         */
-        notifyObservers(): void {
-            let _this = this;
-            this.observers.forEach(observer =>{
-                observer.update(_this);
-            });
+            // update
+            this.update(bind._handler_, null);
         }
 
         /**
          * update
-         * @param observable
+         * @param handler
+         * @param event
          */
-        abstract update(observable: Observable): void;
+        abstract update(handler: Handler, event: Event): void;
+
+        /**
+         * destroy
+         */
+        destroy(): void {
+            console.debug("Component.destroy", this);
+        }
 
         /**
          * hasAttribute
@@ -75,6 +67,7 @@ namespace duice {
          * @param value
          */
         setAttribute(name: string, value: string): void {
+            console.log(this.element, name, value);
             this.element.setAttribute(`${getAlias()}:${name}`, value);
         }
 

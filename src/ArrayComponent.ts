@@ -4,7 +4,7 @@ namespace duice {
     /**
      * ArrayComponent
      */
-    export abstract class ArrayComponent extends Component<Array> {
+    export abstract class ArrayComponent extends Component {
 
         item: string;
 
@@ -16,26 +16,19 @@ namespace duice {
          * @param context
          * @protected
          */
-        protected constructor(element: HTMLElement, context: object) {
+        protected constructor(element: HTMLElement) {
             console.debug("ArrayComponent.constructor", element);
-            super(element, context);
+            super(element);
             this.item = this.getAttribute("item");
             this.status = this.getAttribute("status");
-
-            // bind
-            let array = findObject(context, this.getAttribute("bind"));
-            this.bind(array._handler_);
-
-            // update
-            this.update(array._handler_);
         }
 
         /**
          * update
          * @param arrayHandler
          */
-        update(arrayHandler: ArrayHandler) {
-            console.debug("ArrayComponent.update", arrayHandler);
+        update(arrayHandler: ArrayHandler, event: object) {
+            console.debug("ArrayComponent.update", arrayHandler, event);
             let array = arrayHandler.getTarget();
             this.setArray(array);
         }

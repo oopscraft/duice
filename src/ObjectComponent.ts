@@ -5,7 +5,7 @@ namespace duice {
     /**
      * ObjectComponent
      */
-    export abstract class ObjectComponent extends Component<Object> {
+    export abstract class ObjectComponent extends Component {
 
         name: string;
 
@@ -15,25 +15,18 @@ namespace duice {
          * @param context
          * @protected
          */
-        protected constructor(element: HTMLElement, context: object) {
-            super(element, context);
-            console.debug("MapComponent.constructor", element);
+        protected constructor(element: HTMLElement) {
+            console.debug("ObjectComponent.constructor", element);
+            super(element);
             this.name = this.getAttribute("name");
-
-            // bind
-            let object = findObject(context, this.getAttribute("bind"));
-            this.bind(object._handler_);
-
-            // update
-            this.update(object._handler_);
         }
 
         /**
          * update
          * @param objectHandler
          */
-        update(objectHandler: ObjectHandler): void {
-            console.debug("ObjectComponent.update", objectHandler);
+        override update(objectHandler: ObjectHandler, event: object): void {
+            console.debug("ObjectComponent.update", objectHandler, event);
             let object = objectHandler.getTarget();
             let value = object[this.name];
             this.setValue(value);

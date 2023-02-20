@@ -1,10 +1,18 @@
 namespace duice {
 
-    export interface Observable {
+    export class Observable {
 
-        addObserver(observer: Observer): void;
+        observers: Observer[] = [];
 
-        notifyObservers(): void;
+        addObserver(observer: Observer): void {
+            this.observers.push(observer);
+        }
+
+        notifyObservers(event: Event): void {
+            this.observers.forEach(observer => {
+                observer.update(this, event);
+            });
+        }
     }
 
 }

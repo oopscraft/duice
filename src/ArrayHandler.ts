@@ -4,7 +4,7 @@ namespace duice {
     /**
      * Set data structure
      */
-    export class ArrayHandler extends Handler<Array> {
+    export class ArrayHandler extends Handler {
 
         /**
          * constructor
@@ -18,8 +18,8 @@ namespace duice {
          * update
          * @param arrayComponent
          */
-        update(arrayComponent: ArrayComponent): void {
-            console.log("Set.update", arrayComponent);
+        update(arrayComponent: ArrayComponent, event: object): void {
+            console.log("Set.update", arrayComponent, event);
         }
 
         /**
@@ -30,7 +30,7 @@ namespace duice {
          */
         set(target: Object, property: string, value: any): boolean {
             console.log("ArrayHandler.change", target, property, value);
-            this.notifyObservers();
+            this.notifyObservers(new Event(this, {}));
             return true;
         }
     }

@@ -1,20 +1,20 @@
+///<reference path="Observable.ts"/>
 namespace duice {
 
     /**
      * Handler
      */
-    export abstract class Handler<T> implements ProxyHandler<any>, Observer, Observable {
+    export abstract class Handler extends Observable implements Observer, ProxyHandler<any> {
 
-        target: T;
-
-        observers: Component<T>[] = [];
+        target: any;
 
         /**
          * constructor
          * @param target
          * @protected
          */
-        protected constructor(target: T) {
+        protected constructor(target: any) {
+            super();
             this.target = target;
 
             // adds handler
@@ -25,39 +25,22 @@ namespace duice {
         }
 
         /**
+         * update
+         * @param component
+         * @param event
+         */
+        abstract update(component: Component, event: Event): void;
+
+        /**
          * getTarget
          */
-        getTarget(): T {
+        getTarget(): any {
             return this.target;
         }
 
-        /**
-         * get
-         * @param target
-         * @param property
-         * @param receiver
-         */
         get(target: any, property: any, receiver: any): any {
             return Reflect.get(target, property, receiver);
         }
-
-        /**
-         * addObserver
-         * @param observer
-         */
-        addObserver(observer: Component<T>): void {
-            this.observers.push(observer);
-        }
-
-        notifyObservers(): void {
-            let _this = this;
-            this.observers.forEach(observer => {
-                console.debug("MapHandler.notifyObservers", observer);
-                observer.update(_this);
-            });
-        }
-
-        abstract update(observable: Observable): void;
 
     }
 
