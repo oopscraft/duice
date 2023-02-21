@@ -11,7 +11,7 @@ namespace duice.element {
         override doInitialize(context: object): void {
             let _this = this;
             this.element.addEventListener('change', function(event){
-                _this.notifyObservers(new Event(_this,{}));
+                _this.notifyObservers(new Event(_this, {}));
             },true);
         }
 

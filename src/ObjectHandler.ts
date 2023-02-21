@@ -1,5 +1,3 @@
-///<reference path="Handler.ts"/>
-///<reference path="event/Event.ts"/>
 namespace duice {
 
     /**
@@ -23,9 +21,7 @@ namespace duice {
         set(name: string, value: any): void {
             this.getTarget().set
             Reflect.set(this.getTarget(), name, value);
-            this.notifyObservers(new ValueChangeEvent(
-                name, value
-            ));
+            this.notifyObservers(new duice.event.ValueChangeEvent(name, value));
         }
 
         /**
@@ -41,7 +37,7 @@ namespace duice {
          * @param objectComponent
          * @param event
          */
-        doUpdate(objectComponent: ObjectComponent, event: duice.Event): void {
+        doUpdate(objectComponent: ObjectComponent, event: duice.event.Event): void {
 
         }
     }

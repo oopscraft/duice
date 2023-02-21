@@ -1,19 +1,22 @@
-namespace duice.event {
+namespace duice {
 
-    /**
-     * Event
-     */
-    export class Event {
-
+    export namespace event {
         /**
-         * constructor
-         * @param type
-         * @param data
+         * Event
          */
-        constructor() {
-            // no-op
+        export class Event {
+
+            /**
+             * constructor
+             * @param type
+             * @param data
+             */
+            constructor() {
+                // no-op
+            }
         }
 
     }
+
 
 }

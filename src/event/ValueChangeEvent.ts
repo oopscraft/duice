@@ -1,30 +1,33 @@
-namespace duice.event {
+namespace duice {
 
-    export class ValueChangeEvent extends Event {
+    export namespace event {
 
-        name: string;
+        export class ValueChangeEvent extends Event {
 
-        value: any;
+            name: string;
 
-        /**
-         * constructor
-         * @param type
-         * @param data
-         */
-        constructor(name: string, value: any) {
-            super();
-            this.name = name;
-            this.value = value;
+            value: any;
+
+            /**
+             * constructor
+             * @param type
+             * @param data
+             */
+            constructor(name: string, value: any) {
+                super();
+                this.name = name;
+                this.value = value;
+            }
+
+            getName(): string {
+                return this.name;
+            }
+
+            getValue(): any {
+                return this.value;
+            }
         }
-
-        getName(): string {
-            return this.name;
-        }
-
-        getValue(): any {
-            return this.value;
-        }
-
 
     }
+
 }
