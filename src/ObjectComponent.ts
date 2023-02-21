@@ -1,7 +1,5 @@
 namespace duice {
 
-    import ValueChangeEvent = duice.event.ValueChangeEvent;
-
     /**
      * ObjectComponent
      */
@@ -21,31 +19,16 @@ namespace duice {
         }
 
         doUpdate(objectHandler: ObjectHandler, event: Event): void {
-            if(event instanceof ValueChangeEvent){
-                let value = objectHandler.get
-            }
-            switch(event){
-                case ObjectEventType.VALUE_CHANGE:
-                    if(event.getData()['name'] === this.name){
-                        let value = objectHandler.get
-                        this.setValue()
-                    }
-                    object[]
-                    event.data.name
-                    break;
+            if(event instanceof duice.event.ValueChangeEvent){
+                if(event.getName() === this.name){
+                    this.setValue(event.getValue());
+                }
             }
         }
 
-        /**
-         * getName
-         */
-        getName(): string {
-            return this.name;
-        }
+        abstract setValue(value: any): void;
 
-        abstract setValue: void;
-
-        abstract getValue: string;
+        abstract getValue(): string;
 
     }
 

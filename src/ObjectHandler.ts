@@ -2,8 +2,6 @@
 ///<reference path="event/Event.ts"/>
 namespace duice {
 
-    import ValueChangeEvent = duice.event.ValueChangeEvent;
-
     /**
      * ObjectHandler
      */
@@ -23,6 +21,7 @@ namespace duice {
          * @param value
          */
         set(name: string, value: any): void {
+            this.getTarget().set
             Reflect.set(this.getTarget(), name, value);
             this.notifyObservers(new ValueChangeEvent(
                 name, value
