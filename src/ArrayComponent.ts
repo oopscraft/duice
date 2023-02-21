@@ -24,16 +24,6 @@ namespace duice {
         }
 
         /**
-         * update
-         * @param arrayHandler
-         */
-        doUpdate(arrayHandler: ArrayHandler, event: object) {
-            console.debug("ArrayComponent.update", arrayHandler, event);
-            let array = arrayHandler.getTarget();
-            this.setArray(array);
-        }
-
-        /**
          * getItem
          */
         getItem(): string {
@@ -46,12 +36,6 @@ namespace duice {
         getStatus(): string {
             return this.status;
         }
-
-        /**
-         * setArray
-         * @param array
-         */
-        abstract setArray(array:object[]);
 
     }
 

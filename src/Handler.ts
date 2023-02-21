@@ -4,7 +4,7 @@ namespace duice {
     /**
      * Handler
      */
-    export abstract class Handler extends Observable implements Observer, ProxyHandler<any> {
+    export abstract class Handler extends Observable implements Observer {
 
         target: any;
 
@@ -16,16 +16,19 @@ namespace duice {
         protected constructor(target: any) {
             super();
             this.target = target;
-
-            // adds handler
-            Object.defineProperty(target, "_handler_", {
-                value: this,
-                writable: false
-            });
         }
 
         /**
          * update
+         * @param component
+         * @param event
+         */
+        update(component: Component, event: Event): void {
+            this.doUpdate(component, event);
+        }
+
+        /**
+         * doUpdate
          * @param component
          * @param event
          */

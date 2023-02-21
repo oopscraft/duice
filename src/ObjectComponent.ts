@@ -1,6 +1,6 @@
-///<reference path="Observer.ts"/>
-///<reference path="Component.ts"/>
 namespace duice {
+
+    import ValueChangeEvent = duice.event.ValueChangeEvent;
 
     /**
      * ObjectComponent
@@ -12,13 +12,28 @@ namespace duice {
         /**
          * constructor
          * @param element
-         * @param context
          * @protected
          */
         protected constructor(element: HTMLElement) {
             console.debug("ObjectComponent.constructor", element);
             super(element);
             this.name = this.getAttribute("name");
+        }
+
+        doUpdate(objectHandler: ObjectHandler, event: Event): void {
+            if(event instanceof ValueChangeEvent){
+                let value = objectHandler.get
+            }
+            switch(event){
+                case ObjectEventType.VALUE_CHANGE:
+                    if(event.getData()['name'] === this.name){
+                        let value = objectHandler.get
+                        this.setValue()
+                    }
+                    object[]
+                    event.data.name
+                    break;
+            }
         }
 
         /**
@@ -28,16 +43,9 @@ namespace duice {
             return this.name;
         }
 
-        /**
-         * setValue
-         * @param value
-         */
-        abstract setValue(value: any): void;
+        abstract setValue: void;
 
-        /**
-         * getValue
-         */
-        abstract getValue(): any;
+        abstract getValue: string;
 
     }
 

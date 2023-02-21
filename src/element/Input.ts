@@ -19,18 +19,21 @@ namespace duice.element {
          * update
          * @param objectHandler
          */
-        override doUpdate(objectHandler: ObjectHandler, event: object): void {
+        override doUpdate(objectHandler: ObjectHandler, event: ObjectEvent): void {
             console.debug("ObjectComponent.update", objectHandler, event);
             let object = objectHandler.getTarget();
-            let value = object[this.name];
+            switch(event.getType()){
+                case ObjectEventType.VALUE_CHANGE:
+                    break;
+            }
+
+            let value = object[eve];
             this.setValue(value);
         }
 
         override doDestroy(): void {
             // no-op
         }
-
-
 
         setValue(value: any): void {
             this.element.value = value;

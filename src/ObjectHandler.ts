@@ -1,6 +1,8 @@
 ///<reference path="Handler.ts"/>
-///<reference path="Event.ts"/>
+///<reference path="event/Event.ts"/>
 namespace duice {
+
+    import ValueChangeEvent = duice.event.ValueChangeEvent;
 
     /**
      * ObjectHandler
@@ -15,18 +17,33 @@ namespace duice {
             super(object);
         }
 
-        doUpdate(objectComponent: ObjectComponent, event: object): void {
-            console.debug('ObjectHandler.update', objectComponent, event);
-            let name = objectComponent.getName();
-            let value = objectComponent.getValue();
+        /**
+         * set
+         * @param name
+         * @param value
+         */
+        set(name: string, value: any): void {
             Reflect.set(this.getTarget(), name, value);
+            this.notifyObservers(new ValueChangeEvent(
+                name, value
+            ));
         }
 
-        set(target: Object, property: string, value: any): boolean {
-            console.debug("ObjectHandler.set", target, property, value);
-            Reflect.set(target, property, value);
-            this.notifyObservers(new Event(this,{}));
-            return true;
+        /**
+         * get
+         * @param name
+         */
+        get(name: string) {
+            return Reflect.get(this.getTarget(), name);
+        }
+
+        /**
+         * doUpdate
+         * @param objectComponent
+         * @param event
+         */
+        doUpdate(objectComponent: ObjectComponent, event: duice.Event): void {
+
         }
     }
 }

@@ -15,14 +15,6 @@ namespace duice {
         }
 
         /**
-         * update
-         * @param arrayComponent
-         */
-        doUpdate(arrayComponent: ArrayComponent, event: object): void {
-            console.log("Set.update", arrayComponent, event);
-        }
-
-        /**
          * set
          * @param target
          * @param property
@@ -32,6 +24,9 @@ namespace duice {
             console.log("ArrayHandler.change", target, property, value);
             this.notifyObservers(new Event(this, {}));
             return true;
+        }
+
+        update(component: duice.Component, event: duice.Event): void {
         }
     }
 }
