@@ -5,7 +5,7 @@ namespace duice {
      */
     export abstract class MapComponent extends Component {
 
-        name: string;
+        key: string;
 
         /**
          * constructor
@@ -15,20 +15,54 @@ namespace duice {
         protected constructor(element: HTMLElement) {
             console.debug("ObjectComponent.constructor", element);
             super(element);
-            this.name = this.getAttribute("name");
+            this.key = this.getAttribute("key");
         }
 
-        doUpdate(handler: duice.Observable, event: duice.MapEvent): void {
-            if(event instanceof duice.event.ValueChangeEvent){
-                if(event.getName() === this.name){
-                    this.setValue(event.getValue());
-                }
+        /**
+         * doInitialize
+         * @param context
+         */
+        abstract doInitialize(context: object): void;
+
+        /**
+         * doUpdate
+         * @param mapHandler
+         * @param mapEvent
+         */
+        doUpdate(mapHandler: MapHandler, mapEvent: MapEvent): void {
+            console.debug("MapComponent.doUpdate", mapHandler, mapEvent);
+            switch(mapEvent.getType()){
+                case MapEventType.SET_VALUE:
+                    if(mapEvent.getDetail("key") === this.key){
+                        this.setValue(mapEvent.getDetail("value"));
+                    }
+                    break;
+                case MapEventType.SET_READONLY:
+                    if(mapEvent.getDetail("key") === this.key){
+                        this.setReadonly(mapEvent.getDetail("readonly"));
+                    }
+                    break;
+                default:
+                    throw Error("Invalid event type");
             }
         }
 
+        /**
+         * doDestroy
+         */
+        abstract doDestroy(): void;
+
+        /**
+         * setValue
+         * @param value
+         */
         abstract setValue(value: any): void;
 
-        abstract getValue(): string;
+        /**
+         * setReadonly
+         * @param readonly
+         */
+        abstract setReadonly(readonly: boolean): void;
 
     }
 

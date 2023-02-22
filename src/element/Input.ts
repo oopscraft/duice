@@ -1,3 +1,4 @@
+///<reference path="../MapComponent.ts"/>
 namespace duice.element {
 
     export class Input extends MapComponent {
@@ -11,51 +12,21 @@ namespace duice.element {
         override doInitialize(context: object): void {
             let _this = this;
             this.element.addEventListener('change', function(event){
-                _this.notifyObservers(new Event(_this, {}));
+                let mapEvent = new MapEvent(MapEventType.SET_VALUE,{
+                    key: _this.key,
+                    value: this.value
+                });
+                _this.notifyObservers(mapEvent);
             },true);
         }
 
-        /**
-         * update
-         * @param handler
-         */
-        override doUpdate(handler: duice.Observable, event: duice.MapEvent): void {
-            console.debug("ObjectComponent.update", handler, event);
-            let object = handler.getTarget();
-            switch(event.getType()){
-                case ObjectEventType.VALUE_CHANGE:
-                    break;
-            }
-
-            let value = object[eve];
-            this.setValue(value);
-        }
-
-        override doDestroy(): void {
-            // no-op
-        }
-
         setValue(value: any): void {
-            this.element.value = value;
+            throw new Error("Method not implemented.");
         }
 
-        /**
-         * getValue
-         */
-        getValue() {
-            return this.element.value;
+        setReadonly(readonly: boolean): void {
+            throw new Error("Method not implemented.");
         }
-
-        /**
-         * setReadonly
-         * @param readonly
-         */
-        setReadonly(readonly: boolean) {
-            if(readonly) {
-                this.element.readOnly = readonly;
-            }
-        }
-
 
     }
 

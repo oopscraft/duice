@@ -14,19 +14,14 @@ namespace duice {
             super(array);
         }
 
-        // /**
-        //  * set
-        //  * @param target
-        //  * @param property
-        //  * @param value
-        //  */
-        // set(target: Object, property: string, value: any): boolean {
-        //     console.log("ArrayHandler.change", target, property, value);
-        //     this.notifyObservers(new Event(this, {}));
-        //     return true;
-        // }
-        //
-        // update(component: duice.Component, event: duice.MapEvent): void {
-        // }
+        /**
+         * doUpdate
+         * @param arrayComponent
+         * @param arrayEvent
+         */
+        doUpdate(arrayComponent: ArrayComponent, arrayEvent: ArrayEvent): void {
+            console.debug("ArrayHandler.doUpdate", arrayComponent, arrayEvent);
+        }
+
     }
 }

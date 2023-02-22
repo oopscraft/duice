@@ -8,9 +8,10 @@ namespace duice {
         /**
          * constructor
          */
-        constructor() {
-            super();
+        constructor(type: symbol, detail: object) {
+            super(type, detail);
         }
+
     }
 
 }
