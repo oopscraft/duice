@@ -8,7 +8,7 @@ namespace duice {
             this.observers.push(observer);
         }
 
-        notifyObservers(event: duice.event.Event): void {
+        notifyObservers(event: Event): void {
             this.observers.forEach(observer => {
                 observer.update(this, event);
             });

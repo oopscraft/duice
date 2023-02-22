@@ -1,6 +1,6 @@
 namespace duice.element {
 
-    export class Input extends ObjectComponent {
+    export class Input extends MapComponent {
 
         element: HTMLInputElement;
 
@@ -17,11 +17,11 @@ namespace duice.element {
 
         /**
          * update
-         * @param objectHandler
+         * @param handler
          */
-        override doUpdate(objectHandler: ObjectHandler, event: ObjectEvent): void {
-            console.debug("ObjectComponent.update", objectHandler, event);
-            let object = objectHandler.getTarget();
+        override doUpdate(handler: duice.Observable, event: duice.MapEvent): void {
+            console.debug("ObjectComponent.update", handler, event);
+            let object = handler.getTarget();
             switch(event.getType()){
                 case ObjectEventType.VALUE_CHANGE:
                     break;

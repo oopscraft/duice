@@ -13,9 +13,9 @@ namespace duice {
         constructor(json: object[]) {
             super();
             json.forEach(element => {
-               this.push(new duice.Object(element));
+               this.push(new duice.Map(element));
             });
-            return new Proxy(this, new ArrayHandler(this));
+            return new Proxy(this, {});
         }
 
     }

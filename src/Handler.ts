@@ -11,20 +11,26 @@ namespace duice {
         /**
          * constructor
          * @param target
-         * @protected
          */
-        protected constructor(target: any) {
+        protected constructor(target: any){
             super();
             this.target = target;
         }
 
         /**
+         * getTarget
+         */
+        getTarget(): any {
+            return this.target();
+        }
+
+        /**
          * update
-         * @param component
+         * @param observable
          * @param event
          */
-        update(component: Component, event: Event): void {
-            this.doUpdate(component, event);
+        update(observable: Observable, event: Event): void {
+            this.doUpdate(observable, event);
         }
 
         /**
@@ -32,18 +38,7 @@ namespace duice {
          * @param component
          * @param event
          */
-        abstract doUpdate(component: Component, event: Event): void;
-
-        /**
-         * getTarget
-         */
-        getTarget(): any {
-            return this.target;
-        }
-
-        get(target: any, property: any, receiver: any): any {
-            return Reflect.get(target, property, receiver);
-        }
+        abstract doUpdate(component: Observable, event: Event): void;
 
     }
 

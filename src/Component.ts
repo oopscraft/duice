@@ -42,11 +42,11 @@ namespace duice {
 
         /**
          * update
-         * @param handler
+         * @param observable
          * @param event
          */
-        update(handler: Handler, event: Event): void {
-            this.doUpdate(handler, event);
+        update(observable: Observable, event: Event): void {
+            this.doUpdate(observable, event);
         }
 
         /**
@@ -54,7 +54,7 @@ namespace duice {
          * @param handler
          * @param event
          */
-        abstract doUpdate(handler: Handler, event: Event): void;
+        abstract doUpdate(handler: Observable, event: Event): void;
 
         /**
          * destroy

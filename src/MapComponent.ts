@@ -3,7 +3,7 @@ namespace duice {
     /**
      * ObjectComponent
      */
-    export abstract class ObjectComponent extends Component {
+    export abstract class MapComponent extends Component {
 
         name: string;
 
@@ -18,7 +18,7 @@ namespace duice {
             this.name = this.getAttribute("name");
         }
 
-        doUpdate(objectHandler: ObjectHandler, event: Event): void {
+        doUpdate(handler: duice.Observable, event: duice.MapEvent): void {
             if(event instanceof duice.event.ValueChangeEvent){
                 if(event.getName() === this.name){
                     this.setValue(event.getValue());

@@ -38,7 +38,7 @@ namespace duice {
      * @param context
      */
     export function initializeComponent(container: any, context: object): void {
-        [ArrayComponent, ObjectComponent].forEach(componentType => {
+        [ArrayComponent, MapComponent].forEach(componentType => {
             componentDefinitions.forEach(componentDefinition => {
                 if(componentDefinition.componentType.prototype instanceof componentType) {
                     let selector = componentDefinition.getSelector();
