@@ -50,7 +50,7 @@ namespace duice {
         }
 
         /**
-         * doUpdate
+         * doUpdate test
          * @param handler
          * @param event
          */
