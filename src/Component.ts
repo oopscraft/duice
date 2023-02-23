@@ -65,7 +65,7 @@ namespace duice {
         }
 
         /**
-         *
+         * doDestroy
          */
         abstract doDestroy(): void;
 
