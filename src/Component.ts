@@ -9,7 +9,7 @@ namespace duice {
 
         element: HTMLElement;
 
-        protected constructor(element: HTMLElement) {
+        protected constructor(element: HTMLElement, context: object) {
             super();
             this.element = element;
             this.id = generateUuid();
@@ -22,16 +22,13 @@ namespace duice {
         initialize(context: object): void {
             console.debug("Component.initialize", this);
 
+            // initialize
+            this.doInitialize(context);
+
             // bind
             let bind = findObject(context, this.getAttribute("bind"));
             this.addObserver(bind._handler_);
             bind._handler_.addObserver(this);
-
-            // initialize
-            this.doInitialize(context);
-
-            // update
-            this.doUpdate(bind._handler_, null);
         }
 
         /**
@@ -45,7 +42,7 @@ namespace duice {
          * @param observable
          * @param event
          */
-        update(observable: Observable, event: Event): void {
+        update(observable: Observable, detail: object): void {
             this.doUpdate(observable, event);
         }
 
@@ -54,7 +51,7 @@ namespace duice {
          * @param handler
          * @param event
          */
-        abstract doUpdate(handler: Observable, event: Event): void;
+        abstract doUpdate(handler: Observable, detail: object): void;
 
         /**
          * destroy

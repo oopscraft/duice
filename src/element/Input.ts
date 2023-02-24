@@ -12,7 +12,7 @@ namespace duice.element {
         override doInitialize(context: object): void {
             let _this = this;
             this.element.addEventListener('change', function(event){
-                let mapEvent = new MapEvent(MapEventType.SET_VALUE,{
+                let mapEvent = new MapEvent(MapEventType.SetValue,{
                     key: _this.key,
                     value: this.value
                 });

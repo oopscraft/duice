@@ -5,6 +5,8 @@ namespace duice {
      */
     export class MapHandler extends Handler {
 
+        readonly: object = {}
+
         /**
          * constructor
          * @param map
@@ -18,7 +20,7 @@ namespace duice {
          * @param mapComponent
          * @param event
          */
-        doUpdate(mapComponent: MapComponent, mapEvent: MapEvent): void {
+        doUpdate(mapComponent: MapComponent, detail): void {
             console.debug("MapHandler.doUpdate", mapComponent, mapEvent);
         }
 
@@ -27,10 +29,25 @@ namespace duice {
          * @param key
          * @param value
          */
-        set(key: string, value: any): boolean {
+        set(key: string, value: any): void {
             this.getTarget().set(key, value);
-            this.notifyObservers(new MapEvent());
-            return true;
+            this.notifyObservers({key:key, value:value}));
+        }
+
+        /**
+         * get
+         * @param key
+         */
+        get(key: string): void {
+            return this.getTarget().get(this.key);
+        }
+
+        setReadonly(key: string, readonly: boolean){
+            this.readonly[key] = readon;
+        }
+
+        isReadonly(key: string): void {
+            return this.readonly[key];
         }
 
     }

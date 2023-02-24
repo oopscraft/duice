@@ -22,35 +22,27 @@ namespace duice {
          * doInitialize
          * @param context
          */
-        abstract doInitialize(context: object): void;
+        doInitialize(context: object): void {
+            console.debug("MapComponent.doInitialize", context);
+        }
 
         /**
          * doUpdate
          * @param mapHandler
          * @param mapEvent
          */
-        doUpdate(mapHandler: MapHandler, mapEvent: MapEvent): void {
-            console.debug("MapComponent.doUpdate", mapHandler, mapEvent);
-            switch(mapEvent.getType()){
-                case MapEventType.SET_VALUE:
-                    if(mapEvent.getDetail("key") === this.key){
-                        this.setValue(mapEvent.getDetail("value"));
-                    }
-                    break;
-                case MapEventType.SET_READONLY:
-                    if(mapEvent.getDetail("key") === this.key){
-                        this.setReadonly(mapEvent.getDetail("readonly"));
-                    }
-                    break;
-                default:
-                    throw Error("Invalid event type");
-            }
+        doUpdate(mapHandler: MapHandler, detail: object): void {
+            console.debug("MapComponent.doUpdate", mapHandler, detail);
+            this.setValue(mapHandler.get(this.key));
+            this.setReadonly()
         }
 
         /**
          * doDestroy
          */
-        abstract doDestroy(): void;
+        doDestroy(): void {
+            console.debug("MapComponent.doDestroy");
+        }
 
         /**
          * setValue
