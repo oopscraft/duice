@@ -11,7 +11,10 @@ namespace duice {
          */
         constructor(json: object) {
             super();
-            return new Proxy(this, {});
+            return new Proxy(this, {
+
+
+            });
             // Object.assign(this, json);
             //
             // // adds handler
@@ -29,6 +32,10 @@ namespace duice {
             //         return true;
             //     }
             // });
+        }
+
+        fromJson(json: object): void {
+
         }
 
     }

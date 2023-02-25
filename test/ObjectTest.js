@@ -10,6 +10,6 @@ let object = new duice.Object({
 console.log("object", object);
 
 // handler
-console.log("handler", object._handler_);
+console.log("handler", object.name);
 
 

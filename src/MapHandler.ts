@@ -43,7 +43,7 @@ namespace duice {
         }
 
         setReadonly(key: string, readonly: boolean){
-            this.readonly[key] = readon;
+            this.readonly[key] = readonly;
         }
 
         isReadonly(key: string): void {
