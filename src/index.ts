@@ -38,7 +38,7 @@ namespace duice {
      * @param context
      */
     export function initializeComponent(container: any, context: object): void {
-        [ArrayComponent, MapComponent].forEach(componentType => {
+        [ArrayComponent, ObjectComponent].forEach(componentType => {
             componentDefinitions.forEach(componentDefinition => {
                 if(componentDefinition.componentType.prototype instanceof componentType) {
                     let selector = componentDefinition.getSelector();
@@ -80,14 +80,6 @@ namespace duice {
             return (<any>window)[name];
         }
         return eval.call(context, name);
-    }
-
-    /**
-     * getProxyHandler
-     * @param obj
-     */
-    export function getProxyHandler(obj: object) {
-        return Object.getOwnPropertyDescriptor(obj, '[[handler]]').value;
     }
 
     /**

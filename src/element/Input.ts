@@ -1,31 +1,38 @@
-///<reference path="../MapComponent.ts"/>
+///<reference path="../ObjectComponent.ts"/>
 namespace duice.element {
 
-    export class Input extends MapComponent {
+    export class Input extends ObjectComponent {
 
         element: HTMLInputElement;
 
+        /**
+         * constructor
+         * @param element
+         * @param context
+         */
         constructor(element: HTMLInputElement) {
             super(element);
-        }
-
-        override doInitialize(context: object): void {
             let _this = this;
             this.element.addEventListener('change', function(event){
-                let mapEvent = new MapEvent(MapEventType.SetValue,{
-                    key: _this.key,
-                    value: this.value
-                });
-                _this.notifyObservers(mapEvent);
+                _this.setValue(this.value);
+                _this.notifyObservers({});
             },true);
         }
 
-        setValue(value: any): void {
-            throw new Error("Method not implemented.");
+        /**
+         * setValue
+         * @param value
+         */
+        setValue(value: any): boolean {
+            this.element.value = value;
+            return true;
         }
 
-        setReadonly(readonly: boolean): void {
-            throw new Error("Method not implemented.");
+        /**
+         * getValue
+         */
+        getValue(): any {
+            return this.element.value;
         }
 
     }

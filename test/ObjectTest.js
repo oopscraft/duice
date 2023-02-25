@@ -7,9 +7,9 @@ let object = new duice.Object({
     name:'james',
     age: 18
 });
-console.log("object", object);
+console.log("object:", object);
 
 // handler
-console.log("handler", object.name);
+console.log("handler:", object.name);
 
 

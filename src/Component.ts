@@ -3,14 +3,20 @@ namespace duice {
     /**
      * Component
      */
-    export abstract class Component extends Observable implements Observer {
+    export abstract class Component<T> {
 
         id: string;
 
         element: HTMLElement;
 
-        protected constructor(element: HTMLElement, context: object) {
-            super();
+        observers: Handler<T>[] = [];
+
+        /**
+         * constructor
+         * @param element
+         * @protected
+         */
+        protected constructor(element: HTMLElement) {
             this.element = element;
             this.id = generateUuid();
             this.setAttribute("id", this.id);
@@ -18,53 +24,42 @@ namespace duice {
 
         /**
          * initialize
+         * @param data
          */
         initialize(context: object): void {
-            console.debug("Component.initialize", this);
-
-            // initialize
-            this.doInitialize(context);
 
             // bind
-            let bind = findObject(context, this.getAttribute("bind"));
-            this.addObserver(bind._handler_);
-            bind._handler_.addObserver(this);
+            let handler = findObject(context, this.getAttribute("bind"))._handler_;
+            this.addObserver(handler);
+            handler.addObserver(this);
+
+            // call template method
+            this.update(handler, {});
         }
 
         /**
-         * doInitialize
-         * @param context
+         * addObserver
+         * @param observer
          */
-        abstract doInitialize(context: object): void;
+        addObserver(observer: Handler<T>): void {
+            this.observers.push(observer);
+        }
+
+        /**
+         * notifyObservers
+         */
+        notifyObservers(detail: object): void {
+            for(let i = 0; i < this.observers.length; i++){
+                this.observers[i].update(this, detail);
+            }
+        }
 
         /**
          * update
-         * @param observable
-         * @param event
-         */
-        update(observable: Observable, detail: object): void {
-            this.doUpdate(observable, event);
-        }
-
-        /**
-         * doUpdate
          * @param handler
-         * @param event
+         * @param detail
          */
-        abstract doUpdate(handler: Observable, detail: object): void;
-
-        /**
-         * destroy
-         */
-        destroy(): void {
-            console.debug("Component.destroy", this);
-            this.doDestroy();
-        }
-
-        /**
-         * doDestroy
-         */
-        abstract doDestroy(): void;
+        abstract update(handler: Handler<T>, detail: object): void;
 
         /**
          * hasAttribute

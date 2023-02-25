@@ -1,19 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
     <script src="../../build/duice.js"></script>
     <script>
         let myObject = new duice.Object({
-            id: "james",
-            name: "james smith"
+            id: "james!!!",
+            name: "james smith!!!"
         });
     </script>
 </head>
 <body>
-
-    <input is="duice-input" duice:bind="myObject" duice:name="id" onchange="console.log(myObject);"/>
-
+    <input is="duice-input" duice:bind="myObject" duice:property="id" onchange="console.log(myObject);"/>
 </body>
 </html>

@@ -4,18 +4,14 @@ namespace duice {
     /**
      * ArrayProxy
      */
-    export class Array extends globalThis.Array {
+    export class Array {
 
         /**
          * constructor
-         * @param json
+         * @param array
          */
-        constructor(json: object[]) {
-            super();
-            json.forEach(element => {
-               this.push(new duice.Map(element));
-            });
-            return new Proxy(this, {});
+        constructor(array: object[]) {
+            return new Proxy(array, new ArrayHandler(array));
         }
 
     }

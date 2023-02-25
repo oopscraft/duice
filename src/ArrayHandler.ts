@@ -2,25 +2,35 @@
 namespace duice {
 
     /**
-     * Set data structure
+     * ArrayHandler
      */
-    export class ArrayHandler extends Handler {
+    export class ArrayHandler extends Handler<object[]> {
 
         /**
          * constructor
          * @param target
          */
-        constructor(array: Array) {
+        constructor(array: object[]) {
             super(array);
         }
 
         /**
-         * doUpdate
-         * @param arrayComponent
-         * @param arrayEvent
+         * array
+         * @param target
+         * @param thisArg
+         * @param argumentsList
          */
-        doUpdate(arrayComponent: ArrayComponent, arrayEvent: ArrayEvent): void {
-            console.debug("ArrayHandler.doUpdate", arrayComponent, arrayEvent);
+        apply(target, thisArg, argumentsList) {
+            Reflect.apply(target, thisArg, argumentsList);
+        }
+
+        /**
+         * update
+         * @param component
+         * @param detail
+         */
+        update(component: ArrayComponent, detail: object): void {
+            console.debug("ArrayHandler.update:", component, detail);
         }
 
     }

@@ -9,34 +9,44 @@ namespace duice.element {
 
         tBodyTemplate: HTMLTableSectionElement;
 
-        /**
-         * constructor
-         * @param element
-         * @param context
-         */
-        constructor(element: HTMLTableElement) {
-            console.debug("Table.constructor", element);
+        constructor(element: HTMLTableElement){
             super(element);
-            console.log(this.element);
-            alert(this.element);
             this.tBodyTemplate = <HTMLTableSectionElement>this.element.querySelector("tbody");
             this.element.removeChild(this.tBodyTemplate);
         }
 
-        setArray(array: object[]): void {
-            console.debug("Table.setArray", array);
-            let length = array.length;
-            let index = -1;
-            array.forEach(object => {
-                index ++;
-                let tBody: HTMLTableSectionElement = <HTMLTableSectionElement>this.tBodyTemplate.cloneNode(true);
-                let context = {};
-                context[this.getItem()] = object;
-                context[this.getStatus()] = {'index':index,'length':length};
-                initializeComponent(tBody, context);
-                this.element.appendChild(tBody);
-            });
+        createRowElement(object: object, status: object): HTMLElement {
+            throw new Error("Method not implemented.");
         }
+
+        // /**
+        //  * constructor
+        //  * @param element
+        //  * @param context
+        //  */
+        // constructor(element: HTMLTableElement) {
+        //     console.debug("Table.constructor", element);
+        //     super(element);
+        //     console.log(this.element);
+        //     alert(this.element);
+        //     this.tBodyTemplate = <HTMLTableSectionElement>this.element.querySelector("tbody");
+        //     this.element.removeChild(this.tBodyTemplate);
+        // }
+        //
+        // setArray(array: object[]): void {
+        //     console.debug("Table.setArray", array);
+        //     let length = array.length;
+        //     let index = -1;
+        //     array.forEach(object => {
+        //         index ++;
+        //         let tBody: HTMLTableSectionElement = <HTMLTableSectionElement>this.tBodyTemplate.cloneNode(true);
+        //         let context = {};
+        //         context[this.getItem()] = object;
+        //         context[this.getStatus()] = {'index':index,'length':length};
+        //         initializeComponent(tBody, context);
+        //         this.element.appendChild(tBody);
+        //     });
+        // }
     }
 
     // defines component

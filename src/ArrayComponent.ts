@@ -4,9 +4,9 @@ namespace duice {
     /**
      * ArrayComponent
      */
-    export abstract class ArrayComponent extends Component {
+    export abstract class ArrayComponent extends Component<object[]> {
 
-        item: string;
+        var: string;
 
         status: string;
 
@@ -19,15 +19,15 @@ namespace duice {
         protected constructor(element: HTMLElement) {
             console.debug("ArrayComponent.constructor", element);
             super(element);
-            this.item = this.getAttribute("item");
+            this.var = this.getAttribute("var");
             this.status = this.getAttribute("status");
         }
 
         /**
-         * getItem
+         * getVar
          */
-        getItem(): string {
-            return this.item;
+        getVar(): string {
+            return this.var;
         }
 
         /**
@@ -36,6 +36,30 @@ namespace duice {
         getStatus(): string {
             return this.status;
         }
+
+        /**
+         * update
+         * @param array
+         */
+        update(arrayHandler: ArrayHandler, detail: object): void {
+            let array = arrayHandler.getTarget();
+            for(let index = 0, size = array.length; index < size; index ++ ){
+                let object = array[index];
+                let status = {
+                    index: index,
+                    length: array.length
+                };
+                let rowElement= this.createRowElement(object, status);
+                this.element.appendChild(rowElement);
+            }
+        }
+
+        /**
+         * createRow
+         * @param object
+         */
+        abstract createRowElement(object: object, status: object): HTMLElement;
+
 
     }
 

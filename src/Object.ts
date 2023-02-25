@@ -1,14 +1,13 @@
 namespace duice {
 
-   export class Object extends globalThis.Object {
+   export class Object {
 
         /**
          * constructor
          * @param json
          */
-        constructor(json: object) {
-            super();
-            return new Proxy(this, new ObjectHandler(this)handler);
+        constructor(object: object) {
+            return new Proxy(object, new ObjectHandler(object));
         }
 
     }
