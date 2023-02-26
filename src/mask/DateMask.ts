@@ -1,7 +1,7 @@
-namespace duice {
+namespace duice.mask {
 
     /**
-     * duice.DateFormat
+     * DateFormat
      */
     export class DateMask implements Mask<string> {
 

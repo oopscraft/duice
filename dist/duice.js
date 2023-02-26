@@ -524,6 +524,18 @@ var duice;
             getValue() {
                 return this.element.value;
             }
+            /**
+             * setReadOnly
+             * @param readOnly
+             */
+            setReadOnly(readOnly) {
+                if (readOnly) {
+                    this.element.style.pointerEvents = 'none';
+                }
+                else {
+                    this.element.style.pointerEvents = '';
+                }
+            }
         }
         element_1.Input = Input;
         // defines component
@@ -645,6 +657,18 @@ var duice;
             getValue() {
                 return this.element.value;
             }
+            /**
+             * setReadOnly
+             * @param readOnly
+             */
+            setReadOnly(readOnly) {
+                if (readOnly) {
+                    this.element.style.pointerEvents = 'none';
+                }
+                else {
+                    this.element.style.pointerEvents = '';
+                }
+            }
         }
         element_3.Select = Select;
         // defines component
@@ -694,238 +718,247 @@ var duice;
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
-    /**
-     * duice.DateFormat
-     */
-    class DateMask {
+    var mask;
+    (function (mask) {
         /**
-         * Constructor
-         * @param pattern
+         * DateFormat
          */
-        constructor(pattern) {
-            this.patternRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
-            this.pattern = pattern;
-        }
-        /**
-         * Encodes date string
-         * @param string
-         */
-        encode(string) {
-            if (!string) {
-                return '';
+        class DateMask {
+            /**
+             * Constructor
+             * @param pattern
+             */
+            constructor(pattern) {
+                this.patternRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
+                this.pattern = pattern;
             }
-            if (!this.pattern) {
-                return new Date(string).toString();
-            }
-            let date = new Date(string);
-            string = this.pattern.replace(this.patternRex, function ($1) {
-                switch ($1) {
-                    case "yyyy":
-                        return date.getFullYear();
-                    case "yy":
-                        return duice.padLeft(String(date.getFullYear() % 1000), 2, '0');
-                    case "MM":
-                        return duice.padLeft(String(date.getMonth() + 1), 2, '0');
-                    case "dd":
-                        return duice.padLeft(String(date.getDate()), 2, '0');
-                    case "HH":
-                        return duice.padLeft(String(date.getHours()), 2, '0');
-                    case "hh":
-                        return duice.padLeft(String(date.getHours() <= 12 ? date.getHours() : date.getHours() % 12), 2, '0');
-                    case "mm":
-                        return duice.padLeft(String(date.getMinutes()), 2, '0');
-                    case "ss":
-                        return duice.padLeft(String(date.getSeconds()), 2, '0');
-                    default:
-                        return $1;
+            /**
+             * Encodes date string
+             * @param string
+             */
+            encode(string) {
+                if (!string) {
+                    return '';
                 }
-            });
-            return string;
-        }
-        /**
-         * Decodes formatted date string to ISO date string.
-         * @param string
-         */
-        decode(string) {
-            if (!string) {
-                return null;
+                if (!this.pattern) {
+                    return new Date(string).toString();
+                }
+                let date = new Date(string);
+                string = this.pattern.replace(this.patternRex, function ($1) {
+                    switch ($1) {
+                        case "yyyy":
+                            return date.getFullYear();
+                        case "yy":
+                            return duice.padLeft(String(date.getFullYear() % 1000), 2, '0');
+                        case "MM":
+                            return duice.padLeft(String(date.getMonth() + 1), 2, '0');
+                        case "dd":
+                            return duice.padLeft(String(date.getDate()), 2, '0');
+                        case "HH":
+                            return duice.padLeft(String(date.getHours()), 2, '0');
+                        case "hh":
+                            return duice.padLeft(String(date.getHours() <= 12 ? date.getHours() : date.getHours() % 12), 2, '0');
+                        case "mm":
+                            return duice.padLeft(String(date.getMinutes()), 2, '0');
+                        case "ss":
+                            return duice.padLeft(String(date.getSeconds()), 2, '0');
+                        default:
+                            return $1;
+                    }
+                });
+                return string;
             }
-            if (!this.pattern) {
-                return new Date(string).toISOString();
-            }
-            let date = new Date(0, 0, 0, 0, 0, 0);
-            let match;
-            while ((match = this.patternRex.exec(this.pattern)) != null) {
-                let formatString = match[0];
-                let formatIndex = match.index;
-                let formatLength = formatString.length;
-                let matchValue = string.substr(formatIndex, formatLength);
-                matchValue = duice.padRight(matchValue, formatLength, '0');
-                switch (formatString) {
-                    case 'yyyy': {
-                        let fullYear = parseInt(matchValue);
-                        date.setFullYear(fullYear);
-                        break;
-                    }
-                    case 'yy': {
-                        let yyValue = parseInt(matchValue);
-                        let yearPrefix = Math.floor(new Date().getFullYear() / 100);
-                        let fullYear = yearPrefix * 100 + yyValue;
-                        date.setFullYear(fullYear);
-                        break;
-                    }
-                    case 'MM': {
-                        let monthValue = parseInt(matchValue);
-                        date.setMonth(monthValue - 1);
-                        break;
-                    }
-                    case 'dd': {
-                        let dateValue = parseInt(matchValue);
-                        date.setDate(dateValue);
-                        break;
-                    }
-                    case 'HH': {
-                        let hoursValue = parseInt(matchValue);
-                        date.setHours(hoursValue);
-                        break;
-                    }
-                    case 'hh': {
-                        let hoursValue = parseInt(matchValue);
-                        date.setHours(hoursValue > 12 ? (hoursValue + 12) : hoursValue);
-                        break;
-                    }
-                    case 'mm': {
-                        let minutesValue = parseInt(matchValue);
-                        date.setMinutes(minutesValue);
-                        break;
-                    }
-                    case 'ss': {
-                        let secondsValue = parseInt(matchValue);
-                        date.setSeconds(secondsValue);
-                        break;
+            /**
+             * Decodes formatted date string to ISO date string.
+             * @param string
+             */
+            decode(string) {
+                if (!string) {
+                    return null;
+                }
+                if (!this.pattern) {
+                    return new Date(string).toISOString();
+                }
+                let date = new Date(0, 0, 0, 0, 0, 0);
+                let match;
+                while ((match = this.patternRex.exec(this.pattern)) != null) {
+                    let formatString = match[0];
+                    let formatIndex = match.index;
+                    let formatLength = formatString.length;
+                    let matchValue = string.substr(formatIndex, formatLength);
+                    matchValue = duice.padRight(matchValue, formatLength, '0');
+                    switch (formatString) {
+                        case 'yyyy': {
+                            let fullYear = parseInt(matchValue);
+                            date.setFullYear(fullYear);
+                            break;
+                        }
+                        case 'yy': {
+                            let yyValue = parseInt(matchValue);
+                            let yearPrefix = Math.floor(new Date().getFullYear() / 100);
+                            let fullYear = yearPrefix * 100 + yyValue;
+                            date.setFullYear(fullYear);
+                            break;
+                        }
+                        case 'MM': {
+                            let monthValue = parseInt(matchValue);
+                            date.setMonth(monthValue - 1);
+                            break;
+                        }
+                        case 'dd': {
+                            let dateValue = parseInt(matchValue);
+                            date.setDate(dateValue);
+                            break;
+                        }
+                        case 'HH': {
+                            let hoursValue = parseInt(matchValue);
+                            date.setHours(hoursValue);
+                            break;
+                        }
+                        case 'hh': {
+                            let hoursValue = parseInt(matchValue);
+                            date.setHours(hoursValue > 12 ? (hoursValue + 12) : hoursValue);
+                            break;
+                        }
+                        case 'mm': {
+                            let minutesValue = parseInt(matchValue);
+                            date.setMinutes(minutesValue);
+                            break;
+                        }
+                        case 'ss': {
+                            let secondsValue = parseInt(matchValue);
+                            date.setSeconds(secondsValue);
+                            break;
+                        }
                     }
                 }
+                return date.toISOString();
             }
-            return date.toISOString();
         }
-    }
-    duice.DateMask = DateMask;
+        mask.DateMask = DateMask;
+    })(mask = duice.mask || (duice.mask = {}));
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
-    /**
-     * duice.NumberFormat
-     * @param scale number
-     */
-    class NumberMask {
+    var mask;
+    (function (mask) {
         /**
-         * Constructor
-         * @param scale
+         * NumberFormat
+         * @param scale number
          */
-        constructor(scale) {
-            this.scale = 0;
-            this.scale = scale;
+        class NumberMask {
+            /**
+             * Constructor
+             * @param scale
+             */
+            constructor(scale) {
+                this.scale = 0;
+                this.scale = scale;
+            }
+            /**
+             * Encodes number as format
+             * @param number
+             */
+            encode(number) {
+                if (!number || isNaN(Number(number))) {
+                    return '';
+                }
+                number = Number(number);
+                let string = String(number.toFixed(this.scale));
+                let reg = /(^[+-]?\d+)(\d{3})/;
+                while (reg.test(string)) {
+                    string = string.replace(reg, '$1' + ',' + '$2');
+                }
+                return string;
+            }
+            /**
+             * Decodes formatted value as original value
+             * @param string
+             */
+            decode(string) {
+                if (!string) {
+                    return null;
+                }
+                if (string.length === 1 && /[+-]/.test(string)) {
+                    string += '0';
+                }
+                string = string.replace(/,/gi, '');
+                if (isNaN(Number(string))) {
+                    throw 'NaN';
+                }
+                let number = Number(string);
+                number = Number(number.toFixed(this.scale));
+                return number;
+            }
         }
-        /**
-         * Encodes number as format
-         * @param number
-         */
-        encode(number) {
-            if (!number || isNaN(Number(number))) {
-                return '';
-            }
-            number = Number(number);
-            let string = String(number.toFixed(this.scale));
-            let reg = /(^[+-]?\d+)(\d{3})/;
-            while (reg.test(string)) {
-                string = string.replace(reg, '$1' + ',' + '$2');
-            }
-            return string;
-        }
-        /**
-         * Decodes formatted value as original value
-         * @param string
-         */
-        decode(string) {
-            if (!string) {
-                return null;
-            }
-            if (string.length === 1 && /[+-]/.test(string)) {
-                string += '0';
-            }
-            string = string.replace(/,/gi, '');
-            if (isNaN(Number(string))) {
-                throw 'NaN';
-            }
-            let number = Number(string);
-            number = Number(number.toFixed(this.scale));
-            return number;
-        }
-    }
-    duice.NumberMask = NumberMask;
+        mask.NumberMask = NumberMask;
+    })(mask = duice.mask || (duice.mask = {}));
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
-    /**
-     * duice.StringFormat
-     * @param string format
-     */
-    class StringMask {
+    var mask;
+    (function (mask) {
         /**
-         * Constructor
-         * @param pattern
+         * StringFormat
+         * @param string format
          */
-        constructor(pattern) {
-            this.pattern = pattern;
+        class StringMask {
+            /**
+             * Constructor
+             * @param pattern
+             */
+            constructor(pattern) {
+                this.pattern = pattern;
+            }
+            /**
+             * encode string as format
+             * @param value
+             */
+            encode(value) {
+                if (!this.pattern) {
+                    return value;
+                }
+                let encodedValue = '';
+                let patternChars = this.pattern.split('');
+                let valueChars = value.split('');
+                let valueCharsPosition = 0;
+                for (let i = 0, size = patternChars.length; i < size; i++) {
+                    let patternChar = patternChars[i];
+                    if (patternChar === '#') {
+                        encodedValue += valueChars[valueCharsPosition++] || '';
+                    }
+                    else {
+                        encodedValue += patternChar;
+                    }
+                }
+                return encodedValue;
+            }
+            /**
+             * decodes string as format
+             * @param value
+             */
+            decode(value) {
+                if (!this.pattern) {
+                    return value;
+                }
+                let decodedValue = '';
+                let patternChars = this.pattern.split('');
+                let valueChars = value.split('');
+                let valueCharsPosition = 0;
+                for (let i = 0, size = patternChars.length; i < size; i++) {
+                    let patternChar = patternChars[i];
+                    if (patternChar === '#') {
+                        decodedValue += valueChars[valueCharsPosition++] || '';
+                    }
+                    else {
+                        valueCharsPosition++;
+                    }
+                }
+                return decodedValue;
+            }
         }
-        /**
-         * encode string as format
-         * @param value
-         */
-        encode(value) {
-            if (!this.pattern) {
-                return value;
-            }
-            let encodedValue = '';
-            let patternChars = this.pattern.split('');
-            let valueChars = value.split('');
-            let valueCharsPosition = 0;
-            for (let i = 0, size = patternChars.length; i < size; i++) {
-                let patternChar = patternChars[i];
-                if (patternChar === '#') {
-                    encodedValue += valueChars[valueCharsPosition++] || '';
-                }
-                else {
-                    encodedValue += patternChar;
-                }
-            }
-            return encodedValue;
-        }
-        /**
-         * decodes string as format
-         * @param value
-         */
-        decode(value) {
-            if (!this.pattern) {
-                return value;
-            }
-            let decodedValue = '';
-            let patternChars = this.pattern.split('');
-            let valueChars = value.split('');
-            let valueCharsPosition = 0;
-            for (let i = 0, size = patternChars.length; i < size; i++) {
-                let patternChar = patternChars[i];
-                if (patternChar === '#') {
-                    decodedValue += valueChars[valueCharsPosition++] || '';
-                }
-                else {
-                    valueCharsPosition++;
-                }
-            }
-            return decodedValue;
-        }
-    }
-    duice.StringMask = StringMask;
+        mask.StringMask = StringMask;
+    })(mask = duice.mask || (duice.mask = {}));
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
@@ -1001,5 +1034,31 @@ var duice;
         }
     }
     duice.ObjectHandler = ObjectHandler;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    var element;
+    (function (element_5) {
+        class InputCheckbox extends element_5.Input {
+            /**
+             * constructor
+             * @param element
+             */
+            constructor(element) {
+                super(element);
+                // stop click event propagation
+                this.element.addEventListener('click', function (event) {
+                    event.stopPropagation();
+                }, true);
+            }
+            /**
+             * getValue
+             */
+            getValue() {
+                return this.element.checked;
+            }
+        }
+        element_5.InputCheckbox = InputCheckbox;
+    })(element = duice.element || (duice.element = {}));
 })(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map

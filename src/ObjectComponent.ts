@@ -54,6 +54,11 @@ namespace duice {
          */
         abstract getValue(): any;
 
+        /**
+         * setReadOnly
+         */
+        abstract setReadOnly(readOnly: boolean): void;
+
     }
 
 }

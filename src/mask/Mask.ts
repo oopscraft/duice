@@ -1,7 +1,7 @@
-namespace duice {
+namespace duice.mask {
 
     /**
-     * duice.Mask interface
+     * Mask interface
      */
     export interface Mask<T> {
 

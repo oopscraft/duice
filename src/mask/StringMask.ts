@@ -1,7 +1,7 @@
-namespace duice {
+namespace duice.mask {
 
     /**
-     * duice.StringFormat
+     * StringFormat
      * @param string format
      */
     export class StringMask implements Mask<string> {

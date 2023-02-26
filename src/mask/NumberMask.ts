@@ -1,7 +1,7 @@
-namespace duice {
+namespace duice.mask {
 
     /**
-     * duice.NumberFormat
+     * NumberFormat
      * @param scale number
      */
     export class NumberMask implements Mask<number> {

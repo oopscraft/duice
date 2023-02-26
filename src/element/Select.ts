@@ -108,6 +108,18 @@ namespace duice.element {
             return this.element.value;
         }
 
+        /**
+         * setReadOnly
+         * @param readOnly
+         */
+        setReadOnly(readOnly: boolean): void {
+            if(readOnly){
+                this.element.style.pointerEvents = 'none';
+            }else{
+                this.element.style.pointerEvents = '';
+            }
+        }
+
     }
 
     // defines component
