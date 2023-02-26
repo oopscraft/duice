@@ -28,7 +28,7 @@ namespace duice.element {
             super(element);
             let _this = this;
             this.element.addEventListener('change', function(event){
-                _this.notifyHandlers({});
+                _this.setValue(this.value);
             },true);
         }
 
@@ -38,6 +38,7 @@ namespace duice.element {
          */
         setValue(value: any): boolean {
             this.element.value = value;
+            this.notifyHandlers({});
             return true;
         }
 

@@ -83,6 +83,30 @@ namespace duice {
     }
 
     /**
+     * removeChildNodes
+     * @param element
+     */
+    export function removeChildNodes(element: HTMLElement): void {
+        // Remove element nodes and prevent memory leaks
+        let node, nodes = element.childNodes, i = 0;
+        while (node = nodes[i++]) {
+            if (node.nodeType === 1 ) {
+                element.removeChild(node);
+            }
+        }
+
+        // Remove any remaining nodes
+        while (element.firstChild) {
+            element.removeChild(element.firstChild);
+        }
+
+        // If this is a select, ensure that it displays empty
+        if(element instanceof HTMLSelectElement){
+            (<HTMLSelectElement>element).options.length = 0;
+        }
+    }
+
+    /**
      * converts value to left-padded value
      * @param value value
      * @param length to pad

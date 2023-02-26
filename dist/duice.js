@@ -379,6 +379,28 @@ var duice;
     }
     duice.findObject = findObject;
     /**
+     * removeChildNodes
+     * @param element
+     */
+    function removeChildNodes(element) {
+        // Remove element nodes and prevent memory leaks
+        let node, nodes = element.childNodes, i = 0;
+        while (node = nodes[i++]) {
+            if (node.nodeType === 1) {
+                element.removeChild(node);
+            }
+        }
+        // Remove any remaining nodes
+        while (element.firstChild) {
+            element.removeChild(element.firstChild);
+        }
+        // If this is a select, ensure that it displays empty
+        if (element instanceof HTMLSelectElement) {
+            element.options.length = 0;
+        }
+    }
+    duice.removeChildNodes = removeChildNodes;
+    /**
      * converts value to left-padded value
      * @param value value
      * @param length to pad
@@ -471,7 +493,7 @@ var duice;
                 super(element);
                 let _this = this;
                 this.element.addEventListener('change', function (event) {
-                    _this.notifyHandlers({});
+                    _this.setValue(this.value);
                 }, true);
             }
             /**
@@ -493,6 +515,7 @@ var duice;
              */
             setValue(value) {
                 this.element.value = value;
+                this.notifyHandlers({});
                 return true;
             }
             /**
@@ -530,12 +553,110 @@ var duice;
         element_2.InputNumber = InputNumber;
     })(element = duice.element || (duice.element = {}));
 })(duice || (duice = {}));
+var duice;
+(function (duice) {
+    var element;
+    (function (element_3) {
+        class Select extends duice.ObjectComponent {
+            /**
+             * constructor
+             * @param element
+             */
+            constructor(element) {
+                super(element);
+                this.defaultOptions = [];
+                let _this = this;
+                this.element.addEventListener('change', function (event) {
+                    _this.setValue(this.value);
+                });
+                // stores default options
+                for (let i = 0, size = this.element.options.length; i < size; i++) {
+                    this.defaultOptions.push(this.element.options[i]);
+                }
+                // option
+                this.option = this.getAttribute('option');
+            }
+            /**
+             * create
+             * @param element
+             */
+            static create(element) {
+                return new Select(element);
+            }
+            /**
+             * doInitialize
+             * @param object
+             */
+            doInitialize(object) {
+                // set options
+                if (this.option) {
+                    let optionParts = this.option.split(',');
+                    let options = duice.findObject({}, optionParts[0]);
+                    let value = optionParts[1];
+                    let text = optionParts[2];
+                    this.setOption(options, value, text);
+                }
+                // update
+                super.doInitialize(object);
+            }
+            /**
+             * setOptions
+             * @param options
+             * @param value
+             * @param text
+             */
+            setOption(options, value, text) {
+                // removes
+                duice.removeChildNodes(this.element);
+                // adds default options
+                let _this = this;
+                this.defaultOptions.forEach(option => {
+                    _this.element.appendChild(option);
+                });
+                // adds additional options
+                options.forEach(option => {
+                    let optionElement = document.createElement('option');
+                    optionElement.value = option[value];
+                    optionElement.appendChild(document.createTextNode(option[text]));
+                    _this.element.appendChild(optionElement);
+                });
+            }
+            /**
+             * doUpdate
+             * @param object
+             * @param detail
+             */
+            doUpdate(object, detail) {
+                let value = object[this.property];
+                this.setValue(value);
+            }
+            /**
+             * setValue
+             * @param value
+             */
+            setValue(value) {
+                this.element.value = value;
+                this.notifyHandlers({});
+                return true;
+            }
+            /**
+             * getValue
+             */
+            getValue() {
+                return this.element.value;
+            }
+        }
+        element_3.Select = Select;
+        // defines component
+        duice.defineComponent(Select, "select", `${duice.getAlias()}-select`);
+    })(element = duice.element || (duice.element = {}));
+})(duice || (duice = {}));
 ///<reference path="../ArrayComponent.ts"/>
 ///<reference path="../ComponentDefinition.ts"/>
 var duice;
 (function (duice) {
     var element;
-    (function (element_3) {
+    (function (element_4) {
         /**
          * Table
          */
@@ -566,7 +687,7 @@ var duice;
                 return tBody;
             }
         }
-        element_3.Table = Table;
+        element_4.Table = Table;
         // defines component
         duice.defineComponent(Table, "table", `${duice.getAlias()}-table`);
     })(element = duice.element || (duice.element = {}));
