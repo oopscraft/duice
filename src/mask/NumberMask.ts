@@ -5,6 +5,7 @@ namespace duice {
      * @param scale number
      */
     export class NumberMask implements Mask<number> {
+
         scale:number = 0;
 
         /**

@@ -45,31 +45,12 @@ namespace duice {
                     let elements = container.querySelectorAll(selector);
                     elements.forEach(element => {
                         console.debug("initializeComponent", element);
-                        let component = Reflect.construct(componentDefinition.componentType, [element]);
+                        let component = Reflect.apply(componentDefinition.componentType.create, undefined, [element]);
                         component.initialize(context);
                     });
                 }
             });
         });
-    }
-
-    /**
-     * object
-      * @param json
-     */
-    export function object(json: object): any {
-        let object = new duice.Object(json);
-        return new Proxy(object, new ObjectHandler(object));
-    }
-
-    /**
-     * array
-     * @param json
-     * @private
-     */
-    export function array(json: object[]) {
-        let array = new duice.Array(json);
-        return new Proxy(array, new ArrayHandler(array));
     }
 
     /**

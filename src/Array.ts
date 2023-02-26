@@ -8,6 +8,16 @@ namespace duice {
     export class Array extends globalThis.Array {
 
         /**
+         * create
+         * @param json
+         */
+        static create(json: object[]): any {
+            let array = new Array(json);
+            let arrayHandler = new ArrayHandler(array);
+            return new Proxy(array, arrayHandler);
+        }
+
+        /**
          * constructor
          * @param array
          */

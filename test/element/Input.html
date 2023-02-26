@@ -2,13 +2,15 @@
 <head>
     <script src="../../build/duice.js"></script>
     <script>
-        let myObject = duice.object({
+        let myObject = duice.Object.create({
             id: "james!!!",
-            name: "james smith!!!"
+            name: "james smith!!!",
+            age: 19
         });
     </script>
 </head>
 <body>
-    <input is="duice-input" duice:bind="myObject" duice:property="id" onchange="console.log(myObject);"/>
+    <input is="duice-input" type="text" duice:bind="myObject" duice:property="id" onchange="console.log(myObject);"/>
+    <input is="duice-input" type="number" step="any" duice:bind="myObject" duice:property="age" onchange="console.log(myObject);"/>
 </body>
 </html>

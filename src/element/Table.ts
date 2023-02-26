@@ -10,6 +10,14 @@ namespace duice.element {
         tBodyTemplate: HTMLTableSectionElement;
 
         /**
+         * create
+         * @param element
+         */
+        static create(element: HTMLTableElement): Table {
+            return new Table(element);
+        }
+
+        /**
          * constructor
          * @param element
          */
