@@ -14,6 +14,8 @@ namespace duice.element {
             switch(type) {
                 case 'number':
                     return new InputNumber(element);
+                case 'checkbox':
+                    return new InputCheckbox(element);
                 default:
                     return new Input(element);
             }

@@ -505,6 +505,8 @@ var duice;
                 switch (type) {
                     case 'number':
                         return new element_1.InputNumber(element);
+                    case 'checkbox':
+                        return new element_1.InputCheckbox(element);
                     default:
                         return new Input(element);
                 }
