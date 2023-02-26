@@ -10,6 +10,14 @@ namespace duice.element {
             super(element);
         }
 
+        /**
+         * getValue
+         */
+        override getValue(): number {
+            let value = super.getValue();
+            return Number(value);
+        }
+
     }
 
 }

@@ -5,8 +5,6 @@ namespace duice.element {
 
         element: HTMLInputElement;
 
-        type: string;
-
         /**
          * create
          * @param element
@@ -28,7 +26,6 @@ namespace duice.element {
          */
         constructor(element: HTMLInputElement) {
             super(element);
-            this.type = element.getAttribute('type');
             let _this = this;
             this.element.addEventListener('change', function(event){
                 _this.notifyHandlers({});
@@ -48,9 +45,6 @@ namespace duice.element {
          * getValue
          */
         getValue(): any {
-            if(this.type === 'number'){
-                return Number(this.element.value);
-            }
             return this.element.value;
         }
 

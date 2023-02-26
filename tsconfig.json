@@ -3,7 +3,7 @@
     "sourceRoot": "src",
     "rootDir": "src",
     "target": "es6",
-    "outFile": "build/duice.js",
+    "outFile": "dist/duice.js",
     "sourceMap": true,
   },
   "include": [
