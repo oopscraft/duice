@@ -54,10 +54,29 @@ namespace duice {
     }
 
     /**
+     * object
+      * @param json
+     */
+    export function object(json: object): any {
+        let object = new duice.Object(json);
+        return new Proxy(object, new ObjectHandler(object));
+    }
+
+    /**
+     * array
+     * @param json
+     * @private
+     */
+    export function array(json: object[]) {
+        let array = new duice.Array(json);
+        return new Proxy(array, new ArrayHandler(array));
+    }
+
+    /**
      * Generates random UUID value
      * @return  UUID string
      */
-    export function generateUuid():string {
+    export function generateUuid(): string {
         let dt = new Date().getTime();
         let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
             let r = (dt + Math.random()*16)%16 | 0;

@@ -29,7 +29,8 @@ namespace duice {
         initialize(context: object): void {
 
             // bind
-            let handler = findObject(context, this.getAttribute('bind'))._handler_;
+            let bind = findObject(context, this.getAttribute('bind'));
+            let handler = bind._handler_;
             this.addHandler(handler);
             handler.addComponent(this);
 

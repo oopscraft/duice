@@ -1,13 +1,19 @@
 namespace duice {
 
-   export class Object {
+    export class Object {
 
         /**
          * constructor
          * @param json
          */
-        constructor(object: object) {
-            return new Proxy(object, new ObjectHandler(object));
+        constructor(json: object) {
+            this.fromJson(json);
+        }
+
+        fromJson(json: object): void {
+            for(let property in json){
+                this[property] = json[property];
+            }
         }
 
     }

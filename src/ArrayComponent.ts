@@ -62,7 +62,7 @@ namespace duice {
 
             // creates row
             for(let index = 0, size = array.length; index < size; index ++ ){
-                let object = new duice.Object(array[index]);
+                let object = array[index];
                 let status = {
                     index: index,
                     length: array.length
