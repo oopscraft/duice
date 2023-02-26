@@ -95,7 +95,7 @@ namespace duice.element {
          * setValue
          * @param value
          */
-        setValue(value: any): boolean {
+        override setValue(value: any): boolean {
             this.element.value = value;
             this.notifyHandlers({});
             return true;
@@ -104,7 +104,7 @@ namespace duice.element {
         /**
          * getValue
          */
-        getValue(): any {
+        override getValue(): any {
             return this.element.value;
         }
 
@@ -112,7 +112,7 @@ namespace duice.element {
          * setReadOnly
          * @param readOnly
          */
-        setReadOnly(readOnly: boolean): void {
+        override setReadOnly(readOnly: boolean): void {
             if(readOnly){
                 this.element.style.pointerEvents = 'none';
             }else{
