@@ -15,13 +15,18 @@ namespace duice {
         }
 
         /**
-         * array
+         * set
          * @param target
-         * @param thisArg
-         * @param argumentsList
+         * @param property
+         * @param value
          */
-        apply(target, thisArg, argumentsList) {
-            Reflect.apply(target, thisArg, argumentsList);
+        set(target: object, property: string, value: any): boolean {
+            console.log("- Array.set", target, property, value);
+            Reflect.set(target, property, value);
+            if(property === 'length'){
+                this.notifyComponents({});
+            }
+            return true;
         }
 
         /**

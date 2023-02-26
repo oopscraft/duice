@@ -7,7 +7,7 @@ namespace duice {
 
         target: T;
 
-        observers: Component<T>[] = [];
+        components: Component<T>[] = [];
 
         /**
          * constructor
@@ -15,11 +15,11 @@ namespace duice {
          * @protected
          */
         protected constructor(target: T) {
-            console.debug("target:", target);
+            console.log("target:", target);
             this.target = target;
             globalThis.Object.defineProperty(target, "_handler_", {
                 value: this,
-                writable: false
+                writable: true
             });
         }
 
@@ -34,15 +34,15 @@ namespace duice {
          * addObserver
          * @param component
          */
-        addObserver(component: Component<T>): void {
-            this.observers.push(component);
+        addComponent(component: Component<T>): void {
+            this.components.push(component);
         }
 
         /**
          * notifyObservers
          */
-        notifyObservers(detail: object): void {
-            this.observers.forEach(observer => {
+        notifyComponents(detail: object): void {
+            this.components.forEach(observer => {
                 observer.update(this, detail);
             });
         }

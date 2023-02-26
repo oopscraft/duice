@@ -16,7 +16,7 @@
 </head>
 <body>
 
-    <table is="duice-table" duice:bind="myArray" duice:item="myObject" duice:status="index" border="1">
+    <table is="duice-table" duice:bind="myArray" duice:var="myObject" duice:status="status" border="1">
         <thead>
             <tr>
                 <td>Name</td>
@@ -26,10 +26,10 @@
         <tbody>
             <tr>
                 <td>
-                    <input is="duice-input" duice:bind="myObject" duice:name="name"/>
+                    <input is="duice-input" duice:bind="myObject" duice:property="name"/>
                 </td>
                 <td>
-                    <input is="duice-input" duice:bind="myObject" duice:name="age"/>
+                    <input is="duice-input" duice:bind="myObject" duice:property="age"/>
                 </td>
             </tr>
         </tbody>

@@ -33,7 +33,7 @@ namespace duice {
         set(target: object, property: string, value: any) {
             console.log("- Object.set", target, property, value);
             Reflect.set(target, property, value);
-            this.notifyObservers({});
+            this.notifyComponents({});
             return true;
         }
 

@@ -26,11 +26,20 @@ namespace duice {
         }
 
         /**
-         * update
+         * doInitialize
          * @param object
          */
-        update(objectHandler: ObjectHandler, detail: object): void {
-            let value = objectHandler.getTarget()[this.property];
+        override doInitialize(object: object): void {
+            this.doUpdate(object, {});
+        }
+
+        /**
+         * doUpdate
+         * @param object
+         * @param detail
+         */
+        override doUpdate(object: object, detail: object): void {
+            let value = object[this.property];
             this.setValue(value);
         }
 

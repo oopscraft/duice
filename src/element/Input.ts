@@ -14,8 +14,7 @@ namespace duice.element {
             super(element);
             let _this = this;
             this.element.addEventListener('change', function(event){
-                _this.setValue(this.value);
-                _this.notifyObservers({});
+                _this.notifyHandlers({});
             },true);
         }
 

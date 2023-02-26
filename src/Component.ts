@@ -9,7 +9,7 @@ namespace duice {
 
         element: HTMLElement;
 
-        observers: Handler<T>[] = [];
+        handlers: Handler<T>[] = [];
 
         /**
          * constructor
@@ -24,42 +24,59 @@ namespace duice {
 
         /**
          * initialize
-         * @param data
+         * @param context
          */
         initialize(context: object): void {
 
             // bind
-            let handler = findObject(context, this.getAttribute("bind"))._handler_;
-            this.addObserver(handler);
-            handler.addObserver(this);
+            let handler = findObject(context, this.getAttribute('bind'))._handler_;
+            this.addHandler(handler);
+            handler.addComponent(this);
 
-            // call template method
-            this.update(handler, {});
+            // initialize
+            let data = handler.getTarget();
+            this.doInitialize(data);
         }
 
         /**
-         * addObserver
-         * @param observer
+         * doInitialize
+         * @param data
          */
-        addObserver(observer: Handler<T>): void {
-            this.observers.push(observer);
-        }
-
-        /**
-         * notifyObservers
-         */
-        notifyObservers(detail: object): void {
-            for(let i = 0; i < this.observers.length; i++){
-                this.observers[i].update(this, detail);
-            }
-        }
+        abstract doInitialize(data: T): void;
 
         /**
          * update
          * @param handler
          * @param detail
          */
-        abstract update(handler: Handler<T>, detail: object): void;
+        update(handler: Handler<T>, detail: object): void {
+            let data = handler.getTarget();
+            this.doUpdate(data, detail);
+        }
+
+        /**
+         * doUpdate
+         * @param data
+         * @param detail
+         */
+        abstract doUpdate(data: T, detail: object): void;
+
+        /**
+         * addHandler
+         * @param observer
+         */
+        addHandler(observer: Handler<T>): void {
+            this.handlers.push(observer);
+        }
+
+        /**
+         * notifyHandlers
+         */
+        notifyHandlers(detail: object): void {
+            for(let i = 0; i < this.handlers.length; i++){
+                this.handlers[i].update(this, detail);
+            }
+        }
 
         /**
          * hasAttribute
@@ -83,7 +100,6 @@ namespace duice {
          * @param value
          */
         setAttribute(name: string, value: string): void {
-            console.log(this.element, name, value);
             this.element.setAttribute(`${getAlias()}:${name}`, value);
         }
 
