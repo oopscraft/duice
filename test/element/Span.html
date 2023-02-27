@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<head>
+    <script src="../../dist/duice.js"></script>
+    <script>
+        let myObject = duice.Object.create({
+            name: "james smith!!!",
+            age: 19,
+            enabled: true
+        });
+    </script>
+</head>
+<body>
+    <span is="duice-input" duice:bind="myObject" duice:property="name"></span>
+</body>
+</html>

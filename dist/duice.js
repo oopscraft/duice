@@ -612,12 +612,64 @@ var duice;
         duice.defineComponent(Select, "select", `${duice.getAlias()}-select`);
     })(element = duice.element || (duice.element = {}));
 })(duice || (duice = {}));
+var duice;
+(function (duice) {
+    var element;
+    (function (element_4) {
+        class Span extends duice.ObjectComponent {
+            /**
+             * constructor
+             * @param element
+             */
+            constructor(element) {
+                super(element);
+            }
+            /**
+             * create
+             * @param element
+             */
+            static create(element) {
+                return new Span(element);
+            }
+            /**
+             * doInitialize
+             * @param object
+             */
+            doInitialize(object) {
+                this.doUpdate(object, {});
+            }
+            /**
+             * doUpdate
+             * @param object
+             * @param detail
+             */
+            doUpdate(object, detail) {
+                // removes child nodes
+                duice.removeChildNodes(this.element);
+                // set value
+                let value = object[this.getProperty()];
+                let textNode = document.createTextNode(value);
+                this.element.appendChild(textNode);
+            }
+            /**
+             * getValue
+             */
+            getValue() {
+                let value = this.element.innerHTML;
+                return value;
+            }
+        }
+        element_4.Span = Span;
+        // defines component
+        duice.defineComponent(Span, "span", `${duice.getAlias()}-span`);
+    })(element = duice.element || (duice.element = {}));
+})(duice || (duice = {}));
 ///<reference path="../ArrayComponent.ts"/>
 ///<reference path="../ComponentDefinition.ts"/>
 var duice;
 (function (duice) {
     var element;
-    (function (element_4) {
+    (function (element_5) {
         /**
          * Table
          */
@@ -685,9 +737,62 @@ var duice;
                 return tBody;
             }
         }
-        element_4.Table = Table;
+        element_5.Table = Table;
         // defines component
         duice.defineComponent(Table, "table", `${duice.getAlias()}-table`);
+    })(element = duice.element || (duice.element = {}));
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    var element;
+    (function (element_6) {
+        class Textarea extends duice.ObjectComponent {
+            /**
+             * constructor
+             * @param element
+             */
+            constructor(element) {
+                super(element);
+            }
+            /**
+             * create
+             * @param element
+             */
+            static create(element) {
+                return new Textarea(element);
+            }
+            /**
+             * doInitialize
+             * @param object
+             */
+            doInitialize(object) {
+                // adds change event listener
+                let _this = this;
+                this.element.addEventListener('change', function (event) {
+                    _this.notifyHandlers({});
+                }, true);
+                // update
+                this.doUpdate(object, {});
+            }
+            /**
+             * doUpdate
+             * @param object
+             * @param detail
+             */
+            doUpdate(object, detail) {
+                let value = object[this.property];
+                this.element.value = value;
+            }
+            /**
+             * getValue
+             */
+            getValue() {
+                return this.element.value;
+            }
+        }
+        element_6.Textarea = Textarea;
+        // defines component
+        duice.defineComponent(Textarea, "textarea", `${duice.getAlias()}-textarea`);
     })(element = duice.element || (duice.element = {}));
 })(duice || (duice = {}));
 var duice;
@@ -1013,8 +1118,8 @@ var duice;
 var duice;
 (function (duice) {
     var element;
-    (function (element_5) {
-        class InputCheckbox extends element_5.Input {
+    (function (element_7) {
+        class InputCheckbox extends element_7.Input {
             /**
              * constructor
              * @param element
@@ -1043,7 +1148,7 @@ var duice;
                 return this.element.checked;
             }
         }
-        element_5.InputCheckbox = InputCheckbox;
+        element_7.InputCheckbox = InputCheckbox;
     })(element = duice.element || (duice.element = {}));
 })(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map
