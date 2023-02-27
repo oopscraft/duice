@@ -511,8 +511,8 @@ var duice;
              */
             constructor(element) {
                 super(element);
-                if (element.hasAttribute('mask')) {
-                    let pattern = element.getAttribute('mask');
+                if (this.hasAttribute('mask')) {
+                    let pattern = this.getAttribute('mask');
                     this.mask = new duice.mask.StringMask(pattern);
                 }
             }

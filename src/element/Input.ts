@@ -34,8 +34,8 @@ namespace duice.element {
          */
         constructor(element: HTMLInputElement) {
             super(element);
-            if(element.hasAttribute('mask')){
-                let pattern = element.getAttribute('mask');
+            if(this.hasAttribute('mask')){
+                let pattern = this.getAttribute('mask');
                 this.mask = new mask.StringMask(pattern);
             }
         }
