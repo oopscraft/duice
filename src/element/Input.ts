@@ -1,9 +1,15 @@
 ///<reference path="../ObjectComponent.ts"/>
+///<reference path="../mask/StringMask.ts"/>
 namespace duice.element {
 
+    /**
+     * Input
+     */
     export class Input extends ObjectComponent {
 
         element: HTMLInputElement;
+
+        mask: mask.StringMask;
 
         /**
          * create
@@ -28,6 +34,10 @@ namespace duice.element {
          */
         constructor(element: HTMLInputElement) {
             super(element);
+            if(element.hasAttribute('mask')){
+                let pattern = element.getAttribute('mask');
+                this.mask = new mask.StringMask(pattern);
+            }
         }
 
         /**
@@ -53,14 +63,15 @@ namespace duice.element {
          */
         override doUpdate(object: object, detail: object): void {
             let value = object[this.property];
-            this.element.value = value;
+            this.element.value = this.mask ? this.mask.encode(value) : value;
         }
 
         /**
          * getValue
          */
         override getValue(): any {
-            return this.element.value;
+            let value = this.element.value;
+            return this.mask ? this.mask.decode(value) : value;
         }
 
     }

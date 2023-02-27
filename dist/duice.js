@@ -428,11 +428,81 @@ var duice;
     }
     duice.ObjectComponent = ObjectComponent;
 })(duice || (duice = {}));
+var duice;
+(function (duice) {
+    var mask;
+    (function (mask) {
+        /**
+         * StringFormat
+         * @param string format
+         */
+        class StringMask {
+            /**
+             * Constructor
+             * @param pattern
+             */
+            constructor(pattern) {
+                this.pattern = pattern;
+            }
+            /**
+             * encode string as format
+             * @param value
+             */
+            encode(value) {
+                if (!this.pattern) {
+                    return value;
+                }
+                let encodedValue = '';
+                let patternChars = this.pattern.split('');
+                let valueChars = value.split('');
+                let valueCharsPosition = 0;
+                for (let i = 0, size = patternChars.length; i < size; i++) {
+                    let patternChar = patternChars[i];
+                    if (patternChar === '#') {
+                        encodedValue += valueChars[valueCharsPosition++] || '';
+                    }
+                    else {
+                        encodedValue += patternChar;
+                    }
+                }
+                return encodedValue;
+            }
+            /**
+             * decodes string as format
+             * @param value
+             */
+            decode(value) {
+                if (!this.pattern) {
+                    return value;
+                }
+                let decodedValue = '';
+                let patternChars = this.pattern.split('');
+                let valueChars = value.split('');
+                let valueCharsPosition = 0;
+                for (let i = 0, size = patternChars.length; i < size; i++) {
+                    let patternChar = patternChars[i];
+                    if (patternChar === '#') {
+                        decodedValue += valueChars[valueCharsPosition++] || '';
+                    }
+                    else {
+                        valueCharsPosition++;
+                    }
+                }
+                return decodedValue;
+            }
+        }
+        mask.StringMask = StringMask;
+    })(mask = duice.mask || (duice.mask = {}));
+})(duice || (duice = {}));
 ///<reference path="../ObjectComponent.ts"/>
+///<reference path="../mask/StringMask.ts"/>
 var duice;
 (function (duice) {
     var element;
     (function (element_1) {
+        /**
+         * Input
+         */
         class Input extends duice.ObjectComponent {
             /**
              * constructor
@@ -441,6 +511,10 @@ var duice;
              */
             constructor(element) {
                 super(element);
+                if (element.hasAttribute('mask')) {
+                    let pattern = element.getAttribute('mask');
+                    this.mask = new duice.mask.StringMask(pattern);
+                }
             }
             /**
              * create
@@ -477,13 +551,14 @@ var duice;
              */
             doUpdate(object, detail) {
                 let value = object[this.property];
-                this.element.value = value;
+                this.element.value = this.mask ? this.mask.encode(value) : value;
             }
             /**
              * getValue
              */
             getValue() {
-                return this.element.value;
+                let value = this.element.value;
+                return this.mask ? this.mask.decode(value) : value;
             }
         }
         element_1.Input = Input;
@@ -971,72 +1046,6 @@ var duice;
             }
         }
         mask.NumberMask = NumberMask;
-    })(mask = duice.mask || (duice.mask = {}));
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    var mask;
-    (function (mask) {
-        /**
-         * StringFormat
-         * @param string format
-         */
-        class StringMask {
-            /**
-             * Constructor
-             * @param pattern
-             */
-            constructor(pattern) {
-                this.pattern = pattern;
-            }
-            /**
-             * encode string as format
-             * @param value
-             */
-            encode(value) {
-                if (!this.pattern) {
-                    return value;
-                }
-                let encodedValue = '';
-                let patternChars = this.pattern.split('');
-                let valueChars = value.split('');
-                let valueCharsPosition = 0;
-                for (let i = 0, size = patternChars.length; i < size; i++) {
-                    let patternChar = patternChars[i];
-                    if (patternChar === '#') {
-                        encodedValue += valueChars[valueCharsPosition++] || '';
-                    }
-                    else {
-                        encodedValue += patternChar;
-                    }
-                }
-                return encodedValue;
-            }
-            /**
-             * decodes string as format
-             * @param value
-             */
-            decode(value) {
-                if (!this.pattern) {
-                    return value;
-                }
-                let decodedValue = '';
-                let patternChars = this.pattern.split('');
-                let valueChars = value.split('');
-                let valueCharsPosition = 0;
-                for (let i = 0, size = patternChars.length; i < size; i++) {
-                    let patternChar = patternChars[i];
-                    if (patternChar === '#') {
-                        decodedValue += valueChars[valueCharsPosition++] || '';
-                    }
-                    else {
-                        valueCharsPosition++;
-                    }
-                }
-                return decodedValue;
-            }
-        }
-        mask.StringMask = StringMask;
     })(mask = duice.mask || (duice.mask = {}));
 })(duice || (duice = {}));
 var duice;
