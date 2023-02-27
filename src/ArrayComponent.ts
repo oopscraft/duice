@@ -10,8 +10,6 @@ namespace duice {
 
         status: string;
 
-        rowElements: HTMLElement[] = [];
-
         /**
          * constructor
          * @param element
@@ -37,44 +35,6 @@ namespace duice {
          */
         getStatus(): string {
             return this.status;
-        }
-
-        /**
-         * doInitialize
-         * @param array
-         */
-        override doInitialize(array: object[]): void {
-            this.doUpdate(array, {});
-        }
-
-        /**
-         * doUpdate
-         * @param array
-         * @param detail
-         */
-        override doUpdate(array: object[], detail: object): void {
-
-            // clear
-            this.rowElements.forEach(rowElement =>{
-                this.element.removeChild(rowElement);
-            });
-            this.rowElements.length = 0;
-
-            // creates row
-            for(let index = 0, size = array.length; index < size; index ++ ){
-                let object = array[index];
-                let status = {
-                    index: index,
-                    length: array.length
-                };
-                let rowElement= this.createRowElement(object, status);
-                let context = {};
-                context[this.getVar()] = object;
-                context[this.getStatus()] = status;
-                initializeComponent(rowElement, context);
-                this.element.appendChild(rowElement);
-                this.rowElements.push(rowElement);
-            }
         }
 
         /**

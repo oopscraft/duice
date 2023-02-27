@@ -22,17 +22,6 @@ namespace duice.element {
          */
         constructor(element: HTMLSelectElement) {
             super(element);
-            let _this = this;
-            this.element.addEventListener('change', function(event){
-                _this.setValue(this.value);
-            });
-
-            // stores default options
-            for(let i = 0, size = this.element.options.length; i < size; i ++){
-                this.defaultOptions.push(this.element.options[i])
-            }
-
-            // option
             this.option = this.getAttribute('option');
        }
 
@@ -41,6 +30,12 @@ namespace duice.element {
          * @param object
          */
         override doInitialize(object: object): void {
+
+            // stores default options
+            for(let i = 0, size = this.element.options.length; i < size; i ++){
+                this.defaultOptions.push(this.element.options[i])
+            }
+
             // set options
             if(this.option){
                 let optionParts = this.option.split(',');
@@ -50,8 +45,14 @@ namespace duice.element {
                 this.setOption(options, value, text);
             }
 
-            // update
-            super.doInitialize(object);
+            // adds change event listener
+            let _this = this;
+            this.element.addEventListener('change', function(event){
+                _this.notifyHandlers({});
+            },true);
+
+            // updates
+            this.doUpdate(object, {});
         }
 
         /**
@@ -87,18 +88,7 @@ namespace duice.element {
          */
         override doUpdate(object: object, detail: object): void {
             let value = object[this.property];
-            this.setValue(value);
-        }
-
-
-        /**
-         * setValue
-         * @param value
-         */
-        override setValue(value: any): boolean {
             this.element.value = value;
-            this.notifyHandlers({});
-            return true;
         }
 
         /**
@@ -106,18 +96,6 @@ namespace duice.element {
          */
         override getValue(): any {
             return this.element.value;
-        }
-
-        /**
-         * setReadOnly
-         * @param readOnly
-         */
-        override setReadOnly(readOnly: boolean): void {
-            if(readOnly){
-                this.element.style.pointerEvents = 'none';
-            }else{
-                this.element.style.pointerEvents = '';
-            }
         }
 
     }

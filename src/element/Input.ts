@@ -28,20 +28,32 @@ namespace duice.element {
          */
         constructor(element: HTMLInputElement) {
             super(element);
-            let _this = this;
-            this.element.addEventListener('change', function(event){
-                _this.setValue(this.value);
-            },true);
         }
 
         /**
-         * setValue
-         * @param value
+         * doInitialize
+         * @param object
          */
-        override setValue(value: any): boolean {
+        override doInitialize(object: object): void {
+
+            // adds change event listener
+            let _this = this;
+            this.element.addEventListener('change', function(event){
+                _this.notifyHandlers({});
+            },true);
+
+            // update
+            this.doUpdate(object, {});
+        }
+
+        /**
+         * doUpdate
+         * @param object
+         * @param detail
+         */
+        override doUpdate(object: object, detail: object): void {
+            let value = object[this.property];
             this.element.value = value;
-            this.notifyHandlers({});
-            return true;
         }
 
         /**
@@ -49,18 +61,6 @@ namespace duice.element {
          */
         override getValue(): any {
             return this.element.value;
-        }
-
-        /**
-         * setReadOnly
-         * @param readOnly
-         */
-        override setReadOnly(readOnly: boolean): void {
-            if(readOnly){
-                this.element.style.pointerEvents = 'none';
-            }else{
-                this.element.style.pointerEvents = '';
-            }
         }
 
     }

@@ -155,6 +155,7 @@ var duice;
          * @param detail
          */
         update(handler, detail) {
+            console.log("Component.update", handler, detail);
             let data = handler.getTarget();
             this.doUpdate(data, detail);
         }
@@ -214,7 +215,6 @@ var duice;
         constructor(element) {
             console.debug("ArrayComponent.constructor", element);
             super(element);
-            this.rowElements = [];
             this.var = this.getAttribute("var");
             this.status = this.getAttribute("status");
         }
@@ -229,40 +229,6 @@ var duice;
          */
         getStatus() {
             return this.status;
-        }
-        /**
-         * doInitialize
-         * @param array
-         */
-        doInitialize(array) {
-            this.doUpdate(array, {});
-        }
-        /**
-         * doUpdate
-         * @param array
-         * @param detail
-         */
-        doUpdate(array, detail) {
-            // clear
-            this.rowElements.forEach(rowElement => {
-                this.element.removeChild(rowElement);
-            });
-            this.rowElements.length = 0;
-            // creates row
-            for (let index = 0, size = array.length; index < size; index++) {
-                let object = array[index];
-                let status = {
-                    index: index,
-                    length: array.length
-                };
-                let rowElement = this.createRowElement(object, status);
-                let context = {};
-                context[this.getVar()] = object;
-                context[this.getStatus()] = status;
-                duice.initializeComponent(rowElement, context);
-                this.element.appendChild(rowElement);
-                this.rowElements.push(rowElement);
-            }
         }
     }
     duice.ArrayComponent = ArrayComponent;
@@ -459,22 +425,6 @@ var duice;
         getProperty() {
             return this.property;
         }
-        /**
-         * doInitialize
-         * @param object
-         */
-        doInitialize(object) {
-            this.doUpdate(object, {});
-        }
-        /**
-         * doUpdate
-         * @param object
-         * @param detail
-         */
-        doUpdate(object, detail) {
-            let value = object[this.property];
-            this.setValue(value);
-        }
     }
     duice.ObjectComponent = ObjectComponent;
 })(duice || (duice = {}));
@@ -491,10 +441,6 @@ var duice;
              */
             constructor(element) {
                 super(element);
-                let _this = this;
-                this.element.addEventListener('change', function (event) {
-                    _this.setValue(this.value);
-                }, true);
             }
             /**
              * create
@@ -512,31 +458,32 @@ var duice;
                 }
             }
             /**
-             * setValue
-             * @param value
+             * doInitialize
+             * @param object
              */
-            setValue(value) {
+            doInitialize(object) {
+                // adds change event listener
+                let _this = this;
+                this.element.addEventListener('change', function (event) {
+                    _this.notifyHandlers({});
+                }, true);
+                // update
+                this.doUpdate(object, {});
+            }
+            /**
+             * doUpdate
+             * @param object
+             * @param detail
+             */
+            doUpdate(object, detail) {
+                let value = object[this.property];
                 this.element.value = value;
-                this.notifyHandlers({});
-                return true;
             }
             /**
              * getValue
              */
             getValue() {
                 return this.element.value;
-            }
-            /**
-             * setReadOnly
-             * @param readOnly
-             */
-            setReadOnly(readOnly) {
-                if (readOnly) {
-                    this.element.style.pointerEvents = 'none';
-                }
-                else {
-                    this.element.style.pointerEvents = '';
-                }
             }
         }
         element_1.Input = Input;
@@ -555,6 +502,15 @@ var duice;
              */
             constructor(element) {
                 super(element);
+            }
+            /**
+             * doUpdate
+             * @param object
+             * @param detail
+             */
+            doUpdate(object, detail) {
+                let value = object[this.property];
+                this.element.value = value;
             }
             /**
              * getValue
@@ -579,15 +535,6 @@ var duice;
             constructor(element) {
                 super(element);
                 this.defaultOptions = [];
-                let _this = this;
-                this.element.addEventListener('change', function (event) {
-                    _this.setValue(this.value);
-                });
-                // stores default options
-                for (let i = 0, size = this.element.options.length; i < size; i++) {
-                    this.defaultOptions.push(this.element.options[i]);
-                }
-                // option
                 this.option = this.getAttribute('option');
             }
             /**
@@ -602,6 +549,10 @@ var duice;
              * @param object
              */
             doInitialize(object) {
+                // stores default options
+                for (let i = 0, size = this.element.options.length; i < size; i++) {
+                    this.defaultOptions.push(this.element.options[i]);
+                }
                 // set options
                 if (this.option) {
                     let optionParts = this.option.split(',');
@@ -610,8 +561,13 @@ var duice;
                     let text = optionParts[2];
                     this.setOption(options, value, text);
                 }
-                // update
-                super.doInitialize(object);
+                // adds change event listener
+                let _this = this;
+                this.element.addEventListener('change', function (event) {
+                    _this.notifyHandlers({});
+                }, true);
+                // updates
+                this.doUpdate(object, {});
             }
             /**
              * setOptions
@@ -642,34 +598,13 @@ var duice;
              */
             doUpdate(object, detail) {
                 let value = object[this.property];
-                this.setValue(value);
-            }
-            /**
-             * setValue
-             * @param value
-             */
-            setValue(value) {
                 this.element.value = value;
-                this.notifyHandlers({});
-                return true;
             }
             /**
              * getValue
              */
             getValue() {
                 return this.element.value;
-            }
-            /**
-             * setReadOnly
-             * @param readOnly
-             */
-            setReadOnly(readOnly) {
-                if (readOnly) {
-                    this.element.style.pointerEvents = 'none';
-                }
-                else {
-                    this.element.style.pointerEvents = '';
-                }
             }
         }
         element_3.Select = Select;
@@ -693,8 +628,7 @@ var duice;
              */
             constructor(element) {
                 super(element);
-                this.tBodyTemplate = this.element.querySelector("tbody");
-                this.element.removeChild(this.tBodyTemplate);
+                this.rowElements = [];
             }
             /**
              * create
@@ -702,6 +636,44 @@ var duice;
              */
             static create(element) {
                 return new Table(element);
+            }
+            /**
+             * doInitialize
+             * @param array
+             */
+            doInitialize(array) {
+                // tbody template
+                this.tBodyTemplate = this.element.querySelector("tbody");
+                this.element.removeChild(this.tBodyTemplate);
+                // update
+                this.doUpdate(array, {});
+            }
+            /**
+             * doUpdate
+             * @param array
+             * @param detail
+             */
+            doUpdate(array, detail) {
+                // clear
+                this.rowElements.forEach(rowElement => {
+                    this.element.removeChild(rowElement);
+                });
+                this.rowElements.length = 0;
+                // creates row
+                for (let index = 0, size = array.length; index < size; index++) {
+                    let object = array[index];
+                    let status = {
+                        index: index,
+                        length: array.length
+                    };
+                    let rowElement = this.createRowElement(object, status);
+                    let context = {};
+                    context[this.getVar()] = object;
+                    context[this.getStatus()] = status;
+                    duice.initializeComponent(rowElement, context);
+                    this.element.appendChild(rowElement);
+                    this.rowElements.push(rowElement);
+                }
             }
             /**
              * createRowElement
@@ -1030,6 +1002,7 @@ var duice;
          * @param detail
          */
         update(component, detail) {
+            console.log('ObjectHandler.update', component, detail);
             let property = component.getProperty();
             let value = component.getValue();
             Reflect.set(this.getTarget(), property, value);
@@ -1048,10 +1021,20 @@ var duice;
              */
             constructor(element) {
                 super(element);
-                // stop click event propagation
-                this.element.addEventListener('click', function (event) {
-                    event.stopPropagation();
-                }, true);
+            }
+            /**
+             * doUpdate
+             * @param object
+             * @param detail
+             */
+            doUpdate(object, detail) {
+                let value = object[this.property];
+                if (value === true) {
+                    this.element.checked = true;
+                }
+                else {
+                    this.element.checked = false;
+                }
             }
             /**
              * getValue

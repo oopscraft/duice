@@ -8,11 +8,20 @@ namespace duice.element {
          */
         constructor(element: HTMLInputElement) {
             super(element);
+        }
 
-            // stop click event propagation
-            this.element.addEventListener('click', function(event){
-                event.stopPropagation();
-            },true);
+        /**
+         * doUpdate
+         * @param object
+         * @param detail
+         */
+        override doUpdate(object: object, detail: object): void {
+            let value = object[this.property];
+            if(value === true){
+                this.element.checked = true;
+            }else{
+                this.element.checked = false;
+            }
         }
 
         /**

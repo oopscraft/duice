@@ -26,38 +26,9 @@ namespace duice {
         }
 
         /**
-         * doInitialize
-         * @param object
-         */
-        override doInitialize(object: object): void {
-            this.doUpdate(object, {});
-        }
-
-        /**
-         * doUpdate
-         * @param object
-         * @param detail
-         */
-        override doUpdate(object: object, detail: object): void {
-            let value = object[this.property];
-            this.setValue(value);
-        }
-
-        /**
-         * setValue
-         * @param value
-         */
-        abstract setValue(value: any): boolean;
-
-        /**
          * getValue
          */
         abstract getValue(): any;
-
-        /**
-         * setReadOnly
-         */
-        abstract setReadOnly(readOnly: boolean): void;
 
     }
 

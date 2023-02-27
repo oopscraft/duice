@@ -43,6 +43,7 @@ namespace duice {
          * @param detail
          */
         update(component: ObjectComponent, detail: object): void {
+            console.log('ObjectHandler.update', component, detail);
             let property = component.getProperty();
             let value = component.getValue();
             Reflect.set(this.getTarget(), property, value);

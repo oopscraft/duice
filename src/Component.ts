@@ -51,6 +51,7 @@ namespace duice {
          * @param detail
          */
         update(handler: Handler<T>, detail: object): void {
+            console.log("Component.update", handler, detail);
             let data = handler.getTarget();
             this.doUpdate(data, detail);
         }
