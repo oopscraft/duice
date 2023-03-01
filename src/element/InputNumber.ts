@@ -13,7 +13,7 @@ namespace duice.element {
         /**
          * render
          */
-        override render(): void {
+        override doRender(): void {
             let value = this.handler.getPropertyValue(this.getProperty());
             this.element.value = value;
         }
@@ -22,8 +22,8 @@ namespace duice.element {
          * update
          * @param detail
          */
-        override update(detail: object): void {
-            this.render();
+        override doUpdate(detail: object): void {
+            this.doRender();
         }
 
         /**

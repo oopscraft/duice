@@ -13,6 +13,8 @@ namespace duice {
 
         handler: Handler<T>;
 
+        script: string;
+
         /**
          * constructor
          * @param element
@@ -23,21 +25,49 @@ namespace duice {
             this.context = context;
             this.id = this.generateId();
             this.setAttribute(element, "id", this.id);
-
-
+            this.script = this.getAttribute(element, 'script');
         }
 
         /**
          * render
          */
-        abstract render():void;
+        render(): void {
+
+            // calls template method
+            this.doRender();
+
+            // executes script
+            if(this.script){
+                this.executeScript(this.script);
+            }
+        }
+
+        /**
+         * doRender
+         */
+        abstract doRender():void;
 
         /**
          * update
+         * @param detail
+         */
+        update(detail: object): void {
+
+            // calls template method
+            this.doUpdate(detail);
+
+            // executes script
+            if(this.script){
+                this.executeScript(this.script);
+            }
+        }
+
+        /**
+         * doUpdate
          * @param handler
          * @param detail
          */
-        abstract update(detail: object): void;
+        abstract doUpdate(detail: object): void;
 
         /**
          * notifyHandlers
@@ -123,6 +153,20 @@ namespace duice {
             // If this is a select, ensure that it displays empty
             if(element instanceof HTMLSelectElement){
                 (<HTMLSelectElement>element).options.length = 0;
+            }
+        }
+
+        /**
+         * executes script
+         * @param code
+         * @param context
+         */
+        executeScript(script: string):any {
+            try {
+                return Function(script).call(this.element, this.context);
+            }catch(e){
+                console.error(script);
+                throw e;
             }
         }
 

@@ -54,7 +54,7 @@ namespace duice {
         /**
          * render
          */
-        render(): void {
+        doRender(): void {
             let value = this.handler.getPropertyValue(this.getProperty());
             value = this.mask ? this.mask.encode(value) : value;
             let textNode = document.createTextNode(value);
@@ -65,8 +65,8 @@ namespace duice {
          * update
          * @param detail
          */
-        update(detail: object): void {
-            this.render();
+        doUpdate(detail: object): void {
+            this.doRender();
         }
 
         /**

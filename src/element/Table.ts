@@ -26,16 +26,16 @@ namespace duice.element {
         /**
          * render
          */
-        override render(): void {
-            super.render();
+        override doRender(): void {
+            super.doRender();
         }
 
         /**
          * update
          * @param detail
          */
-        override update(detail: object): void {
-            this.render();
+        override doUpdate(detail: object): void {
+            this.doRender();
         }
 
     }

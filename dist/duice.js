@@ -134,6 +134,30 @@ var duice;
             this.context = context;
             this.id = this.generateId();
             this.setAttribute(element, "id", this.id);
+            this.script = this.getAttribute(element, 'script');
+        }
+        /**
+         * render
+         */
+        render() {
+            // calls template method
+            this.doRender();
+            // executes script
+            if (this.script) {
+                this.executeScript(this.script);
+            }
+        }
+        /**
+         * update
+         * @param detail
+         */
+        update(detail) {
+            // calls template method
+            this.doUpdate(detail);
+            // executes script
+            if (this.script) {
+                this.executeScript(this.script);
+            }
         }
         /**
          * notifyHandlers
@@ -213,6 +237,20 @@ var duice;
                 element.options.length = 0;
             }
         }
+        /**
+         * executes script
+         * @param code
+         * @param context
+         */
+        executeScript(script) {
+            try {
+                return Function(script).call(this.element, this.context);
+            }
+            catch (e) {
+                console.error(script);
+                throw e;
+            }
+        }
     }
     duice.Component = Component;
 })(duice || (duice = {}));
@@ -232,7 +270,6 @@ var duice;
         constructor(element, context) {
             console.debug("ArrayComponent.constructor", element, context);
             super(element, context);
-            this.loops = [];
             this.loopTemplates = [];
             this.loopSlots = [];
             // array handler
@@ -244,17 +281,14 @@ var duice;
             let loopElements = this.element.querySelectorAll(`*[${duice.getAlias()}\\:loop]`);
             for (let i = 0; i < loopElements.length; i++) {
                 let loopElement = loopElements[i];
-                let loop = this.getAttribute(loopElement, 'loop');
                 let loopTemplate = loopElement;
                 let loopSlot = document.createElement('slot');
-                this.loops.push(loop);
                 this.loopTemplates.push(loopTemplate);
                 this.loopSlots.push(loopSlot);
                 loopElement.replaceWith(loopSlot);
             }
-            console.log("== loops:", this.loops);
-            console.log("== loopTemplates:", this.loopTemplates);
-            console.log("== loopSlots:", this.loopSlots);
+            console.debug("== loopTemplates:", this.loopTemplates);
+            console.debug("== loopSlots:", this.loopSlots);
         }
         /**
          * create
@@ -268,13 +302,13 @@ var duice;
           * render
           * @param detail
           */
-        render() {
+        doRender() {
             console.log("ArrayComponent.render");
-            for (let i = 0; i < this.loops.length; i++) {
-                let loop = this.loops[i];
+            for (let i = 0; i < this.loopTemplates.length; i++) {
+                //let loop = this.loops[i];
                 let loopTemplate = this.loopTemplates[i];
                 let loopSlot = this.loopSlots[i];
-                console.log("#### loop:", loop);
+                let loop = this.getAttribute(loopTemplate, 'loop');
                 // clear
                 this.removeChildNodes(loopSlot);
                 // create row
@@ -304,7 +338,7 @@ var duice;
          * update
          * @param detail
          */
-        update(detail) {
+        doUpdate(detail) {
             console.log("ArrayComponent.update", detail);
         }
     }
@@ -400,7 +434,7 @@ var duice;
         /**
          * render
          */
-        render() {
+        doRender() {
             let value = this.handler.getPropertyValue(this.getProperty());
             value = this.mask ? this.mask.encode(value) : value;
             let textNode = document.createTextNode(value);
@@ -410,8 +444,8 @@ var duice;
           * update
           * @param detail
           */
-        update(detail) {
-            this.render();
+        doUpdate(detail) {
+            this.doRender();
         }
         /**
          * getValue
@@ -687,7 +721,7 @@ var duice;
              * render
              * @param detail
              */
-            render() {
+            doRender() {
                 let value = this.handler.getPropertyValue(this.property);
                 this.element.value = this.mask ? this.mask.encode(value) : value;
             }
@@ -695,8 +729,8 @@ var duice;
              * update
              * @param detail
              */
-            update(detail) {
-                this.render();
+            doUpdate(detail) {
+                this.doRender();
             }
             /**
              * getValue
@@ -726,7 +760,7 @@ var duice;
             /**
              * render
              */
-            render() {
+            doRender() {
                 let value = this.handler.getPropertyValue(this.getProperty());
                 if (value === true) {
                     this.element.checked = true;
@@ -739,8 +773,8 @@ var duice;
              * update
              * @param detail
              */
-            update(detail) {
-                this.render();
+            doUpdate(detail) {
+                this.doRender();
             }
             /**
              * getValue
@@ -767,7 +801,7 @@ var duice;
             /**
              * render
              */
-            render() {
+            doRender() {
                 let value = this.handler.getPropertyValue(this.getProperty());
                 this.element.value = value;
             }
@@ -775,8 +809,8 @@ var duice;
              * update
              * @param detail
              */
-            update(detail) {
-                this.render();
+            doUpdate(detail) {
+                this.doRender();
             }
             /**
              * getValue
@@ -820,7 +854,7 @@ var duice;
             static create(element, context) {
                 return new Select(element, context);
             }
-            render() {
+            doRender() {
                 // set options
                 if (this.option) {
                     let optionParts = this.option.split(',');
@@ -859,8 +893,8 @@ var duice;
              * update
              * @param detail
              */
-            update(detail) {
-                this.render();
+            doUpdate(detail) {
+                this.doRender();
             }
             /**
              * getValue
@@ -901,15 +935,15 @@ var duice;
             /**
              * render
              */
-            render() {
-                super.render();
+            doRender() {
+                super.doRender();
             }
             /**
              * update
              * @param detail
              */
-            update(detail) {
-                this.render();
+            doUpdate(detail) {
+                this.doRender();
             }
         }
         element_5.Table = Table;
@@ -944,7 +978,7 @@ var duice;
             /**
              * render
              */
-            render() {
+            doRender() {
                 let value = this.handler.getPropertyValue(this.getProperty());
                 this.element.value = value;
             }
@@ -952,8 +986,8 @@ var duice;
              * update
              * @param detail
              */
-            update(detail) {
-                this.render();
+            doUpdate(detail) {
+                this.doRender();
             }
             /**
              * getValue

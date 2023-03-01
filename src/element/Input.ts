@@ -53,7 +53,7 @@ namespace duice.element {
          * render
          * @param detail
          */
-        override render(): void {
+        override doRender(): void {
             let value = this.handler.getPropertyValue(this.property);
             this.element.value = this.mask ? this.mask.encode(value) : value;
         }
@@ -62,8 +62,8 @@ namespace duice.element {
          * update
          * @param detail
          */
-        override update(detail: object): void {
-            this.render();
+        override doUpdate(detail: object): void {
+            this.doRender();
         }
 
         /**

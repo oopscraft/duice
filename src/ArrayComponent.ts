@@ -6,8 +6,6 @@ namespace duice {
      */
     export class ArrayComponent extends Component<object[]> {
 
-        loops: string[] = [];
-
         loopTemplates: HTMLElement[] = [];
 
         loopSlots: HTMLSlotElement[] = [];
@@ -41,31 +39,28 @@ namespace duice {
             let loopElements = this.element.querySelectorAll(`*[${getAlias()}\\:loop]`);
             for(let i = 0; i < loopElements.length; i ++ ){
                 let loopElement = loopElements[i] as HTMLElement;
-                let loop = this.getAttribute(loopElement,'loop');
                 let loopTemplate = loopElement;
                 let loopSlot = document.createElement('slot');
-                this.loops.push(loop);
                 this.loopTemplates.push(loopTemplate);
                 this.loopSlots.push(loopSlot);
                 loopElement.replaceWith(loopSlot);
             }
-            console.log("== loops:", this.loops);
-            console.log("== loopTemplates:", this.loopTemplates);
-            console.log("== loopSlots:", this.loopSlots);
+            console.debug("== loopTemplates:", this.loopTemplates);
+            console.debug("== loopSlots:", this.loopSlots);
         }
 
        /**
          * render
          * @param detail
          */
-        override render(): void {
+        override doRender(): void {
             console.log("ArrayComponent.render");
 
-            for(let i = 0; i < this.loops.length; i ++) {
-                let loop = this.loops[i];
+            for(let i = 0; i < this.loopTemplates.length; i ++) {
+                //let loop = this.loops[i];
                 let loopTemplate = this.loopTemplates[i];
                 let loopSlot = this.loopSlots[i];
-                console.log("#### loop:", loop);
+                let loop = this.getAttribute(loopTemplate,'loop');
 
                 // clear
                 this.removeChildNodes(loopSlot);
@@ -98,7 +93,7 @@ namespace duice {
          * update
          * @param detail
          */
-        update(detail: object): void {
+        doUpdate(detail: object): void {
             console.log("ArrayComponent.update", detail);
         }
 

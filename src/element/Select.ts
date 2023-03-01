@@ -37,7 +37,7 @@ namespace duice.element {
             },true);
         }
 
-        override render(): void {
+        override doRender(): void {
 
             // set options
             if(this.option){
@@ -83,8 +83,8 @@ namespace duice.element {
          * update
          * @param detail
          */
-        override update(detail: object): void {
-            this.render();
+        override doUpdate(detail: object): void {
+            this.doRender();
         }
 
         /**

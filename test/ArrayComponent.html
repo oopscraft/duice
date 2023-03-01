@@ -19,19 +19,19 @@
     <table duice:array="myArray" border="1">
         <thead>
             <tr>
-                <td>status.index</td>
-                <td>status.number</td>
-                <td>status.count</td>
-                <td>status.first</td>
-                <td>status.last</td>
-                <td>item.name</td>
-                <td>item.age</td>
-                <td>item.mobile</td>
+                <th>status.index</th>
+                <th>status.number</th>
+                <th>status.count</th>
+                <th>status.first</th>
+                <th>status.last</th>
+                <th>item.name</th>
+                <th>item.age</th>
+                <th>item.mobile</th>
             </tr>
         </thead>
         <tbody>
             <tr duice:loop="item,status">
-                <td duice:object="status" duice:property="index"></td>
+                <td duice:object="status" duice:property="index" duice:script="this.style.backgroundColor='red';"></td>
                 <td duice:object="status" duice:property="number"></td>
                 <td duice:object="status" duice:property="count"></td>
                 <td duice:object="status" duice:property="first"></td>
@@ -39,6 +39,9 @@
                 <td duice:object="item" duice:property="name"></td>
                 <td duice:object="item" duice:property="age"></td>
                 <td duice:object="item" duice:property="mobile" duice:mask="string('###-####-####')"></td>
+            </tr>
+            <tr duice:if="myArray.length === 0">
+                <td colspan="100%">Data Not Found</td>
             </tr>
         </tbody>
     </table>
