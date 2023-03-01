@@ -501,16 +501,23 @@ var duice;
 (function (duice) {
     let alias = 'duice';
     const componentDefinitions = [];
+    /**
+     * sets alias of namespace
+     * @param value
+     */
     function setAlias(value) {
         alias = value;
     }
     duice.setAlias = setAlias;
+    /**
+     * returns alias of namespace
+     */
     function getAlias() {
         return alias;
     }
     duice.getAlias = getAlias;
     /**
-     * defineComponent
+     * defines component
      * @param componentType
      * @param tagName
      * @param isAttribute
@@ -522,7 +529,7 @@ var duice;
     }
     duice.defineComponent = defineComponent;
     /**
-     * createComponent
+     * creates component
      * @param componentType
      * @param element
      * @param context
@@ -542,25 +549,11 @@ var duice;
         throw new Error('Invalid element');
     }
     duice.createComponent = createComponent;
-    // /**
-    //  * initializeComponent
-    //  * @param context
-    //  */
-    // export function initializeComponentOld(container: any, context: object): void {
-    //     [ArrayComponent, ObjectComponent].forEach(componentType => {
-    //         componentDefinitions.forEach(componentDefinition => {
-    //             if(componentDefinition.componentType.prototype instanceof componentType) {
-    //                 let selector = componentDefinition.getSelector();
-    //                 let elements = container.querySelectorAll(selector);
-    //                 elements.forEach(element => {
-    //                     console.debug("initializeComponent", element);
-    //                     let component = Reflect.apply(componentDefinition.componentType.create, undefined, [element, context]);
-    //                     component.initialize();
-    //                 });
-    //             }
-    //         });
-    //     });
-    // }
+    /**
+     * initializes component
+     * @param container
+     * @param context
+     */
     function initializeComponent(container, context) {
         container.querySelectorAll(`*[${getAlias()}\\:array]:not([${getAlias()}\\:id])`).forEach(arrayElement => {
             let arrayComponent = createComponent(duice.ArrayComponent, arrayElement, context);

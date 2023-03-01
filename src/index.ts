@@ -12,16 +12,23 @@ namespace duice {
 
     const componentDefinitions: ComponentDefinition[] = [];
 
+    /**
+     * sets alias of namespace
+     * @param value
+     */
     export function setAlias(value:string): void {
         alias = value;
     }
 
+    /**
+     * returns alias of namespace
+     */
     export function getAlias(): string {
         return alias;
     }
 
     /**
-     * defineComponent
+     * defines component
      * @param componentType
      * @param tagName
      * @param isAttribute
@@ -33,7 +40,7 @@ namespace duice {
     }
 
     /**
-     * createComponent
+     * creates component
      * @param componentType
      * @param element
      * @param context
@@ -53,26 +60,11 @@ namespace duice {
         throw new Error('Invalid element');
     }
 
-    // /**
-    //  * initializeComponent
-    //  * @param context
-    //  */
-    // export function initializeComponentOld(container: any, context: object): void {
-    //     [ArrayComponent, ObjectComponent].forEach(componentType => {
-    //         componentDefinitions.forEach(componentDefinition => {
-    //             if(componentDefinition.componentType.prototype instanceof componentType) {
-    //                 let selector = componentDefinition.getSelector();
-    //                 let elements = container.querySelectorAll(selector);
-    //                 elements.forEach(element => {
-    //                     console.debug("initializeComponent", element);
-    //                     let component = Reflect.apply(componentDefinition.componentType.create, undefined, [element, context]);
-    //                     component.initialize();
-    //                 });
-    //             }
-    //         });
-    //     });
-    // }
-
+    /**
+     * initializes component
+     * @param container
+     * @param context
+     */
     export function initializeComponent(container: any, context: object): void {
         container.querySelectorAll(`*[${getAlias()}\\:array]:not([${getAlias()}\\:id])`).forEach(arrayElement => {
             let arrayComponent = createComponent(ArrayComponent, arrayElement, context);
