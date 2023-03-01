@@ -21,7 +21,7 @@ namespace duice.mask {
          * @param value
          */
         encode(value: string): string{
-            if(!this.pattern) {
+            if(!value) {
                 return value;
             }
             let encodedValue = '';
@@ -44,7 +44,7 @@ namespace duice.mask {
          * @param value
          */
         decode(value: string): string {
-            if(!this.pattern) {
+            if(!value) {
                 return value;
             }
             let decodedValue = '';

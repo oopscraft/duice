@@ -280,15 +280,21 @@ var duice;
                 // create row
                 let array = this.handler.getTarget();
                 let loopArgs = loop.split(',');
-                let itemName = loopArgs[0];
-                let indexName = loopArgs[1];
+                let objectName = loopArgs[0];
+                let statusName = loopArgs[1];
                 for (let index = 0, size = array.length; index < size; index++) {
                     let item = array[index];
                     console.log('== item:', item);
                     let rowElement = loopTemplate.cloneNode(true);
                     let context = {};
-                    context[itemName] = item;
-                    context[indexName] = index;
+                    context[objectName] = item;
+                    context[statusName] = duice.Object.create({
+                        index: index,
+                        number: index + 1,
+                        count: array.length,
+                        first: (index === 0),
+                        last: (index + 1 === array.length)
+                    });
                     duice.initializeComponent(rowElement, context);
                     loopSlot.appendChild(rowElement);
                 }
@@ -596,7 +602,7 @@ var duice;
              * @param value
              */
             encode(value) {
-                if (!this.pattern) {
+                if (!value) {
                     return value;
                 }
                 let encodedValue = '';
@@ -619,7 +625,7 @@ var duice;
              * @param value
              */
             decode(value) {
-                if (!this.pattern) {
+                if (!value) {
                     return value;
                 }
                 let decodedValue = '';

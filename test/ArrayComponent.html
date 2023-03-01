@@ -6,10 +6,10 @@
     <script src="../dist/duice.js"></script>
     <script>
         let myArray = duice.Array.create([
-            { name: 'james', age: 13 },
-            { name: 'tommy', age: 27 },
-            { name: 'orange', age: 21 },
-            { name: 'apple', age: 18 },
+            { name: 'james', age: 13, mobile:'01012344321'},
+            { name: 'tommy', age: 27, mobile:'01012344321'},
+            { name: 'orange', age: 21, mobile:'01043211234'},
+            { name: 'apple', age: 18, mobile: null},
         ]);
         console.log(myArray);
    </script>
@@ -19,20 +19,34 @@
     <table duice:array="myArray" border="1">
         <thead>
             <tr>
-                <td>Name</td>
-                <td>Age</td>
+                <td>status.index</td>
+                <td>status.number</td>
+                <td>status.count</td>
+                <td>status.first</td>
+                <td>status.last</td>
+                <td>item.name</td>
+                <td>item.age</td>
+                <td>item.mobile</td>
             </tr>
         </thead>
         <tbody>
-            <tr duice:loop="myObject,index">
-                <td duice:object="myObject" duice:property="name"></td>
+            <tr duice:loop="item,status">
+                <td duice:object="status" duice:property="index"></td>
+                <td duice:object="status" duice:property="number"></td>
+                <td duice:object="status" duice:property="count"></td>
+                <td duice:object="status" duice:property="first"></td>
+                <td duice:object="status" duice:property="last"></td>
+                <td duice:object="item" duice:property="name"></td>
+                <td duice:object="item" duice:property="age"></td>
+                <td duice:object="item" duice:property="mobile" duice:mask="string('###-####-####')"></td>
             </tr>
         </tbody>
     </table>
 
     <ul duice:array="myArray">
-        <li duice:loop="myObject,index">
-            <span duice:object="myObject" duice:property="name"></span>
+        <li duice:loop="item,status">
+            <span duice:object="item" duice:property="name"></span>
+            <span duice:object="item" duice:property="age"></span>
         </li>
     </ul>
 
