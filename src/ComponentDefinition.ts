@@ -9,28 +9,15 @@ namespace duice {
 
         tagName: string;
 
-        isAttribute: string;
-
         /**
          * constructor
-         * @param componentType
          * @param tagName
-         * @param isAttribute
+         * @param componentType
          * @protected
          */
-        public constructor(componentType: any, tagName: string, isAttribute?: string)  {
+        public constructor(componentType: any, tagName: string)  {
             this.componentType = componentType;
             this.tagName = tagName;
-            this.isAttribute = isAttribute;
-        }
-
-        /**
-         * getSelector
-         */
-        getSelector(): string {
-            return `${this.tagName}`
-                + (this.isAttribute ? `[is="${this.isAttribute}"]` : '')
-                + `:not([${getAlias()}\\:id])`;
         }
 
     }

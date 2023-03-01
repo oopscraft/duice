@@ -12,47 +12,45 @@ namespace duice.element {
          * create
          * @param element
          */
-        static create(element: HTMLSelectElement): Select {
-            return new Select(element);
+        static create(element: HTMLSelectElement, context: object): Select {
+            return new Select(element, context);
         }
 
         /**
          * constructor
          * @param element
+         * @param context
          */
-        constructor(element: HTMLSelectElement) {
-            super(element);
-            this.option = this.getAttribute('option');
-       }
-
-        /**
-         * doInitialize
-         * @param object
-         */
-        override doInitialize(object: object): void {
+        constructor(element: HTMLSelectElement, context: object) {
+            super(element, context);
+            this.option = this.getAttribute(this.element, 'option');
 
             // stores default options
             for(let i = 0, size = this.element.options.length; i < size; i ++){
                 this.defaultOptions.push(this.element.options[i])
             }
 
+            // adds change event listener
+            let _this = this;
+            this.element.addEventListener('change', function(event){
+                _this.notifyHandler({});
+            },true);
+        }
+
+        override render(): void {
+
             // set options
             if(this.option){
                 let optionParts = this.option.split(',');
-                let options = findObject({}, optionParts[0]);
+                let options = this.findObject(optionParts[0]);
                 let value = optionParts[1];
                 let text = optionParts[2];
                 this.setOption(options, value, text);
             }
 
-            // adds change event listener
-            let _this = this;
-            this.element.addEventListener('change', function(event){
-                _this.notifyHandlers({});
-            },true);
-
-            // updates
-            this.doUpdate(object, {});
+            // set value
+            let value = this.handler.getPropertyValue(this.getProperty());
+            this.element.value = value;
         }
 
         /**
@@ -64,7 +62,7 @@ namespace duice.element {
         setOption(options: object[], value: string, text: string): void {
 
             // removes
-            removeChildNodes(this.element);
+            this.removeChildNodes(this.element);
 
             // adds default options
             let _this = this;
@@ -82,13 +80,11 @@ namespace duice.element {
         }
 
         /**
-         * doUpdate
-         * @param object
+         * update
          * @param detail
          */
-        override doUpdate(object: object, detail: object): void {
-            let value = object[this.property];
-            this.element.value = value;
+        override update(detail: object): void {
+            this.render();
         }
 
         /**
@@ -101,6 +97,6 @@ namespace duice.element {
     }
 
     // defines component
-    defineComponent(Select, "select", `${getAlias()}-select`);
+    defineComponent(Select, "select");
 
 }

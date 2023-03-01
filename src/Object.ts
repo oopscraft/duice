@@ -22,7 +22,8 @@ namespace duice {
 
         fromJson(json: object): void {
             for(let property in json){
-                this[property] = json[property];
+                let value = json[property];
+                this[property] = value;
             }
         }
 

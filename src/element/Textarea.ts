@@ -8,42 +8,38 @@ namespace duice.element {
          * create
          * @param element
          */
-        static create(element:HTMLTextAreaElement): Textarea {
-            return new Textarea(element);
+        static create(element:HTMLTextAreaElement, context: object): Textarea {
+            return new Textarea(element, context);
         }
 
         /**
          * constructor
          * @param element
          */
-        constructor(element: HTMLTextAreaElement) {
-            super(element);
-        }
-
-        /**
-         * doInitialize
-         * @param object
-         */
-        override doInitialize(object: object): void {
+        constructor(element: HTMLTextAreaElement, context: object) {
+            super(element, context);
 
             // adds change event listener
             let _this = this;
             this.element.addEventListener('change', function(event){
-                _this.notifyHandlers({});
+                _this.notifyHandler({});
             },true);
-
-            // update
-            this.doUpdate(object, {});
         }
 
         /**
-         * doUpdate
-         * @param object
+         * render
+         */
+        override render(): void {
+            let value = this.handler.getPropertyValue(this.getProperty());
+            this.element.value = value;
+        }
+
+        /**
+         * update
          * @param detail
          */
-        override doUpdate(object: object, detail: object): void {
-            let value = object[this.property];
-            this.element.value = value;
+        override update(detail: object): void {
+            this.render();
         }
 
         /**
@@ -56,7 +52,7 @@ namespace duice.element {
     }
 
     // defines component
-    defineComponent(Textarea, "textarea", `${getAlias()}-textarea`);
+    defineComponent(Textarea, "textarea");
 
 
 }

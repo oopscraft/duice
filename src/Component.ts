@@ -5,104 +5,125 @@ namespace duice {
      */
     export abstract class Component<T> {
 
-        id: string;
-
         element: HTMLElement;
 
-        handlers: Handler<T>[] = [];
+        context: object;
+
+        id: string;
+
+        handler: Handler<T>;
 
         /**
          * constructor
          * @param element
          * @protected
          */
-        protected constructor(element: HTMLElement) {
+        protected constructor(element: HTMLElement, context: object) {
             this.element = element;
-            this.id = generateUuid();
-            this.setAttribute("id", this.id);
+            this.context = context;
+            this.id = this.generateId();
+            this.setAttribute(element, "id", this.id);
+
+
         }
 
         /**
-         * initialize
-         * @param context
+         * render
          */
-        initialize(context: object): void {
-
-            // bind
-            let bind = findObject(context, this.getAttribute('bind'));
-            let handler = bind._handler_;
-            this.addHandler(handler);
-            handler.addComponent(this);
-
-            // initialize
-            let data = handler.getTarget();
-            this.doInitialize(data);
-        }
-
-        /**
-         * doInitialize
-         * @param data
-         */
-        abstract doInitialize(data: T): void;
+        abstract render():void;
 
         /**
          * update
          * @param handler
          * @param detail
          */
-        update(handler: Handler<T>, detail: object): void {
-            console.log("Component.update", handler, detail);
-            let data = handler.getTarget();
-            this.doUpdate(data, detail);
-        }
-
-        /**
-         * doUpdate
-         * @param data
-         * @param detail
-         */
-        abstract doUpdate(data: T, detail: object): void;
-
-        /**
-         * addHandler
-         * @param observer
-         */
-        addHandler(observer: Handler<T>): void {
-            this.handlers.push(observer);
-        }
+        abstract update(detail: object): void;
 
         /**
          * notifyHandlers
          */
-        notifyHandlers(detail: object): void {
-            for(let i = 0; i < this.handlers.length; i++){
-                this.handlers[i].update(this, detail);
+        notifyHandler(detail: object): void {
+            this.handler.update(this, detail);
+        }
+
+        /**
+         * Generates component ID
+         * @return id
+         */
+        generateId(): string {
+            let dt = new Date().getTime();
+            let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                let r = (dt + Math.random()*16)%16 | 0;
+                dt = Math.floor(dt/16);
+                return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+            });
+            return uuid;
+        }
+
+        /**
+         * findObject
+         * @param name
+         */
+        findObject(name: string): any {
+            if(this.context[name]){
+                return this.context[name];
             }
+            if((<any>window).hasOwnProperty(name)){
+                return (<any>window)[name];
+            }
+            return eval.call(this.context, name);
         }
 
         /**
          * hasAttribute
+         * @param element
          * @param name
          */
-        hasAttribute(name: string): boolean {
-            return this.element.hasAttribute(`${getAlias()}:${name}`)
+        hasAttribute(element: Element, name: string): boolean {
+            return element.hasAttribute(`${getAlias()}:${name}`)
         }
 
         /**
          * getAttribute
+         * @param element
          * @param name
          */
-        getAttribute(name: string): string {
-            return this.element.getAttribute(`${getAlias()}:${name}`);
+        getAttribute(element: Element, name: string): string {
+            return element.getAttribute(`${getAlias()}:${name}`);
         }
 
         /**
          * setAttribute
+         * @param element
          * @param name
          * @param value
          */
-        setAttribute(name: string, value: string): void {
-            this.element.setAttribute(`${getAlias()}:${name}`, value);
+        setAttribute(element: Element, name: string, value: string): void {
+            element.setAttribute(`${getAlias()}:${name}`, value);
+        }
+
+        /**
+         * removeChildNodes
+         * @param element
+         */
+        removeChildNodes(element: HTMLElement): void {
+            // Remove element nodes and prevent memory leaks
+            let node, nodes = element.childNodes, i = 0;
+            while (node = nodes[i++]) {
+                if (node.nodeType === 1 ) {
+                    element.removeChild(node);
+                }
+            }
+
+            // Remove any remaining nodes
+            while (element.firstChild) {
+                element.removeChild(element.firstChild);
+            }
+
+            // If this is a select, ensure that it displays empty
+            if(element instanceof HTMLSelectElement){
+                (<HTMLSelectElement>element).options.length = 0;
+            }
         }
 
     }

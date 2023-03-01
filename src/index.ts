@@ -2,7 +2,7 @@
  * DUICE (Data-oriented UI Component Engine)
  * - Anyone can use it freely.
  * - Modify the source or allow re-creation. However, you must state that you have the original creator.
- * - However, we can not grant patents or licenses for reproductives. (Modifications or reproductions must be shared with the public.)
+ * - However, we can not grant patents or licenses for re-productives. (Modifications or reproductions must be shared with the public.)
  * Licence: LGPL(GNU Lesser General Public License version 3)
  * Copyright (C) 2016 chomookun@gmail.com
  * ============================================================================= */
@@ -26,112 +26,62 @@ namespace duice {
      * @param tagName
      * @param isAttribute
      */
-    export function defineComponent(componentType: any, tagName: string, isAttribute: string) {
-        console.debug("defineComponent", componentType, tagName, isAttribute);
-        let componentDefinition = new ComponentDefinition(componentType, tagName, isAttribute);
+    export function defineComponent(componentType: any, tagName: string) {
+        console.debug("defineComponent", componentType, tagName);
+        let componentDefinition = new ComponentDefinition(componentType, tagName);
         componentDefinitions.push(componentDefinition);
     }
 
     /**
-     * initializeComponent
-     * @param container
-     * @param context
-     */
-    export function initializeComponent(container: any, context: object): void {
-        [ArrayComponent, ObjectComponent].forEach(componentType => {
-            componentDefinitions.forEach(componentDefinition => {
-                if(componentDefinition.componentType.prototype instanceof componentType) {
-                    let selector = componentDefinition.getSelector();
-                    let elements = container.querySelectorAll(selector);
-                    elements.forEach(element => {
-                        console.debug("initializeComponent", element);
-                        let component = Reflect.apply(componentDefinition.componentType.create, undefined, [element]);
-                        component.initialize(context);
-                    });
-                }
-            });
-        });
-    }
-
-    /**
-     * Generates random UUID value
-     * @return  UUID string
-     */
-    export function generateUuid(): string {
-        let dt = new Date().getTime();
-        let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            let r = (dt + Math.random()*16)%16 | 0;
-            dt = Math.floor(dt/16);
-            return (c=='x' ? r :(r&0x3|0x8)).toString(16);
-        });
-        return uuid;
-    }
-
-    /**
-     * find object in context
-     * @param context
-     * @param name
-     */
-    export function findObject(context: object, name: string): any {
-        if(context[name]){
-            return context[name];
-        }
-        if((<any>window).hasOwnProperty(name)){
-            return (<any>window)[name];
-        }
-        return eval.call(context, name);
-    }
-
-    /**
-     * removeChildNodes
+     * createComponent
+     * @param componentType
      * @param element
+     * @param context
      */
-    export function removeChildNodes(element: HTMLElement): void {
-        // Remove element nodes and prevent memory leaks
-        let node, nodes = element.childNodes, i = 0;
-        while (node = nodes[i++]) {
-            if (node.nodeType === 1 ) {
-                element.removeChild(node);
+    export function createComponent(componentType: any, element: HTMLElement, context: object): Component<any> {
+        componentDefinitions.forEach(componentDefinition => {
+            if(componentDefinition.tagName === element.tagName){
+                return componentDefinition.componentType.create(element, context);
             }
+        });
+        if(componentType === ArrayComponent) {
+            return ArrayComponent.create(element, context);
         }
-
-        // Remove any remaining nodes
-        while (element.firstChild) {
-            element.removeChild(element.firstChild);
+        if(componentType === ObjectComponent) {
+            return ObjectComponent.create(element, context);
         }
-
-        // If this is a select, ensure that it displays empty
-        if(element instanceof HTMLSelectElement){
-            (<HTMLSelectElement>element).options.length = 0;
-        }
+        throw new Error('Invalid element');
     }
 
-    /**
-     * converts value to left-padded value
-     * @param value value
-     * @param length to pad
-     * @param padChar character
-     * @return left-padded value
-     */
-    export function padLeft(value:string, length:number, padChar:string) {
-        for(let i = 0, size = (length-value.length); i < size; i ++ ) {
-            value = padChar + value;
-        }
-        return value;
-    }
+    // /**
+    //  * initializeComponent
+    //  * @param context
+    //  */
+    // export function initializeComponentOld(container: any, context: object): void {
+    //     [ArrayComponent, ObjectComponent].forEach(componentType => {
+    //         componentDefinitions.forEach(componentDefinition => {
+    //             if(componentDefinition.componentType.prototype instanceof componentType) {
+    //                 let selector = componentDefinition.getSelector();
+    //                 let elements = container.querySelectorAll(selector);
+    //                 elements.forEach(element => {
+    //                     console.debug("initializeComponent", element);
+    //                     let component = Reflect.apply(componentDefinition.componentType.create, undefined, [element, context]);
+    //                     component.initialize();
+    //                 });
+    //             }
+    //         });
+    //     });
+    // }
 
-    /**
-     * converts value to right-padded value
-     * @param value value
-     * @param length to pad
-     * @param padChar character
-     * @return right-padded string
-     */
-    export function padRight(value:string, length:number, padChar:string) {
-        for(let i = 0, size = (length-value.length); i < size; i ++ ) {
-            value = value + padChar;
-        }
-        return value;
+    export function initializeComponent(container: any, context: object): void {
+        container.querySelectorAll(`*[${getAlias()}\\:array]:not([${getAlias()}\\:id])`).forEach(arrayElement => {
+            let arrayComponent = createComponent(ArrayComponent, arrayElement, context);
+            arrayComponent.render();
+        });
+        container.querySelectorAll(`*[${getAlias()}\\:object]:not([${getAlias()}\\:id])`).forEach(objectElement => {
+            let objectComponent = createComponent(ObjectComponent, objectElement, context);
+            objectComponent.render();
+        });
     }
 
     /**

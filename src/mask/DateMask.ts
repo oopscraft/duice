@@ -34,19 +34,19 @@ namespace duice.mask {
                     case "yyyy":
                         return date.getFullYear();
                     case "yy":
-                        return padLeft(String(date.getFullYear() % 1000), 2, '0');
+                        return String(date.getFullYear() % 1000).padStart(2, '0');
                     case "MM":
-                        return padLeft(String(date.getMonth() + 1), 2, '0');
+                        return String(date.getMonth() + 1).padStart(2, '0');
                     case "dd":
-                        return padLeft(String(date.getDate()), 2, '0');
+                        return String(date.getDate()).padStart(2, '0');
                     case "HH":
-                        return padLeft(String(date.getHours()), 2, '0');
+                        return String(date.getHours()).padStart(2, '0');
                     case "hh":
-                        return padLeft(String(date.getHours() <= 12 ? date.getHours() : date.getHours() % 12), 2, '0');
+                        return String(date.getHours() <= 12 ? date.getHours() : date.getHours() % 12).padStart(2, '0');
                     case "mm":
-                        return padLeft(String(date.getMinutes()), 2, '0');
+                        return String(date.getMinutes()).padStart(2, '0');
                     case "ss":
-                        return padLeft(String(date.getSeconds()), 2, '0');
+                        return String(date.getSeconds()).padStart(2, '0');
                     default:
                         return $1;
                 }
@@ -72,7 +72,7 @@ namespace duice.mask {
                 let formatIndex = match.index;
                 let formatLength = formatString.length;
                 let matchValue = string.substr(formatIndex, formatLength);
-                matchValue = padRight(matchValue, formatLength,'0');
+                matchValue = matchValue.padEnd(formatLength,'0');
                 switch (formatString) {
                     case 'yyyy': {
                         let fullYear = parseInt(matchValue);

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<head>
+    <script src="../dist/duice.js"></script>
+    <script>
+        let myObject = duice.Object.create({
+            id: "JAMES",
+            name: "james smith!!!",
+            age: 19,
+            enabled: true,
+            mobile: '01012345678',
+            address : {
+                country: 'USA',
+                city: 'LA'
+            }
+        });
+    </script>
+</head>
+<body>
+    <h1 duice:object="myObject" duice:property="id">
+        -
+        <small duice:object="myObject" duice:property="name"></small>
+    </h1>
+    <p duice:object="myObject" duice:property="age"></p>
+    <div duice:object="myObject" duice:property="mobile" duice:mask="string('###-####-####')"></div>
+    <div>
+        <span duice:object="myObject" duice:property="address.country"></span>
+        /
+        <span duice:object="myObject" duice:property="address.city"></span>
+    </div>
+</body>
+</html>

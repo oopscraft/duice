@@ -6,18 +6,24 @@ namespace duice.element {
          * constructor
          * @param element
          */
-        constructor(element: HTMLInputElement) {
-            super(element);
+        constructor(element: HTMLInputElement, context: object) {
+            super(element, context);
         }
 
         /**
-         * doUpdate
-         * @param object
+         * render
+         */
+        override render(): void {
+            let value = this.handler.getPropertyValue(this.getProperty());
+            this.element.value = value;
+        }
+
+        /**
+         * update
          * @param detail
          */
-        override doUpdate(object: object, detail: object): void {
-            let value = object[this.property];
-            this.element.value = value;
+        override update(detail: object): void {
+            this.render();
         }
 
         /**

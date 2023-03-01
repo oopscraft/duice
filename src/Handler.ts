@@ -43,7 +43,7 @@ namespace duice {
          */
         notifyComponents(detail: object): void {
             this.components.forEach(observer => {
-                observer.update(this, detail);
+                observer.update(detail);
             });
         }
 
@@ -53,6 +53,7 @@ namespace duice {
          * @param detail
          */
         abstract update(component: Component<T>, detail: object): void;
+
 
     }
 

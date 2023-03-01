@@ -7,83 +7,40 @@ namespace duice.element {
      */
     export class Table extends ArrayComponent {
 
-        tBodyTemplate: HTMLTableSectionElement;
-
-        rowElements: HTMLElement[] = [];
-
         /**
          * create
          * @param element
          */
-        static create(element: HTMLTableElement): Table {
-            return new Table(element);
+        static create(element: HTMLTableElement, context: object): Table {
+            return new Table(element, context);
         }
 
         /**
          * constructor
          * @param element
          */
-        constructor(element: HTMLTableElement){
-            super(element);
+        constructor(element: HTMLTableElement, context: object){
+            super(element, context);
         }
 
         /**
-         * doInitialize
-         * @param array
+         * render
          */
-        override doInitialize(array: object[]): void {
-
-            // tbody template
-            this.tBodyTemplate = <HTMLTableSectionElement>this.element.querySelector("tbody");
-            this.element.removeChild(this.tBodyTemplate);
-
-            // update
-            this.doUpdate(array, {});
+        override render(): void {
+            super.render();
         }
 
         /**
-         * doUpdate
-         * @param array
+         * update
          * @param detail
          */
-        override doUpdate(array: object[], detail: object): void {
-
-            // clear
-            this.rowElements.forEach(rowElement =>{
-                this.element.removeChild(rowElement);
-            });
-            this.rowElements.length = 0;
-
-            // creates row
-            for(let index = 0, size = array.length; index < size; index ++ ){
-                let object = array[index];
-                let status = {
-                    index: index,
-                    length: array.length
-                };
-                let rowElement= this.createRowElement(object, status);
-                let context = {};
-                context[this.getVar()] = object;
-                context[this.getStatus()] = status;
-                initializeComponent(rowElement, context);
-                this.element.appendChild(rowElement);
-                this.rowElements.push(rowElement);
-            }
-        }
-
-        /**
-         * createRowElement
-         * @param object
-         * @param status
-         */
-        createRowElement(object: object, status: object): HTMLElement {
-            let tBody: HTMLTableSectionElement = <HTMLTableSectionElement>this.tBodyTemplate.cloneNode(true);
-            return tBody;
+        override update(detail: object): void {
+            this.render();
         }
 
     }
 
     // defines component
-    defineComponent(Table, "table", `${getAlias()}-table`);
+    defineComponent(Table, "table");
 
 }

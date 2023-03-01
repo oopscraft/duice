@@ -6,14 +6,18 @@
             name: "james smith!!!",
             age: 19,
             enabled: true,
-            mobile: '01012345678'
+            mobile: '01012345678',
+            address : {
+                country: 'USA',
+                city: 'LA'
+            }
         });
     </script>
 </head>
 <body>
-    <input is="duice-input" type="text" duice:bind="myObject" duice:property="name" onchange="console.log(myObject);"/>
-    <input is="duice-input" type="text" duice:bind="myObject" duice:property="mobile" duice:mask="###-####-####" onchange="console.log(myObject);"/>
-    <input is="duice-input" type="number" duice:bind="myObject" duice:property="age" step="any" onchange="console.log(myObject);"/>
-    <input is="duice-input" type="checkbox" duice:bind="myObject" duice:property="enabled" onchange="console.log(myObject);"/>
+    <input duice:object="myObject" duice:property="name" type="text"/>
+    <input duice:object="myObject" duice:property="mobile" type="text" duice:mask="###-####-####"/>
+    <input duice:object="myObject" duice:property="address.country"/>
+    <input duice:object="myObject" duice:property="age" type="number"/>
 </body>
 </html>

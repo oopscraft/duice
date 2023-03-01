@@ -15,15 +15,15 @@ namespace duice.element {
          * create
          * @param element
          */
-        static create(element: HTMLInputElement): Input {
+        static create(element: HTMLInputElement, context: object): Input {
             let type = element.getAttribute('type');
             switch(type) {
                 case 'number':
-                    return new InputNumber(element);
+                    return new InputNumber(element, context);
                 case 'checkbox':
-                    return new InputCheckbox(element);
+                    return new InputCheckbox(element, context);
                 default:
-                    return new Input(element);
+                    return new Input(element, context);
             }
         }
 
@@ -32,38 +32,38 @@ namespace duice.element {
          * @param element
          * @param context
          */
-        constructor(element: HTMLInputElement) {
-            super(element);
-            if(this.hasAttribute('mask')){
-                let pattern = this.getAttribute('mask');
+        constructor(element: HTMLInputElement, context: object) {
+            super(element, context);
+
+            // set mask
+            if(this.hasAttribute(this.element, 'mask')){
+                let pattern = this.getAttribute(this.element, 'mask');
                 this.mask = new mask.StringMask(pattern);
             }
-        }
-
-        /**
-         * doInitialize
-         * @param object
-         */
-        override doInitialize(object: object): void {
 
             // adds change event listener
             let _this = this;
             this.element.addEventListener('change', function(event){
-                _this.notifyHandlers({});
+                _this.notifyHandler({});
             },true);
+        }
 
-            // update
-            this.doUpdate(object, {});
+
+        /**
+         * render
+         * @param detail
+         */
+        override render(): void {
+            let value = this.handler.getPropertyValue(this.property);
+            this.element.value = this.mask ? this.mask.encode(value) : value;
         }
 
         /**
-         * doUpdate
-         * @param object
+         * update
          * @param detail
          */
-        override doUpdate(object: object, detail: object): void {
-            let value = object[this.property];
-            this.element.value = this.mask ? this.mask.encode(value) : value;
+        override update(detail: object): void {
+            this.render();
         }
 
         /**
@@ -77,7 +77,7 @@ namespace duice.element {
     }
 
     // defines component
-    defineComponent(Input, "input", `${getAlias()}-input`);
+    defineComponent(Input, "input");
 
 }
 

@@ -46,8 +46,28 @@ namespace duice {
             console.log('ObjectHandler.update', component, detail);
             let property = component.getProperty();
             let value = component.getValue();
-            Reflect.set(this.getTarget(), property, value);
+            this.setPropertyValue(property, value);
         }
+
+        /**
+         * getPropertyValue
+         * @param property
+         */
+        getPropertyValue(property: string): any {
+            console.assert(property);
+            property = property.replace('.','?.');
+            return new Function(`return this.${property};`).call(this.getTarget());
+        }
+
+        /**
+         * setPropertyValue
+         * @param property
+         * @param value
+         */
+        setPropertyValue(property: string, value: any): void {
+            new Function(`this.${property} = arguments[0];`).call(this.getTarget(), value);
+        }
+
 
     }
 

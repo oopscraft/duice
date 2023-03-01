@@ -6,22 +6,28 @@ namespace duice.element {
          * constructor
          * @param element
          */
-        constructor(element: HTMLInputElement) {
-            super(element);
+        constructor(element: HTMLInputElement, context: object) {
+            super(element, context);
         }
 
         /**
-         * doUpdate
-         * @param object
-         * @param detail
+         * render
          */
-        override doUpdate(object: object, detail: object): void {
-            let value = object[this.property];
+        override render(): void {
+            let value = this.handler.getPropertyValue(this.getProperty());
             if(value === true){
                 this.element.checked = true;
             }else{
                 this.element.checked = false;
             }
+        }
+
+        /**
+         * update
+         * @param detail
+         */
+        override update(detail: object): void {
+            this.render();
         }
 
         /**

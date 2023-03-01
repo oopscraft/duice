@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="../../dist/duice.js"></script>
+    <script src="../dist/duice.js"></script>
     <script>
         let myArray = duice.Array.create([
             { name: 'james', age: 13 },
@@ -25,16 +25,16 @@
         </thead>
         <tbody>
             <tr duice:loop="myObject,index">
-                <td>aaa</td>
-<!--                <td>-->
-<!--                    <input duice:object="myObject" duice:property="name"/>-->
-<!--                </td>-->
-<!--                <td>-->
-<!--                    <input duice:object="myObject" duice:property="age"/>-->
-<!--                </td>-->
+                <td duice:object="myObject" duice:property="name"></td>
             </tr>
         </tbody>
     </table>
+
+    <ul duice:array="myArray">
+        <li duice:loop="myObject,index">
+            <span duice:object="myObject" duice:property="name"></span>
+        </li>
+    </ul>
 
 </body>
 </html>
