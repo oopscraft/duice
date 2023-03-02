@@ -50,10 +50,18 @@ namespace duice {
          * render
          */
         doRender(): void {
-            let value = this.handler.getPropertyValue(this.getProperty());
-            value = this.mask ? this.mask.encode(value) : value;
-            let textNode = document.createTextNode(value);
-            this.element.insertBefore(textNode, this.element.firstChild);
+
+            // process property
+            let property = this.getProperty();
+            if(property) {
+                let value = this.handler.getPropertyValue(property);
+                value = this.mask ? this.mask.encode(value) : value;
+                let textNode = document.createTextNode(value);
+                this.element.insertBefore(textNode, this.element.firstChild);
+            }
+
+            // append to slot element
+            this.appendToStage(this.element);
         }
 
        /**

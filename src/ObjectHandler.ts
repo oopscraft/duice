@@ -45,8 +45,10 @@ namespace duice {
         update(component: ObjectComponent, detail: object): void {
             console.log('ObjectHandler.update', component, detail);
             let property = component.getProperty();
-            let value = component.getValue();
-            this.setPropertyValue(property, value);
+            if(property){
+                let value = component.getValue();
+                this.setPropertyValue(property, value);
+            }
         }
 
         /**

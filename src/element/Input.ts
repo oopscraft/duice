@@ -54,7 +54,7 @@ namespace duice.element {
          * @param detail
          */
         override doRender(): void {
-            let value = this.handler.getPropertyValue(this.property);
+            let value = this.handler.getPropertyValue(this.getProperty());
             this.element.value = this.mask ? this.mask.encode(value) : value;
         }
 

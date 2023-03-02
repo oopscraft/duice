@@ -5,15 +5,17 @@ namespace duice {
      */
     export abstract class Component<T> {
 
+        id: string;
+
         element: HTMLElement;
 
         context: object;
 
-        id: string;
-
         handler: Handler<T>;
 
-        script: string;
+        slotElement: HTMLSlotElement;
+
+        stageElements: HTMLElement[] = [];
 
         /**
          * constructor
@@ -21,11 +23,14 @@ namespace duice {
          * @protected
          */
         protected constructor(element: HTMLElement, context: object) {
-            this.element = element;
-            this.context = context;
             this.id = this.generateId();
             this.setAttribute(element, "id", this.id);
-            this.script = this.getAttribute(element, 'script');
+            this.element = element;
+            this.context = context;
+
+            // create slot element
+            this.slotElement = document.createElement('slot');
+            this.element.replaceWith(this.slotElement);
         }
 
         /**
@@ -33,13 +38,19 @@ namespace duice {
          */
         render(): void {
 
+            // clear
+            this.clearStage();
+
+            // executes condition
+            if(!this.checkIf()) {
+                return;
+            }
+
             // calls template method
             this.doRender();
 
             // executes script
-            if(this.script){
-                this.executeScript(this.script);
-            }
+            this.executeScript();
         }
 
         /**
@@ -53,13 +64,19 @@ namespace duice {
          */
         update(detail: object): void {
 
+            // clear
+            this.clearStage();
+
+            // check condition
+            if(!this.checkIf()){
+                return;
+            }
+
             // calls template method
             this.doUpdate(detail);
 
             // executes script
-            if(this.script){
-                this.executeScript(this.script);
-            }
+            this.executeScript();
         }
 
         /**
@@ -102,6 +119,24 @@ namespace duice {
                 return (<any>window)[name];
             }
             return eval.call(this.context, name);
+        }
+
+        /**
+         * clears stage
+         */
+        clearStage(): void {
+            for(let i = this.stageElements.length - 1; i >= 0; i --) {
+                this.slotElement.parentElement.removeChild(this.stageElements.pop());
+            }
+        }
+
+        /**
+         * appends to stage
+         * @param element
+         */
+        appendToStage(element: HTMLElement): void {
+            this.stageElements.push(element);
+            this.slotElement.parentNode.insertBefore(element, this.slotElement);
         }
 
         /**
@@ -157,17 +192,41 @@ namespace duice {
         }
 
         /**
-         * executes script
-         * @param code
-         * @param context
+         * checkIf
          */
-        executeScript(script: string):any {
-            try {
-                return Function(script).call(this.element, this.context);
-            }catch(e){
-                console.error(script);
-                throw e;
+        checkIf(): boolean {
+            let ifAttribute = this.getAttribute(this.element, 'if');
+            if(ifAttribute){
+                let args = [];
+                let values = [];
+                for(let property in this.context){
+                    args.push(property);
+                    values.push(this.context[property])
+                }
+                let ifFunction = `return ${ifAttribute};`;
+                let result = Function(...args, ifFunction).call(this.element, ...values);
+                if(result === true){
+                    return true;
+                }else{
+                    return false;
+                }
+            }else{
+                return true;
             }
+        }
+
+        /**
+         * executes script
+         */
+        executeScript(): any {
+            let scriptAttribute = this.getAttribute(this.element, 'script');
+            let args = [];
+            let values = [];
+            for(let property in this.context){
+                args.push(property);
+                values.push(this.context[property]);
+            }
+            return Function(...args, scriptAttribute).call(this.element, ...values);
         }
 
     }

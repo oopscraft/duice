@@ -70,16 +70,12 @@ namespace duice {
             if(!arrayElement.hasAttribute(`${getAlias()}:id`)) {
                 let arrayComponent = createComponent(ArrayComponent, arrayElement, context);
                 arrayComponent.render();
-            }else{
-                alert(arrayElement);
             }
         });
         container.querySelectorAll(`*[${getAlias()}\\:object]:not([${getAlias()}\\:id])`).forEach(objectElement => {
             if(!objectElement.hasAttribute(`${getAlias()}:id`)) {
                 let objectComponent = createComponent(ObjectComponent, objectElement, context);
                 objectComponent.render();
-            }else{
-                alert(objectElement);
             }
         });
     }

@@ -130,34 +130,45 @@ var duice;
          * @protected
          */
         constructor(element, context) {
-            this.element = element;
-            this.context = context;
+            this.stageElements = [];
             this.id = this.generateId();
             this.setAttribute(element, "id", this.id);
-            this.script = this.getAttribute(element, 'script');
+            this.element = element;
+            this.context = context;
+            // create slot element
+            this.slotElement = document.createElement('slot');
+            this.element.replaceWith(this.slotElement);
         }
         /**
          * render
          */
         render() {
+            // clear
+            this.clearStage();
+            // executes condition
+            if (!this.checkIf()) {
+                return;
+            }
             // calls template method
             this.doRender();
             // executes script
-            if (this.script) {
-                this.executeScript(this.script);
-            }
+            this.executeScript();
         }
         /**
          * update
          * @param detail
          */
         update(detail) {
+            // clear
+            this.clearStage();
+            // check condition
+            if (!this.checkIf()) {
+                return;
+            }
             // calls template method
             this.doUpdate(detail);
             // executes script
-            if (this.script) {
-                this.executeScript(this.script);
-            }
+            this.executeScript();
         }
         /**
          * notifyHandlers
@@ -190,6 +201,22 @@ var duice;
                 return window[name];
             }
             return eval.call(this.context, name);
+        }
+        /**
+         * clears stage
+         */
+        clearStage() {
+            for (let i = this.stageElements.length - 1; i >= 0; i--) {
+                this.slotElement.parentElement.removeChild(this.stageElements.pop());
+            }
+        }
+        /**
+         * appends to stage
+         * @param element
+         */
+        appendToStage(element) {
+            this.stageElements.push(element);
+            this.slotElement.parentNode.insertBefore(element, this.slotElement);
         }
         /**
          * hasAttribute
@@ -238,18 +265,42 @@ var duice;
             }
         }
         /**
-         * executes script
-         * @param code
-         * @param context
+         * checkIf
          */
-        executeScript(script) {
-            try {
-                return Function(script).call(this.element, this.context);
+        checkIf() {
+            let ifAttribute = this.getAttribute(this.element, 'if');
+            if (ifAttribute) {
+                let args = [];
+                let values = [];
+                for (let property in this.context) {
+                    args.push(property);
+                    values.push(this.context[property]);
+                }
+                let ifFunction = `return ${ifAttribute};`;
+                let result = Function(...args, ifFunction).call(this.element, ...values);
+                if (result === true) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
             }
-            catch (e) {
-                console.error(script);
-                throw e;
+            else {
+                return true;
             }
+        }
+        /**
+         * executes script
+         */
+        executeScript() {
+            let scriptAttribute = this.getAttribute(this.element, 'script');
+            let args = [];
+            let values = [];
+            for (let property in this.context) {
+                args.push(property);
+                values.push(this.context[property]);
+            }
+            return Function(...args, scriptAttribute).call(this.element, ...values);
         }
     }
     duice.Component = Component;
@@ -270,39 +321,11 @@ var duice;
         constructor(element, context) {
             console.debug("ArrayComponent.constructor", element, context);
             super(element, context);
-            this.loopTemplates = [];
-            this.loopSlots = [];
-            this.emptyTemplates = [];
-            this.emptySlots = [];
             // array handler
             let arrayName = this.getAttribute(this.element, 'array');
             let array = this.findObject(arrayName);
             this.handler = array._handler_;
             this.handler.addComponent(this);
-            // loop template and slot
-            let loopElements = this.element.querySelectorAll(`*[${duice.getAlias()}\\:loop]`);
-            for (let i = 0; i < loopElements.length; i++) {
-                let loopElement = loopElements[i];
-                let loopTemplate = loopElement;
-                let loopSlot = document.createElement('slot');
-                this.loopTemplates.push(loopTemplate);
-                this.loopSlots.push(loopSlot);
-                loopElement.replaceWith(loopSlot);
-            }
-            console.debug("loopTemplates:", this.loopTemplates);
-            console.debug("loopSlots:", this.loopSlots);
-            // empty template and slot
-            let emptyElements = this.element.querySelectorAll(`*[${duice.getAlias()}\\:empty]`);
-            for (let i = 0; i < emptyElements.length; i++) {
-                let emptyElement = emptyElements[i];
-                let emptyTemplate = emptyElement;
-                let emptySlot = document.createElement('slot');
-                this.emptyTemplates.push(emptyTemplate);
-                this.emptySlots.push(emptySlot);
-                emptyElement.replaceWith(emptySlot);
-            }
-            console.debug("loopTemplates:", this.loopTemplates);
-            console.debug("loopSlots:", this.loopSlots);
         }
         /**
          * create
@@ -320,23 +343,17 @@ var duice;
             console.log("ArrayComponent.render");
             // defines
             let array = this.handler.getTarget();
-            // renders loop templates
-            for (let i = 0; i < this.loopTemplates.length; i++) {
-                let loopTemplate = this.loopTemplates[i];
-                let loopSlot = this.loopSlots[i];
-                let loopAttribute = this.getAttribute(loopTemplate, 'loop');
-                // clear
-                this.removeChildNodes(loopSlot);
-                // create row
+            let loopAttribute = this.getAttribute(this.element, 'loop');
+            // loop
+            if (loopAttribute) {
                 let loopArgs = loopAttribute.split(',');
                 let objectName = loopArgs[0];
                 let statusName = loopArgs[1];
-                for (let index = 0, size = array.length; index < size; index++) {
-                    let item = array[index];
-                    console.log('== item:', item);
-                    let rowElement = loopTemplate.cloneNode(true);
+                for (let index = 0; index < array.length; index++) {
+                    let object = array[index];
+                    let rowElement = this.element.cloneNode(true);
                     let context = {};
-                    context[objectName] = item;
+                    context[objectName] = object;
                     context[statusName] = duice.Object.create({
                         index: index,
                         number: index + 1,
@@ -345,21 +362,12 @@ var duice;
                         last: (index + 1 === array.length)
                     });
                     duice.initializeComponent(rowElement, context);
-                    loopSlot.appendChild(rowElement);
+                    this.appendToStage(rowElement);
                 }
             }
-            // renders empty templates
-            for (let i = 0; i < this.emptyTemplates.length; i++) {
-                let emptyTemplate = this.emptyTemplates[i];
-                let emptySlot = this.emptySlots[i];
-                let emptyAttribute = this.getAttribute(emptyTemplate, 'empty');
-                let empty = (emptyAttribute.toLowerCase() === 'true');
-                this.removeChildNodes(emptySlot);
-                if ((array.length === 0) === empty) {
-                    let emptyElement = emptyTemplate.cloneNode(true);
-                    duice.initializeComponent(emptyElement, this.context);
-                    emptySlot.appendChild(emptyElement);
-                }
+            else {
+                duice.initializeComponent(this.element, this.context);
+                this.appendToStage(this.element);
             }
         }
         /**
@@ -368,7 +376,7 @@ var duice;
          */
         doUpdate(detail) {
             console.log("ArrayComponent.update", detail);
-            this.doRender();
+            this.render();
         }
     }
     duice.ArrayComponent = ArrayComponent;
@@ -462,10 +470,16 @@ var duice;
          * render
          */
         doRender() {
-            let value = this.handler.getPropertyValue(this.getProperty());
-            value = this.mask ? this.mask.encode(value) : value;
-            let textNode = document.createTextNode(value);
-            this.element.insertBefore(textNode, this.element.firstChild);
+            // process property
+            let property = this.getProperty();
+            if (property) {
+                let value = this.handler.getPropertyValue(property);
+                value = this.mask ? this.mask.encode(value) : value;
+                let textNode = document.createTextNode(value);
+                this.element.insertBefore(textNode, this.element.firstChild);
+            }
+            // append to slot element
+            this.appendToStage(this.element);
         }
         /**
           * update
@@ -527,8 +541,10 @@ var duice;
         update(component, detail) {
             console.log('ObjectHandler.update', component, detail);
             let property = component.getProperty();
-            let value = component.getValue();
-            this.setPropertyValue(property, value);
+            if (property) {
+                let value = component.getValue();
+                this.setPropertyValue(property, value);
+            }
         }
         /**
          * getPropertyValue
@@ -621,17 +637,11 @@ var duice;
                 let arrayComponent = createComponent(duice.ArrayComponent, arrayElement, context);
                 arrayComponent.render();
             }
-            else {
-                alert(arrayElement);
-            }
         });
         container.querySelectorAll(`*[${getAlias()}\\:object]:not([${getAlias()}\\:id])`).forEach(objectElement => {
             if (!objectElement.hasAttribute(`${getAlias()}:id`)) {
                 let objectComponent = createComponent(duice.ObjectComponent, objectElement, context);
                 objectComponent.render();
-            }
-            else {
-                alert(objectElement);
             }
         });
     }
@@ -759,7 +769,7 @@ var duice;
              * @param detail
              */
             doRender() {
-                let value = this.handler.getPropertyValue(this.property);
+                let value = this.handler.getPropertyValue(this.getProperty());
                 this.element.value = this.mask ? this.mask.encode(value) : value;
             }
             /**
@@ -1163,6 +1173,31 @@ var duice;
 var duice;
 (function (duice) {
     var mask;
+    (function (mask_1) {
+        class MaskFactory {
+            /**
+             * getMask
+             * @param mask
+             */
+            static getMask(mask) {
+                if (mask.startsWith('string')) {
+                    mask = mask.replace('string', 'StringMask');
+                }
+                if (mask.startsWith('number')) {
+                    mask = mask.replace('number', 'NumberMask');
+                }
+                if (mask.startsWith('date')) {
+                    mask = mask.replace('date', 'DateMask');
+                }
+                return Function(`return new duice.mask.${mask};`).call(null);
+            }
+        }
+        mask_1.MaskFactory = MaskFactory;
+    })(mask = duice.mask || (duice.mask = {}));
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    var mask;
     (function (mask) {
         /**
          * NumberFormat
@@ -1214,31 +1249,6 @@ var duice;
             }
         }
         mask.NumberMask = NumberMask;
-    })(mask = duice.mask || (duice.mask = {}));
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    var mask;
-    (function (mask_1) {
-        class MaskFactory {
-            /**
-             * getMask
-             * @param mask
-             */
-            static getMask(mask) {
-                if (mask.startsWith('string')) {
-                    mask = mask.replace('string', 'StringMask');
-                }
-                if (mask.startsWith('number')) {
-                    mask = mask.replace('number', 'NumberMask');
-                }
-                if (mask.startsWith('date')) {
-                    mask = mask.replace('date', 'DateMask');
-                }
-                return Function(`return new duice.mask.${mask};`).call(null);
-            }
-        }
-        mask_1.MaskFactory = MaskFactory;
     })(mask = duice.mask || (duice.mask = {}));
 })(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map

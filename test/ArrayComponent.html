@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <!-- bootstrap -->
     <script src="../dist/duice.js"></script>
+    <link rel="stylesheet" href="../dist/duice.css">
     <script>
         let myArray = duice.Array.create([
             { name: 'james', age: 13, mobile:'01012344321'},
@@ -19,7 +21,8 @@
 </head>
 <body>
 
-    <table duice:array="myArray" border="1">
+    <!-- test table -->
+    <table>
         <thead>
             <tr>
                 <th>status.index</th>
@@ -30,10 +33,11 @@
                 <th>item.name</th>
                 <th>item.age</th>
                 <th>item.mobile</th>
+                <th>-</th>
             </tr>
         </thead>
         <tbody>
-            <tr duice:loop="item,status">
+            <tr duice:array="myArray" duice:loop="item,status">
                 <td duice:object="status" duice:property="index" duice:script="this.style.backgroundColor='red';"></td>
                 <td duice:object="status" duice:property="number"></td>
                 <td duice:object="status" duice:property="count"></td>
@@ -42,21 +46,76 @@
                 <td duice:object="item" duice:property="name"></td>
                 <td duice:object="item" duice:property="age"></td>
                 <td duice:object="item" duice:property="mobile" duice:mask="string('###-####-####')"></td>
+                <td>
+                    <button duice:object="status" duice:script="this.dataset.index=status.index;" onclick="myArray.splice(this.dataset.index,1);">
+                        Remove
+                    </button>
+                </td>
             </tr>
-            <tr duice:empty="true">
+            <tr duice:array="myArray" duice:if="myArray.length < 1" duice:script="this.style.backgroundColor='yellow';">
                 <td colspan="100%">Data Not Found</td>
             </tr>
         </tbody>
-        <tfoot duice:empty="false">
-            <td duice:array="myArray" duice:script="this.innerHTML=myArray.length + ' Rows'" colspan="100%" style="text-align:right;"></td>
+        <tfoot>
+            <td colspan="100%" style="text-align:right;">
+                <span duice:array="myArray" duice:script="this.innerHTML=myArray.length + ' Rows';"></span>
+                <button onclick="myArray.push(duice.Object.create({name: 'Kitty'}));">
+                    Add
+                </button>
+            </td>
         </tfoot>
     </table>
-    <ul duice:array="myArray">
-        <li duice:loop="item,status">
-            <span duice:object="item" duice:property="name"></span>
-            <span duice:object="item" duice:property="age"></span>
-        </li>
-    </ul>
+
+    <!-- test li -->
+    <figure>
+        <figcaption>Test List</figcaption>
+        <ul>
+            <li duice:array="myArray" duice:loop="item,status">
+                <span duice:object="item" duice:property="name"></span>
+                <span duice:object="item" duice:property="age"></span>
+            </li>
+        </ul>
+    </figure>
+
+
+
+
+
+
+
+
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">First</th>
+            <th scope="col">Last</th>
+            <th scope="col">Handle</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th scope="row">1</th>
+            <td>Mark</td>
+            <td>Otto</td>
+            <td>@mdo</td>
+        </tr>
+        <tr>
+            <th scope="row">2</th>
+            <td>Jacob</td>
+            <td>Thornton</td>
+            <td>@fat</td>
+        </tr>
+        <tr>
+            <th scope="row">3</th>
+            <td colspan="2">Larry the Bird</td>
+            <td>@twitter</td>
+        </tr>
+        </tbody>
+    </table>
+
+
 
 </body>
 </html>
