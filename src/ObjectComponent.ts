@@ -7,8 +7,6 @@ namespace duice {
 
         handler: ObjectHandler;
 
-        property: string;
-        
         mask: mask.Mask<any>;
 
         /**
@@ -34,9 +32,6 @@ namespace duice {
             this.handler = object._handler_;
             this.handler.addComponent(this);
 
-            // property
-            this.property = this.getAttribute(this.element, "property");
-
             // mask
             if(this.hasAttribute(this.element, 'mask')){
                 let mask = this.getAttribute(this.element, 'mask');
@@ -48,7 +43,7 @@ namespace duice {
          * getProperty
          */
         getProperty(): string {
-            return this.property;
+            return this.getAttribute(this.element, 'property');
         }
 
         /**

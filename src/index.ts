@@ -67,12 +67,20 @@ namespace duice {
      */
     export function initializeComponent(container: any, context: object): void {
         container.querySelectorAll(`*[${getAlias()}\\:array]:not([${getAlias()}\\:id])`).forEach(arrayElement => {
-            let arrayComponent = createComponent(ArrayComponent, arrayElement, context);
-            arrayComponent.render();
+            if(!arrayElement.hasAttribute(`${getAlias()}:id`)) {
+                let arrayComponent = createComponent(ArrayComponent, arrayElement, context);
+                arrayComponent.render();
+            }else{
+                alert(arrayElement);
+            }
         });
         container.querySelectorAll(`*[${getAlias()}\\:object]:not([${getAlias()}\\:id])`).forEach(objectElement => {
-            let objectComponent = createComponent(ObjectComponent, objectElement, context);
-            objectComponent.render();
+            if(!objectElement.hasAttribute(`${getAlias()}:id`)) {
+                let objectComponent = createComponent(ObjectComponent, objectElement, context);
+                objectComponent.render();
+            }else{
+                alert(objectElement);
+            }
         });
     }
 

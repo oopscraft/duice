@@ -12,6 +12,9 @@
             { name: 'apple', age: 18, mobile: null},
         ]);
         console.log(myArray);
+        let myObject = duice.Object.create({
+            id: 'id'
+        });
    </script>
 </head>
 <body>
@@ -40,12 +43,14 @@
                 <td duice:object="item" duice:property="age"></td>
                 <td duice:object="item" duice:property="mobile" duice:mask="string('###-####-####')"></td>
             </tr>
-            <tr duice:if="myArray.length === 0">
+            <tr duice:empty="true">
                 <td colspan="100%">Data Not Found</td>
             </tr>
         </tbody>
+        <tfoot duice:empty="false">
+            <td duice:array="myArray" duice:script="this.innerHTML=myArray.length + ' Rows'" colspan="100%" style="text-align:right;"></td>
+        </tfoot>
     </table>
-
     <ul duice:array="myArray">
         <li duice:loop="item,status">
             <span duice:object="item" duice:property="name"></span>

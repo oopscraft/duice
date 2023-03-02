@@ -272,12 +272,14 @@ var duice;
             super(element, context);
             this.loopTemplates = [];
             this.loopSlots = [];
+            this.emptyTemplates = [];
+            this.emptySlots = [];
             // array handler
             let arrayName = this.getAttribute(this.element, 'array');
             let array = this.findObject(arrayName);
             this.handler = array._handler_;
             this.handler.addComponent(this);
-            // loop
+            // loop template and slot
             let loopElements = this.element.querySelectorAll(`*[${duice.getAlias()}\\:loop]`);
             for (let i = 0; i < loopElements.length; i++) {
                 let loopElement = loopElements[i];
@@ -287,8 +289,20 @@ var duice;
                 this.loopSlots.push(loopSlot);
                 loopElement.replaceWith(loopSlot);
             }
-            console.debug("== loopTemplates:", this.loopTemplates);
-            console.debug("== loopSlots:", this.loopSlots);
+            console.debug("loopTemplates:", this.loopTemplates);
+            console.debug("loopSlots:", this.loopSlots);
+            // empty template and slot
+            let emptyElements = this.element.querySelectorAll(`*[${duice.getAlias()}\\:empty]`);
+            for (let i = 0; i < emptyElements.length; i++) {
+                let emptyElement = emptyElements[i];
+                let emptyTemplate = emptyElement;
+                let emptySlot = document.createElement('slot');
+                this.emptyTemplates.push(emptyTemplate);
+                this.emptySlots.push(emptySlot);
+                emptyElement.replaceWith(emptySlot);
+            }
+            console.debug("loopTemplates:", this.loopTemplates);
+            console.debug("loopSlots:", this.loopSlots);
         }
         /**
          * create
@@ -304,16 +318,17 @@ var duice;
           */
         doRender() {
             console.log("ArrayComponent.render");
+            // defines
+            let array = this.handler.getTarget();
+            // renders loop templates
             for (let i = 0; i < this.loopTemplates.length; i++) {
-                //let loop = this.loops[i];
                 let loopTemplate = this.loopTemplates[i];
                 let loopSlot = this.loopSlots[i];
-                let loop = this.getAttribute(loopTemplate, 'loop');
+                let loopAttribute = this.getAttribute(loopTemplate, 'loop');
                 // clear
                 this.removeChildNodes(loopSlot);
                 // create row
-                let array = this.handler.getTarget();
-                let loopArgs = loop.split(',');
+                let loopArgs = loopAttribute.split(',');
                 let objectName = loopArgs[0];
                 let statusName = loopArgs[1];
                 for (let index = 0, size = array.length; index < size; index++) {
@@ -333,6 +348,19 @@ var duice;
                     loopSlot.appendChild(rowElement);
                 }
             }
+            // renders empty templates
+            for (let i = 0; i < this.emptyTemplates.length; i++) {
+                let emptyTemplate = this.emptyTemplates[i];
+                let emptySlot = this.emptySlots[i];
+                let emptyAttribute = this.getAttribute(emptyTemplate, 'empty');
+                let empty = (emptyAttribute.toLowerCase() === 'true');
+                this.removeChildNodes(emptySlot);
+                if ((array.length === 0) === empty) {
+                    let emptyElement = emptyTemplate.cloneNode(true);
+                    duice.initializeComponent(emptyElement, this.context);
+                    emptySlot.appendChild(emptyElement);
+                }
+            }
         }
         /**
          * update
@@ -340,6 +368,7 @@ var duice;
          */
         doUpdate(detail) {
             console.log("ArrayComponent.update", detail);
+            this.doRender();
         }
     }
     duice.ArrayComponent = ArrayComponent;
@@ -409,8 +438,6 @@ var duice;
             let object = this.findObject(objectName);
             this.handler = object._handler_;
             this.handler.addComponent(this);
-            // property
-            this.property = this.getAttribute(this.element, "property");
             // mask
             if (this.hasAttribute(this.element, 'mask')) {
                 let mask = this.getAttribute(this.element, 'mask');
@@ -429,7 +456,7 @@ var duice;
          * getProperty
          */
         getProperty() {
-            return this.property;
+            return this.getAttribute(this.element, 'property');
         }
         /**
          * render
@@ -590,12 +617,22 @@ var duice;
      */
     function initializeComponent(container, context) {
         container.querySelectorAll(`*[${getAlias()}\\:array]:not([${getAlias()}\\:id])`).forEach(arrayElement => {
-            let arrayComponent = createComponent(duice.ArrayComponent, arrayElement, context);
-            arrayComponent.render();
+            if (!arrayElement.hasAttribute(`${getAlias()}:id`)) {
+                let arrayComponent = createComponent(duice.ArrayComponent, arrayElement, context);
+                arrayComponent.render();
+            }
+            else {
+                alert(arrayElement);
+            }
         });
         container.querySelectorAll(`*[${getAlias()}\\:object]:not([${getAlias()}\\:id])`).forEach(objectElement => {
-            let objectComponent = createComponent(duice.ObjectComponent, objectElement, context);
-            objectComponent.render();
+            if (!objectElement.hasAttribute(`${getAlias()}:id`)) {
+                let objectComponent = createComponent(duice.ObjectComponent, objectElement, context);
+                objectComponent.render();
+            }
+            else {
+                alert(objectElement);
+            }
         });
     }
     duice.initializeComponent = initializeComponent;
