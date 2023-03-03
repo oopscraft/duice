@@ -35,12 +35,6 @@ namespace duice.element {
         constructor(element: HTMLInputElement, context: object) {
             super(element, context);
 
-            // set mask
-            if(this.hasAttribute(this.element, 'mask')){
-                let pattern = this.getAttribute(this.element, 'mask');
-                this.mask = new mask.StringMask(pattern);
-            }
-
             // adds change event listener
             let _this = this;
             this.element.addEventListener('change', function(event){
@@ -54,8 +48,14 @@ namespace duice.element {
          * @param detail
          */
         override doRender(): void {
-            let value = this.handler.getPropertyValue(this.getProperty());
-            this.element.value = this.mask ? this.mask.encode(value) : value;
+            let property = this.getProperty();
+            let value = this.handler.getPropertyValue(property);
+            value = this.mask ? this.mask.encode(value) : value;
+            this.element.value = value;
+            console.warn("==value:", value);
+
+            // append to stage
+            this.appendToStage(this.element);
         }
 
         /**
@@ -63,7 +63,7 @@ namespace duice.element {
          * @param detail
          */
         override doUpdate(detail: object): void {
-            this.doRender();
+            this.render();
         }
 
         /**

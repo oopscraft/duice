@@ -136,7 +136,7 @@ namespace duice {
          */
         appendToStage(element: HTMLElement): void {
             this.stageElements.push(element);
-            this.slotElement.parentNode.insertBefore(element, this.slotElement);
+            this.slotElement.parentElement.insertBefore(element, this.slotElement);
         }
 
         /**

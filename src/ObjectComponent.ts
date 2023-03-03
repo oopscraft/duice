@@ -49,7 +49,7 @@ namespace duice {
         /**
          * render
          */
-        doRender(): void {
+        override doRender(): void {
 
             // process property
             let property = this.getProperty();
@@ -60,7 +60,7 @@ namespace duice {
                 this.element.insertBefore(textNode, this.element.firstChild);
             }
 
-            // append to slot element
+            // append to stage
             this.appendToStage(this.element);
         }
 
@@ -68,8 +68,8 @@ namespace duice {
          * update
          * @param detail
          */
-        doUpdate(detail: object): void {
-            this.doRender();
+        override doUpdate(detail: object): void {
+            this.render();
         }
 
         /**

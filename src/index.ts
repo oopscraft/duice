@@ -10,7 +10,7 @@ namespace duice {
 
     let alias = 'duice';
 
-    const componentDefinitions: ComponentDefinition[] = [];
+    export const componentDefinitions: ComponentDefinition[] = [];
 
     /**
      * sets alias of namespace
@@ -47,7 +47,7 @@ namespace duice {
      */
     export function createComponent(componentType: any, element: HTMLElement, context: object): Component<any> {
         componentDefinitions.forEach(componentDefinition => {
-            if(componentDefinition.tagName === element.tagName){
+            if(componentDefinition.tagName.toLowerCase() === element.tagName.toLowerCase()){
                 return componentDefinition.componentType.create(element, context);
             }
         });
@@ -75,6 +75,10 @@ namespace duice {
         container.querySelectorAll(`*[${getAlias()}\\:object]:not([${getAlias()}\\:id])`).forEach(objectElement => {
             if(!objectElement.hasAttribute(`${getAlias()}:id`)) {
                 let objectComponent = createComponent(ObjectComponent, objectElement, context);
+                if(objectElement.tagName.toLowerCase() === 'input'){
+                    console.warn('objectElement:', objectElement);
+                    console.warn('objectComponent:', objectComponent);
+                }
                 objectComponent.render();
             }
         });

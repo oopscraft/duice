@@ -216,7 +216,7 @@ var duice;
          */
         appendToStage(element) {
             this.stageElements.push(element);
-            this.slotElement.parentNode.insertBefore(element, this.slotElement);
+            this.slotElement.parentElement.insertBefore(element, this.slotElement);
         }
         /**
          * hasAttribute
@@ -478,7 +478,7 @@ var duice;
                 let textNode = document.createTextNode(value);
                 this.element.insertBefore(textNode, this.element.firstChild);
             }
-            // append to slot element
+            // append to stage
             this.appendToStage(this.element);
         }
         /**
@@ -486,7 +486,7 @@ var duice;
           * @param detail
           */
         doUpdate(detail) {
-            this.doRender();
+            this.render();
         }
         /**
          * getValue
@@ -577,7 +577,7 @@ var duice;
 var duice;
 (function (duice) {
     let alias = 'duice';
-    const componentDefinitions = [];
+    duice.componentDefinitions = [];
     /**
      * sets alias of namespace
      * @param value
@@ -602,7 +602,7 @@ var duice;
     function defineComponent(componentType, tagName) {
         console.debug("defineComponent", componentType, tagName);
         let componentDefinition = new duice.ComponentDefinition(componentType, tagName);
-        componentDefinitions.push(componentDefinition);
+        duice.componentDefinitions.push(componentDefinition);
     }
     duice.defineComponent = defineComponent;
     /**
@@ -612,8 +612,8 @@ var duice;
      * @param context
      */
     function createComponent(componentType, element, context) {
-        componentDefinitions.forEach(componentDefinition => {
-            if (componentDefinition.tagName === element.tagName) {
+        duice.componentDefinitions.forEach(componentDefinition => {
+            if (componentDefinition.tagName.toLowerCase() === element.tagName.toLowerCase()) {
                 return componentDefinition.componentType.create(element, context);
             }
         });
@@ -641,6 +641,10 @@ var duice;
         container.querySelectorAll(`*[${getAlias()}\\:object]:not([${getAlias()}\\:id])`).forEach(objectElement => {
             if (!objectElement.hasAttribute(`${getAlias()}:id`)) {
                 let objectComponent = createComponent(duice.ObjectComponent, objectElement, context);
+                if (objectElement.tagName.toLowerCase() === 'input') {
+                    console.warn('objectElement:', objectElement);
+                    console.warn('objectComponent:', objectComponent);
+                }
                 objectComponent.render();
             }
         });
@@ -738,11 +742,6 @@ var duice;
              */
             constructor(element, context) {
                 super(element, context);
-                // set mask
-                if (this.hasAttribute(this.element, 'mask')) {
-                    let pattern = this.getAttribute(this.element, 'mask');
-                    this.mask = new duice.mask.StringMask(pattern);
-                }
                 // adds change event listener
                 let _this = this;
                 this.element.addEventListener('change', function (event) {
@@ -769,15 +768,20 @@ var duice;
              * @param detail
              */
             doRender() {
-                let value = this.handler.getPropertyValue(this.getProperty());
-                this.element.value = this.mask ? this.mask.encode(value) : value;
+                let property = this.getProperty();
+                let value = this.handler.getPropertyValue(property);
+                value = this.mask ? this.mask.encode(value) : value;
+                this.element.value = value;
+                console.warn("==value:", value);
+                // append to stage
+                this.appendToStage(this.element);
             }
             /**
              * update
              * @param detail
              */
             doUpdate(detail) {
-                this.doRender();
+                this.render();
             }
             /**
              * getValue
