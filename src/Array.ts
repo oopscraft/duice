@@ -1,4 +1,3 @@
-///<reference path="ArrayHandler.ts"/>
 namespace duice {
 
 
@@ -11,9 +10,9 @@ namespace duice {
          * create
          * @param json
          */
-        static create(json: object[]): any {
-            let array = new Array(json);
-            let arrayHandler = new ArrayHandler(array);
+        static create(target: object[]): any {
+            let array = new Array(target);
+            let arrayHandler = new ArrayHandler(target);
             return new Proxy(array, arrayHandler);
         }
 
@@ -32,7 +31,7 @@ namespace duice {
          */
         fromJson(json: object[]): void {
             for(let i = 0, size = json.length; i < size; i ++){
-                let object = new duice.Object(json[i]);
+                let object = duice.Object.create(json[i]);
                 this.push(new Proxy(object, new ObjectHandler(object)));
             }
         }

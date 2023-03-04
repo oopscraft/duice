@@ -1,571 +1,3 @@
-var duice;
-(function (duice) {
-    /**
-     * Handler
-     */
-    class Handler {
-        /**
-         * constructor
-         * @param target
-         * @protected
-         */
-        constructor(target) {
-            this.components = [];
-            console.log("target:", target);
-            this.target = target;
-            globalThis.Object.defineProperty(target, "_handler_", {
-                value: this,
-                writable: true
-            });
-        }
-        /**
-         * getTarget
-         */
-        getTarget() {
-            return this.target;
-        }
-        /**
-         * addObserver
-         * @param component
-         */
-        addComponent(component) {
-            this.components.push(component);
-        }
-        /**
-         * notifyObservers
-         */
-        notifyComponents(detail) {
-            this.components.forEach(observer => {
-                observer.update(detail);
-            });
-        }
-    }
-    duice.Handler = Handler;
-})(duice || (duice = {}));
-///<reference path="Handler.ts"/>
-var duice;
-(function (duice) {
-    /**
-     * ArrayHandler
-     */
-    class ArrayHandler extends duice.Handler {
-        /**
-         * constructor
-         * @param target
-         */
-        constructor(array) {
-            super(array);
-        }
-        /**
-         * set
-         * @param target
-         * @param property
-         * @param value
-         */
-        set(target, property, value) {
-            console.log("- Array.set", target, property, value);
-            Reflect.set(target, property, value);
-            if (property === 'length') {
-                this.notifyComponents({});
-            }
-            return true;
-        }
-        /**
-         * update
-         * @param component
-         * @param detail
-         */
-        update(component, detail) {
-            console.debug("ArrayHandler.update:", component, detail);
-        }
-    }
-    duice.ArrayHandler = ArrayHandler;
-})(duice || (duice = {}));
-///<reference path="ArrayHandler.ts"/>
-var duice;
-(function (duice) {
-    /**
-     * ArrayProxy
-     */
-    class Array extends globalThis.Array {
-        /**
-         * create
-         * @param json
-         */
-        static create(json) {
-            let array = new Array(json);
-            let arrayHandler = new duice.ArrayHandler(array);
-            return new Proxy(array, arrayHandler);
-        }
-        /**
-         * constructor
-         * @param array
-         */
-        constructor(json) {
-            super();
-            this.fromJson(json);
-        }
-        /**
-         * fromJson
-         * @param json
-         */
-        fromJson(json) {
-            for (let i = 0, size = json.length; i < size; i++) {
-                let object = new duice.Object(json[i]);
-                this.push(new Proxy(object, new duice.ObjectHandler(object)));
-            }
-        }
-    }
-    duice.Array = Array;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * Component
-     */
-    class Component {
-        /**
-         * constructor
-         * @param element
-         * @protected
-         */
-        constructor(element, context) {
-            this.stageElements = [];
-            this.id = this.generateId();
-            this.setAttribute(element, "id", this.id);
-            this.element = element;
-            this.context = context;
-            // create slot element
-            this.slotElement = document.createElement('slot');
-            this.element.replaceWith(this.slotElement);
-        }
-        /**
-         * render
-         */
-        render() {
-            // clear
-            this.clearStage();
-            // executes condition
-            if (!this.checkIf()) {
-                return;
-            }
-            // calls template method
-            this.doRender();
-            // executes script
-            this.executeScript();
-        }
-        /**
-         * update
-         * @param detail
-         */
-        update(detail) {
-            // clear
-            this.clearStage();
-            // check condition
-            if (!this.checkIf()) {
-                return;
-            }
-            // calls template method
-            this.doUpdate(detail);
-            // executes script
-            this.executeScript();
-        }
-        /**
-         * notifyHandlers
-         */
-        notifyHandler(detail) {
-            this.handler.update(this, detail);
-        }
-        /**
-         * Generates component ID
-         * @return id
-         */
-        generateId() {
-            let dt = new Date().getTime();
-            let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-                let r = (dt + Math.random() * 16) % 16 | 0;
-                dt = Math.floor(dt / 16);
-                return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-            });
-            return uuid;
-        }
-        /**
-         * findObject
-         * @param name
-         */
-        findObject(name) {
-            if (this.context[name]) {
-                return this.context[name];
-            }
-            if (window.hasOwnProperty(name)) {
-                return window[name];
-            }
-            return eval.call(this.context, name);
-        }
-        /**
-         * clears stage
-         */
-        clearStage() {
-            for (let i = this.stageElements.length - 1; i >= 0; i--) {
-                this.slotElement.parentElement.removeChild(this.stageElements.pop());
-            }
-        }
-        /**
-         * appends to stage
-         * @param element
-         */
-        appendToStage(element) {
-            this.stageElements.push(element);
-            this.slotElement.parentElement.insertBefore(element, this.slotElement);
-        }
-        /**
-         * hasAttribute
-         * @param element
-         * @param name
-         */
-        hasAttribute(element, name) {
-            return element.hasAttribute(`${duice.getAlias()}:${name}`);
-        }
-        /**
-         * getAttribute
-         * @param element
-         * @param name
-         */
-        getAttribute(element, name) {
-            return element.getAttribute(`${duice.getAlias()}:${name}`);
-        }
-        /**
-         * setAttribute
-         * @param element
-         * @param name
-         * @param value
-         */
-        setAttribute(element, name, value) {
-            element.setAttribute(`${duice.getAlias()}:${name}`, value);
-        }
-        /**
-         * removeChildNodes
-         * @param element
-         */
-        removeChildNodes(element) {
-            // Remove element nodes and prevent memory leaks
-            let node, nodes = element.childNodes, i = 0;
-            while (node = nodes[i++]) {
-                if (node.nodeType === 1) {
-                    element.removeChild(node);
-                }
-            }
-            // Remove any remaining nodes
-            while (element.firstChild) {
-                element.removeChild(element.firstChild);
-            }
-            // If this is a select, ensure that it displays empty
-            if (element instanceof HTMLSelectElement) {
-                element.options.length = 0;
-            }
-        }
-        /**
-         * checkIf
-         */
-        checkIf() {
-            let ifAttribute = this.getAttribute(this.element, 'if');
-            if (ifAttribute) {
-                let args = [];
-                let values = [];
-                for (let property in this.context) {
-                    args.push(property);
-                    values.push(this.context[property]);
-                }
-                let ifFunction = `return ${ifAttribute};`;
-                let result = Function(...args, ifFunction).call(this.element, ...values);
-                if (result === true) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            }
-            else {
-                return true;
-            }
-        }
-        /**
-         * executes script
-         */
-        executeScript() {
-            let scriptAttribute = this.getAttribute(this.element, 'script');
-            let args = [];
-            let values = [];
-            for (let property in this.context) {
-                args.push(property);
-                values.push(this.context[property]);
-            }
-            return Function(...args, scriptAttribute).call(this.element, ...values);
-        }
-    }
-    duice.Component = Component;
-})(duice || (duice = {}));
-///<reference path="Component.ts"/>
-var duice;
-(function (duice) {
-    /**
-     * ArrayComponent
-     */
-    class ArrayComponent extends duice.Component {
-        /**
-         * constructor
-         * @param element
-         * @param context
-         * @protected
-         */
-        constructor(element, context) {
-            console.debug("ArrayComponent.constructor", element, context);
-            super(element, context);
-            // array handler
-            let arrayName = this.getAttribute(this.element, 'array');
-            let array = this.findObject(arrayName);
-            this.handler = array._handler_;
-            this.handler.addComponent(this);
-        }
-        /**
-         * create
-         * @param element
-         * @param context
-         */
-        static create(element, context) {
-            return new ArrayComponent(element, context);
-        }
-        /**
-          * render
-          * @param detail
-          */
-        doRender() {
-            console.log("ArrayComponent.render");
-            // defines
-            let array = this.handler.getTarget();
-            let loopAttribute = this.getAttribute(this.element, 'loop');
-            // loop
-            if (loopAttribute) {
-                let loopArgs = loopAttribute.split(',');
-                let objectName = loopArgs[0];
-                let statusName = loopArgs[1];
-                for (let index = 0; index < array.length; index++) {
-                    let object = array[index];
-                    let rowElement = this.element.cloneNode(true);
-                    let context = {};
-                    context[objectName] = object;
-                    context[statusName] = duice.Object.create({
-                        index: index,
-                        number: index + 1,
-                        count: array.length,
-                        first: (index === 0),
-                        last: (index + 1 === array.length)
-                    });
-                    duice.initializeComponent(rowElement, context);
-                    this.appendToStage(rowElement);
-                }
-            }
-            else {
-                duice.initializeComponent(this.element, this.context);
-                this.appendToStage(this.element);
-            }
-        }
-        /**
-         * update
-         * @param detail
-         */
-        doUpdate(detail) {
-            console.log("ArrayComponent.update", detail);
-            this.render();
-        }
-    }
-    duice.ArrayComponent = ArrayComponent;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * ComponentDefinition
-     */
-    class ComponentDefinition {
-        /**
-         * constructor
-         * @param tagName
-         * @param componentType
-         * @protected
-         */
-        constructor(componentType, tagName) {
-            this.componentType = componentType;
-            this.tagName = tagName;
-        }
-    }
-    duice.ComponentDefinition = ComponentDefinition;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    class Object {
-        /**
-         * create
-         * @param json
-         */
-        static create(json) {
-            let object = new Object(json);
-            let handler = new duice.ObjectHandler(object);
-            return new Proxy(object, handler);
-        }
-        /**
-         * constructor
-         * @param json
-         */
-        constructor(json) {
-            this.fromJson(json);
-        }
-        fromJson(json) {
-            for (let property in json) {
-                let value = json[property];
-                this[property] = value;
-            }
-        }
-    }
-    duice.Object = Object;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * ObjectComponent
-     */
-    class ObjectComponent extends duice.Component {
-        /**
-         * constructor
-         * @param element
-         * @param context
-         */
-        constructor(element, context) {
-            super(element, context);
-            // object handler
-            let objectName = this.getAttribute(this.element, 'object');
-            let object = this.findObject(objectName);
-            this.handler = object._handler_;
-            this.handler.addComponent(this);
-            // mask
-            if (this.hasAttribute(this.element, 'mask')) {
-                let mask = this.getAttribute(this.element, 'mask');
-                this.mask = duice.mask.MaskFactory.getMask(mask);
-            }
-        }
-        /**
-         * create
-         * @param element
-         * @param context
-         */
-        static create(element, context) {
-            return new ObjectComponent(element, context);
-        }
-        /**
-         * getProperty
-         */
-        getProperty() {
-            return this.getAttribute(this.element, 'property');
-        }
-        /**
-         * render
-         */
-        doRender() {
-            // process property
-            let property = this.getProperty();
-            if (property) {
-                let value = this.handler.getPropertyValue(property);
-                value = this.mask ? this.mask.encode(value) : value;
-                let textNode = document.createTextNode(value);
-                this.element.insertBefore(textNode, this.element.firstChild);
-            }
-            // append to stage
-            this.appendToStage(this.element);
-        }
-        /**
-          * update
-          * @param detail
-          */
-        doUpdate(detail) {
-            this.render();
-        }
-        /**
-         * getValue
-         */
-        getValue() {
-            let value = this.element.firstChild.textContent;
-            return this.mask ? this.mask.decode(value) : value;
-        }
-    }
-    duice.ObjectComponent = ObjectComponent;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * ObjectHandler
-     */
-    class ObjectHandler extends duice.Handler {
-        /**
-         * constructor
-         * @param target
-         */
-        constructor(object) {
-            super(object);
-        }
-        /**
-         * get
-         * @param target
-         * @param property
-         * @param receiver
-         */
-        get(target, property, receiver) {
-            console.log("- Object.get", target, property, receiver);
-            return Reflect.get(target, property, receiver);
-        }
-        /**
-         * set
-         * @param target
-         * @param property
-         * @param value
-         */
-        set(target, property, value) {
-            console.log("- Object.set", target, property, value);
-            Reflect.set(target, property, value);
-            this.notifyComponents({});
-            return true;
-        }
-        /**
-         * update
-         * @param component
-         * @param detail
-         */
-        update(component, detail) {
-            console.log('ObjectHandler.update', component, detail);
-            let property = component.getProperty();
-            if (property) {
-                let value = component.getValue();
-                this.setPropertyValue(property, value);
-            }
-        }
-        /**
-         * getPropertyValue
-         * @param property
-         */
-        getPropertyValue(property) {
-            console.assert(property);
-            property = property.replace('.', '?.');
-            return new Function(`return this.${property};`).call(this.getTarget());
-        }
-        /**
-         * setPropertyValue
-         * @param property
-         * @param value
-         */
-        setPropertyValue(property, value) {
-            new Function(`this.${property} = arguments[0];`).call(this.getTarget(), value);
-        }
-    }
-    duice.ObjectHandler = ObjectHandler;
-})(duice || (duice = {}));
 /* =============================================================================
  * DUICE (Data-oriented UI Component Engine)
  * - Anyone can use it freely.
@@ -577,7 +9,7 @@ var duice;
 var duice;
 (function (duice) {
     let alias = 'duice';
-    duice.componentDefinitions = [];
+    // export const componentDefinitions: ComponentDefinition[] = [];
     /**
      * sets alias of namespace
      * @param value
@@ -593,464 +25,70 @@ var duice;
         return alias;
     }
     duice.getAlias = getAlias;
-    /**
-     * defines component
-     * @param componentType
-     * @param tagName
-     * @param isAttribute
-     */
-    function defineComponent(componentType, tagName) {
-        console.debug("defineComponent", componentType, tagName);
-        let componentDefinition = new duice.ComponentDefinition(componentType, tagName);
-        duice.componentDefinitions.push(componentDefinition);
-    }
-    duice.defineComponent = defineComponent;
-    /**
-     * creates component
-     * @param componentType
-     * @param element
-     * @param context
-     */
-    function createComponent(componentType, element, context) {
-        duice.componentDefinitions.forEach(componentDefinition => {
-            if (componentDefinition.tagName.toLowerCase() === element.tagName.toLowerCase()) {
-                return componentDefinition.componentType.create(element, context);
-            }
-        });
-        if (componentType === duice.ArrayComponent) {
-            return duice.ArrayComponent.create(element, context);
-        }
-        if (componentType === duice.ObjectComponent) {
-            return duice.ObjectComponent.create(element, context);
-        }
-        throw new Error('Invalid element');
-    }
-    duice.createComponent = createComponent;
-    /**
-     * initializes component
-     * @param container
-     * @param context
-     */
-    function initializeComponent(container, context) {
-        container.querySelectorAll(`*[${getAlias()}\\:array]:not([${getAlias()}\\:id])`).forEach(arrayElement => {
-            if (!arrayElement.hasAttribute(`${getAlias()}:id`)) {
-                let arrayComponent = createComponent(duice.ArrayComponent, arrayElement, context);
-                arrayComponent.render();
-            }
-        });
-        container.querySelectorAll(`*[${getAlias()}\\:object]:not([${getAlias()}\\:id])`).forEach(objectElement => {
-            if (!objectElement.hasAttribute(`${getAlias()}:id`)) {
-                let objectComponent = createComponent(duice.ObjectComponent, objectElement, context);
-                if (objectElement.tagName.toLowerCase() === 'input') {
-                    console.warn('objectElement:', objectElement);
-                    console.warn('objectComponent:', objectComponent);
-                }
-                objectComponent.render();
-            }
-        });
-    }
-    duice.initializeComponent = initializeComponent;
+    // /**
+    //  * defines component
+    //  * @param componentType
+    //  * @param tagName
+    //  * @param isAttribute
+    //  */
+    // export function defineComponent(componentType: any, tagName: string) {
+    //     console.debug("defineComponent", componentType, tagName);
+    //     let componentDefinition = new ComponentDefinition(componentType, tagName);
+    //     componentDefinitions.push(componentDefinition);
+    // }
+    //
+    // /**
+    //  * creates component
+    //  * @param componentType
+    //  * @param element
+    //  * @param context
+    //  */
+    // export function createComponent(componentType: any, element: HTMLElement, context: object): Component<any> {
+    //     componentDefinitions.forEach(componentDefinition => {
+    //         if(componentDefinition.tagName.toLowerCase() === element.tagName.toLowerCase()){
+    //             return componentDefinition.componentType.create(element, context);
+    //         }
+    //     });
+    //     if(componentType === ArrayComponent) {
+    //         return ArrayComponent.create(element, context);
+    //     }
+    //     if(componentType === ObjectComponent) {
+    //         return ObjectComponent.create(element, context);
+    //     }
+    //     throw new Error('Invalid element');
+    // }
+    //
+    // /**
+    //  * initializes component
+    //  * @param container
+    //  * @param context
+    //  */
+    // export function initializeComponent(container: any, context: object): void {
+    //     container.querySelectorAll(`*[${getAlias()}\\:array]:not([${getAlias()}\\:id])`).forEach(arrayElement => {
+    //         if(!arrayElement.hasAttribute(`${getAlias()}:id`)) {
+    //             let arrayComponent = createComponent(ArrayComponent, arrayElement, context);
+    //             arrayComponent.render();
+    //         }
+    //     });
+    //     container.querySelectorAll(`*[${getAlias()}\\:object]:not([${getAlias()}\\:id])`).forEach(objectElement => {
+    //         if(!objectElement.hasAttribute(`${getAlias()}:id`)) {
+    //             let objectComponent = createComponent(ObjectComponent, objectElement, context);
+    //             if(objectElement.tagName.toLowerCase() === 'input'){
+    //                 console.warn('objectElement:', objectElement);
+    //                 console.warn('objectComponent:', objectComponent);
+    //             }
+    //             objectComponent.render();
+    //         }
+    //     });
+    // }
     /**
      * listens DOMContentLoaded event
      */
     if (globalThis.document) {
         document.addEventListener("DOMContentLoaded", event => {
-            initializeComponent(document, {});
+            duice.ElementInitializer.initializeElement(document.documentElement, {});
         });
     }
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    var mask;
-    (function (mask) {
-        /**
-         * StringFormat
-         * @param string format
-         */
-        class StringMask {
-            /**
-             * Constructor
-             * @param pattern
-             */
-            constructor(pattern) {
-                this.pattern = pattern;
-            }
-            /**
-             * encode string as format
-             * @param value
-             */
-            encode(value) {
-                if (!value) {
-                    return value;
-                }
-                let encodedValue = '';
-                let patternChars = this.pattern.split('');
-                let valueChars = value.split('');
-                let valueCharsPosition = 0;
-                for (let i = 0, size = patternChars.length; i < size; i++) {
-                    let patternChar = patternChars[i];
-                    if (patternChar === '#') {
-                        encodedValue += valueChars[valueCharsPosition++] || '';
-                    }
-                    else {
-                        encodedValue += patternChar;
-                    }
-                }
-                return encodedValue;
-            }
-            /**
-             * decodes string as format
-             * @param value
-             */
-            decode(value) {
-                if (!value) {
-                    return value;
-                }
-                let decodedValue = '';
-                let patternChars = this.pattern.split('');
-                let valueChars = value.split('');
-                let valueCharsPosition = 0;
-                for (let i = 0, size = patternChars.length; i < size; i++) {
-                    let patternChar = patternChars[i];
-                    if (patternChar === '#') {
-                        decodedValue += valueChars[valueCharsPosition++] || '';
-                    }
-                    else {
-                        valueCharsPosition++;
-                    }
-                }
-                return decodedValue;
-            }
-        }
-        mask.StringMask = StringMask;
-    })(mask = duice.mask || (duice.mask = {}));
-})(duice || (duice = {}));
-///<reference path="../ObjectComponent.ts"/>
-///<reference path="../mask/StringMask.ts"/>
-var duice;
-(function (duice) {
-    var element;
-    (function (element_1) {
-        /**
-         * Input
-         */
-        class Input extends duice.ObjectComponent {
-            /**
-             * constructor
-             * @param element
-             * @param context
-             */
-            constructor(element, context) {
-                super(element, context);
-                // adds change event listener
-                let _this = this;
-                this.element.addEventListener('change', function (event) {
-                    _this.notifyHandler({});
-                }, true);
-            }
-            /**
-             * create
-             * @param element
-             */
-            static create(element, context) {
-                let type = element.getAttribute('type');
-                switch (type) {
-                    case 'number':
-                        return new element_1.InputNumber(element, context);
-                    case 'checkbox':
-                        return new element_1.InputCheckbox(element, context);
-                    default:
-                        return new Input(element, context);
-                }
-            }
-            /**
-             * render
-             * @param detail
-             */
-            doRender() {
-                let property = this.getProperty();
-                let value = this.handler.getPropertyValue(property);
-                value = this.mask ? this.mask.encode(value) : value;
-                this.element.value = value;
-                console.warn("==value:", value);
-                // append to stage
-                this.appendToStage(this.element);
-            }
-            /**
-             * update
-             * @param detail
-             */
-            doUpdate(detail) {
-                this.render();
-            }
-            /**
-             * getValue
-             */
-            getValue() {
-                let value = this.element.value;
-                return this.mask ? this.mask.decode(value) : value;
-            }
-        }
-        element_1.Input = Input;
-        // defines component
-        duice.defineComponent(Input, "input");
-    })(element = duice.element || (duice.element = {}));
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    var element;
-    (function (element_2) {
-        class InputCheckbox extends element_2.Input {
-            /**
-             * constructor
-             * @param element
-             */
-            constructor(element, context) {
-                super(element, context);
-            }
-            /**
-             * render
-             */
-            doRender() {
-                let value = this.handler.getPropertyValue(this.getProperty());
-                if (value === true) {
-                    this.element.checked = true;
-                }
-                else {
-                    this.element.checked = false;
-                }
-            }
-            /**
-             * update
-             * @param detail
-             */
-            doUpdate(detail) {
-                this.doRender();
-            }
-            /**
-             * getValue
-             */
-            getValue() {
-                return this.element.checked;
-            }
-        }
-        element_2.InputCheckbox = InputCheckbox;
-    })(element = duice.element || (duice.element = {}));
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    var element;
-    (function (element_3) {
-        class InputNumber extends element_3.Input {
-            /**
-             * constructor
-             * @param element
-             */
-            constructor(element, context) {
-                super(element, context);
-            }
-            /**
-             * render
-             */
-            doRender() {
-                let value = this.handler.getPropertyValue(this.getProperty());
-                this.element.value = value;
-            }
-            /**
-             * update
-             * @param detail
-             */
-            doUpdate(detail) {
-                this.doRender();
-            }
-            /**
-             * getValue
-             */
-            getValue() {
-                let value = super.getValue();
-                return Number(value);
-            }
-        }
-        element_3.InputNumber = InputNumber;
-    })(element = duice.element || (duice.element = {}));
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    var element;
-    (function (element_4) {
-        class Select extends duice.ObjectComponent {
-            /**
-             * constructor
-             * @param element
-             * @param context
-             */
-            constructor(element, context) {
-                super(element, context);
-                this.defaultOptions = [];
-                this.option = this.getAttribute(this.element, 'option');
-                // stores default options
-                for (let i = 0, size = this.element.options.length; i < size; i++) {
-                    this.defaultOptions.push(this.element.options[i]);
-                }
-                // adds change event listener
-                let _this = this;
-                this.element.addEventListener('change', function (event) {
-                    _this.notifyHandler({});
-                }, true);
-            }
-            /**
-             * create
-             * @param element
-             */
-            static create(element, context) {
-                return new Select(element, context);
-            }
-            doRender() {
-                // set options
-                if (this.option) {
-                    let optionParts = this.option.split(',');
-                    let options = this.findObject(optionParts[0]);
-                    let value = optionParts[1];
-                    let text = optionParts[2];
-                    this.setOption(options, value, text);
-                }
-                // set value
-                let value = this.handler.getPropertyValue(this.getProperty());
-                this.element.value = value;
-            }
-            /**
-             * setOptions
-             * @param options
-             * @param value
-             * @param text
-             */
-            setOption(options, value, text) {
-                // removes
-                this.removeChildNodes(this.element);
-                // adds default options
-                let _this = this;
-                this.defaultOptions.forEach(option => {
-                    _this.element.appendChild(option);
-                });
-                // adds additional options
-                options.forEach(option => {
-                    let optionElement = document.createElement('option');
-                    optionElement.value = option[value];
-                    optionElement.appendChild(document.createTextNode(option[text]));
-                    _this.element.appendChild(optionElement);
-                });
-            }
-            /**
-             * update
-             * @param detail
-             */
-            doUpdate(detail) {
-                this.doRender();
-            }
-            /**
-             * getValue
-             */
-            getValue() {
-                return this.element.value;
-            }
-        }
-        element_4.Select = Select;
-        // defines component
-        duice.defineComponent(Select, "select");
-    })(element = duice.element || (duice.element = {}));
-})(duice || (duice = {}));
-///<reference path="../ArrayComponent.ts"/>
-///<reference path="../ComponentDefinition.ts"/>
-var duice;
-(function (duice) {
-    var element;
-    (function (element_5) {
-        /**
-         * Table
-         */
-        class Table extends duice.ArrayComponent {
-            /**
-             * create
-             * @param element
-             */
-            static create(element, context) {
-                return new Table(element, context);
-            }
-            /**
-             * constructor
-             * @param element
-             */
-            constructor(element, context) {
-                super(element, context);
-            }
-            /**
-             * render
-             */
-            doRender() {
-                super.doRender();
-            }
-            /**
-             * update
-             * @param detail
-             */
-            doUpdate(detail) {
-                this.doRender();
-            }
-        }
-        element_5.Table = Table;
-        // defines component
-        duice.defineComponent(Table, "table");
-    })(element = duice.element || (duice.element = {}));
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    var element;
-    (function (element_6) {
-        class Textarea extends duice.ObjectComponent {
-            /**
-             * constructor
-             * @param element
-             */
-            constructor(element, context) {
-                super(element, context);
-                // adds change event listener
-                let _this = this;
-                this.element.addEventListener('change', function (event) {
-                    _this.notifyHandler({});
-                }, true);
-            }
-            /**
-             * create
-             * @param element
-             */
-            static create(element, context) {
-                return new Textarea(element, context);
-            }
-            /**
-             * render
-             */
-            doRender() {
-                let value = this.handler.getPropertyValue(this.getProperty());
-                this.element.value = value;
-            }
-            /**
-             * update
-             * @param detail
-             */
-            doUpdate(detail) {
-                this.doRender();
-            }
-            /**
-             * getValue
-             */
-            getValue() {
-                return this.element.value;
-            }
-        }
-        element_6.Textarea = Textarea;
-        // defines component
-        duice.defineComponent(Textarea, "textarea");
-    })(element = duice.element || (duice.element = {}));
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
@@ -1254,5 +292,445 @@ var duice;
         }
         mask.NumberMask = NumberMask;
     })(mask = duice.mask || (duice.mask = {}));
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    var mask;
+    (function (mask) {
+        /**
+         * StringFormat
+         * @param string format
+         */
+        class StringMask {
+            /**
+             * Constructor
+             * @param pattern
+             */
+            constructor(pattern) {
+                this.pattern = pattern;
+            }
+            /**
+             * encode string as format
+             * @param value
+             */
+            encode(value) {
+                if (!value) {
+                    return value;
+                }
+                let encodedValue = '';
+                let patternChars = this.pattern.split('');
+                let valueChars = value.split('');
+                let valueCharsPosition = 0;
+                for (let i = 0, size = patternChars.length; i < size; i++) {
+                    let patternChar = patternChars[i];
+                    if (patternChar === '#') {
+                        encodedValue += valueChars[valueCharsPosition++] || '';
+                    }
+                    else {
+                        encodedValue += patternChar;
+                    }
+                }
+                return encodedValue;
+            }
+            /**
+             * decodes string as format
+             * @param value
+             */
+            decode(value) {
+                if (!value) {
+                    return value;
+                }
+                let decodedValue = '';
+                let patternChars = this.pattern.split('');
+                let valueChars = value.split('');
+                let valueCharsPosition = 0;
+                for (let i = 0, size = patternChars.length; i < size; i++) {
+                    let patternChar = patternChars[i];
+                    if (patternChar === '#') {
+                        decodedValue += valueChars[valueCharsPosition++] || '';
+                    }
+                    else {
+                        valueCharsPosition++;
+                    }
+                }
+                return decodedValue;
+            }
+        }
+        mask.StringMask = StringMask;
+    })(mask = duice.mask || (duice.mask = {}));
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    class Object {
+        /**
+         * create
+         * @param json
+         */
+        static create(json) {
+            let object = new Object(json);
+            let handler = new duice.ObjectHandler(object);
+            return new Proxy(object, handler);
+        }
+        /**
+         * constructor
+         * @param json
+         */
+        constructor(json) {
+            for (let property in json) {
+                let value = json[property];
+                this[property] = value;
+            }
+        }
+    }
+    duice.Object = Object;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    /**
+     * ArrayProxy
+     */
+    class Array extends globalThis.Array {
+        /**
+         * create
+         * @param json
+         */
+        static create(target) {
+            let array = new Array(target);
+            let arrayHandler = new duice.ArrayHandler(target);
+            return new Proxy(array, arrayHandler);
+        }
+        /**
+         * constructor
+         * @param array
+         */
+        constructor(json) {
+            super();
+            this.fromJson(json);
+        }
+        /**
+         * fromJson
+         * @param json
+         */
+        fromJson(json) {
+            for (let i = 0, size = json.length; i < size; i++) {
+                let object = duice.Object.create(json[i]);
+                this.push(new Proxy(object, new duice.ObjectHandler(object)));
+            }
+        }
+    }
+    duice.Array = Array;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    class Observable {
+        constructor() {
+            this.observers = [];
+        }
+        addObserver(observer) {
+            this.observers.push(observer);
+        }
+        notifyObservers(detail) {
+            this.observers.forEach(observer => {
+                observer.update(this, detail);
+            });
+        }
+    }
+    duice.Observable = Observable;
+})(duice || (duice = {}));
+///<reference path="Observable.ts"/>
+var duice;
+(function (duice) {
+    class Handler extends duice.Observable {
+        /**
+         * constructor
+         * @param target
+         * @protected
+         */
+        constructor(target) {
+            super();
+            this.target = target;
+            globalThis.Object.defineProperty(target, "_handler_", {
+                value: this,
+                writable: true
+            });
+        }
+        /**
+         * getTarget
+         */
+        getTarget() {
+            return this.target;
+        }
+        /**
+         * update
+         * @param element
+         * @param detail
+         */
+        update(element, detail) {
+            this.doUpdate(element, detail);
+        }
+    }
+    duice.Handler = Handler;
+})(duice || (duice = {}));
+///<reference path="Handler.ts"/>
+var duice;
+(function (duice) {
+    class ArrayHandler extends duice.Handler {
+        constructor(target) {
+            super(target);
+        }
+        /**
+         * set
+         * @param target
+         * @param property
+         * @param value
+         */
+        set(target, property, value) {
+            console.log("- Array.set", target, property, value);
+            Reflect.set(target, property, value);
+            if (property === 'length') {
+                this.notifyObservers({});
+            }
+            return true;
+        }
+        doUpdate(element, detail) {
+            // TODO
+        }
+    }
+    duice.ArrayHandler = ArrayHandler;
+})(duice || (duice = {}));
+///<reference path="Handler.ts"/>
+var duice;
+(function (duice) {
+    class ObjectHandler extends duice.Handler {
+        constructor(target) {
+            super(target);
+        }
+        /**
+         * get
+         * @param target
+         * @param property
+         * @param receiver
+         */
+        get(target, property, receiver) {
+            console.log("- Object.get", target, property, receiver);
+            return Reflect.get(target, property, receiver);
+        }
+        /**
+         * set
+         * @param target
+         * @param property
+         * @param value
+         */
+        set(target, property, value) {
+            console.log("- Object.set", target, property, value);
+            Reflect.set(target, property, value);
+            this.notifyObservers({});
+            return true;
+        }
+        doUpdate(element, detail) {
+            // TODO
+        }
+    }
+    duice.ObjectHandler = ObjectHandler;
+})(duice || (duice = {}));
+///<reference path="Observable.ts"/>
+var duice;
+(function (duice) {
+    class Element extends duice.Observable {
+        constructor(htmlElement) {
+            super();
+            this.htmlElement = htmlElement;
+            this.id = this.generateId();
+            this.setAttribute('id', this.id);
+        }
+        /**
+         * get id
+         */
+        getId() {
+            return this.id;
+        }
+        /**
+         * gets html element
+         */
+        getHtmlElement() {
+            return this.htmlElement;
+        }
+        /**
+         * bind
+         * @param object
+         */
+        bind(object) {
+            this.handler = object._handler_;
+            console.assert(this.handler);
+            this.addObserver(this.handler);
+            this.handler.addObserver(this);
+        }
+        setProperty(property) {
+            this.property = property;
+        }
+        getProperty() {
+            return this.property;
+        }
+        /**
+         * render
+         */
+        render() {
+            // array handler
+            if (this.handler instanceof duice.ArrayHandler) {
+                this.handler.getTarget().forEach(object => {
+                    this.doRender(object);
+                });
+            }
+            // object handler
+            if (this.handler instanceof duice.ObjectHandler) {
+                this.doRender(this.handler.getTarget());
+            }
+        }
+        /**
+         * doRender
+         * @param object
+         */
+        doRender(object) {
+            console.warn('== handler', this.handler.getTarget());
+            console.log('object', object);
+            let value = object[this.getProperty()];
+            let textNode = document.createTextNode(value);
+            console.warn('textNode', textNode);
+            this.htmlElement.insertBefore(textNode, this.htmlElement.firstChild);
+        }
+        /**
+         * update
+         * @param handler
+         * @param detail
+         */
+        update(handler, detail) {
+            console.log("Element.update", handler, detail);
+            this.render();
+        }
+        /**
+         * Generates component ID
+         */
+        generateId() {
+            let dt = new Date().getTime();
+            let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                let r = (dt + Math.random() * 16) % 16 | 0;
+                dt = Math.floor(dt / 16);
+                return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+            });
+            return uuid;
+        }
+        /**
+         * hasAttribute
+         * @param name
+         */
+        hasAttribute(name) {
+            return this.htmlElement.hasAttribute(`${duice.getAlias()}:${name}`);
+        }
+        /**
+         * getAttribute
+         * @param name
+         */
+        getAttribute(name) {
+            return this.htmlElement.getAttribute(`${duice.getAlias()}:${name}`);
+        }
+        /**
+         * setAttribute
+         * @param name
+         * @param value
+         */
+        setAttribute(name, value) {
+            this.htmlElement.setAttribute(`${duice.getAlias()}:${name}`, value);
+        }
+    }
+    duice.Element = Element;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    class ElementFactory {
+        /**
+         * adds element definition
+         * @param tagName
+         * @param elementType
+         */
+        static addElementDefinition(tagName, elementType) {
+            let elementDefinition = new duice.ElementDefinition(tagName, elementType);
+            this.elementDefinitions.push(elementDefinition);
+        }
+        /**
+         * creates element
+         * @param htmlElement
+         * @param context
+         */
+        static createElement(htmlElement, context) {
+            // creates element instance
+            let tagName = htmlElement.tagName;
+            let element = null;
+            this.elementDefinitions.forEach(elementDefinition => {
+                if (tagName === elementDefinition.getTagName()) {
+                    let elementType = elementDefinition.getElementType();
+                    element = Reflect.construct(elementType, [htmlElement]);
+                }
+            });
+            if (element === null) {
+                element = new duice.Element(htmlElement);
+            }
+            // bind
+            let bindAttribute = htmlElement.getAttribute(`${duice.getAlias()}:bind`);
+            let bindObject = this.findObject(context, bindAttribute);
+            console.assert(bindObject, `bind object[${bindAttribute}] is not found`);
+            element.bind(bindObject);
+            // property
+            let propertyAttribute = htmlElement.getAttribute(`${duice.getAlias()}:property`);
+            element.setProperty(propertyAttribute);
+            // returns
+            return element;
+        }
+        /**
+         * findObject
+         * @param context
+         * @param name
+         */
+        static findObject(context, name) {
+            if (context[name]) {
+                return context[name];
+            }
+            if (window.hasOwnProperty(name)) {
+                return window[name];
+            }
+            return eval.call(context, name);
+        }
+    }
+    ElementFactory.elementDefinitions = [];
+    duice.ElementFactory = ElementFactory;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    class ElementInitializer {
+        static initializeElement(container, context) {
+            container.querySelectorAll(`*[${duice.getAlias()}\\:bind]:not([${duice.getAlias()}\\:id])`).forEach(htmlElement => {
+                if (!htmlElement.hasAttribute(`${duice.getAlias()}:id`)) {
+                    let element = duice.ElementFactory.createElement(htmlElement, context);
+                    element.render();
+                }
+            });
+        }
+    }
+    duice.ElementInitializer = ElementInitializer;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    class ElementDefinition {
+        constructor(tagName, elementType) {
+            this.tagName = tagName;
+            this.elementType = elementType;
+        }
+        getTagName() {
+            return this.tagName;
+        }
+        getElementType() {
+            return this.elementType;
+        }
+    }
+    duice.ElementDefinition = ElementDefinition;
 })(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map

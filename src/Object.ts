@@ -16,11 +16,7 @@ namespace duice {
          * constructor
          * @param json
          */
-        constructor(json: object) {
-            this.fromJson(json);
-        }
-
-        fromJson(json: object): void {
+        private constructor(json: object) {
             for(let property in json){
                 let value = json[property];
                 this[property] = value;
@@ -28,5 +24,4 @@ namespace duice {
         }
 
     }
-
 }

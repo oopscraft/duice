@@ -1,13 +1,9 @@
+///<reference path="Observable.ts"/>
 namespace duice {
 
-    /**
-     * Handler
-     */
-    export abstract class Handler<T> {
+    export abstract class Handler<T> extends Observable implements Observer<Element<T>> {
 
         target: T;
-
-        components: Component<T>[] = [];
 
         /**
          * constructor
@@ -15,7 +11,7 @@ namespace duice {
          * @protected
          */
         protected constructor(target: T) {
-            console.log("target:", target);
+            super();
             this.target = target;
             globalThis.Object.defineProperty(target, "_handler_", {
                 value: this,
@@ -31,29 +27,20 @@ namespace duice {
         }
 
         /**
-         * addObserver
-         * @param component
-         */
-        addComponent(component: Component<T>): void {
-            this.components.push(component);
-        }
-
-        /**
-         * notifyObservers
-         */
-        notifyComponents(detail: object): void {
-            this.components.forEach(observer => {
-                observer.update(detail);
-            });
-        }
-
-        /**
          * update
-         * @param component
+         * @param element
          * @param detail
          */
-        abstract update(component: Component<T>, detail: object): void;
+        update(element: Element<T>, detail: any): void {
+            this.doUpdate(element, detail);
+        }
 
+        /**
+         * doUpdate
+         * @param element
+         * @param detail
+         */
+        abstract doUpdate(element: Element<T>, detail): void;
 
     }
 

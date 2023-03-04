@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<head>
+    <script src="../dist/duice.js"></script>
+    <script>
+        let myObject = duice.Object.create({
+            name: "james smith!!!",
+        });
+        let myArray = duice.Array.create([
+            { name: 'apple' },
+            { name: 'orange' }
+        ]);
+    </script>
+</head>
+<body>
+    <span duice:bind="myObject" duice:property="name"></span>
+    <ul>
+        <li duice:bind="myArray" duice:property></li>
+    </ul>
+</body>
+</html>

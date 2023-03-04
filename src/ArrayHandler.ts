@@ -1,17 +1,10 @@
 ///<reference path="Handler.ts"/>
 namespace duice {
 
-    /**
-     * ArrayHandler
-     */
     export class ArrayHandler extends Handler<object[]> {
 
-        /**
-         * constructor
-         * @param target
-         */
-        constructor(array: object[]) {
-            super(array);
+        constructor(target: object[]) {
+            super(target);
         }
 
         /**
@@ -24,19 +17,16 @@ namespace duice {
             console.log("- Array.set", target, property, value);
             Reflect.set(target, property, value);
             if(property === 'length'){
-                this.notifyComponents({});
+                this.notifyObservers({});
             }
             return true;
         }
 
-        /**
-         * update
-         * @param component
-         * @param detail
-         */
-        update(component: ArrayComponent, detail: object): void {
-            console.debug("ArrayHandler.update:", component, detail);
+        doUpdate(element: duice.Element<object[]>, detail): void {
+            // TODO
         }
 
+
     }
+
 }
