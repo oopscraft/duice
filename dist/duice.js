@@ -402,13 +402,24 @@ var duice;
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
+    /**
+     * Observable
+     */
     class Observable {
         constructor() {
             this.observers = [];
         }
+        /**
+         * addObserver
+         * @param observer
+         */
         addObserver(observer) {
             this.observers.push(observer);
         }
+        /**
+         * notifyObservers
+         * @param detail
+         */
         notifyObservers(detail) {
             this.observers.forEach(observer => {
                 observer.update(this, detail);
