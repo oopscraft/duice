@@ -6,7 +6,7 @@ namespace duice.mask {
          * getMask
          * @param mask
          */
-        static getMask(mask: string): mask.Mask<any> {
+        static getMask(mask: string): mask.Mask {
             if(mask.startsWith('string')){
                 mask = mask.replace('string', 'StringMask');
             }

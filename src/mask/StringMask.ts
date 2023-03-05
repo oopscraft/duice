@@ -4,7 +4,7 @@ namespace duice.mask {
      * StringFormat
      * @param string format
      */
-    export class StringMask implements Mask<string> {
+    export class StringMask implements Mask {
 
         pattern: string;
 
@@ -12,7 +12,7 @@ namespace duice.mask {
          * Constructor
          * @param pattern
          */
-        constructor(pattern?: string){
+        constructor(pattern: string){
             this.pattern = pattern;
         }
 

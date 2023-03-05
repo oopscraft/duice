@@ -6,14 +6,19 @@ let jdom = new JSDOM('<!DOCTYPE html>');
 global.window = jdom.window;
 global.document = jdom.window.document;
 
-// object
-let object = duice.Object.create({
+// data
+let data = duice.Data.create({
     name:'james'
 });
-console.log("object:", object);
+console.log("data:", data);
 
 // element
-let htmlSpanElement = document.createElement('span');
+let htmlElement = document.createElement('span');
+let element = new duice.element.GenericElement(htmlElement, context);
+
+element.bindData(data);
+
+
 let element = new duice.Element(htmlSpanElement);
 element.bind(object);
 element.setProperty('name');

@@ -1,6 +1,26 @@
 namespace duice.element {
 
-    // export class InputCheckbox extends Input {
+
+    export class InputNumberElement extends InputElement {
+
+        /**
+         * constructor
+         * @param htmlElement
+         * @param context
+         */
+        constructor(htmlElement: HTMLInputElement, context: object) {
+            super(htmlElement, context);
+        }
+
+        doRender(data: object): void {
+        }
+
+        doUpdate(data: object, detail: object): void {
+        }
+
+    }
+
+    // export class InputNumber extends Input {
     //
     //     /**
     //      * constructor
@@ -15,11 +35,7 @@ namespace duice.element {
     //      */
     //     override doRender(): void {
     //         let value = this.handler.getPropertyValue(this.getProperty());
-    //         if(value === true){
-    //             this.element.checked = true;
-    //         }else{
-    //             this.element.checked = false;
-    //         }
+    //         this.element.value = value;
     //     }
     //
     //     /**
@@ -33,8 +49,9 @@ namespace duice.element {
     //     /**
     //      * getValue
     //      */
-    //     override getValue(): any {
-    //         return this.element.checked;
+    //     override getValue(): number {
+    //         let value = super.getValue();
+    //         return Number(value);
     //     }
     //
     // }

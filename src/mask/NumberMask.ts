@@ -4,7 +4,7 @@ namespace duice.mask {
      * NumberFormat
      * @param scale number
      */
-    export class NumberMask implements Mask<number> {
+    export class NumberMask implements Mask {
 
         scale:number = 0;
 

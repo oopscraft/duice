@@ -2,9 +2,9 @@ namespace duice {
 
     export class Observable {
 
-       observers: Observer<any>[] = []
+       observers: Observer[] = []
 
-       addObserver(observer: Observer<any>): void {
+       addObserver(observer: Observer): void {
            this.observers.push(observer);
        }
 

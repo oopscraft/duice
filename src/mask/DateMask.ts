@@ -3,7 +3,7 @@ namespace duice.mask {
     /**
      * DateFormat
      */
-    export class DateMask implements Mask<string> {
+    export class DateMask implements Mask {
 
         pattern:string;
 

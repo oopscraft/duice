@@ -1,10 +1,26 @@
-///<reference path="Handler.ts"/>
 namespace duice {
 
-    export class ArrayHandler extends Handler<object[]> {
+    /**
+     * DataSetHandler
+     */
+    export class DataSetHandler extends Observable implements Observer {
 
-        constructor(target: object[]) {
-            super(target);
+        dataSet: DataSet;
+
+        /**
+         * constructor
+         * @param dataSet
+         */
+        constructor(dataSet: DataSet) {
+            super();
+            this.dataSet = dataSet;
+        }
+
+        /**
+         * getDataSet
+         */
+        getDataSet(): DataSet {
+            return this.dataSet;
         }
 
         /**
@@ -22,8 +38,13 @@ namespace duice {
             return true;
         }
 
-        doUpdate(element: duice.Element<object[]>, detail): void {
-            // TODO
+        /**
+         * update
+         * @param elementSet
+         * @param detail
+         */
+        update(elementSet: ElementSet, detail: any): void {
+
         }
 
 

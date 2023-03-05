@@ -26,6 +26,29 @@ namespace duice {
     }
 
     /**
+     * initializes
+     * @param container
+     * @param context
+     */
+    export function initialize(container: any, context: object): void {
+
+        // initializes element set
+        container.querySelectorAll(`*[${getAlias()}\\:data-set]:not([${getAlias()}\\:id])`).forEach(htmlElement => {
+            let elementSetFactory = ElementSetFactory.getInstance(htmlElement);
+            let elementSet = elementSetFactory.createElementSet(htmlElement, context);
+            elementSet.render();
+        });
+
+        // initializes element
+        container.querySelectorAll(`*[${getAlias()}\\:data]:not([${getAlias()}\\:id])`).forEach(htmlElement => {
+            let elementFactory = ElementFactory.getInstance(htmlElement);
+            let element = elementFactory.createElement(htmlElement, context);
+            console.warn('==>', elementFactory, element);
+            element.render();
+        });
+    }
+
+    /**
      * findObject
      * @param context
      * @param name
@@ -38,6 +61,19 @@ namespace duice {
             return (<any>window)[name];
         }
         return eval.call(context, name);
+    }
+
+    /**
+     * Generates component ID
+     */
+    export function generateUuid(): string {
+        let dt = new Date().getTime();
+        let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            let r = (dt + Math.random()*16)%16 | 0;
+            dt = Math.floor(dt/16);
+            return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+        });
+        return uuid;
     }
 
     /**
@@ -69,11 +105,35 @@ namespace duice {
     }
 
     /**
+     * removeChildNodes
+     * @param element
+     */
+    export function removeChildNodes(element: HTMLElement): void {
+        // Remove element nodes and prevent memory leaks
+        let node, nodes = element.childNodes, i = 0;
+        while (node = nodes[i++]) {
+            if (node.nodeType === 1 ) {
+                element.removeChild(node);
+            }
+        }
+
+        // Remove any remaining nodes
+        while (element.firstChild) {
+            element.removeChild(element.firstChild);
+        }
+
+        // If this is a select, ensure that it displays empty
+        if(element instanceof HTMLSelectElement){
+            (<HTMLSelectElement>element).options.length = 0;
+        }
+    }
+
+    /**
      * listens DOMContentLoaded event
      */
     if(globalThis.document) {
         document.addEventListener("DOMContentLoaded", event => {
-            duice.ElementInitializer.initializeElement(document.documentElement, {});
+            initialize(document.documentElement, {});
         });
     }
 

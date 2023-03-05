@@ -3,21 +3,21 @@ namespace duice.mask {
     /**
      * Mask interface
      */
-    export interface Mask<T> {
+    export interface Mask {
 
         /**
          * Encodes original value as formatted value
          * @param value value
          * @return formatted value
          */
-        encode(value: T): string;
+        encode(value: any): any;
 
         /**
          * Decodes formatted value to original value
          * @param value value
          * @return original value
          */
-        decode(value: string): T;
+        decode(value: any): any;
     }
 
 }

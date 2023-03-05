@@ -10,10 +10,14 @@ namespace duice {
          * create
          * @param json
          */
-        static create(target: object[]): any {
-            let array = new DataSet(target);
-            let arrayHandler = new ArrayHandler(target);
-            return new Proxy(array, arrayHandler);
+        static create(array: object[]): any {
+            let dataSet = new DataSet(array);
+            let dataSetHandler = new DataSetHandler(dataSet);
+            globalThis.Object.defineProperty(dataSet, "_handler_", {
+                value: dataSetHandler,
+                writable: true
+            });
+            return new Proxy(dataSet, dataSetHandler);
         }
 
         /**
@@ -27,11 +31,11 @@ namespace duice {
 
         /**
          * fromJson
-         * @param json
+         * @param array
          */
-        fromJson(json: object[]): void {
-            for(let i = 0, size = json.length; i < size; i ++){
-                let object = duice.Data.create(json[i]);
+        fromJson(array: object[]): void {
+            for(let i = 0, size = array.length; i < size; i ++){
+                let object = duice.Data.create(array[i]);
                 this.push(new Proxy(object, new DataHandler(object)));
             }
         }

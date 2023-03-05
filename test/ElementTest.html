@@ -1,19 +1,21 @@
 <!DOCTYPE html>
-<head>
-    <script src="../dist/duice.js"></script>
-    <script>
-        let myObject = duice.Object.create({
-            name: "james smith!!!",
-        });
-        let myArray = duice.DataSet.create([
-            { name: 'apple' },
-            { name: 'orange' }
-        ]);
-    </script>
-</head>
-<body>
-    <span duice:bind="myObject" duice:property="name"></span>
+<html>
+    <head>
+        <script src="../dist/duice.js"></script>
+        <script>
+            let myData = duice.Data.create({
+                name: "Apple",
+                age: 18,
+                mobile: '01012345678',
 
-    <slot>test</slot>
-</body>
+            });
+        </script>
+    </head>
+    <body>
+        <pre>
+            name: <span duice:data="myData" duice:property="name"></span>
+            name: <input duice:data="myData" duice:property="name"/>
+            mobile: <span duice:data="myData" duice:property="mobile" duice:mask="string('###-####-####')"></span>
+        </pre>
+    </body>
 </html>

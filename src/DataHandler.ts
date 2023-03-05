@@ -1,10 +1,26 @@
-///<reference path="Handler.ts"/>
 namespace duice {
 
+    /**
+     * DataHandler
+     */
     export class DataHandler extends Observable implements Observer {
 
-        constructor(target: object){
-            super(target);
+        data: object;
+
+        /**
+         * constructor
+         * @param data
+         */
+        constructor(data: Data){
+            super();
+            this.data = data;
+        }
+
+        /**
+         * getData
+         */
+        getData(): Data {
+            return this.data;
         }
 
         /**
@@ -33,12 +49,38 @@ namespace duice {
 
         /**
          * update
-         * @param observable
+         * @param element
          * @param detail
          */
-        update(observable: object, detail: any): void {
-            // TODO
+        update(element: Element, detail: any): void {
+            console.log("Data.update", element, detail);
+            let property = element.getProperty();
+            if(property){
+                let value = element.getValue();
+                this.setPropertyValue(property, value);
+            }
+            this.notifyObservers(detail);
         }
+
+        /**
+         * getPropertyValue
+         * @param property
+         */
+        getPropertyValue(property: string): any {
+            console.assert(property);
+            property = property.replace('.','?.');
+            return new Function(`return this.${property};`).call(this.getData());
+        }
+
+        /**
+         * setPropertyValue
+         * @param property
+         * @param value
+         */
+        setPropertyValue(property: string, value: any): void {
+            new Function(`this.${property} = arguments[0];`).call(this.getData(), value);
+        }
+
 
     }
 

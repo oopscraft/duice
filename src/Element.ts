@@ -1,47 +1,49 @@
 ///<reference path="Observable.ts"/>
 namespace duice {
 
+    import MaskFactory = duice.mask.MaskFactory;
+    import Mask = duice.mask.Mask;
+
     /**
      * Element
      */
-    export abstract class Element<T> extends Observable implements Observer<Handler<T>> {
+    export abstract class Element extends Observable implements Observer {
 
         id: string;
 
         htmlElement: HTMLElement;
 
-        handler: Handler<T>;
+        context: object;
+
+        dataHandler: DataHandler;
+
+        property: string;
+
+        mask: Mask;
 
         /**
          * constructor
          * @param htmlElement
          * @protected
          */
-        protected constructor(htmlElement: HTMLElement) {
+        protected constructor(htmlElement: HTMLElement, context: object) {
             super();
             this.htmlElement = htmlElement;
-            this.id = this.generateId();
-            this.htmlElement.setAttribute(`${getAlias()}:id`, this.id);
+            this.context = context;
+            this.id = generateUuid();
+            setAttribute(this.htmlElement, 'id', this.id);
         }
 
         /**
-         * Generates component ID
+         * setData
+         * @param data
          */
-        generateId(): string {
-            let dt = new Date().getTime();
-            let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                let r = (dt + Math.random()*16)%16 | 0;
-                dt = Math.floor(dt/16);
-                return (c=='x' ? r :(r&0x3|0x8)).toString(16);
-            });
-            return uuid;
-        }
-
-        /**
-         * get id
-         */
-        getId(): string {
-            return this.id;
+        setData(data: string): void {
+            let dataObject = findObject(this.context, data);
+            this.dataHandler = Object.getOwnPropertyDescriptor(dataObject, '_handler_').value;
+            console.assert(this.dataHandler);
+            this.addObserver(this.dataHandler);
+            this.dataHandler.addObserver(this);
         }
 
         /**
@@ -52,21 +54,40 @@ namespace duice {
         }
 
         /**
-         * bind
-         * @param object
+         * set property
+         * @param property
          */
-        bind(object: any): void {
-            this.handler = object._handler_;
-            console.assert(this.handler);
-            this.addObserver(this.handler);
-            this.handler.addObserver(this);
+        setProperty(property: string): void {
+            this.property = property;
+        }
+
+        /**
+         * get property
+         */
+        getProperty(): string {
+            return this.property;
+        }
+
+        /**
+         * setMask
+         * @param mask
+         */
+        setMask(mask: string): void {
+            this.mask = MaskFactory.getMask(mask);
+        }
+
+        /**
+         * getMask
+         */
+        getMask(): duice.mask.Mask {
+            return this.mask;
         }
 
         /**
          * render
          */
         render(): void {
-            let data = this.handler.getTarget();
+            let data = this.dataHandler.getData();
             this.doRender(data);
         }
 
@@ -74,15 +95,15 @@ namespace duice {
          * doRender
          * @param data
          */
-        abstract doRender(data: T): void;
+        abstract doRender(data: object): void;
 
         /**
          * update
-         * @param handler
+         * @param dataHandler
          * @param detail
          */
-        update(handler: Handler<T>, detail: object): void {
-            let data = this.handler.getTarget();
+        update(dataHandler: DataHandler, detail: object): void {
+            let data = this.dataHandler.getData();
             this.doUpdate(data, detail);
         }
 
@@ -91,7 +112,13 @@ namespace duice {
          * @param data
          * @param detail
          */
-        abstract doUpdate(data: T, detail: object): void;
+        abstract doUpdate(data: object, detail: object): void;
+
+        /**
+         * setValue
+         */
+        abstract getValue(): any;
+
 
     }
 }
