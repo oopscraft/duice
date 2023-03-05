@@ -1,7 +1,7 @@
 ///<reference path="Handler.ts"/>
 namespace duice {
 
-    export class ObjectHandler extends Handler<object> {
+    export class DataHandler extends Observable implements Observer {
 
         constructor(target: object){
             super(target);
@@ -31,8 +31,12 @@ namespace duice {
             return true;
         }
 
-
-        doUpdate(element: duice.Element<object>, detail): void {
+        /**
+         * update
+         * @param observable
+         * @param detail
+         */
+        update(observable: object, detail: any): void {
             // TODO
         }
 

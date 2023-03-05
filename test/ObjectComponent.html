@@ -7,6 +7,7 @@
             name: "james smith!!!",
             age: 19,
             enabled: true,
+            bloodType: 'A',
             mobile: '01012345678',
             address : {
                 country: 'USA',
@@ -16,15 +17,27 @@
     </script>
 </head>
 <body>
-    <h1 duice:object="myObject" duice:property="id">
-        - <small duice:object="myObject" duice:property="name"></small>
+    <h1 duice:bind="myObject" duice:property="id">
+        - <small duice:bind="myObject" duice:property="name"></small>
     </h1>
-    <p duice:object="myObject" duice:property="age"></p>
-    <div duice:object="myObject" duice:property="mobile" duice:mask="string('###-####-####')"></div>
+    <p duice:bind="myObject" duice:property="age"></p>
+    <div duice:bind="myObject" duice:property="mobile" duice:mask="string('###-####-####')"></div>
     <div>
-        <span duice:object="myObject" duice:property="address.country"></span>
+        <span duice:bind="myObject" duice:property="address.country"></span>
         /
-        <span duice:object="myObject" duice:property="address.city"></span>
+        <span duice:bind="myObject" duice:property="address.city"></span>
+    </div>
+    <div>
+        <input duice:bind="myObject" duice:property="name"/>
+    </div>
+    <div>
+        <select duice:bind="myObject" duice:property="bloodType">
+            <option>-- select --</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="O">O</option>
+            <option value="AB">AB</option>
+        </select>
     </div>
 </body>
 </html>

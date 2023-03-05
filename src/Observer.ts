@@ -1,8 +1,8 @@
 namespace duice {
 
-    export interface Observer<T> {
+    export interface Observer {
 
-        update(observable: T, detail: any): void;
+        update(observable: object, detail: any): void;
 
     }
 }

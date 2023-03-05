@@ -10,8 +10,6 @@ namespace duice {
 
     let alias = 'duice';
 
-    // export const componentDefinitions: ComponentDefinition[] = [];
-
     /**
      * sets alias of namespace
      * @param value
@@ -27,63 +25,48 @@ namespace duice {
         return alias;
     }
 
-    // /**
-    //  * defines component
-    //  * @param componentType
-    //  * @param tagName
-    //  * @param isAttribute
-    //  */
-    // export function defineComponent(componentType: any, tagName: string) {
-    //     console.debug("defineComponent", componentType, tagName);
-    //     let componentDefinition = new ComponentDefinition(componentType, tagName);
-    //     componentDefinitions.push(componentDefinition);
-    // }
-    //
-    // /**
-    //  * creates component
-    //  * @param componentType
-    //  * @param element
-    //  * @param context
-    //  */
-    // export function createComponent(componentType: any, element: HTMLElement, context: object): Component<any> {
-    //     componentDefinitions.forEach(componentDefinition => {
-    //         if(componentDefinition.tagName.toLowerCase() === element.tagName.toLowerCase()){
-    //             return componentDefinition.componentType.create(element, context);
-    //         }
-    //     });
-    //     if(componentType === ArrayComponent) {
-    //         return ArrayComponent.create(element, context);
-    //     }
-    //     if(componentType === ObjectComponent) {
-    //         return ObjectComponent.create(element, context);
-    //     }
-    //     throw new Error('Invalid element');
-    // }
-    //
-    // /**
-    //  * initializes component
-    //  * @param container
-    //  * @param context
-    //  */
-    // export function initializeComponent(container: any, context: object): void {
-    //     container.querySelectorAll(`*[${getAlias()}\\:array]:not([${getAlias()}\\:id])`).forEach(arrayElement => {
-    //         if(!arrayElement.hasAttribute(`${getAlias()}:id`)) {
-    //             let arrayComponent = createComponent(ArrayComponent, arrayElement, context);
-    //             arrayComponent.render();
-    //         }
-    //     });
-    //     container.querySelectorAll(`*[${getAlias()}\\:object]:not([${getAlias()}\\:id])`).forEach(objectElement => {
-    //         if(!objectElement.hasAttribute(`${getAlias()}:id`)) {
-    //             let objectComponent = createComponent(ObjectComponent, objectElement, context);
-    //             if(objectElement.tagName.toLowerCase() === 'input'){
-    //                 console.warn('objectElement:', objectElement);
-    //                 console.warn('objectComponent:', objectComponent);
-    //             }
-    //             objectComponent.render();
-    //         }
-    //     });
-    // }
+    /**
+     * findObject
+     * @param context
+     * @param name
+     */
+    export function findObject(context: object, name: string): any {
+        if(context[name]){
+            return context[name];
+        }
+        if((<any>window).hasOwnProperty(name)){
+            return (<any>window)[name];
+        }
+        return eval.call(context, name);
+    }
 
+    /**
+     * hasAttribute
+     * @param htmlElement
+     * @param name
+     */
+    export function hasAttribute(htmlElement: HTMLElement, name: string): boolean {
+        return htmlElement.hasAttribute(`${getAlias()}:${name}`)
+    }
+
+    /**
+     * getAttribute
+     * @param htmlElement
+     * @param name
+     */
+    export function getAttribute(htmlElement: HTMLElement, name: string): string {
+        return htmlElement.getAttribute(`${getAlias()}:${name}`);
+    }
+
+    /**
+     * setAttribute
+     * @param htmlElement
+     * @param name
+     * @param value
+     */
+    export function setAttribute(htmlElement: HTMLElement, name: string, value: string): void {
+        htmlElement.setAttribute(`${getAlias()}:${name}`, value);
+    }
 
     /**
      * listens DOMContentLoaded event
@@ -93,7 +76,5 @@ namespace duice {
             duice.ElementInitializer.initializeElement(document.documentElement, {});
         });
     }
-
-
 
 }

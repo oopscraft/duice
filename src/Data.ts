@@ -1,14 +1,14 @@
 namespace duice {
 
-    export class Object {
+    export class Data extends globalThis.Object {
 
         /**
          * create
          * @param json
          */
         static create(json: object): any {
-            let object = new Object(json);
-            let handler = new ObjectHandler(object);
+            let object = new Data(json);
+            let handler = new DataHandler(object);
             return new Proxy(object, handler);
         }
 
@@ -17,6 +17,7 @@ namespace duice {
          * @param json
          */
         private constructor(json: object) {
+            super();
             for(let property in json){
                 let value = json[property];
                 this[property] = value;

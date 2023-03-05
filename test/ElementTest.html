@@ -5,7 +5,7 @@
         let myObject = duice.Object.create({
             name: "james smith!!!",
         });
-        let myArray = duice.Array.create([
+        let myArray = duice.DataSet.create([
             { name: 'apple' },
             { name: 'orange' }
         ]);
@@ -13,8 +13,7 @@
 </head>
 <body>
     <span duice:bind="myObject" duice:property="name"></span>
-    <ul>
-        <li duice:bind="myArray" duice:property></li>
-    </ul>
+
+    <slot>test</slot>
 </body>
 </html>

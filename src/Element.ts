@@ -1,7 +1,10 @@
 ///<reference path="Observable.ts"/>
 namespace duice {
 
-    export class Element<T> extends Observable implements Observer<Handler<T>> {
+    /**
+     * Element
+     */
+    export abstract class Element<T> extends Observable implements Observer<Handler<T>> {
 
         id: string;
 
@@ -9,13 +12,29 @@ namespace duice {
 
         handler: Handler<T>;
 
-        property: string;
-
-        constructor(htmlElement: HTMLElement) {
+        /**
+         * constructor
+         * @param htmlElement
+         * @protected
+         */
+        protected constructor(htmlElement: HTMLElement) {
             super();
             this.htmlElement = htmlElement;
             this.id = this.generateId();
-            this.setAttribute('id', this.id);
+            this.htmlElement.setAttribute(`${getAlias()}:id`, this.id);
+        }
+
+        /**
+         * Generates component ID
+         */
+        generateId(): string {
+            let dt = new Date().getTime();
+            let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                let r = (dt + Math.random()*16)%16 | 0;
+                dt = Math.floor(dt/16);
+                return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+            });
+            return uuid;
         }
 
         /**
@@ -43,91 +62,36 @@ namespace duice {
             this.handler.addObserver(this);
         }
 
-        setProperty(property: string): void {
-            this.property = property;
-        }
-
-        getProperty(): string {
-            return this.property;
-        }
-
         /**
          * render
          */
         render(): void {
-            // array handler
-            if(this.handler instanceof duice.ArrayHandler) {
-                this.handler.getTarget().forEach(object => {
-                    this.doRender(object);
-                });
-            }
-            // object handler
-            if(this.handler instanceof duice.ObjectHandler) {
-                this.doRender(this.handler.getTarget());
-            }
+            let data = this.handler.getTarget();
+            this.doRender(data);
         }
 
         /**
          * doRender
-         * @param object
+         * @param data
          */
-        doRender(object: object): void {
-            console.warn('== handler', this.handler.getTarget());
-            console.log('object', object);
-            let value = object[this.getProperty()];
-            let textNode = document.createTextNode(value);
-            console.warn('textNode', textNode);
-            this.htmlElement.insertBefore(textNode, this.htmlElement.firstChild);
-        }
+        abstract doRender(data: T): void;
 
         /**
          * update
          * @param handler
          * @param detail
          */
-        update(handler: Handler<T>, detail: any): void {
-            console.log("Element.update", handler, detail);
-            this.render();
+        update(handler: Handler<T>, detail: object): void {
+            let data = this.handler.getTarget();
+            this.doUpdate(data, detail);
         }
 
         /**
-         * Generates component ID
+         * doUpdate
+         * @param data
+         * @param detail
          */
-        generateId(): string {
-            let dt = new Date().getTime();
-            let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                let r = (dt + Math.random()*16)%16 | 0;
-                dt = Math.floor(dt/16);
-                return (c=='x' ? r :(r&0x3|0x8)).toString(16);
-            });
-            return uuid;
-        }
-
-        /**
-         * hasAttribute
-         * @param name
-         */
-        hasAttribute(name: string): boolean {
-            return this.htmlElement.hasAttribute(`${getAlias()}:${name}`)
-        }
-
-        /**
-         * getAttribute
-         * @param name
-         */
-        getAttribute(name: string): string {
-            return this.htmlElement.getAttribute(`${getAlias()}:${name}`);
-        }
-
-        /**
-         * setAttribute
-         * @param name
-         * @param value
-         */
-        setAttribute(name: string, value: string): void {
-            this.htmlElement.setAttribute(`${getAlias()}:${name}`, value);
-        }
-
+        abstract doUpdate(data: T, detail: object): void;
 
     }
 }

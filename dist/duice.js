@@ -9,7 +9,6 @@
 var duice;
 (function (duice) {
     let alias = 'duice';
-    // export const componentDefinitions: ComponentDefinition[] = [];
     /**
      * sets alias of namespace
      * @param value
@@ -25,62 +24,49 @@ var duice;
         return alias;
     }
     duice.getAlias = getAlias;
-    // /**
-    //  * defines component
-    //  * @param componentType
-    //  * @param tagName
-    //  * @param isAttribute
-    //  */
-    // export function defineComponent(componentType: any, tagName: string) {
-    //     console.debug("defineComponent", componentType, tagName);
-    //     let componentDefinition = new ComponentDefinition(componentType, tagName);
-    //     componentDefinitions.push(componentDefinition);
-    // }
-    //
-    // /**
-    //  * creates component
-    //  * @param componentType
-    //  * @param element
-    //  * @param context
-    //  */
-    // export function createComponent(componentType: any, element: HTMLElement, context: object): Component<any> {
-    //     componentDefinitions.forEach(componentDefinition => {
-    //         if(componentDefinition.tagName.toLowerCase() === element.tagName.toLowerCase()){
-    //             return componentDefinition.componentType.create(element, context);
-    //         }
-    //     });
-    //     if(componentType === ArrayComponent) {
-    //         return ArrayComponent.create(element, context);
-    //     }
-    //     if(componentType === ObjectComponent) {
-    //         return ObjectComponent.create(element, context);
-    //     }
-    //     throw new Error('Invalid element');
-    // }
-    //
-    // /**
-    //  * initializes component
-    //  * @param container
-    //  * @param context
-    //  */
-    // export function initializeComponent(container: any, context: object): void {
-    //     container.querySelectorAll(`*[${getAlias()}\\:array]:not([${getAlias()}\\:id])`).forEach(arrayElement => {
-    //         if(!arrayElement.hasAttribute(`${getAlias()}:id`)) {
-    //             let arrayComponent = createComponent(ArrayComponent, arrayElement, context);
-    //             arrayComponent.render();
-    //         }
-    //     });
-    //     container.querySelectorAll(`*[${getAlias()}\\:object]:not([${getAlias()}\\:id])`).forEach(objectElement => {
-    //         if(!objectElement.hasAttribute(`${getAlias()}:id`)) {
-    //             let objectComponent = createComponent(ObjectComponent, objectElement, context);
-    //             if(objectElement.tagName.toLowerCase() === 'input'){
-    //                 console.warn('objectElement:', objectElement);
-    //                 console.warn('objectComponent:', objectComponent);
-    //             }
-    //             objectComponent.render();
-    //         }
-    //     });
-    // }
+    /**
+     * findObject
+     * @param context
+     * @param name
+     */
+    function findObject(context, name) {
+        if (context[name]) {
+            return context[name];
+        }
+        if (window.hasOwnProperty(name)) {
+            return window[name];
+        }
+        return eval.call(context, name);
+    }
+    duice.findObject = findObject;
+    /**
+     * hasAttribute
+     * @param htmlElement
+     * @param name
+     */
+    function hasAttribute(htmlElement, name) {
+        return htmlElement.hasAttribute(`${getAlias()}:${name}`);
+    }
+    duice.hasAttribute = hasAttribute;
+    /**
+     * getAttribute
+     * @param htmlElement
+     * @param name
+     */
+    function getAttribute(htmlElement, name) {
+        return htmlElement.getAttribute(`${getAlias()}:${name}`);
+    }
+    duice.getAttribute = getAttribute;
+    /**
+     * setAttribute
+     * @param htmlElement
+     * @param name
+     * @param value
+     */
+    function setAttribute(htmlElement, name, value) {
+        htmlElement.setAttribute(`${getAlias()}:${name}`, value);
+    }
+    duice.setAttribute = setAttribute;
     /**
      * listens DOMContentLoaded event
      */
@@ -361,67 +347,6 @@ var duice;
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
-    class Object {
-        /**
-         * create
-         * @param json
-         */
-        static create(json) {
-            let object = new Object(json);
-            let handler = new duice.ObjectHandler(object);
-            return new Proxy(object, handler);
-        }
-        /**
-         * constructor
-         * @param json
-         */
-        constructor(json) {
-            for (let property in json) {
-                let value = json[property];
-                this[property] = value;
-            }
-        }
-    }
-    duice.Object = Object;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * ArrayProxy
-     */
-    class Array extends globalThis.Array {
-        /**
-         * create
-         * @param json
-         */
-        static create(target) {
-            let array = new Array(target);
-            let arrayHandler = new duice.ArrayHandler(target);
-            return new Proxy(array, arrayHandler);
-        }
-        /**
-         * constructor
-         * @param array
-         */
-        constructor(json) {
-            super();
-            this.fromJson(json);
-        }
-        /**
-         * fromJson
-         * @param json
-         */
-        fromJson(json) {
-            for (let i = 0, size = json.length; i < size; i++) {
-                let object = duice.Object.create(json[i]);
-                this.push(new Proxy(object, new duice.ObjectHandler(object)));
-            }
-        }
-    }
-    duice.Array = Array;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
     class Observable {
         constructor() {
             this.observers = [];
@@ -436,6 +361,102 @@ var duice;
         }
     }
     duice.Observable = Observable;
+})(duice || (duice = {}));
+///<reference path="Observable.ts"/>
+var duice;
+(function (duice) {
+    /**
+     * Element
+     */
+    class Element extends duice.Observable {
+        /**
+         * constructor
+         * @param htmlElement
+         * @protected
+         */
+        constructor(htmlElement) {
+            super();
+            this.htmlElement = htmlElement;
+            this.id = this.generateId();
+            this.htmlElement.setAttribute(`${duice.getAlias()}:id`, this.id);
+        }
+        /**
+         * Generates component ID
+         */
+        generateId() {
+            let dt = new Date().getTime();
+            let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                let r = (dt + Math.random() * 16) % 16 | 0;
+                dt = Math.floor(dt / 16);
+                return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+            });
+            return uuid;
+        }
+        /**
+         * get id
+         */
+        getId() {
+            return this.id;
+        }
+        /**
+         * gets html element
+         */
+        getHtmlElement() {
+            return this.htmlElement;
+        }
+        /**
+         * bind
+         * @param object
+         */
+        bind(object) {
+            this.handler = object._handler_;
+            console.assert(this.handler);
+            this.addObserver(this.handler);
+            this.handler.addObserver(this);
+        }
+        /**
+         * render
+         */
+        render() {
+            let data = this.handler.getTarget();
+            this.doRender(data);
+        }
+        /**
+         * update
+         * @param handler
+         * @param detail
+         */
+        update(handler, detail) {
+            let data = this.handler.getTarget();
+            this.doUpdate(data, detail);
+        }
+    }
+    duice.Element = Element;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    /**
+     * ElementFactory
+     */
+    class ElementFactory {
+        /**
+         * return factory instance
+         * @param htmlElement
+         * @param context
+         */
+        static getInstance(htmlElement, context) {
+            let bindAttribute = duice.getAttribute(htmlElement, 'bind');
+            let bindObject = duice.findObject(context, bindAttribute);
+            console.assert(bindObject, `bind[${bindAttribute}] object is null`);
+            if (bindObject instanceof duice.DataSet) {
+                return new duice.ArrayElementFactory();
+            }
+            else {
+                return new duice.ObjectElementFactory();
+            }
+        }
+    }
+    duice.ElementFactory = ElementFactory;
 })(duice || (duice = {}));
 ///<reference path="Observable.ts"/>
 var duice;
@@ -471,6 +492,285 @@ var duice;
     }
     duice.Handler = Handler;
 })(duice || (duice = {}));
+var duice;
+(function (duice) {
+    class ElementInitializer {
+        /**
+         * initializes elements
+         * @param container
+         * @param context
+         */
+        static initializeElement(container, context) {
+            container.querySelectorAll(`*[${duice.getAlias()}\\:bind]:not([${duice.getAlias()}\\:id])`).forEach(htmlElement => {
+                if (!htmlElement.hasAttribute(`${duice.getAlias()}:id`)) {
+                    let elementFactory = duice.ElementFactory.getInstance(htmlElement, context);
+                    let element = elementFactory.createElement(htmlElement, context);
+                    element.render();
+                }
+            });
+        }
+    }
+    duice.ElementInitializer = ElementInitializer;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    /**
+     * ArrayElement
+     */
+    class ArrayElement extends duice.Element {
+        /**
+         * constructor
+         * @param htmlElement
+         */
+        constructor(htmlElement) {
+            super(htmlElement);
+        }
+        /**
+         * set loop
+         * @param loop
+         */
+        setLoop(loop) {
+            this.loop = loop;
+        }
+        /**
+         * get loop
+         */
+        getLoop() {
+            return this.loop;
+        }
+        /**
+         * doRender
+         * @param array
+         */
+        doRender(array) {
+            console.log('ArrayElement.doRender', array);
+        }
+        /**
+         * update
+         * @param array
+         * @param detail
+         */
+        doUpdate(array, detail) {
+            console.log('ArrayElement.doUpdate', array, detail);
+        }
+    }
+    duice.ArrayElement = ArrayElement;
+})(duice || (duice = {}));
+///<reference path="Observable.ts"/>
+var duice;
+(function (duice) {
+    /**
+     * ObjectElement
+     */
+    class ObjectElement extends duice.Element {
+        constructor(htmlElement) {
+            super(htmlElement);
+        }
+        /**
+         * sets property
+         * @param property
+         */
+        setProperty(property) {
+            this.property = property;
+        }
+        /**
+         * gets property
+         */
+        getProperty() {
+            return this.property;
+        }
+        /**
+         * doRender
+         * @param object
+         */
+        doRender(object) {
+            console.log("ObjectElement.doRender", object);
+            let value = object[this.getProperty()];
+            // sets value by html element type
+            if (this.htmlElement instanceof HTMLInputElement) {
+                this.htmlElement.value = value;
+            }
+            // select
+            else if (this.htmlElement instanceof HTMLSelectElement) {
+                this.htmlElement.value = value;
+            }
+            // else
+            else {
+                if (this.childNode) {
+                    this.htmlElement.removeChild(this.childNode);
+                }
+                this.childNode = document.createTextNode(value);
+                this.htmlElement.insertBefore(this.childNode, this.htmlElement.firstChild);
+            }
+        }
+        /**
+         * update
+         * @param object
+         * @param detail
+         */
+        doUpdate(object, detail) {
+            console.log("ObjectElement.doUpdate", object, detail);
+            this.doRender(object);
+        }
+    }
+    duice.ObjectElement = ObjectElement;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    /**
+     * ObjectElementFactory
+     */
+    class ObjectElementFactory extends duice.ElementFactory {
+        /**
+         * creates element
+         * @param htmlElement
+         * @param bindObject
+         */
+        createElement(htmlElement, context) {
+            let element = new duice.ObjectElement(htmlElement);
+            // bind
+            let bindAttribute = duice.getAttribute(htmlElement, 'bind');
+            let bindObject = duice.findObject(context, bindAttribute);
+            element.bind(bindObject);
+            // property
+            if (duice.hasAttribute(htmlElement, 'property')) {
+                element.setProperty(duice.getAttribute(htmlElement, 'property'));
+            }
+            // returns
+            return element;
+        }
+    }
+    duice.ObjectElementFactory = ObjectElementFactory;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    /**
+     * ArrayElementFactory
+     */
+    class ArrayElementFactory extends duice.ElementFactory {
+        /**
+         * creates element
+         * @param htmlElement
+         * @param context
+         */
+        createElement(htmlElement, context) {
+            let element = new duice.ArrayElement(htmlElement);
+            // bind
+            let bindAttribute = duice.getAttribute(htmlElement, 'bind');
+            let bindObject = duice.findObject(context, bindAttribute);
+            element.bind(bindObject);
+            // loop
+            if (duice.hasAttribute(htmlElement, 'loop')) {
+                element.setLoop(duice.getAttribute(htmlElement, 'loop'));
+            }
+            // returns
+            return element;
+        }
+    }
+    duice.ArrayElementFactory = ArrayElementFactory;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    /**
+     * DataSet
+     */
+    class DataSet extends globalThis.Array {
+        /**
+         * create
+         * @param json
+         */
+        static create(target) {
+            let array = new DataSet(target);
+            let arrayHandler = new duice.ArrayHandler(target);
+            return new Proxy(array, arrayHandler);
+        }
+        /**
+         * constructor
+         * @param array
+         */
+        constructor(json) {
+            super();
+            this.fromJson(json);
+        }
+        /**
+         * fromJson
+         * @param json
+         */
+        fromJson(json) {
+            for (let i = 0, size = json.length; i < size; i++) {
+                let object = duice.Data.create(json[i]);
+                this.push(new Proxy(object, new duice.DataHandler(object)));
+            }
+        }
+    }
+    duice.DataSet = DataSet;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    class Data extends globalThis.Object {
+        /**
+         * create
+         * @param json
+         */
+        static create(json) {
+            let object = new Data(json);
+            let handler = new duice.DataHandler(object);
+            return new Proxy(object, handler);
+        }
+        /**
+         * constructor
+         * @param json
+         */
+        constructor(json) {
+            super();
+            for (let property in json) {
+                let value = json[property];
+                this[property] = value;
+            }
+        }
+    }
+    duice.Data = Data;
+})(duice || (duice = {}));
+///<reference path="Handler.ts"/>
+var duice;
+(function (duice) {
+    class DataHandler extends duice.Observable {
+        constructor(target) {
+            super(target);
+        }
+        /**
+         * get
+         * @param target
+         * @param property
+         * @param receiver
+         */
+        get(target, property, receiver) {
+            console.log("- Object.get", target, property, receiver);
+            return Reflect.get(target, property, receiver);
+        }
+        /**
+         * set
+         * @param target
+         * @param property
+         * @param value
+         */
+        set(target, property, value) {
+            console.log("- Object.set", target, property, value);
+            Reflect.set(target, property, value);
+            this.notifyObservers({});
+            return true;
+        }
+        /**
+         * update
+         * @param observable
+         * @param detail
+         */
+        update(observable, detail) {
+            // TODO
+        }
+    }
+    duice.DataHandler = DataHandler;
+})(duice || (duice = {}));
 ///<reference path="Handler.ts"/>
 var duice;
 (function (duice) {
@@ -497,240 +797,5 @@ var duice;
         }
     }
     duice.ArrayHandler = ArrayHandler;
-})(duice || (duice = {}));
-///<reference path="Handler.ts"/>
-var duice;
-(function (duice) {
-    class ObjectHandler extends duice.Handler {
-        constructor(target) {
-            super(target);
-        }
-        /**
-         * get
-         * @param target
-         * @param property
-         * @param receiver
-         */
-        get(target, property, receiver) {
-            console.log("- Object.get", target, property, receiver);
-            return Reflect.get(target, property, receiver);
-        }
-        /**
-         * set
-         * @param target
-         * @param property
-         * @param value
-         */
-        set(target, property, value) {
-            console.log("- Object.set", target, property, value);
-            Reflect.set(target, property, value);
-            this.notifyObservers({});
-            return true;
-        }
-        doUpdate(element, detail) {
-            // TODO
-        }
-    }
-    duice.ObjectHandler = ObjectHandler;
-})(duice || (duice = {}));
-///<reference path="Observable.ts"/>
-var duice;
-(function (duice) {
-    class Element extends duice.Observable {
-        constructor(htmlElement) {
-            super();
-            this.htmlElement = htmlElement;
-            this.id = this.generateId();
-            this.setAttribute('id', this.id);
-        }
-        /**
-         * get id
-         */
-        getId() {
-            return this.id;
-        }
-        /**
-         * gets html element
-         */
-        getHtmlElement() {
-            return this.htmlElement;
-        }
-        /**
-         * bind
-         * @param object
-         */
-        bind(object) {
-            this.handler = object._handler_;
-            console.assert(this.handler);
-            this.addObserver(this.handler);
-            this.handler.addObserver(this);
-        }
-        setProperty(property) {
-            this.property = property;
-        }
-        getProperty() {
-            return this.property;
-        }
-        /**
-         * render
-         */
-        render() {
-            // array handler
-            if (this.handler instanceof duice.ArrayHandler) {
-                this.handler.getTarget().forEach(object => {
-                    this.doRender(object);
-                });
-            }
-            // object handler
-            if (this.handler instanceof duice.ObjectHandler) {
-                this.doRender(this.handler.getTarget());
-            }
-        }
-        /**
-         * doRender
-         * @param object
-         */
-        doRender(object) {
-            console.warn('== handler', this.handler.getTarget());
-            console.log('object', object);
-            let value = object[this.getProperty()];
-            let textNode = document.createTextNode(value);
-            console.warn('textNode', textNode);
-            this.htmlElement.insertBefore(textNode, this.htmlElement.firstChild);
-        }
-        /**
-         * update
-         * @param handler
-         * @param detail
-         */
-        update(handler, detail) {
-            console.log("Element.update", handler, detail);
-            this.render();
-        }
-        /**
-         * Generates component ID
-         */
-        generateId() {
-            let dt = new Date().getTime();
-            let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-                let r = (dt + Math.random() * 16) % 16 | 0;
-                dt = Math.floor(dt / 16);
-                return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-            });
-            return uuid;
-        }
-        /**
-         * hasAttribute
-         * @param name
-         */
-        hasAttribute(name) {
-            return this.htmlElement.hasAttribute(`${duice.getAlias()}:${name}`);
-        }
-        /**
-         * getAttribute
-         * @param name
-         */
-        getAttribute(name) {
-            return this.htmlElement.getAttribute(`${duice.getAlias()}:${name}`);
-        }
-        /**
-         * setAttribute
-         * @param name
-         * @param value
-         */
-        setAttribute(name, value) {
-            this.htmlElement.setAttribute(`${duice.getAlias()}:${name}`, value);
-        }
-    }
-    duice.Element = Element;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    class ElementFactory {
-        /**
-         * adds element definition
-         * @param tagName
-         * @param elementType
-         */
-        static addElementDefinition(tagName, elementType) {
-            let elementDefinition = new duice.ElementDefinition(tagName, elementType);
-            this.elementDefinitions.push(elementDefinition);
-        }
-        /**
-         * creates element
-         * @param htmlElement
-         * @param context
-         */
-        static createElement(htmlElement, context) {
-            // creates element instance
-            let tagName = htmlElement.tagName;
-            let element = null;
-            this.elementDefinitions.forEach(elementDefinition => {
-                if (tagName === elementDefinition.getTagName()) {
-                    let elementType = elementDefinition.getElementType();
-                    element = Reflect.construct(elementType, [htmlElement]);
-                }
-            });
-            if (element === null) {
-                element = new duice.Element(htmlElement);
-            }
-            // bind
-            let bindAttribute = htmlElement.getAttribute(`${duice.getAlias()}:bind`);
-            let bindObject = this.findObject(context, bindAttribute);
-            console.assert(bindObject, `bind object[${bindAttribute}] is not found`);
-            element.bind(bindObject);
-            // property
-            let propertyAttribute = htmlElement.getAttribute(`${duice.getAlias()}:property`);
-            element.setProperty(propertyAttribute);
-            // returns
-            return element;
-        }
-        /**
-         * findObject
-         * @param context
-         * @param name
-         */
-        static findObject(context, name) {
-            if (context[name]) {
-                return context[name];
-            }
-            if (window.hasOwnProperty(name)) {
-                return window[name];
-            }
-            return eval.call(context, name);
-        }
-    }
-    ElementFactory.elementDefinitions = [];
-    duice.ElementFactory = ElementFactory;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    class ElementInitializer {
-        static initializeElement(container, context) {
-            container.querySelectorAll(`*[${duice.getAlias()}\\:bind]:not([${duice.getAlias()}\\:id])`).forEach(htmlElement => {
-                if (!htmlElement.hasAttribute(`${duice.getAlias()}:id`)) {
-                    let element = duice.ElementFactory.createElement(htmlElement, context);
-                    element.render();
-                }
-            });
-        }
-    }
-    duice.ElementInitializer = ElementInitializer;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    class ElementDefinition {
-        constructor(tagName, elementType) {
-            this.tagName = tagName;
-            this.elementType = elementType;
-        }
-        getTagName() {
-            return this.tagName;
-        }
-        getElementType() {
-            return this.elementType;
-        }
-    }
-    duice.ElementDefinition = ElementDefinition;
 })(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map

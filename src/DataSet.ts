@@ -2,16 +2,16 @@ namespace duice {
 
 
     /**
-     * ArrayProxy
+     * DataSet
      */
-    export class Array extends globalThis.Array {
+    export class DataSet extends globalThis.Array {
 
         /**
          * create
          * @param json
          */
         static create(target: object[]): any {
-            let array = new Array(target);
+            let array = new DataSet(target);
             let arrayHandler = new ArrayHandler(target);
             return new Proxy(array, arrayHandler);
         }
@@ -31,8 +31,8 @@ namespace duice {
          */
         fromJson(json: object[]): void {
             for(let i = 0, size = json.length; i < size; i ++){
-                let object = duice.Object.create(json[i]);
-                this.push(new Proxy(object, new ObjectHandler(object)));
+                let object = duice.Data.create(json[i]);
+                this.push(new Proxy(object, new DataHandler(object)));
             }
         }
 

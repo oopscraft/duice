@@ -1,17 +1,24 @@
 namespace duice {
 
-    export class ElementFactory {
-
-        static elementDefinitions: ElementDefinition[] = [];
+    /**
+     * ElementFactory
+     */
+    export abstract class ElementFactory<T> {
 
         /**
-         * adds element definition
-         * @param tagName
-         * @param elementType
+         * return factory instance
+         * @param htmlElement
+         * @param context
          */
-        static addElementDefinition(tagName: string, elementType: any): void {
-            let elementDefinition = new ElementDefinition(tagName, elementType);
-            this.elementDefinitions.push(elementDefinition);
+        static getInstance(htmlElement: HTMLElement, context: object): ElementFactory<any> {
+            let bindAttribute = getAttribute(htmlElement, 'bind');
+            let bindObject = findObject(context, bindAttribute);
+            console.assert(bindObject, `bind[${bindAttribute}] object is null`);
+            if(bindObject instanceof DataSet){
+                return new ArrayElementFactory();
+            }else{
+                return new ObjectElementFactory();
+            }
         }
 
         /**
@@ -19,51 +26,8 @@ namespace duice {
          * @param htmlElement
          * @param context
          */
-        static createElement(htmlElement: HTMLElement, context: object): Element<any> {
-
-            // creates element instance
-            let tagName = htmlElement.tagName;
-            let element = null;
-            this.elementDefinitions.forEach(elementDefinition => {
-                if(tagName === elementDefinition.getTagName()){
-                    let elementType = elementDefinition.getElementType();
-                    element = Reflect.construct(elementType,[htmlElement]);
-                }
-            });
-            if(element === null) {
-                element = new duice.Element(htmlElement);
-            }
-
-            // bind
-            let bindAttribute = htmlElement.getAttribute(`${getAlias()}:bind`);
-            let bindObject = this.findObject(context, bindAttribute);
-            console.assert(bindObject, `bind object[${bindAttribute}] is not found`);
-            element.bind(bindObject);
-
-            // property
-            let propertyAttribute = htmlElement.getAttribute(`${getAlias()}:property`);
-            element.setProperty(propertyAttribute);
-
-            // returns
-            return element;
-        }
-
-        /**
-         * findObject
-         * @param context
-         * @param name
-         */
-        static findObject(context: object, name: string): any {
-            if(context[name]){
-                return context[name];
-            }
-            if((<any>window).hasOwnProperty(name)){
-                return (<any>window)[name];
-            }
-            return eval.call(context, name);
-        }
-
-
+        abstract createElement(htmlElement: HTMLElement, context: object): T;
 
     }
+
 }
