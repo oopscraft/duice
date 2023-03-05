@@ -1,7 +1,15 @@
 namespace duice.element {
 
 
+    import NumberMask = duice.mask.NumberMask;
+    import Mask = duice.mask.Mask;
+
+    /**
+     * InputNumberElement
+     */
     export class InputNumberElement extends InputElement {
+
+        mask: Mask = new NumberMask();
 
         /**
          * constructor
@@ -10,50 +18,41 @@ namespace duice.element {
          */
         constructor(htmlElement: HTMLInputElement, context: object) {
             super(htmlElement, context);
+
+            // key press event
+            this.htmlElement.removeAttribute('type');
+            this.getHtmlElement().addEventListener('keypress', event => {
+                if(/[\d|\.|,]/.test(event.key) === false) {
+                    event.preventDefault();
+                }
+            });
         }
 
+        /**
+         * doRender
+         * @param data
+         */
         doRender(data: object): void {
+            super.doRender(data);
         }
 
+        /**
+         * doUpdate
+         * @param data
+         * @param detail
+         */
         doUpdate(data: object, detail: object): void {
+            this.doRender(data);
+        }
+
+        /**
+         * getValue
+         */
+        getValue(): any {
+            let value = super.getValue();
+            return Number(value);
         }
 
     }
-
-    // export class InputNumber extends Input {
-    //
-    //     /**
-    //      * constructor
-    //      * @param element
-    //      */
-    //     constructor(element: HTMLInputElement, context: object) {
-    //         super(element, context);
-    //     }
-    //
-    //     /**
-    //      * render
-    //      */
-    //     override doRender(): void {
-    //         let value = this.handler.getPropertyValue(this.getProperty());
-    //         this.element.value = value;
-    //     }
-    //
-    //     /**
-    //      * update
-    //      * @param detail
-    //      */
-    //     override doUpdate(detail: object): void {
-    //         this.doRender();
-    //     }
-    //
-    //     /**
-    //      * getValue
-    //      */
-    //     override getValue(): number {
-    //         let value = super.getValue();
-    //         return Number(value);
-    //     }
-    //
-    // }
 
 }

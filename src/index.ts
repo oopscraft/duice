@@ -43,7 +43,6 @@ namespace duice {
         container.querySelectorAll(`*[${getAlias()}\\:data]:not([${getAlias()}\\:id])`).forEach(htmlElement => {
             let elementFactory = ElementFactory.getInstance(htmlElement);
             let element = elementFactory.createElement(htmlElement, context);
-            console.warn('==>', elementFactory, element);
             element.render();
         });
     }

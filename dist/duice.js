@@ -40,7 +40,6 @@ var duice;
         container.querySelectorAll(`*[${getAlias()}\\:data]:not([${getAlias()}\\:id])`).forEach(htmlElement => {
             let elementFactory = duice.ElementFactory.getInstance(htmlElement);
             let element = elementFactory.createElement(htmlElement, context);
-            console.warn('==>', elementFactory, element);
             element.render();
         });
     }
@@ -1015,6 +1014,10 @@ var duice;
 (function (duice) {
     var element;
     (function (element) {
+        var NumberMask = duice.mask.NumberMask;
+        /**
+         * InputNumberElement
+         */
         class InputNumberElement extends element.InputElement {
             /**
              * constructor
@@ -1023,48 +1026,39 @@ var duice;
              */
             constructor(htmlElement, context) {
                 super(htmlElement, context);
+                this.mask = new NumberMask();
+                // key press event
+                this.htmlElement.removeAttribute('type');
+                this.getHtmlElement().addEventListener('keypress', event => {
+                    if (/[\d|\.|,]/.test(event.key) === false) {
+                        event.preventDefault();
+                    }
+                });
             }
+            /**
+             * doRender
+             * @param data
+             */
             doRender(data) {
+                super.doRender(data);
             }
+            /**
+             * doUpdate
+             * @param data
+             * @param detail
+             */
             doUpdate(data, detail) {
+                this.doRender(data);
+            }
+            /**
+             * getValue
+             */
+            getValue() {
+                let value = super.getValue();
+                return Number(value);
             }
         }
         element.InputNumberElement = InputNumberElement;
-        // export class InputNumber extends Input {
-        //
-        //     /**
-        //      * constructor
-        //      * @param element
-        //      */
-        //     constructor(element: HTMLInputElement, context: object) {
-        //         super(element, context);
-        //     }
-        //
-        //     /**
-        //      * render
-        //      */
-        //     override doRender(): void {
-        //         let value = this.handler.getPropertyValue(this.getProperty());
-        //         this.element.value = value;
-        //     }
-        //
-        //     /**
-        //      * update
-        //      * @param detail
-        //      */
-        //     override doUpdate(detail: object): void {
-        //         this.doRender();
-        //     }
-        //
-        //     /**
-        //      * getValue
-        //      */
-        //     override getValue(): number {
-        //         let value = super.getValue();
-        //         return Number(value);
-        //     }
-        //
-        // }
     })(element = duice.element || (duice.element = {}));
 })(duice || (duice = {}));
 var duice;
