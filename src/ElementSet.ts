@@ -58,6 +58,18 @@ namespace duice {
          */
         render(): void {
             let dataSet = this.dataSetHandler.getDataSet();
+            this.doRender(dataSet);
+
+            // executes script
+            this.executeScript();
+        }
+
+        /**
+         * doRender
+         * @param dataSet
+         */
+        doRender(dataSet: DataSet): void {
+            removeChildNodes(this.slotElement);
             if(this.loop){
                 let loopArgs = this.loop.split(',');
                 let itemName = loopArgs[0].trim();
@@ -66,13 +78,19 @@ namespace duice {
                     let data = dataSet[index];
                     let context = {};
                     context[itemName] = data;
-                    context[statusName] = {
-                        index: index
-                    };
+                    context[statusName] = duice.Data.create({
+                        index: index,
+                        count: index+1,
+                        size: dataSet.length,
+                        first: (index === 0),
+                        last: (dataSet.length == index+1)
+                    });
                     let rowHtmlElement = this.htmlElement.cloneNode(true) as HTMLElement;
                     initialize(rowHtmlElement, context);
                     this.slotElement.appendChild(rowHtmlElement);
                 }
+            }else{
+                this.slotElement.appendChild(this.htmlElement);
             }
         }
 
@@ -81,9 +99,33 @@ namespace duice {
          * @param observable
          * @param detail
          */
-        update(observable: object, detail: any): void {
-            throw new Error("Method not implemented.");
+        update(dataSetHandler: DataSetHandler, detail: any): void {
+            let dataSet = dataSetHandler.getDataSet();
+            this.doUpdate(dataSet);
+
+            // executes script
+            this.executeScript();
         }
+
+        /**
+         * doUpdate
+         * @param dataSet
+         */
+        doUpdate(dataSet: DataSet): void {
+            this.doRender(dataSet);
+        }
+
+
+        /**
+         * executes script
+         */
+        executeScript(): void {
+            let script = getAttribute(this.htmlElement, 'script');
+            if(script) {
+                executeScript(script, this.htmlElement, this.context);
+            }
+        }
+
 
     }
 }

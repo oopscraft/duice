@@ -123,6 +123,22 @@ var duice;
     }
     duice.removeChildNodes = removeChildNodes;
     /**
+     * execute script
+     * @param script
+     * @param thisArg
+     * @param context
+     */
+    function executeScript(script, thisArg, context) {
+        let args = [];
+        let values = [];
+        for (let property in context) {
+            args.push(property);
+            values.push(context[property]);
+        }
+        return Function(...args, script).call(thisArg, ...values);
+    }
+    duice.executeScript = executeScript;
+    /**
      * listens DOMContentLoaded event
      */
     if (globalThis.document) {
@@ -497,6 +513,8 @@ var duice;
         render() {
             let data = this.dataHandler.getData();
             this.doRender(data);
+            // executes script
+            this.executeScript();
         }
         /**
          * update
@@ -506,6 +524,17 @@ var duice;
         update(dataHandler, detail) {
             let data = this.dataHandler.getData();
             this.doUpdate(data, detail);
+            // executes script
+            this.executeScript();
+        }
+        /**
+         * executes script
+         */
+        executeScript() {
+            let script = duice.getAttribute(this.getHtmlElement(), 'script');
+            if (script) {
+                duice.executeScript(script, this.getHtmlElement(), this.context);
+            }
         }
     }
     duice.Element = Element;
@@ -721,16 +750,18 @@ var duice;
          * @param data
          */
         doRender(data) {
-            // defines value
-            let value = data[this.getProperty()];
-            value = this.getMask() ? this.getMask().encode(value) : value;
-            // clears text node
-            if (this.textNode) {
-                this.getHtmlElement().removeChild(this.textNode);
+            // if element has property
+            if (this.getProperty()) {
+                let value = data[this.getProperty()];
+                value = this.getMask() ? this.getMask().encode(value) : value;
+                // clears text node
+                if (this.textNode) {
+                    this.getHtmlElement().removeChild(this.textNode);
+                }
+                // appends text node
+                this.textNode = document.createTextNode(value);
+                this.getHtmlElement().insertBefore(this.textNode, this.getHtmlElement().firstChild);
             }
-            // appends text node
-            this.textNode = document.createTextNode(value);
-            this.getHtmlElement().insertBefore(this.textNode, this.getHtmlElement().firstChild);
         }
         /**
          * doUpdate
@@ -791,8 +822,18 @@ var duice;
          * render
          */
         render() {
-            var _a;
             let dataSet = this.dataSetHandler.getDataSet();
+            this.doRender(dataSet);
+            // executes script
+            this.executeScript();
+        }
+        /**
+         * doRender
+         * @param dataSet
+         */
+        doRender(dataSet) {
+            var _a;
+            duice.removeChildNodes(this.slotElement);
             if (this.loop) {
                 let loopArgs = this.loop.split(',');
                 let itemName = loopArgs[0].trim();
@@ -801,13 +842,20 @@ var duice;
                     let data = dataSet[index];
                     let context = {};
                     context[itemName] = data;
-                    context[statusName] = {
-                        index: index
-                    };
+                    context[statusName] = duice.Data.create({
+                        index: index,
+                        count: index + 1,
+                        size: dataSet.length,
+                        first: (index === 0),
+                        last: (dataSet.length == index + 1)
+                    });
                     let rowHtmlElement = this.htmlElement.cloneNode(true);
                     duice.initialize(rowHtmlElement, context);
                     this.slotElement.appendChild(rowHtmlElement);
                 }
+            }
+            else {
+                this.slotElement.appendChild(this.htmlElement);
             }
         }
         /**
@@ -815,8 +863,27 @@ var duice;
          * @param observable
          * @param detail
          */
-        update(observable, detail) {
-            throw new Error("Method not implemented.");
+        update(dataSetHandler, detail) {
+            let dataSet = dataSetHandler.getDataSet();
+            this.doUpdate(dataSet);
+            // executes script
+            this.executeScript();
+        }
+        /**
+         * doUpdate
+         * @param dataSet
+         */
+        doUpdate(dataSet) {
+            this.doRender(dataSet);
+        }
+        /**
+         * executes script
+         */
+        executeScript() {
+            let script = duice.getAttribute(this.htmlElement, 'script');
+            if (script) {
+                duice.executeScript(script, this.htmlElement, this.context);
+            }
         }
     }
     duice.ElementSet = ElementSet;
@@ -966,6 +1033,9 @@ var duice;
 (function (duice) {
     var element;
     (function (element) {
+        /**
+         * InputCheckboxElement
+         */
         class InputCheckboxElement extends element.InputElement {
             /**
              * constructor
@@ -974,51 +1044,51 @@ var duice;
              */
             constructor(htmlElement, context) {
                 super(htmlElement, context);
+                // true false value
+                let trueValue = duice.getAttribute(this.getHtmlElement(), 'true-value');
+                this.trueValue = trueValue ? trueValue : true;
+                let falseValue = duice.getAttribute(this.getHtmlElement(), 'false-value');
+                this.falseValue = falseValue ? falseValue : false;
+                // add change event listener
+                let _this = this;
+                this.getHtmlElement().addEventListener('change', event => {
+                    _this.notifyObservers({});
+                }, true);
             }
+            /**
+             * doRender
+             * @param data
+             */
             doRender(data) {
+                let value = data[this.getProperty()];
+                if (value === this.trueValue) {
+                    this.htmlElement.checked = true;
+                }
+                else {
+                    this.htmlElement.checked = false;
+                }
             }
+            /**
+             * doUpdate
+             * @param data
+             * @param detail
+             */
             doUpdate(data, detail) {
+                this.doRender(data);
+            }
+            /**
+             * getValue
+             */
+            getValue() {
+                if (this.htmlElement.checked) {
+                    return this.trueValue;
+                }
+                else {
+                    return this.falseValue;
+                }
             }
         }
         element.InputCheckboxElement = InputCheckboxElement;
-        // export class InputCheckbox extends Input {
-        //
-        //     /**
-        //      * constructor
-        //      * @param element
-        //      */
-        //     constructor(element: HTMLInputElement, context: object) {
-        //         super(element, context);
-        //     }
-        //
-        //     /**
-        //      * render
-        //      */
-        //     override doRender(): void {
-        //         let value = this.handler.getPropertyValue(this.getProperty());
-        //         if(value === true){
-        //             this.element.checked = true;
-        //         }else{
-        //             this.element.checked = false;
-        //         }
-        //     }
-        //
-        //     /**
-        //      * update
-        //      * @param detail
-        //      */
-        //     override doUpdate(detail: object): void {
-        //         this.doRender();
-        //     }
-        //
-        //     /**
-        //      * getValue
-        //      */
-        //     override getValue(): any {
-        //         return this.element.checked;
-        //     }
-        //
-        // }
     })(element = duice.element || (duice.element = {}));
 })(duice || (duice = {}));
 var duice;

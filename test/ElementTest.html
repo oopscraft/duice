@@ -7,7 +7,8 @@
                 name: "Apple",
                 age: 18,
                 mobile: '01012345678',
-
+                enabled: true,
+                enabledYn: 'Y',
             });
         </script>
     </head>
@@ -21,6 +22,8 @@
             mobile: <span duice:data="myData" duice:property="mobile" duice:mask="string('###-####-####')"></span>
             mobile: <input duice:data="myData" duice:property="mobile"/>
             mobile: <input duice:data="myData" duice:property="mobile" duice:mask="string('###-####-####')"/>
+            enabled: <input duice:data="myData" duice:property="enabled" type="checkbox"/>
+            enabledYn: <input duice:data="myData" duice:property="enabledYn" type="checkbox" duice:true-value="Y" duice:false-value="N"/>
         </pre>
     </body>
 </html>

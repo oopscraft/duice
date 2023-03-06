@@ -89,6 +89,9 @@ namespace duice {
         render(): void {
             let data = this.dataHandler.getData();
             this.doRender(data);
+
+            // executes script
+            this.executeScript();
         }
 
         /**
@@ -105,6 +108,19 @@ namespace duice {
         update(dataHandler: DataHandler, detail: object): void {
             let data = this.dataHandler.getData();
             this.doUpdate(data, detail);
+
+            // executes script
+            this.executeScript();
+        }
+
+        /**
+         * executes script
+         */
+        executeScript(): void {
+            let script = getAttribute(this.getHtmlElement(), 'script');
+            if(script) {
+                executeScript(script, this.getHtmlElement(), this.context);
+            }
         }
 
         /**
@@ -119,6 +135,6 @@ namespace duice {
          */
         abstract getValue(): any;
 
-
     }
+
 }

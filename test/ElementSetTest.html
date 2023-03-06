@@ -7,13 +7,13 @@
     <script src="../dist/duice.js"></script>
     <link rel="stylesheet" href="../dist/duice.css">
     <script>
-        let myArray = duice.DataSet.create([
+        let myDataSet = duice.DataSet.create([
             { name: 'james', age: 13, mobile:'01012344321'},
             { name: 'tommy', age: 27, mobile:'01012344321'},
             { name: 'orange', age: 21, mobile:'01043211234'},
             { name: 'apple', age: 18, mobile: null},
         ]);
-        console.log(myArray);
+        console.log(myDataSet);
    </script>
 </head>
 <body>
@@ -34,29 +34,29 @@
             </tr>
         </thead>
         <tbody>
-            <tr duice:data-set="myArray" duice:loop="item,status">
-<!--                <td duice:data="status" duice:property="index" duice:script="this.style.backgroundColor='red';"></td>-->
-<!--                <td duice:data="status" duice:property="number"></td>-->
-<!--                <td duice:data="status" duice:property="count"></td>-->
-<!--                <td duice:data="status" duice:property="first"></td>-->
-<!--                <td duice:data="status" duice:property="last"></td>-->
+            <tr duice:data-set="myDataSet" duice:loop="item,status">
+                <td duice:data="status" duice:property="index" duice:script="this.style.backgroundColor='red';"></td>
+                <td duice:data="status" duice:property="count"></td>
+                <td duice:data="status" duice:property="size"></td>
+                <td duice:data="status" duice:property="first"></td>
+                <td duice:data="status" duice:property="last"></td>
                 <td duice:data="item" duice:property="name"></td>
                 <td duice:data="item" duice:property="age"></td>
                 <td duice:data="item" duice:property="mobile" duice:mask="string('###-####-####')"></td>
-<!--                <td>-->
-<!--                    <button duice:data="status" duice:script="this.dataset.index=status.index;" onclick="myArray.splice(this.dataset.index,1);">-->
-<!--                        Remove-->
-<!--                    </button>-->
-<!--                </td>-->
+                <td>
+                    <button duice:data="status" duice:script="this.dataset.index=status.index;" onclick="myDataSet.splice(this.dataset.index,1);">
+                        Remove
+                    </button>
+                </td>
             </tr>
-            <tr duice:data-set="myArray" duice:if="myArray.length < 1" duice:script="this.style.backgroundColor='yellow';">
+            <tr duice:data-set="myDataSet" duice:script="myDataSet.length > 0 ? this.style.display='none' : this.style.display='';">
                 <td colspan="100%">Data Not Found</td>
             </tr>
         </tbody>
         <tfoot>
             <td colspan="100%" style="text-align:right;">
-                <span duice:data-set="myArray" duice:script="this.innerHTML=myArray.length + ' Rows';"></span>
-                <button onclick="myArray.push(duice.Object.create({name: 'Kitty'}));">
+                <span duice:data-set="myDataSet" duice:script="this.innerHTML=myDataSet.length + ' Rows';"></span>
+                <button onclick="myDataSet.push(duice.Data.create({name: 'Kitty'}));">
                     Add
                 </button>
             </td>
@@ -67,7 +67,7 @@
     <figure>
         <figcaption>Test List</figcaption>
         <ul>
-            <li duice:data-set="myArray" duice:loop="item,status">
+            <li duice:data-set="myDataSet" duice:loop="item,status">
                 <span duice:data="item" duice:property="name"></span>
                 <span duice:data="item" duice:property="age"></span>
             </li>

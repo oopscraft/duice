@@ -1,6 +1,13 @@
 namespace duice.element {
 
+    /**
+     * InputCheckboxElement
+     */
     export class InputCheckboxElement extends InputElement {
+
+        trueValue: any;
+
+        falseValue: any;
 
         /**
          * constructor
@@ -9,54 +16,53 @@ namespace duice.element {
          */
         constructor(htmlElement: HTMLInputElement, context: object) {
             super(htmlElement, context);
+
+            // true false value
+            let trueValue = getAttribute(this.getHtmlElement(), 'true-value');
+            this.trueValue = trueValue ? trueValue : true;
+            let falseValue = getAttribute(this.getHtmlElement(), 'false-value');
+            this.falseValue = falseValue ? falseValue : false;
+
+            // add change event listener
+            let _this = this;
+            this.getHtmlElement().addEventListener('change', event => {
+                _this.notifyObservers({});
+            }, true);
         }
 
+        /**
+         * doRender
+         * @param data
+         */
         doRender(data: object): void {
+            let value = data[this.getProperty()];
+            if(value === this.trueValue){
+                this.htmlElement.checked = true;
+            }else{
+                this.htmlElement.checked = false;
+            }
         }
 
+        /**
+         * doUpdate
+         * @param data
+         * @param detail
+         */
         doUpdate(data: object, detail: object): void {
+            this.doRender(data);
+        }
+
+        /**
+         * getValue
+         */
+        getValue(): any {
+            if(this.htmlElement.checked){
+                return this.trueValue;
+            }else{
+                return this.falseValue;
+            }
         }
 
     }
-
-
-    // export class InputCheckbox extends Input {
-    //
-    //     /**
-    //      * constructor
-    //      * @param element
-    //      */
-    //     constructor(element: HTMLInputElement, context: object) {
-    //         super(element, context);
-    //     }
-    //
-    //     /**
-    //      * render
-    //      */
-    //     override doRender(): void {
-    //         let value = this.handler.getPropertyValue(this.getProperty());
-    //         if(value === true){
-    //             this.element.checked = true;
-    //         }else{
-    //             this.element.checked = false;
-    //         }
-    //     }
-    //
-    //     /**
-    //      * update
-    //      * @param detail
-    //      */
-    //     override doUpdate(detail: object): void {
-    //         this.doRender();
-    //     }
-    //
-    //     /**
-    //      * getValue
-    //      */
-    //     override getValue(): any {
-    //         return this.element.checked;
-    //     }
-    //
-    // }
 
 }

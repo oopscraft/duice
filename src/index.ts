@@ -128,6 +128,22 @@ namespace duice {
     }
 
     /**
+     * execute script
+     * @param script
+     * @param thisArg
+     * @param context
+     */
+    export function executeScript(script:string, thisArg: any, context: object): any {
+        let args = [];
+        let values = [];
+        for(let property in context){
+            args.push(property);
+            values.push(context[property]);
+        }
+        return Function(...args, script).call(thisArg, ...values);
+    }
+
+    /**
      * listens DOMContentLoaded event
      */
     if(globalThis.document) {

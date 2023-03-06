@@ -21,18 +21,20 @@ namespace duice {
          */
         doRender(data: object): void {
 
-            // defines value
-            let value = data[this.getProperty()];
-            value = this.getMask() ? this.getMask().encode(value): value;
+            // if element has property
+            if(this.getProperty()) {
+                let value = data[this.getProperty()];
+                value = this.getMask() ? this.getMask().encode(value) : value;
 
-            // clears text node
-            if(this.textNode){
-                this.getHtmlElement().removeChild(this.textNode);
+                // clears text node
+                if (this.textNode) {
+                    this.getHtmlElement().removeChild(this.textNode);
+                }
+
+                // appends text node
+                this.textNode = document.createTextNode(value);
+                this.getHtmlElement().insertBefore(this.textNode, this.getHtmlElement().firstChild);
             }
-
-            // appends text node
-            this.textNode = document.createTextNode(value);
-            this.getHtmlElement().insertBefore(this.textNode, this.getHtmlElement().firstChild);
         }
 
         /**
