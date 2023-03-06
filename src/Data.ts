@@ -28,6 +28,10 @@ namespace duice {
             this.copy(object);
         }
 
+        static test():void {
+
+        }
+
         /**
          * load
          * @param object

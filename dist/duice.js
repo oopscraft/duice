@@ -652,6 +652,8 @@ var duice;
             super();
             this.copy(object);
         }
+        static test() {
+        }
         /**
          * load
          * @param object
