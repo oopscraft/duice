@@ -3,7 +3,7 @@ namespace duice.element {
     /**
      * GenericElementFactory
      */
-    export class GenericElementFactory extends ElementFactory {
+    export class GenericElementFactory extends ElementFactory<GenericElement> {
 
         /**
          * doCreateElement

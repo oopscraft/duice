@@ -43,8 +43,13 @@ namespace duice {
          * @param elementSet
          * @param detail
          */
-        update(elementSet: ElementSet, detail: any): void {
-
+        update(elementSet: ElementSet<any>, detail: any): void {
+            console.log("DataSetHandler", element, detail);
+            if(detail.name === 'changeIndex'){
+                let data = this.dataSet.splice(detail.fromIndex,1)[0];
+                this.dataSet.splice(detail.toIndex, 0, data);
+            }
+            this.notifyObservers(detail);
         }
 
 

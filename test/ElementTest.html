@@ -9,6 +9,8 @@
                 mobile: '01012345678',
                 enabled: true,
                 enabledYn: 'Y',
+                groupId: "fruit",
+                profile: "My name is apple.\n I am Fruit."
             });
         </script>
     </head>
@@ -24,6 +26,12 @@
             mobile: <input duice:data="myData" duice:property="mobile" duice:mask="string('###-####-####')"/>
             enabled: <input duice:data="myData" duice:property="enabled" type="checkbox"/>
             enabledYn: <input duice:data="myData" duice:property="enabledYn" type="checkbox" duice:true-value="Y" duice:false-value="N"/>
+            groupId: <select duice:data="myData" duice:property="groupId" onchange="console.log(myData.groupId);">
+                        <option value>- Group ID -</option>
+                        <option value="fruit">Fruit</option>
+                        <option value="animal">Animal</option>
+                     </select>
+            profile: <textarea duice:data="myData" duice:property="profile"></textarea>
         </pre>
     </body>
 </html>

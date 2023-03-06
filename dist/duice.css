@@ -1,10 +1,11 @@
 :root {
     --table-border: solid 1px #ddd;
-    --table-thead-color: #f7f7f7;
-    --table-tbody-color: white;
-    --table-hover-color: #f7f7f7;
-    --table-index-color: #f7f7f7;
-    --table-tfoot-color: white;
+    --table-padding: 2px;
+    --table-thead-background-color: #f7f7f7;
+    --table-tbody-background-color: white;
+    --table-tbody-hover-color: #f7f7f7;
+    --table-tbody-index-color: #f7f7f7;
+    --table-tfoot-background-color: white;
 }
 
 /**
@@ -22,14 +23,14 @@ table caption {
     font-weight: bold;
 }
 table thead tr {
-    background-color: var(--table-thead-color)
+    background-color: var(--table-thead-background-color)
 }
 table thead tr th {
     position: sticky;
     position: -webkit-sticky;
     top: 0;
     border: var(--table-border);
-    padding: 0.25rem;
+    padding: var(--table-padding);
     font-weight: bold;
     text-align: left;
     text-overflow: ellipsis;
@@ -37,30 +38,39 @@ table thead tr th {
     overflow: hidden;
 }
 table tbody tr {
-    background-color: var(--table-tbody-color);
+    background-color: var(--table-tbody-background-color);
 }
 table tbody tr:hover {
-    background-color: var(--table-hover-color);
+    background-color: var(--table-tbody-hover-color);
     transition: all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
 table tbody tr td {
     border: var(--table-border);
+    padding: var(--table-padding);
     text-align: left;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
 }
 table tfoot {
-    background-color: var(--table-tfoot-color);
+    background-color: var(--table-tfoot-background-color);
 }
 table tfoot tr {
 }
 table tfoot tr td {
+    border: var(--table-border);
+    padding: var(--table-padding);
     position: sticky;
     position: -webkit-sticky;
-    border: var(--table-border);
     text-align: left;
     text-overflow: ellipsis;
+}
+
+/**
+ * input
+ */
+input {
+
 }
 
 /**

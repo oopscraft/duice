@@ -3,11 +3,11 @@ namespace duice {
     /**
      * ArrayElement
      */
-    export class ElementSet extends Observable implements Observer {
+    export class ElementSet<T extends HTMLElement> extends Observable implements Observer {
 
         id: string;
 
-        htmlElement: HTMLElement;
+        htmlElement: T;
 
         context: object;
 
@@ -17,11 +17,13 @@ namespace duice {
 
         loop: string;
 
+        editable: boolean = false;
+
         /**
          * constructor
          * @param htmlElement
          */
-        constructor(htmlElement: HTMLElement, context: object) {
+        constructor(htmlElement: T, context: object) {
             super();
             this.htmlElement = htmlElement;
             this.context = context;
@@ -31,6 +33,12 @@ namespace duice {
             // replace with slot element
             this.slotElement = document.createElement('slot');
             this.htmlElement.replaceWith(this.slotElement);
+
+            // editable
+            let editable = getAttribute(this.htmlElement, 'editable');
+            if(editable){
+                this.editable = (editable.toLowerCase() === 'true');
+            }
         }
 
         /**
@@ -69,6 +77,7 @@ namespace duice {
          * @param dataSet
          */
         doRender(dataSet: DataSet): void {
+            let _this = this;
             removeChildNodes(this.slotElement);
             if(this.loop){
                 let loopArgs = this.loop.split(',');
@@ -86,6 +95,35 @@ namespace duice {
                         last: (dataSet.length == index+1)
                     });
                     let rowHtmlElement = this.htmlElement.cloneNode(true) as HTMLElement;
+                    setAttribute(rowHtmlElement, 'index', index.toString());
+
+                    // editable
+                    if(this.editable){
+                        rowHtmlElement.setAttribute('draggable', 'true');
+                        rowHtmlElement.addEventListener('dragstart', function(event){
+                            let fromIndex = getAttribute(this, 'index');
+                            event.dataTransfer.setData("text", fromIndex);
+                        });
+                        rowHtmlElement.addEventListener('dragover', function(event){
+                            event.preventDefault();
+                            event.stopPropagation();
+                        });
+                        rowHtmlElement.addEventListener('drop', async function(event){
+                            event.preventDefault();
+                            event.stopPropagation();
+                            let fromIndex = parseInt(event.dataTransfer.getData('text'));
+                            let toIndex = parseInt(getAttribute(this, 'index'));
+                            let detail = {
+                                name: 'changeIndex',
+                                fromIndex: fromIndex,
+                                toIndex: toIndex
+                            };
+                            //await dataSet.moveRow(fromIndex, toIndex);
+                            _this.notifyObservers(detail);
+                        });
+                    }
+
+                    // initializes row element
                     initialize(rowHtmlElement, context);
                     this.slotElement.appendChild(rowHtmlElement);
                 }

@@ -52,35 +52,15 @@ namespace duice {
          * @param element
          * @param detail
          */
-        update(element: Element, detail: any): void {
-            console.log("Data.update", element, detail);
+        update(element: Element<any>, detail: any): void {
+            console.log("DataHandler.update", element, detail);
             let property = element.getProperty();
             if(property){
                 let value = element.getValue();
-                this.setPropertyValue(property, value);
+                setPropertyValue(this.getData(), property, value);
             }
             this.notifyObservers(detail);
         }
-
-        /**
-         * getPropertyValue
-         * @param property
-         */
-        getPropertyValue(property: string): any {
-            console.assert(property);
-            property = property.replace('.','?.');
-            return new Function(`return this.${property};`).call(this.getData());
-        }
-
-        /**
-         * setPropertyValue
-         * @param property
-         * @param value
-         */
-        setPropertyValue(property: string, value: any): void {
-            new Function(`this.${property} = arguments[0];`).call(this.getData(), value);
-        }
-
 
     }
 

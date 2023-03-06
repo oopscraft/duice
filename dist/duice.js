@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 /* =============================================================================
  * DUICE (Data-oriented UI Component Engine)
  * - Anyone can use it freely.
@@ -122,6 +131,27 @@ var duice;
         }
     }
     duice.removeChildNodes = removeChildNodes;
+    /**
+     * getPropertyValue
+     * @param data
+     * @param property
+     */
+    function getPropertyValue(data, property) {
+        console.assert(property);
+        property = property.replace('.', '?.');
+        return new Function(`return this.${property};`).call(data);
+    }
+    duice.getPropertyValue = getPropertyValue;
+    /**
+     * setPropertyValue
+     * @param data
+     * @param property
+     * @param value
+     */
+    function setPropertyValue(data, property, value) {
+        new Function('value', `this.${property} = value;`).call(data, value);
+    }
+    duice.setPropertyValue = setPropertyValue;
     /**
      * execute script
      * @param script
@@ -660,30 +690,13 @@ var duice;
          * @param detail
          */
         update(element, detail) {
-            console.log("Data.update", element, detail);
+            console.log("DataHandler.update", element, detail);
             let property = element.getProperty();
             if (property) {
                 let value = element.getValue();
-                this.setPropertyValue(property, value);
+                duice.setPropertyValue(this.getData(), property, value);
             }
             this.notifyObservers(detail);
-        }
-        /**
-         * getPropertyValue
-         * @param property
-         */
-        getPropertyValue(property) {
-            console.assert(property);
-            property = property.replace('.', '?.');
-            return new Function(`return this.${property};`).call(this.getData());
-        }
-        /**
-         * setPropertyValue
-         * @param property
-         * @param value
-         */
-        setPropertyValue(property, value) {
-            new Function(`this.${property} = arguments[0];`).call(this.getData(), value);
         }
     }
     duice.DataHandler = DataHandler;
@@ -728,6 +741,12 @@ var duice;
          * @param detail
          */
         update(elementSet, detail) {
+            console.log("DataSetHandler", duice.element, detail);
+            if (detail.name === 'changeIndex') {
+                let data = this.dataSet.splice(detail.fromIndex, 1)[0];
+                this.dataSet.splice(detail.toIndex, 0, data);
+            }
+            this.notifyObservers(detail);
         }
     }
     duice.DataSetHandler = DataSetHandler;
@@ -752,7 +771,7 @@ var duice;
         doRender(data) {
             // if element has property
             if (this.getProperty()) {
-                let value = data[this.getProperty()];
+                let value = duice.getPropertyValue(data, this.getProperty());
                 value = this.getMask() ? this.getMask().encode(value) : value;
                 // clears text node
                 if (this.textNode) {
@@ -792,6 +811,7 @@ var duice;
          */
         constructor(htmlElement, context) {
             super();
+            this.editable = false;
             this.htmlElement = htmlElement;
             this.context = context;
             this.id = duice.generateUuid();
@@ -799,6 +819,11 @@ var duice;
             // replace with slot element
             this.slotElement = document.createElement('slot');
             this.htmlElement.replaceWith(this.slotElement);
+            // editable
+            let editable = duice.getAttribute(this.htmlElement, 'editable');
+            if (editable) {
+                this.editable = (editable.toLowerCase() === 'true');
+            }
         }
         /**
          * setDataSet
@@ -833,6 +858,7 @@ var duice;
          */
         doRender(dataSet) {
             var _a;
+            let _this = this;
             duice.removeChildNodes(this.slotElement);
             if (this.loop) {
                 let loopArgs = this.loop.split(',');
@@ -850,6 +876,35 @@ var duice;
                         last: (dataSet.length == index + 1)
                     });
                     let rowHtmlElement = this.htmlElement.cloneNode(true);
+                    duice.setAttribute(rowHtmlElement, 'index', index.toString());
+                    // editable
+                    if (this.editable) {
+                        rowHtmlElement.setAttribute('draggable', 'true');
+                        rowHtmlElement.addEventListener('dragstart', function (event) {
+                            let fromIndex = duice.getAttribute(this, 'index');
+                            event.dataTransfer.setData("text", fromIndex);
+                        });
+                        rowHtmlElement.addEventListener('dragover', function (event) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        });
+                        rowHtmlElement.addEventListener('drop', function (event) {
+                            return __awaiter(this, void 0, void 0, function* () {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                let fromIndex = parseInt(event.dataTransfer.getData('text'));
+                                let toIndex = parseInt(duice.getAttribute(this, 'index'));
+                                let detail = {
+                                    name: 'changeIndex',
+                                    fromIndex: fromIndex,
+                                    toIndex: toIndex
+                                };
+                                //await dataSet.moveRow(fromIndex, toIndex);
+                                _this.notifyObservers(detail);
+                            });
+                        });
+                    }
+                    // initializes row element
                     duice.initialize(rowHtmlElement, context);
                     this.slotElement.appendChild(rowHtmlElement);
                 }
@@ -1004,10 +1059,8 @@ var duice;
              * @param data
              */
             doRender(data) {
-                // defines value
-                let value = data[this.getProperty()];
+                let value = duice.getPropertyValue(data, this.getProperty());
                 value = this.getMask() ? this.getMask().encode(value) : value;
-                // set value
                 this.htmlElement.value = value;
             }
             /**
@@ -1044,11 +1097,13 @@ var duice;
              */
             constructor(htmlElement, context) {
                 super(htmlElement, context);
+                this.trueValue = true;
+                this.falseValue = false;
                 // true false value
                 let trueValue = duice.getAttribute(this.getHtmlElement(), 'true-value');
-                this.trueValue = trueValue ? trueValue : true;
+                this.trueValue = trueValue ? trueValue : this.trueValue;
                 let falseValue = duice.getAttribute(this.getHtmlElement(), 'false-value');
-                this.falseValue = falseValue ? falseValue : false;
+                this.falseValue = falseValue ? falseValue : this.falseValue;
                 // add change event listener
                 let _this = this;
                 this.getHtmlElement().addEventListener('change', event => {
@@ -1062,7 +1117,7 @@ var duice;
             doRender(data) {
                 let value = data[this.getProperty()];
                 if (value === this.trueValue) {
-                    this.htmlElement.checked = true;
+                    this.getHtmlElement().checked = true;
                 }
                 else {
                     this.htmlElement.checked = false;
@@ -1108,8 +1163,10 @@ var duice;
             constructor(htmlElement, context) {
                 super(htmlElement, context);
                 this.mask = new NumberMask();
-                // key press event
-                this.htmlElement.removeAttribute('type');
+                // changes type and style
+                this.getHtmlElement().removeAttribute('type');
+                this.getHtmlElement().style.textAlign = 'right';
+                // prevents invalid key press
                 this.getHtmlElement().addEventListener('keypress', event => {
                     if (/[\d|\.|,]/.test(event.key) === false) {
                         event.preventDefault();
@@ -1140,6 +1197,101 @@ var duice;
             }
         }
         element.InputNumberElement = InputNumberElement;
+    })(element = duice.element || (duice.element = {}));
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    var element;
+    (function (element) {
+        /**
+         * SelectElement
+         */
+        class SelectElement extends duice.Element {
+            /**
+             * constructor
+             * @param htmlElement
+             * @param context
+             */
+            constructor(htmlElement, context) {
+                super(htmlElement, context);
+                // adds event listener
+                let _this = this;
+                this.getHtmlElement().addEventListener('change', event => {
+                    _this.notifyObservers({});
+                }, true);
+            }
+            /**
+             * doRender
+             * @param data
+             */
+            doRender(data) {
+                let value = duice.getPropertyValue(data, this.getProperty());
+                this.getHtmlElement().value = value;
+            }
+            /**
+             * doUpdate
+             * @param data
+             * @param detail
+             */
+            doUpdate(data, detail) {
+                this.doRender(data);
+            }
+            /**
+             * getValue
+             */
+            getValue() {
+                return this.getHtmlElement().value;
+            }
+        }
+        element.SelectElement = SelectElement;
+    })(element = duice.element || (duice.element = {}));
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    var element;
+    (function (element) {
+        /**
+         * Textarea
+         */
+        class TextareaElement extends duice.Element {
+            /**
+             * constructor
+             * @param htmlElement
+             * @param context
+             */
+            constructor(htmlElement, context) {
+                super(htmlElement, context);
+                // adds change event listener
+                let _this = this;
+                this.getHtmlElement().addEventListener('change', event => {
+                    _this.notifyObservers({});
+                }, true);
+            }
+            /**
+             * doRender
+             * @param data
+             */
+            doRender(data) {
+                let value = duice.getPropertyValue(data, this.getProperty());
+                this.getHtmlElement().value = value;
+            }
+            /**
+             * doUpdate
+             * @param data
+             * @param detail
+             */
+            doUpdate(data, detail) {
+                this.doRender(data);
+            }
+            /**
+             * getValue
+             */
+            getValue() {
+                let value = this.getHtmlElement().value;
+                return value;
+            }
+        }
+        element.TextareaElement = TextareaElement;
     })(element = duice.element || (duice.element = {}));
 })(duice || (duice = {}));
 var duice;
@@ -1209,6 +1361,64 @@ var duice;
         element.InputElementFactory = InputElementFactory;
         // register
         duice.ElementFactory.registerElementFactory(new InputElementFactory());
+    })(element = duice.element || (duice.element = {}));
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    var element;
+    (function (element) {
+        /**
+         * SelectElementFactory
+         */
+        class SelectElementFactory extends duice.ElementFactory {
+            /**
+             * doCreateElement
+             * @param htmlElement
+             * @param context
+             */
+            doCreateElement(htmlElement, context) {
+                return new element.SelectElement(htmlElement, context);
+            }
+            /**
+             * support
+             * @param htmlElement
+             */
+            support(htmlElement) {
+                return (htmlElement.tagName.toLowerCase() === 'select');
+            }
+        }
+        element.SelectElementFactory = SelectElementFactory;
+        // register
+        duice.ElementFactory.registerElementFactory(new SelectElementFactory());
+    })(element = duice.element || (duice.element = {}));
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    var element;
+    (function (element) {
+        /**
+         * TextareaElementFactory
+         */
+        class TextareaElementFactory extends duice.ElementFactory {
+            /**
+             * doCreateElement
+             * @param htmlElement
+             * @param context
+             */
+            doCreateElement(htmlElement, context) {
+                return new element.TextareaElement(htmlElement, context);
+            }
+            /**
+             * support
+             * @param htmlElement
+             */
+            support(htmlElement) {
+                return (htmlElement.tagName.toLowerCase() === 'textarea');
+            }
+        }
+        element.TextareaElementFactory = TextareaElementFactory;
+        // register
+        duice.ElementFactory.registerElementFactory(new TextareaElementFactory());
     })(element = duice.element || (duice.element = {}));
 })(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map

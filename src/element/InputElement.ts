@@ -1,9 +1,7 @@
 namespace duice.element {
 
 
-    export class InputElement extends Element {
-
-        htmlElement: HTMLInputElement;
+    export class InputElement extends Element<HTMLInputElement> {
 
         /**
          * constructor
@@ -25,12 +23,8 @@ namespace duice.element {
          * @param data
          */
         doRender(data: object): void {
-
-            // defines value
-            let value = data[this.getProperty()];
+            let value = getPropertyValue(data, this.getProperty());
             value = this.getMask() ? this.getMask().encode(value): value;
-
-            // set value
             this.htmlElement.value = value;
         }
 

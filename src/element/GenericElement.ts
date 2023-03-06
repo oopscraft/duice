@@ -3,7 +3,7 @@ namespace duice {
     /**
      * GenericElement
      */
-    export class GenericElement extends Element {
+    export class GenericElement extends Element<HTMLElement> {
 
         textNode: Node;
 
@@ -23,7 +23,7 @@ namespace duice {
 
             // if element has property
             if(this.getProperty()) {
-                let value = data[this.getProperty()];
+                let value = getPropertyValue(data, this.getProperty());
                 value = this.getMask() ? this.getMask().encode(value) : value;
 
                 // clears text node

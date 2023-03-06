@@ -5,9 +5,9 @@ namespace duice.element {
      */
     export class InputCheckboxElement extends InputElement {
 
-        trueValue: any;
+        trueValue: any = true;
 
-        falseValue: any;
+        falseValue: any = false;
 
         /**
          * constructor
@@ -19,9 +19,9 @@ namespace duice.element {
 
             // true false value
             let trueValue = getAttribute(this.getHtmlElement(), 'true-value');
-            this.trueValue = trueValue ? trueValue : true;
+            this.trueValue = trueValue ? trueValue : this.trueValue;
             let falseValue = getAttribute(this.getHtmlElement(), 'false-value');
-            this.falseValue = falseValue ? falseValue : false;
+            this.falseValue = falseValue ? falseValue : this.falseValue;
 
             // add change event listener
             let _this = this;
@@ -37,7 +37,7 @@ namespace duice.element {
         doRender(data: object): void {
             let value = data[this.getProperty()];
             if(value === this.trueValue){
-                this.htmlElement.checked = true;
+                this.getHtmlElement().checked = true;
             }else{
                 this.htmlElement.checked = false;
             }

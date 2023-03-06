@@ -7,11 +7,11 @@ namespace duice {
     /**
      * Element
      */
-    export abstract class Element extends Observable implements Observer {
+    export abstract class Element<T extends HTMLElement> extends Observable implements Observer {
 
         id: string;
 
-        htmlElement: HTMLElement;
+        htmlElement: T;
 
         context: object;
 
@@ -26,7 +26,7 @@ namespace duice {
          * @param htmlElement
          * @protected
          */
-        protected constructor(htmlElement: HTMLElement, context: object) {
+        protected constructor(htmlElement: T, context: object) {
             super();
             this.htmlElement = htmlElement;
             this.context = context;
@@ -49,7 +49,7 @@ namespace duice {
         /**
          * gets html element
          */
-        getHtmlElement(): HTMLElement {
+        getHtmlElement(): T {
             return this.htmlElement;
         }
 

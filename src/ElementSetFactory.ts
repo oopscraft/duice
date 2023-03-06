@@ -3,13 +3,13 @@ namespace duice {
     /**
      * ElementFactory
      */
-    export class ElementSetFactory {
+    export class ElementSetFactory<T extends ElementSet<any>> {
 
         /**
          * get instance
          * @param htmlElement
          */
-        static getInstance(htmlElement: HTMLElement): ElementSetFactory {
+        static getInstance(htmlElement: HTMLElement): ElementSetFactory<ElementSet<any>> {
             return new ElementSetFactory();
         }
 
@@ -17,7 +17,7 @@ namespace duice {
          * createElementSet
          * @param htmlElement
          */
-        createElementSet(htmlElement: HTMLElement, context: object): ElementSet {
+        createElementSet(htmlElement: HTMLElement, context: object): ElementSet<any> {
 
             // creates element set
             let elementSet = new ElementSet(htmlElement, context);

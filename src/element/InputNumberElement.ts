@@ -1,6 +1,5 @@
 namespace duice.element {
 
-
     import NumberMask = duice.mask.NumberMask;
     import Mask = duice.mask.Mask;
 
@@ -19,8 +18,11 @@ namespace duice.element {
         constructor(htmlElement: HTMLInputElement, context: object) {
             super(htmlElement, context);
 
-            // key press event
-            this.htmlElement.removeAttribute('type');
+            // changes type and style
+            this.getHtmlElement().removeAttribute('type');
+            this.getHtmlElement().style.textAlign = 'right';
+
+            // prevents invalid key press
             this.getHtmlElement().addEventListener('keypress', event => {
                 if(/[\d|\.|,]/.test(event.key) === false) {
                     event.preventDefault();

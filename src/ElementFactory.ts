@@ -3,15 +3,15 @@ namespace duice {
     /**
      * ElementFactory
      */
-    export abstract class ElementFactory {
+    export abstract class ElementFactory<T extends Element<any>> {
 
-        static elementFactoryRegistry: ElementFactory[] = [];
+        static elementFactoryRegistry: ElementFactory<Element<any>>[] = [];
 
         /**
          * registerElementFactory
          * @param elementFactory
          */
-        static registerElementFactory(elementFactory: ElementFactory): void {
+        static registerElementFactory(elementFactory: ElementFactory<Element<any>>): void {
             this.elementFactoryRegistry.push(elementFactory);
         }
 
@@ -19,7 +19,7 @@ namespace duice {
          * get instance
          * @param htmlElement
          */
-        static getInstance(htmlElement: HTMLElement): ElementFactory {
+        static getInstance(htmlElement: HTMLElement): ElementFactory<Element<any>> {
             let instance;
             this.elementFactoryRegistry.forEach(elementFactory => {
                 if(elementFactory.support(htmlElement)){
@@ -38,7 +38,7 @@ namespace duice {
          * @param htmlElement
          * @param context
          */
-        createElement(htmlElement: HTMLElement, context: object): Element {
+        createElement(htmlElement: HTMLElement, context: object): Element<any> {
 
             // creates element
             let element = this.doCreateElement(htmlElement, context);
@@ -74,7 +74,7 @@ namespace duice {
          * @param htmlElement
          * @param context
          */
-        abstract doCreateElement(htmlElement: HTMLElement, context: object): Element;
+        abstract doCreateElement(htmlElement: HTMLElement, context: object): Element<any>;
 
     }
 

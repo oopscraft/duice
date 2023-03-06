@@ -3,14 +3,14 @@ namespace duice.element {
     /**
      * InputElementFactory
      */
-    export class InputElementFactory extends ElementFactory {
+    export class InputElementFactory extends ElementFactory<InputElement> {
 
         /**
          * doCreateElement
          * @param htmlElement
          * @param context
          */
-        doCreateElement(htmlElement: HTMLInputElement, context: object): Element {
+        doCreateElement(htmlElement: HTMLInputElement, context: object): InputElement {
             let type = htmlElement.getAttribute('type');
             switch(type) {
                 case 'number':
