@@ -24,9 +24,21 @@ namespace duice {
          * constructor
          * @param array
          */
-        constructor(json: object[]) {
+        constructor(array: object[]) {
             super();
-            this.fromJson(json);
+            this.copy(array);
+        }
+
+        /**
+         * copy
+         * @param array
+         */
+        copy(array: object[]): void {
+            this.length = 0;
+            for(let i = 0, size = array.length; i < size; i ++){
+                let data = duice.Data.create(array[i]);
+                this.push(data);
+            }
         }
 
         /**
@@ -34,12 +46,17 @@ namespace duice {
          * @param array
          */
         fromJson(array: object[]): void {
-            for(let i = 0, size = array.length; i < size; i ++){
-                let object = duice.Data.create(array[i]);
-                this.push(new Proxy(object, new DataHandler(object)));
-            }
+            this.copy(array);
+            let handler = Object.getOwnPropertyDescriptor(this, '_handler_').value;
+            handler.notifyObservers({});
         }
 
+        /**
+         * toJson
+         */
+        toJson(): string {
+            return JSON.stringify(this);
+        }
     }
 
 }

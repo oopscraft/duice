@@ -592,19 +592,35 @@ var duice;
          * constructor
          * @param array
          */
-        constructor(json) {
+        constructor(array) {
             super();
-            this.fromJson(json);
+            this.copy(array);
+        }
+        /**
+         * copy
+         * @param array
+         */
+        copy(array) {
+            this.length = 0;
+            for (let i = 0, size = array.length; i < size; i++) {
+                let data = duice.Data.create(array[i]);
+                this.push(data);
+            }
         }
         /**
          * fromJson
          * @param array
          */
         fromJson(array) {
-            for (let i = 0, size = array.length; i < size; i++) {
-                let object = duice.Data.create(array[i]);
-                this.push(new Proxy(object, new duice.DataHandler(object)));
-            }
+            this.copy(array);
+            let handler = Object.getOwnPropertyDescriptor(this, '_handler_').value;
+            handler.notifyObservers({});
+        }
+        /**
+         * toJson
+         */
+        toJson() {
+            return JSON.stringify(this);
         }
     }
     duice.DataSet = DataSet;
@@ -634,10 +650,35 @@ var duice;
          */
         constructor(object) {
             super();
+            this.copy(object);
+        }
+        /**
+         * load
+         * @param object
+         */
+        copy(object) {
+            for (let property in this) {
+                delete this[property];
+            }
             for (let property in object) {
                 let value = object[property];
                 this[property] = value;
             }
+        }
+        /**
+         * fromJson
+         * @param object
+         */
+        fromJson(object) {
+            this.copy(object);
+            let handler = Object.getOwnPropertyDescriptor(this, '_handler_').value;
+            handler.notifyObservers({});
+        }
+        /**
+         * toJson
+         */
+        toJson() {
+            return JSON.stringify(this);
         }
     }
     duice.Data = Data;

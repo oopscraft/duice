@@ -13,4 +13,11 @@ let myData = duice.Data.create({
 console.log(myData);
 
 
+// fromJson
+myData.fromJson({
+    name: 'Orange'
+});
+console.log(myData);
+
+
 

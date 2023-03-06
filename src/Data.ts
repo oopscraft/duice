@@ -25,10 +25,38 @@ namespace duice {
          */
         private constructor(object: object) {
             super();
+            this.copy(object);
+        }
+
+        /**
+         * load
+         * @param object
+         */
+        copy(object: object): void {
+            for(let property in this){
+                delete this[property];
+            }
             for(let property in object){
                 let value = object[property];
                 this[property] = value;
             }
+        }
+
+        /**
+         * fromJson
+         * @param object
+         */
+        fromJson(object: object): void {
+            this.copy(object);
+            let handler = Object.getOwnPropertyDescriptor(this, '_handler_').value;
+            handler.notifyObservers({});
+        }
+
+        /**
+         * toJson
+         */
+        toJson(): string {
+            return JSON.stringify(this);
         }
 
     }

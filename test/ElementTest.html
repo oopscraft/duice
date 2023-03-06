@@ -10,7 +10,11 @@
                 enabled: true,
                 enabledYn: 'Y',
                 groupId: "fruit",
-                profile: "My name is apple.\n I am Fruit."
+                profile: "My name is apple.\n I am Fruit.",
+                address: {
+                    country: 'USA',
+                    city: 'LA'
+                }
             });
         </script>
     </head>
@@ -32,6 +36,8 @@
                         <option value="animal">Animal</option>
                      </select>
             profile: <textarea duice:data="myData" duice:property="profile"></textarea>
+            address.country: <span duice:data="myData" duice:property="address.country"></span>
+            address.city: <span duice:data="myData" duice:property="address.city"></span>
         </pre>
     </body>
 </html>

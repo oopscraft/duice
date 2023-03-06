@@ -5,7 +5,7 @@ namespace duice {
      */
     export class DataHandler extends Observable implements Observer {
 
-        data: object;
+        data: Data;
 
         /**
          * constructor

@@ -8,6 +8,12 @@ global.document = jdom.window.document;
 
 // create
 let myDataSet = duice.DataSet.create([
-    { name:'james' }
+    { name: 'Apple' }
+]);
+console.log(myDataSet);
+
+// fromJson
+myDataSet.fromJson([
+    { name: 'Orange' }
 ]);
 console.log(myDataSet);
