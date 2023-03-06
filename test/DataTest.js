@@ -20,4 +20,8 @@ myData.fromJson({
 console.log(myData);
 
 
+// toJson
+let json = myData.toJson();
+console.log('json:', json);
+
 

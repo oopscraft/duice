@@ -17,3 +17,7 @@ myDataSet.fromJson([
     { name: 'Orange' }
 ]);
 console.log(myDataSet);
+
+// toJson
+let json = myDataSet.toJson();
+console.log('json:', json);
