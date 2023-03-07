@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta charset="utf-8">
         <script src="../dist/duice.js"></script>
+        <link rel="stylesheet" href="../dist/duice.css">
         <script>
             'use strict';
             let myData = duice.Data.create({
@@ -24,6 +26,7 @@
     </head>
     <body>
         <pre>
+            한글: 가나다라마바사
             name: <span duice:data="myData" duice:property="name"></span>
             name: <input duice:data="myData" duice:property="name"/>
             age: <span duice:data="myData" duice:property="age"></span>
