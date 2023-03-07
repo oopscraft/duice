@@ -20,5 +20,19 @@ duice.Data.assign(myData, {
 console.log(myData);
 console.assert(myData.name === 'Orange');
 
+// setReadonly
+console.log('setReadonly');
+duice.Data.setReadonly(myData, 'name', true);
+console.assert(duice.Data.isReadonly(myData, 'name') === true);
+duice.Data.setReadonly(myData, 'name', false);
+console.assert(duice.Data.isReadonly(myData,'name') === false);
+
+// setReadonlyAll
+console.log('setReadonlyAll');
+duice.Data.setReadonlyAll(myData, true);
+console.assert(duice.Data.isReadonly(myData, 'name') === true);
+duice.Data.setReadonlyAll(myData, false);
+console.assert(duice.Data.isReadonly(myData, 'name') === false);
+
 
 

@@ -20,4 +20,18 @@ duice.DataSet.assign(myDataSet,[
 console.log(myDataSet);
 console.assert(myDataSet[0].name === 'Orange');
 
+// setReadonly
+duice.DataSet.setReadonly(myDataSet, 'name', true);
+console.assert(duice.DataSet.isReadonly(myDataSet, 'name') === true);
+duice.DataSet.setReadonly(myDataSet, 'name', false);
+console.assert(duice.DataSet.isReadonly(myDataSet,'name') === false);
+
+// setReadonlyAll
+console.log('setReadonlyAll');
+duice.DataSet.setReadonlyAll(myDataSet, true);
+console.assert(duice.DataSet.isReadonly(myDataSet, 'name') === true);
+duice.DataSet.setReadonlyAll(myDataSet, false);
+console.assert(duice.DataSet.isReadonly(myDataSet, 'name') === false);
+
+
 

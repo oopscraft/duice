@@ -582,10 +582,20 @@ var duice;
         static create(array) {
             let dataSet = new DataSet(array);
             let dataSetHandler = new duice.DataSetHandler(dataSet);
-            globalThis.Object.defineProperty(dataSet, "_handler_", {
+            // _handler_
+            Object.defineProperty(dataSet, '_handler_', {
                 value: dataSetHandler,
                 writable: true
             });
+            // _meta_
+            Object.defineProperty(dataSet, '_meta_', {
+                value: {
+                    readonlyAll: false,
+                    readonly: new Set()
+                },
+                writable: true
+            });
+            // return this as proxy instance
             return new Proxy(dataSet, dataSetHandler);
         }
         /**
@@ -595,6 +605,20 @@ var duice;
         constructor(array) {
             super();
             DataSet.internalAssign(this, array);
+        }
+        /**
+         * getHandler
+         * @param data
+         */
+        static getHandler(data) {
+            return Object.getOwnPropertyDescriptor(data, '_handler_').value;
+        }
+        /**
+         * getMeta
+         * @param data
+         */
+        static getMeta(data) {
+            return Object.getOwnPropertyDescriptor(data, '_meta_').value;
         }
         /**
          * internalAssign
@@ -623,8 +647,51 @@ var duice;
          * @param dataSet
          */
         static notify(dataSet) {
-            let handler = Object.getOwnPropertyDescriptor(dataSet, '_handler_').value;
+            let handler = this.getHandler(dataSet);
             handler.notifyObservers({});
+        }
+        /**
+         * setReadonly
+         * @param dataSet
+         * @param property
+         * @param readonly
+         */
+        static setReadonly(dataSet, property, readonly) {
+            let meta = this.getMeta(dataSet);
+            if (readonly) {
+                meta['readonly'].add(property);
+            }
+            else {
+                meta['readonly'].delete(property);
+            }
+            for (let index = 0; index >= dataSet.length; index++) {
+                duice.Data.setReadonly(dataSet[index], property, readonly);
+            }
+        }
+        /**
+         * isReadonly
+         * @param dataSet
+         * @param property
+         */
+        static isReadonly(dataSet, property) {
+            let meta = this.getMeta(dataSet);
+            if (meta['readonlyAll'] || meta['readonly'].has(property)) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        /**
+         * setReadonlyAll
+         * @param dataSet
+         * @param readonly
+         */
+        static setReadonlyAll(dataSet, readonly) {
+            this.getMeta(dataSet)['readonlyAll'] = readonly;
+            for (let index = 0; index >= dataSet.length; index++) {
+                DataSet.setReadonlyAll(dataSet[index], readonly);
+            }
         }
     }
     duice.DataSet = DataSet;
@@ -642,10 +709,20 @@ var duice;
         static create(object) {
             let data = new Data(object);
             let dataHandler = new duice.DataHandler(data);
+            // _handler_
             globalThis.Object.defineProperty(data, "_handler_", {
                 value: dataHandler,
                 writable: true
             });
+            // _meta_
+            globalThis.Object.defineProperty(data, "_meta_", {
+                value: {
+                    readonlyAll: false,
+                    readonly: new Set()
+                },
+                writable: true
+            });
+            // return this as proxy instance
             return new Proxy(data, dataHandler);
         }
         /**
@@ -655,6 +732,20 @@ var duice;
         constructor(object) {
             super();
             Data.internalAssign(this, object);
+        }
+        /**
+         * getHandler
+         * @param data
+         */
+        static getHandler(data) {
+            return Object.getOwnPropertyDescriptor(data, '_handler_').value;
+        }
+        /**
+         * getMeta
+         * @param data
+         */
+        static getMeta(data) {
+            return Object.getOwnPropertyDescriptor(data, '_meta_').value;
         }
         /**
          * internalAssign
@@ -686,8 +777,48 @@ var duice;
          * @param data
          */
         static notify(data) {
-            let handler = Object.getOwnPropertyDescriptor(data, '_handler_').value;
+            let handler = this.getHandler(data);
             handler.notifyObservers({});
+        }
+        /**
+         * setReadonly
+         * @param data
+         * @param property
+         * @param readonly
+         */
+        static setReadonly(data, property, readonly) {
+            let meta = this.getMeta(data);
+            if (readonly) {
+                meta['readonly'].add(property);
+            }
+            else {
+                meta['readonly'].delete(property);
+            }
+        }
+        /**
+         * isReadonly
+         * @param data
+         * @param property
+         */
+        static isReadonly(data, property) {
+            let meta = this.getMeta(data);
+            if (meta['readonlyAll'] || meta['readonly'].has(property)) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        /**
+         * setReadonlyAll
+         * @param data
+         * @param readonly
+         */
+        static setReadonlyAll(data, readonly) {
+            this.getMeta(data)['readonlyAll'] = readonly;
+            for (let property in this) {
+                this.setReadonly(data, property, readonly);
+            }
         }
     }
     duice.Data = Data;
