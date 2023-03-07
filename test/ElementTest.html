@@ -27,8 +27,8 @@
     <body>
         <pre>
             한글: 가나다라마바사
-            name: <span duice:data="myData" duice:property="name"></span>
-            name: <input duice:data="myData" duice:property="name"/>
+            name:
+            name:
             age: <span duice:data="myData" duice:property="age"></span>
             age: <input duice:data="myData" duice:property="age" type="number"/>
             mobile: <span duice:data="myData" duice:property="mobile"></span>
@@ -46,5 +46,21 @@
             address.country: <span duice:data="myData" duice:property="address.country"></span>
             address.city: <span duice:data="myData" duice:property="address.city"></span>
         </pre>
+        <div class="container" style="width:1000px; border:solid 2px #efefef;">
+            <div class="row">
+                <div class="col-2">
+                    name
+                </div>
+                <div class="col-4">
+                    <span duice:data="myData" duice:property="name"></span>
+                </div>
+                <div class="col-2">
+                    name
+                </div>
+                <div class="col-4">
+                    <input duice:data="myData" duice:property="name"/>
+                </div>
+            </div>
+        </div>
     </body>
 </html>

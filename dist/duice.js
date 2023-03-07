@@ -1681,4 +1681,13 @@ var duice;
         duice.ElementFactory.registerElementFactory(new TextareaElementFactory());
     })(element = duice.element || (duice.element = {}));
 })(duice || (duice = {}));
+var duice;
+(function (duice) {
+    var dialog;
+    (function (dialog) {
+        class Dialog {
+        }
+        dialog.Dialog = Dialog;
+    })(dialog = duice.dialog || (duice.dialog = {}));
+})(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map
