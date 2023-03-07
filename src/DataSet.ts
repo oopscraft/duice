@@ -1,6 +1,5 @@
 namespace duice {
 
-
     /**
      * DataSet
      */
@@ -26,37 +25,42 @@ namespace duice {
          */
         constructor(array: object[]) {
             super();
-            this.copy(array);
+            DataSet.internalAssign(this, array);
         }
 
         /**
-         * copy
+         * internalAssign
+         * @param dataSet
          * @param array
          */
-        copy(array: object[]): void {
-            this.length = 0;
+        static internalAssign(dataSet: DataSet, array: object[]): DataSet {
+            dataSet.length = 0;
             for(let i = 0, size = array.length; i < size; i ++){
-                let data = duice.Data.create(array[i]);
-                this.push(data);
+                dataSet[i] = duice.Data.create(array[i]);
             }
+            return dataSet;
         }
 
         /**
-         * fromJson
+         * assign
+         * @param dataSet
          * @param array
          */
-        fromJson(array: object[]): void {
-            this.copy(array);
-            let handler = Object.getOwnPropertyDescriptor(this, '_handler_').value;
+        static assign(dataSet: DataSet, array: object[]): DataSet {
+            DataSet.internalAssign(dataSet, array);
+            DataSet.notify(dataSet);
+            return dataSet;
+        }
+
+        /**
+         * notify
+         * @param dataSet
+         */
+        static notify(dataSet: DataSet): void {
+            let handler = Object.getOwnPropertyDescriptor(dataSet, '_handler_').value;
             handler.notifyObservers({});
         }
 
-        /**
-         * toJson
-         */
-        toJson(): string {
-            return JSON.stringify(this);
-        }
     }
 
 }

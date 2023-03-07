@@ -594,33 +594,37 @@ var duice;
          */
         constructor(array) {
             super();
-            this.copy(array);
+            DataSet.internalAssign(this, array);
         }
         /**
-         * copy
+         * internalAssign
+         * @param dataSet
          * @param array
          */
-        copy(array) {
-            this.length = 0;
+        static internalAssign(dataSet, array) {
+            dataSet.length = 0;
             for (let i = 0, size = array.length; i < size; i++) {
-                let data = duice.Data.create(array[i]);
-                this.push(data);
+                dataSet[i] = duice.Data.create(array[i]);
             }
+            return dataSet;
         }
         /**
-         * fromJson
+         * assign
+         * @param dataSet
          * @param array
          */
-        fromJson(array) {
-            this.copy(array);
-            let handler = Object.getOwnPropertyDescriptor(this, '_handler_').value;
-            handler.notifyObservers({});
+        static assign(dataSet, array) {
+            DataSet.internalAssign(dataSet, array);
+            DataSet.notify(dataSet);
+            return dataSet;
         }
         /**
-         * toJson
+         * notify
+         * @param dataSet
          */
-        toJson() {
-            return JSON.stringify(this);
+        static notify(dataSet) {
+            let handler = Object.getOwnPropertyDescriptor(dataSet, '_handler_').value;
+            handler.notifyObservers({});
         }
     }
     duice.DataSet = DataSet;
@@ -650,37 +654,40 @@ var duice;
          */
         constructor(object) {
             super();
-            this.copy(object);
-        }
-        static test() {
+            Data.internalAssign(this, object);
         }
         /**
-         * load
+         * internalAssign
          * @param object
+         * @param data
          */
-        copy(object) {
-            for (let property in this) {
-                delete this[property];
+        static internalAssign(data, object) {
+            for (let property in data) {
+                Reflect.deleteProperty(data, property);
             }
             for (let property in object) {
-                let value = object[property];
-                this[property] = value;
+                let value = Reflect.get(object, property);
+                Reflect.set(data, property, value);
             }
+            return data;
         }
         /**
-         * fromJson
+         * assign
+         * @param data
          * @param object
          */
-        fromJson(object) {
-            this.copy(object);
-            let handler = Object.getOwnPropertyDescriptor(this, '_handler_').value;
-            handler.notifyObservers({});
+        static assign(data, object) {
+            Data.internalAssign(data, object);
+            Data.notify(data);
+            return data;
         }
         /**
-         * toJson
+         * notify
+         * @param data
          */
-        toJson() {
-            return JSON.stringify(this);
+        static notify(data) {
+            let handler = Object.getOwnPropertyDescriptor(data, '_handler_').value;
+            handler.notifyObservers({});
         }
     }
     duice.Data = Data;

@@ -11,17 +11,14 @@ let myData = duice.Data.create({
     name: 'Apple'
 });
 console.log(myData);
+console.assert(myData.name === 'Apple');
 
-
-// fromJson
-myData.fromJson({
+// assign
+duice.Data.assign(myData, {
     name: 'Orange'
 });
 console.log(myData);
+console.assert(myData.name === 'Orange');
 
-
-// toJson
-let json = myData.toJson();
-console.log('json:', json);
 
 

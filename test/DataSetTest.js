@@ -11,13 +11,13 @@ let myDataSet = duice.DataSet.create([
     { name: 'Apple' }
 ]);
 console.log(myDataSet);
+console.assert(myDataSet[0].name === 'Apple');
 
-// fromJson
-myDataSet.fromJson([
+// assign
+duice.DataSet.assign(myDataSet,[
     { name: 'Orange' }
 ]);
 console.log(myDataSet);
+console.assert(myDataSet[0].name === 'Orange');
 
-// toJson
-let json = myDataSet.toJson();
-console.log('json:', json);
+

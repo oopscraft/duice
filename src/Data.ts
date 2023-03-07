@@ -25,42 +25,43 @@ namespace duice {
          */
         private constructor(object: object) {
             super();
-            this.copy(object);
-        }
-
-        static test():void {
-
+            Data.internalAssign(this, object);
         }
 
         /**
-         * load
+         * internalAssign
          * @param object
+         * @param data
          */
-        copy(object: object): void {
-            for(let property in this){
-                delete this[property];
+        static internalAssign(data: Data, object: object): Data {
+            for(let property in data){
+                Reflect.deleteProperty(data, property);
             }
             for(let property in object){
-                let value = object[property];
-                this[property] = value;
+                let value = Reflect.get(object, property);
+                Reflect.set(data, property, value);
             }
+            return data;
         }
 
         /**
-         * fromJson
+         * assign
+         * @param data
          * @param object
          */
-        fromJson(object: object): void {
-            this.copy(object);
-            let handler = Object.getOwnPropertyDescriptor(this, '_handler_').value;
-            handler.notifyObservers({});
+        static assign(data: Data, object: object): Data {
+            Data.internalAssign(data, object);
+            Data.notify(data);
+            return data;
         }
 
         /**
-         * toJson
+         * notify
+         * @param data
          */
-        toJson(): string {
-            return JSON.stringify(this);
+        static notify(data: Data): void {
+            let handler = Object.getOwnPropertyDescriptor(data, '_handler_').value;
+            handler.notifyObservers({});
         }
 
     }
