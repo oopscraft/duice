@@ -31,27 +31,10 @@ namespace duice.element {
         }
 
         /**
-         * doRender
-         * @param data
+         * doGetValue
          */
-        doRender(data: object): void {
-            super.doRender(data);
-        }
-
-        /**
-         * doUpdate
-         * @param data
-         * @param detail
-         */
-        doUpdate(data: object, detail: object): void {
-            this.doRender(data);
-        }
-
-        /**
-         * getValue
-         */
-        getValue(): any {
-            let value = super.getValue();
+        doGetValue(): any {
+            let value = super.doGetValue();
             return Number(value);
         }
 

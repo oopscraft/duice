@@ -14,34 +14,24 @@ namespace duice.element {
             super(htmlElement, context);
 
             // adds change event listener
-            let _this = this;
             this.getHtmlElement().addEventListener('change', event => {
-                _this.notifyObservers({});
+                this.checkBeforeChange(event);
+                this.notifyObservers({});
             }, true);
         }
 
         /**
-         * doRender
-         * @param data
+         * doSetValue
+         * @param value
          */
-        doRender(data: object): void {
-            let value = getPropertyValue(data, this.getProperty());
+        doSetValue(value: any): void {
             this.getHtmlElement().value = value;
         }
 
         /**
-         * doUpdate
-         * @param data
-         * @param detail
+         * doGetValue
          */
-        doUpdate(data: object, detail: object): void {
-            this.doRender(data);
-        }
-
-        /**
-         * getValue
-         */
-        getValue(): any {
+        doGetValue(): any {
             let value = this.getHtmlElement().value;
             return value;
         }

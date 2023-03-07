@@ -1,6 +1,8 @@
 namespace duice.element {
 
-
+    /**
+     * InputElement
+     */
     export class InputElement extends Element<HTMLInputElement> {
 
         /**
@@ -11,38 +13,26 @@ namespace duice.element {
         constructor(htmlElement: HTMLInputElement, context: object) {
             super(htmlElement, context);
 
-            // adds change event listener
-            let _this = this;
-            this.getHtmlElement().addEventListener('change', function(event){
-                _this.notifyObservers({});
-            },true);
+            // adds change listener
+            this.getHtmlElement().addEventListener('change', event => {
+                this.checkBeforeChange(event);
+                this.notifyObservers({});
+            }, true);
         }
 
         /**
-         * doRender
-         * @param data
+         * doSetValue
+         * @param value
          */
-        doRender(data: object): void {
-            let value = getPropertyValue(data, this.getProperty());
-            value = this.getMask() ? this.getMask().encode(value): value;
-            this.htmlElement.value = value;
+        doSetValue(value: any): void {
+            this.getHtmlElement().value = value;
         }
 
         /**
-         * doUpdate
-         * @param data
-         * @param detail
+         * doGetValue
          */
-        doUpdate(data: object, detail: object): void {
-            this.doRender(data);
-        }
-
-        /**
-         * getValue
-         */
-        getValue(): any {
-            let value = this.htmlElement.value;
-            return this.getMask() ? this.getMask().decode(value) : value;
+        doGetValue(): any {
+            return this.getHtmlElement().value;
         }
 
         /**

@@ -47,6 +47,13 @@ namespace duice {
         }
 
         /**
+         * getDataHandler
+         */
+        getDataHandler(): DataHandler {
+            return this.dataHandler;
+        }
+
+        /**
          * gets html element
          */
         getHtmlElement(): T {
@@ -87,13 +94,15 @@ namespace duice {
          * render
          */
         render(): void {
-            let data = this.dataHandler.getData();
-            this.doRender(data);
 
-            // property
             if(this.property){
-                let meta = Data.getMeta(data);
-                this.setReadonly(meta.isReadonly(this.property));
+
+                // set value
+                this.setValue(this.dataHandler.getValue(this.property));
+
+                // set readonly
+                let readonly = this.dataHandler.isReadonly(this.property);
+                this.setReadonly(readonly);
             }
 
             // executes script
@@ -101,28 +110,65 @@ namespace duice {
         }
 
         /**
-         * doRender
-         * @param data
-         */
-        abstract doRender(data: object): void;
-
-        /**
          * update
          * @param dataHandler
          * @param detail
          */
         update(dataHandler: DataHandler, detail: object): void {
-            let data = this.dataHandler.getData();
-            this.doUpdate(data, detail);
 
-            // property
             if(this.property){
-                let meta = Data.getMeta(data);
-                this.setReadonly(meta.isReadonly(this.property));
+
+                // set value
+                this.setValue(dataHandler.getValue(this.property));
+
+                // set readonly
+                let readonly = this.dataHandler.isReadonly(this.property);
+                this.setReadonly(readonly);
             }
 
             // executes script
             this.executeScript();
+        }
+
+        /**
+         * setValue
+         * @param value
+         */
+        setValue(value: any): void {
+            value = this.getMask() ? this.getMask().encode(value) : value;
+            this.doSetValue(value);
+        }
+
+        /**
+         * doSetValue
+         * @param value
+         */
+        abstract doSetValue(value: any): void;
+
+        /**
+         * getValue
+         */
+        getValue(): any {
+            let value = this.doGetValue();
+            value = this.getMask() ? this.getMask().decode(value) : value;
+            return value;
+        }
+
+        /**
+         * doGetValue
+         */
+        abstract doGetValue(): any;
+
+        /**
+         * checkBeforeChange
+         * @param event
+         */
+        checkBeforeChange(event: any): void {
+            let value = event.target['value'];
+            if(this.dataHandler.callBeforeChangeListener(this.property, value) === false){
+                this.setValue(this.dataHandler.getValue(this.property));
+                throw new Error('before change listener returns false');
+            }
         }
 
         /**
@@ -134,18 +180,6 @@ namespace duice {
                 executeScript(script, this.getHtmlElement(), this.context);
             }
         }
-
-        /**
-         * doUpdate
-         * @param data
-         * @param detail
-         */
-        abstract doUpdate(data: object, detail: object): void;
-
-        /**
-         * setValue
-         */
-        abstract getValue(): any;
 
         /**
          * setReadonly

@@ -128,27 +128,6 @@ namespace duice {
     }
 
     /**
-     * getPropertyValue
-     * @param data
-     * @param property
-     */
-    export function getPropertyValue(data: object, property: string): any {
-        console.assert(property);
-        property = property.replace('.','?.');
-        return new Function(`return this.${property};`).call(data);
-    }
-
-    /**
-     * setPropertyValue
-     * @param data
-     * @param property
-     * @param value
-     */
-    export function setPropertyValue(data: object, property: string, value: any): void {
-        new Function('value', `this.${property} = value;`).call(data, value);
-    }
-
-    /**
      * execute script
      * @param script
      * @param thisArg

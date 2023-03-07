@@ -19,13 +19,6 @@ namespace duice {
                 writable: true
             });
 
-            // _meta_
-            let dataSetMeta = new DataSetMeta();
-            Object.defineProperty(dataSet, '_meta_', {
-                value: dataSetMeta,
-                writable: true
-            });
-
             // return this as proxy instance
             return new Proxy(dataSet, dataSetHandler);
         }
@@ -45,14 +38,6 @@ namespace duice {
          */
         static getHandler(dataSet: DataSet): DataSetHandler {
             return Object.getOwnPropertyDescriptor(dataSet, '_handler_').value as DataSetHandler;
-        }
-
-        /**
-         * getMeta
-         * @param data
-         */
-        static getMeta(data: Data): DataSetMeta {
-            return Object.getOwnPropertyDescriptor(data, '_meta_').value as DataSetMeta;
         }
 
         /**
@@ -95,8 +80,8 @@ namespace duice {
          * @param readonly
          */
         static setReadonly(dataSet: DataSet, property: string, readonly: boolean): void {
-            let meta = this.getMeta(dataSet);
-            meta.setReadonly(property, readonly);
+            let handler = this.getHandler(dataSet);
+            handler.setReadonly(property, readonly);
         }
 
         /**
@@ -105,8 +90,8 @@ namespace duice {
          * @param property
          */
         static isReadonly(dataSet: DataSet, property: string): boolean {
-            let meta = this.getMeta(dataSet);
-            return meta.isReadonly(property);
+            let handler = this.getHandler(dataSet);
+            return handler.isReadonly(property);
         }
 
         /**
@@ -115,10 +100,10 @@ namespace duice {
          * @param readonly
          */
         static setReadonlyAll(dataSet: DataSet, readonly: boolean): void {
-            let meta = this.getMeta(dataSet);
-            meta.setReadonlyAll(readonly);
+            let handler = this.getHandler(dataSet);
+            handler.setReadonlyAll(readonly);
             for(let index = 0; index >= dataSet.length; index ++ ){
-                DataSet.setReadonlyAll(dataSet[index], readonly);
+                Data.setReadonlyAll(dataSet[index], readonly);
             }
         }
 

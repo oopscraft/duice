@@ -19,13 +19,6 @@ namespace duice {
                 writable: true
             });
 
-            // _meta_
-            let dataMeta = new DataMeta();
-            globalThis.Object.defineProperty(data, "_meta_", {
-                value: dataMeta,
-                writable: true
-            });
-
             // return this as proxy instance
             return new Proxy(data, dataHandler);
         }
@@ -45,14 +38,6 @@ namespace duice {
          */
         static getHandler(data: Data): DataHandler {
             return Object.getOwnPropertyDescriptor(data, '_handler_').value as DataHandler;
-        }
-
-        /**
-         * getMeta
-         * @param data
-         */
-        static getMeta(data: Data): DataMeta {
-            return Object.getOwnPropertyDescriptor(data, '_meta_').value as DataMeta;
         }
 
         /**
@@ -98,8 +83,8 @@ namespace duice {
          * @param readonly
          */
         static setReadonly(data: Data, property: string, readonly: boolean): void {
-            let meta = this.getMeta(data);
-            meta.setReadonly(property, readonly);
+            let handler = this.getHandler(data);
+            handler.setReadonly(property, readonly);
         }
 
         /**
@@ -108,8 +93,8 @@ namespace duice {
          * @param property
          */
         static isReadonly(data: Data, property: string): boolean {
-            let meta = this.getMeta(data);
-            return meta.isReadonly(property);
+            let handler = this.getHandler(data);
+            return handler.isReadonly(property);
         }
 
         /**
@@ -118,11 +103,31 @@ namespace duice {
          * @param readonly
          */
         static setReadonlyAll(data: Data, readonly: boolean): void {
-            let meta = this.getMeta(data);
-            meta.setReadonlyAll(readonly);
+            let handler = this.getHandler(data);
+            handler.setReadonlyAll(readonly);
             for(let property in this) {
-                meta.setReadonly(property, readonly);
+                handler.setReadonly(property, readonly);
             }
+        }
+
+        /**
+         * onBeforeChange
+         * @param data
+         * @param listener
+         */
+        static onBeforeChange(data: Data, listener: Function): void {
+            let handler = this.getHandler(data);
+            handler.setBeforeChangeListener(listener);
+        }
+
+        /**
+         * onAfterChange
+         * @param data
+         * @param listener
+         */
+        static onAfterChange(data: Data, listener: Function): void {
+            let handler = this.getHandler(data);
+            handler.setAfterChangeListener(listener);
         }
 
     }

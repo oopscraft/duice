@@ -13,43 +13,24 @@ namespace duice {
          */
         constructor(htmlElement: HTMLElement, context: object){
             super(htmlElement, context);
+
+            // appends text node
+            this.textNode = document.createTextNode('');
+            this.getHtmlElement().insertBefore(this.textNode, this.getHtmlElement().firstChild);
         }
 
         /**
-         * doRender
-         * @param data
+         * doSetValue
+         * @param value
          */
-        doRender(data: object): void {
-
-            // if element has property
-            if(this.getProperty()) {
-                let value = getPropertyValue(data, this.getProperty());
-                value = this.getMask() ? this.getMask().encode(value) : value;
-
-                // clears text node
-                if (this.textNode) {
-                    this.getHtmlElement().removeChild(this.textNode);
-                }
-
-                // appends text node
-                this.textNode = document.createTextNode(value);
-                this.getHtmlElement().insertBefore(this.textNode, this.getHtmlElement().firstChild);
-            }
-        }
-
-        /**
-         * doUpdate
-         * @param data
-         * @param detail
-         */
-        doUpdate(data: object, detail: object): void {
-            this.doRender(data);
+        doSetValue(value: any): void {
+            this.textNode.textContent = value;
         }
 
         /**
          * getValue
          */
-        getValue(): any {
+        doGetValue(): any {
             return this.textNode.textContent;
         }
 

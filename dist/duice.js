@@ -132,27 +132,6 @@ var duice;
     }
     duice.removeChildNodes = removeChildNodes;
     /**
-     * getPropertyValue
-     * @param data
-     * @param property
-     */
-    function getPropertyValue(data, property) {
-        console.assert(property);
-        property = property.replace('.', '?.');
-        return new Function(`return this.${property};`).call(data);
-    }
-    duice.getPropertyValue = getPropertyValue;
-    /**
-     * setPropertyValue
-     * @param data
-     * @param property
-     * @param value
-     */
-    function setPropertyValue(data, property, value) {
-        new Function('value', `this.${property} = value;`).call(data, value);
-    }
-    duice.setPropertyValue = setPropertyValue;
-    /**
      * execute script
      * @param script
      * @param thisArg
@@ -506,6 +485,12 @@ var duice;
             this.dataHandler.addObserver(this);
         }
         /**
+         * getDataHandler
+         */
+        getDataHandler() {
+            return this.dataHandler;
+        }
+        /**
          * gets html element
          */
         getHtmlElement() {
@@ -541,12 +526,12 @@ var duice;
          * render
          */
         render() {
-            let data = this.dataHandler.getData();
-            this.doRender(data);
-            // property
             if (this.property) {
-                let meta = duice.Data.getMeta(data);
-                this.setReadonly(meta.isReadonly(this.property));
+                // set value
+                this.setValue(this.dataHandler.getValue(this.property));
+                // set readonly
+                let readonly = this.dataHandler.isReadonly(this.property);
+                this.setReadonly(readonly);
             }
             // executes script
             this.executeScript();
@@ -557,15 +542,42 @@ var duice;
          * @param detail
          */
         update(dataHandler, detail) {
-            let data = this.dataHandler.getData();
-            this.doUpdate(data, detail);
-            // property
             if (this.property) {
-                let meta = duice.Data.getMeta(data);
-                this.setReadonly(meta.isReadonly(this.property));
+                // set value
+                this.setValue(dataHandler.getValue(this.property));
+                // set readonly
+                let readonly = this.dataHandler.isReadonly(this.property);
+                this.setReadonly(readonly);
             }
             // executes script
             this.executeScript();
+        }
+        /**
+         * setValue
+         * @param value
+         */
+        setValue(value) {
+            value = this.getMask() ? this.getMask().encode(value) : value;
+            this.doSetValue(value);
+        }
+        /**
+         * getValue
+         */
+        getValue() {
+            let value = this.doGetValue();
+            value = this.getMask() ? this.getMask().decode(value) : value;
+            return value;
+        }
+        /**
+         * checkBeforeChange
+         * @param event
+         */
+        checkBeforeChange(event) {
+            let value = event.target['value'];
+            if (this.dataHandler.callBeforeChangeListener(this.property, value) === false) {
+                this.setValue(this.dataHandler.getValue(this.property));
+                throw new Error('before change listener returns false');
+            }
         }
         /**
          * executes script
@@ -597,12 +609,6 @@ var duice;
                 value: dataSetHandler,
                 writable: true
             });
-            // _meta_
-            let dataSetMeta = new duice.DataSetMeta();
-            Object.defineProperty(dataSet, '_meta_', {
-                value: dataSetMeta,
-                writable: true
-            });
             // return this as proxy instance
             return new Proxy(dataSet, dataSetHandler);
         }
@@ -620,13 +626,6 @@ var duice;
          */
         static getHandler(dataSet) {
             return Object.getOwnPropertyDescriptor(dataSet, '_handler_').value;
-        }
-        /**
-         * getMeta
-         * @param data
-         */
-        static getMeta(data) {
-            return Object.getOwnPropertyDescriptor(data, '_meta_').value;
         }
         /**
          * internalAssign
@@ -665,8 +664,8 @@ var duice;
          * @param readonly
          */
         static setReadonly(dataSet, property, readonly) {
-            let meta = this.getMeta(dataSet);
-            meta.setReadonly(property, readonly);
+            let handler = this.getHandler(dataSet);
+            handler.setReadonly(property, readonly);
         }
         /**
          * isReadonly
@@ -674,8 +673,8 @@ var duice;
          * @param property
          */
         static isReadonly(dataSet, property) {
-            let meta = this.getMeta(dataSet);
-            return meta.isReadonly(property);
+            let handler = this.getHandler(dataSet);
+            return handler.isReadonly(property);
         }
         /**
          * setReadonlyAll
@@ -683,10 +682,10 @@ var duice;
          * @param readonly
          */
         static setReadonlyAll(dataSet, readonly) {
-            let meta = this.getMeta(dataSet);
-            meta.setReadonlyAll(readonly);
+            let handler = this.getHandler(dataSet);
+            handler.setReadonlyAll(readonly);
             for (let index = 0; index >= dataSet.length; index++) {
-                DataSet.setReadonlyAll(dataSet[index], readonly);
+                duice.Data.setReadonlyAll(dataSet[index], readonly);
             }
         }
     }
@@ -710,12 +709,6 @@ var duice;
                 value: dataHandler,
                 writable: true
             });
-            // _meta_
-            let dataMeta = new duice.DataMeta();
-            globalThis.Object.defineProperty(data, "_meta_", {
-                value: dataMeta,
-                writable: true
-            });
             // return this as proxy instance
             return new Proxy(data, dataHandler);
         }
@@ -733,13 +726,6 @@ var duice;
          */
         static getHandler(data) {
             return Object.getOwnPropertyDescriptor(data, '_handler_').value;
-        }
-        /**
-         * getMeta
-         * @param data
-         */
-        static getMeta(data) {
-            return Object.getOwnPropertyDescriptor(data, '_meta_').value;
         }
         /**
          * internalAssign
@@ -781,8 +767,8 @@ var duice;
          * @param readonly
          */
         static setReadonly(data, property, readonly) {
-            let meta = this.getMeta(data);
-            meta.setReadonly(property, readonly);
+            let handler = this.getHandler(data);
+            handler.setReadonly(property, readonly);
         }
         /**
          * isReadonly
@@ -790,8 +776,8 @@ var duice;
          * @param property
          */
         static isReadonly(data, property) {
-            let meta = this.getMeta(data);
-            return meta.isReadonly(property);
+            let handler = this.getHandler(data);
+            return handler.isReadonly(property);
         }
         /**
          * setReadonlyAll
@@ -799,11 +785,29 @@ var duice;
          * @param readonly
          */
         static setReadonlyAll(data, readonly) {
-            let meta = this.getMeta(data);
-            meta.setReadonlyAll(readonly);
+            let handler = this.getHandler(data);
+            handler.setReadonlyAll(readonly);
             for (let property in this) {
-                meta.setReadonly(property, readonly);
+                handler.setReadonly(property, readonly);
             }
+        }
+        /**
+         * onBeforeChange
+         * @param data
+         * @param listener
+         */
+        static onBeforeChange(data, listener) {
+            let handler = this.getHandler(data);
+            handler.setBeforeChangeListener(listener);
+        }
+        /**
+         * onAfterChange
+         * @param data
+         * @param listener
+         */
+        static onAfterChange(data, listener) {
+            let handler = this.getHandler(data);
+            handler.setAfterChangeListener(listener);
         }
     }
     duice.Data = Data;
@@ -848,9 +852,33 @@ var duice;
          */
         set(target, property, value) {
             console.log("- Object.set", target, property, value);
+            // check before change listener
+            if (!this.callBeforeChangeListener(property, value)) {
+                return true;
+            }
+            // change property value
             Reflect.set(target, property, value);
+            // notify
             this.notifyObservers({});
+            // returns
             return true;
+        }
+        /**
+         * getValue
+         * @param property
+         */
+        getValue(property) {
+            console.assert(property);
+            property = property.replace('.', '?.');
+            return new Function(`return this.${property};`).call(this.getData());
+        }
+        /**
+         * setValue
+         * @param property
+         * @param value
+         */
+        setValue(property, value) {
+            new Function('value', `this.${property} = value;`).call(this.getData(), value);
         }
         /**
          * update
@@ -861,9 +889,13 @@ var duice;
             console.log("DataHandler.update", element, detail);
             let property = element.getProperty();
             if (property) {
-                let value = element.getValue();
-                duice.setPropertyValue(this.getData(), property, value);
+                // change property value
+                let value = element.doGetValue();
+                this.setValue(property, value);
+                // calls after change listener
+                this.callAfterChangeListener(property, value);
             }
+            // notify
             this.notifyObservers(detail);
         }
         /**
@@ -891,11 +923,43 @@ var duice;
          * @param property
          */
         isReadonly(property) {
-            if (this.readonlyAll || this.readonly.has(property)) {
-                return true;
+            return this.readonlyAll || this.readonly.has(property);
+        }
+        /**
+         * setBeforeChangeListener
+         * @param listener
+         */
+        setBeforeChangeListener(listener) {
+            this.beforeChangeListener = listener;
+        }
+        /**
+         * callBeforeChangeListener
+         * @param property
+         * @param value
+         */
+        callBeforeChangeListener(property, value) {
+            if (this.beforeChangeListener) {
+                if (!this.beforeChangeListener.call(this.getData(), property, value)) {
+                    return false;
+                }
             }
-            else {
-                return false;
+            return true;
+        }
+        /**
+         * setAfterChangeListener
+         * @param listener
+         */
+        setAfterChangeListener(listener) {
+            this.afterChangeListener = listener;
+        }
+        /**
+         * callAfterChangeListener
+         * @param property
+         * @param value
+         */
+        callAfterChangeListener(property, value) {
+            if (this.afterChangeListener) {
+                this.afterChangeListener.call(this.getData(), property, value);
             }
         }
     }
@@ -913,6 +977,8 @@ var duice;
          */
         constructor(dataSet) {
             super();
+            this.readonlyAll = false;
+            this.readonly = new Set();
             this.dataSet = dataSet;
         }
         /**
@@ -948,6 +1014,33 @@ var duice;
             }
             this.notifyObservers(detail);
         }
+        /**
+         * setReadonlyAll
+         * @param readonly
+         */
+        setReadonlyAll(readonly) {
+            this.readonlyAll = readonly;
+        }
+        /**
+         * setReadonly
+         * @param property
+         * @param readonly
+         */
+        setReadonly(property, readonly) {
+            if (readonly) {
+                this.readonly.add(property);
+            }
+            else {
+                this.readonly.delete(property);
+            }
+        }
+        /**
+         * isReadonly
+         * @param property
+         */
+        isReadonly(property) {
+            return this.readonlyAll || this.readonly.has(property);
+        }
     }
     duice.DataSetHandler = DataSetHandler;
 })(duice || (duice = {}));
@@ -963,37 +1056,21 @@ var duice;
          */
         constructor(htmlElement, context) {
             super(htmlElement, context);
+            // appends text node
+            this.textNode = document.createTextNode('');
+            this.getHtmlElement().insertBefore(this.textNode, this.getHtmlElement().firstChild);
         }
         /**
-         * doRender
-         * @param data
+         * doSetValue
+         * @param value
          */
-        doRender(data) {
-            // if element has property
-            if (this.getProperty()) {
-                let value = duice.getPropertyValue(data, this.getProperty());
-                value = this.getMask() ? this.getMask().encode(value) : value;
-                // clears text node
-                if (this.textNode) {
-                    this.getHtmlElement().removeChild(this.textNode);
-                }
-                // appends text node
-                this.textNode = document.createTextNode(value);
-                this.getHtmlElement().insertBefore(this.textNode, this.getHtmlElement().firstChild);
-            }
-        }
-        /**
-         * doUpdate
-         * @param data
-         * @param detail
-         */
-        doUpdate(data, detail) {
-            this.doRender(data);
+        doSetValue(value) {
+            this.textNode.textContent = value;
         }
         /**
          * getValue
          */
-        getValue() {
+        doGetValue() {
             return this.textNode.textContent;
         }
         /**
@@ -1247,6 +1324,9 @@ var duice;
 (function (duice) {
     var element;
     (function (element) {
+        /**
+         * InputElement
+         */
         class InputElement extends duice.Element {
             /**
              * constructor
@@ -1255,35 +1335,24 @@ var duice;
              */
             constructor(htmlElement, context) {
                 super(htmlElement, context);
-                // adds change event listener
-                let _this = this;
-                this.getHtmlElement().addEventListener('change', function (event) {
-                    _this.notifyObservers({});
+                // adds change listener
+                this.getHtmlElement().addEventListener('change', event => {
+                    this.checkBeforeChange(event);
+                    this.notifyObservers({});
                 }, true);
             }
             /**
-             * doRender
-             * @param data
+             * doSetValue
+             * @param value
              */
-            doRender(data) {
-                let value = duice.getPropertyValue(data, this.getProperty());
-                value = this.getMask() ? this.getMask().encode(value) : value;
-                this.htmlElement.value = value;
+            doSetValue(value) {
+                this.getHtmlElement().value = value;
             }
             /**
-             * doUpdate
-             * @param data
-             * @param detail
+             * doGetValue
              */
-            doUpdate(data, detail) {
-                this.doRender(data);
-            }
-            /**
-             * getValue
-             */
-            getValue() {
-                let value = this.htmlElement.value;
-                return this.getMask() ? this.getMask().decode(value) : value;
+            doGetValue() {
+                return this.getHtmlElement().value;
             }
             /**
              * setReadonly
@@ -1318,18 +1387,12 @@ var duice;
                 this.trueValue = trueValue ? trueValue : this.trueValue;
                 let falseValue = duice.getAttribute(this.getHtmlElement(), 'false-value');
                 this.falseValue = falseValue ? falseValue : this.falseValue;
-                // add change event listener
-                let _this = this;
-                this.getHtmlElement().addEventListener('change', event => {
-                    _this.notifyObservers({});
-                }, true);
             }
             /**
-             * doRender
-             * @param data
+             * doSetValue
+             * @param value
              */
-            doRender(data) {
-                let value = data[this.getProperty()];
+            doSetValue(value) {
                 if (value === this.trueValue) {
                     this.getHtmlElement().checked = true;
                 }
@@ -1338,17 +1401,9 @@ var duice;
                 }
             }
             /**
-             * doUpdate
-             * @param data
-             * @param detail
+             * doGetValue
              */
-            doUpdate(data, detail) {
-                this.doRender(data);
-            }
-            /**
-             * getValue
-             */
-            getValue() {
+            doGetValue() {
                 if (this.htmlElement.checked) {
                     return this.trueValue;
                 }
@@ -1388,25 +1443,10 @@ var duice;
                 });
             }
             /**
-             * doRender
-             * @param data
+             * doGetValue
              */
-            doRender(data) {
-                super.doRender(data);
-            }
-            /**
-             * doUpdate
-             * @param data
-             * @param detail
-             */
-            doUpdate(data, detail) {
-                this.doRender(data);
-            }
-            /**
-             * getValue
-             */
-            getValue() {
-                let value = super.getValue();
+            doGetValue() {
+                let value = super.doGetValue();
                 return Number(value);
             }
         }
@@ -1429,31 +1469,22 @@ var duice;
             constructor(htmlElement, context) {
                 super(htmlElement, context);
                 // adds event listener
-                let _this = this;
                 this.getHtmlElement().addEventListener('change', event => {
-                    _this.notifyObservers({});
+                    this.checkBeforeChange(event);
+                    this.notifyObservers({});
                 }, true);
             }
             /**
-             * doRender
-             * @param data
+             * doSetValue
+             * @param value
              */
-            doRender(data) {
-                let value = duice.getPropertyValue(data, this.getProperty());
+            doSetValue(value) {
                 this.getHtmlElement().value = value;
             }
             /**
-             * doUpdate
-             * @param data
-             * @param detail
+             * doGetValue
              */
-            doUpdate(data, detail) {
-                this.doRender(data);
-            }
-            /**
-             * getValue
-             */
-            getValue() {
+            doGetValue() {
                 return this.getHtmlElement().value;
             }
             /**
@@ -1488,31 +1519,22 @@ var duice;
             constructor(htmlElement, context) {
                 super(htmlElement, context);
                 // adds change event listener
-                let _this = this;
                 this.getHtmlElement().addEventListener('change', event => {
-                    _this.notifyObservers({});
+                    this.checkBeforeChange(event);
+                    this.notifyObservers({});
                 }, true);
             }
             /**
-             * doRender
-             * @param data
+             * doSetValue
+             * @param value
              */
-            doRender(data) {
-                let value = duice.getPropertyValue(data, this.getProperty());
+            doSetValue(value) {
                 this.getHtmlElement().value = value;
             }
             /**
-             * doUpdate
-             * @param data
-             * @param detail
+             * doGetValue
              */
-            doUpdate(data, detail) {
-                this.doRender(data);
-            }
-            /**
-             * getValue
-             */
-            getValue() {
+            doGetValue() {
                 let value = this.getHtmlElement().value;
                 return value;
             }
@@ -1658,89 +1680,5 @@ var duice;
         // register
         duice.ElementFactory.registerElementFactory(new TextareaElementFactory());
     })(element = duice.element || (duice.element = {}));
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    class DataMeta {
-        constructor() {
-            this.readonlyAll = false;
-            this.readonly = new Set();
-        }
-        /**
-         * setReadonlyAll
-         * @param readonly
-         */
-        setReadonlyAll(readonly) {
-            this.readonlyAll = readonly;
-        }
-        /**
-         * setReadonly
-         * @param property
-         * @param readonly
-         */
-        setReadonly(property, readonly) {
-            if (readonly) {
-                this.readonly.add(property);
-            }
-            else {
-                this.readonly.delete(property);
-            }
-        }
-        /**
-         * isReadonly
-         * @param property
-         */
-        isReadonly(property) {
-            if (this.readonlyAll || this.readonly.has(property)) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-    }
-    duice.DataMeta = DataMeta;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    class DataSetMeta {
-        constructor() {
-            this.readonlyAll = false;
-            this.readonly = new Set();
-        }
-        /**
-         * setReadonlyAll
-         * @param readonly
-         */
-        setReadonlyAll(readonly) {
-            this.readonlyAll = readonly;
-        }
-        /**
-         * setReadonly
-         * @param property
-         * @param readonly
-         */
-        setReadonly(property, readonly) {
-            if (readonly) {
-                this.readonly.add(property);
-            }
-            else {
-                this.readonly.delete(property);
-            }
-        }
-        /**
-         * isReadonly
-         * @param property
-         */
-        isReadonly(property) {
-            if (this.readonlyAll || this.readonly.has(property)) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-    }
-    duice.DataSetMeta = DataSetMeta;
 })(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map
