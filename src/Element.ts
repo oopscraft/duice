@@ -40,7 +40,7 @@ namespace duice {
          */
         setData(data: string): void {
             let dataObject = findObject(this.context, data);
-            this.dataHandler = Object.getOwnPropertyDescriptor(dataObject, '_handler_').value;
+            this.dataHandler = Data.getHandler(dataObject);
             console.assert(this.dataHandler);
             this.addObserver(this.dataHandler);
             this.dataHandler.addObserver(this);

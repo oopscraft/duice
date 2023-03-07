@@ -500,7 +500,7 @@ var duice;
          */
         setData(data) {
             let dataObject = duice.findObject(this.context, data);
-            this.dataHandler = Object.getOwnPropertyDescriptor(dataObject, '_handler_').value;
+            this.dataHandler = duice.Data.getHandler(dataObject);
             console.assert(this.dataHandler);
             this.addObserver(this.dataHandler);
             this.dataHandler.addObserver(this);
@@ -588,11 +588,9 @@ var duice;
                 writable: true
             });
             // _meta_
+            let dataSetMeta = new duice.DataSetMeta();
             Object.defineProperty(dataSet, '_meta_', {
-                value: {
-                    readonlyAll: false,
-                    readonly: new Set()
-                },
+                value: dataSetMeta,
                 writable: true
             });
             // return this as proxy instance
@@ -608,10 +606,10 @@ var duice;
         }
         /**
          * getHandler
-         * @param data
+         * @param dataSet
          */
-        static getHandler(data) {
-            return Object.getOwnPropertyDescriptor(data, '_handler_').value;
+        static getHandler(dataSet) {
+            return Object.getOwnPropertyDescriptor(dataSet, '_handler_').value;
         }
         /**
          * getMeta
@@ -658,15 +656,7 @@ var duice;
          */
         static setReadonly(dataSet, property, readonly) {
             let meta = this.getMeta(dataSet);
-            if (readonly) {
-                meta['readonly'].add(property);
-            }
-            else {
-                meta['readonly'].delete(property);
-            }
-            for (let index = 0; index >= dataSet.length; index++) {
-                duice.Data.setReadonly(dataSet[index], property, readonly);
-            }
+            meta.setReadonly(property, readonly);
         }
         /**
          * isReadonly
@@ -675,12 +665,7 @@ var duice;
          */
         static isReadonly(dataSet, property) {
             let meta = this.getMeta(dataSet);
-            if (meta['readonlyAll'] || meta['readonly'].has(property)) {
-                return true;
-            }
-            else {
-                return false;
-            }
+            return meta.isReadonly(property);
         }
         /**
          * setReadonlyAll
@@ -688,7 +673,8 @@ var duice;
          * @param readonly
          */
         static setReadonlyAll(dataSet, readonly) {
-            this.getMeta(dataSet)['readonlyAll'] = readonly;
+            let meta = this.getMeta(dataSet);
+            meta.setReadonlyAll(readonly);
             for (let index = 0; index >= dataSet.length; index++) {
                 DataSet.setReadonlyAll(dataSet[index], readonly);
             }
@@ -715,11 +701,9 @@ var duice;
                 writable: true
             });
             // _meta_
+            let dataMeta = new duice.DataMeta();
             globalThis.Object.defineProperty(data, "_meta_", {
-                value: {
-                    readonlyAll: false,
-                    readonly: new Set()
-                },
+                value: dataMeta,
                 writable: true
             });
             // return this as proxy instance
@@ -788,12 +772,7 @@ var duice;
          */
         static setReadonly(data, property, readonly) {
             let meta = this.getMeta(data);
-            if (readonly) {
-                meta['readonly'].add(property);
-            }
-            else {
-                meta['readonly'].delete(property);
-            }
+            meta.setReadonly(property, readonly);
         }
         /**
          * isReadonly
@@ -802,12 +781,7 @@ var duice;
          */
         static isReadonly(data, property) {
             let meta = this.getMeta(data);
-            if (meta['readonlyAll'] || meta['readonly'].has(property)) {
-                return true;
-            }
-            else {
-                return false;
-            }
+            return meta.isReadonly(property);
         }
         /**
          * setReadonlyAll
@@ -815,9 +789,10 @@ var duice;
          * @param readonly
          */
         static setReadonlyAll(data, readonly) {
-            this.getMeta(data)['readonlyAll'] = readonly;
+            let meta = this.getMeta(data);
+            meta.setReadonlyAll(readonly);
             for (let property in this) {
-                this.setReadonly(data, property, readonly);
+                meta.setReadonly(property, readonly);
             }
         }
     }
@@ -1012,7 +987,7 @@ var duice;
          */
         setDataSet(dataSet) {
             let dataSetObject = duice.findObject(this.context, dataSet);
-            this.dataSetHandler = Object.getOwnPropertyDescriptor(dataSetObject, '_handler_').value;
+            this.dataSetHandler = duice.DataSet.getHandler(dataSetObject);
             console.assert(this.dataSetHandler);
             this.addObserver(this.dataSetHandler);
             this.dataSetHandler.addObserver(this);
@@ -1601,5 +1576,89 @@ var duice;
         // register
         duice.ElementFactory.registerElementFactory(new TextareaElementFactory());
     })(element = duice.element || (duice.element = {}));
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    class DataMeta {
+        constructor() {
+            this.readonlyAll = false;
+            this.readonly = new Set();
+        }
+        /**
+         * setReadonlyAll
+         * @param readonly
+         */
+        setReadonlyAll(readonly) {
+            this.readonlyAll = readonly;
+        }
+        /**
+         * setReadonly
+         * @param property
+         * @param readonly
+         */
+        setReadonly(property, readonly) {
+            if (readonly) {
+                this.readonly.add(property);
+            }
+            else {
+                this.readonly.delete(property);
+            }
+        }
+        /**
+         * isReadonly
+         * @param property
+         */
+        isReadonly(property) {
+            if (this.readonlyAll || this.readonly.has(property)) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    }
+    duice.DataMeta = DataMeta;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    class DataSetMeta {
+        constructor() {
+            this.readonlyAll = false;
+            this.readonly = new Set();
+        }
+        /**
+         * setReadonlyAll
+         * @param readonly
+         */
+        setReadonlyAll(readonly) {
+            this.readonlyAll = readonly;
+        }
+        /**
+         * setReadonly
+         * @param property
+         * @param readonly
+         */
+        setReadonly(property, readonly) {
+            if (readonly) {
+                this.readonly.add(property);
+            }
+            else {
+                this.readonly.delete(property);
+            }
+        }
+        /**
+         * isReadonly
+         * @param property
+         */
+        isReadonly(property) {
+            if (this.readonlyAll || this.readonly.has(property)) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    }
+    duice.DataSetMeta = DataSetMeta;
 })(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map

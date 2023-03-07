@@ -47,7 +47,7 @@ namespace duice {
          */
         setDataSet(dataSet: string): void {
             let dataSetObject = findObject(this.context, dataSet);
-            this.dataSetHandler = Object.getOwnPropertyDescriptor(dataSetObject, '_handler_').value;
+            this.dataSetHandler = DataSet.getHandler(dataSetObject);
             console.assert(this.dataSetHandler);
             this.addObserver(this.dataSetHandler);
             this.dataSetHandler.addObserver(this);

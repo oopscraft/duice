@@ -20,11 +20,9 @@ namespace duice {
             });
 
             // _meta_
+            let dataMeta = new DataMeta();
             globalThis.Object.defineProperty(data, "_meta_", {
-                value: {
-                    readonlyAll: false,
-                    readonly: new Set<string>()
-                },
+                value: dataMeta,
                 writable: true
             });
 
@@ -53,8 +51,8 @@ namespace duice {
          * getMeta
          * @param data
          */
-        static getMeta(data: Data): object {
-            return Object.getOwnPropertyDescriptor(data, '_meta_').value as object;
+        static getMeta(data: Data): DataMeta {
+            return Object.getOwnPropertyDescriptor(data, '_meta_').value as DataMeta;
         }
 
         /**
@@ -101,11 +99,7 @@ namespace duice {
          */
         static setReadonly(data: Data, property: string, readonly: boolean): void {
             let meta = this.getMeta(data);
-            if(readonly) {
-                meta['readonly'].add(property);
-            }else{
-                meta['readonly'].delete(property);
-            }
+            meta.setReadonly(property, readonly);
         }
 
         /**
@@ -115,11 +109,7 @@ namespace duice {
          */
         static isReadonly(data: Data, property: string): boolean {
             let meta = this.getMeta(data);
-            if(meta['readonlyAll'] || meta['readonly'].has(property)){
-                return true;
-            }else{
-                return false;
-            }
+            return meta.isReadonly(property);
         }
 
         /**
@@ -128,9 +118,10 @@ namespace duice {
          * @param readonly
          */
         static setReadonlyAll(data: Data, readonly: boolean): void {
-            this.getMeta(data)['readonlyAll'] = readonly;
+            let meta = this.getMeta(data);
+            meta.setReadonlyAll(readonly);
             for(let property in this) {
-                this.setReadonly(data, property, readonly);
+                meta.setReadonly(property, readonly);
             }
         }
 

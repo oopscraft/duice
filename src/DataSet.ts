@@ -20,11 +20,9 @@ namespace duice {
             });
 
             // _meta_
+            let dataSetMeta = new DataSetMeta();
             Object.defineProperty(dataSet, '_meta_', {
-                value: {
-                    readonlyAll: false,
-                    readonly: new Set<string>()
-                },
+                value: dataSetMeta,
                 writable: true
             });
 
@@ -43,18 +41,18 @@ namespace duice {
 
         /**
          * getHandler
-         * @param data
+         * @param dataSet
          */
-        static getHandler(data: Data): DataHandler {
-            return Object.getOwnPropertyDescriptor(data, '_handler_').value as DataHandler;
+        static getHandler(dataSet: DataSet): DataSetHandler {
+            return Object.getOwnPropertyDescriptor(dataSet, '_handler_').value as DataSetHandler;
         }
 
         /**
          * getMeta
          * @param data
          */
-        static getMeta(data: Data): object {
-            return Object.getOwnPropertyDescriptor(data, '_meta_').value as object;
+        static getMeta(data: Data): DataSetMeta {
+            return Object.getOwnPropertyDescriptor(data, '_meta_').value as DataSetMeta;
         }
 
         /**
@@ -98,14 +96,7 @@ namespace duice {
          */
         static setReadonly(dataSet: DataSet, property: string, readonly: boolean): void {
             let meta = this.getMeta(dataSet);
-            if(readonly) {
-                meta['readonly'].add(property);
-            }else{
-                meta['readonly'].delete(property);
-            }
-            for(let index = 0; index >= dataSet.length; index ++) {
-                Data.setReadonly(dataSet[index], property, readonly);
-            }
+            meta.setReadonly(property, readonly);
         }
 
         /**
@@ -115,11 +106,7 @@ namespace duice {
          */
         static isReadonly(dataSet: DataSet, property: string): boolean {
             let meta = this.getMeta(dataSet);
-            if(meta['readonlyAll'] || meta['readonly'].has(property)){
-                return true;
-            }else{
-                return false;
-            }
+            return meta.isReadonly(property);
         }
 
         /**
@@ -128,7 +115,8 @@ namespace duice {
          * @param readonly
          */
         static setReadonlyAll(dataSet: DataSet, readonly: boolean): void {
-            this.getMeta(dataSet)['readonlyAll'] = readonly;
+            let meta = this.getMeta(dataSet);
+            meta.setReadonlyAll(readonly);
             for(let index = 0; index >= dataSet.length; index ++ ){
                 DataSet.setReadonlyAll(dataSet[index], readonly);
             }
