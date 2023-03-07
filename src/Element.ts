@@ -90,6 +90,12 @@ namespace duice {
             let data = this.dataHandler.getData();
             this.doRender(data);
 
+            // property
+            if(this.property){
+                let meta = Data.getMeta(data);
+                this.setReadonly(meta.isReadonly(this.property));
+            }
+
             // executes script
             this.executeScript();
         }
@@ -108,6 +114,12 @@ namespace duice {
         update(dataHandler: DataHandler, detail: object): void {
             let data = this.dataHandler.getData();
             this.doUpdate(data, detail);
+
+            // property
+            if(this.property){
+                let meta = Data.getMeta(data);
+                this.setReadonly(meta.isReadonly(this.property));
+            }
 
             // executes script
             this.executeScript();
@@ -134,6 +146,12 @@ namespace duice {
          * setValue
          */
         abstract getValue(): any;
+
+        /**
+         * setReadonly
+         * @param readonly
+         */
+        abstract setReadonly(readonly: boolean): void;
 
     }
 

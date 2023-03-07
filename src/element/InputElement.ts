@@ -45,6 +45,14 @@ namespace duice.element {
             return this.getMask() ? this.getMask().decode(value) : value;
         }
 
+        /**
+         * setReadonly
+         * @param readonly
+         */
+        setReadonly(readonly: boolean): void {
+            this.getHtmlElement().readOnly = readonly;
+        }
+
     }
 
 }

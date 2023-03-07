@@ -46,6 +46,18 @@ namespace duice.element {
             return value;
         }
 
+        /**
+         * setReadonly
+         * @param readonly
+         */
+        setReadonly(readonly: boolean): void {
+            if(readonly){
+                this.getHtmlElement().setAttribute('readonly', 'readonly');
+            }else {
+                this.getHtmlElement().removeAttribute('readonly');
+            }
+        }
+
     }
 
 }

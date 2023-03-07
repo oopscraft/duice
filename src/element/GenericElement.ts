@@ -53,6 +53,14 @@ namespace duice {
             return this.textNode.textContent;
         }
 
+        /**
+         * setReadonly
+         * @param readonly
+         */
+        setReadonly(readonly: boolean): void {
+            // no-op
+        }
+
     }
 
 }

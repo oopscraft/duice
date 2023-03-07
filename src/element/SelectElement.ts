@@ -45,6 +45,18 @@ namespace duice.element {
             return this.getHtmlElement().value;
         }
 
+        /**
+         * setReadonly
+         * @param readonly
+         */
+        setReadonly(readonly: boolean): void {
+            if(readonly){
+                this.getHtmlElement().style.pointerEvents = 'non';
+            }else{
+                this.getHtmlElement().style.pointerEvents = '';
+            }
+        }
+
     }
 
 }

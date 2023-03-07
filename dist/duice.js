@@ -543,6 +543,11 @@ var duice;
         render() {
             let data = this.dataHandler.getData();
             this.doRender(data);
+            // property
+            if (this.property) {
+                let meta = duice.Data.getMeta(data);
+                this.setReadonly(meta.isReadonly(this.property));
+            }
             // executes script
             this.executeScript();
         }
@@ -554,6 +559,11 @@ var duice;
         update(dataHandler, detail) {
             let data = this.dataHandler.getData();
             this.doUpdate(data, detail);
+            // property
+            if (this.property) {
+                let meta = duice.Data.getMeta(data);
+                this.setReadonly(meta.isReadonly(this.property));
+            }
             // executes script
             this.executeScript();
         }
@@ -810,6 +820,8 @@ var duice;
          */
         constructor(data) {
             super();
+            this.readonlyAll = false;
+            this.readonly = new Set();
             this.data = data;
         }
         /**
@@ -853,6 +865,38 @@ var duice;
                 duice.setPropertyValue(this.getData(), property, value);
             }
             this.notifyObservers(detail);
+        }
+        /**
+         * setReadonlyAll
+         * @param readonly
+         */
+        setReadonlyAll(readonly) {
+            this.readonlyAll = readonly;
+        }
+        /**
+         * setReadonly
+         * @param property
+         * @param readonly
+         */
+        setReadonly(property, readonly) {
+            if (readonly) {
+                this.readonly.add(property);
+            }
+            else {
+                this.readonly.delete(property);
+            }
+        }
+        /**
+         * isReadonly
+         * @param property
+         */
+        isReadonly(property) {
+            if (this.readonlyAll || this.readonly.has(property)) {
+                return true;
+            }
+            else {
+                return false;
+            }
         }
     }
     duice.DataHandler = DataHandler;
@@ -951,6 +995,13 @@ var duice;
          */
         getValue() {
             return this.textNode.textContent;
+        }
+        /**
+         * setReadonly
+         * @param readonly
+         */
+        setReadonly(readonly) {
+            // no-op
         }
     }
     duice.GenericElement = GenericElement;
@@ -1234,6 +1285,13 @@ var duice;
                 let value = this.htmlElement.value;
                 return this.getMask() ? this.getMask().decode(value) : value;
             }
+            /**
+             * setReadonly
+             * @param readonly
+             */
+            setReadonly(readonly) {
+                this.getHtmlElement().readOnly = readonly;
+            }
         }
         element.InputElement = InputElement;
     })(element = duice.element || (duice.element = {}));
@@ -1398,6 +1456,18 @@ var duice;
             getValue() {
                 return this.getHtmlElement().value;
             }
+            /**
+             * setReadonly
+             * @param readonly
+             */
+            setReadonly(readonly) {
+                if (readonly) {
+                    this.getHtmlElement().style.pointerEvents = 'non';
+                }
+                else {
+                    this.getHtmlElement().style.pointerEvents = '';
+                }
+            }
         }
         element.SelectElement = SelectElement;
     })(element = duice.element || (duice.element = {}));
@@ -1445,6 +1515,18 @@ var duice;
             getValue() {
                 let value = this.getHtmlElement().value;
                 return value;
+            }
+            /**
+             * setReadonly
+             * @param readonly
+             */
+            setReadonly(readonly) {
+                if (readonly) {
+                    this.getHtmlElement().setAttribute('readonly', 'readonly');
+                }
+                else {
+                    this.getHtmlElement().removeAttribute('readonly');
+                }
             }
         }
         element.TextareaElement = TextareaElement;
