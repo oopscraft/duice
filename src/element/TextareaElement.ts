@@ -1,4 +1,4 @@
-namespace duice.element {
+namespace duice {
 
     /**
      * Textarea

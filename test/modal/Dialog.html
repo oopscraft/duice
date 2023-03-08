@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="../../dist/duice.js"></script>
+    <link rel="stylesheet" href="../../dist/duice.css">
+    <script>
+        'use strict';
+
+        /**
+         * doAlert
+         */
+        function doAlert() {
+            duice.alert('<b>Hello~</b>\nThis is alert message!')
+                .onBeforeClose(() => {
+                    alert('before close');
+                })
+                .onAfterClose(() => {
+                    alert('after close');
+                })
+                .open();
+        }
+
+        /**
+         * doConfirm
+         */
+        function doConfirm() {
+            duice.confirm('<b>Hello~</b>\nThis is confirm message!')
+                .onBeforeConfirm(() => {
+                    alert('before confirm');
+                })
+                .onAfterConfirm(() => {
+                    alert('after confirm');
+                })
+                .open();
+        }
+
+        /**
+         * doPrompt
+         * @returns {Promise<void>}
+         */
+        async function doPrompt() {
+            let name = await duice.prompt("<b>Hello~</b>\nWhat is your name?")
+                .open();
+            alert(name);
+        }
+
+        /**
+         * doDialog
+         */
+        function doDialog() {
+            duice.dialog(document.getElementById('myDialog'))
+                .open();
+        }
+
+    </script>
+</head>
+<body>
+    <button onclick="doAlert();">
+        doAlert
+    </button>
+    <button onclick="doConfirm();">
+        doConfirm
+    </button>
+    <button onclick="doPrompt();">
+        doPrompt
+    </button>
+    <button onclick="doDialog();">
+        doDialog
+    </button>
+
+    <dialog id="myDialog">
+        Test Dialog
+    </dialog>
+</body>
+</html>

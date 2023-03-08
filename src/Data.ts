@@ -117,7 +117,7 @@ namespace duice {
          */
         static onBeforeChange(data: Data, listener: Function): void {
             let handler = this.getHandler(data);
-            handler.setBeforeChangeListener(listener);
+            handler.onBeforeChange(listener);
         }
 
         /**
@@ -127,7 +127,7 @@ namespace duice {
          */
         static onAfterChange(data: Data, listener: Function): void {
             let handler = this.getHandler(data);
-            handler.setAfterChangeListener(listener);
+            handler.onAfterChange(listener);
         }
 
     }

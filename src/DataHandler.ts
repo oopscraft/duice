@@ -1,3 +1,4 @@
+///<reference path="Observable.ts"/>
 namespace duice {
 
     /**
@@ -52,7 +53,7 @@ namespace duice {
             console.log("- Object.set", target, property, value);
 
             // check before change listener
-            if(!this.callBeforeChangeListener(property, value)){
+            if(!this.callBeforeChange(property, value)){
                 return true;
             }
 
@@ -100,7 +101,7 @@ namespace duice {
                 this.setValue(property, value);
 
                 // calls after change listener
-                this.callAfterChangeListener(property, value);
+                this.callAfterChange(property, value);
             }
 
             // notify
@@ -137,19 +138,19 @@ namespace duice {
         }
 
         /**
-         * setBeforeChangeListener
+         * onBeforeChange
          * @param listener
          */
-        setBeforeChangeListener(listener: Function): void {
+        onBeforeChange(listener: Function): void {
             this.beforeChangeListener = listener;
         }
 
         /**
-         * callBeforeChangeListener
+         * callBeforeChange
          * @param property
          * @param value
          */
-        callBeforeChangeListener(property: string, value: any): boolean {
+        callBeforeChange(property: string, value: any): boolean {
             if(this.beforeChangeListener) {
                 if(!this.beforeChangeListener.call(this.getData(), property, value)) {
                     return false;
@@ -159,19 +160,19 @@ namespace duice {
         }
 
         /**
-         * setAfterChangeListener
+         * onAfterChange
          * @param listener
          */
-        setAfterChangeListener(listener: Function): void {
+        onAfterChange(listener: Function): void {
             this.afterChangeListener = listener;
         }
 
         /**
-         * callAfterChangeListener
+         * callAfterChange
          * @param property
          * @param value
          */
-        callAfterChangeListener(property: string, value: any): void {
+        callAfterChange(property: string, value: any): void {
             if(this.afterChangeListener){
                 this.afterChangeListener.call(this.getData(), property, value);
             }

@@ -1,8 +1,6 @@
 ///<reference path="Observable.ts"/>
+///<reference path="mask/MaskFactory.ts"/>
 namespace duice {
-
-    import MaskFactory = duice.mask.MaskFactory;
-    import Mask = duice.mask.Mask;
 
     /**
      * Element
@@ -86,7 +84,7 @@ namespace duice {
         /**
          * getMask
          */
-        getMask(): duice.mask.Mask {
+        getMask(): Mask {
             return this.mask;
         }
 
@@ -165,7 +163,7 @@ namespace duice {
          */
         checkBeforeChange(event: any): void {
             let value = event.target['value'];
-            if(this.dataHandler.callBeforeChangeListener(this.property, value) === false){
+            if(this.dataHandler.callBeforeChange(this.property, value) === false){
                 this.setValue(this.dataHandler.getValue(this.property));
                 throw new Error('before change listener returns false');
             }

@@ -1,4 +1,5 @@
-namespace duice.element {
+///<reference path="InputElement.ts"/>
+namespace duice {
 
     /**
      * InputCheckboxElement

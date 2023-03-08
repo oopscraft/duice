@@ -48,7 +48,7 @@ namespace duice {
          * @param detail
          */
         update(elementSet: ElementSet<any>, detail: any): void {
-            console.log("DataSetHandler", element, detail);
+            console.log("DataSetHandler", elementSet, detail);
             if(detail.name === 'changeIndex'){
                 let data = this.dataSet.splice(detail.fromIndex,1)[0];
                 this.dataSet.splice(detail.toIndex, 0, data);

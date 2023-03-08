@@ -1,4 +1,4 @@
-namespace duice.mask {
+namespace duice {
 
     /**
      * DateFormat

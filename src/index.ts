@@ -144,6 +144,38 @@ namespace duice {
     }
 
     /**
+     * alert
+     * @param message
+     */
+    export function alert(message: string): duice.AlertDialog {
+        return new duice.AlertDialog(message);
+    }
+
+    /**
+     * confirm
+     * @param message
+     */
+    export function confirm(message: string): duice.ConfirmDialog {
+        return new duice.ConfirmDialog(message);
+    }
+
+    /**
+     * prompt
+     * @param message
+     */
+    export function prompt(message: string): duice.PromptDialog {
+        return new duice.PromptDialog(message);
+    }
+
+    /**
+     * dialog
+     * @param dialogElement
+     */
+    export function dialog(dialogElement: HTMLDialogElement): duice.Dialog {
+        return new duice.Dialog(dialogElement);
+    }
+
+    /**
      * listens DOMContentLoaded event
      */
     if(globalThis.document) {

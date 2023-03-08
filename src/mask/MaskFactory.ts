@@ -1,4 +1,4 @@
-namespace duice.mask {
+namespace duice {
 
     export class MaskFactory {
 
@@ -6,7 +6,7 @@ namespace duice.mask {
          * getMask
          * @param mask
          */
-        static getMask(mask: string): mask.Mask {
+        static getMask(mask: string): Mask {
             if(mask.startsWith('string')){
                 mask = mask.replace('string', 'StringMask');
             }
@@ -16,7 +16,7 @@ namespace duice.mask {
             if(mask.startsWith('date')){
                 mask = mask.replace('date', 'DateMask');
             }
-            return Function(`return new duice.mask.${mask};`).call(null);
+            return Function(`return new duice.${mask};`).call(null);
         }
 
     }

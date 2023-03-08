@@ -29,7 +29,7 @@ namespace duice {
             if(instance){
                 return instance;
             }else{
-                return new element.GenericElementFactory();
+                return new GenericElementFactory();
             }
         }
 

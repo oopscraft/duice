@@ -1,7 +1,5 @@
-namespace duice.element {
-
-    import NumberMask = duice.mask.NumberMask;
-    import Mask = duice.mask.Mask;
+///<reference path="../mask/NumberMask.ts"/>
+namespace duice {
 
     /**
      * InputNumberElement

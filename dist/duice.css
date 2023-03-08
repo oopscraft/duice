@@ -26,8 +26,9 @@
     --button-padding: 0.0625rem 0.5rem;
     --button-border: solid 1px #ccc;
     --button-border-radius: 1px;
-    --button-background-color: #eee;
-    --button-hover-color: #ddd;
+    --button-background-color: #f7f7f7;
+    --button-hover-background-color: #eee;
+    --dialog-border: solid 1px black;
 }
 
 /* global */
@@ -46,17 +47,15 @@ html *:focus {
 }
 .row {
     display: flex;
-    flex-wrap: wrap;
+    display: -ms-flexbox;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    margin: 0px;
+    padding: 0px;
 }
-.col {
-    flex-basis: 0;
-    flex-grow: 1;
-    max-width: 100%;
-}
-.col-auto {
-    flex: 0 0 auto;
-    width: auto;
-    max-width: none;
+.row > * {
+    margin: 0px;
+    border: none;
 }
 .col-1 {
     flex: 0 0 8.333333%;
@@ -241,7 +240,12 @@ button {
     transition-duration: 0.3s;
 }
 button:hover {
-    background-color: var(--button-hover-color);
+    background-color: var(--button-hover-background-color);
+}
+
+/* dialog */
+dialog {
+    border: var(--dialog-border);
 }
 
 
