@@ -196,21 +196,20 @@ var duice;
          * @param value
          */
         set(target, property, value) {
-            return __awaiter(this, void 0, void 0, function* () {
-                console.log("- Object.set", target, property, value);
-                // check before change listener
-                if (!(yield this.callBeforeChange(property, value))) {
-                    return true;
+            console.log("- Object.set", target, property, value);
+            // checks before change listener
+            this.callBeforeChange(property, value).then((result) => {
+                if (result) {
+                    // change property value
+                    Reflect.set(target, property, value);
+                    // calls after change listener
+                    this.callAfterChange(property, value).then();
+                    // notify
+                    this.notifyObservers({});
                 }
-                // change property value
-                Reflect.set(target, property, value);
-                // calls after change listener
-                yield this.callAfterChange(property, value);
-                // notify
-                this.notifyObservers({});
-                // returns
-                return true;
             });
+            // returns
+            return true;
         }
         /**
          * getValue

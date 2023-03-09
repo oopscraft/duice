@@ -7,6 +7,7 @@
     <script>
         'use strict';
         let myData = duice.Data.create({
+            name: 'Apple',
             phoneNo: '01012345678',
             cardNo: '0000111122223333',
             balanceAmount: 1234567.13,
@@ -49,7 +50,7 @@
     </script>
 </head>
 <body>
-<h1>Element Test</h1>
+<h1>Element Sample</h1>
 <div class="container">
     <div class="row">
         <div class="col-2">
@@ -68,6 +69,27 @@
                     <th>HTML Code</th>
                 </tr>
                 </thead>
+                <!-- name -->
+                <tbody>
+                <tr>
+                    <td rowspan="2" class="font-weight-bold">name</td>
+                    <td rowspan="2" duice:data="myData" duice:property="name"></td>
+                    <td>
+                        <span duice:data="myData" duice:property="name"/></span>
+                    </td>
+                    <td class="font-weight-light">
+                        &lt;* duice:data="myData" duice:property="name"&gt; &lt;/*&gt;
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="text" duice:data="myData" duice:property="name"/>
+                    </td>
+                    <td class="font-weight-light">
+                        &lt;input type="text" duice:data="myData" duice:property="name"/&gt;
+                    </td>
+                </tr>
+                </tbody>
                 <!-- phoneNo -->
                 <tbody>
                 <tr>

@@ -49,22 +49,22 @@ namespace duice {
          * @param property
          * @param value
          */
-        async set(target: object, property: string, value: any) {
+        set(target: object, property: string, value: any) {
             console.log("- Object.set", target, property, value);
 
-            // check before change listener
-            if(! await this.callBeforeChange(property, value)){
-                return true;
-            }
+            // checks before change listener
+            this.callBeforeChange(property, value).then((result)=>{
+                if(result){
+                    // change property value
+                    Reflect.set(target, property, value);
 
-            // change property value
-            Reflect.set(target, property, value);
+                    // calls after change listener
+                    this.callAfterChange(property, value).then();
 
-            // calls after change listener
-            await this.callAfterChange(property, value);
-
-            // notify
-            this.notifyObservers({});
+                    // notify
+                    this.notifyObservers({});
+                }
+            });
 
             // returns
             return true;
