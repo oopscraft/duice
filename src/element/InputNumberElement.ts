@@ -6,8 +6,6 @@ namespace duice {
      */
     export class InputNumberElement extends InputElement {
 
-        mask: Mask = new NumberMask();
-
         /**
          * constructor
          * @param htmlElement
@@ -29,10 +27,10 @@ namespace duice {
         }
 
         /**
-         * doGetValue
+         * getValue
          */
-        doGetValue(): any {
-            let value = super.doGetValue();
+        getValue(): any {
+            let value = super.getValue();
             return Number(value);
         }
 

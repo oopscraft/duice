@@ -196,17 +196,21 @@ var duice;
          * @param value
          */
         set(target, property, value) {
-            console.log("- Object.set", target, property, value);
-            // check before change listener
-            if (!this.callBeforeChange(property, value)) {
+            return __awaiter(this, void 0, void 0, function* () {
+                console.log("- Object.set", target, property, value);
+                // check before change listener
+                if (!(yield this.callBeforeChange(property, value))) {
+                    return true;
+                }
+                // change property value
+                Reflect.set(target, property, value);
+                // calls after change listener
+                yield this.callAfterChange(property, value);
+                // notify
+                this.notifyObservers({});
+                // returns
                 return true;
-            }
-            // change property value
-            Reflect.set(target, property, value);
-            // notify
-            this.notifyObservers({});
-            // returns
-            return true;
+            });
         }
         /**
          * getValue
@@ -231,17 +235,22 @@ var duice;
          * @param detail
          */
         update(element, detail) {
-            console.log("DataHandler.update", element, detail);
-            let property = element.getProperty();
-            if (property) {
-                // change property value
-                let value = element.doGetValue();
-                this.setValue(property, value);
-                // calls after change listener
-                this.callAfterChange(property, value);
-            }
-            // notify
-            this.notifyObservers(detail);
+            return __awaiter(this, void 0, void 0, function* () {
+                console.log("DataHandler.update", element, detail);
+                let property = element.getProperty();
+                if (property) {
+                    let value = element.getValue();
+                    // calls before change listener
+                    if (yield this.callBeforeChange(property, value)) {
+                        // change property value
+                        this.setValue(property, value);
+                        // calls after change listener
+                        yield this.callAfterChange(property, value);
+                    }
+                }
+                // notify
+                this.notifyObservers(detail);
+            });
         }
         /**
          * setReadonlyAll
@@ -278,19 +287,6 @@ var duice;
             this.beforeChangeListener = listener;
         }
         /**
-         * callBeforeChange
-         * @param property
-         * @param value
-         */
-        callBeforeChange(property, value) {
-            if (this.beforeChangeListener) {
-                if (!this.beforeChangeListener.call(this.getData(), property, value)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        /**
          * onAfterChange
          * @param listener
          */
@@ -298,14 +294,32 @@ var duice;
             this.afterChangeListener = listener;
         }
         /**
+         * callBeforeChange
+         * @param property
+         * @param value
+         */
+        callBeforeChange(property, value) {
+            return __awaiter(this, void 0, void 0, function* () {
+                if (this.beforeChangeListener) {
+                    let result = yield this.beforeChangeListener.call(this.getData(), property, value);
+                    if (result === false) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+        }
+        /**
          * callAfterChange
          * @param property
          * @param value
          */
         callAfterChange(property, value) {
-            if (this.afterChangeListener) {
-                this.afterChangeListener.call(this.getData(), property, value);
-            }
+            return __awaiter(this, void 0, void 0, function* () {
+                if (this.afterChangeListener) {
+                    yield this.afterChangeListener.call(this.getData(), property, value);
+                }
+            });
         }
     }
     duice.DataHandler = DataHandler;
@@ -543,7 +557,7 @@ var duice;
             this.dataHandler.addObserver(this);
         }
         /**
-         * getDataHandler
+         * returns bind data handler
          */
         getDataHandler() {
             return this.dataHandler;
@@ -568,14 +582,14 @@ var duice;
             return this.property;
         }
         /**
-         * setMask
-         * @param mask
+         * set mask
+         * @param mask string from html mask attribute
          */
         setMask(mask) {
             this.mask = duice.MaskFactory.getMask(mask);
         }
         /**
-         * getMask
+         * returns mask
          */
         getMask() {
             return this.mask;
@@ -609,33 +623,6 @@ var duice;
             }
             // executes script
             this.executeScript();
-        }
-        /**
-         * setValue
-         * @param value
-         */
-        setValue(value) {
-            value = this.getMask() ? this.getMask().encode(value) : value;
-            this.doSetValue(value);
-        }
-        /**
-         * getValue
-         */
-        getValue() {
-            let value = this.doGetValue();
-            value = this.getMask() ? this.getMask().decode(value) : value;
-            return value;
-        }
-        /**
-         * checkBeforeChange
-         * @param event
-         */
-        checkBeforeChange(event) {
-            let value = event.target['value'];
-            if (this.dataHandler.callBeforeChange(this.property, value) === false) {
-                this.setValue(this.dataHandler.getValue(this.property));
-                throw new Error('before change listener returns false');
-            }
         }
         /**
          * executes script
@@ -1031,7 +1018,9 @@ var duice;
      * @param message
      */
     function alert(message) {
-        return new duice.AlertDialog(message);
+        return __awaiter(this, void 0, void 0, function* () {
+            yield new duice.AlertDialog(message).open();
+        });
     }
     duice.alert = alert;
     /**
@@ -1039,7 +1028,9 @@ var duice;
      * @param message
      */
     function confirm(message) {
-        return new duice.ConfirmDialog(message);
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield new duice.ConfirmDialog(message).open();
+        });
     }
     duice.confirm = confirm;
     /**
@@ -1047,7 +1038,9 @@ var duice;
      * @param message
      */
     function prompt(message) {
-        return new duice.PromptDialog(message);
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield new duice.PromptDialog(message).open();
+        });
     }
     duice.prompt = prompt;
     /**
@@ -1055,7 +1048,9 @@ var duice;
      * @param dialogElement
      */
     function dialog(dialogElement) {
-        return new duice.Dialog(dialogElement);
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield new duice.Dialog(dialogElement).open();
+        });
     }
     duice.dialog = dialog;
     /**
@@ -1271,7 +1266,7 @@ var duice;
             confirmButton.appendChild(document.createTextNode('Yes'));
             confirmButton.style.width = '3rem';
             confirmButton.addEventListener('click', event => {
-                this.confirm().then();
+                this.confirm(true).then();
             });
             this.getDialogElement().appendChild(confirmButton);
             // cancel button
@@ -1279,7 +1274,7 @@ var duice;
             cancelButton.appendChild(document.createTextNode('No'));
             cancelButton.style.width = '3rem';
             cancelButton.addEventListener('click', event => {
-                this.close().then();
+                this.close(false).then();
             });
             this.getDialogElement().appendChild(cancelButton);
         }
@@ -1425,17 +1420,20 @@ var duice;
             this.getHtmlElement().insertBefore(this.textNode, this.getHtmlElement().firstChild);
         }
         /**
-         * doSetValue
+         * setValue
          * @param value
          */
-        doSetValue(value) {
+        setValue(value) {
+            value = this.getMask() ? this.getMask().encode(value) : value;
             this.textNode.textContent = value;
         }
         /**
          * getValue
          */
-        doGetValue() {
-            return this.textNode.textContent;
+        getValue() {
+            let value = this.textNode.textContent;
+            value = this.getMask() ? this.getMask().decode(value) : value;
+            return value;
         }
         /**
          * setReadonly
@@ -1486,22 +1484,24 @@ var duice;
             super(htmlElement, context);
             // adds change listener
             this.getHtmlElement().addEventListener('change', event => {
-                this.checkBeforeChange(event);
                 this.notifyObservers({});
             }, true);
         }
         /**
-         * doSetValue
+         * setValue
          * @param value
          */
-        doSetValue(value) {
+        setValue(value) {
+            value = this.getMask() ? this.getMask().encode(value) : value;
             this.getHtmlElement().value = value;
         }
         /**
-         * doGetValue
+         * getValue
          */
-        doGetValue() {
-            return this.getHtmlElement().value;
+        getValue() {
+            let value = this.getHtmlElement().value;
+            value = this.getMask() ? this.getMask().decode(value) : value;
+            return value;
         }
         /**
          * setReadonly
@@ -1536,10 +1536,10 @@ var duice;
             this.falseValue = falseValue ? falseValue : this.falseValue;
         }
         /**
-         * doSetValue
+         * setValue
          * @param value
          */
-        doSetValue(value) {
+        setValue(value) {
             if (value === this.trueValue) {
                 this.getHtmlElement().checked = true;
             }
@@ -1548,9 +1548,9 @@ var duice;
             }
         }
         /**
-         * doGetValue
+         * getValue
          */
-        doGetValue() {
+        getValue() {
             if (this.htmlElement.checked) {
                 return this.trueValue;
             }
@@ -1667,7 +1667,6 @@ var duice;
          */
         constructor(htmlElement, context) {
             super(htmlElement, context);
-            this.mask = new duice.NumberMask();
             // changes type and style
             this.getHtmlElement().removeAttribute('type');
             this.getHtmlElement().style.textAlign = 'right';
@@ -1679,10 +1678,10 @@ var duice;
             });
         }
         /**
-         * doGetValue
+         * getValue
          */
-        doGetValue() {
-            let value = super.doGetValue();
+        getValue() {
+            let value = super.getValue();
             return Number(value);
         }
     }
@@ -1703,21 +1702,20 @@ var duice;
             super(htmlElement, context);
             // adds event listener
             this.getHtmlElement().addEventListener('change', event => {
-                this.checkBeforeChange(event);
                 this.notifyObservers({});
             }, true);
         }
         /**
-         * doSetValue
+         * setValue
          * @param value
          */
-        doSetValue(value) {
+        setValue(value) {
             this.getHtmlElement().value = value;
         }
         /**
-         * doGetValue
+         * getValue
          */
-        doGetValue() {
+        getValue() {
             return this.getHtmlElement().value;
         }
         /**
@@ -1776,21 +1774,20 @@ var duice;
             super(htmlElement, context);
             // adds change event listener
             this.getHtmlElement().addEventListener('change', event => {
-                this.checkBeforeChange(event);
                 this.notifyObservers({});
             }, true);
         }
         /**
-         * doSetValue
+         * setValue
          * @param value
          */
-        doSetValue(value) {
+        setValue(value) {
             this.getHtmlElement().value = value;
         }
         /**
-         * doGetValue
+         * getValue
          */
-        doGetValue() {
+        getValue() {
             let value = this.getHtmlElement().value;
             return value;
         }
@@ -1987,6 +1984,9 @@ var duice;
                 }
                 else {
                     encodedValue += patternChar;
+                }
+                if (valueCharsPosition >= valueChars.length) {
+                    break;
                 }
             }
             return encodedValue;

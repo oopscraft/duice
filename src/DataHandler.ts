@@ -49,16 +49,19 @@ namespace duice {
          * @param property
          * @param value
          */
-        set(target: object, property: string, value: any) {
+        async set(target: object, property: string, value: any) {
             console.log("- Object.set", target, property, value);
 
             // check before change listener
-            if(!this.callBeforeChange(property, value)){
+            if(! await this.callBeforeChange(property, value)){
                 return true;
             }
 
             // change property value
             Reflect.set(target, property, value);
+
+            // calls after change listener
+            await this.callAfterChange(property, value);
 
             // notify
             this.notifyObservers({});
@@ -91,17 +94,21 @@ namespace duice {
          * @param element
          * @param detail
          */
-        update(element: Element<any>, detail: any): void {
+        async update(element: Element<any>, detail: any): Promise<void> {
             console.log("DataHandler.update", element, detail);
             let property = element.getProperty();
             if(property){
+                let value = element.getValue();
 
-                // change property value
-                let value = element.doGetValue();
-                this.setValue(property, value);
+                // calls before change listener
+                if(await this.callBeforeChange(property, value)){
 
-                // calls after change listener
-                this.callAfterChange(property, value);
+                    // change property value
+                    this.setValue(property, value);
+
+                    // calls after change listener
+                    await this.callAfterChange(property, value);
+                }
             }
 
             // notify
@@ -146,20 +153,6 @@ namespace duice {
         }
 
         /**
-         * callBeforeChange
-         * @param property
-         * @param value
-         */
-        callBeforeChange(property: string, value: any): boolean {
-            if(this.beforeChangeListener) {
-                if(!this.beforeChangeListener.call(this.getData(), property, value)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        /**
          * onAfterChange
          * @param listener
          */
@@ -168,13 +161,28 @@ namespace duice {
         }
 
         /**
+         * callBeforeChange
+         * @param property
+         * @param value
+         */
+        async callBeforeChange(property: string, value: any): Promise<boolean> {
+            if(this.beforeChangeListener) {
+                let result = await this.beforeChangeListener.call(this.getData(), property, value);
+                if(result === false){
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /**
          * callAfterChange
          * @param property
          * @param value
          */
-        callAfterChange(property: string, value: any): void {
+        async callAfterChange(property: string, value: any): Promise<void> {
             if(this.afterChangeListener){
-                this.afterChangeListener.call(this.getData(), property, value);
+                await this.afterChangeListener.call(this.getData(), property, value);
             }
         }
 

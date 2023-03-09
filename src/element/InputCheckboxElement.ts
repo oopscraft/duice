@@ -26,10 +26,10 @@ namespace duice {
         }
 
         /**
-         * doSetValue
+         * setValue
          * @param value
          */
-        doSetValue(value: any): void {
+        setValue(value: any): void {
             if (value === this.trueValue) {
                 this.getHtmlElement().checked = true;
             } else {
@@ -38,9 +38,9 @@ namespace duice {
         }
 
         /**
-         * doGetValue
+         * getValue
          */
-        doGetValue(): any {
+        getValue(): any {
             if(this.htmlElement.checked){
                 return this.trueValue;
             }else{

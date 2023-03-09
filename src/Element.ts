@@ -45,7 +45,7 @@ namespace duice {
         }
 
         /**
-         * getDataHandler
+         * returns bind data handler
          */
         getDataHandler(): DataHandler {
             return this.dataHandler;
@@ -74,15 +74,15 @@ namespace duice {
         }
 
         /**
-         * setMask
-         * @param mask
+         * set mask
+         * @param mask string from html mask attribute
          */
         setMask(mask: string): void {
             this.mask = MaskFactory.getMask(mask);
         }
 
         /**
-         * getMask
+         * returns mask
          */
         getMask(): Mask {
             return this.mask;
@@ -132,42 +132,12 @@ namespace duice {
          * setValue
          * @param value
          */
-        setValue(value: any): void {
-            value = this.getMask() ? this.getMask().encode(value) : value;
-            this.doSetValue(value);
-        }
-
-        /**
-         * doSetValue
-         * @param value
-         */
-        abstract doSetValue(value: any): void;
+        abstract setValue(value: any): void;
 
         /**
          * getValue
          */
-        getValue(): any {
-            let value = this.doGetValue();
-            value = this.getMask() ? this.getMask().decode(value) : value;
-            return value;
-        }
-
-        /**
-         * doGetValue
-         */
-        abstract doGetValue(): any;
-
-        /**
-         * checkBeforeChange
-         * @param event
-         */
-        checkBeforeChange(event: any): void {
-            let value = event.target['value'];
-            if(this.dataHandler.callBeforeChange(this.property, value) === false){
-                this.setValue(this.dataHandler.getValue(this.property));
-                throw new Error('before change listener returns false');
-            }
-        }
+        abstract getValue(): any;
 
         /**
          * executes script

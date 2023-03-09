@@ -25,7 +25,7 @@ namespace duice {
                 return '';
             }
             number = Number(number);
-            let string = String(number.toFixed(this.scale));
+            let string = String(number.toFixed(this.scale)) as string;
             let reg = /(^[+-]?\d+)(\d{3})/;
             while (reg.test(string)) {
                 string = string.replace(reg, '$1' + ',' + '$2');

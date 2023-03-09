@@ -29,7 +29,7 @@ namespace duice {
             confirmButton.appendChild(document.createTextNode('Yes'));
             confirmButton.style.width = '3rem';
             confirmButton.addEventListener('click', event => {
-                this.confirm().then();
+                this.confirm(true).then();
             });
             this.getDialogElement().appendChild(confirmButton);
 
@@ -38,7 +38,7 @@ namespace duice {
             cancelButton.appendChild(document.createTextNode('No'));
             cancelButton.style.width = '3rem';
             cancelButton.addEventListener('click', event => {
-                this.close().then();
+                this.close(false).then();
             });
             this.getDialogElement().appendChild(cancelButton);
         }

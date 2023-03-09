@@ -15,23 +15,22 @@ namespace duice {
 
             // adds change event listener
             this.getHtmlElement().addEventListener('change', event => {
-                this.checkBeforeChange(event);
                 this.notifyObservers({});
             }, true);
         }
 
         /**
-         * doSetValue
+         * setValue
          * @param value
          */
-        doSetValue(value: any): void {
+        setValue(value: any): void {
             this.getHtmlElement().value = value;
         }
 
         /**
-         * doGetValue
+         * getValue
          */
-        doGetValue(): any {
+        getValue(): any {
             let value = this.getHtmlElement().value;
             return value;
         }

@@ -35,6 +35,9 @@ namespace duice {
                 } else {
                     encodedValue += patternChar;
                 }
+                if(valueCharsPosition >= valueChars.length){
+                   break;
+                }
             }
             return encodedValue;
         }

@@ -10,29 +10,27 @@
         /**
          * doAlert
          */
-        function doAlert() {
-            duice.alert('<b>Hello~</b>\nThis is alert message!')
-                .onBeforeClose(() => {
-                    alert('before close');
-                })
-                .onAfterClose(() => {
-                    alert('after close');
-                })
-                .open();
+        async function doAlert() {
+            await duice.alert('<b>Hello~</b>\nThis is alert message!');
         }
 
         /**
          * doConfirm
          */
-        function doConfirm() {
-            duice.confirm('<b>Hello~</b>\nThis is confirm message!')
-                .onBeforeConfirm(() => {
-                    alert('before confirm');
-                })
-                .onAfterConfirm(() => {
-                    alert('after confirm');
-                })
-                .open();
+        async function doConfirm() {
+
+            // await style
+            if(await duice.confirm('await style')){
+                alert(true);
+            }else{
+                alert(false);
+            }
+
+            // promise then style
+            duice.confirm('promise-then style').then((result) =>{
+                alert(`result is [${result}]`);
+            });
+
         }
 
         /**
@@ -40,17 +38,16 @@
          * @returns {Promise<void>}
          */
         async function doPrompt() {
-            let name = await duice.prompt("<b>Hello~</b>\nWhat is your name?")
-                .open();
+            let name = await duice.prompt("<b>Hello~</b>\nWhat is your name?");
             alert(name);
         }
 
         /**
          * doDialog
          */
-        function doDialog() {
-            duice.dialog(document.getElementById('myDialog'))
-                .open();
+        async function doDialog() {
+            await duice.dialog(document.getElementById('myDialog'));
+            alert('do next');
         }
 
     </script>

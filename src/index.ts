@@ -147,32 +147,32 @@ namespace duice {
      * alert
      * @param message
      */
-    export function alert(message: string): duice.AlertDialog {
-        return new duice.AlertDialog(message);
+    export async function alert(message: string): Promise<void> {
+        await new duice.AlertDialog(message).open();
     }
 
     /**
      * confirm
      * @param message
      */
-    export function confirm(message: string): duice.ConfirmDialog {
-        return new duice.ConfirmDialog(message);
+    export async function confirm(message: string): Promise<boolean> {
+        return await new duice.ConfirmDialog(message).open();
     }
 
     /**
      * prompt
      * @param message
      */
-    export function prompt(message: string): duice.PromptDialog {
-        return new duice.PromptDialog(message);
+    export async function prompt(message: string): Promise<string> {
+        return await new duice.PromptDialog(message).open();
     }
 
     /**
      * dialog
      * @param dialogElement
      */
-    export function dialog(dialogElement: HTMLDialogElement): duice.Dialog {
-        return new duice.Dialog(dialogElement);
+    export async function dialog(dialogElement: HTMLDialogElement): Promise<void> {
+        return await new duice.Dialog(dialogElement).open();
     }
 
     /**

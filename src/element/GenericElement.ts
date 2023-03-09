@@ -20,18 +20,21 @@ namespace duice {
         }
 
         /**
-         * doSetValue
+         * setValue
          * @param value
          */
-        doSetValue(value: any): void {
+        setValue(value: any): void {
+            value = this.getMask() ? this.getMask().encode(value) : value;
             this.textNode.textContent = value;
         }
 
         /**
          * getValue
          */
-        doGetValue(): any {
-            return this.textNode.textContent;
+        getValue(): any {
+            let value = this.textNode.textContent;
+            value = this.getMask() ? this.getMask().decode(value) : value;
+            return value;
         }
 
         /**
