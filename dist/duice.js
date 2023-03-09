@@ -975,6 +975,31 @@ var duice;
     }
     duice.setAttribute = setAttribute;
     /**
+     * getCurrentWindow
+     * @private
+     */
+    function getCurrentWindow() {
+        if (window.frameElement) {
+            return window.parent;
+        }
+        else {
+            return window;
+        }
+    }
+    duice.getCurrentWindow = getCurrentWindow;
+    /**
+     * moveToCenterPosition
+     */
+    function moveToCenterPosition(htmlElement) {
+        let currentWindow = getCurrentWindow();
+        let computedStyle = currentWindow.getComputedStyle(this.dialog);
+        let computedWidth = parseInt(computedStyle.getPropertyValue('width').replace(/px/gi, ''));
+        let computedHeight = parseInt(computedStyle.getPropertyValue('height').replace(/px/gi, ''));
+        htmlElement.style.left = Math.max(0, currentWindow.innerWidth / 2 - computedWidth / 2) + 'px';
+        htmlElement.style.top = Math.max(0, currentWindow.innerHeight / 2 - computedHeight / 2) + 'px';
+    }
+    duice.moveToCenterPosition = moveToCenterPosition;
+    /**
      * removeChildNodes
      * @param element
      */
@@ -1073,6 +1098,41 @@ var duice;
          */
         constructor(dialogElement) {
             this.dialogElement = dialogElement;
+            // dialog fixed style
+            this.dialogElement.style.position = 'absolute';
+            this.dialogElement.style.left = '0';
+            this.dialogElement.style.right = '0';
+            this.dialogElement.style.margin = 'auto';
+            this.dialogElement.style.height = 'fit-content';
+            // header
+            let header = document.createElement('span');
+            this.dialogElement.appendChild(header);
+            header.style.display = 'block';
+            header.style.position = 'absolute';
+            header.style.left = '0';
+            header.style.top = '0';
+            header.style.width = '100%';
+            header.style.height = '1rem';
+            header.style.cursor = 'pointer';
+            let currentWindow = duice.getCurrentWindow();
+            let _this = this;
+            header.onmousedown = function (event) {
+                let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+                pos3 = event.clientX;
+                pos4 = event.clientY;
+                currentWindow.document.onmouseup = function (event) {
+                    currentWindow.document.onmousemove = null;
+                    currentWindow.document.onmouseup = null;
+                };
+                currentWindow.document.onmousemove = function (event) {
+                    pos1 = pos3 - event.clientX;
+                    pos2 = pos4 - event.clientY;
+                    pos3 = event.clientX;
+                    pos4 = event.clientY;
+                    _this.getDialogElement().style.left = (_this.getDialogElement().offsetLeft - pos1) + 'px';
+                    _this.getDialogElement().style.top = (_this.getDialogElement().offsetTop - pos2) + 'px';
+                };
+            };
             // creates close button
             let closeButton = document.createElement('span');
             closeButton.style.position = 'absolute';
@@ -1103,8 +1163,8 @@ var duice;
          */
         show() {
             // show dialog modal
-            let window = globalThis.window['fragment'] ? globalThis.window.parent : globalThis.window;
-            window.document.body.appendChild(this.dialogElement);
+            let currentWindow = globalThis.window['fragment'] ? globalThis.window.parent : globalThis.window;
+            currentWindow.document.body.appendChild(this.dialogElement);
             this.dialogElement.showModal();
             //return promise to delay
             return new Promise(function (resolve, reject) {
@@ -1223,6 +1283,7 @@ var duice;
          */
         constructor(message) {
             super(document.createElement('dialog'));
+            this.getDialogElement().style.padding = '1rem';
             this.getDialogElement().style.minWidth = '15rem';
             this.getDialogElement().style.textAlign = 'center';
             // message pre
@@ -1254,6 +1315,7 @@ var duice;
          */
         constructor(message) {
             super(document.createElement('dialog'));
+            this.getDialogElement().style.padding = '1rem';
             this.getDialogElement().style.minWidth = '15rem';
             this.getDialogElement().style.textAlign = 'center';
             // message pre
@@ -1331,6 +1393,7 @@ var duice;
          */
         constructor(message) {
             super(document.createElement('dialog'));
+            this.getDialogElement().style.padding = '1rem';
             this.getDialogElement().style.minWidth = '15rem';
             this.getDialogElement().style.textAlign = 'center';
             // message pre

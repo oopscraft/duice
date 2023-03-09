@@ -28,6 +28,43 @@ namespace duice {
         constructor(dialogElement: HTMLDialogElement) {
             this.dialogElement = dialogElement;
 
+            // dialog fixed style
+            this.dialogElement.style.position = 'absolute';
+            this.dialogElement.style.left = '0';
+            this.dialogElement.style.right = '0';
+            this.dialogElement.style.margin = 'auto';
+            this.dialogElement.style.height = 'fit-content';
+
+            // header
+            let header = document.createElement('span');
+            this.dialogElement.appendChild(header);
+            header.style.display = 'block';
+            header.style.position = 'absolute';
+            header.style.left = '0';
+            header.style.top = '0';
+            header.style.width = '100%';
+            header.style.height = '1rem';
+            header.style.cursor = 'pointer';
+            let currentWindow = getCurrentWindow();
+            let _this = this;
+            header.onmousedown = function (event) {
+                let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+                pos3 = event.clientX;
+                pos4 = event.clientY;
+                currentWindow.document.onmouseup = function (event) {
+                    currentWindow.document.onmousemove = null;
+                    currentWindow.document.onmouseup = null;
+                };
+                currentWindow.document.onmousemove = function (event) {
+                    pos1 = pos3 - event.clientX;
+                    pos2 = pos4 - event.clientY;
+                    pos3 = event.clientX;
+                    pos4 = event.clientY;
+                    _this.getDialogElement().style.left = (_this.getDialogElement().offsetLeft - pos1) + 'px';
+                    _this.getDialogElement().style.top = (_this.getDialogElement().offsetTop - pos2) + 'px';
+                };
+            };
+
             // creates close button
             let closeButton = document.createElement('span');
             closeButton.style.position = 'absolute';
@@ -61,8 +98,8 @@ namespace duice {
         protected show(): Promise<any> {
 
             // show dialog modal
-            let window = globalThis.window['fragment'] ? globalThis.window.parent : globalThis.window;
-            window.document.body.appendChild(this.dialogElement);
+            let currentWindow = globalThis.window['fragment'] ? globalThis.window.parent : globalThis.window;
+            currentWindow.document.body.appendChild(this.dialogElement);
             this.dialogElement.showModal();
 
             //return promise to delay
