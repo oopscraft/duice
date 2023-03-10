@@ -6,9 +6,11 @@ namespace duice {
      */
     export class ConfirmDialog extends Dialog {
 
-        protected beforeConfirmListener: Function;
+        messagePre: HTMLPreElement;
 
-        protected afterConfirmListener: Function;
+        confirmButton: HTMLButtonElement;
+
+        cancelButton: HTMLButtonElement;
 
         /**
          * constructor
@@ -21,70 +23,57 @@ namespace duice {
             this.getDialogElement().style.textAlign = 'center';
 
             // message pre
-            let messagePre = document.createElement('pre');
-            messagePre.innerHTML = message;
-            this.getDialogElement().appendChild(messagePre);
+            this.messagePre = document.createElement('pre');
+            this.messagePre.innerHTML = message;
+            this.getDialogElement().appendChild(this.messagePre);
 
             // confirm button
-            let confirmButton = document.createElement('button');
-            confirmButton.appendChild(document.createTextNode('Yes'));
-            confirmButton.style.width = '3rem';
-            confirmButton.addEventListener('click', event => {
-                this.confirm(true).then();
+            this.confirmButton = document.createElement('button');
+            this.confirmButton.appendChild(document.createTextNode('Yes'));
+            this.confirmButton.style.width = '3rem';
+            this.confirmButton.addEventListener('click', event => {
+                this.confirm();
             });
-            this.getDialogElement().appendChild(confirmButton);
+            this.getDialogElement().appendChild(this.confirmButton);
 
             // cancel button
-            let cancelButton = document.createElement('button');
-            cancelButton.appendChild(document.createTextNode('No'));
-            cancelButton.style.width = '3rem';
-            cancelButton.addEventListener('click', event => {
-                this.close(false).then();
+            this.cancelButton = document.createElement('button');
+            this.cancelButton.appendChild(document.createTextNode('No'));
+            this.cancelButton.style.width = '3rem';
+            this.cancelButton.addEventListener('click', event => {
+                this.cancel();
             });
-            this.getDialogElement().appendChild(cancelButton);
+            this.getDialogElement().appendChild(this.cancelButton);
+        }
+
+        /**
+         * open
+         */
+        override open() {
+            let promise = super.open();
+            this.confirmButton.focus();
+            return promise;
         }
 
         /**
          * confirm
-         * @param args
          */
-        async confirm(...args: any[]): Promise<any> {
-
-            // call before confirm listener
-            if(this.beforeConfirmListener){
-                if(await this.beforeConfirmListener.call(this, ...args) === false){
-                    return;
-                }
-            }
-
-            // hide
-            await this.hide();
-
-            // call after confirm listener
-            if(this.afterConfirmListener){
-                await this.afterConfirmListener.call(this, ...args);
-            }
-
-            // resolves promise
-            this.promiseResolve(...args);
+        confirm() {
+           this.resolve(true);
         }
 
         /**
-         * Adds beforeConfirm listener
-         * @param listener
+         * cancel
          */
-        onBeforeConfirm(listener:Function): this {
-            this.beforeConfirmListener = listener;
-            return this;
+        cancel() {
+           this.resolve(false);
         }
 
         /**
-         * Adds afterConfirm listener
-         * @param listener
+         * close
          */
-        onAfterConfirm(listener:Function):any {
-            this.afterConfirmListener = listener;
-            return this;
+        override close() {
+           this.resolve(false);
         }
 
     }

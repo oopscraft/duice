@@ -86,7 +86,7 @@ h6 {
     display: flex;
     display: -ms-flexbox;
     flex-wrap: nowrap;
-    justify-content: space-between;
+    justify-content: unset;
     margin: 0px;
     padding: 0px;
 }

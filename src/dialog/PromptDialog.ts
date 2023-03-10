@@ -6,9 +6,13 @@ namespace duice {
      */
     export class PromptDialog extends Dialog {
 
-        protected beforeConfirmListener: Function;
+        messagePre: HTMLPreElement;
 
-        protected afterConfirmListener: Function;
+        promptInput: HTMLInputElement;
+
+        confirmButton: HTMLButtonElement;
+
+        cancelButton: HTMLButtonElement;
 
         /**
          * constructor
@@ -21,78 +25,44 @@ namespace duice {
             this.getDialogElement().style.textAlign = 'center';
 
             // message pre
-            let messagePre = document.createElement('pre');
-            messagePre.innerHTML = message;
-            this.getDialogElement().appendChild(messagePre);
+            this.messagePre = document.createElement('pre');
+            this.messagePre.innerHTML = message;
+            this.getDialogElement().appendChild(this.messagePre);
 
             // prompt input
-            let promptInput = document.createElement('input');
-            promptInput.style.display = 'block';
-            promptInput.style.textAlign = 'center';
-            promptInput.style.margin = '0.75rem 0';
-            promptInput.style.width = '100%';
-            this.getDialogElement().appendChild(promptInput);
+            this.promptInput = document.createElement('input');
+            this.promptInput.style.display = 'block';
+            this.promptInput.style.textAlign = 'center';
+            this.promptInput.style.margin = '0.75rem 0';
+            this.promptInput.style.width = '100%';
+            this.getDialogElement().appendChild(this.promptInput);
 
             // confirm button
-            let confirmButton = document.createElement('button');
-            confirmButton.appendChild(document.createTextNode('Yes'));
-            confirmButton.style.width = '3rem';
-            confirmButton.addEventListener('click', event => {
-                this.confirm(promptInput.value).then();
+            this.confirmButton = document.createElement('button');
+            this.confirmButton.appendChild(document.createTextNode('Yes'));
+            this.confirmButton.style.width = '3rem';
+            this.confirmButton.addEventListener('click', event => {
+                this.resolve(this.promptInput.value);
             });
-            this.getDialogElement().appendChild(confirmButton);
+            this.getDialogElement().appendChild(this.confirmButton);
 
             // cancel button
-            let cancelButton = document.createElement('button');
-            cancelButton.appendChild(document.createTextNode('No'));
-            cancelButton.style.width = '3rem';
-            cancelButton.addEventListener('click', event => {
-                this.close().then();
+            this.cancelButton = document.createElement('button');
+            this.cancelButton.appendChild(document.createTextNode('No'));
+            this.cancelButton.style.width = '3rem';
+            this.cancelButton.addEventListener('click', event => {
+                this.resolve();
             });
-            this.getDialogElement().appendChild(cancelButton);
+            this.getDialogElement().appendChild(this.cancelButton);
         }
 
         /**
-         * confirm
-         * @param args
+         * open
          */
-        async confirm(...args: any[]): Promise<any> {
-
-            // call before confirm listener
-            if (this.beforeConfirmListener) {
-                if (await this.beforeConfirmListener.call(this, ...args) === false) {
-                    return;
-                }
-            }
-
-            // hide
-            await this.hide();
-
-            // call after confirm listener
-            if (this.afterConfirmListener) {
-                await this.afterConfirmListener.call(this, ...args);
-            }
-
-            // resolves promise
-            this.promiseResolve(...args);
-        }
-
-        /**
-         * Adds beforeConfirm listener
-         * @param listener
-         */
-        public onBeforeConfirm(listener: Function): this {
-            this.beforeConfirmListener = listener;
-            return this;
-        }
-
-        /**
-         * Adds afterConfirm listener
-         * @param listener
-         */
-        onAfterConfirm(listener: Function): any {
-            this.afterConfirmListener = listener;
-            return this;
+        open() {
+            let promise = super.open();
+            this.promptInput.focus();
+            return promise;
         }
 
     }

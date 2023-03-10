@@ -7,13 +7,9 @@ namespace duice {
 
         protected dialogElement: HTMLDialogElement;
 
-        beforeOpenListener: Function;
+        protected header: HTMLSpanElement;
 
-        afterOpenListener: Function;
-
-        protected beforeCloseListener: Function;
-
-        protected afterCloseListener: Function;
+        protected closeButton: HTMLSpanElement;
 
         protected promise: Promise<any>;
 
@@ -27,6 +23,7 @@ namespace duice {
          */
         constructor(dialogElement: HTMLDialogElement) {
             this.dialogElement = dialogElement;
+            let _this = this;
 
             // dialog fixed style
             this.dialogElement.style.position = 'absolute';
@@ -36,53 +33,73 @@ namespace duice {
             this.dialogElement.style.height = 'fit-content';
 
             // header
-            let header = document.createElement('span');
-            this.dialogElement.appendChild(header);
-            header.style.display = 'block';
-            header.style.position = 'absolute';
-            header.style.left = '0';
-            header.style.top = '0';
-            header.style.width = '100%';
-            header.style.height = '1rem';
-            header.style.cursor = 'pointer';
-            let currentWindow = getCurrentWindow();
-            let _this = this;
-            header.onmousedown = function (event) {
+            this.header = document.createElement('span');
+            this.dialogElement.appendChild(this.header);
+            this.header.style.display = 'block';
+            this.header.style.position = 'absolute';
+            this.header.style.left = '0';
+            this.header.style.top = '0';
+            this.header.style.width = '100%';
+            this.header.style.height = '1rem';
+            this.header.style.cursor = 'pointer';
+
+            // drag
+            this.dialogElement.style.margin = '0px';
+            this.header.onmousedown = function (event) {
                 let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
                 pos3 = event.clientX;
                 pos4 = event.clientY;
-                currentWindow.document.onmouseup = function (event) {
-                    currentWindow.document.onmousemove = null;
-                    currentWindow.document.onmouseup = null;
+                window.document.onmouseup = function (event) {
+                    window.document.onmousemove = null;
+                    window.document.onmouseup = null;
+
                 };
-                currentWindow.document.onmousemove = function (event) {
+                window.document.onmousemove = function (event) {
                     pos1 = pos3 - event.clientX;
                     pos2 = pos4 - event.clientY;
                     pos3 = event.clientX;
                     pos4 = event.clientY;
-                    _this.getDialogElement().style.left = (_this.getDialogElement().offsetLeft - pos1) + 'px';
-                    _this.getDialogElement().style.top = (_this.getDialogElement().offsetTop - pos2) + 'px';
+                    _this.dialogElement.style.left = (_this.dialogElement.offsetLeft - pos1) + 'px';
+                    _this.dialogElement.style.top = (_this.dialogElement.offsetTop - pos2) + 'px';
                 };
             };
 
             // creates close button
-            let closeButton = document.createElement('span');
-            closeButton.style.position = 'absolute';
-            closeButton.style.top = '0';
-            closeButton.style.right = '0';
-            closeButton.style.cursor = 'pointer';
-            closeButton.style.width = '1rem';
-            closeButton.style.height = '1rem';
-            closeButton.style.lineHeight = '1rem';
-            closeButton.style.margin = '1px';
-            closeButton.style.textAlign = 'center';
-            closeButton.style.fontFamily = 'sans-serif';
-            closeButton.style.fontSize = '0.75rem';
-            closeButton.appendChild(document.createTextNode('X'));
-            closeButton.addEventListener('click', event => {
-                this.close().then();
+            this.closeButton = document.createElement('span');
+            this.closeButton.style.position = 'absolute';
+            this.closeButton.style.top = '0';
+            this.closeButton.style.right = '0';
+            this.closeButton.style.cursor = 'pointer';
+            this.closeButton.style.width = '1rem';
+            this.closeButton.style.height = '1rem';
+            this.closeButton.style.lineHeight = '1rem';
+            this.closeButton.style.margin = '1px';
+            this.closeButton.style.textAlign = 'center';
+            this.closeButton.style.fontFamily = 'sans-serif';
+            this.closeButton.style.fontSize = '0.75rem';
+            this.closeButton.appendChild(document.createTextNode('X'));
+            this.closeButton.addEventListener('click', event => {
+                _this.close();
             });
-            this.dialogElement.appendChild(closeButton);
+            this.dialogElement.appendChild(this.closeButton);
+
+            // on resize event
+            window.addEventListener('resize', function (event) {
+                _this.moveToCenterPosition();
+            });
+        }
+
+        /**
+         * moveToCenterPosition
+         */
+        moveToCenterPosition() {
+            let computedStyle = window.getComputedStyle(this.dialogElement);
+            let computedWidth = parseInt(computedStyle.getPropertyValue('width').replace(/px/gi, ''));
+            let computedHeight = parseInt(computedStyle.getPropertyValue('height').replace(/px/gi, ''));
+            let scrollX = window.scrollX;
+            let scrollY = window.scrollY;
+            this.dialogElement.style.left = Math.max(0, window.innerWidth / 2 - computedWidth / 2) + scrollX + 'px';
+            this.dialogElement.style.top = Math.max(0, window.innerHeight / 2 - computedHeight / 2) + scrollY + 'px';
         }
 
         /**
@@ -95,56 +112,39 @@ namespace duice {
         /**
          * Shows modal
          */
-        protected show(): Promise<any> {
+        protected show(): void {
+
+            // saves current scroll position
+            let scrollX = window.scrollX;
+            let scrollY = window.scrollY;
 
             // show dialog modal
-            let currentWindow = globalThis.window['fragment'] ? globalThis.window.parent : globalThis.window;
-            currentWindow.document.body.appendChild(this.dialogElement);
+            getCurrentWindow().document.body.appendChild(this.dialogElement);
             this.dialogElement.showModal();
 
-            //return promise to delay
-            return new Promise(function (resolve, reject) {
-                setTimeout(function () {
-                    resolve(true);
-                }, 100);
-            });
+            // restore previous scroll position
+            window.scrollTo(scrollX, scrollY);
+
+            // adjusting position
+            this.moveToCenterPosition();
         }
 
         /**
          * Hides modal
          */
-        protected hide(): Promise<any> {
+        protected hide(): void {
+
             // closes modal
             this.dialogElement.close();
-
-            // return promise to delay
-            return new Promise(function (resolve, reject) {
-                setTimeout(function () {
-                    resolve(true);
-                }, 100);
-            });
         }
 
         /**
          * open
-         * @param args
          */
-        async open(...args: any[]): Promise<any> {
+        async open() {
 
-            // call before open listener
-            if (this.beforeOpenListener) {
-                if (await this.beforeOpenListener.call(this, ...args) === false) {
-                    return;
-                }
-            }
-
-            // show
-            await this.show();
-
-            //  call after open listener
-            if (this.afterOpenListener) {
-                await this.afterOpenListener.call(this, ...args);
-            }
+            // show modal
+            this.show();
 
             // creates promise
             let _this = this;
@@ -157,63 +157,27 @@ namespace duice {
 
         /**
          * close
+         */
+        close() {
+            this.reject();
+        }
+
+        /**
+         * confirm
          * @param args
          */
-        async close(...args: any[]): Promise<any> {
-
-            // call before close listener
-            if (this.beforeCloseListener) {
-                if (await this.beforeCloseListener.call(this, ...args) === false) {
-                    return;
-                }
-            }
-
-            // hide
-            await this.hide();
-
-            // call after close listener
-            if (this.afterCloseListener) {
-                await this.afterCloseListener.call(this, ...args);
-            }
-
-            // resolves promise
+        resolve(...args: any[]) {
+            this.hide();
             this.promiseResolve(...args);
         }
 
         /**
-         * Adds beforeOpen listener
-         * @param listener
+         * close
+         * @param args
          */
-        onBeforeOpen(listener: Function): this {
-            this.beforeOpenListener = listener;
-            return this;
-        }
-
-        /**
-         * Adds afterOpen listener
-         * @param listener
-         */
-        onAfterOpen(listener: Function): this {
-            this.afterOpenListener = listener;
-            return this;
-        }
-
-        /**
-         * Adds beforeClose listener
-         * @param listener
-         */
-        public onBeforeClose(listener: Function): this {
-            this.beforeCloseListener = listener;
-            return this;
-        }
-
-        /**
-         * Adds afterClose listener
-         * @param listener
-         */
-        onAfterClose(listener: Function): this {
-            this.afterCloseListener = listener;
-            return this;
+        reject(...args: any[]) {
+            this.hide();
+            this.promiseReject(...args);
         }
 
     }

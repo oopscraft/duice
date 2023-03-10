@@ -8,66 +8,139 @@
         'use strict';
 
         /**
-         * doAlert
+         * alertAwait
+         * @returns {Promise<void>}
          */
-        async function doAlert() {
+        async function alertAwait() {
             await duice.alert('<b>Hello~</b>\nThis is alert message!');
+            alert('ok');
         }
 
         /**
-         * doConfirm
+         * alertThen
+         * @returns {Promise<void>}
          */
-        async function doConfirm() {
+        async function alertThen() {
+            duice.alert('<b>Hello~</b>\nThis is alert message!').then(()=>{
+                alert('ok');
+            });
+        }
 
-            // await style
-            if(await duice.confirm('await style')){
+        /**
+         * confirmAwait
+         * @returns {Promise<void>}
+         */
+        async function confirmAwait() {
+            if(await duice.confirm('<b>Hello~</b>\nThis is confirm message!\nYes or No?')){
                 alert(true);
             }else{
                 alert(false);
             }
-
-            // promise then style
-            duice.confirm('promise-then style').then((result) =>{
-                alert(`result is [${result}]`);
-            });
-
         }
 
         /**
-         * doPrompt
+         * confirmThen
          * @returns {Promise<void>}
          */
-        async function doPrompt() {
+        async function confirmThen() {
+            duice.confirm('<b>Hello~</b>\nThis is confirm message!\nYes or No?').then((result) =>{
+                if(result) {
+                    alert(true);
+                }else{
+                    alert(false);
+                }
+            });
+        }
+
+        /**
+         * promptAwait
+         * @returns {Promise<void>}
+         */
+        async function promptAwait() {
             let name = await duice.prompt("<b>Hello~</b>\nWhat is your name?");
             alert(name);
         }
 
         /**
-         * doDialog
+         * promptThen
+         * @returns {Promise<void>}
          */
-        async function doDialog() {
-            await duice.dialog(document.getElementById('myDialog'));
-            alert('do next');
+        async function promptThen() {
+            duice.prompt("<b>Hello~</b>\nWhat is your name?").then(name => {
+                alert(name);
+            });
         }
+
+        /**
+         * openDialog
+         * @returns {Promise<void>}
+         */
+        async function openDialog() {
+            duice.dialog(document.getElementById('myDialog')).then(()=>{
+                alert('do next');
+            });
+        }
+
+        // adds DOMContentLoaded event listener
+        document.addEventListener("DOMContentLoaded", event => {
+            document.getElementById('alertAwaitCode').innerText = alertAwait;
+            document.getElementById('alertThenCode').innerText = alertThen;
+            document.getElementById('confirmAwaitCode').innerText = confirmAwait;
+            document.getElementById('confirmThenCode').innerText = confirmThen;
+            document.getElementById('promptAwaitCode').innerText = promptAwait;
+            document.getElementById('promptThenCode').innerText = promptThen;
+
+            // dialog
+            document.getElementById('dialogHtml').innerText = document.getElementById('myDialog').outerHTML;
+            document.getElementById('dialogCode').innerText = openDialog;
+        });
 
     </script>
 </head>
 <body>
-    <button onclick="doAlert();">
-        doAlert
-    </button>
-    <button onclick="doConfirm();">
-        doConfirm
-    </button>
-    <button onclick="doPrompt();">
-        doPrompt
-    </button>
-    <button onclick="doDialog();">
-        doDialog
-    </button>
+<h1>Dialog Test</h1>
 
-    <dialog id="myDialog">
-        Test Dialog
-    </dialog>
+<!-- alert -->
+<h2>Alert</h2>
+<h3>await style</h3>
+<pre id="alertAwaitCode" class="font-weight-light"></pre>
+<button onclick="alertAwait();">alertAwait</button>
+<h3>then style</h3>
+<pre id="alertThenCode" class="font-weight-light"></pre>
+<button onclick="alertThen();">alertThen</button>
+
+<!-- confirm -->
+<h2>Confirm</h2>
+<h3>await style</h3>
+<pre id="confirmAwaitCode" class="font-weight-light"></pre>
+<button onclick="confirmAwait();">confirmAwait</button>
+<h3>then style</h3>
+<pre id="confirmThenCode" class="font-weight-light"></pre>
+<button onclick="confirmThen();">confirmThen</button>
+
+<!-- prompt -->
+<h2>Prompt</h2>
+<h3>await style</h3>
+<pre id="promptAwaitCode" class="font-weight-light"></pre>
+<button onclick="promptAwait();">promptAwait</button>
+<h3>then style</h3>
+<pre id="promptThenCode" class="font-weight-light"></pre>
+<button onclick="promptThen();">promptThen</button>
+
+<!-- dialog -->
+<h2>Custom Dialog</h2>
+<h3>HTML</h3>
+<pre id="dialogHtml" class="font-weight-light"></pre>
+<h3>Javascript</h3>
+<pre id="dialogCode" class="font-weight-light"></pre>
+<button onclick="openDialog();">openDialog</button>
+<dialog id="myDialog">
+    <pre style="width:400px; height:400px;">
+        Custom Dialog
+        fdsafdsa
+        fdsafdsafdsa
+        fdsafdsafdsafdsa
+    </pre>
+</dialog>
 </body>
 </html>

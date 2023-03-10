@@ -6,6 +6,10 @@ namespace duice {
      */
     export class AlertDialog extends Dialog {
 
+        messagePre: HTMLPreElement;
+
+        confirmButton: HTMLButtonElement;
+
         /**
          * constructor
          * @param message
@@ -17,20 +21,42 @@ namespace duice {
             this.getDialogElement().style.textAlign = 'center';
 
             // message pre
-            let messagePre = document.createElement('pre');
-            messagePre.innerHTML = message;
-            this.getDialogElement().appendChild(messagePre);
+            this.messagePre = document.createElement('pre');
+            this.messagePre.innerHTML = message;
+            this.getDialogElement().appendChild(this.messagePre);
 
             // confirm button
-            let confirmButton = document.createElement('button');
-            confirmButton.appendChild(document.createTextNode('Yes'));
-            confirmButton.style.width = '3rem';
-            confirmButton.addEventListener('click', event => {
-                this.close().then();
+            this.confirmButton = document.createElement('button');
+            this.confirmButton.appendChild(document.createTextNode('Yes'));
+            this.confirmButton.style.width = '3rem';
+            this.confirmButton.addEventListener('click', event => {
+                this.confirm();
             });
-            this.getDialogElement().appendChild(confirmButton);
+            this.getDialogElement().appendChild(this.confirmButton);
         }
 
+        /**
+         * open
+         */
+        override open() {
+            let promise = super.open();
+            this.confirmButton.focus();
+            return promise;
+        }
+
+        /**
+         * confirm
+         */
+        confirm() {
+            this.resolve();
+        }
+
+        /**
+         * close
+         */
+        override close() {
+            this.resolve();
+        }
     }
 
 }
