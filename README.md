@@ -12,6 +12,6 @@ DUICE (Data oriented UI Component Element)
 
 
 ## Reference
-- git repository: https://github.com/oopscraft/duice
-- official site: https://duice.oopscraft.org
+- git repository: [https://github.com/oopscraft/duice](https://github.com/oopscraft/duice)
+- official site: [https://duice.oopscraft.org](https://duice.oopscraft.org)
 
