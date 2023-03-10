@@ -6,7 +6,7 @@ DUICE (Data oriented UI Component Element)
 
 [Data to Element Test](test/ElementTest.html)
 
-[DataSet to ElementSet Test](test/ElementTest.html)
+[DataSet to ElementSet Test](test/ElementSetTest.html)
 
 [Dialog/Alert/Confirm/Prompt Test](test/dialog/Dialog.html)
 
