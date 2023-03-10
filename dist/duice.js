@@ -18,23 +18,10 @@ var duice;
          * @param object
          */
         static create(object) {
-            let data = new Data(object);
+            let data = new Data();
             let dataHandler = new duice.DataHandler(data);
-            // _handler_
-            globalThis.Object.defineProperty(data, "_handler_", {
-                value: dataHandler,
-                writable: true
-            });
-            // return this as proxy instance
+            dataHandler.assign(object);
             return new Proxy(data, dataHandler);
-        }
-        /**
-         * constructor
-         * @param object
-         */
-        constructor(object) {
-            super();
-            Data.internalAssign(this, object);
         }
         /**
          * getHandler
@@ -44,37 +31,29 @@ var duice;
             return Object.getOwnPropertyDescriptor(data, '_handler_').value;
         }
         /**
-         * internalAssign
-         * @param object
-         * @param data
-         */
-        static internalAssign(data, object) {
-            for (let property in data) {
-                Reflect.deleteProperty(data, property);
-            }
-            for (let property in object) {
-                let value = Reflect.get(object, property);
-                Reflect.set(data, property, value);
-            }
-            return data;
-        }
-        /**
          * assign
          * @param data
          * @param object
          */
         static assign(data, object) {
-            Data.internalAssign(data, object);
-            Data.notify(data);
+            let handler = this.getHandler(data);
+            handler.assign(object);
+            handler.notifyObservers({});
             return data;
         }
         /**
-         * notify
+         * isDirty
          * @param data
          */
-        static notify(data) {
-            let handler = this.getHandler(data);
-            handler.notifyObservers({});
+        static isDirty(data) {
+            return this.getHandler(data).isDirty();
+        }
+        /**
+         * reset
+         * @param data
+         */
+        static reset(data) {
+            this.getHandler(data).reset();
         }
         /**
          * setReadonly
@@ -136,6 +115,7 @@ var duice;
     class Observable {
         constructor() {
             this.observers = [];
+            this.notifyEnabled = true;
         }
         /**
          * addObserver
@@ -145,13 +125,40 @@ var duice;
             this.observers.push(observer);
         }
         /**
+         * removeObserver
+         * @param observer
+         */
+        removeObserver(observer) {
+            for (let i = 0, size = this.observers.length; i < size; i++) {
+                if (this.observers[i] === observer) {
+                    this.observers.splice(i, 1);
+                    return;
+                }
+            }
+        }
+        /**
+         * suspend notify
+         */
+        suspendNotify() {
+            this.notifyEnabled = false;
+        }
+        /**
+         * resume notify
+         * @param enable
+         */
+        resumeNotify() {
+            this.notifyEnabled = true;
+        }
+        /**
          * notifyObservers
          * @param detail
          */
         notifyObservers(detail) {
-            this.observers.forEach(observer => {
-                observer.update(this, detail);
-            });
+            if (this.notifyEnabled) {
+                this.observers.forEach(observer => {
+                    observer.update(this, detail);
+                });
+            }
         }
     }
     duice.Observable = Observable;
@@ -171,7 +178,12 @@ var duice;
             super();
             this.readonlyAll = false;
             this.readonly = new Set();
+            this.listenerEnabled = true;
             this.data = data;
+            globalThis.Object.defineProperty(data, "_handler_", {
+                value: this,
+                writable: true
+            });
         }
         /**
          * getData
@@ -210,6 +222,46 @@ var duice;
             });
             // returns
             return true;
+        }
+        /**
+         * assign
+         * @param object
+         */
+        assign(object) {
+            try {
+                // suspend
+                this.suspendListener();
+                this.suspendNotify();
+                // deletes
+                for (let property in this.data) {
+                    delete this.data[property];
+                }
+                // assign
+                for (let property in object) {
+                    this.data[property] = object[property];
+                }
+                // copy origin data
+                this.originData = JSON.parse(JSON.stringify(this.data));
+            }
+            finally {
+                // resume
+                this.resumeListener();
+                this.resumeNotify();
+            }
+            // notify observers
+            this.notifyObservers({});
+        }
+        /**
+         * isDirty
+         */
+        isDirty() {
+            return JSON.stringify(this.data) !== JSON.stringify(this.originData);
+        }
+        /**
+         * reset
+         */
+        reset() {
+            this.assign(this.originData);
         }
         /**
          * getValue
@@ -257,6 +309,7 @@ var duice;
          */
         setReadonlyAll(readonly) {
             this.readonlyAll = readonly;
+            this.notifyObservers({});
         }
         /**
          * setReadonly
@@ -270,6 +323,7 @@ var duice;
             else {
                 this.readonly.delete(property);
             }
+            this.notifyObservers({});
         }
         /**
          * isReadonly
@@ -293,13 +347,25 @@ var duice;
             this.afterChangeListener = listener;
         }
         /**
+         * suspends listener
+         */
+        suspendListener() {
+            this.listenerEnabled = false;
+        }
+        /**
+         * resumes listener
+         */
+        resumeListener() {
+            this.listenerEnabled = true;
+        }
+        /**
          * callBeforeChange
          * @param property
          * @param value
          */
         callBeforeChange(property, value) {
             return __awaiter(this, void 0, void 0, function* () {
-                if (this.beforeChangeListener) {
+                if (this.listenerEnabled && this.beforeChangeListener) {
                     let result = yield this.beforeChangeListener.call(this.getData(), property, value);
                     if (result === false) {
                         return false;
@@ -315,7 +381,7 @@ var duice;
          */
         callAfterChange(property, value) {
             return __awaiter(this, void 0, void 0, function* () {
-                if (this.afterChangeListener) {
+                if (this.listenerEnabled && this.afterChangeListener) {
                     yield this.afterChangeListener.call(this.getData(), property, value);
                 }
             });

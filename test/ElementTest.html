@@ -21,13 +21,6 @@
             }
         });
 
-        /**
-         * printMyData
-         */
-        function printMyData() {
-            document.getElementById('myData').value = JSON.stringify(myData, null, 4);
-        }
-
         // adds before change listener
         duice.Data.onBeforeChange(myData, async (property, value) => {
             if(await duice.confirm(`Do you want to change [${property}] is [${value}]`)){
@@ -37,14 +30,21 @@
             }
         });
 
+        /**
+         * printMyData
+         */
+        function printMyDataAsJson() {
+            document.getElementById('myData').value = JSON.stringify(myData, null, 4);
+        }
+
         // adds after change listener
         duice.Data.onAfterChange(myData, (property, value) => {
-            printMyData();
+            printMyDataAsJson();
         });
 
         // adds DOMContentLoaded event listener
         document.addEventListener("DOMContentLoaded", event => {
-            printMyData();
+            printMyDataAsJson();
         });
 
     </script>
@@ -55,8 +55,29 @@
     <div class="row">
         <div class="col-2">
             <h2>Data</h2>
-            <textarea id="myData" rows="30" style="line-height:1rem;">
+            <textarea id="myData" rows="15" class="font-weight-light" >
             </textarea>
+            <button onclick="duice.Data.assign(myData, JSON.parse(document.getElementById('myData').value));" class="font-weight-light">
+                duice.Data.assign(myData,[object]);
+            </button>
+            <button onclick="duice.Data.setReadonlyAll(myData, true);" class="font-weight-light">
+                duice.Data.setReadonlyAll(myData,true);
+            </button>
+            <button onclick="duice.Data.setReadonlyAll(myData, false);" class="font-weight-light">
+                duice.Data.setReadonlyAll(myData,false);
+            </button>
+            <button onclick="duice.Data.setReadonly(myData, 'name', true);" class="font-weight-light">
+                duice.Data.setReadonly(myData,'name', true);
+            </button>
+            <button onclick="duice.Data.setReadonly(myData, 'name', false);" class="font-weight-light">
+                duice.Data.setReadonly(myData,'name',true);
+            </button>
+            <button onclick="alert(duice.Data.isDirty(myData));" class="font-weight-light">
+                duice.Data.isDirty(myData);
+            </button>
+            <button onclick="duice.Data.reset(myData); printMyDataAsJson();" class="font-weight-light">
+                duice.Data.reset(myData);
+            </button>
         </div>
         <div class="col-10">
             <h2>Element</h2>

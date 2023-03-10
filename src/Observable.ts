@@ -7,6 +7,8 @@ namespace duice {
 
         observers: Observer[] = []
 
+        notifyEnabled: boolean = true;
+
         /**
          * addObserver
          * @param observer
@@ -16,13 +18,43 @@ namespace duice {
         }
 
         /**
+         * removeObserver
+         * @param observer
+         */
+        removeObserver(observer: Observer): void {
+            for(let i = 0, size = this.observers.length; i < size; i++){
+                if(this.observers[i] === observer){
+                    this.observers.splice(i,1);
+                    return;
+                }
+            }
+        }
+
+        /**
+         * suspend notify
+         */
+        suspendNotify(): void {
+            this.notifyEnabled = false;
+        }
+
+        /**
+         * resume notify
+         * @param enable
+         */
+        resumeNotify(): void {
+            this.notifyEnabled = true;
+        }
+
+        /**
          * notifyObservers
          * @param detail
          */
         notifyObservers(detail: any): void {
-            this.observers.forEach(observer => {
-                observer.update(this, detail);
-            });
+            if(this.notifyEnabled){
+                this.observers.forEach(observer => {
+                    observer.update(this, detail);
+                });
+            }
         }
 
     }

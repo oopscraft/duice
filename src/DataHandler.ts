@@ -8,9 +8,13 @@ namespace duice {
 
         data: Data;
 
+        originData: object;
+
         readonlyAll: boolean = false;
 
         readonly: Set<string> = new Set<string>();
+
+        listenerEnabled: boolean = true;
 
         beforeChangeListener: Function;
 
@@ -23,6 +27,10 @@ namespace duice {
         constructor(data: Data){
             super();
             this.data = data;
+            globalThis.Object.defineProperty(data, "_handler_", {
+                value: this,
+                writable: true
+            });
         }
 
         /**
@@ -68,6 +76,53 @@ namespace duice {
 
             // returns
             return true;
+        }
+
+        /**
+         * assign
+         * @param object
+         */
+        assign(object: object): void {
+            try {
+                // suspend
+                this.suspendListener()
+                this.suspendNotify();
+
+                // deletes
+                for (let property in this.data) {
+                    delete this.data[property];
+                }
+
+                // assign
+                for (let property in object) {
+                    this.data[property] = object[property];
+                }
+
+                // copy origin data
+                this.originData = JSON.parse(JSON.stringify(this.data));
+
+            }finally{
+                // resume
+                this.resumeListener();
+                this.resumeNotify();
+            }
+
+            // notify observers
+            this.notifyObservers({});
+        }
+
+        /**
+         * isDirty
+         */
+        isDirty(): boolean {
+            return JSON.stringify(this.data) !== JSON.stringify(this.originData);
+        }
+
+        /**
+         * reset
+         */
+        reset(): void {
+            this.assign(this.originData);
         }
 
         /**
@@ -121,6 +176,7 @@ namespace duice {
          */
         setReadonlyAll(readonly: boolean): void {
             this.readonlyAll = readonly;
+            this.notifyObservers({});
         }
 
         /**
@@ -134,6 +190,7 @@ namespace duice {
             }else{
                 this.readonly.delete(property);
             }
+            this.notifyObservers({});
         }
 
         /**
@@ -161,12 +218,26 @@ namespace duice {
         }
 
         /**
+         * suspends listener
+         */
+        suspendListener(): void {
+            this.listenerEnabled = false;
+        }
+
+        /**
+         * resumes listener
+         */
+        resumeListener(): void {
+            this.listenerEnabled = true;
+        }
+
+        /**
          * callBeforeChange
          * @param property
          * @param value
          */
         async callBeforeChange(property: string, value: any): Promise<boolean> {
-            if(this.beforeChangeListener) {
+            if(this.listenerEnabled && this.beforeChangeListener) {
                 let result = await this.beforeChangeListener.call(this.getData(), property, value);
                 if(result === false){
                     return false;
@@ -181,7 +252,7 @@ namespace duice {
          * @param value
          */
         async callAfterChange(property: string, value: any): Promise<void> {
-            if(this.afterChangeListener){
+            if(this.listenerEnabled && this.afterChangeListener){
                 await this.afterChangeListener.call(this.getData(), property, value);
             }
         }

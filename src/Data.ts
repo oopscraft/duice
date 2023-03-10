@@ -10,26 +10,10 @@ namespace duice {
          * @param object
          */
         static create(object: object): any {
-            let data = new Data(object);
+            let data = new Data();
             let dataHandler = new DataHandler(data);
-
-            // _handler_
-            globalThis.Object.defineProperty(data, "_handler_", {
-                value: dataHandler,
-                writable: true
-            });
-
-            // return this as proxy instance
+            dataHandler.assign(object);
             return new Proxy(data, dataHandler);
-        }
-
-        /**
-         * constructor
-         * @param object
-         */
-        private constructor(object: object) {
-            super();
-            Data.internalAssign(this, object);
         }
 
         /**
@@ -41,39 +25,31 @@ namespace duice {
         }
 
         /**
-         * internalAssign
-         * @param object
-         * @param data
-         */
-        static internalAssign(data: Data, object: object): Data {
-            for(let property in data){
-                Reflect.deleteProperty(data, property);
-            }
-            for(let property in object){
-                let value = Reflect.get(object, property);
-                Reflect.set(data, property, value);
-            }
-            return data;
-        }
-
-        /**
          * assign
          * @param data
          * @param object
          */
         static assign(data: Data, object: object): Data {
-            Data.internalAssign(data, object);
-            Data.notify(data);
+            let handler = this.getHandler(data);
+            handler.assign(object);
+            handler.notifyObservers({});
             return data;
         }
 
         /**
-         * notify
+         * isDirty
          * @param data
          */
-        static notify(data: Data): void {
-            let handler = this.getHandler(data);
-            handler.notifyObservers({});
+        static isDirty(data: Data): boolean {
+            return this.getHandler(data).isDirty();
+        }
+
+        /**
+         * reset
+         * @param data
+         */
+        static reset(data: Data): void {
+            this.getHandler(data).reset();
         }
 
         /**
