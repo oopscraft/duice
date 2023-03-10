@@ -17,6 +17,14 @@ namespace duice {
         }
 
         /**
+         * constructor
+         * @protected
+         */
+        protected constructor() {
+            super();
+        }
+
+        /**
          * getHandler
          * @param data
          */
@@ -36,21 +44,6 @@ namespace duice {
             return data;
         }
 
-        /**
-         * isDirty
-         * @param data
-         */
-        static isDirty(data: Data): boolean {
-            return this.getHandler(data).isDirty();
-        }
-
-        /**
-         * reset
-         * @param data
-         */
-        static reset(data: Data): void {
-            this.getHandler(data).reset();
-        }
 
         /**
          * setReadonly
@@ -84,6 +77,22 @@ namespace duice {
             for(let property in this) {
                 handler.setReadonly(property, readonly);
             }
+        }
+
+        /**
+         * isDirty
+         * @param data
+         */
+        static isDirty(data: Data): boolean {
+            return this.getHandler(data).isDirty();
+        }
+
+        /**
+         * reset
+         * @param data
+         */
+        static reset(data: Data): void {
+            this.getHandler(data).reset();
         }
 
         /**

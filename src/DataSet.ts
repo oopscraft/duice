@@ -10,26 +10,18 @@ namespace duice {
          * @param json
          */
         static create(array: object[]): any {
-            let dataSet = new DataSet(array);
+            let dataSet = new DataSet();
             let dataSetHandler = new DataSetHandler(dataSet);
-
-            // _handler_
-            Object.defineProperty(dataSet, '_handler_', {
-                value: dataSetHandler,
-                writable: true
-            });
-
-            // return this as proxy instance
+            dataSetHandler.assign(array);
             return new Proxy(dataSet, dataSetHandler);
         }
 
         /**
          * constructor
-         * @param array
+         * @protected
          */
-        constructor(array: object[]) {
+        protected constructor() {
             super();
-            DataSet.internalAssign(this, array);
         }
 
         /**
@@ -41,36 +33,15 @@ namespace duice {
         }
 
         /**
-         * internalAssign
-         * @param dataSet
-         * @param array
-         */
-        static internalAssign(dataSet: DataSet, array: object[]): DataSet {
-            dataSet.length = 0;
-            for(let i = 0, size = array.length; i < size; i ++){
-                dataSet[i] = duice.Data.create(array[i]);
-            }
-            return dataSet;
-        }
-
-        /**
          * assign
          * @param dataSet
          * @param array
          */
         static assign(dataSet: DataSet, array: object[]): DataSet {
-            DataSet.internalAssign(dataSet, array);
-            DataSet.notify(dataSet);
-            return dataSet;
-        }
-
-        /**
-         * notify
-         * @param dataSet
-         */
-        static notify(dataSet: DataSet): void {
             let handler = this.getHandler(dataSet);
+            handler.assign(array);
             handler.notifyObservers({});
+            return dataSet;
         }
 
         /**

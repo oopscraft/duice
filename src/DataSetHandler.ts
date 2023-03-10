@@ -18,6 +18,10 @@ namespace duice {
         constructor(dataSet: DataSet) {
             super();
             this.dataSet = dataSet;
+            Object.defineProperty(dataSet, '_handler_', {
+                value: this,
+                writable: true
+            });
         }
 
         /**
@@ -40,6 +44,32 @@ namespace duice {
                 this.notifyObservers({});
             }
             return true;
+        }
+
+        /**
+         * assign
+         * @param array
+         */
+        assign(array: object[]): void {
+            try {
+                // suspend
+                this.suspendNotify();
+
+                // deletes
+                this.dataSet.length = 0;
+
+                // assign
+                for(let i = 0, size = array.length; i < size; i ++){
+                    this.dataSet[i] = duice.Data.create(array[i]);
+                }
+
+            }finally{
+                // resume
+                this.resumeNotify();
+            }
+
+            // notify observers
+            this.notifyObservers({});
         }
 
         /**

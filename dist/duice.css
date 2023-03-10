@@ -30,18 +30,23 @@
 }
 
 /* global */
-html * {
-    margin: 0px;
-    padding: 0px;
-    font-family: sans-serif;
+html {
     -ms-text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
     font-family: var(--font-family);
     font-size: var(--font-size);
     line-height: var(--line-height);
 }
+html * {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+}
 html *:focus {
     outline: 1px solid black;
+}
+body {
+    margin: 0;
 }
 
 /* h */
@@ -136,11 +141,12 @@ h6 {
 table {
     table-layout: fixed;
     position: relative;
-    border-collapse: collapse;
+    /*border-collapse: collapse;*/
+    border-collapse: separate;
     border-spacing: 0;
     border: var(--table-border);
 }
-table tr th {
+table thead tr th {
     position: sticky;
     position: -webkit-sticky;
     top: 0;
@@ -155,10 +161,10 @@ table tr th {
     white-space: nowrap;
     overflow: hidden;
 }
-table tr th:has(*) {
+table thead tr th:has(*) {
     padding: 1px;
 }
-table tr td {
+table tbody tr td {
     border: var(--table-border);
     padding: var(--table-padding);
     background-color: var(--table-td-background-color);
@@ -167,8 +173,15 @@ table tr td {
     white-space: nowrap;
     overflow: hidden;
 }
-table tr td:has(*) {
+table tbody tr td:has(*) {
     padding: 1px;
+}
+table tfoot tr td {
+    position: sticky;
+    position: -webkit-sticky;
+    bottom: 0;
+    border: var(--table-border);
+    background-color: var(--table-td-background-color);
 }
 
 /* input */
@@ -245,46 +258,4 @@ button:hover {
     background-color: var(--button-hover-background-color);
 }
 
-/* dialog */
-/*dialog {*/
-/*    border: var(--dialog-border);*/
-/*}*/
-
-/*dialog {*/
-/*    position: absolute;*/
-/*    left: 0; right: 0;*/
-/*    !*width: -moz-fit-content;*!*/
-/*    !*width: -webkit-fit-content;*!*/
-/*    !*width: fit-content;*!*/
-/*    !*height: -moz-fit-content;*!*/
-/*    !*height: -webkit-fit-content;*!*/
-/*    !*height: fit-content;*!*/
-/*    margin: auto;*/
-/*    !*border: solid;*!*/
-/*    !*padding: 1em;*!*/
-/*    !*background: white;*!*/
-/*    !*color: black;*!*/
-/*    display: block;*/
-/*}*/
-
-/*dialog:not([open]) {*/
-/*    display: none;*/
-/*}*/
-
-/*dialog + .backdrop {*/
-/*    position: fixed;*/
-/*    top: 0; right: 0; bottom: 0; left: 0;*/
-/*    background: rgba(0,0,0,0.1);*/
-/*}*/
-
-/*._dialog_overlay {*/
-/*    position: fixed;*/
-/*    top: 0; right: 0; bottom: 0; left: 0;*/
-/*}*/
-
-/*dialog.fixed {*/
-/*    position: fixed;*/
-/*    top: 50%;*/
-/*    transform: translate(0, -50%);*/
-/*}*/
 

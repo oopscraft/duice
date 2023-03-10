@@ -24,6 +24,13 @@ var duice;
             return new Proxy(data, dataHandler);
         }
         /**
+         * constructor
+         * @protected
+         */
+        constructor() {
+            super();
+        }
+        /**
          * getHandler
          * @param data
          */
@@ -40,20 +47,6 @@ var duice;
             handler.assign(object);
             handler.notifyObservers({});
             return data;
-        }
-        /**
-         * isDirty
-         * @param data
-         */
-        static isDirty(data) {
-            return this.getHandler(data).isDirty();
-        }
-        /**
-         * reset
-         * @param data
-         */
-        static reset(data) {
-            this.getHandler(data).reset();
         }
         /**
          * setReadonly
@@ -85,6 +78,20 @@ var duice;
             for (let property in this) {
                 handler.setReadonly(property, readonly);
             }
+        }
+        /**
+         * isDirty
+         * @param data
+         */
+        static isDirty(data) {
+            return this.getHandler(data).isDirty();
+        }
+        /**
+         * reset
+         * @param data
+         */
+        static reset(data) {
+            this.getHandler(data).reset();
         }
         /**
          * onBeforeChange
@@ -400,23 +407,17 @@ var duice;
          * @param json
          */
         static create(array) {
-            let dataSet = new DataSet(array);
+            let dataSet = new DataSet();
             let dataSetHandler = new duice.DataSetHandler(dataSet);
-            // _handler_
-            Object.defineProperty(dataSet, '_handler_', {
-                value: dataSetHandler,
-                writable: true
-            });
-            // return this as proxy instance
+            dataSetHandler.assign(array);
             return new Proxy(dataSet, dataSetHandler);
         }
         /**
          * constructor
-         * @param array
+         * @protected
          */
-        constructor(array) {
+        constructor() {
             super();
-            DataSet.internalAssign(this, array);
         }
         /**
          * getHandler
@@ -426,34 +427,15 @@ var duice;
             return Object.getOwnPropertyDescriptor(dataSet, '_handler_').value;
         }
         /**
-         * internalAssign
-         * @param dataSet
-         * @param array
-         */
-        static internalAssign(dataSet, array) {
-            dataSet.length = 0;
-            for (let i = 0, size = array.length; i < size; i++) {
-                dataSet[i] = duice.Data.create(array[i]);
-            }
-            return dataSet;
-        }
-        /**
          * assign
          * @param dataSet
          * @param array
          */
         static assign(dataSet, array) {
-            DataSet.internalAssign(dataSet, array);
-            DataSet.notify(dataSet);
-            return dataSet;
-        }
-        /**
-         * notify
-         * @param dataSet
-         */
-        static notify(dataSet) {
             let handler = this.getHandler(dataSet);
+            handler.assign(array);
             handler.notifyObservers({});
+            return dataSet;
         }
         /**
          * setReadonly
@@ -504,6 +486,10 @@ var duice;
             this.readonlyAll = false;
             this.readonly = new Set();
             this.dataSet = dataSet;
+            Object.defineProperty(dataSet, '_handler_', {
+                value: this,
+                writable: true
+            });
         }
         /**
          * getDataSet
@@ -524,6 +510,28 @@ var duice;
                 this.notifyObservers({});
             }
             return true;
+        }
+        /**
+         * assign
+         * @param array
+         */
+        assign(array) {
+            try {
+                // suspend
+                this.suspendNotify();
+                // deletes
+                this.dataSet.length = 0;
+                // assign
+                for (let i = 0, size = array.length; i < size; i++) {
+                    this.dataSet[i] = duice.Data.create(array[i]);
+                }
+            }
+            finally {
+                // resume
+                this.resumeNotify();
+            }
+            // notify observers
+            this.notifyObservers({});
         }
         /**
          * update
