@@ -1,2 +1,2 @@
 # duice
-DUICE (Data oriented UI Component Element)
+DUICE (Data oriented UI Component Engine)
