@@ -9,13 +9,36 @@
     <script>
         'use strict';
         let myDataSet = duice.DataSet.create([
-            { name: 'james', age: 13, mobile:'01012344321', groupId: 'human'},
-            { name: 'tommy', age: 27, mobile:'01012344321', groupId: 'human'},
-            { name: 'orange', age: 21, mobile:'01043211234', groupId: 'fruit'},
-            { name: 'apple', age: 18, mobile: null},
+            {
+                name: 'Apple',
+                phoneNo: '01012345678',
+                cardNo: '0000111122223333',
+                balanceAmount: 1234567.13,
+                type: 'fruit',
+                enabled: true,
+                enabledYn: 'Y',
+                description: "My name is apple.\n I am apple.",
+                address: {
+                    country: 'USA',
+                    city: 'LA'
+                }
+            },
+            {
+                name: 'Monkey',
+                phoneNo: '01098765432',
+                cardNo: '9999888877776666',
+                balanceAmount: 7654321.51,
+                type: 'animal',
+                enabled: false,
+                enabledYn: 'N',
+                description: "My name is apple.\n I am monkey.",
+                address: {
+                    country: 'Japan',
+                    city: 'Tokyo'
+                }
+            }
         ]);
         console.log(myDataSet);
-
 
         /**
          * printMyDataSetAsJson
@@ -43,7 +66,35 @@
         <div class="col-10">
             <h2>ElementSet</h2>
             <!-- test table -->
-            <h3>Table</h3>
+            <h3>Simple Table</h3>
+            <table>
+                <tr>
+                    <th>index</th>
+                    <th>name</th>
+                    <th>phoneNo</th>
+                    <th>cardNo</th>
+                    <th>balanceAmount</th>
+                    <th>type</th>
+                    <th>enabled</th>
+                    <th>enabledYn</th>
+                    <th>address.country</th>
+                </tr>
+                <tr duice:data-set="myDataSet" duice:loop="item,status">
+                    <td duice:data="status" duice:property="index"></td>
+                    <td duice:data="item" duice:property="name"></td>
+                    <td duice:data="item" duice:property="phoneNo" duice:mask="string('###-####-####')"></td>
+                    <td duice:data="item" duice:property="cardNo" duice:mask="string('####-####-####-####')"></td>
+                    <td duice:data="item" duice:property="balanceAmount" duice:mask="number(2)"></td>
+                    <td duice:data="item" duice:property="type"></td>
+                    <td duice:data="item" duice:property="enabled"></td>
+                    <td duice:data="item" duice:property="enabledYn"></td>
+                    <td duice:data="item" duice:property="address.country"></td>
+                </tr>
+            </table>
+
+
+            <!-- test table -->
+            <h3>Editable Table</h3>
             <div style="border:solid 1px; width:fit-content; max-height:300px; overflow-y:scroll; border:solid 1px darkgray;">
                 <table>
                     <thead>

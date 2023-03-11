@@ -35,7 +35,7 @@ var duice;
          * @param data
          */
         static getHandler(data) {
-            return Object.getOwnPropertyDescriptor(data, '_handler_').value;
+            return duice.Object.getOwnPropertyDescriptor(data, '_handler_').value;
         }
         /**
          * assign
@@ -424,7 +424,7 @@ var duice;
          * @param dataSet
          */
         static getHandler(dataSet) {
-            return Object.getOwnPropertyDescriptor(dataSet, '_handler_').value;
+            return duice.Object.getOwnPropertyDescriptor(dataSet, '_handler_').value;
         }
         /**
          * assign
@@ -486,7 +486,7 @@ var duice;
             this.readonlyAll = false;
             this.readonly = new Set();
             this.dataSet = dataSet;
-            Object.defineProperty(dataSet, '_handler_', {
+            duice.Object.defineProperty(dataSet, '_handler_', {
                 value: this,
                 writable: true
             });
@@ -2098,5 +2098,114 @@ var duice;
         }
     }
     duice.StringMask = StringMask;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    /**
+     * Data
+     */
+    class Object extends globalThis.Object {
+        /**
+         * create
+         * @param object
+         */
+        static create(object) {
+            let data = new duice.Data();
+            let dataHandler = new duice.DataHandler(data);
+            dataHandler.assign(object);
+            return new Proxy(data, dataHandler);
+        }
+        /**
+         * constructor
+         * @protected
+         */
+        constructor(object) {
+            super(object);
+            let;
+            return new Proxy(this, {});
+        }
+        /**
+         * getHandler
+         * @param data
+         */
+        static getHandler(data) {
+            return Object.getOwnPropertyDescriptor(data, '_handler_').value;
+        }
+        /**
+         * assign
+         * @param data
+         * @param object
+         */
+        static assign(data, object) {
+            let handler = this.getHandler(data);
+            handler.assign(object);
+            handler.notifyObservers({});
+            return data;
+        }
+        /**
+         * setReadonly
+         * @param data
+         * @param property
+         * @param readonly
+         */
+        static setReadonly(data, property, readonly) {
+            let handler = this.getHandler(data);
+            handler.setReadonly(property, readonly);
+        }
+        /**
+         * isReadonly
+         * @param data
+         * @param property
+         */
+        static isReadonly(data, property) {
+            let handler = this.getHandler(data);
+            return handler.isReadonly(property);
+        }
+        /**
+         * setReadonlyAll
+         * @param data
+         * @param readonly
+         */
+        static setReadonlyAll(data, readonly) {
+            let handler = this.getHandler(data);
+            handler.setReadonlyAll(readonly);
+            for (let property in this) {
+                handler.setReadonly(property, readonly);
+            }
+        }
+        /**
+         * isDirty
+         * @param data
+         */
+        static isDirty(data) {
+            return this.getHandler(data).isDirty();
+        }
+        /**
+         * reset
+         * @param data
+         */
+        static reset(data) {
+            this.getHandler(data).reset();
+        }
+        /**
+         * onBeforeChange
+         * @param data
+         * @param listener
+         */
+        static onBeforeChange(data, listener) {
+            let handler = this.getHandler(data);
+            handler.onBeforeChange(listener);
+        }
+        /**
+         * onAfterChange
+         * @param data
+         * @param listener
+         */
+        static onAfterChange(data, listener) {
+            let handler = this.getHandler(data);
+            handler.onAfterChange(listener);
+        }
+    }
+    duice.Object = Object;
 })(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map

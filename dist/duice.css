@@ -146,42 +146,42 @@ table {
     border-spacing: 0;
     border: var(--table-border);
 }
-table thead tr th {
-    position: sticky;
-    position: -webkit-sticky;
-    top: 0;
+table tr th {
     background-color: var(--table-th-background-color);
     border: var(--table-border);
     padding: var(--table-padding);
     padding-top: 3px;
     padding-bottom: 3px;
     font-weight: bold;
-    text-align: left;
+    text-align: center;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
 }
-table thead tr th:has(*) {
+table tr th:has(*) {
     padding: 1px;
 }
-table tbody tr td {
+table tr td {
     border: var(--table-border);
     padding: var(--table-padding);
     background-color: var(--table-td-background-color);
-    text-align: left;
+    text-align: center;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
 }
-table tbody tr td:has(*) {
+table tr td:has(*) {
     padding: 1px;
+}
+table thead tr th {
+    position: sticky;
+    position: -webkit-sticky;
+    top: 0;
 }
 table tfoot tr td {
     position: sticky;
     position: -webkit-sticky;
     bottom: 0;
-    border: var(--table-border);
-    background-color: var(--table-td-background-color);
 }
 
 /* input */
