@@ -66,7 +66,7 @@ namespace duice {
          * render
          */
         render(): void {
-            let dataSet = this.arrayHandler.getArray();
+            let dataSet = this.arrayHandler.getArrayProxy();
             this.doRender(dataSet);
 
             // executes script
@@ -139,7 +139,7 @@ namespace duice {
          * @param detail
          */
         update(arrayHandler: ArrayHandler, detail: any): void {
-            let array = arrayHandler.getArray();
+            let array = arrayHandler.getArrayProxy();
             this.doUpdate(array);
 
             // executes script

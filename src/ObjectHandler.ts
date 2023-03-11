@@ -6,7 +6,7 @@ namespace duice {
      */
     export class ObjectHandler extends Observable implements Observer {
 
-        object: Object;
+        objectProxy: ObjectProxy;
 
         originObject: object;
 
@@ -22,23 +22,23 @@ namespace duice {
 
         /**
          * constructor
-         * @param object
+         * @param objectProxy
          */
-        constructor(object: Object) {
+        constructor(objectProxy: ObjectProxy) {
             super();
-            this.object = object;
+            this.objectProxy = objectProxy;
             this.save();
-            globalThis.Object.defineProperty(object, "_handler_", {
+            globalThis.Object.defineProperty(objectProxy, "_handler_", {
                 value: this,
                 writable: true
             });
         }
 
         /**
-         * getObject
+         * getObjectProxy
          */
-        getObject(): Object {
-            return this.object;
+        getObjectProxy(): ObjectProxy {
+            return this.objectProxy;
         }
 
         /**
@@ -90,13 +90,13 @@ namespace duice {
                 this.suspendNotify();
 
                 // deletes
-                for (let property in this.object) {
-                    delete this.object[property];
+                for (let property in this.objectProxy) {
+                    delete this.objectProxy[property];
                 }
 
                 // assign
                 for (let property in object) {
-                    this.object[property] = object[property];
+                    this.objectProxy[property] = object[property];
                 }
 
                 // saves origin object
@@ -116,7 +116,7 @@ namespace duice {
          * save
          */
         save(): void {
-            this.originObject = JSON.parse(JSON.stringify(this.object));
+            this.originObject = JSON.parse(JSON.stringify(this.objectProxy));
         }
 
         /**
@@ -130,7 +130,7 @@ namespace duice {
          * isDirty
          */
         isDirty(): boolean {
-            return JSON.stringify(this.object) !== JSON.stringify(this.originObject);
+            return JSON.stringify(this.objectProxy) !== JSON.stringify(this.originObject);
         }
 
         /**
@@ -140,7 +140,7 @@ namespace duice {
         getValue(property: string): any {
             console.assert(property);
             property = property.replace('.','?.');
-            return new Function(`return this.${property};`).call(this.getObject());
+            return new Function(`return this.${property};`).call(this.getObjectProxy());
         }
 
         /**
@@ -149,7 +149,7 @@ namespace duice {
          * @param value
          */
         setValue(property: string, value: any): void {
-            new Function('value', `this.${property} = value;`).call(this.getObject(), value);
+            new Function('value', `this.${property} = value;`).call(this.getObjectProxy(), value);
         }
 
         /**
@@ -210,18 +210,18 @@ namespace duice {
         }
 
         /**
-         * onBeforeChange
+         * setBeforeChangeListener
          * @param listener
          */
-        onBeforeChange(listener: Function): void {
+        setBeforeChangeListener(listener: Function): void {
             this.beforeChangeListener = listener;
         }
 
         /**
-         * onAfterChange
+         * setAfterChangeListener
          * @param listener
          */
-        onAfterChange(listener: Function): void {
+        setAfterChangeListener(listener: Function): void {
             this.afterChangeListener = listener;
         }
 
@@ -246,7 +246,7 @@ namespace duice {
          */
         async callBeforeChange(property: string, value: any): Promise<boolean> {
             if(this.listenerEnabled && this.beforeChangeListener) {
-                let result = await this.beforeChangeListener.call(this.getObject(), property, value);
+                let result = await this.beforeChangeListener.call(this.getObjectProxy(), property, value);
                 if(result === false){
                     return false;
                 }
@@ -261,7 +261,7 @@ namespace duice {
          */
         async callAfterChange(property: string, value: any): Promise<void> {
             if(this.listenerEnabled && this.afterChangeListener){
-                await this.afterChangeListener.call(this.getObject(), property, value);
+                await this.afterChangeListener.call(this.getObjectProxy(), property, value);
             }
         }
 

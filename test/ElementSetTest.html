@@ -7,7 +7,7 @@
     <script src="../dist/duice.js"></script>
     <link rel="stylesheet" href="../dist/duice.css">
     <script>
-        'use strict';
+        //'use strict';
         let myArray = new duice.ArrayProxy([
             {
                 name: 'Apple',
@@ -47,6 +47,15 @@
             document.getElementById('myArray').value = JSON.stringify(myArray, null, 4);
         }
 
+        // adds before change listener
+        // duice.ArrayProxy.setBeforeChangeListener(myArray, async (property, value) => {
+        //     if(await duice.confirm(`Do you want to change [${property}] is [${value}]`)){
+        //         return true;
+        //     }else{
+        //         return false;
+        //     }
+        // });
+
         // adds DOMContentLoaded event listener
         document.addEventListener("DOMContentLoaded", event => {
             viewMyArray();
@@ -65,22 +74,28 @@
         </div>
         <div class="col-10">
             <h2>ElementSet</h2>
-            <!-- test table -->
-            <h3>Simple Table</h3>
+            <!-- simple table -->
+            <h3>
+                Simple Table
+                <small>&lt;tr duice:array="myArray" loop="item,status"&gt;</small>
+            </h3>
             <table>
                 <tr>
-                    <th>index</th>
-                    <th>name</th>
-                    <th>phoneNo</th>
-                    <th>cardNo</th>
-                    <th>balanceAmount</th>
-                    <th>type</th>
-                    <th>enabled</th>
-                    <th>enabledYn</th>
-                    <th>address.country</th>
+                    <th>status.index</th>
+                    <th>status.count</th>
+                    <th>item.name</th>
+                    <th>item.phoneNo</th>
+                    <th>item.cardNo</th>
+                    <th>item.balanceAmount</th>
+                    <th>item.type</th>
+                    <th>item.enabled</th>
+                    <th>item.enabledYn</th>
+                    <th>item.address.country</th>
+                    <th>item.address.city</th>
                 </tr>
                 <tr duice:array="myArray" duice:loop="item,status">
                     <td duice:object="status" duice:property="index"></td>
+                    <td duice:object="status" duice:property="count"></td>
                     <td duice:object="item" duice:property="name"></td>
                     <td duice:object="item" duice:property="phoneNo" duice:mask="string('###-####-####')"></td>
                     <td duice:object="item" duice:property="cardNo" duice:mask="string('####-####-####-####')"></td>
@@ -89,48 +104,52 @@
                     <td duice:object="item" duice:property="enabled"></td>
                     <td duice:object="item" duice:property="enabledYn"></td>
                     <td duice:object="item" duice:property="address.country"></td>
+                    <td duice:object="item" duice:property="address.city"></td>
                 </tr>
             </table>
-
-
-            <!-- test table -->
-            <h3>Editable Table</h3>
-            <div style="border:solid 1px; width:fit-content; max-height:300px; overflow-y:scroll; border:solid 1px darkgray;">
+            <!-- editable table -->
+            <h3>
+                Editable Table
+                <small>&lt;tr duice:array="myArray" loop="item,status" editable="true"&gt;</small>
+            </h3>
+            <div style="border:solid 1px; width:fit-content; max-height:200px; overflow-y:scroll; border:solid 1px darkgray;">
                 <table>
                     <thead>
                     <tr>
                         <th>status.index</th>
-                        <th>status.number</th>
                         <th>status.count</th>
-                        <th>status.first</th>
-                        <th>status.last</th>
                         <th>item.name</th>
-                        <th>item.age</th>
-                        <th>item.mobile</th>
-                        <th>item.groupId</th>
+                        <th>item.phoneNo</th>
+                        <th>item.cardNo</th>
+                        <th>item.balanceAmount</th>
+                        <th>item.type</th>
+                        <th>item.enabled</th>
+                        <th>item.enabledYn</th>
+                        <th>item.address.country</th>
+                        <th>item.address.city</th>
                         <th>-</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr duice:array="myArray" duice:loop="item,status" duice:editable="true">
-                        <td duice:object="status" duice:property="index" duice:script="this.style.backgroundColor='red';"></td>
-                        <td duice:object="status" duice:property="count"></td>
-                        <td duice:object="status" duice:property="size"></td>
-                        <td duice:object="status" duice:property="first"></td>
-                        <td duice:object="status" duice:property="last"></td>
-                        <td duice:object="item" duice:property="name"></td>
-                        <td duice:object="item" duice:property="age"></td>
+                        <td><span duice:object="status" duice:property="index"></span></td>
+                        <td><span duice:object="status" duice:property="count"></span></td>
+                        <td><input duice:object="item" duice:property="name"/></td>
+                        <td><input type="text" duice:object="item" duice:property="phoneNo" duice:mask="string('###-####-####')"/></td>
+                        <td><input type="text" duice:object="item" duice:property="cardNo" duice:mask="string('####-####-####-####')"/></td>
+                        <td><input type="number" duice:object="item" duice:property="balanceAmount" duice:mask="number(2)"/></td>
                         <td>
-                            <input duice:object="item" duice:property="mobile" duice:mask="string('###-####-####')"/>
-                        </td>
-                        <td>
-                            <select duice:object="item" duice:property="groupId">
-                                <option value>- Group ID -</option>
+                            <select duice:object="item" duice:property="type">
+                                <option value>- type -</option>
                                 <option value="human">Human</option>
                                 <option value="fruit">Fruit</option>
                                 <option value="animal">Animal</option>
                             </select>
                         </td>
+                        <td><input type="checkbox" duice:object="item" duice:property="enabled"/></td>
+                        <td><input type="checkbox" duice:object="item" duice:property="enabledYn" duice:true-value="Y" duice:false-value="N"/></td>
+                        <td><input type="text" duice:object="item" duice:property="address.country"/></td>
+                        <td><input type="text" duice:object="item" duice:property="address.city"/></td>
                         <td>
                             <button duice:object="status" duice:script="this.dataset.index=status.index;"
                                     onclick="myArray.splice(this.dataset.index,1);">
@@ -153,21 +172,8 @@
                     </tfoot>
                 </table>
             </div>
-            <!-- test li -->
-            <h3>List</h3>
-            <ul>
-                <li duice:array="myArray" duice:loop="item,status" duice:editable="true">
-                    <span duice:object="item" duice:property="name"></span>
-                    <span duice:object="item" duice:property="age"></span>
-                </li>
-            </ul>
         </div>
     </div>
 </div>
-
-
-
-
-
 </body>
 </html>

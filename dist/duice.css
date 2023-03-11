@@ -46,8 +46,6 @@ html *:focus {
 body {
     margin: 0;
 }
-
-/* h */
 h1 {
     font-size: calc(var(--font-size) + 1.0vw);
 }
@@ -66,6 +64,10 @@ h5 {
 h6 {
     font-size: calc(var(--font-size) + 0.0vw);
 }
+small {
+    font-size: smaller;
+}
+
 
 /* font */
 .font-weight-bold {
@@ -171,12 +173,12 @@ table tr td {
 table tr td:has(*) {
     padding: 1px;
 }
-table thead tr th {
+table thead {
     position: sticky;
     position: -webkit-sticky;
     top: 0;
 }
-table tfoot tr td {
+table tfoot {
     position: sticky;
     position: -webkit-sticky;
     bottom: 0;
@@ -230,7 +232,7 @@ textarea {
     border: var(--textarea-border);
     border-radius: var(--textarea-border-radius);
     width: 100%;
-    line-height: inherit;
+    line-height: 150%;
     white-space: pre-line;
     box-sizing: border-box;
     -moz-box-sizing: border-box;

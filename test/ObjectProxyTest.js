@@ -9,57 +9,57 @@ global.document = jdom.window.document;
 /**
  * create
  */
-let myData = new duice.ObjectProxy({
+let myObject = new duice.ObjectProxy({
     name: 'Apple'
 });
-console.log(myData);
-duice.assert(myData.name === 'Apple');
+console.log(myObject);
+duice.assert(myObject.name === 'Apple');
 
 /**
  * assign
  */
-duice.ObjectProxy.assign(myData, {
+duice.ObjectProxy.assign(myObject, {
     name: 'Orange'
 });
-console.log(myData);
-duice.assert(myData.name === 'Orange');
+console.log(myObject);
+duice.assert(myObject.name === 'Orange');
 
 /**
  * setReadonly
  */
 console.log('setReadonly');
-duice.ObjectProxy.setReadonly(myData, 'name', true);
-duice.assert(duice.ObjectProxy.isReadonly(myData, 'name') === true);
-duice.ObjectProxy.setReadonly(myData, 'name', false);
-duice.assert(duice.ObjectProxy.isReadonly(myData,'name') === false);
+duice.ObjectProxy.setReadonly(myObject, 'name', true);
+duice.assert(duice.ObjectProxy.isReadonly(myObject, 'name') === true);
+duice.ObjectProxy.setReadonly(myObject, 'name', false);
+duice.assert(duice.ObjectProxy.isReadonly(myObject,'name') === false);
 
 /**
  * setReadonlyAll
  */
 console.log('setReadonlyAll');
-duice.ObjectProxy.setReadonlyAll(myData, true);
-duice.assert(duice.ObjectProxy.isReadonly(myData, 'name') === true);
-duice.ObjectProxy.setReadonlyAll(myData, false);
-duice.assert(duice.ObjectProxy.isReadonly(myData, 'name') === false);
+duice.ObjectProxy.setReadonlyAll(myObject, true);
+duice.assert(duice.ObjectProxy.isReadonly(myObject, 'name') === true);
+duice.ObjectProxy.setReadonlyAll(myObject, false);
+duice.assert(duice.ObjectProxy.isReadonly(myObject, 'name') === false);
 
 /**
  * event listener - negative
  */
-duice.ObjectProxy.onBeforeChange(myData, (property, value) => {
+duice.ObjectProxy.setBeforeChangeListener(myObject, (property, value) => {
     console.log("property,value:", property, value);
     return false;
 });
-myData.name = 'Kitty';
-duice.assert(myData.name !== 'Kitty');
+myObject.name = 'Kitty';
+duice.assert(myObject.name !== 'Kitty');
 
 /**
  * event listener - positive
  */
-duice.ObjectProxy.onBeforeChange(myData, (property, value) => {
+duice.ObjectProxy.setBeforeChangeListener(myObject, (property, value) => {
     console.log("property,value:", property, value);
     return true;
 });
-myData.name = 'Kitty';
-duice.assert(myData.name === 'Kitty');
+myObject.name = 'Kitty';
+duice.assert(myObject.name === 'Kitty');
 
 

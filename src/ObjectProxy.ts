@@ -1,105 +1,115 @@
 namespace duice {
 
     /**
-     * Data
+     * ObjectProxy
      */
-    export class ObjectProxy {
+    export class ObjectProxy extends globalThis.Object {
 
         /**
          * constructor
          */
-        public constructor(object: object) {
-            let objectHandler = new ObjectHandler(object);
-            return new Proxy(object, objectHandler);
+        public constructor(object?: object) {
+            super();
+
+            // copy property
+            if(typeof object === 'object'){
+                for(let property in object){
+                    this[property] = object[property];
+                }
+            }
+
+            // return proxy instance
+            let objectHandler = new ObjectHandler(this);
+            return new Proxy<ObjectProxy>(this, objectHandler);
         }
 
         /**
          * getHandler
-         * @param data
+         * @param objectProxy
          */
-        static getHandler(object: object): ObjectHandler {
-            return globalThis.Object.getOwnPropertyDescriptor(object, '_handler_').value as ObjectHandler;
+        static getHandler(objectProxy: ObjectProxy): ObjectHandler {
+            let objectHandler = globalThis.Object.getOwnPropertyDescriptor(objectProxy, '_handler_')?.value;
+            assert(objectHandler, 'objectHandler is not found');
+            return objectHandler;
         }
 
         /**
          * assign
+         * @param objectProxy
          * @param object
-         * @param value
          */
-        static assign(object: object, value: object): void {
-            let handler = this.getHandler(object);
-            handler.assign(value);
+        static assign(objectProxy: ObjectProxy, object: object): void {
+            let handler = this.getHandler(objectProxy);
+            handler.assign(object);
             handler.notifyObservers({});
         }
 
         /**
          * setReadonly
-         * @param object
+         * @param objectProxy
          * @param property
          * @param readonly
          */
-        static setReadonly(object: object, property: string, readonly: boolean): void {
-            let handler = this.getHandler(object);
-            handler.setReadonly(property, readonly);
+        static setReadonly(objectProxy: ObjectProxy, property: string, readonly: boolean): void {
+            let objectHandler = this.getHandler(objectProxy);
+            objectHandler.setReadonly(property, readonly);
         }
 
         /**
          * isReadonly
-         * @param object
+         * @param objectProxy
          * @param property
          */
-        static isReadonly(object: object, property: string): boolean {
-            let handler = this.getHandler(object);
-            return handler.isReadonly(property);
+        static isReadonly(objectProxy: ObjectProxy, property: string): boolean {
+            let objectHandler = this.getHandler(objectProxy);
+            return objectHandler.isReadonly(property);
         }
 
         /**
          * setReadonlyAll
-         * @param object
+         * @param objectProxy
          * @param readonly
          */
-        static setReadonlyAll(object: object, readonly: boolean): void {
-            let handler = this.getHandler(object);
-            handler.setReadonlyAll(readonly);
+        static setReadonlyAll(objectProxy: ObjectProxy, readonly: boolean): void {
+            let objectHandler = this.getHandler(objectProxy);
+            objectHandler.setReadonlyAll(readonly);
             for(let property in this) {
-                handler.setReadonly(property, readonly);
+                objectHandler.setReadonly(property, readonly);
             }
         }
 
         /**
          * isDirty
-         * @param object
+         * @param objectProxy
          */
-        static isDirty(object: object): boolean {
-            return this.getHandler(object).isDirty();
+        static isDirty(objectProxy: ObjectProxy): boolean {
+            return this.getHandler(objectProxy).isDirty();
         }
 
         /**
          * reset
-         * @param object
+         * @param objectProxy
          */
-        static reset(object: object): void {
-            this.getHandler(object).reset();
+        static reset(objectProxy: ObjectProxy): void {
+            this.getHandler(objectProxy).reset();
         }
 
         /**
-         * onBeforeChange
-         * @param object
+         * setBeforeChangeListener
+         * @param objectProxy
          * @param listener
          */
-        static onBeforeChange(object: object, listener: Function): void {
-            let handler = this.getHandler(object);
-            handler.onBeforeChange(listener);
+        static setBeforeChangeListener(objectProxy: ObjectProxy, listener: Function): void {
+            this.getHandler(objectProxy).setBeforeChangeListener(listener);
         }
 
         /**
-         * onAfterChange
-         * @param object
+         * setAfterChangeListener
+         * @param objectProxy
          * @param listener
          */
-        static onAfterChange(object: object, listener: Function): void {
-            let handler = this.getHandler(object);
-            handler.onAfterChange(listener);
+        static setAfterChangeListener(objectProxy: ObjectProxy, listener: Function): void {
+            this.getHandler(objectProxy).setAfterChangeListener(listener);
         }
 
     }

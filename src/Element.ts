@@ -40,7 +40,6 @@ namespace duice {
             let object = findObject(this.context, objectName);
             assert(object, `ObjectProxy[${objectName}] is not found.`)
             this.objectHandler = ObjectProxy.getHandler(object);
-            assert(this.objectHandler, `[${objectName}] is not ObjectProxy.`);
             this.addObserver(this.objectHandler);
             this.objectHandler.addObserver(this);
         }

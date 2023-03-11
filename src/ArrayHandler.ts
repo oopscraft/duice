@@ -6,30 +6,46 @@ namespace duice {
      */
     export class ArrayHandler extends Observable implements Observer {
 
-        array: object[];
+        arrayProxy: ArrayProxy;
 
         readonlyAll: boolean = false;
 
         readonly: Set<string> = new Set<string>();
 
+        listenerEnabled: boolean = true;
+
+        beforeChangeListener: Function;
+
+        afterChangeListener: Function;
+
         /**
          * constructor
-         * @param array
+         * @param arrayProxy
          */
-        constructor(array: object[]) {
+        constructor(arrayProxy: ArrayProxy) {
             super();
-            this.array = array;
-            globalThis.Object.defineProperty(array, '_handler_', {
+            this.arrayProxy = arrayProxy;
+
+            // setting handler as property
+            globalThis.Object.defineProperty(arrayProxy, '_handler_', {
                 value: this,
                 writable: true
             });
+
+            // creates child object to proxy
+            for(let index = 0; index < this.arrayProxy.length; index ++) {
+                let object = new ObjectProxy(this.arrayProxy[index]);
+                this.arrayProxy[index] = object;
+                let objectHandler = ObjectProxy.getHandler(object);
+                objectHandler.addObserver(this);
+            }
         }
 
         /**
-         * getArray
+         * getArrayProxy
          */
-        getArray(): object[] {
-            return this.array;
+        getArrayProxy(): ArrayProxy {
+            return this.arrayProxy;
         }
 
         /**
@@ -57,11 +73,16 @@ namespace duice {
                 this.suspendNotify();
 
                 // deletes
-                this.array.length = 0;
+                this.arrayProxy.length = 0;
 
                 // assign
-                for(let i = 0, size = array.length; i < size; i ++){
-                    this.array[i] = new duice.ObjectProxy(array[i]);
+                for(let index = 0, size = array.length; index < size; index ++){
+                    let objectProxy = new duice.ObjectProxy(array[index]);
+                    let objectHandler = ObjectProxy.getHandler(objectProxy);
+                    objectHandler.setBeforeChangeListener(this.beforeChangeListener);
+                    objectHandler.setAfterChangeListener(this.afterChangeListener);
+                    objectHandler.addObserver(this);
+                    this.arrayProxy[index] = objectProxy;
                 }
 
             }finally{
@@ -81,8 +102,8 @@ namespace duice {
         update(elementSet: ElementSet<any>, detail: any): void {
             console.log("DataSetHandler", elementSet, detail);
             if(detail.name === 'changeIndex'){
-                let data = this.array.splice(detail.fromIndex,1)[0];
-                this.array.splice(detail.toIndex, 0, data);
+                let data = this.arrayProxy.splice(detail.fromIndex,1)[0];
+                this.arrayProxy.splice(detail.toIndex, 0, data);
             }
             this.notifyObservers(detail);
         }
@@ -114,6 +135,22 @@ namespace duice {
          */
         isReadonly(property: string): boolean {
             return this.readonlyAll || this.readonly.has(property);
+        }
+
+        /**
+         * setBeforeChangeListener
+         * @param listener
+         */
+        setBeforeChangeListener(listener: Function): void {
+            this.beforeChangeListener = listener;
+        }
+
+        /**
+         * setAfterChangeListener
+         * @param listener
+         */
+        setAfterChangeListener(listener: Function): void {
+            this.afterChangeListener = listener;
         }
 
     }
