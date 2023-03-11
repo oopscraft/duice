@@ -33,14 +33,14 @@ namespace duice {
     export function initialize(container: any, context: object): void {
 
         // initializes element set
-        container.querySelectorAll(`*[${getAlias()}\\:data-set]:not([${getAlias()}\\:id])`).forEach(htmlElement => {
+        container.querySelectorAll(`*[${getAlias()}\\:array]:not([${getAlias()}\\:id])`).forEach(htmlElement => {
             let elementSetFactory = ElementSetFactory.getInstance(htmlElement);
             let elementSet = elementSetFactory.createElementSet(htmlElement, context);
             elementSet.render();
         });
 
         // initializes element
-        container.querySelectorAll(`*[${getAlias()}\\:data]:not([${getAlias()}\\:id])`).forEach(htmlElement => {
+        container.querySelectorAll(`*[${getAlias()}\\:object]:not([${getAlias()}\\:id])`).forEach(htmlElement => {
             let elementFactory = ElementFactory.getInstance(htmlElement);
             let element = elementFactory.createElement(htmlElement, context);
             element.render();
@@ -73,6 +73,18 @@ namespace duice {
             return (c=='x' ? r :(r&0x3|0x8)).toString(16);
         });
         return uuid;
+    }
+
+    /**
+     * assert
+     * @param condition
+     * @param message
+     */
+    export function assert(condition: any, message?: string): void {
+        console.assert(condition, message);
+        if(!condition){
+            throw new Error(message||'Assertion Failed');
+        }
     }
 
     /**
@@ -159,13 +171,18 @@ namespace duice {
      * @param context
      */
     export function executeScript(script:string, thisArg: any, context: object): any {
-        let args = [];
-        let values = [];
-        for(let property in context){
-            args.push(property);
-            values.push(context[property]);
+        try {
+            let args = [];
+            let values = [];
+            for(let property in context){
+                args.push(property);
+                values.push(context[property]);
+            }
+            return Function(...args, script).call(thisArg, ...values);
+        }catch(e){
+            console.error(script, e);
+            throw e;
         }
-        return Function(...args, script).call(thisArg, ...values);
     }
 
     /**

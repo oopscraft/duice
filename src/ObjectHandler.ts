@@ -2,13 +2,13 @@
 namespace duice {
 
     /**
-     * DataHandler
+     * ObjectHandler
      */
-    export class DataHandler extends Observable implements Observer {
+    export class ObjectHandler extends Observable implements Observer {
 
-        data: Data;
+        object: Object;
 
-        originData: object;
+        originObject: object;
 
         readonlyAll: boolean = false;
 
@@ -22,22 +22,23 @@ namespace duice {
 
         /**
          * constructor
-         * @param data
+         * @param object
          */
-        constructor(data: Data){
+        constructor(object: Object) {
             super();
-            this.data = data;
-            globalThis.Object.defineProperty(data, "_handler_", {
+            this.object = object;
+            this.save();
+            globalThis.Object.defineProperty(object, "_handler_", {
                 value: this,
                 writable: true
             });
         }
 
         /**
-         * getData
+         * getObject
          */
-        getData(): Data {
-            return this.data;
+        getObject(): Object {
+            return this.object;
         }
 
         /**
@@ -61,8 +62,8 @@ namespace duice {
             console.log("- Object.set", target, property, value);
 
             // checks before change listener
-            this.callBeforeChange(property, value).then((result)=>{
-                if(result){
+            this.callBeforeChange(property, value).then((result) => {
+                if (result) {
                     // change property value
                     Reflect.set(target, property, value);
 
@@ -89,19 +90,19 @@ namespace duice {
                 this.suspendNotify();
 
                 // deletes
-                for (let property in this.data) {
-                    delete this.data[property];
+                for (let property in this.object) {
+                    delete this.object[property];
                 }
 
                 // assign
                 for (let property in object) {
-                    this.data[property] = object[property];
+                    this.object[property] = object[property];
                 }
 
-                // copy origin data
-                this.originData = JSON.parse(JSON.stringify(this.data));
+                // saves origin object
+                this.save();
 
-            }finally{
+            } finally {
                 // resume
                 this.resumeListener();
                 this.resumeNotify();
@@ -112,17 +113,24 @@ namespace duice {
         }
 
         /**
-         * isDirty
+         * save
          */
-        isDirty(): boolean {
-            return JSON.stringify(this.data) !== JSON.stringify(this.originData);
+        save(): void {
+            this.originObject = JSON.parse(JSON.stringify(this.object));
         }
 
         /**
          * reset
          */
         reset(): void {
-            this.assign(this.originData);
+            this.assign(this.originObject);
+        }
+
+        /**
+         * isDirty
+         */
+        isDirty(): boolean {
+            return JSON.stringify(this.object) !== JSON.stringify(this.originObject);
         }
 
         /**
@@ -132,7 +140,7 @@ namespace duice {
         getValue(property: string): any {
             console.assert(property);
             property = property.replace('.','?.');
-            return new Function(`return this.${property};`).call(this.getData());
+            return new Function(`return this.${property};`).call(this.getObject());
         }
 
         /**
@@ -141,7 +149,7 @@ namespace duice {
          * @param value
          */
         setValue(property: string, value: any): void {
-            new Function('value', `this.${property} = value;`).call(this.getData(), value);
+            new Function('value', `this.${property} = value;`).call(this.getObject(), value);
         }
 
         /**
@@ -238,7 +246,7 @@ namespace duice {
          */
         async callBeforeChange(property: string, value: any): Promise<boolean> {
             if(this.listenerEnabled && this.beforeChangeListener) {
-                let result = await this.beforeChangeListener.call(this.getData(), property, value);
+                let result = await this.beforeChangeListener.call(this.getObject(), property, value);
                 if(result === false){
                     return false;
                 }
@@ -253,7 +261,7 @@ namespace duice {
          */
         async callAfterChange(property: string, value: any): Promise<void> {
             if(this.listenerEnabled && this.afterChangeListener){
-                await this.afterChangeListener.call(this.getData(), property, value);
+                await this.afterChangeListener.call(this.getObject(), property, value);
             }
         }
 

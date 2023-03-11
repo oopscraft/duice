@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="../dist/duice.css">
     <script>
         'use strict';
-        let myData = duice.Data.create({
+        let myObject = new duice.ObjectProxy({
             name: 'Apple',
             phoneNo: '01012345678',
             cardNo: '0000111122223333',
@@ -21,8 +21,15 @@
             }
         });
 
+        /**
+         * printMyObject
+         */
+        function printMyObject() {
+            document.getElementById('myObject').value = JSON.stringify(myObject, null, 4);
+        }
+
         // adds before change listener
-        duice.Data.onBeforeChange(myData, async (property, value) => {
+        duice.ObjectProxy.onBeforeChange(myObject, async (property, value) => {
             if(await duice.confirm(`Do you want to change [${property}] is [${value}]`)){
                 return true;
             }else{
@@ -30,21 +37,14 @@
             }
         });
 
-        /**
-         * printMyData
-         */
-        function printMyDataAsJson() {
-            document.getElementById('myData').value = JSON.stringify(myData, null, 4);
-        }
-
         // adds after change listener
-        duice.Data.onAfterChange(myData, (property, value) => {
-            printMyDataAsJson();
+        duice.ObjectProxy.onAfterChange(myObject, (property, value) => {
+            printMyObject();
         });
 
         // adds DOMContentLoaded event listener
         document.addEventListener("DOMContentLoaded", event => {
-            printMyDataAsJson();
+            printMyObject();
         });
 
     </script>
@@ -53,33 +53,36 @@
 <h1>Element Test</h1>
 <div class="container">
     <div class="row">
-        <div class="col-2">
+        <div class="col-3">
             <h2>Data</h2>
-            <textarea id="myData" rows="15" class="font-weight-light" >
+            <textarea id="myObject" rows="15" class="font-weight-light" >
             </textarea>
-            <button onclick="duice.Data.assign(myData, JSON.parse(document.getElementById('myData').value));" class="font-weight-light">
-                duice.Data.assign(myData,[object]);
-            </button>
-            <button onclick="duice.Data.setReadonlyAll(myData, true);" class="font-weight-light">
-                duice.Data.setReadonlyAll(myData,true);
-            </button>
-            <button onclick="duice.Data.setReadonlyAll(myData, false);" class="font-weight-light">
-                duice.Data.setReadonlyAll(myData,false);
-            </button>
-            <button onclick="duice.Data.setReadonly(myData, 'name', true);" class="font-weight-light">
-                duice.Data.setReadonly(myData,'name', true);
-            </button>
-            <button onclick="duice.Data.setReadonly(myData, 'name', false);" class="font-weight-light">
-                duice.Data.setReadonly(myData,'name',true);
-            </button>
-            <button onclick="alert(duice.Data.isDirty(myData));" class="font-weight-light">
-                duice.Data.isDirty(myData);
-            </button>
-            <button onclick="duice.Data.reset(myData); printMyDataAsJson();" class="font-weight-light">
-                duice.Data.reset(myData);
-            </button>
+            <div style="display:flex; flex-direction:column; align-items:flex-start;">
+                <button onclick="duice.ObjectProxy.assign(myObject, JSON.parse(document.getElementById('myObject').value));"
+                        class="font-weight-light">
+                    duice.ObjectProxy.assign(myObject,[object]);
+                </button>
+                <button onclick="duice.ObjectProxy.setReadonlyAll(myObject, true);" class="font-weight-light">
+                    duice.ObjectProxy.setReadonlyAll(myObject,true);
+                </button>
+                <button onclick="duice.ObjectProxy.setReadonlyAll(myObject, false);" class="font-weight-light">
+                    duice.ObjectProxy.setReadonlyAll(myObject,false);
+                </button>
+                <button onclick="duice.ObjectProxy.setReadonly(myObject, 'name', true);" class="font-weight-light">
+                    duice.ObjectProxy.setReadonly(myObject,'name', true);
+                </button>
+                <button onclick="duice.ObjectProxy.setReadonly(myObject, 'name', false);" class="font-weight-light">
+                    duice.ObjectProxy.setReadonly(myObject,'name',true);
+                </button>
+                <button onclick="alert(duice.ObjectProxy.isDirty(myObject));" class="font-weight-light">
+                    duice.ObjectProxy.isDirty(myObject);
+                </button>
+                <button onclick="duice.ObjectProxy.reset(myObject); printMyObject();" class="font-weight-light">
+                    duice.ObjectProxy.reset(myObject);
+                </button>
+            </div>
         </div>
-        <div class="col-10">
+        <div class="col-9">
             <h2>Element</h2>
             <table>
                 <thead>
@@ -94,20 +97,20 @@
                 <tbody>
                 <tr>
                     <td rowspan="2" class="font-weight-bold">name</td>
-                    <td rowspan="2" duice:data="myData" duice:property="name"></td>
+                    <td rowspan="2" duice:object="myObject" duice:property="name"></td>
                     <td>
-                        <span duice:data="myData" duice:property="name"/></span>
+                        <span duice:object="myObject" duice:property="name"/></span>
                     </td>
                     <td class="font-weight-light">
-                        &lt;* duice:data="myData" duice:property="name"&gt; &lt;/*&gt;
+                        &lt;* duice:object="myObject" duice:property="name"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="text" duice:data="myData" duice:property="name"/>
+                        <input type="text" duice:object="myObject" duice:property="name"/>
                     </td>
                     <td class="font-weight-light">
-                        &lt;input type="text" duice:data="myData" duice:property="name"/&gt;
+                        &lt;input type="text" duice:object="myObject" duice:property="name"/&gt;
                     </td>
                 </tr>
                 </tbody>
@@ -115,34 +118,34 @@
                 <tbody>
                 <tr>
                     <td rowspan="4" class="font-weight-bold">phoneNo</td>
-                    <td rowspan="4" duice:data="myData" duice:property="phoneNo"></td>
+                    <td rowspan="4" duice:object="myObject" duice:property="phoneNo"></td>
                     <td>
-                        <span duice:data="myData" duice:property="phoneNo"/></span>
+                        <span duice:object="myObject" duice:property="phoneNo"/></span>
                     </td>
                     <td class="font-weight-light">
-                        &lt;* duice:data="myData" duice:property="phoneNo"&gt; &lt;/*&gt;
+                        &lt;* duice:object="myObject" duice:property="phoneNo"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
-                    <td duice:data="myData" duice:property="phoneNo" duice:mask="string('###-####-####')"></td>
+                    <td duice:object="myObject" duice:property="phoneNo" duice:mask="string('###-####-####')"></td>
                     <td class="font-weight-light">
-                        &lt;* duice:data="myData" duice:property="phoneNo" duice:mask="string('###-####-####')"&gt; &lt;/*&gt;
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <input type="text" duice:data="myData" duice:property="phoneNo"/>
-                    </td>
-                    <td class="font-weight-light">
-                        &lt;input type="text" duice:data="myData" duice:property="phoneNo"/&gt;
+                        &lt;* duice:object="myObject" duice:property="phoneNo" duice:mask="string('###-####-####')"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="text" duice:data="myData" duice:property="phoneNo" duice:mask="string('###-####-####')"/>
+                        <input type="text" duice:object="myObject" duice:property="phoneNo"/>
                     </td>
                     <td class="font-weight-light">
-                        &lt;input type="text" duice:data="myData" duice:property="phoneNo" duice:mask="string('###-####-####')"/&gt;
+                        &lt;input type="text" duice:object="myObject" duice:property="phoneNo"/&gt;
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="text" duice:object="myObject" duice:property="phoneNo" duice:mask="string('###-####-####')"/>
+                    </td>
+                    <td class="font-weight-light">
+                        &lt;input type="text" duice:object="myObject" duice:property="phoneNo" duice:mask="string('###-####-####')"/&gt;
                     </td>
                 </tr>
                 </tbody>
@@ -150,34 +153,34 @@
                 <tbody>
                 <tr>
                     <td rowspan="4" class="font-weight-bold">cardNo</td>
-                    <td rowspan="4" duice:data="myData" duice:property="cardNo"></td>
+                    <td rowspan="4" duice:object="myObject" duice:property="cardNo"></td>
                     <td>
-                        <span duice:data="myData" duice:property="cardNo"/></span>
+                        <span duice:object="myObject" duice:property="cardNo"/></span>
                     </td>
                     <td class="font-weight-light">
-                        &lt;* duice:data="myData" duice:property="cardNo"&gt; &lt;/*&gt;
+                        &lt;* duice:object="myObject" duice:property="cardNo"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
-                    <td duice:data="myData" duice:property="cardNo" duice:mask="string('####-####-####-####')"></td>
+                    <td duice:object="myObject" duice:property="cardNo" duice:mask="string('####-####-####-####')"></td>
                     <td class="font-weight-light">
-                        &lt;* duice:data="myData" duice:property="cardNo" duice:mask="string('####-####-####-####')"&gt; &lt;/*&gt;
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <input type="text" duice:data="myData" duice:property="cardNo"/>
-                    </td>
-                    <td class="font-weight-light">
-                        &lt;input type="text" duice:data="myData" duice:property="cardNo"/&gt;
+                        &lt;* duice:object="myObject" duice:property="cardNo" duice:mask="string('####-####-####-####')"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="text" duice:data="myData" duice:property="cardNo" duice:mask="string('####-####-####-####')"/>
+                        <input type="text" duice:object="myObject" duice:property="cardNo"/>
                     </td>
                     <td class="font-weight-light">
-                        &lt;input type="text" duice:data="myData" duice:property="cardNo" duice:mask="string('####-####-####-####')"/&gt;
+                        &lt;input type="text" duice:object="myObject" duice:property="cardNo"/&gt;
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="text" duice:object="myObject" duice:property="cardNo" duice:mask="string('####-####-####-####')"/>
+                    </td>
+                    <td class="font-weight-light">
+                        &lt;input type="text" duice:object="myObject" duice:property="cardNo" duice:mask="string('####-####-####-####')"/&gt;
                     </td>
                 </tr>
                 </tbody>
@@ -185,34 +188,34 @@
                 <tbody>
                 <tr>
                     <td rowspan="4" class="font-weight-bold">balanceAmount</td>
-                    <td rowspan="4" duice:data="myData" duice:property="balanceAmount"></td>
+                    <td rowspan="4" duice:object="myObject" duice:property="balanceAmount"></td>
                     <td>
-                        <span duice:data="myData" duice:property="balanceAmount"></span>
+                        <span duice:object="myObject" duice:property="balanceAmount"></span>
                     </td>
                     <td class="font-weight-light">
-                        &lt;* duice:data="myData" duice:property="balanceAmount"&gt; &lt;/*&gt;
+                        &lt;* duice:object="myObject" duice:property="balanceAmount"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
-                    <td type="number" duice:data="myData" duice:property="balanceAmount" duice:mask="number(2)"></td>
+                    <td type="number" duice:object="myObject" duice:property="balanceAmount" duice:mask="number(2)"></td>
                     <td class="font-weight-light">
-                        &lt;* duice:data="myData" duice:property="balanceAmount" duice:mask="number(2)"&gt &lt;/*&gt;
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <input type="number" duice:data="myData" duice:property="balanceAmount"/>
-                    </td>
-                    <td class="font-weight-light">
-                        &lt;input type="number" duice:data="myData" duice:property="balanceAmount"/&gt;
+                        &lt;* duice:object="myObject" duice:property="balanceAmount" duice:mask="number(2)"&gt &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="number" duice:data="myData" duice:property="balanceAmount" duice:mask="number(2)"/>
+                        <input type="number" duice:object="myObject" duice:property="balanceAmount"/>
                     </td>
                     <td class="font-weight-light">
-                        &lt;input type="number" duice:data="myData" duice:property="balanceAmount" duice:mask="number(2)"/&gt;
+                        &lt;input type="number" duice:object="myObject" duice:property="balanceAmount"/&gt;
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="number" duice:object="myObject" duice:property="balanceAmount" duice:mask="number(2)"/>
+                    </td>
+                    <td class="font-weight-light">
+                        &lt;input type="number" duice:object="myObject" duice:property="balanceAmount" duice:mask="number(2)"/&gt;
                     </td>
                 </tr>
                 </tbody>
@@ -220,17 +223,17 @@
                 <tbody>
                 <tr>
                     <td rowspan="2" class="font-weight-bold">type</td>
-                    <td rowspan="2" duice:data="myData" duice:property="type"></td>
+                    <td rowspan="2" duice:object="myObject" duice:property="type"></td>
                     <td>
-                        <span duice:data="myData" duice:property="type"></span>
+                        <span duice:object="myObject" duice:property="type"></span>
                     </td>
                     <td class="font-weight-light">
-                        &lt;* duice:data="myData" duice:property="type"&gt; &lt;/*&gt;
+                        &lt;* duice:object="myObject" duice:property="type"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <select duice:data="myData" duice:property="type">
+                        <select duice:object="myObject" duice:property="type">
                             <option value>- Select Type -</option>
                             <option value="human">Human</option>
                             <option value="fruit">Fruit</option>
@@ -238,7 +241,7 @@
                         </select>
                     </td>
                     <td class="font-weight-light">
-                        &lt;select duice:data="myData" duice:property="type"/&gt; ... &lt;/select&gt;
+                        &lt;select duice:object="myObject" duice:property="type"/&gt; ... &lt;/select&gt;
                     </td>
                 </tr>
                 </tbody>
@@ -246,20 +249,20 @@
                 <tbody>
                 <tr>
                     <td rowspan="2" class="font-weight-bold">enable</td>
-                    <td rowspan="2" duice:data="myData" duice:property="enabled"></td>
+                    <td rowspan="2" duice:object="myObject" duice:property="enabled"></td>
                     <td>
-                        <span duice:data="myData" duice:property="enabled"></span>
+                        <span duice:object="myObject" duice:property="enabled"></span>
                     </td>
                     <td class="font-weight-light">
-                        &lt;* duice:data="myData" duice:property="enabled"&gt; &lt;/*&gt;
+                        &lt;* duice:object="myObject" duice:property="enabled"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="checkbox" duice:data="myData" duice:property="enabled"/>
+                        <input type="checkbox" duice:object="myObject" duice:property="enabled"/>
                     </td>
                     <td class="font-weight-light">
-                        &lt;input type="checkbox" duice:data="myData" duice:property="enabled"/&gt;
+                        &lt;input type="checkbox" duice:object="myObject" duice:property="enabled"/&gt;
                     </td>
                 </tr>
                 </tbody>
@@ -267,20 +270,20 @@
                 <tbody>
                 <tr>
                     <td rowspan="2" class="font-weight-bold">enableYn</td>
-                    <td rowspan="2" duice:data="myData" duice:property="enabledYn"></td>
+                    <td rowspan="2" duice:object="myObject" duice:property="enabledYn"></td>
                     <td>
-                        <span duice:data="myData" duice:property="enabledYn"></span>
+                        <span duice:object="myObject" duice:property="enabledYn"></span>
                     </td>
                     <td class="font-weight-light">
-                        &lt;* duice:data="myData" duice:property="enabledYn"&gt; &lt;/*&gt;
+                        &lt;* duice:object="myObject" duice:property="enabledYn"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="checkbox" duice:data="myData" duice:property="enabledYn" duice:true-value="Y" duice:false-value="N"/>
+                        <input type="checkbox" duice:object="myObject" duice:property="enabledYn" duice:true-value="Y" duice:false-value="N"/>
                     </td>
                     <td class="font-weight-light">
-                        &lt;input type="checkbox" duice:data="myData" duice:property="enabled" duice:true-value="Y" duice:false-value="N"/&gt;
+                        &lt;input type="checkbox" duice:object="myObject" duice:property="enabled" duice:true-value="Y" duice:false-value="N"/&gt;
                     </td>
                 </tr>
                 </tbody>
@@ -288,20 +291,20 @@
                 <tbody>
                 <tr>
                     <td rowspan="2" class="font-weight-bold">description</td>
-                    <td rowspan="2" duice:data="myData" duice:property="description" style="white-space: pre-wrap;"></td>
+                    <td rowspan="2" duice:object="myObject" duice:property="description" style="white-space: pre-wrap;"></td>
                     <td>
-                        <pre duice:data="myData" duice:property="description"></pre>
+                        <pre duice:object="myObject" duice:property="description"></pre>
                     </td>
                     <td class="font-weight-light">
-                        &lt;* duice:data="myData" duice:property="description"&gt; &lt;/*&gt;
+                        &lt;* duice:object="myObject" duice:property="description"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <textarea duice:data="myData" duice:property="description"/></textarea>
+                        <textarea duice:object="myObject" duice:property="description"/></textarea>
                     </td>
                     <td class="font-weight-light">
-                        &lt;textarea duice:data="myData" duice:property="description"&gt; &lt;/textarea&gt;
+                        &lt;textarea duice:object="myObject" duice:property="description"&gt; &lt;/textarea&gt;
                     </td>
                 </tr>
                 </tbody>
@@ -309,20 +312,20 @@
                 <tbody>
                 <tr>
                     <td rowspan="2" class="font-weight-bold">address.country</td>
-                    <td rowspan="2" duice:data="myData" duice:property="address.country"></td>
+                    <td rowspan="2" duice:object="myObject" duice:property="address.country"></td>
                     <td>
-                        <span duice:data="myData" duice:property="address.country"></span>
+                        <span duice:object="myObject" duice:property="address.country"></span>
                     </td>
                     <td class="font-weight-light">
-                        &lt;* duice:data="myData" duice:property="address.country"&gt; &lt;/*&gt;
+                        &lt;* duice:object="myObject" duice:property="address.country"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="text" duice:data="myData" duice:property="address.country"/>
+                        <input type="text" duice:object="myObject" duice:property="address.country"/>
                     </td>
                     <td class="font-weight-light">
-                        &lt;input type="text" duice:data="myData" duice:property="address.country"/&gt;
+                        &lt;input type="text" duice:object="myObject" duice:property="address.country"/&gt;
                     </td>
                 </tr>
                 </tbody>

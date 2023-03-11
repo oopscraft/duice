@@ -43,9 +43,9 @@ namespace duice {
             // creates element
             let element = this.doCreateElement(htmlElement, context);
 
-            // data
-            let data = getAttribute(htmlElement, 'data');
-            element.setData(data);
+            // object
+            let object = getAttribute(htmlElement, 'object');
+            element.setObject(object);
 
             // property
             let property = getAttribute(htmlElement, 'property');

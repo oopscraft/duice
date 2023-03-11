@@ -1,11 +1,12 @@
+///<reference path="Observable.ts"/>
 namespace duice {
 
     /**
-     * DataSetHandler
+     * ArrayHandler
      */
-    export class DataSetHandler extends Observable implements Observer {
+    export class ArrayHandler extends Observable implements Observer {
 
-        dataSet: DataSet;
+        array: object[];
 
         readonlyAll: boolean = false;
 
@@ -13,22 +14,22 @@ namespace duice {
 
         /**
          * constructor
-         * @param dataSet
+         * @param array
          */
-        constructor(dataSet: DataSet) {
+        constructor(array: object[]) {
             super();
-            this.dataSet = dataSet;
-            Object.defineProperty(dataSet, '_handler_', {
+            this.array = array;
+            globalThis.Object.defineProperty(array, '_handler_', {
                 value: this,
                 writable: true
             });
         }
 
         /**
-         * getDataSet
+         * getArray
          */
-        getDataSet(): DataSet {
-            return this.dataSet;
+        getArray(): object[] {
+            return this.array;
         }
 
         /**
@@ -56,11 +57,11 @@ namespace duice {
                 this.suspendNotify();
 
                 // deletes
-                this.dataSet.length = 0;
+                this.array.length = 0;
 
                 // assign
                 for(let i = 0, size = array.length; i < size; i ++){
-                    this.dataSet[i] = duice.Data.create(array[i]);
+                    this.array[i] = new duice.ObjectProxy(array[i]);
                 }
 
             }finally{
@@ -80,8 +81,8 @@ namespace duice {
         update(elementSet: ElementSet<any>, detail: any): void {
             console.log("DataSetHandler", elementSet, detail);
             if(detail.name === 'changeIndex'){
-                let data = this.dataSet.splice(detail.fromIndex,1)[0];
-                this.dataSet.splice(detail.toIndex, 0, data);
+                let data = this.array.splice(detail.fromIndex,1)[0];
+                this.array.splice(detail.toIndex, 0, data);
             }
             this.notifyObservers(detail);
         }

@@ -23,8 +23,8 @@ namespace duice {
             let elementSet = new ElementSet(htmlElement, context);
 
             // find data set
-            let dataSet = getAttribute(htmlElement, 'data-set');
-            elementSet.setDataSet(dataSet);
+            let array = getAttribute(htmlElement, 'array');
+            elementSet.setArray(array);
 
             // loop
             let loop = getAttribute(htmlElement, 'loop');

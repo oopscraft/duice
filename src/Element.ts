@@ -13,7 +13,7 @@ namespace duice {
 
         context: object;
 
-        dataHandler: DataHandler;
+        objectHandler: ObjectHandler;
 
         property: string;
 
@@ -34,21 +34,22 @@ namespace duice {
 
         /**
          * setData
-         * @param data
+         * @param objectName
          */
-        setData(data: string): void {
-            let dataObject = findObject(this.context, data);
-            this.dataHandler = Data.getHandler(dataObject);
-            console.assert(this.dataHandler);
-            this.addObserver(this.dataHandler);
-            this.dataHandler.addObserver(this);
+        setObject(objectName: string): void {
+            let object = findObject(this.context, objectName);
+            assert(object, `ObjectProxy[${objectName}] is not found.`)
+            this.objectHandler = ObjectProxy.getHandler(object);
+            assert(this.objectHandler, `[${objectName}] is not ObjectProxy.`);
+            this.addObserver(this.objectHandler);
+            this.objectHandler.addObserver(this);
         }
 
         /**
-         * returns bind data handler
+         * returns object handler
          */
-        getDataHandler(): DataHandler {
-            return this.dataHandler;
+        getObjectHandler(): ObjectHandler {
+            return this.objectHandler;
         }
 
         /**
@@ -96,10 +97,10 @@ namespace duice {
             if(this.property){
 
                 // set value
-                this.setValue(this.dataHandler.getValue(this.property));
+                this.setValue(this.objectHandler.getValue(this.property));
 
                 // set readonly
-                let readonly = this.dataHandler.isReadonly(this.property);
+                let readonly = this.objectHandler.isReadonly(this.property);
                 this.setReadonly(readonly);
             }
 
@@ -109,18 +110,18 @@ namespace duice {
 
         /**
          * update
-         * @param dataHandler
+         * @param objectHandler
          * @param detail
          */
-        update(dataHandler: DataHandler, detail: object): void {
+        update(objectHandler: ObjectHandler, detail: object): void {
 
             if(this.property){
 
                 // set value
-                this.setValue(dataHandler.getValue(this.property));
+                this.setValue(objectHandler.getValue(this.property));
 
                 // set readonly
-                let readonly = this.dataHandler.isReadonly(this.property);
+                let readonly = this.objectHandler.isReadonly(this.property);
                 this.setReadonly(readonly);
             }
 

@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="../dist/duice.css">
     <script>
         'use strict';
-        let myDataSet = duice.DataSet.create([
+        let myArray = new duice.ArrayProxy([
             {
                 name: 'Apple',
                 phoneNo: '01012345678',
@@ -38,18 +38,18 @@
                 }
             }
         ]);
-        console.log(myDataSet);
+        console.log(myArray);
 
         /**
-         * printMyDataSetAsJson
+         * viewMyArray
          */
-        function printMyDataSetAsJson() {
-            document.getElementById('myDataSet').value = JSON.stringify(myDataSet, null, 4);
+        function viewMyArray() {
+            document.getElementById('myArray').value = JSON.stringify(myArray, null, 4);
         }
 
         // adds DOMContentLoaded event listener
         document.addEventListener("DOMContentLoaded", event => {
-            printMyDataSetAsJson();
+            viewMyArray();
         });
 
     </script>
@@ -60,7 +60,7 @@
     <div class="row">
         <div class="col-2">
             <h2>DataSet</h2>
-            <textarea id="myDataSet" rows="20" class="font-weight-light" >
+            <textarea id="myArray" rows="20" class="font-weight-light" >
             </textarea>
         </div>
         <div class="col-10">
@@ -79,16 +79,16 @@
                     <th>enabledYn</th>
                     <th>address.country</th>
                 </tr>
-                <tr duice:data-set="myDataSet" duice:loop="item,status">
-                    <td duice:data="status" duice:property="index"></td>
-                    <td duice:data="item" duice:property="name"></td>
-                    <td duice:data="item" duice:property="phoneNo" duice:mask="string('###-####-####')"></td>
-                    <td duice:data="item" duice:property="cardNo" duice:mask="string('####-####-####-####')"></td>
-                    <td duice:data="item" duice:property="balanceAmount" duice:mask="number(2)"></td>
-                    <td duice:data="item" duice:property="type"></td>
-                    <td duice:data="item" duice:property="enabled"></td>
-                    <td duice:data="item" duice:property="enabledYn"></td>
-                    <td duice:data="item" duice:property="address.country"></td>
+                <tr duice:array="myArray" duice:loop="item,status">
+                    <td duice:object="status" duice:property="index"></td>
+                    <td duice:object="item" duice:property="name"></td>
+                    <td duice:object="item" duice:property="phoneNo" duice:mask="string('###-####-####')"></td>
+                    <td duice:object="item" duice:property="cardNo" duice:mask="string('####-####-####-####')"></td>
+                    <td duice:object="item" duice:property="balanceAmount" duice:mask="number(2)"></td>
+                    <td duice:object="item" duice:property="type"></td>
+                    <td duice:object="item" duice:property="enabled"></td>
+                    <td duice:object="item" duice:property="enabledYn"></td>
+                    <td duice:object="item" duice:property="address.country"></td>
                 </tr>
             </table>
 
@@ -112,19 +112,19 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr duice:data-set="myDataSet" duice:loop="item,status" duice:editable="true">
-                        <td duice:data="status" duice:property="index" duice:script="this.style.backgroundColor='red';"></td>
-                        <td duice:data="status" duice:property="count"></td>
-                        <td duice:data="status" duice:property="size"></td>
-                        <td duice:data="status" duice:property="first"></td>
-                        <td duice:data="status" duice:property="last"></td>
-                        <td duice:data="item" duice:property="name"></td>
-                        <td duice:data="item" duice:property="age"></td>
+                    <tr duice:array="myArray" duice:loop="item,status" duice:editable="true">
+                        <td duice:object="status" duice:property="index" duice:script="this.style.backgroundColor='red';"></td>
+                        <td duice:object="status" duice:property="count"></td>
+                        <td duice:object="status" duice:property="size"></td>
+                        <td duice:object="status" duice:property="first"></td>
+                        <td duice:object="status" duice:property="last"></td>
+                        <td duice:object="item" duice:property="name"></td>
+                        <td duice:object="item" duice:property="age"></td>
                         <td>
-                            <input duice:data="item" duice:property="mobile" duice:mask="string('###-####-####')"/>
+                            <input duice:object="item" duice:property="mobile" duice:mask="string('###-####-####')"/>
                         </td>
                         <td>
-                            <select duice:data="item" duice:property="groupId">
+                            <select duice:object="item" duice:property="groupId">
                                 <option value>- Group ID -</option>
                                 <option value="human">Human</option>
                                 <option value="fruit">Fruit</option>
@@ -132,21 +132,21 @@
                             </select>
                         </td>
                         <td>
-                            <button duice:data="status" duice:script="this.dataset.index=status.index;"
-                                    onclick="myDataSet.splice(this.dataset.index,1);">
+                            <button duice:object="status" duice:script="this.dataset.index=status.index;"
+                                    onclick="myArray.splice(this.dataset.index,1);">
                                 Remove
                             </button>
                         </td>
                     </tr>
-                    <tr duice:data-set="myDataSet"
-                        duice:script="myDataSet.length > 0 ? this.style.display='none' : this.style.display='';">
+                    <tr duice:array="myArray"
+                        duice:script="myArray.length > 0 ? this.style.display='none' : this.style.display='';">
                         <td colspan="100%">Data Not Found</td>
                     </tr>
                     </tbody>
                     <tfoot>
                     <td colspan="100%" style="text-align:right;">
-                        <span duice:data-set="myDataSet" duice:script="this.innerHTML=myDataSet.length + ' Rows';"></span>
-                        <button onclick="myDataSet.push(duice.Data.create({name: 'Kitty'}));">
+                        <span duice:array="myArray" duice:script="this.innerHTML=myArray.length + ' Rows';"></span>
+                        <button onclick="myArray.push(new duice.ObjectProxy({name: 'Kitty'}));">
                             Add
                         </button>
                     </td>
@@ -156,9 +156,9 @@
             <!-- test li -->
             <h3>List</h3>
             <ul>
-                <li duice:data-set="myDataSet" duice:loop="item,status" duice:editable="true">
-                    <span duice:data="item" duice:property="name"></span>
-                    <span duice:data="item" duice:property="age"></span>
+                <li duice:array="myArray" duice:loop="item,status" duice:editable="true">
+                    <span duice:object="item" duice:property="name"></span>
+                    <span duice:object="item" duice:property="age"></span>
                 </li>
             </ul>
         </div>

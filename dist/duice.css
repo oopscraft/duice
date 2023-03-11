@@ -6,12 +6,10 @@
     --table-padding: 0.0625rem 0.5rem;
     --table-th-background-color: #f7f7f7;
     --table-td-background-color: white;
-    --input-margin: 1px;
     --input-padding: 0.0625rem 0.5rem;
     --input-border-width: 1px;
     --input-border-color: #ccc;
     --input-border-radius: 1px;
-    --select-margin: 1px;
     --select-padding: 0.0625rem 0.5rem;
     --select-border: solid 1px #ccc;
     --select-border-radius: 1px;
@@ -186,10 +184,11 @@ table tfoot tr td {
 
 /* input */
 input {
-    margin: 0px;
+    margin: 0;
     border: solid 1px #ccc;
     border-radius: 1px;
     padding: var(--input-padding);
+    width: 100%;
     height: inherit;
     line-height: inherit;
     box-sizing: border-box;
@@ -199,10 +198,11 @@ input {
 
 /* select */
 select {
-    margin: var(--select-margin);
+    margin: 0;
     padding: var(--select-padding);
     border: var(--select-border);
     border-radius: var(--select-border-radius);
+    width: 100%;
     height: inherit;
     line-height: inherit;
     box-sizing: border-box;
@@ -225,11 +225,11 @@ select {
 
 /* textarea */
 textarea {
-    margin: var(--textarea-margin);
+    margin: 0;
     padding: var(--textarea-padding);
     border: var(--textarea-border);
     border-radius: var(--textarea-border-radius);
-    width: calc(100% - 3px);
+    width: 100%;
     line-height: inherit;
     white-space: pre-line;
     box-sizing: border-box;

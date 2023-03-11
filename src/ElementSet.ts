@@ -11,7 +11,7 @@ namespace duice {
 
         context: object;
 
-        dataSetHandler: DataSetHandler;
+        arrayHandler: ArrayHandler;
 
         slotElement: HTMLSlotElement;
 
@@ -43,14 +43,15 @@ namespace duice {
 
         /**
          * setDataSet
-         * @param dataSet
+         * @param arrayName
          */
-        setDataSet(dataSet: string): void {
-            let dataSetObject = findObject(this.context, dataSet);
-            this.dataSetHandler = DataSet.getHandler(dataSetObject);
-            console.assert(this.dataSetHandler);
-            this.addObserver(this.dataSetHandler);
-            this.dataSetHandler.addObserver(this);
+        setArray(arrayName: string): void {
+            let array = findObject(this.context, arrayName);
+            assert(array, `ArrayProxy[${arrayName}] is not found.`);
+            this.arrayHandler = ArrayProxy.getHandler(array);
+            assert(this.arrayHandler, `[${arrayName}] is not ArrayProxy.`);
+            this.addObserver(this.arrayHandler);
+            this.arrayHandler.addObserver(this);
         }
 
         /**
@@ -65,7 +66,7 @@ namespace duice {
          * render
          */
         render(): void {
-            let dataSet = this.dataSetHandler.getDataSet();
+            let dataSet = this.arrayHandler.getArray();
             this.doRender(dataSet);
 
             // executes script
@@ -74,25 +75,25 @@ namespace duice {
 
         /**
          * doRender
-         * @param dataSet
+         * @param array
          */
-        doRender(dataSet: DataSet): void {
+        doRender(array: object[]): void {
             let _this = this;
             removeChildNodes(this.slotElement);
             if(this.loop){
                 let loopArgs = this.loop.split(',');
                 let itemName = loopArgs[0].trim();
                 let statusName = loopArgs[1]?.trim();
-                for(let index = 0; index < dataSet.length; index ++){
-                    let data = dataSet[index];
+                for(let index = 0; index < array.length; index ++){
+                    let data = array[index];
                     let context = {};
                     context[itemName] = data;
-                    context[statusName] = duice.Data.create({
+                    context[statusName] = new ObjectProxy({
                         index: index,
                         count: index+1,
-                        size: dataSet.length,
+                        size: array.length,
                         first: (index === 0),
-                        last: (dataSet.length == index+1)
+                        last: (array.length == index+1)
                     });
                     let rowHtmlElement = this.htmlElement.cloneNode(true) as HTMLElement;
                     setAttribute(rowHtmlElement, 'index', index.toString());
@@ -137,9 +138,9 @@ namespace duice {
          * @param observable
          * @param detail
          */
-        update(dataSetHandler: DataSetHandler, detail: any): void {
-            let dataSet = dataSetHandler.getDataSet();
-            this.doUpdate(dataSet);
+        update(arrayHandler: ArrayHandler, detail: any): void {
+            let array = arrayHandler.getArray();
+            this.doUpdate(array);
 
             // executes script
             this.executeScript();
@@ -147,12 +148,11 @@ namespace duice {
 
         /**
          * doUpdate
-         * @param dataSet
+         * @param array
          */
-        doUpdate(dataSet: DataSet): void {
-            this.doRender(dataSet);
+        doUpdate(array: object[]): void {
+            this.doRender(array);
         }
-
 
         /**
          * executes script
@@ -163,7 +163,6 @@ namespace duice {
                 executeScript(script, this.htmlElement, this.context);
             }
         }
-
 
     }
 }

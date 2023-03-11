@@ -10,113 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 var duice;
 (function (duice) {
     /**
-     * Data
-     */
-    class Data extends globalThis.Object {
-        /**
-         * create
-         * @param object
-         */
-        static create(object) {
-            let data = new Data();
-            let dataHandler = new duice.DataHandler(data);
-            dataHandler.assign(object);
-            return new Proxy(data, dataHandler);
-        }
-        /**
-         * constructor
-         * @protected
-         */
-        constructor() {
-            super();
-        }
-        /**
-         * getHandler
-         * @param data
-         */
-        static getHandler(data) {
-            return duice.Object.getOwnPropertyDescriptor(data, '_handler_').value;
-        }
-        /**
-         * assign
-         * @param data
-         * @param object
-         */
-        static assign(data, object) {
-            let handler = this.getHandler(data);
-            handler.assign(object);
-            handler.notifyObservers({});
-            return data;
-        }
-        /**
-         * setReadonly
-         * @param data
-         * @param property
-         * @param readonly
-         */
-        static setReadonly(data, property, readonly) {
-            let handler = this.getHandler(data);
-            handler.setReadonly(property, readonly);
-        }
-        /**
-         * isReadonly
-         * @param data
-         * @param property
-         */
-        static isReadonly(data, property) {
-            let handler = this.getHandler(data);
-            return handler.isReadonly(property);
-        }
-        /**
-         * setReadonlyAll
-         * @param data
-         * @param readonly
-         */
-        static setReadonlyAll(data, readonly) {
-            let handler = this.getHandler(data);
-            handler.setReadonlyAll(readonly);
-            for (let property in this) {
-                handler.setReadonly(property, readonly);
-            }
-        }
-        /**
-         * isDirty
-         * @param data
-         */
-        static isDirty(data) {
-            return this.getHandler(data).isDirty();
-        }
-        /**
-         * reset
-         * @param data
-         */
-        static reset(data) {
-            this.getHandler(data).reset();
-        }
-        /**
-         * onBeforeChange
-         * @param data
-         * @param listener
-         */
-        static onBeforeChange(data, listener) {
-            let handler = this.getHandler(data);
-            handler.onBeforeChange(listener);
-        }
-        /**
-         * onAfterChange
-         * @param data
-         * @param listener
-         */
-        static onAfterChange(data, listener) {
-            let handler = this.getHandler(data);
-            handler.onAfterChange(listener);
-        }
-    }
-    duice.Data = Data;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
      * Observable
      */
     class Observable {
@@ -174,29 +67,575 @@ var duice;
 var duice;
 (function (duice) {
     /**
-     * DataHandler
+     * ArrayHandler
      */
-    class DataHandler extends duice.Observable {
+    class ArrayHandler extends duice.Observable {
         /**
          * constructor
-         * @param data
+         * @param array
          */
-        constructor(data) {
+        constructor(array) {
             super();
             this.readonlyAll = false;
             this.readonly = new Set();
-            this.listenerEnabled = true;
-            this.data = data;
-            globalThis.Object.defineProperty(data, "_handler_", {
+            this.array = array;
+            globalThis.Object.defineProperty(array, '_handler_', {
                 value: this,
                 writable: true
             });
         }
         /**
-         * getData
+         * getArray
          */
-        getData() {
-            return this.data;
+        getArray() {
+            return this.array;
+        }
+        /**
+         * set
+         * @param target
+         * @param property
+         * @param value
+         */
+        set(target, property, value) {
+            console.log("- Array.set", target, property, value);
+            Reflect.set(target, property, value);
+            if (property === 'length') {
+                this.notifyObservers({});
+            }
+            return true;
+        }
+        /**
+         * assign
+         * @param array
+         */
+        assign(array) {
+            try {
+                // suspend
+                this.suspendNotify();
+                // deletes
+                this.array.length = 0;
+                // assign
+                for (let i = 0, size = array.length; i < size; i++) {
+                    this.array[i] = new duice.ObjectProxy(array[i]);
+                }
+            }
+            finally {
+                // resume
+                this.resumeNotify();
+            }
+            // notify observers
+            this.notifyObservers({});
+        }
+        /**
+         * update
+         * @param elementSet
+         * @param detail
+         */
+        update(elementSet, detail) {
+            console.log("DataSetHandler", elementSet, detail);
+            if (detail.name === 'changeIndex') {
+                let data = this.array.splice(detail.fromIndex, 1)[0];
+                this.array.splice(detail.toIndex, 0, data);
+            }
+            this.notifyObservers(detail);
+        }
+        /**
+         * setReadonlyAll
+         * @param readonly
+         */
+        setReadonlyAll(readonly) {
+            this.readonlyAll = readonly;
+        }
+        /**
+         * setReadonly
+         * @param property
+         * @param readonly
+         */
+        setReadonly(property, readonly) {
+            if (readonly) {
+                this.readonly.add(property);
+            }
+            else {
+                this.readonly.delete(property);
+            }
+        }
+        /**
+         * isReadonly
+         * @param property
+         */
+        isReadonly(property) {
+            return this.readonlyAll || this.readonly.has(property);
+        }
+    }
+    duice.ArrayHandler = ArrayHandler;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    /**
+     * DataSet
+     */
+    class ArrayProxy {
+        /**
+         * constructor
+         */
+        constructor(array) {
+            let arrayHandler = new duice.ArrayHandler(array);
+            array.forEach(object => {
+                object = new duice.ObjectProxy(object);
+            });
+            return new Proxy(array, arrayHandler);
+        }
+        /**
+         * getHandler
+         * @param array
+         */
+        static getHandler(array) {
+            return globalThis.Object.getOwnPropertyDescriptor(array, '_handler_').value;
+        }
+        /**
+         * assign
+         * @param array
+         * @param values
+         */
+        static assign(array, values) {
+            let handler = this.getHandler(array);
+            handler.assign(values);
+            handler.notifyObservers({});
+        }
+        /**
+         * setReadonly
+         * @param array
+         * @param property
+         * @param readonly
+         */
+        static setReadonly(array, property, readonly) {
+            let handler = this.getHandler(array);
+            handler.setReadonly(property, readonly);
+        }
+        /**
+         * isReadonly
+         * @param array
+         * @param property
+         */
+        static isReadonly(array, property) {
+            let handler = this.getHandler(array);
+            return handler.isReadonly(property);
+        }
+        /**
+         * setReadonlyAll
+         * @param array
+         * @param readonly
+         */
+        static setReadonlyAll(array, readonly) {
+            let handler = this.getHandler(array);
+            handler.setReadonlyAll(readonly);
+            for (let index = 0; index >= array.length; index++) {
+                duice.ObjectProxy.setReadonlyAll(array[index], readonly);
+            }
+        }
+    }
+    duice.ArrayProxy = ArrayProxy;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    class MaskFactory {
+        /**
+         * getMask
+         * @param mask
+         */
+        static getMask(mask) {
+            if (mask.startsWith('string')) {
+                mask = mask.replace('string', 'StringMask');
+            }
+            if (mask.startsWith('number')) {
+                mask = mask.replace('number', 'NumberMask');
+            }
+            if (mask.startsWith('date')) {
+                mask = mask.replace('date', 'DateMask');
+            }
+            return Function(`return new duice.${mask};`).call(null);
+        }
+    }
+    duice.MaskFactory = MaskFactory;
+})(duice || (duice = {}));
+///<reference path="Observable.ts"/>
+///<reference path="mask/MaskFactory.ts"/>
+var duice;
+(function (duice) {
+    /**
+     * Element
+     */
+    class Element extends duice.Observable {
+        /**
+         * constructor
+         * @param htmlElement
+         * @protected
+         */
+        constructor(htmlElement, context) {
+            super();
+            this.htmlElement = htmlElement;
+            this.context = context;
+            this.id = duice.generateUuid();
+            duice.setAttribute(this.htmlElement, 'id', this.id);
+        }
+        /**
+         * setData
+         * @param objectName
+         */
+        setObject(objectName) {
+            let object = duice.findObject(this.context, objectName);
+            duice.assert(object, `ObjectProxy[${objectName}] is not found.`);
+            this.objectHandler = duice.ObjectProxy.getHandler(object);
+            duice.assert(this.objectHandler, `[${objectName}] is not ObjectProxy.`);
+            this.addObserver(this.objectHandler);
+            this.objectHandler.addObserver(this);
+        }
+        /**
+         * returns object handler
+         */
+        getObjectHandler() {
+            return this.objectHandler;
+        }
+        /**
+         * gets html element
+         */
+        getHtmlElement() {
+            return this.htmlElement;
+        }
+        /**
+         * set property
+         * @param property
+         */
+        setProperty(property) {
+            this.property = property;
+        }
+        /**
+         * get property
+         */
+        getProperty() {
+            return this.property;
+        }
+        /**
+         * set mask
+         * @param mask string from html mask attribute
+         */
+        setMask(mask) {
+            this.mask = duice.MaskFactory.getMask(mask);
+        }
+        /**
+         * returns mask
+         */
+        getMask() {
+            return this.mask;
+        }
+        /**
+         * render
+         */
+        render() {
+            if (this.property) {
+                // set value
+                this.setValue(this.objectHandler.getValue(this.property));
+                // set readonly
+                let readonly = this.objectHandler.isReadonly(this.property);
+                this.setReadonly(readonly);
+            }
+            // executes script
+            this.executeScript();
+        }
+        /**
+         * update
+         * @param objectHandler
+         * @param detail
+         */
+        update(objectHandler, detail) {
+            if (this.property) {
+                // set value
+                this.setValue(objectHandler.getValue(this.property));
+                // set readonly
+                let readonly = this.objectHandler.isReadonly(this.property);
+                this.setReadonly(readonly);
+            }
+            // executes script
+            this.executeScript();
+        }
+        /**
+         * executes script
+         */
+        executeScript() {
+            let script = duice.getAttribute(this.getHtmlElement(), 'script');
+            if (script) {
+                duice.executeScript(script, this.getHtmlElement(), this.context);
+            }
+        }
+    }
+    duice.Element = Element;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    /**
+     * ElementFactory
+     */
+    class ElementFactory {
+        /**
+         * registerElementFactory
+         * @param elementFactory
+         */
+        static registerElementFactory(elementFactory) {
+            this.elementFactoryRegistry.push(elementFactory);
+        }
+        /**
+         * get instance
+         * @param htmlElement
+         */
+        static getInstance(htmlElement) {
+            let instance;
+            this.elementFactoryRegistry.forEach(elementFactory => {
+                if (elementFactory.support(htmlElement)) {
+                    instance = elementFactory;
+                }
+            });
+            if (instance) {
+                return instance;
+            }
+            else {
+                return new duice.GenericElementFactory();
+            }
+        }
+        /**
+         * creates element
+         * @param htmlElement
+         * @param context
+         */
+        createElement(htmlElement, context) {
+            // creates element
+            let element = this.doCreateElement(htmlElement, context);
+            // object
+            let object = duice.getAttribute(htmlElement, 'object');
+            element.setObject(object);
+            // property
+            let property = duice.getAttribute(htmlElement, 'property');
+            if (property) {
+                element.setProperty(property);
+            }
+            // mask
+            let mask = duice.getAttribute(htmlElement, 'mask');
+            if (mask) {
+                element.setMask(mask);
+            }
+            // returns
+            return element;
+        }
+    }
+    ElementFactory.elementFactoryRegistry = [];
+    duice.ElementFactory = ElementFactory;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    /**
+     * ArrayElement
+     */
+    class ElementSet extends duice.Observable {
+        /**
+         * constructor
+         * @param htmlElement
+         */
+        constructor(htmlElement, context) {
+            super();
+            this.editable = false;
+            this.htmlElement = htmlElement;
+            this.context = context;
+            this.id = duice.generateUuid();
+            duice.setAttribute(this.htmlElement, 'id', this.id);
+            // replace with slot element
+            this.slotElement = document.createElement('slot');
+            this.htmlElement.replaceWith(this.slotElement);
+            // editable
+            let editable = duice.getAttribute(this.htmlElement, 'editable');
+            if (editable) {
+                this.editable = (editable.toLowerCase() === 'true');
+            }
+        }
+        /**
+         * setDataSet
+         * @param arrayName
+         */
+        setArray(arrayName) {
+            let array = duice.findObject(this.context, arrayName);
+            duice.assert(array, `ArrayProxy[${arrayName}] is not found.`);
+            this.arrayHandler = duice.ArrayProxy.getHandler(array);
+            duice.assert(this.arrayHandler, `[${arrayName}] is not ArrayProxy.`);
+            this.addObserver(this.arrayHandler);
+            this.arrayHandler.addObserver(this);
+        }
+        /**
+         * setLoop
+         * @param loop
+         */
+        setLoop(loop) {
+            this.loop = loop;
+        }
+        /**
+         * render
+         */
+        render() {
+            let dataSet = this.arrayHandler.getArray();
+            this.doRender(dataSet);
+            // executes script
+            this.executeScript();
+        }
+        /**
+         * doRender
+         * @param array
+         */
+        doRender(array) {
+            var _a;
+            let _this = this;
+            duice.removeChildNodes(this.slotElement);
+            if (this.loop) {
+                let loopArgs = this.loop.split(',');
+                let itemName = loopArgs[0].trim();
+                let statusName = (_a = loopArgs[1]) === null || _a === void 0 ? void 0 : _a.trim();
+                for (let index = 0; index < array.length; index++) {
+                    let data = array[index];
+                    let context = {};
+                    context[itemName] = data;
+                    context[statusName] = new duice.ObjectProxy({
+                        index: index,
+                        count: index + 1,
+                        size: array.length,
+                        first: (index === 0),
+                        last: (array.length == index + 1)
+                    });
+                    let rowHtmlElement = this.htmlElement.cloneNode(true);
+                    duice.setAttribute(rowHtmlElement, 'index', index.toString());
+                    // editable
+                    if (this.editable) {
+                        rowHtmlElement.setAttribute('draggable', 'true');
+                        rowHtmlElement.addEventListener('dragstart', function (event) {
+                            let fromIndex = duice.getAttribute(this, 'index');
+                            event.dataTransfer.setData("text", fromIndex);
+                        });
+                        rowHtmlElement.addEventListener('dragover', function (event) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        });
+                        rowHtmlElement.addEventListener('drop', function (event) {
+                            return __awaiter(this, void 0, void 0, function* () {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                let fromIndex = parseInt(event.dataTransfer.getData('text'));
+                                let toIndex = parseInt(duice.getAttribute(this, 'index'));
+                                let detail = {
+                                    name: 'changeIndex',
+                                    fromIndex: fromIndex,
+                                    toIndex: toIndex
+                                };
+                                //await dataSet.moveRow(fromIndex, toIndex);
+                                _this.notifyObservers(detail);
+                            });
+                        });
+                    }
+                    // initializes row element
+                    duice.initialize(rowHtmlElement, context);
+                    this.slotElement.appendChild(rowHtmlElement);
+                }
+            }
+            else {
+                this.slotElement.appendChild(this.htmlElement);
+            }
+        }
+        /**
+         * update
+         * @param observable
+         * @param detail
+         */
+        update(arrayHandler, detail) {
+            let array = arrayHandler.getArray();
+            this.doUpdate(array);
+            // executes script
+            this.executeScript();
+        }
+        /**
+         * doUpdate
+         * @param array
+         */
+        doUpdate(array) {
+            this.doRender(array);
+        }
+        /**
+         * executes script
+         */
+        executeScript() {
+            let script = duice.getAttribute(this.htmlElement, 'script');
+            if (script) {
+                duice.executeScript(script, this.htmlElement, this.context);
+            }
+        }
+    }
+    duice.ElementSet = ElementSet;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    /**
+     * ElementFactory
+     */
+    class ElementSetFactory {
+        /**
+         * get instance
+         * @param htmlElement
+         */
+        static getInstance(htmlElement) {
+            return new ElementSetFactory();
+        }
+        /**
+         * createElementSet
+         * @param htmlElement
+         */
+        createElementSet(htmlElement, context) {
+            // creates element set
+            let elementSet = new duice.ElementSet(htmlElement, context);
+            // find data set
+            let array = duice.getAttribute(htmlElement, 'array');
+            elementSet.setArray(array);
+            // loop
+            let loop = duice.getAttribute(htmlElement, 'loop');
+            if (loop) {
+                elementSet.setLoop(loop);
+            }
+            // returns
+            return elementSet;
+        }
+    }
+    duice.ElementSetFactory = ElementSetFactory;
+})(duice || (duice = {}));
+///<reference path="Observable.ts"/>
+var duice;
+(function (duice) {
+    /**
+     * ObjectHandler
+     */
+    class ObjectHandler extends duice.Observable {
+        /**
+         * constructor
+         * @param object
+         */
+        constructor(object) {
+            super();
+            this.readonlyAll = false;
+            this.readonly = new Set();
+            this.listenerEnabled = true;
+            this.object = object;
+            this.save();
+            globalThis.Object.defineProperty(object, "_handler_", {
+                value: this,
+                writable: true
+            });
+        }
+        /**
+         * getObject
+         */
+        getObject() {
+            return this.object;
         }
         /**
          * get
@@ -240,15 +679,15 @@ var duice;
                 this.suspendListener();
                 this.suspendNotify();
                 // deletes
-                for (let property in this.data) {
-                    delete this.data[property];
+                for (let property in this.object) {
+                    delete this.object[property];
                 }
                 // assign
                 for (let property in object) {
-                    this.data[property] = object[property];
+                    this.object[property] = object[property];
                 }
-                // copy origin data
-                this.originData = JSON.parse(JSON.stringify(this.data));
+                // saves origin object
+                this.save();
             }
             finally {
                 // resume
@@ -259,16 +698,22 @@ var duice;
             this.notifyObservers({});
         }
         /**
-         * isDirty
+         * save
          */
-        isDirty() {
-            return JSON.stringify(this.data) !== JSON.stringify(this.originData);
+        save() {
+            this.originObject = JSON.parse(JSON.stringify(this.object));
         }
         /**
          * reset
          */
         reset() {
-            this.assign(this.originData);
+            this.assign(this.originObject);
+        }
+        /**
+         * isDirty
+         */
+        isDirty() {
+            return JSON.stringify(this.object) !== JSON.stringify(this.originObject);
         }
         /**
          * getValue
@@ -277,7 +722,7 @@ var duice;
         getValue(property) {
             console.assert(property);
             property = property.replace('.', '?.');
-            return new Function(`return this.${property};`).call(this.getData());
+            return new Function(`return this.${property};`).call(this.getObject());
         }
         /**
          * setValue
@@ -285,7 +730,7 @@ var duice;
          * @param value
          */
         setValue(property, value) {
-            new Function('value', `this.${property} = value;`).call(this.getData(), value);
+            new Function('value', `this.${property} = value;`).call(this.getObject(), value);
         }
         /**
          * update
@@ -373,7 +818,7 @@ var duice;
         callBeforeChange(property, value) {
             return __awaiter(this, void 0, void 0, function* () {
                 if (this.listenerEnabled && this.beforeChangeListener) {
-                    let result = yield this.beforeChangeListener.call(this.getData(), property, value);
+                    let result = yield this.beforeChangeListener.call(this.getObject(), property, value);
                     if (result === false) {
                         return false;
                     }
@@ -389,562 +834,108 @@ var duice;
         callAfterChange(property, value) {
             return __awaiter(this, void 0, void 0, function* () {
                 if (this.listenerEnabled && this.afterChangeListener) {
-                    yield this.afterChangeListener.call(this.getData(), property, value);
+                    yield this.afterChangeListener.call(this.getObject(), property, value);
                 }
             });
         }
     }
-    duice.DataHandler = DataHandler;
+    duice.ObjectHandler = ObjectHandler;
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
     /**
-     * DataSet
+     * Data
      */
-    class DataSet extends globalThis.Array {
-        /**
-         * create
-         * @param json
-         */
-        static create(array) {
-            let dataSet = new DataSet();
-            let dataSetHandler = new duice.DataSetHandler(dataSet);
-            dataSetHandler.assign(array);
-            return new Proxy(dataSet, dataSetHandler);
-        }
+    class ObjectProxy {
         /**
          * constructor
-         * @protected
          */
-        constructor() {
-            super();
+        constructor(object) {
+            let objectHandler = new duice.ObjectHandler(object);
+            return new Proxy(object, objectHandler);
         }
         /**
          * getHandler
-         * @param dataSet
+         * @param data
          */
-        static getHandler(dataSet) {
-            return duice.Object.getOwnPropertyDescriptor(dataSet, '_handler_').value;
+        static getHandler(object) {
+            return globalThis.Object.getOwnPropertyDescriptor(object, '_handler_').value;
         }
         /**
          * assign
-         * @param dataSet
-         * @param array
+         * @param object
+         * @param value
          */
-        static assign(dataSet, array) {
-            let handler = this.getHandler(dataSet);
-            handler.assign(array);
+        static assign(object, value) {
+            let handler = this.getHandler(object);
+            handler.assign(value);
             handler.notifyObservers({});
-            return dataSet;
         }
         /**
          * setReadonly
-         * @param dataSet
+         * @param object
          * @param property
          * @param readonly
          */
-        static setReadonly(dataSet, property, readonly) {
-            let handler = this.getHandler(dataSet);
+        static setReadonly(object, property, readonly) {
+            let handler = this.getHandler(object);
             handler.setReadonly(property, readonly);
         }
         /**
          * isReadonly
-         * @param dataSet
+         * @param object
          * @param property
          */
-        static isReadonly(dataSet, property) {
-            let handler = this.getHandler(dataSet);
+        static isReadonly(object, property) {
+            let handler = this.getHandler(object);
             return handler.isReadonly(property);
         }
         /**
          * setReadonlyAll
-         * @param dataSet
+         * @param object
          * @param readonly
          */
-        static setReadonlyAll(dataSet, readonly) {
-            let handler = this.getHandler(dataSet);
+        static setReadonlyAll(object, readonly) {
+            let handler = this.getHandler(object);
             handler.setReadonlyAll(readonly);
-            for (let index = 0; index >= dataSet.length; index++) {
-                duice.Data.setReadonlyAll(dataSet[index], readonly);
+            for (let property in this) {
+                handler.setReadonly(property, readonly);
             }
+        }
+        /**
+         * isDirty
+         * @param object
+         */
+        static isDirty(object) {
+            return this.getHandler(object).isDirty();
+        }
+        /**
+         * reset
+         * @param object
+         */
+        static reset(object) {
+            this.getHandler(object).reset();
+        }
+        /**
+         * onBeforeChange
+         * @param object
+         * @param listener
+         */
+        static onBeforeChange(object, listener) {
+            let handler = this.getHandler(object);
+            handler.onBeforeChange(listener);
+        }
+        /**
+         * onAfterChange
+         * @param object
+         * @param listener
+         */
+        static onAfterChange(object, listener) {
+            let handler = this.getHandler(object);
+            handler.onAfterChange(listener);
         }
     }
-    duice.DataSet = DataSet;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * DataSetHandler
-     */
-    class DataSetHandler extends duice.Observable {
-        /**
-         * constructor
-         * @param dataSet
-         */
-        constructor(dataSet) {
-            super();
-            this.readonlyAll = false;
-            this.readonly = new Set();
-            this.dataSet = dataSet;
-            duice.Object.defineProperty(dataSet, '_handler_', {
-                value: this,
-                writable: true
-            });
-        }
-        /**
-         * getDataSet
-         */
-        getDataSet() {
-            return this.dataSet;
-        }
-        /**
-         * set
-         * @param target
-         * @param property
-         * @param value
-         */
-        set(target, property, value) {
-            console.log("- Array.set", target, property, value);
-            Reflect.set(target, property, value);
-            if (property === 'length') {
-                this.notifyObservers({});
-            }
-            return true;
-        }
-        /**
-         * assign
-         * @param array
-         */
-        assign(array) {
-            try {
-                // suspend
-                this.suspendNotify();
-                // deletes
-                this.dataSet.length = 0;
-                // assign
-                for (let i = 0, size = array.length; i < size; i++) {
-                    this.dataSet[i] = duice.Data.create(array[i]);
-                }
-            }
-            finally {
-                // resume
-                this.resumeNotify();
-            }
-            // notify observers
-            this.notifyObservers({});
-        }
-        /**
-         * update
-         * @param elementSet
-         * @param detail
-         */
-        update(elementSet, detail) {
-            console.log("DataSetHandler", elementSet, detail);
-            if (detail.name === 'changeIndex') {
-                let data = this.dataSet.splice(detail.fromIndex, 1)[0];
-                this.dataSet.splice(detail.toIndex, 0, data);
-            }
-            this.notifyObservers(detail);
-        }
-        /**
-         * setReadonlyAll
-         * @param readonly
-         */
-        setReadonlyAll(readonly) {
-            this.readonlyAll = readonly;
-        }
-        /**
-         * setReadonly
-         * @param property
-         * @param readonly
-         */
-        setReadonly(property, readonly) {
-            if (readonly) {
-                this.readonly.add(property);
-            }
-            else {
-                this.readonly.delete(property);
-            }
-        }
-        /**
-         * isReadonly
-         * @param property
-         */
-        isReadonly(property) {
-            return this.readonlyAll || this.readonly.has(property);
-        }
-    }
-    duice.DataSetHandler = DataSetHandler;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    class MaskFactory {
-        /**
-         * getMask
-         * @param mask
-         */
-        static getMask(mask) {
-            if (mask.startsWith('string')) {
-                mask = mask.replace('string', 'StringMask');
-            }
-            if (mask.startsWith('number')) {
-                mask = mask.replace('number', 'NumberMask');
-            }
-            if (mask.startsWith('date')) {
-                mask = mask.replace('date', 'DateMask');
-            }
-            return Function(`return new duice.${mask};`).call(null);
-        }
-    }
-    duice.MaskFactory = MaskFactory;
-})(duice || (duice = {}));
-///<reference path="Observable.ts"/>
-///<reference path="mask/MaskFactory.ts"/>
-var duice;
-(function (duice) {
-    /**
-     * Element
-     */
-    class Element extends duice.Observable {
-        /**
-         * constructor
-         * @param htmlElement
-         * @protected
-         */
-        constructor(htmlElement, context) {
-            super();
-            this.htmlElement = htmlElement;
-            this.context = context;
-            this.id = duice.generateUuid();
-            duice.setAttribute(this.htmlElement, 'id', this.id);
-        }
-        /**
-         * setData
-         * @param data
-         */
-        setData(data) {
-            let dataObject = duice.findObject(this.context, data);
-            this.dataHandler = duice.Data.getHandler(dataObject);
-            console.assert(this.dataHandler);
-            this.addObserver(this.dataHandler);
-            this.dataHandler.addObserver(this);
-        }
-        /**
-         * returns bind data handler
-         */
-        getDataHandler() {
-            return this.dataHandler;
-        }
-        /**
-         * gets html element
-         */
-        getHtmlElement() {
-            return this.htmlElement;
-        }
-        /**
-         * set property
-         * @param property
-         */
-        setProperty(property) {
-            this.property = property;
-        }
-        /**
-         * get property
-         */
-        getProperty() {
-            return this.property;
-        }
-        /**
-         * set mask
-         * @param mask string from html mask attribute
-         */
-        setMask(mask) {
-            this.mask = duice.MaskFactory.getMask(mask);
-        }
-        /**
-         * returns mask
-         */
-        getMask() {
-            return this.mask;
-        }
-        /**
-         * render
-         */
-        render() {
-            if (this.property) {
-                // set value
-                this.setValue(this.dataHandler.getValue(this.property));
-                // set readonly
-                let readonly = this.dataHandler.isReadonly(this.property);
-                this.setReadonly(readonly);
-            }
-            // executes script
-            this.executeScript();
-        }
-        /**
-         * update
-         * @param dataHandler
-         * @param detail
-         */
-        update(dataHandler, detail) {
-            if (this.property) {
-                // set value
-                this.setValue(dataHandler.getValue(this.property));
-                // set readonly
-                let readonly = this.dataHandler.isReadonly(this.property);
-                this.setReadonly(readonly);
-            }
-            // executes script
-            this.executeScript();
-        }
-        /**
-         * executes script
-         */
-        executeScript() {
-            let script = duice.getAttribute(this.getHtmlElement(), 'script');
-            if (script) {
-                duice.executeScript(script, this.getHtmlElement(), this.context);
-            }
-        }
-    }
-    duice.Element = Element;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * ElementFactory
-     */
-    class ElementFactory {
-        /**
-         * registerElementFactory
-         * @param elementFactory
-         */
-        static registerElementFactory(elementFactory) {
-            this.elementFactoryRegistry.push(elementFactory);
-        }
-        /**
-         * get instance
-         * @param htmlElement
-         */
-        static getInstance(htmlElement) {
-            let instance;
-            this.elementFactoryRegistry.forEach(elementFactory => {
-                if (elementFactory.support(htmlElement)) {
-                    instance = elementFactory;
-                }
-            });
-            if (instance) {
-                return instance;
-            }
-            else {
-                return new duice.GenericElementFactory();
-            }
-        }
-        /**
-         * creates element
-         * @param htmlElement
-         * @param context
-         */
-        createElement(htmlElement, context) {
-            // creates element
-            let element = this.doCreateElement(htmlElement, context);
-            // data
-            let data = duice.getAttribute(htmlElement, 'data');
-            element.setData(data);
-            // property
-            let property = duice.getAttribute(htmlElement, 'property');
-            if (property) {
-                element.setProperty(property);
-            }
-            // mask
-            let mask = duice.getAttribute(htmlElement, 'mask');
-            if (mask) {
-                element.setMask(mask);
-            }
-            // returns
-            return element;
-        }
-    }
-    ElementFactory.elementFactoryRegistry = [];
-    duice.ElementFactory = ElementFactory;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * ArrayElement
-     */
-    class ElementSet extends duice.Observable {
-        /**
-         * constructor
-         * @param htmlElement
-         */
-        constructor(htmlElement, context) {
-            super();
-            this.editable = false;
-            this.htmlElement = htmlElement;
-            this.context = context;
-            this.id = duice.generateUuid();
-            duice.setAttribute(this.htmlElement, 'id', this.id);
-            // replace with slot element
-            this.slotElement = document.createElement('slot');
-            this.htmlElement.replaceWith(this.slotElement);
-            // editable
-            let editable = duice.getAttribute(this.htmlElement, 'editable');
-            if (editable) {
-                this.editable = (editable.toLowerCase() === 'true');
-            }
-        }
-        /**
-         * setDataSet
-         * @param dataSet
-         */
-        setDataSet(dataSet) {
-            let dataSetObject = duice.findObject(this.context, dataSet);
-            this.dataSetHandler = duice.DataSet.getHandler(dataSetObject);
-            console.assert(this.dataSetHandler);
-            this.addObserver(this.dataSetHandler);
-            this.dataSetHandler.addObserver(this);
-        }
-        /**
-         * setLoop
-         * @param loop
-         */
-        setLoop(loop) {
-            this.loop = loop;
-        }
-        /**
-         * render
-         */
-        render() {
-            let dataSet = this.dataSetHandler.getDataSet();
-            this.doRender(dataSet);
-            // executes script
-            this.executeScript();
-        }
-        /**
-         * doRender
-         * @param dataSet
-         */
-        doRender(dataSet) {
-            var _a;
-            let _this = this;
-            duice.removeChildNodes(this.slotElement);
-            if (this.loop) {
-                let loopArgs = this.loop.split(',');
-                let itemName = loopArgs[0].trim();
-                let statusName = (_a = loopArgs[1]) === null || _a === void 0 ? void 0 : _a.trim();
-                for (let index = 0; index < dataSet.length; index++) {
-                    let data = dataSet[index];
-                    let context = {};
-                    context[itemName] = data;
-                    context[statusName] = duice.Data.create({
-                        index: index,
-                        count: index + 1,
-                        size: dataSet.length,
-                        first: (index === 0),
-                        last: (dataSet.length == index + 1)
-                    });
-                    let rowHtmlElement = this.htmlElement.cloneNode(true);
-                    duice.setAttribute(rowHtmlElement, 'index', index.toString());
-                    // editable
-                    if (this.editable) {
-                        rowHtmlElement.setAttribute('draggable', 'true');
-                        rowHtmlElement.addEventListener('dragstart', function (event) {
-                            let fromIndex = duice.getAttribute(this, 'index');
-                            event.dataTransfer.setData("text", fromIndex);
-                        });
-                        rowHtmlElement.addEventListener('dragover', function (event) {
-                            event.preventDefault();
-                            event.stopPropagation();
-                        });
-                        rowHtmlElement.addEventListener('drop', function (event) {
-                            return __awaiter(this, void 0, void 0, function* () {
-                                event.preventDefault();
-                                event.stopPropagation();
-                                let fromIndex = parseInt(event.dataTransfer.getData('text'));
-                                let toIndex = parseInt(duice.getAttribute(this, 'index'));
-                                let detail = {
-                                    name: 'changeIndex',
-                                    fromIndex: fromIndex,
-                                    toIndex: toIndex
-                                };
-                                //await dataSet.moveRow(fromIndex, toIndex);
-                                _this.notifyObservers(detail);
-                            });
-                        });
-                    }
-                    // initializes row element
-                    duice.initialize(rowHtmlElement, context);
-                    this.slotElement.appendChild(rowHtmlElement);
-                }
-            }
-            else {
-                this.slotElement.appendChild(this.htmlElement);
-            }
-        }
-        /**
-         * update
-         * @param observable
-         * @param detail
-         */
-        update(dataSetHandler, detail) {
-            let dataSet = dataSetHandler.getDataSet();
-            this.doUpdate(dataSet);
-            // executes script
-            this.executeScript();
-        }
-        /**
-         * doUpdate
-         * @param dataSet
-         */
-        doUpdate(dataSet) {
-            this.doRender(dataSet);
-        }
-        /**
-         * executes script
-         */
-        executeScript() {
-            let script = duice.getAttribute(this.htmlElement, 'script');
-            if (script) {
-                duice.executeScript(script, this.htmlElement, this.context);
-            }
-        }
-    }
-    duice.ElementSet = ElementSet;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * ElementFactory
-     */
-    class ElementSetFactory {
-        /**
-         * get instance
-         * @param htmlElement
-         */
-        static getInstance(htmlElement) {
-            return new ElementSetFactory();
-        }
-        /**
-         * createElementSet
-         * @param htmlElement
-         */
-        createElementSet(htmlElement, context) {
-            // creates element set
-            let elementSet = new duice.ElementSet(htmlElement, context);
-            // find data set
-            let dataSet = duice.getAttribute(htmlElement, 'data-set');
-            elementSet.setDataSet(dataSet);
-            // loop
-            let loop = duice.getAttribute(htmlElement, 'loop');
-            if (loop) {
-                elementSet.setLoop(loop);
-            }
-            // returns
-            return elementSet;
-        }
-    }
-    duice.ElementSetFactory = ElementSetFactory;
+    duice.ObjectProxy = ObjectProxy;
 })(duice || (duice = {}));
 /* =============================================================================
  * DUICE (Data-oriented UI Component Engine)
@@ -979,13 +970,13 @@ var duice;
      */
     function initialize(container, context) {
         // initializes element set
-        container.querySelectorAll(`*[${getAlias()}\\:data-set]:not([${getAlias()}\\:id])`).forEach(htmlElement => {
+        container.querySelectorAll(`*[${getAlias()}\\:array]:not([${getAlias()}\\:id])`).forEach(htmlElement => {
             let elementSetFactory = duice.ElementSetFactory.getInstance(htmlElement);
             let elementSet = elementSetFactory.createElementSet(htmlElement, context);
             elementSet.render();
         });
         // initializes element
-        container.querySelectorAll(`*[${getAlias()}\\:data]:not([${getAlias()}\\:id])`).forEach(htmlElement => {
+        container.querySelectorAll(`*[${getAlias()}\\:object]:not([${getAlias()}\\:id])`).forEach(htmlElement => {
             let elementFactory = duice.ElementFactory.getInstance(htmlElement);
             let element = elementFactory.createElement(htmlElement, context);
             element.render();
@@ -1020,6 +1011,18 @@ var duice;
         return uuid;
     }
     duice.generateUuid = generateUuid;
+    /**
+     * assert
+     * @param condition
+     * @param message
+     */
+    function assert(condition, message) {
+        console.assert(condition, message);
+        if (!condition) {
+            throw new Error(message || 'Assertion Failed');
+        }
+    }
+    duice.assert = assert;
     /**
      * hasAttribute
      * @param htmlElement
@@ -1102,13 +1105,19 @@ var duice;
      * @param context
      */
     function executeScript(script, thisArg, context) {
-        let args = [];
-        let values = [];
-        for (let property in context) {
-            args.push(property);
-            values.push(context[property]);
+        try {
+            let args = [];
+            let values = [];
+            for (let property in context) {
+                args.push(property);
+                values.push(context[property]);
+            }
+            return Function(...args, script).call(thisArg, ...values);
         }
-        return Function(...args, script).call(thisArg, ...values);
+        catch (e) {
+            console.error(script, e);
+            throw e;
+        }
     }
     duice.executeScript = executeScript;
     /**
@@ -2098,114 +2107,5 @@ var duice;
         }
     }
     duice.StringMask = StringMask;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * Data
-     */
-    class Object extends globalThis.Object {
-        /**
-         * create
-         * @param object
-         */
-        static create(object) {
-            let data = new duice.Data();
-            let dataHandler = new duice.DataHandler(data);
-            dataHandler.assign(object);
-            return new Proxy(data, dataHandler);
-        }
-        /**
-         * constructor
-         * @protected
-         */
-        constructor(object) {
-            super(object);
-            let;
-            return new Proxy(this, {});
-        }
-        /**
-         * getHandler
-         * @param data
-         */
-        static getHandler(data) {
-            return Object.getOwnPropertyDescriptor(data, '_handler_').value;
-        }
-        /**
-         * assign
-         * @param data
-         * @param object
-         */
-        static assign(data, object) {
-            let handler = this.getHandler(data);
-            handler.assign(object);
-            handler.notifyObservers({});
-            return data;
-        }
-        /**
-         * setReadonly
-         * @param data
-         * @param property
-         * @param readonly
-         */
-        static setReadonly(data, property, readonly) {
-            let handler = this.getHandler(data);
-            handler.setReadonly(property, readonly);
-        }
-        /**
-         * isReadonly
-         * @param data
-         * @param property
-         */
-        static isReadonly(data, property) {
-            let handler = this.getHandler(data);
-            return handler.isReadonly(property);
-        }
-        /**
-         * setReadonlyAll
-         * @param data
-         * @param readonly
-         */
-        static setReadonlyAll(data, readonly) {
-            let handler = this.getHandler(data);
-            handler.setReadonlyAll(readonly);
-            for (let property in this) {
-                handler.setReadonly(property, readonly);
-            }
-        }
-        /**
-         * isDirty
-         * @param data
-         */
-        static isDirty(data) {
-            return this.getHandler(data).isDirty();
-        }
-        /**
-         * reset
-         * @param data
-         */
-        static reset(data) {
-            this.getHandler(data).reset();
-        }
-        /**
-         * onBeforeChange
-         * @param data
-         * @param listener
-         */
-        static onBeforeChange(data, listener) {
-            let handler = this.getHandler(data);
-            handler.onBeforeChange(listener);
-        }
-        /**
-         * onAfterChange
-         * @param data
-         * @param listener
-         */
-        static onAfterChange(data, listener) {
-            let handler = this.getHandler(data);
-            handler.onAfterChange(listener);
-        }
-    }
-    duice.Object = Object;
 })(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map
