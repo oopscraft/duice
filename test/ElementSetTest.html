@@ -48,13 +48,18 @@
         }
 
         // adds before change listener
-        // duice.ArrayProxy.setBeforeChangeListener(myArray, async (property, value) => {
-        //     if(await duice.confirm(`Do you want to change [${property}] is [${value}]`)){
-        //         return true;
-        //     }else{
-        //         return false;
-        //     }
-        // });
+        duice.ArrayProxy.onBeforeChange(myArray, async (property, value) => {
+            if(await duice.confirm(`Do you want to change [${property}] is [${value}]`)){
+                return true;
+            }else{
+                return false;
+            }
+        });
+
+        // add after change listener
+        duice.ArrayProxy.onAfterChange(myArray, (property, value) => {
+            viewMyArray();
+        });
 
         // adds DOMContentLoaded event listener
         document.addEventListener("DOMContentLoaded", event => {

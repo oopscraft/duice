@@ -62,13 +62,13 @@ namespace duice {
             console.log("- Object.set", target, property, value);
 
             // checks before change listener
-            this.callBeforeChange(property, value).then((result) => {
+            this.callBeforeChangeListener(property, value).then((result) => {
                 if (result) {
                     // change property value
                     Reflect.set(target, property, value);
 
                     // calls after change listener
-                    this.callAfterChange(property, value).then();
+                    this.callAfterChangeListener(property, value).then();
 
                     // notify
                     this.notifyObservers({});
@@ -164,13 +164,13 @@ namespace duice {
                 let value = element.getValue();
 
                 // calls before change listener
-                if(await this.callBeforeChange(property, value)){
+                if(await this.callBeforeChangeListener(property, value)){
 
                     // change property value
                     this.setValue(property, value);
 
                     // calls after change listener
-                    await this.callAfterChange(property, value);
+                    await this.callAfterChangeListener(property, value);
                 }
             }
 
@@ -240,11 +240,11 @@ namespace duice {
         }
 
         /**
-         * callBeforeChange
+         * callBeforeChangeListener
          * @param property
          * @param value
          */
-        async callBeforeChange(property: string, value: any): Promise<boolean> {
+        async callBeforeChangeListener(property: string, value: any): Promise<boolean> {
             if(this.listenerEnabled && this.beforeChangeListener) {
                 let result = await this.beforeChangeListener.call(this.getObjectProxy(), property, value);
                 if(result === false){
@@ -255,11 +255,11 @@ namespace duice {
         }
 
         /**
-         * callAfterChange
+         * callAfterChangeListener
          * @param property
          * @param value
          */
-        async callAfterChange(property: string, value: any): Promise<void> {
+        async callAfterChangeListener(property: string, value: any): Promise<void> {
             if(this.listenerEnabled && this.afterChangeListener){
                 await this.afterChangeListener.call(this.getObjectProxy(), property, value);
             }

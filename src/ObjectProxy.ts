@@ -95,20 +95,20 @@ namespace duice {
         }
 
         /**
-         * setBeforeChangeListener
+         * onBeforeChange
          * @param objectProxy
          * @param listener
          */
-        static setBeforeChangeListener(objectProxy: ObjectProxy, listener: Function): void {
+        static onBeforeChange(objectProxy: ObjectProxy, listener: Function): void {
             this.getHandler(objectProxy).setBeforeChangeListener(listener);
         }
 
         /**
-         * setAfterChangeListener
+         * onAfterChange
          * @param objectProxy
          * @param listener
          */
-        static setAfterChangeListener(objectProxy: ObjectProxy, listener: Function): void {
+        static onAfterChange(objectProxy: ObjectProxy, listener: Function): void {
             this.getHandler(objectProxy).setAfterChangeListener(listener);
         }
 

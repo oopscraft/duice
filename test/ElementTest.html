@@ -29,7 +29,7 @@
         }
 
         // adds before change listener
-        duice.ObjectProxy.setBeforeChangeListener(myObject, async (property, value) => {
+        duice.ObjectProxy.onBeforeChange(myObject, async (property, value) => {
             if(await duice.confirm(`Do you want to change [${property}] is [${value}]`)){
                 return true;
             }else{
@@ -38,7 +38,7 @@
         });
 
         // adds after change listener
-        duice.ObjectProxy.setAfterChangeListener(myObject, (property, value) => {
+        duice.ObjectProxy.onAfterChange(myObject, (property, value) => {
             viewMyObject();
         });
 

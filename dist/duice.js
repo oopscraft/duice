@@ -490,7 +490,6 @@ var duice;
                                     fromIndex: fromIndex,
                                     toIndex: toIndex
                                 };
-                                //await dataSet.moveRow(fromIndex, toIndex);
                                 _this.notifyObservers(detail);
                             });
                         });
@@ -616,12 +615,12 @@ var duice;
         set(target, property, value) {
             console.log("- Object.set", target, property, value);
             // checks before change listener
-            this.callBeforeChange(property, value).then((result) => {
+            this.callBeforeChangeListener(property, value).then((result) => {
                 if (result) {
                     // change property value
                     Reflect.set(target, property, value);
                     // calls after change listener
-                    this.callAfterChange(property, value).then();
+                    this.callAfterChangeListener(property, value).then();
                     // notify
                     this.notifyObservers({});
                 }
@@ -704,11 +703,11 @@ var duice;
                 if (property) {
                     let value = element.getValue();
                     // calls before change listener
-                    if (yield this.callBeforeChange(property, value)) {
+                    if (yield this.callBeforeChangeListener(property, value)) {
                         // change property value
                         this.setValue(property, value);
                         // calls after change listener
-                        yield this.callAfterChange(property, value);
+                        yield this.callAfterChangeListener(property, value);
                     }
                 }
                 // notify
@@ -771,11 +770,11 @@ var duice;
             this.listenerEnabled = true;
         }
         /**
-         * callBeforeChange
+         * callBeforeChangeListener
          * @param property
          * @param value
          */
-        callBeforeChange(property, value) {
+        callBeforeChangeListener(property, value) {
             return __awaiter(this, void 0, void 0, function* () {
                 if (this.listenerEnabled && this.beforeChangeListener) {
                     let result = yield this.beforeChangeListener.call(this.getObjectProxy(), property, value);
@@ -787,11 +786,11 @@ var duice;
             });
         }
         /**
-         * callAfterChange
+         * callAfterChangeListener
          * @param property
          * @param value
          */
-        callAfterChange(property, value) {
+        callAfterChangeListener(property, value) {
             return __awaiter(this, void 0, void 0, function* () {
                 if (this.listenerEnabled && this.afterChangeListener) {
                     yield this.afterChangeListener.call(this.getObjectProxy(), property, value);
@@ -2045,25 +2044,25 @@ var duice;
             }
         }
         /**
-         * setBeforeChangeListener
+         * onBeforeChange
          * @param array
          * @param listener
          */
-        static setBeforeChangeListener(array, listener) {
+        static onBeforeChange(array, listener) {
             this.getHandler(array).setBeforeChangeListener(listener);
             array.forEach(object => {
-                duice.ObjectProxy.setBeforeChangeListener(object, listener);
+                duice.ObjectProxy.onBeforeChange(object, listener);
             });
         }
         /**
-         * setAfterChangeListener
+         * onAfterChange
          * @param array
          * @param listener
          */
-        static setAfterChangeListener(array, listener) {
+        static onAfterChange(array, listener) {
             this.getHandler(array).setAfterChangeListener(listener);
             array.forEach(object => {
-                duice.ObjectProxy.setAfterChangeListener(object, listener);
+                duice.ObjectProxy.onAfterChange(object, listener);
             });
         }
     }
@@ -2156,19 +2155,19 @@ var duice;
             this.getHandler(objectProxy).reset();
         }
         /**
-         * setBeforeChangeListener
+         * onBeforeChange
          * @param objectProxy
          * @param listener
          */
-        static setBeforeChangeListener(objectProxy, listener) {
+        static onBeforeChange(objectProxy, listener) {
             this.getHandler(objectProxy).setBeforeChangeListener(listener);
         }
         /**
-         * setAfterChangeListener
+         * onAfterChange
          * @param objectProxy
          * @param listener
          */
-        static setAfterChangeListener(objectProxy, listener) {
+        static onAfterChange(objectProxy, listener) {
             this.getHandler(objectProxy).setAfterChangeListener(listener);
         }
     }

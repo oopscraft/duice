@@ -119,7 +119,6 @@ namespace duice {
                                 fromIndex: fromIndex,
                                 toIndex: toIndex
                             };
-                            //await dataSet.moveRow(fromIndex, toIndex);
                             _this.notifyObservers(detail);
                         });
                     }

@@ -79,26 +79,26 @@ namespace duice {
         }
 
         /**
-         * setBeforeChangeListener
+         * onBeforeChange
          * @param array
          * @param listener
          */
-        static setBeforeChangeListener(array: ArrayProxy, listener: Function): void {
+        static onBeforeChange(array: ArrayProxy, listener: Function): void {
             this.getHandler(array).setBeforeChangeListener(listener);
             array.forEach(object => {
-                ObjectProxy.setBeforeChangeListener(object, listener);
+                ObjectProxy.onBeforeChange(object, listener);
             });
         }
 
         /**
-         * setAfterChangeListener
+         * onAfterChange
          * @param array
          * @param listener
          */
-        static setAfterChangeListener(array: ArrayProxy, listener: Function): void {
+        static onAfterChange(array: ArrayProxy, listener: Function): void {
             this.getHandler(array).setAfterChangeListener(listener);
             array.forEach(object => {
-                ObjectProxy.setAfterChangeListener(object, listener);
+                ObjectProxy.onAfterChange(object, listener);
             });
         }
 

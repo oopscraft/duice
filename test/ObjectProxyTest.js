@@ -45,7 +45,7 @@ duice.assert(duice.ObjectProxy.isReadonly(myObject, 'name') === false);
 /**
  * event listener - negative
  */
-duice.ObjectProxy.setBeforeChangeListener(myObject, (property, value) => {
+duice.ObjectProxy.onBeforeChange(myObject, (property, value) => {
     console.log("property,value:", property, value);
     return false;
 });
@@ -55,7 +55,7 @@ duice.assert(myObject.name !== 'Kitty');
 /**
  * event listener - positive
  */
-duice.ObjectProxy.setBeforeChangeListener(myObject, (property, value) => {
+duice.ObjectProxy.onBeforeChange(myObject, (property, value) => {
     console.log("property,value:", property, value);
     return true;
 });
