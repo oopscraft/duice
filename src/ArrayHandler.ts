@@ -14,9 +14,21 @@ namespace duice {
 
         listenerEnabled: boolean = true;
 
-        beforeChangeListener: Function;
+        propertyChangingListener: Function;
 
-        afterChangeListener: Function;
+        propertyChangedListener: Function;
+
+        rowAddingListener: Function;
+
+        rowAddedListener: Function;
+
+        rowDeletingListener: Function;
+
+        rowDeletedListener: Function;
+
+        rowMovingListener: Function;
+
+        rowMovedListener: Function;
 
         /**
          * constructor
@@ -34,9 +46,9 @@ namespace duice {
 
             // creates child object to proxy
             for(let index = 0; index < this.arrayProxy.length; index ++) {
-                let object = new ObjectProxy(this.arrayProxy[index]);
-                this.arrayProxy[index] = object;
-                let objectHandler = ObjectProxy.getHandler(object);
+                let objectProxy = new ObjectProxy(this.arrayProxy[index]);
+                this.arrayProxy[index] = objectProxy;
+                let objectHandler = ObjectProxy.getHandler(objectProxy);
                 objectHandler.addObserver(this);
             }
         }
@@ -49,19 +61,51 @@ namespace duice {
         }
 
         /**
-         * set
+         * get
          * @param target
          * @param property
-         * @param value
+         * @param receiver
          */
-        set(target: object, property: string, value: any): boolean {
-            console.log("- Array.set", target, property, value);
-            Reflect.set(target, property, value);
-            if(property === 'length'){
-                this.notifyObservers({});
+        get(target: object, property: string, receiver: object): any {
+            console.log("ArrayHandler.get", '|', target, '|', property, '|', receiver);
+            let _this = this;
+            const value = target[property];
+            if (typeof value === 'function') {
+                if (['push', 'unshift'].includes(property)) {
+                    return function (el) {
+                        console.log('this is a array modification');
+                        let result = Array.prototype[property].apply(target, arguments);
+                        _this.notifyObservers(new Event(_this));
+                        return result;
+                    }
+                }
+                if (['pop'].includes(property)) {
+                    return function () {
+                        console.log('this is a array modification');
+                        let result = Array.prototype[property].apply(target, arguments);
+                        _this.notifyObservers(new Event(this));
+                        return result;
+                    }
+                }
+                return value.bind(target);
             }
-            return true;
+            return value;
         }
+
+        // /**
+        //  * set
+        //  * @param target
+        //  * @param property
+        //  * @param value
+        //  */
+        // set(target: object, property: string, value: any): boolean {
+        //     console.log("ArrayHandler.set", '|', target, '|', property, '|', value);
+        //     Reflect.set(target, property, value);
+        //     if(property === 'length'){
+        //         this.notifyObservers(new Event(this));
+        //     }
+        //     return true;
+        // }
 
         /**
          * assign
@@ -78,11 +122,11 @@ namespace duice {
                 // assign
                 for(let index = 0, size = array.length; index < size; index ++){
                     let objectProxy = new duice.ObjectProxy(array[index]);
-                    let objectHandler = ObjectProxy.getHandler(objectProxy);
-                    objectHandler.setBeforeChangeListener(this.beforeChangeListener);
-                    objectHandler.setAfterChangeListener(this.afterChangeListener);
-                    objectHandler.addObserver(this);
                     this.arrayProxy[index] = objectProxy;
+                    let objectHandler = ObjectProxy.getHandler(objectProxy);
+                    objectHandler.setPropertyChangingListener(this.propertyChangingListener);
+                    objectHandler.setPropertyChangedListener(this.propertyChangedListener);
+                    objectHandler.addObserver(this);
                 }
 
             }finally{
@@ -91,21 +135,25 @@ namespace duice {
             }
 
             // notify observers
-            this.notifyObservers({});
+            this.notifyObservers(new Event(this));
         }
 
         /**
          * update
          * @param elementSet
-         * @param detail
+         * @param event
          */
-        update(elementSet: ElementSet<any>, detail: any): void {
-            console.log("DataSetHandler", elementSet, detail);
-            if(detail.name === 'changeIndex'){
-                let data = this.arrayProxy.splice(detail.fromIndex,1)[0];
-                this.arrayProxy.splice(detail.toIndex, 0, data);
+        async update(elementSet: ElementSet<any>, event: Event): Promise<void> {
+            console.log("DataSetHandler", elementSet, event);
+
+            // RowModeEvent
+            if(event instanceof RowMoveEvent){
+                let object = this.arrayProxy.splice(event.getFromIndex(),1)[0];
+                this.arrayProxy.splice(event.getToIndex(), 0, object);
             }
-            this.notifyObservers(detail);
+
+            // notify observers
+            this.notifyObservers(event);
         }
 
         /**
@@ -138,19 +186,102 @@ namespace duice {
         }
 
         /**
-         * setBeforeChangeListener
-         * @param listener
+         * suspends listener
          */
-        setBeforeChangeListener(listener: Function): void {
-            this.beforeChangeListener = listener;
+        suspendListener(): void {
+            this.listenerEnabled = false;
         }
 
         /**
-         * setAfterChangeListener
+         * resumes listener
+         */
+        resumeListener(): void {
+            this.listenerEnabled = true;
+        }
+
+        /**
+         * checkListener
+         * @param listener
+         * @param event
+         */
+        async checkListener(listener: Function, event: Event): Promise<boolean> {
+            if(this.listenerEnabled){
+                let result = await listener.call(this.getArrayProxy(), event);
+                if(result == false){
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /**
+         * set property changing event listener
          * @param listener
          */
-        setAfterChangeListener(listener: Function): void {
-            this.afterChangeListener = listener;
+        setPropertyChangingListener(listener: Function): void {
+            this.propertyChangingListener = listener;
+            this.arrayProxy.forEach(object => {
+                ObjectProxy.onPropertyChanging(object, listener);
+            });
+        }
+
+        /**
+         * set property changed event listener
+         * @param listener
+         */
+        setPropertyChangedListener(listener: Function): void {
+            this.propertyChangedListener = listener;
+            this.arrayProxy.forEach(object => {
+                ObjectProxy.onPropertyChanged(object, listener);
+            });
+        }
+
+        /**
+         * setRowAddingListener
+         * @param listener
+         */
+        setRowAddingListener(listener: Function): void {
+            this.rowAddingListener = listener;
+        }
+
+        /**
+         * setRowAddedListener
+         * @param listener
+         */
+        setRowAddedListener(listener: Function): void {
+            this.rowAddedListener = listener;
+        }
+
+        /**
+         * setRowDeletingListener
+         * @param listener
+         */
+        setRowDeletingListener(listener: Function): void {
+            this.rowDeletingListener = listener;
+        }
+
+        /**
+         * setRowDeletedListener
+         * @param listener
+         */
+        setRowDeletedListener(listener: Function): void {
+            this.rowDeletedListener = listener;
+        }
+
+        /**
+         * setRowMovingListener
+         * @param listener
+         */
+        setRowMovingListener(listener: Function): void {
+            this.rowMovingListener = listener;
+        }
+
+        /**
+         * setRowMovedListener
+         * @param listener
+         */
+        setRowMovedListener(listener: Function): void {
+            this.rowMovedListener = listener;
         }
 
     }

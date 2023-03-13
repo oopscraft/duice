@@ -114,12 +114,8 @@ namespace duice {
                             event.stopPropagation();
                             let fromIndex = parseInt(event.dataTransfer.getData('text'));
                             let toIndex = parseInt(getAttribute(this, 'index'));
-                            let detail = {
-                                name: 'changeIndex',
-                                fromIndex: fromIndex,
-                                toIndex: toIndex
-                            };
-                            _this.notifyObservers(detail);
+                            let rowIndexChangeEvent = new RowMoveEvent(_this, fromIndex, toIndex);
+                            _this.notifyObservers(rowIndexChangeEvent);
                         });
                     }
 

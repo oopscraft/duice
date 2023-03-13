@@ -47,9 +47,14 @@
             document.getElementById('myArray').value = JSON.stringify(myArray, null, 4);
         }
 
+        function assignMyArray(){
+            let array = JSON.parse(document.getElementById('myArray').value);
+            duice.ArrayProxy.assign(myArray, array);
+        }
+
         // adds before change listener
-        duice.ArrayProxy.onBeforeChange(myArray, async (property, value) => {
-            if(await duice.confirm(`Do you want to change [${property}] is [${value}]`)){
+        duice.ArrayProxy.onPropertyChanging(myArray, async (event) => {
+            if(await duice.confirm(`Do you want to change [${event.getProperty()}] is [${event.getValue()}]`)){
                 return true;
             }else{
                 return false;
@@ -57,13 +62,16 @@
         });
 
         // add after change listener
-        duice.ArrayProxy.onAfterChange(myArray, (property, value) => {
+        duice.ArrayProxy.onPropertyChanged(myArray, (property, value) => {
             viewMyArray();
         });
 
         // adds DOMContentLoaded event listener
         document.addEventListener("DOMContentLoaded", event => {
             viewMyArray();
+            document.getElementById('myArray').addEventListener('change', event => {
+                assignMyArray();
+            });
         });
 
     </script>

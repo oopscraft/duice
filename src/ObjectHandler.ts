@@ -16,9 +16,9 @@ namespace duice {
 
         listenerEnabled: boolean = true;
 
-        beforeChangeListener: Function;
+        propertyChangingListener: Function;
 
-        afterChangeListener: Function;
+        propertyChangedListener: Function;
 
         /**
          * constructor
@@ -48,7 +48,7 @@ namespace duice {
          * @param receiver
          */
         get(target: object, property: string, receiver: object): any {
-            console.log("- Object.get", target, property, receiver);
+            console.log("ObjectHandler.get", target, property, receiver);
             return Reflect.get(target, property, receiver);
         }
 
@@ -59,19 +59,20 @@ namespace duice {
          * @param value
          */
         set(target: object, property: string, value: any) {
-            console.log("- Object.set", target, property, value);
+            console.log("ObjectHandler.set", target, property, value);
 
-            // checks before change listener
-            this.callBeforeChangeListener(property, value).then((result) => {
-                if (result) {
-                    // change property value
+            // try to change property value
+            let event = new PropertyChangeEvent(this, property, value);
+            this.checkListener(this.propertyChangingListener, event).then(result => {
+                if(result){
+
+                    // change value
                     Reflect.set(target, property, value);
 
-                    // calls after change listener
-                    this.callAfterChangeListener(property, value).then();
-
-                    // notify
-                    this.notifyObservers({});
+                    // calls property changed listener
+                    this.checkListener(this.propertyChangedListener, event).then(() => {
+                        this.notifyObservers(event);
+                    });
                 }
             });
 
@@ -109,7 +110,7 @@ namespace duice {
             }
 
             // notify observers
-            this.notifyObservers({});
+            this.notifyObservers(new Event(this));
         }
 
         /**
@@ -138,7 +139,6 @@ namespace duice {
          * @param property
          */
         getValue(property: string): any {
-            console.assert(property);
             property = property.replace('.','?.');
             return new Function(`return this.${property};`).call(this.getObjectProxy());
         }
@@ -155,27 +155,23 @@ namespace duice {
         /**
          * update
          * @param element
-         * @param detail
+         * @param event
          */
-        async update(element: Element<any>, detail: any): Promise<void> {
-            console.log("DataHandler.update", element, detail);
-            let property = element.getProperty();
-            if(property){
+        async update(element: Element<any>, event: Event): Promise<void> {
+            console.log("ObjectHandler.update", element, event);
+
+            // if property change event
+            if(event instanceof PropertyChangeEvent){
+                let property = element.getProperty();
                 let value = element.getValue();
-
-                // calls before change listener
-                if(await this.callBeforeChangeListener(property, value)){
-
-                    // change property value
+                if(await this.checkListener(this.propertyChangingListener, event)){
                     this.setValue(property, value);
-
-                    // calls after change listener
-                    await this.callAfterChangeListener(property, value);
+                    await this.checkListener(this.propertyChangedListener, event);
                 }
             }
 
             // notify
-            this.notifyObservers(detail);
+            this.notifyObservers(event);
         }
 
         /**
@@ -184,7 +180,7 @@ namespace duice {
          */
         setReadonlyAll(readonly: boolean): void {
             this.readonlyAll = readonly;
-            this.notifyObservers({});
+            this.notifyObservers(new Event(this));
         }
 
         /**
@@ -198,7 +194,7 @@ namespace duice {
             }else{
                 this.readonly.delete(property);
             }
-            this.notifyObservers({});
+            this.notifyObservers(new Event(this));
         }
 
         /**
@@ -210,19 +206,19 @@ namespace duice {
         }
 
         /**
-         * setBeforeChangeListener
+         * sets property changing event listener
          * @param listener
          */
-        setBeforeChangeListener(listener: Function): void {
-            this.beforeChangeListener = listener;
+        setPropertyChangingListener(listener: Function): void {
+            this.propertyChangingListener = listener;
         }
 
         /**
-         * setAfterChangeListener
+         * sets property changed event listener
          * @param listener
          */
-        setAfterChangeListener(listener: Function): void {
-            this.afterChangeListener = listener;
+        setPropertyChangedListener(listener: Function): void {
+            this.propertyChangedListener = listener;
         }
 
         /**
@@ -240,29 +236,18 @@ namespace duice {
         }
 
         /**
-         * callBeforeChangeListener
-         * @param property
-         * @param value
+         * checkListener
+         * @param listener
+         * @param event
          */
-        async callBeforeChangeListener(property: string, value: any): Promise<boolean> {
-            if(this.listenerEnabled && this.beforeChangeListener) {
-                let result = await this.beforeChangeListener.call(this.getObjectProxy(), property, value);
-                if(result === false){
+        async checkListener(listener: Function, event: Event): Promise<boolean> {
+            if(this.listenerEnabled){
+                let result = await listener.call(this.getObjectProxy(), event);
+                if(result == false){
                     return false;
                 }
             }
             return true;
-        }
-
-        /**
-         * callAfterChangeListener
-         * @param property
-         * @param value
-         */
-        async callAfterChangeListener(property: string, value: any): Promise<void> {
-            if(this.listenerEnabled && this.afterChangeListener){
-                await this.afterChangeListener.call(this.getObjectProxy(), property, value);
-            }
         }
 
     }

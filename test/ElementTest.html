@@ -28,9 +28,17 @@
             document.getElementById('myObject').value = JSON.stringify(myObject, null, 4);
         }
 
+        /**
+         * assignMyObject
+         */
+        function assignMyObject() {
+            let object = JSON.parse(document.getElementById('myObject').value);
+            duice.ObjectProxy.assign(myObject, object);
+        }
+
         // adds before change listener
-        duice.ObjectProxy.onBeforeChange(myObject, async (property, value) => {
-            if(await duice.confirm(`Do you want to change [${property}] is [${value}]`)){
+        duice.ObjectProxy.onPropertyChanging(myObject, async (event) => {
+            if(await duice.confirm(`Do you want to change [${event.getProperty()}] is [${event.getValue()}]`)){
                 return true;
             }else{
                 return false;
@@ -38,13 +46,16 @@
         });
 
         // adds after change listener
-        duice.ObjectProxy.onAfterChange(myObject, (property, value) => {
+        duice.ObjectProxy.onPropertyChanged(myObject, (property, value) => {
             viewMyObject();
         });
 
         // adds DOMContentLoaded event listener
         document.addEventListener("DOMContentLoaded", event => {
             viewMyObject();
+            document.getElementById("myObject").addEventListener('change',()=>{
+                assignMyObject();
+            });
         });
 
     </script>
@@ -58,8 +69,7 @@
             <textarea id="myObject" rows="15" class="font-weight-light" >
             </textarea>
             <div style="display:flex; flex-direction:column; align-items:flex-start;">
-                <button onclick="duice.ObjectProxy.assign(myObject, JSON.parse(document.getElementById('myObject').value));"
-                        class="font-weight-light">
+                <button onclick="assignMyObject();" class="font-weight-light">
                     duice.ObjectProxy.assign(myObject,[object]);
                 </button>
                 <button onclick="duice.ObjectProxy.setReadonlyAll(myObject, true);" class="font-weight-light">

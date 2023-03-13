@@ -41,7 +41,6 @@ namespace duice {
         static assign(objectProxy: ObjectProxy, object: object): void {
             let handler = this.getHandler(objectProxy);
             handler.assign(object);
-            handler.notifyObservers({});
         }
 
         /**
@@ -95,21 +94,21 @@ namespace duice {
         }
 
         /**
-         * onBeforeChange
+         * onPropertyChanging
          * @param objectProxy
          * @param listener
          */
-        static onBeforeChange(objectProxy: ObjectProxy, listener: Function): void {
-            this.getHandler(objectProxy).setBeforeChangeListener(listener);
+        static onPropertyChanging(objectProxy: ObjectProxy, listener: Function): void {
+            this.getHandler(objectProxy).setPropertyChangingListener(listener);
         }
 
         /**
-         * onAfterChange
+         * onPropertyChanged
          * @param objectProxy
          * @param listener
          */
-        static onAfterChange(objectProxy: ObjectProxy, listener: Function): void {
-            this.getHandler(objectProxy).setAfterChangeListener(listener);
+        static onPropertyChanged(objectProxy: ObjectProxy, listener: Function): void {
+            this.getHandler(objectProxy).setPropertyChangedListener(listener);
         }
 
     }

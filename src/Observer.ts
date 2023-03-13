@@ -8,9 +8,9 @@ namespace duice {
         /**
          * update
          * @param observable
-         * @param detail
+         * @param event
          */
-        update(observable: object, detail: any): void;
+        update(observable: object, event: Event): void;
 
     }
 }

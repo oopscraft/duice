@@ -140,6 +140,16 @@ namespace duice {
         abstract getValue(): any;
 
         /**
+         * getIndex
+         */
+        getIndex(): number {
+            let index = getAttribute(this.htmlElement, 'index');
+            if(index){
+                return Number(index);
+            }
+        }
+
+        /**
          * executes script
          */
         executeScript(): void {

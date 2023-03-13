@@ -47,12 +47,12 @@ namespace duice {
 
         /**
          * notifyObservers
-         * @param detail
+         * @param event
          */
-        notifyObservers(detail: any): void {
+        notifyObservers(event: Event): void {
             if(this.notifyEnabled){
                 this.observers.forEach(observer => {
-                    observer.update(this, detail);
+                    observer.update(this, event);
                 });
             }
         }
