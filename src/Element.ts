@@ -45,13 +45,6 @@ namespace duice {
         }
 
         /**
-         * returns object handler
-         */
-        getObjectHandler(): ObjectHandler {
-            return this.objectHandler;
-        }
-
-        /**
          * gets html element
          */
         getHtmlElement(): T {

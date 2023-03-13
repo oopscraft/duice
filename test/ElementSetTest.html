@@ -49,42 +49,42 @@
 
         function assignMyArray(){
             let array = JSON.parse(document.getElementById('myArray').value);
-            duice.ArrayProxy.assign(myArray, array);
+            myArray.assign(array);
         }
 
         // property changing listener
-        duice.ArrayProxy.onPropertyChanging(myArray, async (event) => {
+        myArray.onPropertyChanging(async event => {
             if(!await duice.confirm(`Do you want to change [${event.getProperty()}] is [${event.getValue()}]`)){
                 return false;
             }
         });
 
         // property changed listener
-        duice.ArrayProxy.onPropertyChanged(myArray, (property, value) => {
+        myArray.onPropertyChanged(event => {
             viewMyArray();
         });
 
         // row inserting listener
-        duice.ArrayProxy.onRowInserting(myArray, async (event) => {
+        myArray.onRowInserting(async event => {
             if(!await duice.confirm(`insert [${event.getIndex()}]${JSON.stringify(event.getRows())}`)){
                 return false;
             }
         });
 
         // row inserted listener
-        duice.ArrayProxy.onRowInserted(myArray, (event) => {
+        myArray.onRowInserted(event => {
             viewMyArray();
         });
 
         // row deleting listener
-        duice.ArrayProxy.onRowDeleting(myArray, async (event) => {
+        myArray.onRowDeleting(async event => {
             if(!await duice.confirm(`delete [${event.getIndex()}]${JSON.stringify(event.getRows())}`)){
                 return false;
             }
         });
 
         // row deleted listener
-        duice.ArrayProxy.onRowDeleted(myArray, (event) => {
+        myArray.onRowDeleted(event => {
             viewMyArray();
         })
 

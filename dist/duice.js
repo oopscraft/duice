@@ -411,9 +411,8 @@ var duice;
          * @param arrayProxy
          * @param array
          */
-        static assign(arrayProxy, array) {
-            let handler = duice.getHandler(arrayProxy);
-            handler.assign(array);
+        assign(array) {
+            duice.getHandler(this).assign(array);
         }
         /**
          * insertRow
@@ -428,82 +427,70 @@ var duice;
         }
         /**
          * setReadonly
-         * @param array
          * @param property
          * @param readonly
          */
-        static setReadonly(array, property, readonly) {
-            let handler = duice.getHandler(array);
-            handler.setReadonly(property, readonly);
+        setReadonly(property, readonly) {
+            duice.getHandler(this).setReadonly(property, readonly);
         }
         /**
          * isReadonly
-         * @param array
          * @param property
          */
-        static isReadonly(array, property) {
-            let handler = duice.getHandler(array);
-            return handler.isReadonly(property);
+        isReadonly(property) {
+            return duice.getHandler(this).isReadonly(property);
         }
         /**
          * setReadonlyAll
-         * @param array
          * @param readonly
          */
-        static setReadonlyAll(array, readonly) {
-            let handler = duice.getHandler(array);
-            handler.setReadonlyAll(readonly);
-            for (let index = 0; index >= array.length; index++) {
-                duice.ObjectProxy.setReadonlyAll(array[index], readonly);
+        setReadonlyAll(readonly) {
+            duice.getHandler(this).setReadonlyAll(readonly);
+            for (let index = 0; index >= this.length; index++) {
+                duice.ObjectProxy.setReadonlyAll(this[index], readonly);
             }
         }
         /**
          * onPropertyChanging
-         * @param arrayProxy
          * @param listener
          */
-        static onPropertyChanging(arrayProxy, listener) {
-            duice.getHandler(arrayProxy).setPropertyChangingListener(listener);
+        onPropertyChanging(listener) {
+            duice.getHandler(this).setPropertyChangingListener(listener);
         }
         /**
          * onPropertyChanged
-         * @param arrayArray
          * @param listener
          */
-        static onPropertyChanged(arrayArray, listener) {
-            duice.getHandler(arrayArray).setPropertyChangedListener(listener);
+        onPropertyChanged(listener) {
+            duice.getHandler(this).setPropertyChangedListener(listener);
         }
         /**
          * onRowInserting
-         * @param arrayProxy
          * @param listener
          */
-        static onRowInserting(arrayProxy, listener) {
-            duice.getHandler(arrayProxy).setRowInsertingListener(listener);
+        onRowInserting(listener) {
+            duice.getHandler(this).setRowInsertingListener(listener);
         }
         /**
          * onRowInserted
-         * @param arrayProxy
          * @param listener
          */
-        static onRowInserted(arrayProxy, listener) {
-            duice.getHandler(arrayProxy).setRowInsertedListener(listener);
+        onRowInserted(listener) {
+            duice.getHandler(this).setRowInsertedListener(listener);
         }
         /**
          * onRowDeleting
-         * @param arrayProxy
          * @param listener
          */
-        static onRowDeleting(arrayProxy, listener) {
-            duice.getHandler(arrayProxy).setRowDeletingListener(listener);
+        onRowDeleting(listener) {
+            duice.getHandler(this).setRowDeletingListener(listener);
         }
         /**
          * onRowDeleted
-         * @param arrayProxy
          * @param listener
          */
-        static onRowDeleted(arrayProxy, listener) {
-            duice.getHandler(arrayProxy).setRowDeletedListener(listener);
+        onRowDeleted(listener) {
+            duice.getHandler(this).setRowDeletedListener(listener);
         }
     }
     duice.ArrayProxy = ArrayProxy;
@@ -560,12 +547,6 @@ var duice;
             this.objectHandler = duice.getHandler(object);
             this.addObserver(this.objectHandler);
             this.objectHandler.addObserver(this);
-        }
-        /**
-         * returns object handler
-         */
-        getObjectHandler() {
-            return this.objectHandler;
         }
         /**
          * gets html element
