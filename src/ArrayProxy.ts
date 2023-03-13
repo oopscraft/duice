@@ -24,23 +24,23 @@ namespace duice {
         }
 
         /**
-         * getHandler
-         * @param array
-         */
-        static getHandler(array: ArrayProxy): ArrayHandler {
-            let handler = globalThis.Object.getOwnPropertyDescriptor(array, '_handler_')?.value;
-            assert(handler, 'arrayHandler is not found');
-            return handler;
-        }
-
-        /**
          * assign
          * @param arrayProxy
          * @param array
          */
         static assign(arrayProxy: ArrayProxy, array: object[]): void {
-            let handler = this.getHandler(arrayProxy);
+            let handler = getHandler(arrayProxy);
             handler.assign(array);
+        }
+
+        /**
+         * insertRow
+         * @param index
+         * @param rows
+         */
+        async insertRow(index: number, ...rows: object[]): Promise<void> {
+            let handler = getHandler(this);
+            await handler.insertRow(index, ...rows);
         }
 
         /**
@@ -50,7 +50,7 @@ namespace duice {
          * @param readonly
          */
         static setReadonly(array: ArrayProxy, property: string, readonly: boolean): void {
-            let handler = this.getHandler(array);
+            let handler = getHandler(array);
             handler.setReadonly(property, readonly);
         }
 
@@ -60,7 +60,7 @@ namespace duice {
          * @param property
          */
         static isReadonly(array: ArrayProxy, property: string): boolean {
-            let handler = this.getHandler(array);
+            let handler = getHandler(array);
             return handler.isReadonly(property);
         }
 
@@ -70,7 +70,7 @@ namespace duice {
          * @param readonly
          */
         static setReadonlyAll(array: ArrayProxy, readonly: boolean): void {
-            let handler = this.getHandler(array);
+            let handler = getHandler(array);
             handler.setReadonlyAll(readonly);
             for(let index = 0; index >= array.length; index ++ ){
                 ObjectProxy.setReadonlyAll(array[index], readonly);
@@ -83,7 +83,7 @@ namespace duice {
          * @param listener
          */
         static onPropertyChanging(arrayProxy: ArrayProxy, listener: Function): void {
-            this.getHandler(arrayProxy).setPropertyChangingListener(listener);
+            getHandler(arrayProxy).setPropertyChangingListener(listener);
         }
 
         /**
@@ -92,25 +92,25 @@ namespace duice {
          * @param listener
          */
         static onPropertyChanged(arrayArray: ArrayProxy, listener: Function): void {
-            this.getHandler(arrayArray).setPropertyChangedListener(listener);
+            getHandler(arrayArray).setPropertyChangedListener(listener);
         }
 
         /**
-         * onRowAdding
+         * onRowInserting
          * @param arrayProxy
          * @param listener
          */
-        static onRowAdding(arrayProxy: ArrayProxy, listener: Function): void {
-            this.getHandler(arrayProxy).setRowAddingListener(listener);
+        static onRowInserting(arrayProxy: ArrayProxy, listener: Function): void {
+            getHandler(arrayProxy).setRowInsertingListener(listener);
         }
 
         /**
-         * onRowAdded
+         * onRowInserted
          * @param arrayProxy
          * @param listener
          */
-        static onRowAdded(arrayProxy: ArrayProxy, listener: Function): void {
-            this.getHandler(arrayProxy).setRowAddedListener(listener);
+        static onRowInserted(arrayProxy: ArrayProxy, listener: Function): void {
+            getHandler(arrayProxy).setRowInsertedListener(listener);
         }
 
         /**
@@ -119,7 +119,7 @@ namespace duice {
          * @param listener
          */
         static onRowDeleting(arrayProxy: ArrayProxy, listener: Function): void {
-            this.getHandler(arrayProxy).setRowDeletingListener(listener);
+            getHandler(arrayProxy).setRowDeletingListener(listener);
         }
 
         /**
@@ -128,25 +128,7 @@ namespace duice {
          * @param listener
          */
         static onRowDeleted(arrayProxy: ArrayProxy, listener: Function): void {
-            this.getHandler(arrayProxy).setRowDeletedListener(listener);
-        }
-
-        /**
-         * onRowMoving
-         * @param arrayProxy
-         * @param listener
-         */
-        static onRowMoving(arrayProxy: ArrayProxy, listener: Function): void {
-            this.getHandler(arrayProxy).setRowMovingListener(listener);
-        }
-
-        /**
-         * onRowMoved
-         * @param arrayProxy
-         * @param listener
-         */
-        static onRowMoved(arrayProxy: ArrayProxy, listener: Function): void {
-            this.getHandler(arrayProxy).setRowMovedListener(listener);
+            getHandler(arrayProxy).setRowDeletedListener(listener);
         }
 
     }

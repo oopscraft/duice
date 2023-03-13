@@ -1,4 +1,5 @@
 ///<reference path="Observable.ts"/>
+///<reference path="Observer.ts"/>
 namespace duice {
 
     /**
@@ -18,17 +19,13 @@ namespace duice {
 
         propertyChangedListener: Function;
 
-        rowAddingListener: Function;
+        rowInsertingListener: Function;
 
-        rowAddedListener: Function;
+        rowInsertedListener: Function;
 
         rowDeletingListener: Function;
 
         rowDeletedListener: Function;
-
-        rowMovingListener: Function;
-
-        rowMovedListener: Function;
 
         /**
          * constructor
@@ -48,7 +45,7 @@ namespace duice {
             for(let index = 0; index < this.arrayProxy.length; index ++) {
                 let objectProxy = new ObjectProxy(this.arrayProxy[index]);
                 this.arrayProxy[index] = objectProxy;
-                let objectHandler = ObjectProxy.getHandler(objectProxy);
+                let objectHandler = getHandler(objectProxy);
                 objectHandler.addObserver(this);
             }
         }
@@ -71,41 +68,133 @@ namespace duice {
             let _this = this;
             const value = target[property];
             if (typeof value === 'function') {
+
+                // insert element at last,end
                 if (['push', 'unshift'].includes(property)) {
-                    return function (el) {
-                        console.log('this is a array modification');
+                    return async function() {
+
+                        // creates row insert event
+                        let index = -1;
+                        if(property === 'push'){
+                            index = receiver['length'];
+                        }else if(property == 'unshift'){
+                            index = 0;
+                        }
+                        let rows = [];
+                        for(let i in arguments){
+                            rows.push(arguments[i]);
+                        }
+                        let event = new RowInsertEvent(_this, index, rows);
+                        console.debug("RowInsertEvent", event);
+
+                        // calls RowInsertingListener
+                        let length = -1;
+                        if(await _this.checkListener(_this.rowInsertingListener, event)) {
+
+                            // apply
+                            length = Array.prototype[property].apply(target, arguments);
+
+                            // call RowInsertedListener
+                            await _this.checkListener(_this.rowInsertedListener, event);
+
+                            // notify observer
+                            _this.notifyObservers(event);
+                        }
+
+                        // returns
+                        return length;
+                    }
+                }
+
+                // insert element at position
+                if(['splice'].includes(property)){
+                    return async function() {
+
+                        // parse arguments
+                        let start = arguments[0];
+                        let deleteCount = arguments[1];
+                        let deleteRows = [];
+                        for(let i = start; i < (start + deleteCount); i ++) {
+                            deleteRows.push(target[i]);
+                        }
+                        let insertRows = [];
+                        for(let i = 2; i < arguments.length; i ++) {
+                            insertRows.push(arguments[i]);
+                        }
+
+                        // delete rows
+                        if(deleteCount > 0){
+                            let rowDeleteEvent = new RowDeleteEvent(_this, start, deleteRows);
+                            if(await _this.checkListener(_this.rowDeletingListener, rowDeleteEvent)){
+
+                            }
+
+                        }
+
+
+
                         let result = Array.prototype[property].apply(target, arguments);
                         _this.notifyObservers(new Event(_this));
                         return result;
                     }
                 }
-                if (['pop'].includes(property)) {
-                    return function () {
-                        console.log('this is a array modification');
-                        let result = Array.prototype[property].apply(target, arguments);
-                        _this.notifyObservers(new Event(this));
-                        return result;
+
+                // removes last,first element
+                if (['pop', 'shift'].includes(property)) {
+                    return async function() {
+
+                        // creates row delete event
+                        let index = -1;
+                        if(property === 'pop'){
+                            index = receiver['length']-1;
+                        }else if(property === 'shift'){
+                            index = 0;
+                        }
+                        let rows = [target[index]];
+                        let event = new RowDeleteEvent(_this, index, rows);
+                        console.debug("RowDeleteEvent", event);
+
+                        // call RowDeletingListener
+                        let deletedRows;
+                        if(await _this.checkListener(_this.rowDeletingListener, event)){
+
+                            // apply
+                            deletedRows = Array.prototype[property].apply(target, arguments);
+
+                            // call RowDeletedListener
+                            await _this.checkListener(_this.rowDeletedListener, event);
+
+                            // notify observers
+                            _this.notifyObservers(event);
+                        }
+
+                        // return
+                        return deletedRows
                     }
                 }
+
+                // bind
                 return value.bind(target);
             }
+
+            // return
             return value;
         }
 
-        // /**
-        //  * set
-        //  * @param target
-        //  * @param property
-        //  * @param value
-        //  */
-        // set(target: object, property: string, value: any): boolean {
-        //     console.log("ArrayHandler.set", '|', target, '|', property, '|', value);
-        //     Reflect.set(target, property, value);
-        //     if(property === 'length'){
-        //         this.notifyObservers(new Event(this));
-        //     }
-        //     return true;
-        // }
+        /**
+         * set
+         * @param target
+         * @param property
+         * @param value
+         */
+        set(target: object, property: string, value: any): boolean {
+            console.log("ArrayHandler.set", '|', target, '|', property, '|', value);
+            Reflect.set(target, property, value);
+            if(property === 'length'){
+                this.notifyObservers(new Event(this));
+            }
+            return true;
+        }
 
         /**
          * assign
@@ -123,7 +212,7 @@ namespace duice {
                 for(let index = 0, size = array.length; index < size; index ++){
                     let objectProxy = new duice.ObjectProxy(array[index]);
                     this.arrayProxy[index] = objectProxy;
-                    let objectHandler = ObjectProxy.getHandler(objectProxy);
+                    let objectHandler = getHandler(objectProxy);
                     objectHandler.setPropertyChangingListener(this.propertyChangingListener);
                     objectHandler.setPropertyChangedListener(this.propertyChangedListener);
                     objectHandler.addObserver(this);
@@ -136,6 +225,19 @@ namespace duice {
 
             // notify observers
             this.notifyObservers(new Event(this));
+        }
+
+        async insertRow(index: number, ...rows: object[]): Promise<void> {
+            let event = new RowInsertEvent(this, index, rows);
+            if(await this.checkListener(this.rowInsertingListener, event)){
+                this.arrayProxy.splice(index, 0, ...rows);
+                await this.checkListener(this.rowInsertedListener, event);
+                this.notifyObservers(event);
+            }
+        }
+
+        async deleteRow(index: number, size?: number): Promise<void> {
+
         }
 
         /**
@@ -186,42 +288,13 @@ namespace duice {
         }
 
         /**
-         * suspends listener
-         */
-        suspendListener(): void {
-            this.listenerEnabled = false;
-        }
-
-        /**
-         * resumes listener
-         */
-        resumeListener(): void {
-            this.listenerEnabled = true;
-        }
-
-        /**
-         * checkListener
-         * @param listener
-         * @param event
-         */
-        async checkListener(listener: Function, event: Event): Promise<boolean> {
-            if(this.listenerEnabled){
-                let result = await listener.call(this.getArrayProxy(), event);
-                if(result == false){
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        /**
          * set property changing event listener
          * @param listener
          */
         setPropertyChangingListener(listener: Function): void {
             this.propertyChangingListener = listener;
-            this.arrayProxy.forEach(object => {
-                ObjectProxy.onPropertyChanging(object, listener);
+            this.arrayProxy.forEach(objectProxy => {
+                getHandler(objectProxy).setPropertyChangingListener(listener);
             });
         }
 
@@ -231,25 +304,25 @@ namespace duice {
          */
         setPropertyChangedListener(listener: Function): void {
             this.propertyChangedListener = listener;
-            this.arrayProxy.forEach(object => {
-                ObjectProxy.onPropertyChanged(object, listener);
+            this.arrayProxy.forEach(objectProxy => {
+                getHandler(objectProxy).setPropertyChangedListener(listener);
             });
         }
 
         /**
-         * setRowAddingListener
+         * setRowInsertingListener
          * @param listener
          */
-        setRowAddingListener(listener: Function): void {
-            this.rowAddingListener = listener;
+        setRowInsertingListener(listener: Function): void {
+            this.rowInsertingListener = listener;
         }
 
         /**
-         * setRowAddedListener
+         * setRowInsertedListener
          * @param listener
          */
-        setRowAddedListener(listener: Function): void {
-            this.rowAddedListener = listener;
+        setRowInsertedListener(listener: Function): void {
+            this.rowInsertedListener = listener;
         }
 
         /**
@@ -269,19 +342,32 @@ namespace duice {
         }
 
         /**
-         * setRowMovingListener
-         * @param listener
+         * suspends listener
          */
-        setRowMovingListener(listener: Function): void {
-            this.rowMovingListener = listener;
+        suspendListener(): void {
+            this.listenerEnabled = false;
         }
 
         /**
-         * setRowMovedListener
-         * @param listener
+         * resumes listener
          */
-        setRowMovedListener(listener: Function): void {
-            this.rowMovedListener = listener;
+        resumeListener(): void {
+            this.listenerEnabled = true;
+        }
+
+        /**
+         * checkListener
+         * @param listener
+         * @param event
+         */
+        async checkListener(listener: Function, event: Event): Promise<boolean> {
+            if(this.listenerEnabled && listener){
+                let result = await listener.call(this.arrayProxy, event);
+                if(result == false){
+                    return false;
+                }
+            }
+            return true;
         }
 
     }

@@ -39,7 +39,7 @@ namespace duice {
         setObject(objectName: string): void {
             let object = findObject(this.context, objectName);
             assert(object, `ObjectProxy[${objectName}] is not found.`)
-            this.objectHandler = ObjectProxy.getHandler(object);
+            this.objectHandler = getHandler(object);
             this.addObserver(this.objectHandler);
             this.objectHandler.addObserver(this);
         }

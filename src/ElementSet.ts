@@ -42,13 +42,13 @@ namespace duice {
         }
 
         /**
-         * setDataSet
+         * setArray
          * @param arrayName
          */
         setArray(arrayName: string): void {
             let array = findObject(this.context, arrayName);
             assert(array, `ArrayProxy[${arrayName}] is not found.`);
-            this.arrayHandler = ArrayProxy.getHandler(array);
+            this.arrayHandler = getHandler(array);
             assert(this.arrayHandler, `[${arrayName}] is not ArrayProxy.`);
             this.addObserver(this.arrayHandler);
             this.arrayHandler.addObserver(this);

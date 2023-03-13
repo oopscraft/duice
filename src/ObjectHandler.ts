@@ -1,4 +1,5 @@
 ///<reference path="Observable.ts"/>
+///<reference path="Observer.ts"/>
 namespace duice {
 
     /**
@@ -27,18 +28,15 @@ namespace duice {
         constructor(objectProxy: ObjectProxy) {
             super();
             this.objectProxy = objectProxy;
-            this.save();
-            globalThis.Object.defineProperty(objectProxy, "_handler_", {
+
+            // setting handler as property
+            globalThis.Object.defineProperty(objectProxy, '_handler_', {
                 value: this,
                 writable: true
             });
-        }
 
-        /**
-         * getObjectProxy
-         */
-        getObjectProxy(): ObjectProxy {
-            return this.objectProxy;
+            // save
+            this.save();
         }
 
         /**
@@ -102,7 +100,6 @@ namespace duice {
 
                 // saves origin object
                 this.save();
-
             } finally {
                 // resume
                 this.resumeListener();
@@ -111,6 +108,28 @@ namespace duice {
 
             // notify observers
             this.notifyObservers(new Event(this));
+        }
+
+        /**
+         * update
+         * @param element
+         * @param event
+         */
+        async update(element: Element<any>, event: Event): Promise<void> {
+            console.log("ObjectHandler.update", element, event);
+
+            // if property change event
+            if(event instanceof PropertyChangeEvent){
+                let property = element.getProperty();
+                let value = element.getValue();
+                if(await this.checkListener(this.propertyChangingListener, event)){
+                    this.setValue(property, value);
+                    await this.checkListener(this.propertyChangedListener, event);
+                }
+            }
+
+            // notify
+            this.notifyObservers(event);
         }
 
         /**
@@ -140,7 +159,7 @@ namespace duice {
          */
         getValue(property: string): any {
             property = property.replace('.','?.');
-            return new Function(`return this.${property};`).call(this.getObjectProxy());
+            return new Function(`return this.${property};`).call(this.objectProxy);
         }
 
         /**
@@ -149,29 +168,7 @@ namespace duice {
          * @param value
          */
         setValue(property: string, value: any): void {
-            new Function('value', `this.${property} = value;`).call(this.getObjectProxy(), value);
-        }
-
-        /**
-         * update
-         * @param element
-         * @param event
-         */
-        async update(element: Element<any>, event: Event): Promise<void> {
-            console.log("ObjectHandler.update", element, event);
-
-            // if property change event
-            if(event instanceof PropertyChangeEvent){
-                let property = element.getProperty();
-                let value = element.getValue();
-                if(await this.checkListener(this.propertyChangingListener, event)){
-                    this.setValue(property, value);
-                    await this.checkListener(this.propertyChangedListener, event);
-                }
-            }
-
-            // notify
-            this.notifyObservers(event);
+            new Function('value', `this.${property} = value;`).call(this.objectProxy, value);
         }
 
         /**
@@ -241,8 +238,8 @@ namespace duice {
          * @param event
          */
         async checkListener(listener: Function, event: Event): Promise<boolean> {
-            if(this.listenerEnabled){
-                let result = await listener.call(this.getObjectProxy(), event);
+            if(this.listenerEnabled && listener){
+                let result = await listener.call(this.objectProxy, event);
                 if(result == false){
                     return false;
                 }
