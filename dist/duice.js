@@ -176,72 +176,34 @@ var duice;
             let _this = this;
             const value = target[property];
             if (typeof value === 'function') {
-                // insert element at last,end
+                // push, unshift
                 if (['push', 'unshift'].includes(property)) {
                     return function () {
                         return __awaiter(this, arguments, void 0, function* () {
-                            // creates row insert event
-                            let index = -1;
+                            let index;
                             if (property === 'push') {
                                 index = receiver['length'];
                             }
-                            else if (property == 'unshift') {
+                            else if (property === 'unshift') {
                                 index = 0;
                             }
                             let rows = [];
                             for (let i in arguments) {
                                 rows.push(arguments[i]);
                             }
-                            let event = new duice.RowInsertEvent(_this, index, rows);
-                            console.debug("RowInsertEvent", event);
-                            // calls RowInsertingListener
-                            let length = -1;
-                            if (yield _this.checkListener(_this.rowInsertingListener, event)) {
-                                // apply
-                                length = Array.prototype[property].apply(target, arguments);
-                                // call RowInsertedListener
-                                yield _this.checkListener(_this.rowInsertedListener, event);
-                                // notify observer
-                                _this.notifyObservers(event);
-                            }
-                            // returns
-                            return length;
+                            yield _this.insertRow(index, ...rows);
+                            return _this.getTarget().length;
                         });
                     };
                 }
-                // insert element at position
+                // splice
                 if (['splice'].includes(property)) {
-                    return function () {
-                        return __awaiter(this, arguments, void 0, function* () {
-                            // parse arguments
-                            let start = arguments[0];
-                            let deleteCount = arguments[1];
-                            let deleteRows = [];
-                            for (let i = start; i < (start + deleteCount); i++) {
-                                deleteRows.push(target[i]);
-                            }
-                            let insertRows = [];
-                            for (let i = 2; i < arguments.length; i++) {
-                                insertRows.push(arguments[i]);
-                            }
-                            // delete rows
-                            if (deleteCount > 0) {
-                                let rowDeleteEvent = new duice.RowDeleteEvent(_this, start, deleteRows);
-                                if (yield _this.checkListener(_this.rowDeletingListener, rowDeleteEvent)) {
-                                }
-                            }
-                            let result = Array.prototype[property].apply(target, arguments);
-                            _this.notifyObservers(new duice.Event(_this));
-                            return result;
-                        });
-                    };
                 }
-                // removes last,first element
+                // pop, shift
                 if (['pop', 'shift'].includes(property)) {
                     return function () {
-                        return __awaiter(this, arguments, void 0, function* () {
-                            // creates row delete event
-                            let index = -1;
+                        return __awaiter(this, void 0, void 0, function* () {
+                            let index;
                             if (property === 'pop') {
                                 index = receiver['length'] - 1;
                             }
@@ -249,23 +211,114 @@ var duice;
                                 index = 0;
                             }
                             let rows = [target[index]];
-                            let event = new duice.RowDeleteEvent(_this, index, rows);
-                            console.debug("RowDeleteEvent", event);
-                            // call RowDeletingListener
-                            let deletedRows;
-                            if (yield _this.checkListener(_this.rowDeletingListener, event)) {
-                                // apply
-                                deletedRows = Array.prototype[property].apply(target, arguments);
-                                // call RowDeletedListener
-                                yield _this.checkListener(_this.rowDeletedListener, event);
-                                // notify observers
-                                _this.notifyObservers(event);
-                            }
-                            // return
-                            return deletedRows;
+                            yield _this.deleteRow(index);
+                            return rows;
                         });
                     };
                 }
+                // // insert element at last,end
+                // if (['push', 'unshift'].includes(property)) {
+                //     return async function() {
+                //
+                //         // creates row insert event
+                //         let index = -1;
+                //         if(property === 'push'){
+                //             index = receiver['length'];
+                //         }else if(property == 'unshift'){
+                //             index = 0;
+                //         }
+                //         let rows = [];
+                //         for(let i in arguments){
+                //             rows.push(arguments[i]);
+                //         }
+                //         let event = new RowInsertEvent(_this, index, rows);
+                //         console.debug("RowInsertEvent", event);
+                //
+                //         // calls RowInsertingListener
+                //         let length = -1;
+                //         if(await _this.checkListener(_this.rowInsertingListener, event)) {
+                //
+                //             // apply
+                //             length = Array.prototype[property].apply(target, arguments);
+                //
+                //             // call RowInsertedListener
+                //             await _this.checkListener(_this.rowInsertedListener, event);
+                //
+                //             // notify observer
+                //             _this.notifyObservers(event);
+                //         }
+                //
+                //         // returns
+                //         return length;
+                //     }
+                // }
+                //
+                // // insert element at position
+                // if(['splice'].includes(property)){
+                //     return async function() {
+                //
+                //         // parse arguments
+                //         let start = arguments[0];
+                //         let deleteCount = arguments[1];
+                //         let deleteRows = [];
+                //         for(let i = start; i < (start + deleteCount); i ++) {
+                //             deleteRows.push(target[i]);
+                //         }
+                //         let insertRows = [];
+                //         for(let i = 2; i < arguments.length; i ++) {
+                //             insertRows.push(arguments[i]);
+                //         }
+                //
+                //         // delete rows
+                //         if(deleteCount > 0){
+                //             let rowDeleteEvent = new RowDeleteEvent(_this, start, deleteRows);
+                //             if(await _this.checkListener(_this.rowDeletingListener, rowDeleteEvent)){
+                //
+                //             }
+                //
+                //         }
+                //
+                //
+                //
+                //         let result = Array.prototype[property].apply(target, arguments);
+                //         _this.notifyObservers(new Event(_this));
+                //         return result;
+                //     }
+                // }
+                //
+                // // removes last,first element
+                // if (['pop', 'shift'].includes(property)) {
+                //     return async function() {
+                //
+                //         // creates row delete event
+                //         let index = -1;
+                //         if(property === 'pop'){
+                //             index = receiver['length']-1;
+                //         }else if(property === 'shift'){
+                //             index = 0;
+                //         }
+                //         let rows = [target[index]];
+                //         let event = new RowDeleteEvent(_this, index, rows);
+                //         console.debug("RowDeleteEvent", event);
+                //
+                //         // call RowDeletingListener
+                //         let deletedRows;
+                //         if(await _this.checkListener(_this.rowDeletingListener, event)){
+                //
+                //             // apply
+                //             deletedRows = Array.prototype[property].apply(target, arguments);
+                //
+                //             // call RowDeletedListener
+                //             await _this.checkListener(_this.rowDeletedListener, event);
+                //
+                //             // notify observers
+                //             _this.notifyObservers(event);
+                //         }
+                //
+                //         // return
+                //         return deletedRows
+                //     }
+                // }
                 // bind
                 return value.bind(target);
             }
@@ -299,7 +352,7 @@ var duice;
                 // assign
                 for (let index = 0, size = array.length; index < size; index++) {
                     let objectProxy = new duice.ObjectProxy(array[index]);
-                    this.getTarget[index] = objectProxy;
+                    this.getTarget()[index] = objectProxy;
                     let objectHandler = duice.ObjectProxy.getHandler(objectProxy);
                     objectHandler.setPropertyChangingListener(this.propertyChangingListener);
                     objectHandler.setPropertyChangedListener(this.propertyChangedListener);
@@ -313,6 +366,11 @@ var duice;
             // notify observers
             this.notifyObservers(new duice.Event(this));
         }
+        /**
+         * insertRow
+         * @param index
+         * @param rows
+         */
         insertRow(index, ...rows) {
             return __awaiter(this, void 0, void 0, function* () {
                 let event = new duice.RowInsertEvent(this, index, rows);
@@ -323,12 +381,34 @@ var duice;
                 }
             });
         }
+        /**
+         * deleteRow
+         * @param index
+         * @param size
+         */
         deleteRow(index, size) {
             return __awaiter(this, void 0, void 0, function* () {
+                let sliceBegin = index;
+                let sliceEnd = (size ? index + size : index + 1);
+                let rows = this.getTarget().slice(sliceBegin, sliceEnd);
+                let event = new duice.RowDeleteEvent(this, index, rows);
+                if (yield this.checkListener(this.rowDeletingListener, event)) {
+                    let spliceStart = index;
+                    let spliceDeleteCount = (size ? size : 1);
+                    this.getTarget().splice(spliceStart, spliceDeleteCount);
+                    yield this.checkListener(this.rowDeletedListener, event);
+                    this.notifyObservers(event);
+                }
             });
         }
+        /**
+         * appendRow
+         * @param rows
+         */
         appendRow(...rows) {
             return __awaiter(this, void 0, void 0, function* () {
+                let index = this.getTarget().length;
+                return this.insertRow(index, ...rows);
             });
         }
         /**
@@ -1262,31 +1342,6 @@ var duice;
     }
     duice.setAttribute = setAttribute;
     /**
-     * getCurrentWindow
-     * @private
-     */
-    function getCurrentWindow() {
-        if (window.frameElement) {
-            return window.parent;
-        }
-        else {
-            return window;
-        }
-    }
-    duice.getCurrentWindow = getCurrentWindow;
-    /**
-     * moveToCenterPosition
-     */
-    function moveToCenterPosition(htmlElement) {
-        let currentWindow = getCurrentWindow();
-        let computedStyle = currentWindow.getComputedStyle(this.dialog);
-        let computedWidth = parseInt(computedStyle.getPropertyValue('width').replace(/px/gi, ''));
-        let computedHeight = parseInt(computedStyle.getPropertyValue('height').replace(/px/gi, ''));
-        htmlElement.style.left = Math.max(0, currentWindow.innerWidth / 2 - computedWidth / 2) + 'px';
-        htmlElement.style.top = Math.max(0, currentWindow.innerHeight / 2 - computedHeight / 2) + 'px';
-    }
-    duice.moveToCenterPosition = moveToCenterPosition;
-    /**
      * removeChildNodes
      * @param element
      */
@@ -1476,7 +1531,7 @@ var duice;
             let scrollX = window.scrollX;
             let scrollY = window.scrollY;
             // show dialog modal
-            duice.getCurrentWindow().document.body.appendChild(this.dialogElement);
+            window.document.body.appendChild(this.dialogElement);
             this.dialogElement.showModal();
             // restore previous scroll position
             window.scrollTo(scrollX, scrollY);

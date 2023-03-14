@@ -119,7 +119,7 @@ namespace duice {
             let scrollY = window.scrollY;
 
             // show dialog modal
-            getCurrentWindow().document.body.appendChild(this.dialogElement);
+            window.document.body.appendChild(this.dialogElement);
             this.dialogElement.showModal();
 
             // restore previous scroll position

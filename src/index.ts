@@ -116,31 +116,6 @@ namespace duice {
     }
 
     /**
-     * getCurrentWindow
-     * @private
-     */
-    export function getCurrentWindow() {
-        if (window.frameElement) {
-            return window.parent;
-        }
-        else {
-            return window;
-        }
-    }
-
-    /**
-     * moveToCenterPosition
-     */
-    export function moveToCenterPosition(htmlElement: HTMLElement) {
-        let currentWindow = getCurrentWindow();
-        let computedStyle = currentWindow.getComputedStyle(this.dialog);
-        let computedWidth = parseInt(computedStyle.getPropertyValue('width').replace(/px/gi, ''));
-        let computedHeight = parseInt(computedStyle.getPropertyValue('height').replace(/px/gi, ''));
-        htmlElement.style.left = Math.max(0, currentWindow.innerWidth / 2 - computedWidth / 2) + 'px';
-        htmlElement.style.top = Math.max(0, currentWindow.innerHeight / 2 - computedHeight / 2) + 'px';
-    }
-
-    /**
      * removeChildNodes
      * @param element
      */
