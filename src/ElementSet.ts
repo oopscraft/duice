@@ -46,10 +46,9 @@ namespace duice {
          * @param arrayName
          */
         setArray(arrayName: string): void {
-            let array = findObject(this.context, arrayName);
-            assert(array, `ArrayProxy[${arrayName}] is not found.`);
-            this.arrayHandler = getHandler(array);
-            assert(this.arrayHandler, `[${arrayName}] is not ArrayProxy.`);
+            let arrayProxy = findObject(this.context, arrayName);
+            assert(arrayProxy, `ArrayProxy[${arrayName}] is not found.`);
+            this.arrayHandler = arrayProxy.getHandler();
             this.addObserver(this.arrayHandler);
             this.arrayHandler.addObserver(this);
         }
@@ -66,7 +65,7 @@ namespace duice {
          * render
          */
         render(): void {
-            let dataSet = this.arrayHandler.getArrayProxy();
+            let dataSet = this.arrayHandler.getTarget();
             this.doRender(dataSet);
 
             // executes script
@@ -134,7 +133,7 @@ namespace duice {
          * @param detail
          */
         update(arrayHandler: ArrayHandler, detail: any): void {
-            let array = arrayHandler.getArrayProxy();
+            let array = arrayHandler.getTarget();
             this.doUpdate(array);
 
             // executes script

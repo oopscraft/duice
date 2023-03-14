@@ -19,8 +19,16 @@ namespace duice {
             }
 
             // return proxy instance
-            let objectHandler = new ObjectHandler(this);
-            return new Proxy<ObjectProxy>(this, objectHandler);
+            let handler = new ObjectHandler(this);
+            return new Proxy<ObjectProxy>(this, handler);
+        }
+
+        /**
+         * getHandler
+         * @param objectProxy
+         */
+        static getHandler(objectProxy: ObjectProxy): ObjectHandler {
+            return Handler.getHandler<ObjectProxy, ObjectHandler>(objectProxy);
         }
 
         /**
@@ -29,8 +37,7 @@ namespace duice {
          * @param object
          */
         static assign(objectProxy: ObjectProxy, object: object): void {
-            let handler = getHandler(objectProxy);
-            handler.assign(object);
+            this.getHandler(objectProxy).assign(object);
         }
 
         /**
@@ -40,8 +47,7 @@ namespace duice {
          * @param readonly
          */
         static setReadonly(objectProxy: ObjectProxy, property: string, readonly: boolean): void {
-            let objectHandler = getHandler(objectProxy);
-            objectHandler.setReadonly(property, readonly);
+            this.getHandler(objectProxy).setReadonly(property, readonly);
         }
 
         /**
@@ -50,8 +56,7 @@ namespace duice {
          * @param property
          */
         static isReadonly(objectProxy: ObjectProxy, property: string): boolean {
-            let objectHandler = getHandler(objectProxy);
-            return objectHandler.isReadonly(property);
+            return this.getHandler(objectProxy).isReadonly(property);
         }
 
         /**
@@ -60,7 +65,7 @@ namespace duice {
          * @param readonly
          */
         static setReadonlyAll(objectProxy: ObjectProxy, readonly: boolean): void {
-            let objectHandler = getHandler(objectProxy);
+            let objectHandler = this.getHandler(objectProxy);
             objectHandler.setReadonlyAll(readonly);
             for(let property in this) {
                 objectHandler.setReadonly(property, readonly);
@@ -72,7 +77,7 @@ namespace duice {
          * @param objectProxy
          */
         static isDirty(objectProxy: ObjectProxy): boolean {
-            return getHandler(objectProxy).isDirty();
+            return this.getHandler(objectProxy).isDirty();
         }
 
         /**
@@ -80,7 +85,7 @@ namespace duice {
          * @param objectProxy
          */
         static reset(objectProxy: ObjectProxy): void {
-            getHandler(objectProxy).reset();
+            this.getHandler(objectProxy).reset();
         }
 
         /**
@@ -89,7 +94,7 @@ namespace duice {
          * @param listener
          */
         static onPropertyChanging(objectProxy: ObjectProxy, listener: Function): void {
-            getHandler(objectProxy).setPropertyChangingListener(listener);
+            this.getHandler(objectProxy).setPropertyChangingListener(listener);
         }
 
         /**
@@ -98,7 +103,7 @@ namespace duice {
          * @param listener
          */
         static onPropertyChanged(objectProxy: ObjectProxy, listener: Function): void {
-            getHandler(objectProxy).setPropertyChangedListener(listener);
+            this.getHandler(objectProxy).setPropertyChangedListener(listener);
         }
 
     }

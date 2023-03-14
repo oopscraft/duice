@@ -11,16 +11,27 @@ namespace duice {
         constructor(array?: object[]) {
             super();
 
+            // creates handler
+            let handler = new ArrayHandler(this);
+
             // copy array elements
-            if(globalThis.Array.isArray(array)) {
+            if (globalThis.Array.isArray(array)) {
                 array.forEach(object => {
-                    this.push(object);
+                    let objectProxy = new ObjectProxy(object);
+                    this.push(objectProxy);
+                    ObjectProxy.getHandler(objectProxy).addObserver(handler);
                 });
             }
 
             // returns proxy instance
-            let arrayHandler = new ArrayHandler(this);
-            return new Proxy<ArrayProxy>(this, arrayHandler);
+            return new Proxy<ArrayProxy>(this, handler);
+        }
+
+        /**
+         * getHandler
+         */
+        getHandler(): ArrayHandler {
+            return Handler.getHandler<ArrayProxy,ArrayHandler>(this);
         }
 
         /**
@@ -29,7 +40,7 @@ namespace duice {
          * @param array
          */
         assign(array: object[]): void {
-            getHandler(this).assign(array);
+            this.getHandler().assign(array);
         }
 
         /**
@@ -38,8 +49,19 @@ namespace duice {
          * @param rows
          */
         async insertRow(index: number, ...rows: object[]): Promise<void> {
-            let handler = getHandler(this);
-            await handler.insertRow(index, ...rows);
+            await this.getHandler().insertRow(index, ...rows);
+        }
+
+        async deleteRow(index: number, size?: number): Promise<void> {
+            await this.getHandler().deleteRow(index, size);
+        }
+
+        /**
+         * appendRows
+         * @param rows
+         */
+        async appendRow(...rows: object[]): Promise<void> {
+            await this.getHandler().appendRow(...rows);
         }
 
         /**
@@ -48,7 +70,7 @@ namespace duice {
          * @param readonly
          */
         setReadonly(property: string, readonly: boolean): void {
-            getHandler(this).setReadonly(property, readonly);
+            this.getHandler().setReadonly(property, readonly);
         }
 
         /**
@@ -56,7 +78,7 @@ namespace duice {
          * @param property
          */
         isReadonly(property: string): boolean {
-            return getHandler(this).isReadonly(property);
+            return this.getHandler().isReadonly(property);
         }
 
         /**
@@ -64,7 +86,7 @@ namespace duice {
          * @param readonly
          */
         setReadonlyAll(readonly: boolean): void {
-            getHandler(this).setReadonlyAll(readonly);
+            this.getHandler().setReadonlyAll(readonly);
             for(let index = 0; index >= this.length; index ++ ){
                 ObjectProxy.setReadonlyAll(this[index], readonly);
             }
@@ -75,7 +97,7 @@ namespace duice {
          * @param listener
          */
         onPropertyChanging(listener: Function): void {
-            getHandler(this).setPropertyChangingListener(listener);
+            this.getHandler().setPropertyChangingListener(listener);
         }
 
         /**
@@ -83,7 +105,7 @@ namespace duice {
          * @param listener
          */
         onPropertyChanged(listener: Function): void {
-            getHandler(this).setPropertyChangedListener(listener);
+            this.getHandler().setPropertyChangedListener(listener);
         }
 
         /**
@@ -91,7 +113,7 @@ namespace duice {
          * @param listener
          */
         onRowInserting(listener: Function): void {
-            getHandler(this).setRowInsertingListener(listener);
+            this.getHandler().setRowInsertingListener(listener);
         }
 
         /**
@@ -99,7 +121,7 @@ namespace duice {
          * @param listener
          */
         onRowInserted(listener: Function): void {
-            getHandler(this).setRowInsertedListener(listener);
+            this.getHandler().setRowInsertedListener(listener);
         }
 
         /**
@@ -107,7 +129,7 @@ namespace duice {
          * @param listener
          */
         onRowDeleting(listener: Function): void {
-            getHandler(this).setRowDeletingListener(listener);
+            this.getHandler().setRowDeletingListener(listener);
         }
 
         /**
@@ -115,7 +137,7 @@ namespace duice {
          * @param listener
          */
         onRowDeleted(listener: Function): void {
-            getHandler(this).setRowDeletedListener(listener);
+            this.getHandler().setRowDeletedListener(listener);
         }
 
     }

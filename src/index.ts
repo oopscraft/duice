@@ -63,16 +63,6 @@ namespace duice {
     }
 
     /**
-     * getHandler
-     * @param object
-     */
-    export function getHandler(object: any): any {
-        let handler = globalThis.Object.getOwnPropertyDescriptor(object, '_handler_').value;
-        assert(handler, 'handler is not found');
-        return handler;
-    }
-
-    /**
      * Generates component ID
      */
     export function generateUuid(): string {

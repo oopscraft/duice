@@ -5,17 +5,9 @@ namespace duice {
     /**
      * ObjectHandler
      */
-    export class ObjectHandler extends Observable implements Observer {
-
-        objectProxy: ObjectProxy;
+    export class ObjectHandler extends Handler<ObjectProxy> {
 
         originObject: object;
-
-        readonlyAll: boolean = false;
-
-        readonly: Set<string> = new Set<string>();
-
-        listenerEnabled: boolean = true;
 
         propertyChangingListener: Function;
 
@@ -26,14 +18,7 @@ namespace duice {
          * @param objectProxy
          */
         constructor(objectProxy: ObjectProxy) {
-            super();
-            this.objectProxy = objectProxy;
-
-            // setting handler as property
-            globalThis.Object.defineProperty(objectProxy, '_handler_', {
-                value: this,
-                writable: true
-            });
+            super(objectProxy);
 
             // save
             this.save();
@@ -89,13 +74,13 @@ namespace duice {
                 this.suspendNotify();
 
                 // deletes
-                for (let property in this.objectProxy) {
-                    delete this.objectProxy[property];
+                for (let property in this.getTarget()) {
+                    delete this.getTarget()[property];
                 }
 
                 // assign
                 for (let property in object) {
-                    this.objectProxy[property] = object[property];
+                    this.getTarget()[property] = object[property];
                 }
 
                 // saves origin object
@@ -136,7 +121,7 @@ namespace duice {
          * save
          */
         save(): void {
-            this.originObject = JSON.parse(JSON.stringify(this.objectProxy));
+            this.originObject = JSON.parse(JSON.stringify(this.getTarget()));
         }
 
         /**
@@ -150,7 +135,7 @@ namespace duice {
          * isDirty
          */
         isDirty(): boolean {
-            return JSON.stringify(this.objectProxy) !== JSON.stringify(this.originObject);
+            return JSON.stringify(this.getTarget()) !== JSON.stringify(this.originObject);
         }
 
         /**
@@ -159,7 +144,7 @@ namespace duice {
          */
         getValue(property: string): any {
             property = property.replace('.','?.');
-            return new Function(`return this.${property};`).call(this.objectProxy);
+            return new Function(`return this.${property};`).call(this.getTarget());
         }
 
         /**
@@ -168,38 +153,7 @@ namespace duice {
          * @param value
          */
         setValue(property: string, value: any): void {
-            new Function('value', `this.${property} = value;`).call(this.objectProxy, value);
-        }
-
-        /**
-         * setReadonlyAll
-         * @param readonly
-         */
-        setReadonlyAll(readonly: boolean): void {
-            this.readonlyAll = readonly;
-            this.notifyObservers(new Event(this));
-        }
-
-        /**
-         * setReadonly
-         * @param property
-         * @param readonly
-         */
-        setReadonly(property: string, readonly: boolean): void {
-            if(readonly){
-                this.readonly.add(property);
-            }else{
-                this.readonly.delete(property);
-            }
-            this.notifyObservers(new Event(this));
-        }
-
-        /**
-         * isReadonly
-         * @param property
-         */
-        isReadonly(property: string): boolean {
-            return this.readonlyAll || this.readonly.has(property);
+            new Function('value', `this.${property} = value;`).call(this.getTarget(), value);
         }
 
         /**
@@ -216,35 +170,6 @@ namespace duice {
          */
         setPropertyChangedListener(listener: Function): void {
             this.propertyChangedListener = listener;
-        }
-
-        /**
-         * suspends listener
-         */
-        suspendListener(): void {
-            this.listenerEnabled = false;
-        }
-
-        /**
-         * resumes listener
-         */
-        resumeListener(): void {
-            this.listenerEnabled = true;
-        }
-
-        /**
-         * checkListener
-         * @param listener
-         * @param event
-         */
-        async checkListener(listener: Function, event: Event): Promise<boolean> {
-            if(this.listenerEnabled && listener){
-                let result = await listener.call(this.objectProxy, event);
-                if(result == false){
-                    return false;
-                }
-            }
-            return true;
         }
 
     }

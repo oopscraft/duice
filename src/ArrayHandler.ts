@@ -1,19 +1,10 @@
-///<reference path="Observable.ts"/>
-///<reference path="Observer.ts"/>
+///<reference path="Handler.ts"/>
 namespace duice {
 
     /**
      * ArrayHandler
      */
-    export class ArrayHandler extends Observable implements Observer {
-
-        arrayProxy: ArrayProxy;
-
-        readonlyAll: boolean = false;
-
-        readonly: Set<string> = new Set<string>();
-
-        listenerEnabled: boolean = true;
+    export class ArrayHandler extends Handler<ArrayProxy> {
 
         propertyChangingListener: Function;
 
@@ -32,29 +23,7 @@ namespace duice {
          * @param arrayProxy
          */
         constructor(arrayProxy: ArrayProxy) {
-            super();
-            this.arrayProxy = arrayProxy;
-
-            // setting handler as property
-            globalThis.Object.defineProperty(arrayProxy, '_handler_', {
-                value: this,
-                writable: true
-            });
-
-            // creates child object to proxy
-            for(let index = 0; index < this.arrayProxy.length; index ++) {
-                let objectProxy = new ObjectProxy(this.arrayProxy[index]);
-                this.arrayProxy[index] = objectProxy;
-                let objectHandler = getHandler(objectProxy);
-                objectHandler.addObserver(this);
-            }
-        }
-
-        /**
-         * getArrayProxy
-         */
-        getArrayProxy(): ArrayProxy {
-            return this.arrayProxy;
+            super(arrayProxy);
         }
 
         /**
@@ -206,13 +175,13 @@ namespace duice {
                 this.suspendNotify();
 
                 // deletes
-                this.arrayProxy.length = 0;
+                this.getTarget().length = 0;
 
                 // assign
                 for(let index = 0, size = array.length; index < size; index ++){
                     let objectProxy = new duice.ObjectProxy(array[index]);
-                    this.arrayProxy[index] = objectProxy;
-                    let objectHandler = getHandler(objectProxy);
+                    this.getTarget[index] = objectProxy;
+                    let objectHandler = ObjectProxy.getHandler(objectProxy);
                     objectHandler.setPropertyChangingListener(this.propertyChangingListener);
                     objectHandler.setPropertyChangedListener(this.propertyChangedListener);
                     objectHandler.addObserver(this);
@@ -230,13 +199,17 @@ namespace duice {
         async insertRow(index: number, ...rows: object[]): Promise<void> {
             let event = new RowInsertEvent(this, index, rows);
             if(await this.checkListener(this.rowInsertingListener, event)){
-                this.arrayProxy.splice(index, 0, ...rows);
+                this.getTarget().splice(index, 0, ...rows);
                 await this.checkListener(this.rowInsertedListener, event);
                 this.notifyObservers(event);
             }
         }
 
         async deleteRow(index: number, size?: number): Promise<void> {
+
+        }
+
+        async appendRow(...rows: object[]): Promise<void> {
 
         }
 
@@ -250,41 +223,12 @@ namespace duice {
 
             // RowModeEvent
             if(event instanceof RowMoveEvent){
-                let object = this.arrayProxy.splice(event.getFromIndex(),1)[0];
-                this.arrayProxy.splice(event.getToIndex(), 0, object);
+                let object = this.getTarget().splice(event.getFromIndex(),1)[0];
+                this.getTarget().splice(event.getToIndex(), 0, object);
             }
 
             // notify observers
             this.notifyObservers(event);
-        }
-
-        /**
-         * setReadonlyAll
-         * @param readonly
-         */
-        setReadonlyAll(readonly: boolean): void {
-            this.readonlyAll = readonly;
-        }
-
-        /**
-         * setReadonly
-         * @param property
-         * @param readonly
-         */
-        setReadonly(property: string, readonly: boolean): void {
-            if(readonly){
-                this.readonly.add(property);
-            }else{
-                this.readonly.delete(property);
-            }
-        }
-
-        /**
-         * isReadonly
-         * @param property
-         */
-        isReadonly(property: string): boolean {
-            return this.readonlyAll || this.readonly.has(property);
         }
 
         /**
@@ -293,8 +237,8 @@ namespace duice {
          */
         setPropertyChangingListener(listener: Function): void {
             this.propertyChangingListener = listener;
-            this.arrayProxy.forEach(objectProxy => {
-                getHandler(objectProxy).setPropertyChangingListener(listener);
+            this.getTarget().forEach(objectProxy => {
+                ObjectProxy.getHandler(objectProxy).setPropertyChangingListener(listener);
             });
         }
 
@@ -304,8 +248,8 @@ namespace duice {
          */
         setPropertyChangedListener(listener: Function): void {
             this.propertyChangedListener = listener;
-            this.arrayProxy.forEach(objectProxy => {
-                getHandler(objectProxy).setPropertyChangedListener(listener);
+            this.getTarget().forEach(objectProxy => {
+                ObjectProxy.getHandler(objectProxy).setPropertyChangedListener(listener);
             });
         }
 
@@ -339,35 +283,6 @@ namespace duice {
          */
         setRowDeletedListener(listener: Function): void {
             this.rowDeletedListener = listener;
-        }
-
-        /**
-         * suspends listener
-         */
-        suspendListener(): void {
-            this.listenerEnabled = false;
-        }
-
-        /**
-         * resumes listener
-         */
-        resumeListener(): void {
-            this.listenerEnabled = true;
-        }
-
-        /**
-         * checkListener
-         * @param listener
-         * @param event
-         */
-        async checkListener(listener: Function, event: Event): Promise<boolean> {
-            if(this.listenerEnabled && listener){
-                let result = await listener.call(this.arrayProxy, event);
-                if(result == false){
-                    return false;
-                }
-            }
-            return true;
         }
 
     }

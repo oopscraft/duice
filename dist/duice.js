@@ -63,42 +63,107 @@ var duice;
     }
     duice.Observable = Observable;
 })(duice || (duice = {}));
-///<reference path="Observable.ts"/>
-///<reference path="Observer.ts"/>
+///<Reference path="Observable.ts"/>
+///<Reference path="Observer.ts"/>
+var duice;
+(function (duice) {
+    class Handler extends duice.Observable {
+        constructor(target) {
+            super();
+            this.readonlyAll = false;
+            this.readonly = new Set();
+            this.listenerEnabled = true;
+            this.target = target;
+            // set handler
+            globalThis.Object.defineProperty(target, '_handler_', {
+                value: this,
+                writable: true
+            });
+        }
+        /**
+         * getHandler
+         * @param proxy
+         */
+        static getHandler(proxy) {
+            let handler = globalThis.Object.getOwnPropertyDescriptor(proxy, '_handler_').value;
+            duice.assert(handler, 'handler is not found');
+            return handler;
+        }
+        getTarget() {
+            return this.target;
+        }
+        /**
+         * setReadonlyAll
+         * @param readonly
+         */
+        setReadonlyAll(readonly) {
+            this.readonlyAll = readonly;
+        }
+        /**
+         * setReadonly
+         * @param property
+         * @param readonly
+         */
+        setReadonly(property, readonly) {
+            if (readonly) {
+                this.readonly.add(property);
+            }
+            else {
+                this.readonly.delete(property);
+            }
+            this.notifyObservers(new duice.Event(this));
+        }
+        /**
+         * isReadonly
+         * @param property
+         */
+        isReadonly(property) {
+            return this.readonlyAll || this.readonly.has(property);
+        }
+        /**
+         * suspends listener
+         */
+        suspendListener() {
+            this.listenerEnabled = false;
+        }
+        /**
+         * resumes listener
+         */
+        resumeListener() {
+            this.listenerEnabled = true;
+        }
+        /**
+         * checkListener
+         * @param listener
+         * @param event
+         */
+        checkListener(listener, event) {
+            return __awaiter(this, void 0, void 0, function* () {
+                if (this.listenerEnabled && listener) {
+                    let result = yield listener.call(this.getTarget(), event);
+                    if (result == false) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+        }
+    }
+    duice.Handler = Handler;
+})(duice || (duice = {}));
+///<reference path="Handler.ts"/>
 var duice;
 (function (duice) {
     /**
      * ArrayHandler
      */
-    class ArrayHandler extends duice.Observable {
+    class ArrayHandler extends duice.Handler {
         /**
          * constructor
          * @param arrayProxy
          */
         constructor(arrayProxy) {
-            super();
-            this.readonlyAll = false;
-            this.readonly = new Set();
-            this.listenerEnabled = true;
-            this.arrayProxy = arrayProxy;
-            // setting handler as property
-            globalThis.Object.defineProperty(arrayProxy, '_handler_', {
-                value: this,
-                writable: true
-            });
-            // creates child object to proxy
-            for (let index = 0; index < this.arrayProxy.length; index++) {
-                let objectProxy = new duice.ObjectProxy(this.arrayProxy[index]);
-                this.arrayProxy[index] = objectProxy;
-                let objectHandler = duice.getHandler(objectProxy);
-                objectHandler.addObserver(this);
-            }
-        }
-        /**
-         * getArrayProxy
-         */
-        getArrayProxy() {
-            return this.arrayProxy;
+            super(arrayProxy);
         }
         /**
          * get
@@ -230,12 +295,12 @@ var duice;
                 // suspend
                 this.suspendNotify();
                 // deletes
-                this.arrayProxy.length = 0;
+                this.getTarget().length = 0;
                 // assign
                 for (let index = 0, size = array.length; index < size; index++) {
                     let objectProxy = new duice.ObjectProxy(array[index]);
-                    this.arrayProxy[index] = objectProxy;
-                    let objectHandler = duice.getHandler(objectProxy);
+                    this.getTarget[index] = objectProxy;
+                    let objectHandler = duice.ObjectProxy.getHandler(objectProxy);
                     objectHandler.setPropertyChangingListener(this.propertyChangingListener);
                     objectHandler.setPropertyChangedListener(this.propertyChangedListener);
                     objectHandler.addObserver(this);
@@ -252,13 +317,17 @@ var duice;
             return __awaiter(this, void 0, void 0, function* () {
                 let event = new duice.RowInsertEvent(this, index, rows);
                 if (yield this.checkListener(this.rowInsertingListener, event)) {
-                    this.arrayProxy.splice(index, 0, ...rows);
+                    this.getTarget().splice(index, 0, ...rows);
                     yield this.checkListener(this.rowInsertedListener, event);
                     this.notifyObservers(event);
                 }
             });
         }
         deleteRow(index, size) {
+            return __awaiter(this, void 0, void 0, function* () {
+            });
+        }
+        appendRow(...rows) {
             return __awaiter(this, void 0, void 0, function* () {
             });
         }
@@ -272,39 +341,12 @@ var duice;
                 console.log("DataSetHandler", elementSet, event);
                 // RowModeEvent
                 if (event instanceof duice.RowMoveEvent) {
-                    let object = this.arrayProxy.splice(event.getFromIndex(), 1)[0];
-                    this.arrayProxy.splice(event.getToIndex(), 0, object);
+                    let object = this.getTarget().splice(event.getFromIndex(), 1)[0];
+                    this.getTarget().splice(event.getToIndex(), 0, object);
                 }
                 // notify observers
                 this.notifyObservers(event);
             });
-        }
-        /**
-         * setReadonlyAll
-         * @param readonly
-         */
-        setReadonlyAll(readonly) {
-            this.readonlyAll = readonly;
-        }
-        /**
-         * setReadonly
-         * @param property
-         * @param readonly
-         */
-        setReadonly(property, readonly) {
-            if (readonly) {
-                this.readonly.add(property);
-            }
-            else {
-                this.readonly.delete(property);
-            }
-        }
-        /**
-         * isReadonly
-         * @param property
-         */
-        isReadonly(property) {
-            return this.readonlyAll || this.readonly.has(property);
         }
         /**
          * set property changing event listener
@@ -312,8 +354,8 @@ var duice;
          */
         setPropertyChangingListener(listener) {
             this.propertyChangingListener = listener;
-            this.arrayProxy.forEach(objectProxy => {
-                duice.getHandler(objectProxy).setPropertyChangingListener(listener);
+            this.getTarget().forEach(objectProxy => {
+                duice.ObjectProxy.getHandler(objectProxy).setPropertyChangingListener(listener);
             });
         }
         /**
@@ -322,8 +364,8 @@ var duice;
          */
         setPropertyChangedListener(listener) {
             this.propertyChangedListener = listener;
-            this.arrayProxy.forEach(objectProxy => {
-                duice.getHandler(objectProxy).setPropertyChangedListener(listener);
+            this.getTarget().forEach(objectProxy => {
+                duice.ObjectProxy.getHandler(objectProxy).setPropertyChangedListener(listener);
             });
         }
         /**
@@ -354,34 +396,6 @@ var duice;
         setRowDeletedListener(listener) {
             this.rowDeletedListener = listener;
         }
-        /**
-         * suspends listener
-         */
-        suspendListener() {
-            this.listenerEnabled = false;
-        }
-        /**
-         * resumes listener
-         */
-        resumeListener() {
-            this.listenerEnabled = true;
-        }
-        /**
-         * checkListener
-         * @param listener
-         * @param event
-         */
-        checkListener(listener, event) {
-            return __awaiter(this, void 0, void 0, function* () {
-                if (this.listenerEnabled && listener) {
-                    let result = yield listener.call(this.arrayProxy, event);
-                    if (result == false) {
-                        return false;
-                    }
-                }
-                return true;
-            });
-        }
     }
     duice.ArrayHandler = ArrayHandler;
 })(duice || (duice = {}));
@@ -396,15 +410,24 @@ var duice;
          */
         constructor(array) {
             super();
+            // creates handler
+            let handler = new duice.ArrayHandler(this);
             // copy array elements
             if (globalThis.Array.isArray(array)) {
                 array.forEach(object => {
-                    this.push(object);
+                    let objectProxy = new duice.ObjectProxy(object);
+                    this.push(objectProxy);
+                    duice.ObjectProxy.getHandler(objectProxy).addObserver(handler);
                 });
             }
             // returns proxy instance
-            let arrayHandler = new duice.ArrayHandler(this);
-            return new Proxy(this, arrayHandler);
+            return new Proxy(this, handler);
+        }
+        /**
+         * getHandler
+         */
+        getHandler() {
+            return duice.Handler.getHandler(this);
         }
         /**
          * assign
@@ -412,7 +435,7 @@ var duice;
          * @param array
          */
         assign(array) {
-            duice.getHandler(this).assign(array);
+            this.getHandler().assign(array);
         }
         /**
          * insertRow
@@ -421,8 +444,21 @@ var duice;
          */
         insertRow(index, ...rows) {
             return __awaiter(this, void 0, void 0, function* () {
-                let handler = duice.getHandler(this);
-                yield handler.insertRow(index, ...rows);
+                yield this.getHandler().insertRow(index, ...rows);
+            });
+        }
+        deleteRow(index, size) {
+            return __awaiter(this, void 0, void 0, function* () {
+                yield this.getHandler().deleteRow(index, size);
+            });
+        }
+        /**
+         * appendRows
+         * @param rows
+         */
+        appendRow(...rows) {
+            return __awaiter(this, void 0, void 0, function* () {
+                yield this.getHandler().appendRow(...rows);
             });
         }
         /**
@@ -431,21 +467,21 @@ var duice;
          * @param readonly
          */
         setReadonly(property, readonly) {
-            duice.getHandler(this).setReadonly(property, readonly);
+            this.getHandler().setReadonly(property, readonly);
         }
         /**
          * isReadonly
          * @param property
          */
         isReadonly(property) {
-            return duice.getHandler(this).isReadonly(property);
+            return this.getHandler().isReadonly(property);
         }
         /**
          * setReadonlyAll
          * @param readonly
          */
         setReadonlyAll(readonly) {
-            duice.getHandler(this).setReadonlyAll(readonly);
+            this.getHandler().setReadonlyAll(readonly);
             for (let index = 0; index >= this.length; index++) {
                 duice.ObjectProxy.setReadonlyAll(this[index], readonly);
             }
@@ -455,42 +491,42 @@ var duice;
          * @param listener
          */
         onPropertyChanging(listener) {
-            duice.getHandler(this).setPropertyChangingListener(listener);
+            this.getHandler().setPropertyChangingListener(listener);
         }
         /**
          * onPropertyChanged
          * @param listener
          */
         onPropertyChanged(listener) {
-            duice.getHandler(this).setPropertyChangedListener(listener);
+            this.getHandler().setPropertyChangedListener(listener);
         }
         /**
          * onRowInserting
          * @param listener
          */
         onRowInserting(listener) {
-            duice.getHandler(this).setRowInsertingListener(listener);
+            this.getHandler().setRowInsertingListener(listener);
         }
         /**
          * onRowInserted
          * @param listener
          */
         onRowInserted(listener) {
-            duice.getHandler(this).setRowInsertedListener(listener);
+            this.getHandler().setRowInsertedListener(listener);
         }
         /**
          * onRowDeleting
          * @param listener
          */
         onRowDeleting(listener) {
-            duice.getHandler(this).setRowDeletingListener(listener);
+            this.getHandler().setRowDeletingListener(listener);
         }
         /**
          * onRowDeleted
          * @param listener
          */
         onRowDeleted(listener) {
-            duice.getHandler(this).setRowDeletedListener(listener);
+            this.getHandler().setRowDeletedListener(listener);
         }
     }
     duice.ArrayProxy = ArrayProxy;
@@ -544,7 +580,7 @@ var duice;
         setObject(objectName) {
             let object = duice.findObject(this.context, objectName);
             duice.assert(object, `ObjectProxy[${objectName}] is not found.`);
-            this.objectHandler = duice.getHandler(object);
+            this.objectHandler = duice.ObjectProxy.getHandler(object);
             this.addObserver(this.objectHandler);
             this.objectHandler.addObserver(this);
         }
@@ -721,10 +757,9 @@ var duice;
          * @param arrayName
          */
         setArray(arrayName) {
-            let array = duice.findObject(this.context, arrayName);
-            duice.assert(array, `ArrayProxy[${arrayName}] is not found.`);
-            this.arrayHandler = duice.getHandler(array);
-            duice.assert(this.arrayHandler, `[${arrayName}] is not ArrayProxy.`);
+            let arrayProxy = duice.findObject(this.context, arrayName);
+            duice.assert(arrayProxy, `ArrayProxy[${arrayName}] is not found.`);
+            this.arrayHandler = arrayProxy.getHandler();
             this.addObserver(this.arrayHandler);
             this.arrayHandler.addObserver(this);
         }
@@ -739,7 +774,7 @@ var duice;
          * render
          */
         render() {
-            let dataSet = this.arrayHandler.getArrayProxy();
+            let dataSet = this.arrayHandler.getTarget();
             this.doRender(dataSet);
             // executes script
             this.executeScript();
@@ -806,7 +841,7 @@ var duice;
          * @param detail
          */
         update(arrayHandler, detail) {
-            let array = arrayHandler.getArrayProxy();
+            let array = arrayHandler.getTarget();
             this.doUpdate(array);
             // executes script
             this.executeScript();
@@ -871,22 +906,13 @@ var duice;
     /**
      * ObjectHandler
      */
-    class ObjectHandler extends duice.Observable {
+    class ObjectHandler extends duice.Handler {
         /**
          * constructor
          * @param objectProxy
          */
         constructor(objectProxy) {
-            super();
-            this.readonlyAll = false;
-            this.readonly = new Set();
-            this.listenerEnabled = true;
-            this.objectProxy = objectProxy;
-            // setting handler as property
-            globalThis.Object.defineProperty(objectProxy, '_handler_', {
-                value: this,
-                writable: true
-            });
+            super(objectProxy);
             // save
             this.save();
         }
@@ -933,12 +959,12 @@ var duice;
                 this.suspendListener();
                 this.suspendNotify();
                 // deletes
-                for (let property in this.objectProxy) {
-                    delete this.objectProxy[property];
+                for (let property in this.getTarget()) {
+                    delete this.getTarget()[property];
                 }
                 // assign
                 for (let property in object) {
-                    this.objectProxy[property] = object[property];
+                    this.getTarget()[property] = object[property];
                 }
                 // saves origin object
                 this.save();
@@ -976,7 +1002,7 @@ var duice;
          * save
          */
         save() {
-            this.originObject = JSON.parse(JSON.stringify(this.objectProxy));
+            this.originObject = JSON.parse(JSON.stringify(this.getTarget()));
         }
         /**
          * reset
@@ -988,7 +1014,7 @@ var duice;
          * isDirty
          */
         isDirty() {
-            return JSON.stringify(this.objectProxy) !== JSON.stringify(this.originObject);
+            return JSON.stringify(this.getTarget()) !== JSON.stringify(this.originObject);
         }
         /**
          * getValue
@@ -996,7 +1022,7 @@ var duice;
          */
         getValue(property) {
             property = property.replace('.', '?.');
-            return new Function(`return this.${property};`).call(this.objectProxy);
+            return new Function(`return this.${property};`).call(this.getTarget());
         }
         /**
          * setValue
@@ -1004,36 +1030,7 @@ var duice;
          * @param value
          */
         setValue(property, value) {
-            new Function('value', `this.${property} = value;`).call(this.objectProxy, value);
-        }
-        /**
-         * setReadonlyAll
-         * @param readonly
-         */
-        setReadonlyAll(readonly) {
-            this.readonlyAll = readonly;
-            this.notifyObservers(new duice.Event(this));
-        }
-        /**
-         * setReadonly
-         * @param property
-         * @param readonly
-         */
-        setReadonly(property, readonly) {
-            if (readonly) {
-                this.readonly.add(property);
-            }
-            else {
-                this.readonly.delete(property);
-            }
-            this.notifyObservers(new duice.Event(this));
-        }
-        /**
-         * isReadonly
-         * @param property
-         */
-        isReadonly(property) {
-            return this.readonlyAll || this.readonly.has(property);
+            new Function('value', `this.${property} = value;`).call(this.getTarget(), value);
         }
         /**
          * sets property changing event listener
@@ -1048,34 +1045,6 @@ var duice;
          */
         setPropertyChangedListener(listener) {
             this.propertyChangedListener = listener;
-        }
-        /**
-         * suspends listener
-         */
-        suspendListener() {
-            this.listenerEnabled = false;
-        }
-        /**
-         * resumes listener
-         */
-        resumeListener() {
-            this.listenerEnabled = true;
-        }
-        /**
-         * checkListener
-         * @param listener
-         * @param event
-         */
-        checkListener(listener, event) {
-            return __awaiter(this, void 0, void 0, function* () {
-                if (this.listenerEnabled && listener) {
-                    let result = yield listener.call(this.objectProxy, event);
-                    if (result == false) {
-                        return false;
-                    }
-                }
-                return true;
-            });
         }
     }
     duice.ObjectHandler = ObjectHandler;
@@ -1098,8 +1067,15 @@ var duice;
                 }
             }
             // return proxy instance
-            let objectHandler = new duice.ObjectHandler(this);
-            return new Proxy(this, objectHandler);
+            let handler = new duice.ObjectHandler(this);
+            return new Proxy(this, handler);
+        }
+        /**
+         * getHandler
+         * @param objectProxy
+         */
+        static getHandler(objectProxy) {
+            return duice.Handler.getHandler(objectProxy);
         }
         /**
          * assign
@@ -1107,8 +1083,7 @@ var duice;
          * @param object
          */
         static assign(objectProxy, object) {
-            let handler = duice.getHandler(objectProxy);
-            handler.assign(object);
+            this.getHandler(objectProxy).assign(object);
         }
         /**
          * setReadonly
@@ -1117,8 +1092,7 @@ var duice;
          * @param readonly
          */
         static setReadonly(objectProxy, property, readonly) {
-            let objectHandler = duice.getHandler(objectProxy);
-            objectHandler.setReadonly(property, readonly);
+            this.getHandler(objectProxy).setReadonly(property, readonly);
         }
         /**
          * isReadonly
@@ -1126,8 +1100,7 @@ var duice;
          * @param property
          */
         static isReadonly(objectProxy, property) {
-            let objectHandler = duice.getHandler(objectProxy);
-            return objectHandler.isReadonly(property);
+            return this.getHandler(objectProxy).isReadonly(property);
         }
         /**
          * setReadonlyAll
@@ -1135,7 +1108,7 @@ var duice;
          * @param readonly
          */
         static setReadonlyAll(objectProxy, readonly) {
-            let objectHandler = duice.getHandler(objectProxy);
+            let objectHandler = this.getHandler(objectProxy);
             objectHandler.setReadonlyAll(readonly);
             for (let property in this) {
                 objectHandler.setReadonly(property, readonly);
@@ -1146,14 +1119,14 @@ var duice;
          * @param objectProxy
          */
         static isDirty(objectProxy) {
-            return duice.getHandler(objectProxy).isDirty();
+            return this.getHandler(objectProxy).isDirty();
         }
         /**
          * reset
          * @param objectProxy
          */
         static reset(objectProxy) {
-            duice.getHandler(objectProxy).reset();
+            this.getHandler(objectProxy).reset();
         }
         /**
          * onPropertyChanging
@@ -1161,7 +1134,7 @@ var duice;
          * @param listener
          */
         static onPropertyChanging(objectProxy, listener) {
-            duice.getHandler(objectProxy).setPropertyChangingListener(listener);
+            this.getHandler(objectProxy).setPropertyChangingListener(listener);
         }
         /**
          * onPropertyChanged
@@ -1169,7 +1142,7 @@ var duice;
          * @param listener
          */
         static onPropertyChanged(objectProxy, listener) {
-            duice.getHandler(objectProxy).setPropertyChangedListener(listener);
+            this.getHandler(objectProxy).setPropertyChangedListener(listener);
         }
     }
     duice.ObjectProxy = ObjectProxy;
@@ -1235,16 +1208,6 @@ var duice;
         return eval.call(context, name);
     }
     duice.findObject = findObject;
-    /**
-     * getHandler
-     * @param object
-     */
-    function getHandler(object) {
-        let handler = globalThis.Object.getOwnPropertyDescriptor(object, '_handler_').value;
-        assert(handler, 'handler is not found');
-        return handler;
-    }
-    duice.getHandler = getHandler;
     /**
      * Generates component ID
      */
