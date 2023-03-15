@@ -161,81 +161,11 @@ namespace duice {
             }
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        // /**
-        //  * doLoop
-        //  */
-        // doLoop() {
-        //     if(this.loop) {
-        //
-        //         let loopArgs = this.loop.split(',');
-        //         let itemName = loopArgs[0].trim();
-        //         let statusName = loopArgs[1]?.trim();
-        //         //console.warn("== loop:", loopArgs);
-        //
-        //         let array = this.objectHandler.getValue(this.property);
-        //         let arrayProxy = new ArrayProxy(array);
-        //         //console.warn("== array:", array);
-        //
-        //
-        //         let loopSlot = document.createElement('slot');
-        //         for(let index = 0; index < arrayProxy.length; index ++) {
-        //             let item = arrayProxy[index];
-        //             const context = {};
-        //             context[itemName] = item;
-        //             context[statusName] = new ObjectProxy({
-        //                 index: index,
-        //                 count: index + 1,
-        //                 size: arrayProxy.length,
-        //                 first: (index === 0),
-        //                 last: (arrayProxy.length == index + 1)
-        //             });
-        //             console.warn("== context:", context);
-        //             let rowHtmlElement = this.htmlElement.cloneNode(true) as HTMLElement;
-        //             setAttribute(rowHtmlElement, 'index', index.toString());
-        //
-        //             // initialize row element
-        //             initialize(this.htmlElement, context);
-        //             initialize(rowHtmlElement, context);
-        //             loopSlot.appendChild(rowHtmlElement);
-        //             //this.htmlElement.appendChild(rowHtmlElement);
-        //         }
-        //
-        //         this.htmlElement.replaceWith(loopSlot);
-        //     }
-        // }
-
-
-
-
-        // /**
-        //  * setReadonly
-        //  * @param readonly
-        //  */
-        // abstract setReadonly(readonly: boolean): void;
+        /**
+         * setReadonly
+         * @param readonly
+         */
+        abstract setReadonly(readonly: boolean): void;
 
     }
 

@@ -68,26 +68,28 @@ var duice;
 var duice;
 (function (duice) {
     class Handler extends duice.Observable {
+        /**
+         * constructor
+         * @protected
+         */
         constructor() {
             super();
             this.readonlyAll = false;
             this.readonly = new Set();
             this.listenerEnabled = true;
         }
+        /**
+         * setTarget
+         * @param target
+         */
         setTarget(target) {
             this.target = target;
         }
+        /**
+         * getTarget
+         */
         getTarget() {
             return this.target;
-        }
-        /**
-         * getHandler
-         * @param proxy
-         */
-        static getHandler(proxy) {
-            let handler = globalThis.Object.getOwnPropertyDescriptor(proxy, '_handler_').value;
-            duice.assert(handler, 'handler is not found');
-            return handler;
         }
         /**
          * setReadonlyAll
@@ -283,7 +285,7 @@ var duice;
 var duice;
 (function (duice) {
     /**
-     * Array
+     * ArrayProxy
      */
     class ArrayProxy extends globalThis.Array {
         /**
@@ -433,6 +435,34 @@ var duice;
          */
         static onRowDeleted(arrayProxy, listener) {
             this.getHandler(arrayProxy).rowDeletedListener = listener;
+        }
+        /**
+         * setReadonly
+         * @param arrayProxy
+         * @param property
+         * @param readonly
+         */
+        static setReadonly(arrayProxy, property, readonly) {
+            this.getHandler(arrayProxy).setReadonly(property, readonly);
+        }
+        /**
+         * isReadonly
+         * @param arrayProxy
+         * @param property
+         */
+        static isReadonly(arrayProxy, property) {
+            return this.getHandler(arrayProxy).isReadonly(property);
+        }
+        /**
+         * setReadonlyAll
+         * @param arrayProxy
+         * @param readonly
+         */
+        static setReadonlyAll(arrayProxy, readonly) {
+            this.getHandler(arrayProxy).setReadonlyAll(readonly);
+            for (let index = 0; index >= this.length; index++) {
+                duice.ObjectProxy.setReadonlyAll(this[index], readonly);
+            }
         }
         /**
          * insertRow
@@ -1107,6 +1137,35 @@ var duice;
          */
         static onPropertyChanged(objectProxy, listener) {
             this.getHandler(objectProxy).propertyChangedListener = listener;
+        }
+        /**
+         * setReadonly
+         * @param objectProxy
+         * @param property
+         * @param readonly
+         */
+        static setReadonly(objectProxy, property, readonly) {
+            this.getHandler(objectProxy).setReadonly(property, readonly);
+        }
+        /**
+         * isReadonly
+         * @param objectProxy
+         * @param property
+         */
+        static isReadonly(objectProxy, property) {
+            return this.getHandler(objectProxy).isReadonly(property);
+        }
+        /**
+         * setReadonlyAll
+         * @param objectProxy
+         * @param readonly
+         */
+        static setReadonlyAll(objectProxy, readonly) {
+            let objectHandler = this.getHandler(objectProxy);
+            objectHandler.setReadonlyAll(readonly);
+            for (let property in this) {
+                objectHandler.setReadonly(property, readonly);
+            }
         }
     }
     duice.ObjectProxy = ObjectProxy;

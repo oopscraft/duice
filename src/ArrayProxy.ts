@@ -1,7 +1,7 @@
 namespace duice {
 
     /**
-     * Array
+     * ArrayProxy
      */
     export class ArrayProxy extends globalThis.Array {
 
@@ -176,6 +176,37 @@ namespace duice {
         }
 
         /**
+         * setReadonly
+         * @param arrayProxy
+         * @param property
+         * @param readonly
+         */
+        static setReadonly(arrayProxy: ArrayProxy, property: string, readonly: boolean): void {
+            this.getHandler(arrayProxy).setReadonly(property, readonly);
+        }
+
+        /**
+         * isReadonly
+         * @param arrayProxy
+         * @param property
+         */
+        static isReadonly(arrayProxy: ArrayProxy, property: string): boolean {
+             return this.getHandler(arrayProxy).isReadonly(property);
+        }
+
+        /**
+         * setReadonlyAll
+         * @param arrayProxy
+         * @param readonly
+         */
+        static setReadonlyAll(arrayProxy: ArrayProxy, readonly: boolean): void {
+            this.getHandler(arrayProxy).setReadonlyAll(readonly);
+            for(let index = 0; index >= this.length; index ++ ){
+                 ObjectProxy.setReadonlyAll(this[index], readonly);
+            }
+        }
+
+        /**
          * insertRow
          * @param index
          * @param rows
@@ -223,98 +254,6 @@ namespace duice {
             let index = this.length;
             return this.insertRow(index, ...rows);
         }
-
-
-
-
-
-
-
-
-
-
-        // /**
-        //  * getHandler
-        //  */
-        // static getHandler(arrayProxy: ArrayProxy): ArrayHandler {
-        //     return Handler.getHandler<ArrayProxy,ArrayHandler>(arrayProxy);
-        // }
-        //
-        // /**
-        //  * assign
-        //  * @param arrayProxy
-        //  * @param array
-        //  */
-        // assign(array: object[]): void {
-        //     this.getHandler().assign(array);
-        // }
-        //
-        // /**
-        //  * insertRow
-        //  * @param index
-        //  * @param rows
-        //  */
-        // async insertRow(index: number, ...rows: object[]): Promise<void> {
-        //     await this.getHandler().insertRow(index, ...rows);
-        // }
-        //
-        // async deleteRow(index: number, size?: number): Promise<void> {
-        //     await this.getHandler().deleteRow(index, size);
-        // }
-        //
-        // /**
-        //  * appendRows
-        //  * @param rows
-        //  */
-        // async appendRow(...rows: object[]): Promise<void> {
-        //     await this.getHandler().appendRow(...rows);
-        // }
-        //
-        // /**
-        //  * setReadonly
-        //  * @param property
-        //  * @param readonly
-        //  */
-        // setReadonly(property: string, readonly: boolean): void {
-        //     // this.getHandler().setReadonly(property, readonly);
-        // }
-        //
-        // /**
-        //  * isReadonly
-        //  * @param property
-        //  */
-        // isReadonly(property: string): boolean {
-        //     // return this.getHandler().isReadonly(property);
-        //     return false;
-        // }
-        //
-        // /**
-        //  * setReadonlyAll
-        //  * @param readonly
-        //  */
-        // setReadonlyAll(readonly: boolean): void {
-        //     // this.getHandler().setReadonlyAll(readonly);
-        //     // for(let index = 0; index >= this.length; index ++ ){
-        //     //     ObjectProxy.setReadonlyAll(this[index], readonly);
-        //     // }
-        // }
-        //
-        // /**
-        //  * onPropertyChanging
-        //  * @param listener
-        //  */
-        // onPropertyChanging(listener: Function): void {
-        //     // this.getHandler().setPropertyChangingListener(listener);
-        // }
-        //
-        // /**
-        //  * onPropertyChanged
-        //  * @param listener
-        //  */
-        // onPropertyChanged(listener: Function): void {
-        //     // this.getHandler().setPropertyChangedListener(listener);
-        // }
-        //
 
     }
 

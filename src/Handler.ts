@@ -12,29 +12,34 @@ namespace duice {
 
         listenerEnabled: boolean = true;
 
+        /**
+         * constructor
+         * @protected
+         */
         protected constructor() {
             super();
         }
 
+        /**
+         * setTarget
+         * @param target
+         */
         setTarget(target: T): void {
             this.target = target;
         }
 
+        /**
+         * getTarget
+         */
         getTarget(): T {
             return this.target;
         }
 
         /**
-         * getHandler
-         * @param proxy
+         * update
+         * @param observable
+         * @param event
          */
-        static getHandler<P,H>(proxy: P): H {
-            let handler = globalThis.Object.getOwnPropertyDescriptor(proxy, '_handler_').value;
-            assert(handler, 'handler is not found');
-            return handler;
-        }
-
-
         abstract update(observable: object, event: Event): void;
 
         /**
