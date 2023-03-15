@@ -188,14 +188,38 @@ var duice;
                             for (let i in arguments) {
                                 rows.push(arguments[i]);
                             }
-                            //await _this.insertRow(index, ...rows);
+                            yield target.insertRow(index, ...rows);
                             return _this.target.length;
                         });
                     };
                 }
                 // splice
                 if (['splice'].includes(property)) {
-                    // TODO
+                    return function () {
+                        return __awaiter(this, arguments, void 0, function* () {
+                            // parse arguments
+                            let start = arguments[0];
+                            let deleteCount = arguments[1];
+                            let deleteRows = [];
+                            for (let i = start; i < (start + deleteCount); i++) {
+                                deleteRows.push(target[i]);
+                            }
+                            let insertRows = [];
+                            for (let i = 2; i < arguments.length; i++) {
+                                insertRows.push(arguments[i]);
+                            }
+                            // delete rows
+                            if (deleteCount > 0) {
+                                yield target.deleteRow(start, deleteCount);
+                            }
+                            // insert rows
+                            if (insertRows.length > 0) {
+                                yield target.insertRow(start, ...insertRows);
+                            }
+                            // returns deleted rows
+                            return deleteRows;
+                        });
+                    };
                 }
                 // pop, shift
                 if (['pop', 'shift'].includes(property)) {
@@ -209,7 +233,7 @@ var duice;
                                 index = 0;
                             }
                             let rows = [target[index]];
-                            //await _this.deleteRow(index);
+                            yield target.deleteRow(index);
                             return rows;
                         });
                     };
@@ -270,16 +294,19 @@ var duice;
             // array handler
             let arrayHandler = new duice.ArrayHandler();
             // copy array elements
-            array.forEach((object, index) => {
-                let objectProxy = new duice.ObjectProxy(object);
-                duice.ObjectProxy.getHandler(objectProxy).addObserver(arrayHandler);
-                this[index] = objectProxy;
-            });
+            if (globalThis.Array.isArray(array)) {
+                array.forEach((object, index) => {
+                    let objectProxy = new duice.ObjectProxy(object);
+                    duice.ObjectProxy.getHandler(objectProxy).addObserver(arrayHandler);
+                    this[index] = objectProxy;
+                });
+            }
             // create proxy
             let arrayProxy = new Proxy(this, arrayHandler);
             arrayHandler.setTarget(arrayProxy);
-            // set handler
+            // set property
             ArrayProxy.setHandler(arrayProxy, arrayHandler);
+            ArrayProxy.setTarget(arrayProxy, this);
             // returns
             return arrayProxy;
         }
@@ -302,7 +329,6 @@ var duice;
                     let objectProxy = new duice.ObjectProxy(object);
                     duice.ObjectProxy.getHandler(objectProxy).addObserver(arrayHandler);
                     arrayProxy[index] = objectProxy;
-                    console.log('== push', objectProxy);
                     // add listener
                     duice.ObjectProxy.onPropertyChanging(objectProxy, arrayHandler.propertyChangingListener);
                     duice.ObjectProxy.onPropertyChanged(objectProxy, arrayHandler.propertyChangedListener);
@@ -315,6 +341,24 @@ var duice;
             }
             // notify observers
             arrayHandler.notifyObservers(new duice.Event(this));
+        }
+        /**
+         * setTarget
+         * @param arrayProxy
+         * @param target
+         */
+        static setTarget(arrayProxy, target) {
+            globalThis.Object.defineProperty(arrayProxy, '_target_', {
+                value: target,
+                writable: true
+            });
+        }
+        /**
+         * getTarget
+         * @param arrayProxy
+         */
+        static getTarget(arrayProxy) {
+            return globalThis.Object.getOwnPropertyDescriptor(arrayProxy, '_target_').value;
         }
         /**
          * setHandler
@@ -343,6 +387,9 @@ var duice;
          */
         static onPropertyChanging(arrayProxy, listener) {
             this.getHandler(arrayProxy).propertyChangingListener = listener;
+            arrayProxy.forEach(objectProxy => {
+                duice.ObjectProxy.getHandler(objectProxy).propertyChangingListener = listener;
+            });
         }
         /**
          * onPropertyChanged
@@ -351,6 +398,61 @@ var duice;
          */
         static onPropertyChanged(arrayProxy, listener) {
             this.getHandler(arrayProxy).propertyChangedListener = listener;
+            arrayProxy.forEach(objectProxy => {
+                duice.ObjectProxy.getHandler(objectProxy).propertyChangedListener = listener;
+            });
+        }
+        /**
+         * insertRow
+         * @param index
+         * @param rows
+         */
+        insertRow(index, ...rows) {
+            return __awaiter(this, void 0, void 0, function* () {
+                let arrayHandler = ArrayProxy.getHandler(this);
+                let proxyTarget = ArrayProxy.getTarget(this);
+                rows.forEach((object, index) => {
+                    rows[index] = new duice.ObjectProxy(object);
+                });
+                let event = new duice.RowInsertEvent(this, index, rows);
+                if (yield arrayHandler.checkListener(arrayHandler.rowInsertingListener, event)) {
+                    proxyTarget.splice(index, 0, ...rows);
+                    yield arrayHandler.checkListener(arrayHandler.rowInsertedListener, event);
+                    arrayHandler.notifyObservers(event);
+                }
+            });
+        }
+        /**
+         * deleteRow
+         * @param index
+         * @param size
+         */
+        deleteRow(index, size) {
+            return __awaiter(this, void 0, void 0, function* () {
+                let arrayHandler = ArrayProxy.getHandler(this);
+                let proxyTarget = ArrayProxy.getTarget(this);
+                let sliceBegin = index;
+                let sliceEnd = (size ? index + size : index + 1);
+                let rows = proxyTarget.slice(sliceBegin, sliceEnd);
+                let event = new duice.RowDeleteEvent(this, index, rows);
+                if (yield arrayHandler.checkListener(arrayHandler.rowDeletingListener, event)) {
+                    let spliceStart = index;
+                    let spliceDeleteCount = (size ? size : 1);
+                    proxyTarget.splice(spliceStart, spliceDeleteCount);
+                    yield arrayHandler.checkListener(arrayHandler.rowDeletedListener, event);
+                    arrayHandler.notifyObservers(event);
+                }
+            });
+        }
+        /**
+         * appendRow
+         * @param rows
+         */
+        appendRow(...rows) {
+            return __awaiter(this, void 0, void 0, function* () {
+                let index = this.length;
+                return this.insertRow(index, ...rows);
+            });
         }
     }
     duice.ArrayProxy = ArrayProxy;
@@ -408,7 +510,10 @@ var duice;
          */
         setObject(objectName) {
             this.objectProxy = duice.findObject(this.context, objectName);
-            duice.assert(this.objectProxy, `ObjectProxy[${objectName}] is not found.`);
+            if (!this.objectProxy) {
+                console.warn(`ObjectProxy[${objectName}] is not found.`, this.objectProxy);
+                this.objectProxy = new duice.ObjectProxy({});
+            }
             let objectHandler = duice.ObjectProxy.getHandler(this.objectProxy);
             this.addObserver(objectHandler);
             objectHandler.addObserver(this);
@@ -570,17 +675,7 @@ var duice;
         constructor(htmlElement, context) {
             super();
             this.slotElement = document.createElement('slot');
-            // loopTemplate: T;
-            // loopSlot: HTMLSlotElement;
             this.editable = false;
-            // this.htmlElement = htmlElement;
-            // this.context = context;
-            // this.id = generateId();
-            // setAttribute(this.htmlElement, 'id', this.id);
-            //
-            // // replace with slot element
-            // this.loopSlot = document.createElement('slot');
-            // htmlElement.replaceWith(this.loopSlot);
             // clone html element template
             this.htmlElement = htmlElement.cloneNode(true);
             duice.setAttribute(this.htmlElement, 'id', duice.generateId());
@@ -596,7 +691,10 @@ var duice;
          */
         setArray(arrayName) {
             this.arrayProxy = duice.findObject(this.context, arrayName);
-            duice.assert(this.arrayProxy, `ArrayProxy[${arrayName}] is not found.`);
+            if (!this.arrayProxy) {
+                console.warn(`ArrayProxy[${arrayName}] is not found.`, this.arrayProxy);
+                this.arrayProxy = new duice.ArrayProxy([]);
+            }
             let arrayHandler = duice.ArrayProxy.getHandler(this.arrayProxy);
             this.addObserver(arrayHandler);
             arrayHandler.addObserver(this);
@@ -630,7 +728,9 @@ var duice;
         doRender(arrayProxy) {
             var _a;
             let _this = this;
+            // removes elements
             duice.removeChildNodes(this.slotElement);
+            // loop
             if (this.loop) {
                 let loopArgs = this.loop.split(',');
                 let itemName = loopArgs[0].trim();
@@ -673,7 +773,6 @@ var duice;
                     }
                     // initializes row element
                     duice.initialize(rowHtmlElement, context);
-                    console.log('== append row:', rowHtmlElement);
                     this.slotElement.appendChild(rowHtmlElement);
                 }
             }
@@ -869,8 +968,9 @@ var duice;
             // creates proxy
             let objectProxy = new Proxy(this, objectHandler);
             objectHandler.setTarget(objectProxy);
-            // set handler
+            // set property
             ObjectProxy.setHandler(objectProxy, objectHandler);
+            ObjectProxy.setTarget(objectProxy, this);
             // returns
             return objectProxy;
         }
@@ -921,6 +1021,24 @@ var duice;
             }
             // notify observers
             objectHandler.notifyObservers(new duice.Event(this));
+        }
+        /**
+         * setTarget
+         * @param objectProxy
+         * @param target
+         */
+        static setTarget(objectProxy, target) {
+            globalThis.Object.defineProperty(objectProxy, '_target_', {
+                value: target,
+                writable: true
+            });
+        }
+        /**
+         * getTarget
+         * @param objectProxy
+         */
+        static getTarget(objectProxy) {
+            return globalThis.Object.getOwnPropertyDescriptor(objectProxy, '_target_').value;
         }
         /**
          * setHandler
@@ -1058,7 +1176,8 @@ var duice;
         }
         catch (ignore) { }
         // throw error
-        throw new Error(`Object[${name}] is not found`);
+        return undefined;
+        //throw new Error(`Object[${name}] is not found`);
     }
     duice.findObject = findObject;
     /**

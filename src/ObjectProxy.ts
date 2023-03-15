@@ -49,8 +49,9 @@ namespace duice {
             let objectProxy = new Proxy<ObjectProxy>(this, objectHandler);
             objectHandler.setTarget(objectProxy);
 
-            // set handler
+            // set property
             ObjectProxy.setHandler(objectProxy, objectHandler);
+            ObjectProxy.setTarget(objectProxy, this);
 
             // returns
             return objectProxy;
@@ -107,6 +108,26 @@ namespace duice {
 
             // notify observers
             objectHandler.notifyObservers(new Event(this));
+        }
+
+        /**
+         * setTarget
+         * @param objectProxy
+         * @param target
+         */
+        static setTarget(objectProxy: ObjectProxy, target: object): void {
+            globalThis.Object.defineProperty(objectProxy, '_target_', {
+                value: target,
+                writable: true
+            });
+        }
+
+        /**
+         * getTarget
+         * @param objectProxy
+         */
+        static getTarget(objectProxy: ObjectProxy): any {
+            return globalThis.Object.getOwnPropertyDescriptor(objectProxy, '_target_').value;
         }
 
         /**

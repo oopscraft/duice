@@ -15,10 +15,6 @@ namespace duice {
 
         loop: string;
 
-        // loopTemplate: T;
-
-        // loopSlot: HTMLSlotElement;
-
         editable: boolean = false;
 
         /**
@@ -27,15 +23,6 @@ namespace duice {
          */
         constructor(htmlElement: T, context: object) {
             super();
-            // this.htmlElement = htmlElement;
-            // this.context = context;
-            // this.id = generateId();
-            // setAttribute(this.htmlElement, 'id', this.id);
-            //
-            // // replace with slot element
-            // this.loopSlot = document.createElement('slot');
-            // htmlElement.replaceWith(this.loopSlot);
-
 
             // clone html element template
             this.htmlElement = htmlElement.cloneNode(true) as T;
@@ -55,7 +42,10 @@ namespace duice {
          */
         setArray(arrayName: string): void {
             this.arrayProxy = findObject(this.context, arrayName);
-            assert(this.arrayProxy, `ArrayProxy[${arrayName}] is not found.`);
+            if(!this.arrayProxy){
+                console.warn(`ArrayProxy[${arrayName}] is not found.`, this.arrayProxy);
+                this.arrayProxy = new ArrayProxy([]);
+            }
             let arrayHandler = ArrayProxy.getHandler(this.arrayProxy);
             this.addObserver(arrayHandler);
             arrayHandler.addObserver(this);
@@ -93,8 +83,11 @@ namespace duice {
          */
         doRender(arrayProxy: ArrayProxy): void {
             let _this = this;
+
+            // removes elements
             removeChildNodes(this.slotElement);
 
+            // loop
             if(this.loop){
                 let loopArgs = this.loop.split(',');
                 let itemName = loopArgs[0].trim();
@@ -139,7 +132,6 @@ namespace duice {
 
                     // initializes row element
                     initialize(rowHtmlElement, context);
-                    console.log('== append row:', rowHtmlElement);
                     this.slotElement.appendChild(rowHtmlElement);
                 }
 

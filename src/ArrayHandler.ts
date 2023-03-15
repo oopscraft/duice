@@ -10,6 +10,15 @@ namespace duice {
 
         propertyChangedListener: Function;
 
+        rowInsertingListener: Function;
+
+        rowInsertedListener: Function;
+
+        rowDeletingListener: Function;
+
+        rowDeletedListener: Function;
+
+
         /**
          * constructor
          * @param arrayProxy
@@ -24,7 +33,7 @@ namespace duice {
          * @param property
          * @param receiver
          */
-        get(target: object, property: string, receiver: object): any {
+        get(target: ArrayProxy, property: string, receiver: object): any {
             console.debug("ArrayHandler.get", '|', target, '|', property, '|', receiver);
             let _this = this;
             const value = target[property];
@@ -43,14 +52,40 @@ namespace duice {
                         for (let i in arguments) {
                             rows.push(arguments[i]);
                         }
-                        //await _this.insertRow(index, ...rows);
+                        await target.insertRow(index, ...rows);
                         return _this.target.length;
                     }
                 }
 
                 // splice
                 if (['splice'].includes(property)) {
-                    // TODO
+                    return async function () {
+
+                        // parse arguments
+                        let start = arguments[0];
+                        let deleteCount = arguments[1];
+                        let deleteRows = [];
+                        for (let i = start; i < (start + deleteCount); i++) {
+                            deleteRows.push(target[i]);
+                        }
+                        let insertRows = [];
+                        for (let i = 2; i < arguments.length; i++) {
+                            insertRows.push(arguments[i]);
+                        }
+
+                        // delete rows
+                        if(deleteCount > 0) {
+                            await target.deleteRow(start, deleteCount);
+                        }
+
+                        // insert rows
+                        if(insertRows.length > 0){
+                            await target.insertRow(start, ...insertRows);
+                        }
+
+                        // returns deleted rows
+                        return deleteRows;
+                    }
                 }
 
                 // pop, shift
@@ -63,7 +98,7 @@ namespace duice {
                             index = 0;
                         }
                         let rows = [target[index]];
-                        //await _this.deleteRow(index);
+                        await target.deleteRow(index);
                         return rows;
                     }
                 }
@@ -83,7 +118,7 @@ namespace duice {
          * @param property
          * @param value
          */
-        set(target: object, property: string, value: any): boolean {
+        set(target: ArrayProxy, property: string, value: any): boolean {
             console.debug("ArrayHandler.set", '|', target, '|', property, '|', value);
             Reflect.set(target, property, value);
             if (property === 'length') {
@@ -126,23 +161,11 @@ namespace duice {
 
 
 
-
-
-
-
-
         //     propertyChangingListener: Function;
         //
         //     propertyChangedListener: Function;
         //
-        //     rowInsertingListener: Function;
-        //
-        //     rowInsertedListener: Function;
-        //
-        //     rowDeletingListener: Function;
-        //
-        //     rowDeletedListener: Function;
-        //
+       //
         //
         //
         //

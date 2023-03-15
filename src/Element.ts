@@ -45,7 +45,10 @@ namespace duice {
          */
         setObject(objectName: string): void {
             this.objectProxy = findObject(this.context, objectName);
-            assert(this.objectProxy, `ObjectProxy[${objectName}] is not found.`)
+            if(!this.objectProxy){
+                console.warn(`ObjectProxy[${objectName}] is not found.`, this.objectProxy);
+                this.objectProxy = new ObjectProxy({});
+            }
             let objectHandler = ObjectProxy.getHandler(this.objectProxy);
             this.addObserver(objectHandler);
             objectHandler.addObserver(this);

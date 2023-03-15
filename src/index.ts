@@ -95,7 +95,8 @@ namespace duice {
         }catch(ignore){}
 
         // throw error
-        throw new Error(`Object[${name}] is not found`);
+        return undefined;
+        //throw new Error(`Object[${name}] is not found`);
     }
 
     /**
