@@ -7,13 +7,13 @@ namespace duice {
      */
     export abstract class Element<T extends HTMLElement> extends Observable implements Observer {
 
-        id: string;
+        slotElement: HTMLSlotElement = document.createElement('slot');
 
         htmlElement: T;
 
         context: object;
 
-        objectHandler: ObjectHandler;
+        objectProxy: ObjectProxy;
 
         property: string;
 
@@ -26,10 +26,17 @@ namespace duice {
          */
         protected constructor(htmlElement: T, context: object) {
             super();
-            this.htmlElement = htmlElement;
+
+            // clone html element template
+            this.htmlElement = htmlElement.cloneNode(true) as T;
+            setAttribute(this.htmlElement, 'id', generateId());
+            markInitialized(htmlElement);
+
+            // replace slot element
+            htmlElement.replaceWith(this.slotElement);
+
+            // set context
             this.context = context;
-            this.id = generateUuid();
-            setAttribute(this.htmlElement, 'id', this.id);
         }
 
         /**
@@ -37,11 +44,11 @@ namespace duice {
          * @param objectName
          */
         setObject(objectName: string): void {
-            let object = findObject(this.context, objectName);
-            assert(object, `ObjectProxy[${objectName}] is not found.`)
-            this.objectHandler = ObjectProxy.getHandler(object);
-            this.addObserver(this.objectHandler);
-            this.objectHandler.addObserver(this);
+            this.objectProxy = findObject(this.context, objectName);
+            assert(this.objectProxy, `ObjectProxy[${objectName}] is not found.`)
+            let objectHandler = ObjectProxy.getHandler(this.objectProxy);
+            this.addObserver(objectHandler);
+            objectHandler.addObserver(this);
         }
 
         /**
@@ -85,40 +92,39 @@ namespace duice {
          * render
          */
         render(): void {
-
             if(this.property){
+                let objectHandler = ObjectProxy.getHandler(this.objectProxy);
 
                 // set value
-                this.setValue(this.objectHandler.getValue(this.property));
-
-                // set readonly
-                let readonly = this.objectHandler.isReadonly(this.property);
-                this.setReadonly(readonly);
+                let value = objectHandler.getValue(this.property);
+                this.setValue(value);
             }
 
             // executes script
             this.executeScript();
+
+            // append to slot element
+            this.slotElement.appendChild(this.htmlElement);
         }
 
         /**
          * update
-         * @param objectHandler
-         * @param detail
+         * @param observable
+         * @param event
          */
-        update(objectHandler: ObjectHandler, detail: object): void {
+        update(observable: Observable, event: Event): void {
+            console.log('Element.update', observable, event);
 
-            if(this.property){
+            // ObjectHandler
+            if(observable instanceof ObjectHandler) {
+                if(this.property){
+                    // set value
+                    this.setValue(observable.getValue(this.property));
+                }
 
-                // set value
-                this.setValue(objectHandler.getValue(this.property));
-
-                // set readonly
-                let readonly = this.objectHandler.isReadonly(this.property);
-                this.setReadonly(readonly);
+                // executes script
+                this.executeScript();
             }
-
-            // executes script
-            this.executeScript();
         }
 
         /**
@@ -133,16 +139,6 @@ namespace duice {
         abstract getValue(): any;
 
         /**
-         * getIndex
-         */
-        getIndex(): number {
-            let index = getAttribute(this.htmlElement, 'index');
-            if(index){
-                return Number(index);
-            }
-        }
-
-        /**
          * executes script
          */
         executeScript(): void {
@@ -153,10 +149,90 @@ namespace duice {
         }
 
         /**
-         * setReadonly
-         * @param readonly
+         * getIndex
          */
-        abstract setReadonly(readonly: boolean): void;
+        getIndex(): number {
+            let index = getAttribute(this.htmlElement, 'index');
+            if(index){
+                return Number(index);
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // /**
+        //  * doLoop
+        //  */
+        // doLoop() {
+        //     if(this.loop) {
+        //
+        //         let loopArgs = this.loop.split(',');
+        //         let itemName = loopArgs[0].trim();
+        //         let statusName = loopArgs[1]?.trim();
+        //         //console.warn("== loop:", loopArgs);
+        //
+        //         let array = this.objectHandler.getValue(this.property);
+        //         let arrayProxy = new ArrayProxy(array);
+        //         //console.warn("== array:", array);
+        //
+        //
+        //         let loopSlot = document.createElement('slot');
+        //         for(let index = 0; index < arrayProxy.length; index ++) {
+        //             let item = arrayProxy[index];
+        //             const context = {};
+        //             context[itemName] = item;
+        //             context[statusName] = new ObjectProxy({
+        //                 index: index,
+        //                 count: index + 1,
+        //                 size: arrayProxy.length,
+        //                 first: (index === 0),
+        //                 last: (arrayProxy.length == index + 1)
+        //             });
+        //             console.warn("== context:", context);
+        //             let rowHtmlElement = this.htmlElement.cloneNode(true) as HTMLElement;
+        //             setAttribute(rowHtmlElement, 'index', index.toString());
+        //
+        //             // initialize row element
+        //             initialize(this.htmlElement, context);
+        //             initialize(rowHtmlElement, context);
+        //             loopSlot.appendChild(rowHtmlElement);
+        //             //this.htmlElement.appendChild(rowHtmlElement);
+        //         }
+        //
+        //         this.htmlElement.replaceWith(loopSlot);
+        //     }
+        // }
+
+
+
+
+        // /**
+        //  * setReadonly
+        //  * @param readonly
+        //  */
+        // abstract setReadonly(readonly: boolean): void;
 
     }
 

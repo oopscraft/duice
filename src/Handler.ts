@@ -4,6 +4,26 @@ namespace duice {
 
     export abstract class Handler<T> extends Observable implements Observer {
 
+        protected constructor() {
+            super();
+        }
+
+        setTarget(target: T): void {
+            this.target = target;
+        }
+
+        getTarget(): T {
+            return this.target;
+        }
+
+
+
+
+
+
+
+
+
         target: T;
 
         readonlyAll: boolean = false;
@@ -12,16 +32,6 @@ namespace duice {
 
         listenerEnabled: boolean = true;
 
-        protected constructor(target: T) {
-            super();
-            this.target = target;
-
-            // set handler
-            globalThis.Object.defineProperty(target, '_handler_', {
-                value: this,
-                writable: true
-            });
-        }
 
         /**
          * getHandler
@@ -33,9 +43,6 @@ namespace duice {
             return handler;
         }
 
-        getTarget(): T {
-            return this.target;
-        }
 
         abstract update(observable: object, event: Event): void;
 

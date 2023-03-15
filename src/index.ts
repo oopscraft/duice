@@ -26,24 +26,48 @@ namespace duice {
     }
 
     /**
+     * returns query selector expression
+     */
+    export function getQuerySelectorExpression(){
+        return [
+            `*[${getAlias()}\\:array]:not([${getAlias()}\\:id])`,
+            `*[${getAlias()}\\:object]:not([${getAlias()}\\:id])`
+        ].join(',');
+    }
+
+    /**
      * initializes
      * @param container
      * @param context
      */
     export function initialize(container: any, context: object): void {
-
-        // initializes element set
-        container.querySelectorAll(`*[${getAlias()}\\:array]:not([${getAlias()}\\:id])`).forEach(htmlElement => {
-            let elementSetFactory = ElementSetFactory.getInstance(htmlElement);
-            let elementSet = elementSetFactory.createElementSet(htmlElement, context);
-            elementSet.render();
+        container.querySelectorAll(getQuerySelectorExpression()).forEach(htmlElement => {
+            if(!hasAttribute(htmlElement, 'id')) {
+                try {
+                    if (hasAttribute(htmlElement, 'array')) {
+                        let elementSetFactory = ElementSetFactory.getInstance(htmlElement);
+                        let elementSet = elementSetFactory.createElementSet(htmlElement, context);
+                        elementSet.render();
+                    } else if (hasAttribute(htmlElement, 'object')) {
+                        let elementFactory = ElementFactory.getInstance(htmlElement);
+                        let element = elementFactory.createElement(htmlElement, context);
+                        element.render();
+                    }
+                }catch(e){
+                    console.error(e.message, htmlElement, container, JSON.stringify(context));
+                }
+            }
         });
+    }
 
-        // initializes element
-        container.querySelectorAll(`*[${getAlias()}\\:object]:not([${getAlias()}\\:id])`).forEach(htmlElement => {
-            let elementFactory = ElementFactory.getInstance(htmlElement);
-            let element = elementFactory.createElement(htmlElement, context);
-            element.render();
+    /**
+     * markInitialized
+     * @param container
+     */
+    export function markInitialized(container: any): void {
+        setAttribute(container, 'id', generateId());
+        container.querySelectorAll(getQuerySelectorExpression()).forEach(htmlElement => {
+            setAttribute(htmlElement, 'id', generateId());
         });
     }
 
@@ -53,26 +77,32 @@ namespace duice {
      * @param name
      */
     export function findObject(context: object, name: string): any {
-        if(context[name]){
-            return context[name];
-        }
-        if((<any>window).hasOwnProperty(name)){
-            return (<any>window)[name];
-        }
-        return eval.call(context, name);
+
+        // find in context
+        try {
+            let object = new Function(`return this.${name};`).call(context);
+            if(object) {
+                return object;
+            }
+        }catch(ignore){}
+
+        // find in global
+        try {
+            let object = new Function(`return ${name};`).call(null);
+            if(object){
+                return object;
+            }
+        }catch(ignore){}
+
+        // throw error
+        throw new Error(`Object[${name}] is not found`);
     }
 
     /**
      * Generates component ID
      */
-    export function generateUuid(): string {
-        let dt = new Date().getTime();
-        let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            let r = (dt + Math.random()*16)%16 | 0;
-            dt = Math.floor(dt/16);
-            return (c=='x' ? r :(r&0x3|0x8)).toString(16);
-        });
-        return uuid;
+    export function generateId(): string {
+        return self.crypto.randomUUID();
     }
 
     /**

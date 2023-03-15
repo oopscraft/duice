@@ -32,6 +32,12 @@ namespace duice {
                 elementSet.setLoop(loop);
             }
 
+            // editable
+            let editable = getAttribute(htmlElement, 'editable');
+            if(editable){
+                elementSet.setEditable(editable.toLowerCase() === 'true');
+            }
+
             // returns
             return elementSet;
         }

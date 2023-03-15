@@ -140,7 +140,7 @@ small {
 /* table */
 table {
     table-layout: fixed;
-    position: relative;
+    /*position: relative;*/
     /*border-collapse: collapse;*/
     border-collapse: separate;
     border-spacing: 0;
@@ -190,7 +190,6 @@ input {
     border: solid 1px #ccc;
     border-radius: 1px;
     padding: var(--input-padding);
-    width: 100%;
     height: inherit;
     line-height: inherit;
     box-sizing: border-box;
@@ -204,7 +203,6 @@ select {
     padding: var(--select-padding);
     border: var(--select-border);
     border-radius: var(--select-border-radius);
-    width: 100%;
     height: inherit;
     line-height: inherit;
     box-sizing: border-box;
@@ -231,7 +229,6 @@ textarea {
     padding: var(--textarea-padding);
     border: var(--textarea-border);
     border-radius: var(--textarea-border-radius);
-    width: 100%;
     line-height: 150%;
     white-space: pre-line;
     box-sizing: border-box;
@@ -260,4 +257,8 @@ button:hover {
     background-color: var(--button-hover-background-color);
 }
 
+/* ul */
+ul {
+    text-align: left;
+}
 

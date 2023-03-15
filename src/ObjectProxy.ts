@@ -8,27 +8,52 @@ namespace duice {
         /**
          * constructor
          */
-        public constructor(object?: object) {
+        public constructor(object: object) {
             super();
 
+            // object handler
+            let objectHandler = new ObjectHandler();
+
             // copy property
-            if(typeof object === 'object'){
-                for(let property in object){
-                    this[property] = object[property];
+            for (let name in object) {
+                let value = object[name];
+
+                // value is array
+                if(Array.isArray(value)){
+                    let arrayProxy = new ArrayProxy(value);
+                    ArrayProxy.getHandler(arrayProxy).addObserver(objectHandler);
+                    this[name] = arrayProxy;
+                    continue;
+                }
+
+                // value is object
+                if(typeof value === 'object'){
+                    let objectProxy = new ObjectProxy(value);
+                    ObjectProxy.getHandler(objectProxy).addObserver(objectHandler);
+                    this[name] = objectProxy;
+                    continue;
+                }
+
+                // value is primitive
+                this[name] = value;
+            }
+
+            // delete not exists property
+            for(let name in this){
+                if(!Object.keys(object).includes(name)){
+                    delete this[name];
                 }
             }
 
-            // return proxy instance
-            let handler = new ObjectHandler(this);
-            return new Proxy<ObjectProxy>(this, handler);
-        }
+            // creates proxy
+            let objectProxy = new Proxy<ObjectProxy>(this, objectHandler);
+            objectHandler.setTarget(objectProxy);
 
-        /**
-         * getHandler
-         * @param objectProxy
-         */
-        static getHandler(objectProxy: ObjectProxy): ObjectHandler {
-            return Handler.getHandler<ObjectProxy, ObjectHandler>(objectProxy);
+            // set handler
+            ObjectProxy.setHandler(objectProxy, objectHandler);
+
+            // returns
+            return objectProxy;
         }
 
         /**
@@ -37,55 +62,73 @@ namespace duice {
          * @param object
          */
         static assign(objectProxy: ObjectProxy, object: object): void {
-            this.getHandler(objectProxy).assign(object);
-        }
-
-        /**
-         * setReadonly
-         * @param objectProxy
-         * @param property
-         * @param readonly
-         */
-        static setReadonly(objectProxy: ObjectProxy, property: string, readonly: boolean): void {
-            this.getHandler(objectProxy).setReadonly(property, readonly);
-        }
-
-        /**
-         * isReadonly
-         * @param objectProxy
-         * @param property
-         */
-        static isReadonly(objectProxy: ObjectProxy, property: string): boolean {
-            return this.getHandler(objectProxy).isReadonly(property);
-        }
-
-        /**
-         * setReadonlyAll
-         * @param objectProxy
-         * @param readonly
-         */
-        static setReadonlyAll(objectProxy: ObjectProxy, readonly: boolean): void {
             let objectHandler = this.getHandler(objectProxy);
-            objectHandler.setReadonlyAll(readonly);
-            for(let property in this) {
-                objectHandler.setReadonly(property, readonly);
+            try {
+
+                // suspend
+                objectHandler.suspendListener()
+                objectHandler.suspendNotify();
+
+                // loop object properties
+                for(let name in object){
+                    let value = object[name];
+
+                    // source value is array
+                    if(Array.isArray(value)){
+                        if(Array.isArray(objectProxy[name])){
+                            ArrayProxy.assign(objectProxy[name], value);
+                        }else{
+                            objectProxy[name] = new ArrayProxy(value);
+                        }
+                        continue;
+                    }
+
+                    // source value is object
+                    if(typeof value === 'object'){
+                        if(typeof objectProxy[name] === 'object'){
+                            ObjectProxy.assign(objectProxy[name], value);
+                        }else{
+                            let objectProxy = new ObjectProxy(value);
+                            ObjectProxy.getHandler(objectProxy).addObserver(objectHandler);
+                            objectProxy[name] = objectProxy;
+                        }
+                        continue;
+                    }
+
+                    // source value is primitive
+                    objectProxy[name] = value;
+                }
+
+            } finally {
+                // resume
+                objectHandler.resumeListener();
+                objectHandler.resumeNotify();
             }
+
+            // notify observers
+            objectHandler.notifyObservers(new Event(this));
         }
 
         /**
-         * isDirty
+         * setHandler
          * @param objectProxy
+         * @param objectHandler
          */
-        static isDirty(objectProxy: ObjectProxy): boolean {
-            return this.getHandler(objectProxy).isDirty();
+        static setHandler(objectProxy: ObjectProxy, objectHandler: ObjectHandler): void {
+            globalThis.Object.defineProperty(objectProxy, '_handler_', {
+                value: objectHandler,
+                writable: true
+            });
         }
 
         /**
-         * reset
+         * getHandler
          * @param objectProxy
          */
-        static reset(objectProxy: ObjectProxy): void {
-            this.getHandler(objectProxy).reset();
+        static getHandler(objectProxy: ObjectProxy): ObjectHandler {
+            let handler = globalThis.Object.getOwnPropertyDescriptor(objectProxy, '_handler_').value;
+            assert(handler, 'handler is not found');
+            return handler;
         }
 
         /**
@@ -94,7 +137,7 @@ namespace duice {
          * @param listener
          */
         static onPropertyChanging(objectProxy: ObjectProxy, listener: Function): void {
-            this.getHandler(objectProxy).setPropertyChangingListener(listener);
+            this.getHandler(objectProxy).propertyChangingListener = listener;
         }
 
         /**
@@ -103,8 +146,96 @@ namespace duice {
          * @param listener
          */
         static onPropertyChanged(objectProxy: ObjectProxy, listener: Function): void {
-            this.getHandler(objectProxy).setPropertyChangedListener(listener);
+            this.getHandler(objectProxy).propertyChangedListener = listener;
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // /**
+        //  * assign
+        //  * @param objectProxy
+        //  * @param object
+        //  */
+        // static assign(objectProxy: ObjectProxy, object: object): void {
+        //     this.getHandler(objectProxy).assign(object);
+        // }
+        //
+        // /**
+        //  * setReadonly
+        //  * @param objectProxy
+        //  * @param property
+        //  * @param readonly
+        //  */
+        // static setReadonly(objectProxy: ObjectProxy, property: string, readonly: boolean): void {
+        //     this.getHandler(objectProxy).setReadonly(property, readonly);
+        // }
+        //
+        // /**
+        //  * isReadonly
+        //  * @param objectProxy
+        //  * @param property
+        //  */
+        // static isReadonly(objectProxy: ObjectProxy, property: string): boolean {
+        //     return this.getHandler(objectProxy).isReadonly(property);
+        // }
+        //
+        // /**
+        //  * setReadonlyAll
+        //  * @param objectProxy
+        //  * @param readonly
+        //  */
+        // static setReadonlyAll(objectProxy: ObjectProxy, readonly: boolean): void {
+        //     let objectHandler = this.getHandler(objectProxy);
+        //     objectHandler.setReadonlyAll(readonly);
+        //     for(let property in this) {
+        //         objectHandler.setReadonly(property, readonly);
+        //     }
+        // }
+        //
+        // /**
+        //  * isDirty
+        //  * @param objectProxy
+        //  */
+        // static isDirty(objectProxy: ObjectProxy): boolean {
+        //     return this.getHandler(objectProxy).isDirty();
+        // }
+        //
+        // /**
+        //  * reset
+        //  * @param objectProxy
+        //  */
+        // static reset(objectProxy: ObjectProxy): void {
+        //     this.getHandler(objectProxy).reset();
+        // }
+        //
+        // /**
+        //  * onPropertyChanging
+        //  * @param objectProxy
+        //  * @param listener
+        //  */
+        // static onPropertyChanging(objectProxy: ObjectProxy, listener: Function): void {
+        //     this.getHandler(objectProxy).setPropertyChangingListener(listener);
+        // }
+        //
+        // /**
+        //  * onPropertyChanged
+        //  * @param objectProxy
+        //  * @param listener
+        //  */
+        // static onPropertyChanged(objectProxy: ObjectProxy, listener: Function): void {
+        //     this.getHandler(objectProxy).setPropertyChangedListener(listener);
+        // }
 
     }
 }

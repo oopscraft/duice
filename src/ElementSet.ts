@@ -5,17 +5,19 @@ namespace duice {
      */
     export class ElementSet<T extends HTMLElement> extends Observable implements Observer {
 
-        id: string;
+        slotElement: HTMLSlotElement = document.createElement('slot');
 
         htmlElement: T;
 
         context: object;
 
-        arrayHandler: ArrayHandler;
-
-        slotElement: HTMLSlotElement;
+        arrayProxy: ArrayProxy;
 
         loop: string;
+
+        // loopTemplate: T;
+
+        // loopSlot: HTMLSlotElement;
 
         editable: boolean = false;
 
@@ -25,20 +27,26 @@ namespace duice {
          */
         constructor(htmlElement: T, context: object) {
             super();
-            this.htmlElement = htmlElement;
+            // this.htmlElement = htmlElement;
+            // this.context = context;
+            // this.id = generateId();
+            // setAttribute(this.htmlElement, 'id', this.id);
+            //
+            // // replace with slot element
+            // this.loopSlot = document.createElement('slot');
+            // htmlElement.replaceWith(this.loopSlot);
+
+
+            // clone html element template
+            this.htmlElement = htmlElement.cloneNode(true) as T;
+            setAttribute(this.htmlElement, 'id', generateId());
+            markInitialized(htmlElement);
+
+            // replace slot element
+            htmlElement.replaceWith(this.slotElement);
+
+            // set context
             this.context = context;
-            this.id = generateUuid();
-            setAttribute(this.htmlElement, 'id', this.id);
-
-            // replace with slot element
-            this.slotElement = document.createElement('slot');
-            this.htmlElement.replaceWith(this.slotElement);
-
-            // editable
-            let editable = getAttribute(this.htmlElement, 'editable');
-            if(editable){
-                this.editable = (editable.toLowerCase() === 'true');
-            }
         }
 
         /**
@@ -46,11 +54,11 @@ namespace duice {
          * @param arrayName
          */
         setArray(arrayName: string): void {
-            let arrayProxy = findObject(this.context, arrayName);
-            assert(arrayProxy, `ArrayProxy[${arrayName}] is not found.`);
-            this.arrayHandler = arrayProxy.getHandler();
-            this.addObserver(this.arrayHandler);
-            this.arrayHandler.addObserver(this);
+            this.arrayProxy = findObject(this.context, arrayName);
+            assert(this.arrayProxy, `ArrayProxy[${arrayName}] is not found.`);
+            let arrayHandler = ArrayProxy.getHandler(this.arrayProxy);
+            this.addObserver(arrayHandler);
+            arrayHandler.addObserver(this);
         }
 
         /**
@@ -62,11 +70,18 @@ namespace duice {
         }
 
         /**
+         * setEditable
+         * @param editable
+         */
+        setEditable(editable: boolean): void {
+            this.editable = editable;
+        }
+
+        /**
          * render
          */
         render(): void {
-            let dataSet = this.arrayHandler.getTarget();
-            this.doRender(dataSet);
+            this.doRender(this.arrayProxy);
 
             // executes script
             this.executeScript();
@@ -74,26 +89,30 @@ namespace duice {
 
         /**
          * doRender
-         * @param array
+         * @param arrayProxy
          */
-        doRender(array: object[]): void {
+        doRender(arrayProxy: ArrayProxy): void {
             let _this = this;
             removeChildNodes(this.slotElement);
+
             if(this.loop){
                 let loopArgs = this.loop.split(',');
                 let itemName = loopArgs[0].trim();
                 let statusName = loopArgs[1]?.trim();
-                for(let index = 0; index < array.length; index ++){
-                    let data = array[index];
-                    let context = {};
-                    context[itemName] = data;
+                for(let index = 0; index < arrayProxy.length; index ++){
+
+                    // context
+                    let context = Object.assign({}, this.context);
+                    context[itemName] = arrayProxy[index];
                     context[statusName] = new ObjectProxy({
                         index: index,
                         count: index+1,
-                        size: array.length,
+                        size: arrayProxy.length,
                         first: (index === 0),
-                        last: (array.length == index+1)
+                        last: (arrayProxy.length == index + 1)
                     });
+
+                    // clones row elements
                     let rowHtmlElement = this.htmlElement.cloneNode(true) as HTMLElement;
                     setAttribute(rowHtmlElement, 'index', index.toString());
 
@@ -120,8 +139,10 @@ namespace duice {
 
                     // initializes row element
                     initialize(rowHtmlElement, context);
+                    console.log('== append row:', rowHtmlElement);
                     this.slotElement.appendChild(rowHtmlElement);
                 }
+
             }else{
                 this.slotElement.appendChild(this.htmlElement);
             }
@@ -130,22 +151,19 @@ namespace duice {
         /**
          * update
          * @param observable
-         * @param detail
+         * @param event
          */
-        update(arrayHandler: ArrayHandler, detail: any): void {
-            let array = arrayHandler.getTarget();
-            this.doUpdate(array);
+        update(observable: Observable, event: Event): void {
+            console.log('ElementSet.update', observable, event);
 
-            // executes script
-            this.executeScript();
-        }
+            // ArrayHandler
+            if(observable instanceof ArrayHandler){
+                let array = observable.getTarget();
+                this.doRender(array);
 
-        /**
-         * doUpdate
-         * @param array
-         */
-        doUpdate(array: object[]): void {
-            this.doRender(array);
+                // executes script
+                this.executeScript();
+            }
         }
 
         /**
