@@ -139,6 +139,41 @@ namespace duice {
             });
         }
 
+        /**
+         * onRowInserting
+         * @param arrayProxy
+         * @param listener
+         */
+        static onRowInserting(arrayProxy: ArrayProxy, listener: Function): void {
+            this.getHandler(arrayProxy).rowInsertingListener = listener;
+        }
+
+        /**
+         * onRowInserted
+         * @param arrayProxy
+         * @param listener
+         */
+        static onRowInserted(arrayProxy: ArrayProxy, listener: Function): void {
+            this.getHandler(arrayProxy).rowInsertedListener = listener;
+        }
+
+        /**
+         * onRowDeleting
+         * @param arrayProxy
+         * @param listener
+         */
+        static onRowDeleting(arrayProxy: ArrayProxy, listener: Function): void {
+            this.getHandler(arrayProxy).rowDeletingListener = listener;
+        }
+
+        /**
+         * onRowDeleted
+         * @param arrayProxy
+         * @param listener
+         */
+        static onRowDeleted(arrayProxy: ArrayProxy, listener: Function): void {
+            this.getHandler(arrayProxy).rowDeletedListener = listener;
+        }
 
         /**
          * insertRow
@@ -280,37 +315,6 @@ namespace duice {
         //     // this.getHandler().setPropertyChangedListener(listener);
         // }
         //
-        // /**
-        //  * onRowInserting
-        //  * @param listener
-        //  */
-        // onRowInserting(listener: Function): void {
-        //     // this.getHandler().setRowInsertingListener(listener);
-        // }
-        //
-        // /**
-        //  * onRowInserted
-        //  * @param listener
-        //  */
-        // onRowInserted(listener: Function): void {
-        //     // this.getHandler().setRowInsertedListener(listener);
-        // }
-        //
-        // /**
-        //  * onRowDeleting
-        //  * @param listener
-        //  */
-        // onRowDeleting(listener: Function): void {
-        //     // this.getHandler().setRowDeletingListener(listener);
-        // }
-        //
-        // /**
-        //  * onRowDeleted
-        //  * @param listener
-        //  */
-        // onRowDeleted(listener: Function): void {
-        //     // this.getHandler().setRowDeletedListener(listener);
-        // }
 
     }
 

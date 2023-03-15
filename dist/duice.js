@@ -403,6 +403,38 @@ var duice;
             });
         }
         /**
+         * onRowInserting
+         * @param arrayProxy
+         * @param listener
+         */
+        static onRowInserting(arrayProxy, listener) {
+            this.getHandler(arrayProxy).rowInsertingListener = listener;
+        }
+        /**
+         * onRowInserted
+         * @param arrayProxy
+         * @param listener
+         */
+        static onRowInserted(arrayProxy, listener) {
+            this.getHandler(arrayProxy).rowInsertedListener = listener;
+        }
+        /**
+         * onRowDeleting
+         * @param arrayProxy
+         * @param listener
+         */
+        static onRowDeleting(arrayProxy, listener) {
+            this.getHandler(arrayProxy).rowDeletingListener = listener;
+        }
+        /**
+         * onRowDeleted
+         * @param arrayProxy
+         * @param listener
+         */
+        static onRowDeleted(arrayProxy, listener) {
+            this.getHandler(arrayProxy).rowDeletedListener = listener;
+        }
+        /**
          * insertRow
          * @param index
          * @param rows

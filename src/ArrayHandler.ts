@@ -18,7 +18,6 @@ namespace duice {
 
         rowDeletedListener: Function;
 
-
         /**
          * constructor
          * @param arrayProxy

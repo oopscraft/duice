@@ -79,29 +79,29 @@
             viewMyArray();
         });
 
-        // // row inserting listener
-        // myArray.onRowInserting(async event => {
-        //     if(!await duice.confirm(`insert [${event.getIndex()}]${JSON.stringify(event.getRows())}`)){
-        //         return false;
-        //     }
-        // });
-        //
-        // // row inserted listener
-        // myArray.onRowInserted(event => {
-        //     viewMyArray();
-        // });
-        //
-        // // row deleting listener
-        // myArray.onRowDeleting(async event => {
-        //     if(!await duice.confirm(`delete [${event.getIndex()}]${JSON.stringify(event.getRows())}`)){
-        //         return false;
-        //     }
-        // });
-        //
-        // // row deleted listener
-        // myArray.onRowDeleted(event => {
-        //     viewMyArray();
-        // })
+        // row inserting listener
+        duice.ArrayProxy.onRowInserting(myArray, async event => {
+            if(!await duice.confirm(`insert [${event.getIndex()}]${JSON.stringify(event.getRows())}`)){
+                return false;
+            }
+        });
+
+        // row inserted listener
+        duice.ArrayProxy.onRowInserted(myArray, event => {
+            viewMyArray();
+        });
+
+        // row deleting listener
+        duice.ArrayProxy.onRowDeleting(myArray, async event => {
+            if(!await duice.confirm(`delete [${event.getIndex()}]${JSON.stringify(event.getRows())}`)){
+                return false;
+            }
+        });
+
+        // row deleted listener
+        duice.ArrayProxy.onRowDeleted(myArray, event => {
+            viewMyArray();
+        })
 
         // adds DOMContentLoaded event listener
         document.addEventListener("DOMContentLoaded", event => {

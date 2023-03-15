@@ -4,6 +4,14 @@ namespace duice {
 
     export abstract class Handler<T> extends Observable implements Observer {
 
+        target: T;
+
+        readonlyAll: boolean = false;
+
+        readonly: Set<string> = new Set<string>();
+
+        listenerEnabled: boolean = true;
+
         protected constructor() {
             super();
         }
@@ -15,23 +23,6 @@ namespace duice {
         getTarget(): T {
             return this.target;
         }
-
-
-
-
-
-
-
-
-
-        target: T;
-
-        readonlyAll: boolean = false;
-
-        readonly: Set<string> = new Set<string>();
-
-        listenerEnabled: boolean = true;
-
 
         /**
          * getHandler
