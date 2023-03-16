@@ -41,7 +41,8 @@ namespace duice {
          */
         setReadonly(readonly: boolean): void {
             if(readonly){
-                this.getHtmlElement().style.pointerEvents = 'non';
+                console.warn("==ok");
+                this.getHtmlElement().style.pointerEvents = 'none';
             }else{
                 this.getHtmlElement().style.pointerEvents = '';
             }

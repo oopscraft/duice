@@ -48,6 +48,10 @@ namespace duice {
          */
         setReadonlyAll(readonly: boolean): void {
             this.readonlyAll = readonly;
+            if(readonly === false){
+                this.readonly.clear();
+            }
+            this.notifyObservers(new Event(this));
         }
 
         /**

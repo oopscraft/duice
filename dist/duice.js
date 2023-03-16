@@ -97,6 +97,10 @@ var duice;
          */
         setReadonlyAll(readonly) {
             this.readonlyAll = readonly;
+            if (readonly === false) {
+                this.readonly.clear();
+            }
+            this.notifyObservers(new duice.Event(this));
         }
         /**
          * setReadonly
@@ -621,6 +625,9 @@ var duice;
                 // set value
                 let value = objectHandler.getValue(this.property);
                 this.setValue(value);
+                // set readonly
+                let readonly = objectHandler.isReadonly(this.property);
+                this.setReadonly(readonly);
             }
             // executes script
             this.executeScript();
@@ -639,6 +646,8 @@ var duice;
                 if (this.property) {
                     // set value
                     this.setValue(observable.getValue(this.property));
+                    // set readonly
+                    this.setReadonly(observable.isReadonly(this.property));
                 }
                 // executes script
                 this.executeScript();
@@ -1267,8 +1276,8 @@ var duice;
         }
         catch (ignore) { }
         // throw error
+        console.warn(`Object[${name}] is not found`);
         return undefined;
-        //throw new Error(`Object[${name}] is not found`);
     }
     duice.findObject = findObject;
     /**
@@ -2059,7 +2068,8 @@ var duice;
          */
         setReadonly(readonly) {
             if (readonly) {
-                this.getHtmlElement().style.pointerEvents = 'non';
+                console.warn("==ok");
+                this.getHtmlElement().style.pointerEvents = 'none';
             }
             else {
                 this.getHtmlElement().style.pointerEvents = '';

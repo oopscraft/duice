@@ -41,20 +41,20 @@
             let object = JSON.parse(document.getElementById('myObject').value);
             duice.ObjectProxy.assign(myObject, object);
         }
-        //
-        // // adds before change listener
-        // duice.ObjectProxy.onPropertyChanging(myObject, async (event) => {
-        //     if(await duice.confirm(`Do you want to change [${event.getProperty()}] is [${event.getValue()}]`)){
-        //         return true;
-        //     }else{
-        //         return false;
-        //     }
-        // });
-        //
-        // // adds after change listener
-        // duice.ObjectProxy.onPropertyChanged(myObject, (property, value) => {
-        //     viewMyObject();
-        // });
+
+        // adds before change listener
+        duice.ObjectProxy.onPropertyChanging(myObject, async (event) => {
+            if(await duice.confirm(`Do you want to change [${event.getProperty()}] is [${event.getValue()}]`)){
+                return true;
+            }else{
+                return false;
+            }
+        });
+
+        // adds after change listener
+        duice.ObjectProxy.onPropertyChanged(myObject, (property, value) => {
+            viewMyObject();
+        });
 
         // adds DOMContentLoaded event listener
         document.addEventListener("DOMContentLoaded", event => {
@@ -88,13 +88,7 @@
                     duice.ObjectProxy.setReadonly(myObject,'name', true);
                 </button>
                 <button onclick="duice.ObjectProxy.setReadonly(myObject, 'name', false);" class="font-weight-light">
-                    duice.ObjectProxy.setReadonly(myObject,'name',true);
-                </button>
-                <button onclick="alert(duice.ObjectProxy.isDirty(myObject));" class="font-weight-light">
-                    duice.ObjectProxy.isDirty(myObject);
-                </button>
-                <button onclick="duice.ObjectProxy.reset(myObject); viewMyObject();" class="font-weight-light">
-                    duice.ObjectProxy.reset(myObject);
+                    duice.ObjectProxy.setReadonly(myObject,'name', false);
                 </button>
             </div>
         </div>

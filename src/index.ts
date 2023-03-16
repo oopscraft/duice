@@ -95,8 +95,8 @@ namespace duice {
         }catch(ignore){}
 
         // throw error
+        console.warn(`Object[${name}] is not found`);
         return undefined;
-        //throw new Error(`Object[${name}] is not found`);
     }
 
     /**

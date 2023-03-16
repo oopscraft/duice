@@ -101,6 +101,10 @@ namespace duice {
                 // set value
                 let value = objectHandler.getValue(this.property);
                 this.setValue(value);
+
+                // set readonly
+                let readonly = objectHandler.isReadonly(this.property);
+                this.setReadonly(readonly);
             }
 
             // executes script
@@ -121,8 +125,12 @@ namespace duice {
             // ObjectHandler
             if(observable instanceof ObjectHandler) {
                 if(this.property){
+
                     // set value
                     this.setValue(observable.getValue(this.property));
+
+                    // set readonly
+                    this.setReadonly(observable.isReadonly(this.property));
                 }
 
                 // executes script
