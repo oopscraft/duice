@@ -12,9 +12,11 @@
             phoneNo: '01012345678',
             cardNo: '0000111122223333',
             balanceAmount: 1234567.13,
+            password: 'p1a2s3s4w5o6r7d8!@',
             type: 'human',
             enabled: true,
             enabledYn: 'Y',
+            gender: 'male',
             description: "My name is apple.\n I am Fruit.",
             address: {
                 country: 'USA',
@@ -229,6 +231,19 @@
                     </td>
                 </tr>
                 </tbody>
+                <!-- password -->
+                <tbody>
+                <tr>
+                    <td class="font-weight-bold">password</td>
+                    <td duice:object="myObject" duice:property="password"></td>
+                    <td>
+                        <input type="password" duice:object="myObject" duice:property="password"></input>
+                    </td>
+                    <td class="font-weight-light">
+                        &lt;input type="password" duice:object="myObject" duice:property="password"&gt; &lt;/*&gt;
+                    </td>
+                </tr>
+                </tbody>
                 <!-- type -->
                 <tbody>
                 <tr>
@@ -297,6 +312,34 @@
                     </td>
                 </tr>
                 </tbody>
+
+
+                <!-- gender -->
+                <tbody>
+                <tr>
+                    <td rowspan="2" class="font-weight-bold">gender</td>
+                    <td rowspan="2" duice:object="myObject" duice:property="gender"></td>
+                    <td>
+                        <span duice:object="myObject" duice:property="gender"></span>
+                    </td>
+                    <td class="font-weight-light">
+                        &lt;* duice:object="myObject" duice:property="enabledYn"&gt; &lt;/*&gt;
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="radio" duice:object="myObject" duice:property="gender" value="male"/>
+                        <input type="radio" duice:object="myObject" duice:property="gender" value="female"/>
+                    </td>
+                    <td class="font-weight-light">
+                        &lt;input type="radio" duice:object="myObject" duice:property="gender" value="male"/&gt;
+                        <br/>
+                        &lt;input type="radio" duice:object="myObject" duice:property="gender" value="male"/&gt;
+                    </td>
+                </tr>
+                </tbody>
+
+
                 <!-- description -->
                 <tbody>
                 <tr>

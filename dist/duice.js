@@ -1901,6 +1901,18 @@ var duice;
                 return this.falseValue;
             }
         }
+        /**
+         * setReadonly
+         * @param readonly
+         */
+        setReadonly(readonly) {
+            if (readonly) {
+                this.getHtmlElement().style.pointerEvents = 'none';
+            }
+            else {
+                this.getHtmlElement().style.pointerEvents = '';
+            }
+        }
     }
     duice.InputCheckboxElement = InputCheckboxElement;
 })(duice || (duice = {}));
@@ -1922,6 +1934,8 @@ var duice;
                     return new duice.InputNumberElement(htmlElement, context);
                 case 'checkbox':
                     return new duice.InputCheckboxElement(htmlElement, context);
+                case 'radio':
+                    return new duice.InputRadioElement(htmlElement, context);
                 default:
                     return new duice.InputElement(htmlElement, context);
             }
@@ -2513,5 +2527,53 @@ var duice;
         }
     }
     duice.StringMask = StringMask;
+})(duice || (duice = {}));
+///<reference path="InputElement.ts"/>
+var duice;
+(function (duice) {
+    /**
+     * InputRadioElement
+     */
+    class InputRadioElement extends duice.InputElement {
+        /**
+         * constructor
+         * @param htmlElement
+         * @param context
+         */
+        constructor(htmlElement, context) {
+            super(htmlElement, context);
+        }
+        /**
+         * setValue
+         * @param value
+         */
+        setValue(value) {
+            if (this.getHtmlElement().value === value) {
+                this.getHtmlElement().checked = true;
+            }
+            else {
+                this.getHtmlElement().checked = false;
+            }
+        }
+        /**
+         * getValue
+         */
+        getValue() {
+            return this.getHtmlElement().value;
+        }
+        /**
+         * setReadonly
+         * @param readonly
+         */
+        setReadonly(readonly) {
+            if (readonly) {
+                this.getHtmlElement().style.pointerEvents = 'none';
+            }
+            else {
+                this.getHtmlElement().style.pointerEvents = '';
+            }
+        }
+    }
+    duice.InputRadioElement = InputRadioElement;
 })(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map

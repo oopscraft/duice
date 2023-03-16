@@ -2,13 +2,9 @@
 namespace duice {
 
     /**
-     * InputCheckboxElement
+     * InputRadioElement
      */
-    export class InputCheckboxElement extends InputElement {
-
-        trueValue: any = true;
-
-        falseValue: any = false;
+    export class InputRadioElement extends InputElement {
 
         /**
          * constructor
@@ -17,12 +13,6 @@ namespace duice {
          */
         constructor(htmlElement: HTMLInputElement, context: object) {
             super(htmlElement, context);
-
-            // true false value
-            let trueValue = getAttribute(this.getHtmlElement(), 'true-value');
-            this.trueValue = trueValue ? trueValue : this.trueValue;
-            let falseValue = getAttribute(this.getHtmlElement(), 'false-value');
-            this.falseValue = falseValue ? falseValue : this.falseValue;
         }
 
         /**
@@ -30,10 +20,10 @@ namespace duice {
          * @param value
          */
         setValue(value: any): void {
-            if (value === this.trueValue) {
+            if(this.getHtmlElement().value === value){
                 this.getHtmlElement().checked = true;
-            } else {
-                this.htmlElement.checked = false;
+            }else{
+                this.getHtmlElement().checked = false;
             }
         }
 
@@ -41,11 +31,7 @@ namespace duice {
          * getValue
          */
         getValue(): any {
-            if(this.htmlElement.checked){
-                return this.trueValue;
-            }else{
-                return this.falseValue;
-            }
+            return this.getHtmlElement().value;
         }
 
         /**

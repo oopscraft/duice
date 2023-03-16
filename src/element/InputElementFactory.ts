@@ -17,6 +17,8 @@ namespace duice {
                     return new InputNumberElement(htmlElement, context);
                 case 'checkbox':
                     return new InputCheckboxElement(htmlElement, context);
+                case 'radio':
+                    return new InputRadioElement(htmlElement, context);
                 default:
                     return new InputElement(htmlElement, context);
             }
