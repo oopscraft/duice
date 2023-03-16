@@ -25,7 +25,11 @@ namespace duice {
          * @param value
          */
         setValue(value: any): void {
-            value = this.getMask() ? this.getMask().encode(value) : value;
+            if(value) {
+                value = this.getMask() ? this.getMask().encode(value) : value;
+            }else{
+                value = '';
+            }
             this.getHtmlElement().value = value;
         }
 
@@ -34,7 +38,11 @@ namespace duice {
          */
         getValue(): any {
             let value = this.getHtmlElement().value;
-            value = this.getMask() ? this.getMask().decode(value) : value;
+            if(value){
+                value = this.getMask() ? this.getMask().decode(value) : value;
+            }else{
+                value = null;
+            }
             return value;
         }
 

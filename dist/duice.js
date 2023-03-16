@@ -1835,7 +1835,12 @@ var duice;
          * @param value
          */
         setValue(value) {
-            value = this.getMask() ? this.getMask().encode(value) : value;
+            if (value) {
+                value = this.getMask() ? this.getMask().encode(value) : value;
+            }
+            else {
+                value = '';
+            }
             this.getHtmlElement().value = value;
         }
         /**
@@ -1843,7 +1848,12 @@ var duice;
          */
         getValue() {
             let value = this.getHtmlElement().value;
-            value = this.getMask() ? this.getMask().decode(value) : value;
+            if (value) {
+                value = this.getMask() ? this.getMask().decode(value) : value;
+            }
+            else {
+                value = null;
+            }
             return value;
         }
         /**

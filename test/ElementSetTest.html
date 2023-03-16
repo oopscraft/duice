@@ -52,6 +52,25 @@
                     {id:'b', name:'B'},
                     {id:'c', name:'C'}
                 ]
+            },
+            {
+                name: 'Tom',
+                phoneNo: '01098765432',
+                cardNo: '9999888877776666',
+                balanceAmount: 7654321.51,
+                type: 'human',
+                enabled: false,
+                enabledYn: 'N',
+                description: "My name is tom.\n I am tom.",
+                address: {
+                    country: 'UK',
+                    city: 'London'
+                },
+                items: [
+                    {id:'a', name:'A'},
+                    {id:'b', name:'B'},
+                    {id:'c', name:'C'}
+                ]
             }
         ]);
 
@@ -114,7 +133,7 @@
     </script>
 </head>
 <body>
-<h1>Element Test</h1>
+<h1>ElementSet Test</h1>
 <div class="container">
     <div class="row">
         <div class="col-2">
@@ -198,7 +217,7 @@
                 <small>&lt;tr duice:array="myArray" duice:loop="item,status" duice:editable="true"&gt;</small>
             </h3>
             <div style="border:solid 1px; width:fit-content; max-height:400px; overflow-y:scroll; border:solid 1px darkgray;">
-                <table class="table table-bordered">
+                <table class="b-none">
                     <thead>
                     <tr>
                         <th>index</th>
