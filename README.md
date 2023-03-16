@@ -62,8 +62,9 @@ const user = new duice.ObjectProxy({
 
 ```javascript
 const users = new duice.ArrayProxy([
-    { id: 'apple', name: 'Apple' },
-    { id: 'monkey', name: 'Monkey' }
+    { name: 'Apple' },
+    { name: 'Monkey' },
+    { name: 'Orange' }
 ]);
 ```
 
@@ -78,13 +79,13 @@ const users = new duice.ArrayProxy([
 <table>
     <tr>
         <th>no</th>
-        <th>id</th>
+        <th>name</th>
         <th>name</th>
     </tr>
     <tr duice:array="users" duice:loop="user,status">
         <td duice:object="status" duice:property="count"></td>
-        <td duice:object="user" duice:property="id"></td>
         <td duice:object="user" duice:property="name"></td>
+        <td><input type="text" duice:object="user" duice:property="name"/></td>
     </tr>
 </table>
 ```
