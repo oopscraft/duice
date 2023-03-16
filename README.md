@@ -1,5 +1,37 @@
 # DUICE (Data oriented UI Component Element)
 
+## Conception
+
+### MVC Auto-Binding (between Data Structure and HTML DOM Element)
+
+By using the Object and Array, bidirectional binding processing is performed with HTML DOM Element in charge of presentation of the screen.
+
+(It's implemented by Internally it is Proxy and Observer Pattern)
+
+When changing the data of Object and Array, the value of the UI DOM element binding was also automatically changed.
+
+Conversely, if the user changes the value of the UI DOM Element, the binding Object and Array is automatically changed.
+
+
+### Reducing Learning Curve (Only simple HTML and javascript)
+
+If you know only basic HTML format and Javascript,
+
+configure it to be able to operate.
+
+
+
+### Pure Javascript Prototype (No Dependency, No Conflict)
+
+This library is developted by just pure javascript.
+
+It is oriented towards minimal code, no-dependency and no-conflict.
+
+Therefore you can use it with another javascript library together.
+
+
+--------------------------------------------------
+
 
 ## Object(Proxy) to Element
 
@@ -103,7 +135,6 @@ async function openDialog() {
     </pre>
 </dialog>
 ```
-
 
 ### Example
 
