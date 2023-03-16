@@ -1,7 +1,7 @@
 # DUICE (Data oriented UI Component Element)
 
 
-## Object to Element
+## Object(Proxy) to Element
 
 ### Javascript
 
