@@ -8,6 +8,6 @@
     "typescript": "^4.8.4"
   },
   "scripts": {
-    "build": "cp static/* ./dist/"
+    "build": "cp src/duice.css ./dist/"
   }
 }

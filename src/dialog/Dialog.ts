@@ -101,7 +101,7 @@ namespace duice {
             let scrollX = window.scrollX;
             let scrollY = window.scrollY;
             this.dialogElement.style.left = Math.max(0, window.innerWidth / 2 - computedWidth / 2) + scrollX + 'px';
-            this.dialogElement.style.top = Math.max(0, window.innerHeight / 2 - computedHeight / 2) + scrollY + 'px';
+            this.dialogElement.style.top = Math.max(0, window.innerHeight / 3 - computedHeight / 3) + scrollY + 'px';
         }
 
         /**

@@ -546,7 +546,7 @@ var duice;
     duice.MaskFactory = MaskFactory;
 })(duice || (duice = {}));
 ///<reference path="Observable.ts"/>
-///<reference path="mask/MaskFactory.ts"/>
+///<reference path="./mask/MaskFactory.ts"/>
 var duice;
 (function (duice) {
     /**
@@ -1525,7 +1525,7 @@ var duice;
             let scrollX = window.scrollX;
             let scrollY = window.scrollY;
             this.dialogElement.style.left = Math.max(0, window.innerWidth / 2 - computedWidth / 2) + scrollX + 'px';
-            this.dialogElement.style.top = Math.max(0, window.innerHeight / 2 - computedHeight / 2) + scrollY + 'px';
+            this.dialogElement.style.top = Math.max(0, window.innerHeight / 3 - computedHeight / 3) + scrollY + 'px';
         }
         /**
          * getDialogElement
@@ -2078,6 +2078,54 @@ var duice;
     }
     duice.InputNumberElement = InputNumberElement;
 })(duice || (duice = {}));
+///<reference path="InputElement.ts"/>
+var duice;
+(function (duice) {
+    /**
+     * InputRadioElement
+     */
+    class InputRadioElement extends duice.InputElement {
+        /**
+         * constructor
+         * @param htmlElement
+         * @param context
+         */
+        constructor(htmlElement, context) {
+            super(htmlElement, context);
+        }
+        /**
+         * setValue
+         * @param value
+         */
+        setValue(value) {
+            if (this.getHtmlElement().value === value) {
+                this.getHtmlElement().checked = true;
+            }
+            else {
+                this.getHtmlElement().checked = false;
+            }
+        }
+        /**
+         * getValue
+         */
+        getValue() {
+            return this.getHtmlElement().value;
+        }
+        /**
+         * setReadonly
+         * @param readonly
+         */
+        setReadonly(readonly) {
+            if (readonly) {
+                this.getHtmlElement().style.pointerEvents = 'none';
+            }
+            else {
+                this.getHtmlElement().style.pointerEvents = '';
+            }
+        }
+    }
+    duice.InputRadioElement = InputRadioElement;
+})(duice || (duice = {}));
 var duice;
 (function (duice) {
     /**
@@ -2561,53 +2609,5 @@ var duice;
         }
     }
     duice.StringMask = StringMask;
-})(duice || (duice = {}));
-///<reference path="InputElement.ts"/>
-var duice;
-(function (duice) {
-    /**
-     * InputRadioElement
-     */
-    class InputRadioElement extends duice.InputElement {
-        /**
-         * constructor
-         * @param htmlElement
-         * @param context
-         */
-        constructor(htmlElement, context) {
-            super(htmlElement, context);
-        }
-        /**
-         * setValue
-         * @param value
-         */
-        setValue(value) {
-            if (this.getHtmlElement().value === value) {
-                this.getHtmlElement().checked = true;
-            }
-            else {
-                this.getHtmlElement().checked = false;
-            }
-        }
-        /**
-         * getValue
-         */
-        getValue() {
-            return this.getHtmlElement().value;
-        }
-        /**
-         * setReadonly
-         * @param readonly
-         */
-        setReadonly(readonly) {
-            if (readonly) {
-                this.getHtmlElement().style.pointerEvents = 'none';
-            }
-            else {
-                this.getHtmlElement().style.pointerEvents = '';
-            }
-        }
-    }
-    duice.InputRadioElement = InputRadioElement;
 })(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map

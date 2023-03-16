@@ -1,5 +1,5 @@
 ///<reference path="Observable.ts"/>
-///<reference path="mask/MaskFactory.ts"/>
+///<reference path="./mask/MaskFactory.ts"/>
 namespace duice {
 
     /**
