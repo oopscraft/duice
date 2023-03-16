@@ -26,11 +26,12 @@ Therefore you can use it with another javascript library together.
 
 ## Object(Proxy) to Element
 
+<script async src="//jsfiddle.net/chomookun/ue1hsdk7/14/embed/js,html,result/dark/"></script>
+
 ### Javascript
 
 ```javascript
 const user = new duice.ObjectProxy({
-    id: 'apple',
     name: 'Apple'
 });
 ```
@@ -44,7 +45,7 @@ const user = new duice.ObjectProxy({
 
 
 ```html
-<span duice:object="user" duice:property="id"></span>
+<span duice:object="user" duice:property="name"></span>
 <input type="text" duice:object="user" duice:property="name"/>
 ```
 
