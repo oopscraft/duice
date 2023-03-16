@@ -2,7 +2,7 @@
 
 ## Conception
 
-### MVC Auto-Binding (between Data Structure and HTML DOM Element)
+### 1. MVC Auto-Binding (between Data Structure and HTML DOM Element)
 
 By using the Object and Array, bidirectional binding processing is performed with HTML DOM Element in charge of presentation of the screen.
 
@@ -13,7 +13,7 @@ When changing the data of Object and Array, the value of the UI DOM element bind
 Conversely, if the user changes the value of the UI DOM Element, the binding Object and Array is automatically changed.
 
 
-### Reducing Learning Curve (Only simple HTML and javascript)
+### 2. Reducing Learning Curve (Only simple HTML and javascript)
 
 If you know only basic HTML format and Javascript,
 
@@ -21,7 +21,7 @@ configure it to be able to operate.
 
 
 
-### Pure Javascript Prototype (No Dependency, No Conflict)
+### 3. Pure Javascript Prototype (No Dependency, No Conflict)
 
 This library is developted by just pure javascript.
 
