@@ -46,6 +46,12 @@ const user = new duice.ObjectProxy({
 
 ### HTML
 
+| attribute                                 | description                  | remark |
+|-------------------------------------------|------------------------------|--------|
+| **duice:object**="[object]"               | Object name to bind          |        |
+| **duice:property**="[property of object]" | Object Property name to bind |        |
+
+
 ```html
 <span duice:object="user" duice:property="id"></span>
 <input type="text" duice:object="user" duice:property="name"/>
@@ -70,6 +76,11 @@ const users = new duice.ArrayProxy([
 ```
 
 ### HTML
+
+| attribute                                     | description                             | remark |
+|-----------------------------------------------|-----------------------------------------|--------|
+| **duice:array**="[array]"                     | Object name to bind                     |        |
+| **duice:loop**="[element name],[status name]" | element object and status variable name |        |
 
 ```html
 <table>
