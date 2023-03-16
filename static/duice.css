@@ -1,68 +1,92 @@
 :root {
-    --font-family: sans-serif;
-    --font-size: 0.75rem;
-    --line-height: 200%;
-    --table-border: solid 1px #ddd;
-    --table-padding: 0.0625rem 0.5rem;
-    --table-th-background-color: #f7f7f7;
-    --table-td-background-color: white;
-    --input-padding: 0.0625rem 0.5rem;
-    --input-border-width: 1px;
-    --input-border-color: #ccc;
-    --input-border-radius: 1px;
-    --select-padding: 0.0625rem 0.5rem;
-    --select-border: solid 1px #ccc;
-    --select-border-radius: 1px;
-    --select-background-img: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAGdJREFUOI3tzjsOwjAURNGDUqSgTxU5K2AVrJtswjUsgHSR0qdxAZZFPrS+3ZvRzBsqf9MUtBtazJk+oMe0VTriiZCFX8nbpENMgfARjsn74vKj5IFruhfc8d6zIF9S/Hyk5HS4spMVeFcOjszaOwMAAAAASUVORK5CYII=');
-    --textarea-margin: 1px;
-    --textarea-padding: 0.0625rem 0.5rem;
-    --textarea-border: solid 1px #ccc;
-    --textarea-border-radius: 1px;
-    --button-margin: 1px;
-    --button-padding: 0.0625rem 0.5rem;
-    --button-border: solid 1px #ccc;
-    --button-border-radius: 1px;
-    --button-background-color: #f7f7f7;
-    --button-hover-background-color: #eee;
-    --dialog-border: solid 1px black;
+    /* global */
+    --duice-background-color: white;
+    --duice-color: black;
+    --duice-font-family: sans-serif;
+    --duice-font-size: 0.75rem;
+    --duice-line-height: 200%;
+    /* element */
+    --duice-element-border: solid 1px #ccc;
+    --duice-element-border-radius: 1px;
+    --duice-element-padding: 0.0625rem 0.5rem;
+    --duice-element-focus-border: solid 1px black;
+    /* table */
+    --duice-table-border: solid 1px #ccc;
+    --duice-table-header-color: #efefef;
+    --duice-table-padding: 0.0625rem 0.5rem;
+    /* select */
+    --duice-select-img: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAaklEQVR4nO2QMQ6AMAhFu6hXY+hn66Yrh7Omung/Q1wakw5NSVx4CRPwfiAEx3H+I8a4AcgiMrVmtMfMO4C1O0CXARQANxEtvf2hELGQt2TyvuU0kdchKq3qSinNJvLPJZmZD3O54zhhiAdheTXMKGeedwAAAABJRU5ErkJggg==");
+    /* button */
+    --duice-button-border: solid 1px #ccc;
+    --duice-button-border-radius: 1px;
+    --duice-button-background-color: #efefef;
+    --duice-button-background-color-hover: #eee;
+    /* dialog */
+    --duice-dialog-border: solid 1px #777;
+}
+:root.dark {
+    --duice-color-scheme: dark;
+    /* global */
+    --duice-background-color: #222;
+    --duice-color: #eee;
+    /* element */
+    --duice-element-border: solid 1px #444;
+    --duice-element-focus-border: solid 1px #eee;
+    /* table */
+    --duice-table-border: solid 1px #444;
+    --duice-table-header-color: #333;
+    /* select */
+    --duice-select-img: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAZ0lEQVR4nO2NMQqAMAxFu6iX1AtasS72BP9vGXMgEXUpdCgNuORBhvCT90NwHOc/SC4AoogMtZs7A7ACmJsL3ued5JlznlrzrhKxkNdk8uzJRF6UpG9IHqo6msiLkkhyM5c7jhO6uADt4GstrvvuOQAAAABJRU5ErkJggg==");
+    /* button */
+    --duice-button-border: solid 1px #555;
+    --duice-button-background-color: #333;
+    --duice-button-background-color-hover: #444;
+    /* dialog */
+    --duice-dialog-border: solid 1px #ccc;
 }
 
 /* global */
 html {
     -ms-text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
-    font-family: var(--font-family);
-    font-size: var(--font-size);
-    line-height: var(--line-height);
+    background-color: var(--duice-background-color);
+    color: var(--duice-color);
+    font-family: var(--duice-font-family);
+    font-size: var(--duice-font-size);
+    line-height: var(--duice-line-height);
 }
 html * {
+    color-scheme: var(--duice-color-scheme);
+    background-color: inherit;
+    color: inherit;
     font-family: inherit;
     font-size: inherit;
     line-height: inherit;
 }
 html *:focus {
-    outline: 1px solid black;
+    outline: 0;
+    border: var(--duice-element-focus-border);
 }
 body {
-    margin: 0;
+    overflow-y: scroll;
 }
 h1 {
-    font-size: calc(var(--font-size) + 1.0vw);
+    font-size: calc(var(--duice-font-size) + 1.0vw);
 }
 h2 {
-    font-size: calc(var(--font-size) + 0.8vw);
+    font-size: calc(var(--duice-font-size) + 0.8vw);
 }
 h3 {
-    font-size: calc(var(--font-size) + 0.6vw);
+    font-size: calc(var(--duice-font-size) + 0.6vw);
 }
 h4 {
-    font-size: calc(var(--font-size) + 0.4vw);
+    font-size: calc(var(--duice-font-size) + 0.4vw);
 }
 h5 {
-    font-size: calc(var(--font-size) + 0.2vw);
+    font-size: calc(var(--duice-font-size) + 0.2vw);
 }
 h6 {
-    font-size: calc(var(--font-size) + 0.0vw);
+    font-size: calc(var(--duice-font-size) + 0.0vw);
 }
 small {
     font-size: smaller;
@@ -73,14 +97,12 @@ table {
     table-layout: fixed;
     border-collapse: collapse;
     border-spacing: 0;
-    border: var(--table-border);
+    border: var(--duice-table-border);
 }
 table tr th {
-    background-color: var(--table-th-background-color);
-    border: var(--table-border);
-    padding: var(--table-padding);
-    padding-top: 3px;
-    padding-bottom: 3px;
+    background-color: var(--duice-table-header-color);
+    border: var(--duice-table-border);
+    padding: var(--duice-table-padding);
     font-weight: bold;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -94,9 +116,8 @@ table tr th:has(*) {
     padding: 1px;
 }
 table tr td {
-    border: var(--table-border);
-    padding: var(--table-padding);
-    background-color: var(--table-td-background-color);
+    border: var(--duice-table-border);
+    padding: var(--duice-table-padding);
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -118,10 +139,9 @@ table tfoot {
 
 /* input */
 input {
-    margin: 0;
-    border: solid 1px #ccc;
-    border-radius: 1px;
-    padding: var(--input-padding);
+    border: var(--duice-element-border);
+    border-radius: var(--duice-element-border-radius);
+    padding: var(--duice-element-padding);
     height: inherit;
     line-height: inherit;
     box-sizing: border-box;
@@ -131,36 +151,26 @@ input {
 
 /* select */
 select {
-    margin: 0;
-    padding: var(--select-padding);
-    border: var(--select-border);
-    border-radius: var(--select-border-radius);
-    height: inherit;
-    line-height: inherit;
-    box-sizing: border-box;
+    border: var(--duice-element-border);
+    border-radius: var(--duice-element-border-radius);
+    padding: var(--duice-element-padding);
+    appearance: none;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     -webkit-appearance: none;
     -moz-appearance: none;
-    appearance: none;
-    background-clip: padding-box;
-    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-    overflow: hidden;
-    background-color: unset;
-    background-image: var(--select-background-img);
+    background-image: var(--duice-select-img);
     background-repeat: no-repeat;
-    background-position: right 0.1rem center;
+    background-position: right 0.2rem center;
+    background-size: 1rem;
     padding-right:2em;
-    font-family:inherit;
-    font-size:inherit;
 }
 
 /* textarea */
 textarea {
-    margin: 0;
-    padding: var(--textarea-padding);
-    border: var(--textarea-border);
-    border-radius: var(--textarea-border-radius);
+    border: var(--duice-element-border);
+    border-radius: var(--duice-element-border-radius);
+    padding: var(--duice-element-padding);
     width: 100%;
     line-height: 150%;
     white-space: pre-line;
@@ -176,23 +186,27 @@ textarea {
 
 /* button */
 button {
-    margin: var(--button-margin);
-    padding: var(--button-padding);
-    border: var(--button-border);
-    border-radius: var(--button-border-radius);
-    background-color: var(--button-background-color);
+    margin: 1px;
+    border: var(--duice-button-border);
+    border-radius: var(--duice-button-border-radius);
+    background-color: var(--duice-button-background-color);
     cursor: pointer;
     text-align: center;
     text-decoration: none;
     transition-duration: 0.3s;
 }
 button:hover {
-    background-color: var(--button-hover-background-color);
+    background-color: var(--duice-button-background-color-hover);
 }
 
 /* ul */
 ul {
     text-align: left;
+}
+
+/* dialog */
+dialog {
+    border: var(--duice-dialog-border);
 }
 
 
@@ -205,11 +219,8 @@ ul {
     display: -ms-flexbox;
     flex-wrap: nowrap;
     justify-content: unset;
-    margin: 0px;
-    padding: 0px;
 }
 .row > * {
-    margin: 0px;
     border: none;
 }
 .col {
@@ -293,3 +304,6 @@ ul {
 .ta-right {
     text-align: right;
 }
+
+
+

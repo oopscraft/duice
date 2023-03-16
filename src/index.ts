@@ -26,6 +26,14 @@ namespace duice {
     }
 
     /**
+     * setColorScheme
+     * @param name
+     */
+    export function setColorScheme(name: string): void {
+        document.documentElement.className = name;
+    }
+
+    /**
      * returns query selector expression
      */
     export function getQuerySelectorExpression(){
@@ -227,6 +235,20 @@ namespace duice {
      * listens DOMContentLoaded event
      */
     if(globalThis.document) {
+
+        // set color scheme
+        try {
+            if(window.matchMedia) {
+                let isColorSchemeDark = window.matchMedia('(prefers-color-scheme: dark)')?.matches;
+                if(isColorSchemeDark){
+                    setColorScheme('dark');
+                }
+            }
+        }catch(ignore){
+            console.warn(ignore.message, ignore);
+        }
+
+        // initialize elements
         document.addEventListener("DOMContentLoaded", event => {
             initialize(document.documentElement, {});
         });

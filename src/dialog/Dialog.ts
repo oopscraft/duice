@@ -31,6 +31,8 @@ namespace duice {
             this.dialogElement.style.right = '0';
             this.dialogElement.style.margin = 'auto';
             this.dialogElement.style.height = 'fit-content';
+            this.dialogElement.style.borderStyle = 'solid';
+            this.dialogElement.style.borderWidth = '1px';
 
             // header
             this.header = document.createElement('span');

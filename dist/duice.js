@@ -1189,6 +1189,7 @@ var duice;
  * ============================================================================= */
 var duice;
 (function (duice) {
+    var _a;
     let alias = 'duice';
     /**
      * sets alias of namespace
@@ -1205,6 +1206,14 @@ var duice;
         return alias;
     }
     duice.getAlias = getAlias;
+    /**
+     * setColorScheme
+     * @param name
+     */
+    function setColorScheme(name) {
+        document.documentElement.className = name;
+    }
+    duice.setColorScheme = setColorScheme;
     /**
      * returns query selector expression
      */
@@ -1415,6 +1424,19 @@ var duice;
      * listens DOMContentLoaded event
      */
     if (globalThis.document) {
+        // set color scheme
+        try {
+            if (window.matchMedia) {
+                let isColorSchemeDark = (_a = window.matchMedia('(prefers-color-scheme: dark)')) === null || _a === void 0 ? void 0 : _a.matches;
+                if (isColorSchemeDark) {
+                    setColorScheme('dark');
+                }
+            }
+        }
+        catch (ignore) {
+            console.warn(ignore.message, ignore);
+        }
+        // initialize elements
         document.addEventListener("DOMContentLoaded", event => {
             initialize(document.documentElement, {});
         });
@@ -1439,6 +1461,8 @@ var duice;
             this.dialogElement.style.right = '0';
             this.dialogElement.style.margin = 'auto';
             this.dialogElement.style.height = 'fit-content';
+            this.dialogElement.style.borderStyle = 'solid';
+            this.dialogElement.style.borderWidth = '1px';
             // header
             this.header = document.createElement('span');
             this.dialogElement.appendChild(this.header);
