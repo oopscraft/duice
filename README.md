@@ -31,6 +31,7 @@ Therefore you can use it with another javascript library together.
 
 ```javascript
 const user = new duice.ObjectProxy({
+    id: 'apple',
     name: 'Apple'
 });
 ```
@@ -44,7 +45,7 @@ const user = new duice.ObjectProxy({
 
 
 ```html
-<span duice:object="user" duice:property="name"></span>
+<span duice:object="user" duice:property="id"></span>
 <input type="text" duice:object="user" duice:property="name"/>
 ```
 
@@ -61,9 +62,9 @@ const user = new duice.ObjectProxy({
 
 ```javascript
 const users = new duice.ArrayProxy([
-    { name: 'Apple' },
-    { name: 'Monkey' },
-    { name: 'Orange' }
+    { id: 'apple', name: 'Apple' },
+    { id: 'monkey', name: 'Monkey' },
+    { id: 'orange', name: 'Orange' }
 ]);
 ```
 
@@ -83,7 +84,7 @@ const users = new duice.ArrayProxy([
     </tr>
     <tr duice:array="users" duice:loop="user,status">
         <td duice:object="status" duice:property="count"></td>
-        <td duice:object="user" duice:property="name"></td>
+        <td duice:object="user" duice:property="id"></td>
         <td><input type="text" duice:object="user" duice:property="name"/></td>
     </tr>
 </table>
