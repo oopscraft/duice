@@ -49,7 +49,7 @@ const user = new duice.ObjectProxy({
 <input type="text" duice:object="user" duice:property="name"/>
 ```
 
-### Example
+### Test Case
 [ObjectProxy to Element Test](test/ElementTest.html)
 
 
@@ -90,7 +90,7 @@ const users = new duice.ArrayProxy([
 </table>
 ```
 
-### Example
+### Test Case 
 
 [ArrayProxy to ElementSet Test](test/ElementSetTest.html)
 
@@ -140,7 +140,7 @@ async function openDialog() {
 </dialog>
 ```
 
-### Example
+### Test Case
 
 [Dialog/Alert/Confirm/Prompt Test](test/dialog/Dialog.html)
 
