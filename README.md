@@ -38,11 +38,12 @@ const user = new duice.ObjectProxy({
 
 ### HTML
 
-| attribute                                  | description                   |
-|:-------------------------------------------|:------------------------------|
-| duice:object="[object]"                | Object name to bind           |
-| duice:property="[property of object]"  | Object Property name to bind  |
-
+| attribute                             | description                                          |
+|:--------------------------------------|:-----------------------------------------------------|
+| duice:object="[object]"               | Object name to bind                                  |
+| duice:property="[property of object]" | Object Property name to bind                         |
+| duice:script="[script code]"          | javascript code to execute when element is updated   |
+| duice:mask="[data masking clause]"    | ex) string('###-###'), number(2), date('yyyy-MM-dd') |
 
 ```html
 <span duice:object="user" duice:property="id"></span>
@@ -74,6 +75,7 @@ const users = new duice.ArrayProxy([
 |:------------------------------------------|:-----------------------------------------|
 | duice:array="[array]"                     | Object name to bind                      |
 | duice:loop="[element name],[status name]" | element object and status variable name  |
+| duice:script="[script code]"          | javascript code to execute when element is updated   |
 
 ```html
 <table>
