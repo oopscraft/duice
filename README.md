@@ -24,11 +24,7 @@ Therefore you can use it with another javascript library together.
 --------------------------------------------------
 
 
-## Object(Proxy) to Elemen
-
-
-<script async src="//jsfiddle.net/chomookun/ue1hsdk7/3/embed/js,html,result/dark/"></script>
-
+## Object(Proxy) to Element
 
 ### Javascript
 
