@@ -37,10 +37,10 @@ const user = new duice.ObjectProxy({
 
 ### HTML
 
-| attribute                                 | description                  | remark |
-|-------------------------------------------|------------------------------|--------|
-| **duice:object**="[object]"               | Object name to bind          |        |
-| **duice:property**="[property of object]" | Object Property name to bind |        |
+| attribute                                  | description                   | remark |
+|:-------------------------------------------|:------------------------------|--------|
+| **duice:object**="[object]"                | Object name to bind           |        |
+| **duice:property**="[property of object]"  | Object Property name to bind  |        |
 
 
 ```html
