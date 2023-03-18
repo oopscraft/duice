@@ -26,14 +26,6 @@ namespace duice {
     }
 
     /**
-     * setColorScheme
-     * @param name
-     */
-    export function setColorScheme(name: string): void {
-        document.documentElement.className = name;
-    }
-
-    /**
      * returns query selector expression
      */
     export function getQuerySelectorExpression(){
@@ -260,8 +252,86 @@ namespace duice {
      * @param name
      */
     export function deleteCookie(name:string):void {
-        let date = new Date();
-        document.cookie = name + "= " + "; expires=" + date.toUTCString() + "; path=/";
+        setCookie(name, '', -1);
+    }
+
+    /**
+     * fetch
+     * @param url
+     * @param options
+     * @param _bypass
+     */
+    export function fetch(url: URL, options: any, _bypass: boolean) {
+        if(!options.headers){
+            options.headers = {};
+        }
+        let xsrfToken = getCookie('X-XSRF-TOKEN');
+        options.headers['X-XSRF-TOKEN'] = xsrfToken;
+        let csrfToken = getCookie('X-CSRF-TOKEN');
+        options.headers['X-CSRF-TOKEN'] = csrfToken;
+        options.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+        options.headers['Pragma'] = 'no-cache';
+        options.headers['Expires'] = '0';
+        return globalThis.fetch(url, options)
+            .then(async function(response){
+                console.debug(response);
+
+                // bypass
+                if(_bypass){
+                    return response;
+                }
+
+                // checks response
+                if(response.ok) {
+                    return response;
+                }else{
+                    let responseJson = await response.json();
+                    console.warn(responseJson);
+                    let message = responseJson.message;
+                    alert(message).then();
+                    throw Error(message);
+                }
+            })
+            .catch((error)=>{
+                throw Error(error);
+            });
+    }
+
+    /**
+     * isDarkMode
+     */
+    export function isDarkMode(): boolean {
+
+        // checks cookie
+        if(getCookie('color-scheme') === 'dark') {
+            return true;
+        }
+        if(getCookie('color-scheme') === 'light') {
+            return false;
+        }
+
+        // checks media query
+        if (window.matchMedia) {
+            if(window.matchMedia('(prefers-color-scheme: dark)')?.matches){
+                return true;
+            }
+        }
+
+        // returns false
+        return false;
+    }
+
+    /**
+     * setDarkMode
+     */
+    export function setDarkMode(enable: boolean): void {
+        if(enable){
+            document.documentElement.classList.add('dark');
+            setCookie('color-scheme', 'dark', 356);
+        }else{
+            document.documentElement.classList.remove('dark');
+            setCookie('color-scheme', 'light', 356);
+        }
     }
 
     /**
@@ -270,16 +340,7 @@ namespace duice {
     if(globalThis.document) {
 
         // set color scheme
-        // try {
-        //     if(window.matchMedia) {
-        //         let isColorSchemeDark = window.matchMedia('(prefers-color-scheme: dark)')?.matches;
-        //         if(isColorSchemeDark){
-        //             setColorScheme('dark');
-        //         }
-        //     }
-        // }catch(ignore){
-        //     console.warn(ignore.message, ignore);
-        // }
+        setDarkMode(isDarkMode());
 
         // initialize elements
         document.addEventListener("DOMContentLoaded", event => {
