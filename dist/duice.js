@@ -1423,7 +1423,6 @@ var duice;
         return value ? value[2] : null;
     }
     duice.getCookie = getCookie;
-    ;
     /**
      * Sets cookie value
      * @param name
@@ -1436,7 +1435,6 @@ var duice;
         document.cookie = name + '=' + value + ';expires=' + date.toUTCString() + ';path=/';
     }
     duice.setCookie = setCookie;
-    ;
     /**
      * Deletes cookie
      * @param name
@@ -1489,47 +1487,9 @@ var duice;
     }
     duice.fetch = fetch;
     /**
-     * isDarkMode
-     */
-    function isDarkMode() {
-        var _a;
-        // checks cookie
-        if (getCookie('color-scheme') === 'dark') {
-            return true;
-        }
-        if (getCookie('color-scheme') === 'light') {
-            return false;
-        }
-        // checks media query
-        if (window.matchMedia) {
-            if ((_a = window.matchMedia('(prefers-color-scheme: dark)')) === null || _a === void 0 ? void 0 : _a.matches) {
-                return true;
-            }
-        }
-        // returns false
-        return false;
-    }
-    duice.isDarkMode = isDarkMode;
-    /**
-     * setDarkMode
-     */
-    function setDarkMode(enable) {
-        if (enable) {
-            document.documentElement.classList.add('dark');
-            setCookie('color-scheme', 'dark', 356);
-        }
-        else {
-            document.documentElement.classList.remove('dark');
-            setCookie('color-scheme', 'light', 356);
-        }
-    }
-    duice.setDarkMode = setDarkMode;
-    /**
      * listens DOMContentLoaded event
      */
     if (globalThis.document) {
-        // set color scheme
-        setDarkMode(isDarkMode());
         // initialize elements
         document.addEventListener("DOMContentLoaded", event => {
             initialize(document.documentElement, {});

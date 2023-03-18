@@ -233,7 +233,7 @@ namespace duice {
     export function getCookie(name:string):string {
         let value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
         return value? value[2] : null;
-    };
+    }
 
     /**
      * Sets cookie value
@@ -245,7 +245,7 @@ namespace duice {
         let date = new Date();
         date.setTime(date.getTime() + day * 60 * 60 * 24 * 1000);
         document.cookie = name + '=' + value + ';expires=' + date.toUTCString() + ';path=/';
-    };
+    }
 
     /**
      * Deletes cookie
@@ -298,49 +298,9 @@ namespace duice {
     }
 
     /**
-     * isDarkMode
-     */
-    export function isDarkMode(): boolean {
-
-        // checks cookie
-        if(getCookie('color-scheme') === 'dark') {
-            return true;
-        }
-        if(getCookie('color-scheme') === 'light') {
-            return false;
-        }
-
-        // checks media query
-        if (window.matchMedia) {
-            if(window.matchMedia('(prefers-color-scheme: dark)')?.matches){
-                return true;
-            }
-        }
-
-        // returns false
-        return false;
-    }
-
-    /**
-     * setDarkMode
-     */
-    export function setDarkMode(enable: boolean): void {
-        if(enable){
-            document.documentElement.classList.add('dark');
-            setCookie('color-scheme', 'dark', 356);
-        }else{
-            document.documentElement.classList.remove('dark');
-            setCookie('color-scheme', 'light', 356);
-        }
-    }
-
-    /**
      * listens DOMContentLoaded event
      */
     if(globalThis.document) {
-
-        // set color scheme
-        setDarkMode(isDarkMode());
 
         // initialize elements
         document.addEventListener("DOMContentLoaded", event => {
