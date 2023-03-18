@@ -235,21 +235,51 @@ namespace duice {
     }
 
     /**
+     * Gets cookie value
+     * @param name
+     */
+    export function getCookie(name:string):string {
+        let value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+        return value? value[2] : null;
+    };
+
+    /**
+     * Sets cookie value
+     * @param name
+     * @param value
+     * @param day
+     */
+    export function setCookie(name:string, value:string, day:number):void {
+        let date = new Date();
+        date.setTime(date.getTime() + day * 60 * 60 * 24 * 1000);
+        document.cookie = name + '=' + value + ';expires=' + date.toUTCString() + ';path=/';
+    };
+
+    /**
+     * Deletes cookie
+     * @param name
+     */
+    export function deleteCookie(name:string):void {
+        let date = new Date();
+        document.cookie = name + "= " + "; expires=" + date.toUTCString() + "; path=/";
+    }
+
+    /**
      * listens DOMContentLoaded event
      */
     if(globalThis.document) {
 
         // set color scheme
-        try {
-            if(window.matchMedia) {
-                let isColorSchemeDark = window.matchMedia('(prefers-color-scheme: dark)')?.matches;
-                if(isColorSchemeDark){
-                    setColorScheme('dark');
-                }
-            }
-        }catch(ignore){
-            console.warn(ignore.message, ignore);
-        }
+        // try {
+        //     if(window.matchMedia) {
+        //         let isColorSchemeDark = window.matchMedia('(prefers-color-scheme: dark)')?.matches;
+        //         if(isColorSchemeDark){
+        //             setColorScheme('dark');
+        //         }
+        //     }
+        // }catch(ignore){
+        //     console.warn(ignore.message, ignore);
+        // }
 
         // initialize elements
         document.addEventListener("DOMContentLoaded", event => {
