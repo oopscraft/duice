@@ -1021,7 +1021,7 @@ var duice;
                     continue;
                 }
                 // value is object
-                if (typeof value === 'object') {
+                if (value != null || typeof value === 'object') {
                     let objectProxy = new ObjectProxy(value);
                     ObjectProxy.getHandler(objectProxy).addObserver(objectHandler);
                     this[name] = objectProxy;
