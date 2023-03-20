@@ -1454,9 +1454,11 @@ var duice;
             options.headers = {};
         }
         // csrf token
-        ['X-XSRF-TOKEN', 'X-CSRF-TOKEN', 'XSRF-TOKEN', 'CSRF-TOKEN'].forEach(tokenName => {
+        ['XSRF-TOKEN', 'CSRF-TOKEN'].forEach(tokenName => {
             let tokenValue = getCookie(tokenName);
-            options.headers[tokenName] = tokenValue;
+            if (tokenValue) {
+                options.headers[`X-${tokenName}`] = tokenValue;
+            }
         });
         options.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
         options.headers['Pragma'] = 'no-cache';
