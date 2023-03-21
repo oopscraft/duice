@@ -98,6 +98,7 @@ table {
     border-collapse: collapse;
     border-spacing: 0;
     border: var(--duice-table-border);
+    width: 100%;
 }
 table tr th {
     background-color: var(--duice-table-header-color);
