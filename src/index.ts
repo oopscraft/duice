@@ -1,11 +1,3 @@
-/* =============================================================================
- * DUICE (Data-oriented UI Component Engine)
- * - Anyone can use it freely.
- * - Modify the source or allow re-creation. However, you must state that you have the original creator.
- * - However, we can not grant patents or licenses for  re-productive. (Modifications or reproductions must be shared with the public.)
- * Licence: LGPL(GNU Lesser General Public License version 3)
- * Copyright (C) 2016 chomookun@gmail.com
- * ============================================================================= */
 namespace duice {
 
     let alias = 'duice';
@@ -262,6 +254,9 @@ namespace duice {
      * @param _bypass
      */
     export function fetch(url: URL, options: any, _bypass: boolean) {
+        if(!options){
+            options = {};
+        }
         if(!options.headers){
             options.headers = {};
         }
