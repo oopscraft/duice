@@ -26,6 +26,17 @@ namespace duice {
          */
         setValue(value: any): void {
             this.getHtmlElement().value = value;
+
+            // force select option
+            if(!value) {
+                for(let i = 0; i < this.getHtmlElement().options.length; i++){
+                    let option = this.getHtmlElement().options[i];
+                    if(!option.nodeValue){
+                        option.selected = true;
+                        break;
+                    }
+                }
+            }
         }
 
         /**
