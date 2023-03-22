@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="../../dist/duice.js"></script>
+    <link rel="stylesheet" href="../../dist/duice.css">
+    <script>
+        'use strict';
+        let myObject = new duice.ObjectProxy({
+            name: 'Apple',
+            phoneNo: '01012345678',
+            cardNo: '0000111122223333',
+            balanceAmount: 1234567.13,
+            password: 'p1a2s3s4w5o6r7d8!@',
+            datetime: '2019-03-16T18:00',
+            date: '2019-04-01',
+            time: '18:12',
+            type: 'human',
+            enabled: true,
+            enabledYn: 'Y',
+            gender: 'male',
+            description: "My name is apple.\n I am Fruit.",
+            address: {
+                country: 'USA',
+                city: 'LA'
+            },
+            items: [
+                {id:'a', name:'A'},
+                {id:'b', name:'B'},
+                {id:'c', name:'C'}
+            ]
+        });
+
+        // class TestElement extends HTMLElement {
+        //     constructor(){
+        //         super();
+        //         this.attachShadow({mode: 'open'});
+        //
+        //         const wrapper = document.createElement('span');
+        //
+        //
+        //         wrapper.style.backgroundColor = 'red';
+        //         wrapper.style.width = '100px';
+        //         wrapper.style.height = '100px';
+        //         let textNode = document.createTextNode(this.dataset.value);
+        //         wrapper.appendChild(textNode);
+        //
+        //         this.shadowRoot.appendChild(wrapper);
+        //     }
+        // }
+
+        class TestElement extends duice.Component {
+            template(){
+                return `<input type="text" duice:object="myObject" duice:property="name"/>`;
+            }
+            doRender() {
+            }
+            doUpdate(observable, event) {
+            }
+        }
+
+        customElements.define('my-component', TestElement);
+
+
+    </script>
+</head>
+<body>
+
+<input type="text" duice:object="myObject" duice:property="name" style="background-color:red;"/>
+
+<my-component id="myComponent">
+    111
+</my-component>
+
+</body>
+</html>

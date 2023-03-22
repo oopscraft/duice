@@ -1213,6 +1213,18 @@ var duice;
      * @param context
      */
     function initialize(container, context) {
+        // initialize component (first order)
+        duice.ComponentFactory.componentFactoryRegistry.forEach(componentFactory => {
+            console.log(componentFactory);
+        });
+        // FIXME for test
+        let componentSelectorExpression = `my-component:not([${getAlias()}\\:id])`;
+        console.warn(componentSelectorExpression);
+        container.querySelectorAll(componentSelectorExpression).forEach(componentElement => {
+            console.warn(componentElement);
+            componentElement.render();
+        });
+        // initialize elementSet, element (order is important)
         container.querySelectorAll(getQuerySelectorExpression()).forEach(htmlElement => {
             if (!hasAttribute(htmlElement, 'id')) {
                 try {
@@ -2671,5 +2683,76 @@ var duice;
         }
     }
     duice.StringMask = StringMask;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    /**
+     * Component
+     */
+    class Component extends HTMLElement {
+        /**
+         * constructor
+         * @param htmlElement
+         * @param context
+         * @protected
+         */
+        constructor() {
+            super();
+            this.attachShadow({ mode: 'open' });
+            let templateElement = document.createElement('template');
+            templateElement.innerHTML = this.template();
+            this.htmlElement = templateElement.content.firstChild;
+            this.shadowRoot.appendChild(this.htmlElement);
+        }
+        render() {
+            let context = {};
+            duice.initialize(this.shadowRoot, {});
+            this.doRender();
+        }
+        /**
+         * update
+         * @param observable
+         * @param event
+         */
+        update(observable, event) {
+            this.doUpdate(observable, event);
+        }
+    }
+    duice.Component = Component;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    class ComponentFactory {
+        static registerComponentFactory(componentFactory) {
+            this.componentFactoryRegistry.push(componentFactory);
+        }
+    }
+    ComponentFactory.componentFactoryRegistry = [];
+    duice.ComponentFactory = ComponentFactory;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    var component;
+    (function (component) {
+        class SampleComponent extends duice.Component {
+            doRender() {
+            }
+            doUpdate(observable, event) {
+            }
+            template() {
+                return "";
+            }
+        }
+        component.SampleComponent = SampleComponent;
+    })(component = duice.component || (duice.component = {}));
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    var component;
+    (function (component) {
+        class SampleComponentFactory extends duice.ComponentFactory {
+        }
+        component.SampleComponentFactory = SampleComponentFactory;
+    })(component = duice.component || (duice.component = {}));
 })(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map

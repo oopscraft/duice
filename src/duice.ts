@@ -33,6 +33,21 @@ namespace duice {
      * @param context
      */
     export function initialize(container: any, context: object): void {
+
+        // initialize component (first order)
+        ComponentFactory.componentFactoryRegistry.forEach(componentFactory => {
+            console.log(componentFactory);
+        });
+        // FIXME for test
+        let componentSelectorExpression = `my-component:not([${getAlias()}\\:id])`;
+        console.warn(componentSelectorExpression);
+        container.querySelectorAll(componentSelectorExpression).forEach(componentElement => {
+            console.warn(componentElement);
+            componentElement.render();
+        });
+
+
+        // initialize elementSet, element (order is important)
         container.querySelectorAll(getQuerySelectorExpression()).forEach(htmlElement => {
             if(!hasAttribute(htmlElement, 'id')) {
                 try {
