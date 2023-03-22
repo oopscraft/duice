@@ -1,7 +1,6 @@
 {
   "type": "module",
   "dependencies": {
-    "bootstrap": "^5.2.3",
     "copyfiles": "^2.4.1",
     "jsdom": "^21.1.0",
     "ts-node": "^10.9.1",
@@ -11,7 +10,7 @@
     "build": "cp src/duice.css ./dist/"
   },
   "name": "duice",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "DUICE(Data-oriented javascript UI Component Element)",
   "homepage": "http://duice.oopscraft.org",
   "author": "chomookun@gmail.com",
@@ -19,5 +18,5 @@
   "bugs": {
     "url": "https://github.com/oopscraft/duice/issues"
   },
-  "main": "duice"
+  "main": "./dist/duice.js"
 }
