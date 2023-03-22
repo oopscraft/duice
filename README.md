@@ -144,7 +144,7 @@ async function openDialog() {
 
 ### Test Case
 
-[Dialog/Alert/Confirm/Prompt Test](test/dialog/Dialog.html)
+[Dialog/Alert/Confirm/Prompt Test](test/dialog/DialogTest.html)
 
 
 ------------------------------------------------------------
