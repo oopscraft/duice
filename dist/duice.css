@@ -68,6 +68,7 @@ html *:focus {
     border: var(--duice-element-focus-border);
 }
 body {
+    margin: 0;
     overflow-y: scroll;
 }
 h1 {
@@ -216,10 +217,12 @@ dialog {
     width: 100%;
 }
 .row {
+    width: 100%;
     display: flex;
     display: -ms-flexbox;
     flex-wrap: nowrap;
-    justify-content: unset;
+    justify-content: space-between;
+    align-items: center;
 }
 .row > * {
     border: none;
@@ -304,6 +307,15 @@ dialog {
 }
 .ta-right {
     text-align: right;
+}
+
+/* etc */
+.link {
+    cursor: pointer;
+}
+.icon {
+    height: calc(var(--duice-font-size) * 2);
+    vertical-align: middle;
 }
 
 
