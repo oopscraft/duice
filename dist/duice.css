@@ -72,22 +72,22 @@ body {
     overflow-y: scroll;
 }
 h1 {
-    font-size: calc(var(--duice-font-size) + 1.0vw);
+    font-size: calc(var(--duice-font-size) * 2.0);
 }
 h2 {
-    font-size: calc(var(--duice-font-size) + 0.8vw);
+    font-size: calc(var(--duice-font-size) * 1.8);
 }
 h3 {
-    font-size: calc(var(--duice-font-size) + 0.6vw);
+    font-size: calc(var(--duice-font-size) * 1.6);
 }
 h4 {
-    font-size: calc(var(--duice-font-size) + 0.4vw);
+    font-size: calc(var(--duice-font-size) * 1.4);
 }
 h5 {
-    font-size: calc(var(--duice-font-size) + 0.2vw);
+    font-size: calc(var(--duice-font-size) * 1.2);
 }
 h6 {
-    font-size: calc(var(--duice-font-size) + 0.0vw);
+    font-size: calc(var(--duice-font-size) * 1.0);
 }
 small {
     font-size: smaller;
@@ -201,6 +201,11 @@ button:hover {
     background-color: var(--duice-button-background-color-hover);
 }
 
+/* img */
+img {
+    vertical-align: middle;
+}
+
 /* ul */
 ul {
     text-align: left;
@@ -222,7 +227,24 @@ dialog {
     display: -ms-flexbox;
     flex-wrap: nowrap;
     justify-content: space-between;
+}
+.row.left {
+    justify-content: flex-start;
+}
+.row.center {
+    justify-content: center;
+}
+.row.right {
+    justify-content: flex-end;
+}
+.row.top {
+    align-items: flex-start;
+}
+.row.middle {
     align-items: center;
+}
+.row.bottom {
+    align-items: flex-end;
 }
 .row > * {
     border: none;

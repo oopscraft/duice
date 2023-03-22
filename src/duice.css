@@ -227,7 +227,24 @@ dialog {
     display: -ms-flexbox;
     flex-wrap: nowrap;
     justify-content: space-between;
+}
+.row.left {
+    justify-content: flex-start;
+}
+.row.center {
+    justify-content: center;
+}
+.row.right {
+    justify-content: flex-end;
+}
+.row.top {
+    align-items: flex-start;
+}
+.row.middle {
     align-items: center;
+}
+.row.bottom {
+    align-items: flex-end;
 }
 .row > * {
     border: none;

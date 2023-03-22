@@ -9,5 +9,15 @@
   },
   "scripts": {
     "build": "cp src/duice.css ./dist/"
-  }
+  },
+  "name": "duice",
+  "version": "0.1.4",
+  "description": "DUICE(Data-oriented javascript UI Component Element)",
+  "homepage": "http://duice.oopscraft.org",
+  "author": "chomookun@gmail.com",
+  "license": "LGPL(GNU Lesser General Public License version 3)",
+  "bugs": {
+    "url": "https://github.com/oopscraft/duice/issues"
+  },
+  "main": "duice"
 }
