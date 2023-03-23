@@ -1,4 +1,4 @@
-# DUICE (Data oriented UI Component Element)
+# DUICE (Data oriented UI Control Element)
 
 ## Conception
 
@@ -24,7 +24,7 @@ Therefore you can use it with another javascript library together.
 --------------------------------------------------
 
 
-## Object(Proxy) to Element
+## Object(Proxy) and Control
 
 
 ### Javascript
@@ -51,13 +51,13 @@ const user = new duice.ObjectProxy({
 ```
 
 ### Test Case
-[ObjectProxy to Element Test](test/ElementTest.html)
+[ObjectProxy to Element Test](test/ControlTest.html)
 
 
 -----------------------------------------------------------
 
 
-## Array(Proxy) to ElementSet
+## Array(Proxy) and LoopControl 
 
 ### Javascript
 
@@ -94,7 +94,7 @@ const users = new duice.ArrayProxy([
 
 ### Test Case 
 
-[ArrayProxy to ElementSet Test](test/ElementSetTest.html)
+[ArrayProxy to LoopControl Test](test/LoopControlTest.html)
 
 
 -----------------------------------------------------------

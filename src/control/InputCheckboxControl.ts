@@ -1,10 +1,10 @@
-///<reference path="InputElement.ts"/>
+///<reference path="InputControl.ts"/>
 namespace duice {
 
     /**
      * InputCheckboxElement
      */
-    export class InputCheckboxElement extends InputElement {
+    export class InputCheckboxControl extends InputControl {
 
         trueValue: any = true;
 
@@ -12,16 +12,16 @@ namespace duice {
 
         /**
          * constructor
-         * @param htmlElement
+         * @param element
          * @param context
          */
-        constructor(htmlElement: HTMLInputElement, context: object) {
-            super(htmlElement, context);
+        constructor(element: HTMLInputElement, context: object) {
+            super(element, context);
 
             // true false value
-            let trueValue = getAttribute(this.getHtmlElement(), 'true-value');
+            let trueValue = getAttribute(this.getElement(), 'true-value');
             this.trueValue = trueValue ? trueValue : this.trueValue;
-            let falseValue = getAttribute(this.getHtmlElement(), 'false-value');
+            let falseValue = getAttribute(this.getElement(), 'false-value');
             this.falseValue = falseValue ? falseValue : this.falseValue;
         }
 
@@ -31,9 +31,9 @@ namespace duice {
          */
         setValue(value: any): void {
             if (value === this.trueValue) {
-                this.getHtmlElement().checked = true;
+                this.getElement().checked = true;
             } else {
-                this.htmlElement.checked = false;
+                this.element.checked = false;
             }
         }
 
@@ -41,7 +41,7 @@ namespace duice {
          * getValue
          */
         getValue(): any {
-            if(this.htmlElement.checked){
+            if(this.element.checked){
                 return this.trueValue;
             }else{
                 return this.falseValue;
@@ -54,9 +54,9 @@ namespace duice {
          */
         setReadonly(readonly: boolean): void {
             if(readonly){
-                this.getHtmlElement().style.pointerEvents = 'none';
+                this.getElement().style.pointerEvents = 'none';
             }else{
-                this.getHtmlElement().style.pointerEvents = '';
+                this.getElement().style.pointerEvents = '';
             }
         }
 

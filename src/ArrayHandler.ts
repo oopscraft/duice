@@ -1,10 +1,10 @@
-///<reference path="Handler.ts"/>
+///<reference path="AbstractHandler.ts"/>
 namespace duice {
 
     /**
      * ArrayHandler
      */
-    export class ArrayHandler extends Handler<ArrayProxy> {
+    export class ArrayHandler extends AbstractHandler<ArrayProxy> {
 
         propertyChangingListener: Function;
 
@@ -134,7 +134,7 @@ namespace duice {
             console.debug("ArrayHandler.update", observable, event);
 
             // ElementSet
-            if(observable instanceof ElementSet){
+            if(observable instanceof LoopControl){
                 if (event instanceof RowMoveEvent) {
                     let object = this.getTarget().splice(event.getFromIndex(), 1)[0];
                     this.getTarget().splice(event.getToIndex(), 0, object);

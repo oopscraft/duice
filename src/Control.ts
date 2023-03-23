@@ -3,13 +3,13 @@
 namespace duice {
 
     /**
-     * Element
+     * Control
      */
-    export abstract class Element<T extends HTMLElement> extends Observable implements Observer {
+    export abstract class Control<T extends HTMLElement> extends Observable implements Observer {
 
-        slotElement: HTMLSlotElement = document.createElement('slot');
+        slot: HTMLSlotElement = document.createElement('slot');
 
-        htmlElement: T;
+        element: T;
 
         context: object;
 
@@ -21,26 +21,26 @@ namespace duice {
 
         /**
          * constructor
-         * @param htmlElement
+         * @param element
          * @protected
          */
-        protected constructor(htmlElement: T, context: object) {
+        protected constructor(element: T, context: object) {
             super();
 
             // clone html element template
-            this.htmlElement = htmlElement.cloneNode(true) as T;
-            setAttribute(this.htmlElement, 'id', generateId());
-            markInitialized(htmlElement);
+            this.element = element;
+            setAttribute(this.element, 'id', generateId());
+            markInitialized(this.element);
 
             // replace slot element
-            htmlElement.replaceWith(this.slotElement);
+            element.replaceWith(this.slot);
 
             // set context
             this.context = context;
         }
 
         /**
-         * setData
+         * set object
          * @param objectName
          */
         setObject(objectName: string): void {
@@ -55,10 +55,10 @@ namespace duice {
         }
 
         /**
-         * gets html element
+         * returns element
          */
-        getHtmlElement(): T {
-            return this.htmlElement;
+        getElement(): T {
+            return this.element;
         }
 
         /**
@@ -110,8 +110,8 @@ namespace duice {
             // executes script
             this.executeScript();
 
-            // append to slot element
-            this.slotElement.appendChild(this.htmlElement);
+            // replace to slot element
+            this.slot.replaceWith(this.element);
         }
 
         /**
@@ -153,9 +153,9 @@ namespace duice {
          * executes script
          */
         executeScript(): void {
-            let script = getAttribute(this.getHtmlElement(), 'script');
+            let script = getAttribute(this.getElement(), 'script');
             if(script) {
-                executeScript(script, this.getHtmlElement(), this.context);
+                executeScript(script, this.getElement(), this.context);
             }
         }
 
@@ -163,7 +163,7 @@ namespace duice {
          * getIndex
          */
         getIndex(): number {
-            let index = getAttribute(this.htmlElement, 'index');
+            let index = getAttribute(this.element, 'index');
             if(index){
                 return Number(index);
             }

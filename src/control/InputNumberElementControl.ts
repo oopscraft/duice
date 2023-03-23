@@ -4,22 +4,22 @@ namespace duice {
     /**
      * InputNumberElement
      */
-    export class InputNumberElement extends InputElement {
+    export class InputNumberControl extends InputControl {
 
         /**
          * constructor
-         * @param htmlElement
+         * @param element
          * @param context
          */
-        constructor(htmlElement: HTMLInputElement, context: object) {
-            super(htmlElement, context);
+        constructor(element: HTMLInputElement, context: object) {
+            super(element, context);
 
             // changes type and style
-            this.getHtmlElement().removeAttribute('type');
-            this.getHtmlElement().style.textAlign = 'right';
+            this.getElement().removeAttribute('type');
+            this.getElement().style.textAlign = 'right';
 
             // prevents invalid key press
-            this.getHtmlElement().addEventListener('keypress', event => {
+            this.getElement().addEventListener('keypress', event => {
                 if(/[\d|\.|,]/.test(event.key) === false) {
                     event.preventDefault();
                 }

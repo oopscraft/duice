@@ -2,8 +2,8 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <script src="../../dist/duice.js"></script>
-    <link rel="stylesheet" href="../../dist/duice.css">
+    <script src="../dist/duice.js"></script>
+    <link rel="stylesheet" href="../dist/duice.css">
     <script>
         'use strict';
         let myObject = new duice.ObjectProxy({
@@ -50,16 +50,48 @@
         // }
 
         class TestElement extends duice.Component {
-            template(){
-                return `<input type="text" duice:object="myObject" duice:property="name"/>`;
+            doTemplate(){
+                return `<span>
+                            <input type="text" duice:object="myObject" duice:property="name"/>
+                        </span>`;
+            }
+            doStyle() {
+
             }
             doRender() {
             }
             doUpdate(observable, event) {
             }
         }
+        class TestElementFactory extends duice.ControlFactory {
+
+            support(htmlElement){
+                return (htmlElement.tagName.toLowerCase() === 'my-component');
+            }
+
+            doCreateControl(htmlElement, context) {
+                // htmlElement.setContext(context);
+                return htmlElement;
+            }
+        }
 
         customElements.define('my-component', TestElement);
+        duice.ControlFactory.registerControlFactory(new TestElementFactory());
+
+
+
+
+        customElements.define('my-input', class Test extends HTMLElement {
+           constructor() {
+               super();
+               this.attachShadow({mode: 'open'});
+               let input = document.createElement('input');
+               input.addEventListener('change', event => {
+                    console.log(event);
+               });
+               this.shadowRoot.appendChild(input);
+           }
+        });
 
 
     </script>
@@ -68,9 +100,11 @@
 
 <input type="text" duice:object="myObject" duice:property="name" style="background-color:red;"/>
 
-<my-component id="myComponent">
+<my-component id="myComponent" duice:object="myObject">
     111
 </my-component>
+
+<my-input></my-input>
 
 </body>
 </html>

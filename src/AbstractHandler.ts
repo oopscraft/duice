@@ -2,7 +2,7 @@
 ///<Reference path="Observer.ts"/>
 namespace duice {
 
-    export abstract class Handler<T> extends Observable implements Observer {
+    export abstract class AbstractHandler<T> extends Observable implements Observer {
 
         target: T;
 

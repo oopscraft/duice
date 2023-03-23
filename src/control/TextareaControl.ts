@@ -3,18 +3,18 @@ namespace duice {
     /**
      * Textarea
      */
-    export class TextareaElement extends Element<HTMLTextAreaElement> {
+    export class TextareaControl extends Control<HTMLTextAreaElement> {
 
         /**
          * constructor
-         * @param htmlElement
+         * @param element
          * @param context
          */
-        constructor(htmlElement: HTMLTextAreaElement, context: object) {
-            super(htmlElement, context);
+        constructor(element: HTMLTextAreaElement, context: object) {
+            super(element, context);
 
             // adds change event listener
-            this.getHtmlElement().addEventListener('change', e => {
+            this.getElement().addEventListener('change', e => {
                 let event = new PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
                 this.notifyObservers(event);
             }, true);
@@ -25,14 +25,14 @@ namespace duice {
          * @param value
          */
         setValue(value: any): void {
-            this.getHtmlElement().value = value;
+            this.getElement().value = value;
         }
 
         /**
          * getValue
          */
         getValue(): any {
-            let value = this.getHtmlElement().value;
+            let value = this.getElement().value;
             return value;
         }
 
@@ -42,9 +42,9 @@ namespace duice {
          */
         setReadonly(readonly: boolean): void {
             if(readonly){
-                this.getHtmlElement().setAttribute('readonly', 'readonly');
+                this.getElement().setAttribute('readonly', 'readonly');
             }else {
-                this.getHtmlElement().removeAttribute('readonly');
+                this.getElement().removeAttribute('readonly');
             }
         }
 

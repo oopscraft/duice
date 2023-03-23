@@ -1,13 +1,13 @@
 namespace duice {
 
     /**
-     * ArrayElement
+     * LoopControl
      */
-    export class ElementSet<T extends HTMLElement> extends Observable implements Observer {
+    export class LoopControl<T extends HTMLElement> extends Observable implements Observer {
 
-        slotElement: HTMLSlotElement = document.createElement('slot');
+        slot: HTMLSlotElement = document.createElement('slot');
 
-        htmlElement: T;
+        element: T;
 
         context: object;
 
@@ -19,18 +19,18 @@ namespace duice {
 
         /**
          * constructor
-         * @param htmlElement
+         * @param element
          */
-        constructor(htmlElement: T, context: object) {
+        constructor(element: T, context: object) {
             super();
 
             // clone html element template
-            this.htmlElement = htmlElement.cloneNode(true) as T;
-            setAttribute(this.htmlElement, 'id', generateId());
-            markInitialized(htmlElement);
+            this.element = element.cloneNode(true) as T;
+            setAttribute(this.element, 'id', generateId());
+            markInitialized(element);
 
             // replace slot element
-            htmlElement.replaceWith(this.slotElement);
+            element.replaceWith(this.slot);
 
             // set context
             this.context = context;
@@ -85,7 +85,7 @@ namespace duice {
             let _this = this;
 
             // removes elements
-            removeChildNodes(this.slotElement);
+            removeChildNodes(this.slot);
 
             // loop
             if(this.loop){
@@ -106,7 +106,7 @@ namespace duice {
                     });
 
                     // clones row elements
-                    let rowHtmlElement = this.htmlElement.cloneNode(true) as HTMLElement;
+                    let rowHtmlElement = this.element.cloneNode(true) as HTMLElement;
                     setAttribute(rowHtmlElement, 'index', index.toString());
 
                     // editable
@@ -132,11 +132,11 @@ namespace duice {
 
                     // initializes row element
                     initialize(rowHtmlElement, context);
-                    this.slotElement.appendChild(rowHtmlElement);
+                    this.slot.appendChild(rowHtmlElement);
                 }
 
             }else{
-                this.slotElement.appendChild(this.htmlElement);
+                this.slot.appendChild(this.element);
             }
         }
 
@@ -162,9 +162,9 @@ namespace duice {
          * executes script
          */
         executeScript(): void {
-            let script = getAttribute(this.htmlElement, 'script');
+            let script = getAttribute(this.element, 'script');
             if(script) {
-                executeScript(script, this.htmlElement, this.context);
+                executeScript(script, this.element, this.context);
             }
         }
 

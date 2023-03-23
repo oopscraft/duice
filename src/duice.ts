@@ -34,34 +34,21 @@ namespace duice {
      */
     export function initialize(container: any, context: object): void {
 
-        // initialize component (first order)
-        ComponentFactory.componentFactoryRegistry.forEach(componentFactory => {
-            console.log(componentFactory);
-        });
-        // FIXME for test
-        let componentSelectorExpression = `my-component:not([${getAlias()}\\:id])`;
-        console.warn(componentSelectorExpression);
-        container.querySelectorAll(componentSelectorExpression).forEach(componentElement => {
-            console.warn(componentElement);
-            componentElement.render();
-        });
-
-
         // initialize elementSet, element (order is important)
-        container.querySelectorAll(getQuerySelectorExpression()).forEach(htmlElement => {
-            if(!hasAttribute(htmlElement, 'id')) {
+        container.querySelectorAll(getQuerySelectorExpression()).forEach(element => {
+            if(!hasAttribute(element, 'id')) {
                 try {
-                    if (hasAttribute(htmlElement, 'array')) {
-                        let elementSetFactory = ElementSetFactory.getInstance(htmlElement);
-                        let elementSet = elementSetFactory.createElementSet(htmlElement, context);
-                        elementSet.render();
-                    } else if (hasAttribute(htmlElement, 'object')) {
-                        let elementFactory = ElementFactory.getInstance(htmlElement);
-                        let element = elementFactory.createElement(htmlElement, context);
-                        element.render();
+                    if (hasAttribute(element, 'array')) {
+                        let loopControlFactory = LoopControlFactory.getInstance(element);
+                        let loopControl = loopControlFactory.createLoopControl(element, context);
+                        loopControl.render();
+                    } else if (hasAttribute(element, 'object')) {
+                        let controlFactory = ControlFactory.getInstance(element);
+                        let control = controlFactory.createControl(element, context);
+                        control.render();
                     }
                 }catch(e){
-                    console.error(e.message, htmlElement, container, JSON.stringify(context));
+                    console.error(e.message, element, container, JSON.stringify(context));
                 }
             }
         });
@@ -72,7 +59,6 @@ namespace duice {
      * @param container
      */
     export function markInitialized(container: any): void {
-        setAttribute(container, 'id', generateId());
         container.querySelectorAll(getQuerySelectorExpression()).forEach(htmlElement => {
             setAttribute(htmlElement, 'id', generateId());
         });
@@ -130,30 +116,30 @@ namespace duice {
 
     /**
      * hasAttribute
-     * @param htmlElement
+     * @param element
      * @param name
      */
-    export function hasAttribute(htmlElement: HTMLElement, name: string): boolean {
-        return htmlElement.hasAttribute(`${getAlias()}:${name}`)
+    export function hasAttribute(element: HTMLElement, name: string): boolean {
+        return element.hasAttribute(`${getAlias()}:${name}`)
     }
 
     /**
      * getAttribute
-     * @param htmlElement
+     * @param element
      * @param name
      */
-    export function getAttribute(htmlElement: HTMLElement, name: string): string {
-        return htmlElement.getAttribute(`${getAlias()}:${name}`);
+    export function getAttribute(element: HTMLElement, name: string): string {
+        return element.getAttribute(`${getAlias()}:${name}`);
     }
 
     /**
      * setAttribute
-     * @param htmlElement
+     * @param element
      * @param name
      * @param value
      */
-    export function setAttribute(htmlElement: HTMLElement, name: string, value: string): void {
-        htmlElement.setAttribute(`${getAlias()}:${name}`, value);
+    export function setAttribute(element: HTMLElement, name: string, value: string): void {
+        element.setAttribute(`${getAlias()}:${name}`, value);
     }
 
     /**
@@ -308,6 +294,10 @@ namespace duice {
             .catch((error)=>{
                 throw Error(error);
             });
+    }
+
+    export function defineComponent(name: string, constructor: CustomElementConstructor): void {
+        customElements.define(name, constructor);
     }
 
     /**

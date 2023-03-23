@@ -1,22 +1,23 @@
+///<reference path="../Control.ts"/>
 namespace duice {
 
     /**
      * GenericElement
      */
-    export class GenericElement extends Element<HTMLElement> {
+    export class GenericControl extends Control<HTMLElement> {
 
         textNode: Node;
 
         /**
          * constructor
-         * @param htmlElement
+         * @param element
          */
-        constructor(htmlElement: HTMLElement, context: object){
-            super(htmlElement, context);
+        constructor(element: HTMLElement, context: object){
+            super(element, context);
 
             // appends text node
             this.textNode = document.createTextNode('');
-            this.getHtmlElement().insertBefore(this.textNode, this.getHtmlElement().firstChild);
+            this.getElement().insertBefore(this.textNode, this.getElement().firstChild);
         }
 
         /**

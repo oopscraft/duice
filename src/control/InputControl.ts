@@ -3,18 +3,18 @@ namespace duice {
     /**
      * InputElement
      */
-    export class InputElement extends Element<HTMLInputElement> {
+    export class InputControl extends Control<HTMLInputElement> {
 
         /**
          * constructor
-         * @param htmlElement
+         * @param element
          * @param context
          */
-        constructor(htmlElement: HTMLInputElement, context: object) {
-            super(htmlElement, context);
+        constructor(element: HTMLInputElement, context: object) {
+            super(element, context);
 
             // adds change listener
-            this.getHtmlElement().addEventListener('change', e => {
+            this.getElement().addEventListener('change', e => {
                 let event = new PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
                 this.notifyObservers(event);
             }, true);
@@ -30,14 +30,14 @@ namespace duice {
             }else{
                 value = '';
             }
-            this.getHtmlElement().value = value;
+            this.getElement().value = value;
         }
 
         /**
          * getValue
          */
         getValue(): any {
-            let value = this.getHtmlElement().value;
+            let value = this.getElement().value;
             if(value){
                 value = this.getMask() ? this.getMask().decode(value) : value;
             }else{
@@ -51,7 +51,7 @@ namespace duice {
          * @param readonly
          */
         setReadonly(readonly: boolean): void {
-            this.getHtmlElement().readOnly = readonly;
+            this.getElement().readOnly = readonly;
         }
 
     }
