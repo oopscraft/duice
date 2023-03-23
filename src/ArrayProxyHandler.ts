@@ -1,4 +1,4 @@
-///<reference path="AbstractHandler.ts"/>
+///<reference path="ProxyHandler.ts"/>
 namespace duice {
 
     /**
