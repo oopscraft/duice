@@ -1,6 +1,6 @@
 ///<reference path="Observable.ts"/>
 ///<reference path="Observer.ts"/>
-///<reference path="ProxyHandler.ts"/>
+///<reference path="AbstractHandler.ts"/>
 namespace duice {
 
     /**

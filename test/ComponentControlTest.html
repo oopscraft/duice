@@ -51,8 +51,12 @@
 
         class TestElement extends duice.Component {
             doTemplate(){
+                let test1 = "<<<<<<<<<<<<<<";
+                let test2 = ">>>>>>>>>>>>>>";
                 return `<span>
+                            ${test1}
                             <input type="text" duice:object="myObject" duice:property="name"/>
+                            ${test2}
                         </span>`;
             }
             doStyle() {
