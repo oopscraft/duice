@@ -2620,88 +2620,7 @@ var duice;
     }
     duice.AbstractHandler = AbstractHandler;
 })(duice || (duice = {}));
-///<reference path="Observable.ts"/>
-///<reference path="Observer.ts"/>
-///<reference path="ProxyHandler.ts"/>
-var duice;
-(function (duice) {
-    /**
-     * ObjectHandler
-     */
-    class ObjectHandler extends duice.AbstractHandler {
-        /**
-         * constructor
-         */
-        constructor() {
-            super();
-        }
-        /**
-         * get
-         * @param target
-         * @param property
-         * @param receiver
-         */
-        get(target, property, receiver) {
-            console.debug("ObjectHandler.get", target, property, receiver);
-            return Reflect.get(target, property, receiver);
-        }
-        /**
-         * set
-         * @param target
-         * @param property
-         * @param value
-         */
-        set(target, property, value) {
-            console.debug("ObjectHandler.set", target, property, value);
-            // change value
-            Reflect.set(target, property, value);
-            // notify
-            let event = new duice.PropertyChangeEvent(this, property, value);
-            this.notifyObservers(event);
-            // returns
-            return true;
-        }
-        /**
-         * update
-         * @param observable
-         * @param event
-         */
-        update(observable, event) {
-            return __awaiter(this, void 0, void 0, function* () {
-                console.log("ObjectHandler.update", observable, event);
-                // Element
-                if (observable instanceof duice.Control) {
-                    let property = observable.getProperty();
-                    let value = observable.getValue();
-                    if (yield this.checkListener(this.propertyChangingListener, event)) {
-                        this.setValue(property, value);
-                        yield this.checkListener(this.propertyChangedListener, event);
-                    }
-                }
-                // notify
-                this.notifyObservers(event);
-            });
-        }
-        /**
-         * getValue
-         * @param property
-         */
-        getValue(property) {
-            property = property.replace('.', '?.');
-            return new Function(`return this.${property};`).call(this.getTarget());
-        }
-        /**
-         * setValue
-         * @param property
-         * @param value
-         */
-        setValue(property, value) {
-            new Function('value', `this.${property} = value;`).call(this.getTarget(), value);
-        }
-    }
-    duice.ObjectHandler = ObjectHandler;
-})(duice || (duice = {}));
-///<reference path="ProxyHandler.ts"/>
+///<reference path="AbstractHandler.ts"/>
 var duice;
 (function (duice) {
     /**
@@ -2832,5 +2751,86 @@ var duice;
         }
     }
     duice.ArrayHandler = ArrayHandler;
+})(duice || (duice = {}));
+///<reference path="Observable.ts"/>
+///<reference path="Observer.ts"/>
+///<reference path="AbstractHandler.ts"/>
+var duice;
+(function (duice) {
+    /**
+     * ObjectHandler
+     */
+    class ObjectHandler extends duice.AbstractHandler {
+        /**
+         * constructor
+         */
+        constructor() {
+            super();
+        }
+        /**
+         * get
+         * @param target
+         * @param property
+         * @param receiver
+         */
+        get(target, property, receiver) {
+            console.debug("ObjectHandler.get", target, property, receiver);
+            return Reflect.get(target, property, receiver);
+        }
+        /**
+         * set
+         * @param target
+         * @param property
+         * @param value
+         */
+        set(target, property, value) {
+            console.debug("ObjectHandler.set", target, property, value);
+            // change value
+            Reflect.set(target, property, value);
+            // notify
+            let event = new duice.PropertyChangeEvent(this, property, value);
+            this.notifyObservers(event);
+            // returns
+            return true;
+        }
+        /**
+         * update
+         * @param observable
+         * @param event
+         */
+        update(observable, event) {
+            return __awaiter(this, void 0, void 0, function* () {
+                console.log("ObjectHandler.update", observable, event);
+                // Element
+                if (observable instanceof duice.Control) {
+                    let property = observable.getProperty();
+                    let value = observable.getValue();
+                    if (yield this.checkListener(this.propertyChangingListener, event)) {
+                        this.setValue(property, value);
+                        yield this.checkListener(this.propertyChangedListener, event);
+                    }
+                }
+                // notify
+                this.notifyObservers(event);
+            });
+        }
+        /**
+         * getValue
+         * @param property
+         */
+        getValue(property) {
+            property = property.replace('.', '?.');
+            return new Function(`return this.${property};`).call(this.getTarget());
+        }
+        /**
+         * setValue
+         * @param property
+         * @param value
+         */
+        setValue(property, value) {
+            new Function('value', `this.${property} = value;`).call(this.getTarget(), value);
+        }
+    }
+    duice.ObjectHandler = ObjectHandler;
 })(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map
