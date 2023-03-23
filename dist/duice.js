@@ -547,29 +547,29 @@ var duice;
 ///<reference path="ComponentControlFactory.ts"/>
 var duice;
 (function (duice) {
-    let alias = 'duice';
+    let namespace = 'duice';
     /**
-     * sets alias of namespace
+     * sets namespace
      * @param value
      */
-    function setAlias(value) {
-        alias = value;
+    function setNamespace(value) {
+        namespace = value;
     }
-    duice.setAlias = setAlias;
+    duice.setNamespace = setNamespace;
     /**
      * returns alias of namespace
      */
-    function getAlias() {
-        return alias;
+    function getNamespace() {
+        return namespace;
     }
-    duice.getAlias = getAlias;
+    duice.getNamespace = getNamespace;
     /**
      * returns query selector expression
      */
     function getQuerySelectorExpression() {
         return [
-            `*[${getAlias()}\\:array]:not([${getAlias()}\\:id])`,
-            `*[${getAlias()}\\:object]:not([${getAlias()}\\:id])`
+            `*[${getNamespace()}\\:array]:not([${getNamespace()}\\:id])`,
+            `*[${getNamespace()}\\:object]:not([${getNamespace()}\\:id])`
         ].join(',');
     }
     duice.getQuerySelectorExpression = getQuerySelectorExpression;
@@ -671,7 +671,7 @@ var duice;
      * @param name
      */
     function hasAttribute(element, name) {
-        return element.hasAttribute(`${getAlias()}:${name}`);
+        return element.hasAttribute(`${getNamespace()}:${name}`);
     }
     duice.hasAttribute = hasAttribute;
     /**
@@ -680,7 +680,7 @@ var duice;
      * @param name
      */
     function getAttribute(element, name) {
-        return element.getAttribute(`${getAlias()}:${name}`);
+        return element.getAttribute(`${getNamespace()}:${name}`);
     }
     duice.getAttribute = getAttribute;
     /**
@@ -690,7 +690,7 @@ var duice;
      * @param value
      */
     function setAttribute(element, name, value) {
-        element.setAttribute(`${getAlias()}:${name}`, value);
+        element.setAttribute(`${getNamespace()}:${name}`, value);
     }
     duice.setAttribute = setAttribute;
     /**

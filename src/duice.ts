@@ -1,21 +1,21 @@
 ///<reference path="ComponentControlFactory.ts"/>
 namespace duice {
 
-    let alias = 'duice';
+    let namespace = 'duice';
 
     /**
-     * sets alias of namespace
+     * sets namespace
      * @param value
      */
-    export function setAlias(value:string): void {
-        alias = value;
+    export function setNamespace(value:string): void {
+        namespace = value;
     }
 
     /**
      * returns alias of namespace
      */
-    export function getAlias(): string {
-        return alias;
+    export function getNamespace(): string {
+        return namespace;
     }
 
     /**
@@ -23,8 +23,8 @@ namespace duice {
      */
     export function getQuerySelectorExpression(){
         return [
-            `*[${getAlias()}\\:array]:not([${getAlias()}\\:id])`,
-            `*[${getAlias()}\\:object]:not([${getAlias()}\\:id])`
+            `*[${getNamespace()}\\:array]:not([${getNamespace()}\\:id])`,
+            `*[${getNamespace()}\\:object]:not([${getNamespace()}\\:id])`
         ].join(',');
     }
 
@@ -125,7 +125,7 @@ namespace duice {
      * @param name
      */
     export function hasAttribute(element: HTMLElement, name: string): boolean {
-        return element.hasAttribute(`${getAlias()}:${name}`)
+        return element.hasAttribute(`${getNamespace()}:${name}`)
     }
 
     /**
@@ -134,7 +134,7 @@ namespace duice {
      * @param name
      */
     export function getAttribute(element: HTMLElement, name: string): string {
-        return element.getAttribute(`${getAlias()}:${name}`);
+        return element.getAttribute(`${getNamespace()}:${name}`);
     }
 
     /**
@@ -144,7 +144,7 @@ namespace duice {
      * @param value
      */
     export function setAttribute(element: HTMLElement, name: string, value: string): void {
-        element.setAttribute(`${getAlias()}:${name}`, value);
+        element.setAttribute(`${getNamespace()}:${name}`, value);
     }
 
     /**
