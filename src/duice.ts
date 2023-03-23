@@ -1,6 +1,6 @@
 namespace duice {
 
-    let alias = 'duice';
+    let alias = 'dc';
 
     /**
      * sets alias of namespace

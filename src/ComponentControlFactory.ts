@@ -28,33 +28,32 @@ namespace duice {
 
         /**
          * creates element
-         * @param htmlElement
+         * @param element
          * @param context
          */
-        createComponent(htmlElement: Component, context: object): Component {
+        createComponentControl(element: Component, context: object): ComponentControl<Component> {
 
-            // set context
-            htmlElement.setContext(context);
+            // creates instance
+            let componentControl = new ComponentControl(element, context);
 
             // object
-            let objectName = getAttribute(htmlElement, 'object');
+            let objectName = getAttribute(element, 'object');
             if(objectName){
-                htmlElement.setObject(objectName);
+                componentControl.setObject(objectName);
             }
 
             // array
-            let arrayName = getAttribute(htmlElement, 'array');
+            let arrayName = getAttribute(element, 'array');
             if(arrayName){
-                htmlElement.setArray(arrayName);
+                componentControl.setArray(arrayName);
             }
 
             // returns
-            return htmlElement;
+            return componentControl;
 
         }
 
-
-        abstract support(htmlElement: HTMLElement): boolean;
+        abstract support(element: HTMLElement): boolean;
 
     }
 

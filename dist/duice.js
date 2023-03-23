@@ -484,7 +484,7 @@ var duice;
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
-    let alias = 'duice';
+    let alias = 'dc';
     /**
      * sets alias of namespace
      * @param value
@@ -1565,21 +1565,24 @@ var duice;
             //initialize(this.shadowRoot, {});
             console.log("========== tagName:", this.tagName);
         }
-        setContext(context) {
-            this.context = context;
-        }
-        setObject(objectName) {
-            this.objectProxy = duice.findObject(this.context, objectName);
-            if (!this.objectProxy) {
-                console.warn(`ObjectProxy[${objectName}] is not found.`, this.objectProxy);
-                this.objectProxy = new duice.ObjectProxy({});
-            }
-            let objectHandler = duice.ObjectProxy.getHandler(this.objectProxy);
-            this.observable.addObserver(objectHandler);
-            // objectHandler.addObserver(this);
-        }
-        setArray(arrayName) {
-        }
+        // setContext(context: object): void {
+        //     this.context = context;
+        // }
+        //
+        // setObject(objectName: string): void {
+        //     this.objectProxy = findObject(this.context, objectName);
+        //     if(!this.objectProxy){
+        //         console.warn(`ObjectProxy[${objectName}] is not found.`, this.objectProxy);
+        //         this.objectProxy = new ObjectProxy({});
+        //     }
+        //     let objectHandler = ObjectProxy.getHandler(this.objectProxy);
+        //     this.observable.addObserver(objectHandler);
+        //     // objectHandler.addObserver(this);
+        // }
+        //
+        // setArray(arrayName: string): void {
+        //
+        // }
         template() {
             return this.doTemplate();
         }
@@ -1592,32 +1595,6 @@ var duice;
     }
     duice.Component = Component;
 })(duice || (duice = {}));
-var duice;
-(function (duice) {
-    var component;
-    (function (component) {
-        class SampleComponent extends duice.Component {
-            doRender() {
-            }
-            doUpdate(observable, event) {
-            }
-            template() {
-                return "";
-            }
-            doTemplate() {
-                return "";
-            }
-        }
-        component.SampleComponent = SampleComponent;
-    })(component = duice.component || (duice.component = {}));
-})(duice || (duice = {}));
-// namespace duice.component {
-//
-//     export class SampleComponentFactory extends ComponentFactory {
-//
-//     }
-//
-// }
 ///<Reference path="Observable.ts"/>
 ///<Reference path="Observer.ts"/>
 var duice;
@@ -1924,6 +1901,31 @@ var duice;
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
+    class ComponentControl extends duice.Observable {
+        constructor(element, context) {
+            super();
+            this.element = element;
+            this.context = context;
+        }
+        setObject(objectName) {
+            this.objectProxy = duice.findObject(this.context, objectName);
+            if (!this.objectProxy) {
+                console.warn(`ObjectProxy[${objectName}] is not found.`, this.objectProxy);
+                this.objectProxy = new duice.ObjectProxy({});
+            }
+            let objectHandler = duice.ObjectProxy.getHandler(this.objectProxy);
+            this.addObserver(objectHandler);
+            objectHandler.addObserver(this);
+        }
+        setArray(arrayName) {
+        }
+        update(observable, event) {
+        }
+    }
+    duice.ComponentControl = ComponentControl;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
     class ComponentControlFactory {
         /**
          * register component factory
@@ -1947,24 +1949,24 @@ var duice;
         }
         /**
          * creates element
-         * @param htmlElement
+         * @param element
          * @param context
          */
-        createComponent(htmlElement, context) {
-            // set context
-            htmlElement.setContext(context);
+        createComponentControl(element, context) {
+            // creates instance
+            let componentControl = new duice.ComponentControl(element, context);
             // object
-            let objectName = duice.getAttribute(htmlElement, 'object');
+            let objectName = duice.getAttribute(element, 'object');
             if (objectName) {
-                htmlElement.setObject(objectName);
+                componentControl.setObject(objectName);
             }
             // array
-            let arrayName = duice.getAttribute(htmlElement, 'array');
+            let arrayName = duice.getAttribute(element, 'array');
             if (arrayName) {
-                htmlElement.setArray(arrayName);
+                componentControl.setArray(arrayName);
             }
             // returns
-            return htmlElement;
+            return componentControl;
         }
     }
     ComponentControlFactory.componentFactoryRegistry = [];

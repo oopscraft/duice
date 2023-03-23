@@ -42,24 +42,24 @@ namespace duice {
 
         }
 
-        setContext(context: object): void {
-            this.context = context;
-        }
-
-        setObject(objectName: string): void {
-            this.objectProxy = findObject(this.context, objectName);
-            if(!this.objectProxy){
-                console.warn(`ObjectProxy[${objectName}] is not found.`, this.objectProxy);
-                this.objectProxy = new ObjectProxy({});
-            }
-            let objectHandler = ObjectProxy.getHandler(this.objectProxy);
-            this.observable.addObserver(objectHandler);
-            // objectHandler.addObserver(this);
-        }
-
-        setArray(arrayName: string): void {
-
-        }
+        // setContext(context: object): void {
+        //     this.context = context;
+        // }
+        //
+        // setObject(objectName: string): void {
+        //     this.objectProxy = findObject(this.context, objectName);
+        //     if(!this.objectProxy){
+        //         console.warn(`ObjectProxy[${objectName}] is not found.`, this.objectProxy);
+        //         this.objectProxy = new ObjectProxy({});
+        //     }
+        //     let objectHandler = ObjectProxy.getHandler(this.objectProxy);
+        //     this.observable.addObserver(objectHandler);
+        //     // objectHandler.addObserver(this);
+        // }
+        //
+        // setArray(arrayName: string): void {
+        //
+        // }
 
         template(): string {
             return this.doTemplate();

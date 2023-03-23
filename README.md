@@ -40,14 +40,14 @@ const user = new duice.ObjectProxy({
 
 | attribute                             | description                                          |
 |:--------------------------------------|:-----------------------------------------------------|
-| duice:object="[object]"               | Object name to bind                                  |
-| duice:property="[property of object]" | Object Property name to bind                         |
-| duice:script="[script code]"          | javascript code to execute when element is updated   |
-| duice:mask="[data masking clause]"    | ex) string('###-###'), number(2), date('yyyy-MM-dd') |
+| dc:object="[object]"               | Object name to bind                                  |
+| dc:property="[property of object]" | Object Property name to bind                         |
+| dc:script="[script code]"          | javascript code to execute when element is updated   |
+| dc:mask="[data masking clause]"    | ex) string('###-###'), number(2), date('yyyy-MM-dd') |
 
 ```html
-<span duice:object="user" duice:property="id"></span>
-<input type="text" duice:object="user" duice:property="name"/>
+<span dc:object="user" dc:property="id"></span>
+<input type="text" dc:object="user" dc:property="name"/>
 ```
 
 ### Test Case
@@ -73,9 +73,9 @@ const users = new duice.ArrayProxy([
 
 | attribute                                 | description                              |
 |:------------------------------------------|:-----------------------------------------|
-| duice:array="[array]"                     | Object name to bind                      |
-| duice:loop="[element name],[status name]" | element object and status variable name  |
-| duice:script="[script code]"          | javascript code to execute when element is updated   |
+| dc:array="[array]"                     | Object name to bind                      |
+| dc:loop="[element name],[status name]" | element object and status variable name  |
+| dc:script="[script code]"          | javascript code to execute when element is updated   |
 
 ```html
 <table>
@@ -84,10 +84,10 @@ const users = new duice.ArrayProxy([
         <th>name</th>
         <th>name</th>
     </tr>
-    <tr duice:array="users" duice:loop="user,status">
-        <td duice:object="status" duice:property="count"></td>
-        <td duice:object="user" duice:property="id"></td>
-        <td><input type="text" duice:object="user" duice:property="name"/></td>
+    <tr dc:array="users" dc:loop="user,status">
+        <td dc:object="status" dc:property="count"></td>
+        <td dc:object="user" dc:property="id"></td>
+        <td><input type="text" dc:object="user" dc:property="name"/></td>
     </tr>
 </table>
 ```
