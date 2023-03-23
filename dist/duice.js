@@ -484,7 +484,7 @@ var duice;
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
-    let alias = 'dc';
+    let alias = 'duice';
     /**
      * sets alias of namespace
      * @param value
