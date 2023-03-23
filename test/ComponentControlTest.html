@@ -52,7 +52,7 @@
         class TestElement extends duice.Component {
             doTemplate(){
                 return `<span>
-                            <input type="text" dc:object="myObject" dc:property="name"/>
+                            <input type="text" duice:object="myObject" duice:property="name"/>
                         </span>`;
             }
             doStyle() {
@@ -98,9 +98,9 @@
 </head>
 <body>
 
-<input type="text" dc:object="myObject" dc:property="name" style="background-color:red;"/>
+<input type="text" duice:object="myObject" duice:property="name" style="background-color:red;"/>
 
-<my-component id="myComponent" dc:object="myObject">
+<my-component id="myComponent" duice:object="myObject">
     111
 </my-component>
 
