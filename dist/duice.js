@@ -484,6 +484,69 @@ var duice;
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
+    class ComponentControlFactory {
+        /**
+         * constructor
+         * @param tagName
+         */
+        constructor(tagName) {
+            this.tagName = tagName;
+        }
+        /**
+         * register component factory
+         * @param componentControlFactory
+         */
+        static registerComponentFactory(componentControlFactory) {
+            this.componentControlFactoryRegistry.push(componentControlFactory);
+        }
+        /**
+         * return instance
+         * @param htmlElement
+         */
+        static getInstance(htmlElement) {
+            let instance;
+            this.componentControlFactoryRegistry.forEach(componentControlFactory => {
+                if (componentControlFactory.support(htmlElement)) {
+                    instance = componentControlFactory;
+                }
+            });
+            return instance;
+        }
+        /**
+         * creates element
+         * @param element
+         * @param context
+         */
+        createComponentControl(element, context) {
+            // creates instance
+            let componentControl = new duice.ComponentControl(element, context);
+            // object
+            let objectName = duice.getAttribute(element, 'object');
+            if (objectName) {
+                componentControl.setObject(objectName);
+            }
+            // array
+            let arrayName = duice.getAttribute(element, 'array');
+            if (arrayName) {
+                componentControl.setArray(arrayName);
+            }
+            // returns
+            return componentControl;
+        }
+        /**
+         * support
+         * @param element
+         */
+        support(element) {
+            return (element.tagName.toLowerCase() === this.tagName);
+        }
+    }
+    ComponentControlFactory.componentControlFactoryRegistry = [];
+    duice.ComponentControlFactory = ComponentControlFactory;
+})(duice || (duice = {}));
+///<reference path="ComponentControlFactory.ts"/>
+var duice;
+(function (duice) {
     let alias = 'duice';
     /**
      * sets alias of namespace
@@ -520,7 +583,12 @@ var duice;
         container.querySelectorAll(getQuerySelectorExpression()).forEach(element => {
             if (!hasAttribute(element, 'id')) {
                 try {
-                    if (hasAttribute(element, 'array')) {
+                    if (duice.ComponentControlFactory.getInstance(element)) {
+                        let componentControlFactory = duice.ComponentControlFactory.getInstance(element);
+                        let componentControl = componentControlFactory.createComponentControl(element, context);
+                        componentControl.render();
+                    }
+                    else if (hasAttribute(element, 'array')) {
                         let loopControlFactory = duice.LoopControlFactory.getInstance(element);
                         let loopControl = loopControlFactory.createLoopControl(element, context);
                         loopControl.render();
@@ -532,7 +600,7 @@ var duice;
                     }
                 }
                 catch (e) {
-                    console.error(e.message, element, container, JSON.stringify(context));
+                    console.error(e, element, container, JSON.stringify(context));
                 }
             }
         });
@@ -787,8 +855,14 @@ var duice;
         });
     }
     duice.fetch = fetch;
-    function defineComponent(name, constructor) {
-        customElements.define(name, constructor);
+    /**
+     * defineComponent
+     * @param tagName
+     * @param constructor
+     */
+    function defineComponent(tagName, constructor) {
+        customElements.define(tagName, constructor);
+        duice.ComponentControlFactory.registerComponentFactory(new duice.ComponentControlFactory(tagName));
     }
     duice.defineComponent = defineComponent;
     /**
@@ -1586,12 +1660,6 @@ var duice;
         template() {
             return this.doTemplate();
         }
-        render() {
-            console.log("================ render", this.htmlElement);
-            duice.initialize(this.htmlElement, this.context);
-            this.doRender();
-            duice.markInitialized(this.htmlElement);
-        }
     }
     duice.Component = Component;
 })(duice || (duice = {}));
@@ -1919,58 +1987,15 @@ var duice;
         }
         setArray(arrayName) {
         }
+        render() {
+            duice.initialize(this.element, this.context);
+            this.element.doRender();
+            duice.markInitialized(this.element);
+        }
         update(observable, event) {
         }
     }
     duice.ComponentControl = ComponentControl;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    class ComponentControlFactory {
-        /**
-         * register component factory
-         * @param componentFactory
-         */
-        static registerComponentFactory(componentFactory) {
-            this.componentFactoryRegistry.push(componentFactory);
-        }
-        /**
-         * return instance
-         * @param htmlElement
-         */
-        static getInstance(htmlElement) {
-            let instance;
-            this.componentFactoryRegistry.forEach(componentFactory => {
-                if (componentFactory.support(htmlElement)) {
-                    instance = componentFactory;
-                }
-            });
-            return instance;
-        }
-        /**
-         * creates element
-         * @param element
-         * @param context
-         */
-        createComponentControl(element, context) {
-            // creates instance
-            let componentControl = new duice.ComponentControl(element, context);
-            // object
-            let objectName = duice.getAttribute(element, 'object');
-            if (objectName) {
-                componentControl.setObject(objectName);
-            }
-            // array
-            let arrayName = duice.getAttribute(element, 'array');
-            if (arrayName) {
-                componentControl.setArray(arrayName);
-            }
-            // returns
-            return componentControl;
-        }
-    }
-    ComponentControlFactory.componentFactoryRegistry = [];
-    duice.ComponentControlFactory = ComponentControlFactory;
 })(duice || (duice = {}));
 var duice;
 (function (duice) {

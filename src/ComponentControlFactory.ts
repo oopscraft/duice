@@ -1,15 +1,17 @@
 namespace duice {
 
-    export abstract class ComponentControlFactory {
+    export class ComponentControlFactory {
 
-        static componentFactoryRegistry: ComponentControlFactory[] = [];
+        static componentControlFactoryRegistry: ComponentControlFactory[] = [];
+
+        tagName: string;
 
         /**
          * register component factory
-         * @param componentFactory
+         * @param componentControlFactory
          */
-        static registerComponentFactory(componentFactory: ComponentControlFactory): void {
-            this.componentFactoryRegistry.push(componentFactory);
+        static registerComponentFactory(componentControlFactory: ComponentControlFactory): void {
+            this.componentControlFactoryRegistry.push(componentControlFactory);
         }
 
         /**
@@ -18,12 +20,20 @@ namespace duice {
          */
         static getInstance(htmlElement: HTMLElement): ComponentControlFactory {
             let instance;
-            this.componentFactoryRegistry.forEach(componentFactory => {
-                if (componentFactory.support(htmlElement)) {
-                    instance = componentFactory;
+            this.componentControlFactoryRegistry.forEach(componentControlFactory => {
+                if (componentControlFactory.support(htmlElement)) {
+                    instance = componentControlFactory;
                 }
             });
             return instance;
+        }
+
+        /**
+         * constructor
+         * @param tagName
+         */
+        constructor(tagName: string) {
+            this.tagName = tagName;
         }
 
         /**
@@ -53,7 +63,13 @@ namespace duice {
 
         }
 
-        abstract support(element: HTMLElement): boolean;
+        /**
+         * support
+         * @param element
+         */
+        support(element: HTMLElement): boolean {
+            return (element.tagName.toLowerCase() === this.tagName);
+        }
 
     }
 

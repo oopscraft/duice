@@ -80,12 +80,6 @@ namespace duice {
 
         abstract doTemplate(): string;
 
-        render(): void {
-            console.log("================ render", this.htmlElement);
-            initialize(this.htmlElement, this.context);
-            this.doRender();
-            markInitialized(this.htmlElement);
-        }
 
         abstract doRender(): void;
 

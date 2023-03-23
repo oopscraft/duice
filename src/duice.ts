@@ -1,3 +1,4 @@
+///<reference path="ComponentControlFactory.ts"/>
 namespace duice {
 
     let alias = 'duice';
@@ -38,7 +39,11 @@ namespace duice {
         container.querySelectorAll(getQuerySelectorExpression()).forEach(element => {
             if(!hasAttribute(element, 'id')) {
                 try {
-                    if (hasAttribute(element, 'array')) {
+                    if(ComponentControlFactory.getInstance(element)){
+                        let componentControlFactory = ComponentControlFactory.getInstance(element);
+                        let componentControl = componentControlFactory.createComponentControl(element, context);
+                        componentControl.render();
+                    }else if (hasAttribute(element, 'array')) {
                         let loopControlFactory = LoopControlFactory.getInstance(element);
                         let loopControl = loopControlFactory.createLoopControl(element, context);
                         loopControl.render();
@@ -48,7 +53,7 @@ namespace duice {
                         control.render();
                     }
                 }catch(e){
-                    console.error(e.message, element, container, JSON.stringify(context));
+                    console.error(e, element, container, JSON.stringify(context));
                 }
             }
         });
@@ -296,8 +301,14 @@ namespace duice {
             });
     }
 
-    export function defineComponent(name: string, constructor: CustomElementConstructor): void {
-        customElements.define(name, constructor);
+    /**
+     * defineComponent
+     * @param tagName
+     * @param constructor
+     */
+    export function defineComponent(tagName: string, constructor: CustomElementConstructor): void {
+        customElements.define(tagName, constructor);
+        ComponentControlFactory.registerComponentFactory(new duice.ComponentControlFactory(tagName));
     }
 
     /**

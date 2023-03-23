@@ -63,20 +63,7 @@
             doUpdate(observable, event) {
             }
         }
-        class TestElementFactory extends duice.ControlFactory {
-
-            support(htmlElement){
-                return (htmlElement.tagName.toLowerCase() === 'my-component');
-            }
-
-            doCreateControl(htmlElement, context) {
-                // htmlElement.setContext(context);
-                return htmlElement;
-            }
-        }
-
-        customElements.define('my-component', TestElement);
-        duice.ControlFactory.registerControlFactory(new TestElementFactory());
+        duice.defineComponent('my-component', TestElement);
 
 
 

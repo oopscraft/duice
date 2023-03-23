@@ -31,6 +31,12 @@ namespace duice {
 
         }
 
+        render(): void {
+            initialize(this.element, this.context);
+            this.element.doRender();
+            markInitialized(this.element);
+        }
+
 
         update(observable: object, event: duice.Event): void {
 
