@@ -1663,310 +1663,6 @@ var duice;
     }
     duice.Component = Component;
 })(duice || (duice = {}));
-///<Reference path="Observable.ts"/>
-///<Reference path="Observer.ts"/>
-var duice;
-(function (duice) {
-    class AbstractHandler extends duice.Observable {
-        /**
-         * constructor
-         * @protected
-         */
-        constructor() {
-            super();
-            this.readonlyAll = false;
-            this.readonly = new Set();
-            this.listenerEnabled = true;
-        }
-        /**
-         * setTarget
-         * @param target
-         */
-        setTarget(target) {
-            this.target = target;
-        }
-        /**
-         * getTarget
-         */
-        getTarget() {
-            return this.target;
-        }
-        /**
-         * setReadonlyAll
-         * @param readonly
-         */
-        setReadonlyAll(readonly) {
-            this.readonlyAll = readonly;
-            if (readonly === false) {
-                this.readonly.clear();
-            }
-            this.notifyObservers(new duice.Event(this));
-        }
-        /**
-         * setReadonly
-         * @param property
-         * @param readonly
-         */
-        setReadonly(property, readonly) {
-            if (readonly) {
-                this.readonly.add(property);
-            }
-            else {
-                this.readonly.delete(property);
-            }
-            this.notifyObservers(new duice.Event(this));
-        }
-        /**
-         * isReadonly
-         * @param property
-         */
-        isReadonly(property) {
-            return this.readonlyAll || this.readonly.has(property);
-        }
-        /**
-         * suspends listener
-         */
-        suspendListener() {
-            this.listenerEnabled = false;
-        }
-        /**
-         * resumes listener
-         */
-        resumeListener() {
-            this.listenerEnabled = true;
-        }
-        /**
-         * checkListener
-         * @param listener
-         * @param event
-         */
-        checkListener(listener, event) {
-            return __awaiter(this, void 0, void 0, function* () {
-                if (this.listenerEnabled && listener) {
-                    let result = yield listener.call(this.getTarget(), event);
-                    if (result == false) {
-                        return false;
-                    }
-                }
-                return true;
-            });
-        }
-    }
-    duice.AbstractHandler = AbstractHandler;
-})(duice || (duice = {}));
-///<reference path="Observable.ts"/>
-///<reference path="Observer.ts"/>
-///<reference path="AbstractHandler.ts"/>
-var duice;
-(function (duice) {
-    /**
-     * ObjectHandler
-     */
-    class ObjectHandler extends duice.AbstractHandler {
-        /**
-         * constructor
-         */
-        constructor() {
-            super();
-        }
-        /**
-         * get
-         * @param target
-         * @param property
-         * @param receiver
-         */
-        get(target, property, receiver) {
-            console.debug("ObjectHandler.get", target, property, receiver);
-            return Reflect.get(target, property, receiver);
-        }
-        /**
-         * set
-         * @param target
-         * @param property
-         * @param value
-         */
-        set(target, property, value) {
-            console.debug("ObjectHandler.set", target, property, value);
-            // change value
-            Reflect.set(target, property, value);
-            // notify
-            let event = new duice.PropertyChangeEvent(this, property, value);
-            this.notifyObservers(event);
-            // returns
-            return true;
-        }
-        /**
-         * update
-         * @param observable
-         * @param event
-         */
-        update(observable, event) {
-            return __awaiter(this, void 0, void 0, function* () {
-                console.log("ObjectHandler.update", observable, event);
-                // Element
-                if (observable instanceof duice.Control) {
-                    let property = observable.getProperty();
-                    let value = observable.getValue();
-                    if (yield this.checkListener(this.propertyChangingListener, event)) {
-                        this.setValue(property, value);
-                        yield this.checkListener(this.propertyChangedListener, event);
-                    }
-                }
-                // notify
-                this.notifyObservers(event);
-            });
-        }
-        /**
-         * getValue
-         * @param property
-         */
-        getValue(property) {
-            property = property.replace('.', '?.');
-            return new Function(`return this.${property};`).call(this.getTarget());
-        }
-        /**
-         * setValue
-         * @param property
-         * @param value
-         */
-        setValue(property, value) {
-            new Function('value', `this.${property} = value;`).call(this.getTarget(), value);
-        }
-    }
-    duice.ObjectHandler = ObjectHandler;
-})(duice || (duice = {}));
-///<reference path="AbstractHandler.ts"/>
-var duice;
-(function (duice) {
-    /**
-     * ArrayHandler
-     */
-    class ArrayHandler extends duice.AbstractHandler {
-        /**
-         * constructor
-         * @param arrayProxy
-         */
-        constructor() {
-            super();
-        }
-        /**
-         * get
-         * @param target
-         * @param property
-         * @param receiver
-         */
-        get(target, property, receiver) {
-            console.debug("ArrayHandler.get", '|', target, '|', property, '|', receiver);
-            let _this = this;
-            const value = target[property];
-            if (typeof value === 'function') {
-                // push, unshift
-                if (['push', 'unshift'].includes(property)) {
-                    return function () {
-                        return __awaiter(this, arguments, void 0, function* () {
-                            let index;
-                            if (property === 'push') {
-                                index = receiver['length'];
-                            }
-                            else if (property === 'unshift') {
-                                index = 0;
-                            }
-                            let rows = [];
-                            for (let i in arguments) {
-                                rows.push(arguments[i]);
-                            }
-                            yield target.insertRow(index, ...rows);
-                            return _this.target.length;
-                        });
-                    };
-                }
-                // splice
-                if (['splice'].includes(property)) {
-                    return function () {
-                        return __awaiter(this, arguments, void 0, function* () {
-                            // parse arguments
-                            let start = arguments[0];
-                            let deleteCount = arguments[1];
-                            let deleteRows = [];
-                            for (let i = start; i < (start + deleteCount); i++) {
-                                deleteRows.push(target[i]);
-                            }
-                            let insertRows = [];
-                            for (let i = 2; i < arguments.length; i++) {
-                                insertRows.push(arguments[i]);
-                            }
-                            // delete rows
-                            if (deleteCount > 0) {
-                                yield target.deleteRow(start, deleteCount);
-                            }
-                            // insert rows
-                            if (insertRows.length > 0) {
-                                yield target.insertRow(start, ...insertRows);
-                            }
-                            // returns deleted rows
-                            return deleteRows;
-                        });
-                    };
-                }
-                // pop, shift
-                if (['pop', 'shift'].includes(property)) {
-                    return function () {
-                        return __awaiter(this, void 0, void 0, function* () {
-                            let index;
-                            if (property === 'pop') {
-                                index = receiver['length'] - 1;
-                            }
-                            else if (property === 'shift') {
-                                index = 0;
-                            }
-                            let rows = [target[index]];
-                            yield target.deleteRow(index);
-                            return rows;
-                        });
-                    };
-                }
-                // bind
-                return value.bind(target);
-            }
-            // return
-            return value;
-        }
-        /**
-         * set
-         * @param target
-         * @param property
-         * @param value
-         */
-        set(target, property, value) {
-            console.debug("ArrayHandler.set", '|', target, '|', property, '|', value);
-            Reflect.set(target, property, value);
-            if (property === 'length') {
-                this.notifyObservers(new duice.Event(this));
-            }
-            return true;
-        }
-        /**
-         * update
-         * @param elementSet
-         * @param event
-         */
-        update(observable, event) {
-            return __awaiter(this, void 0, void 0, function* () {
-                console.debug("ArrayHandler.update", observable, event);
-                // ElementSet
-                if (observable instanceof duice.LoopControl) {
-                    if (event instanceof duice.RowMoveEvent) {
-                        let object = this.getTarget().splice(event.getFromIndex(), 1)[0];
-                        this.getTarget().splice(event.getToIndex(), 0, object);
-                    }
-                }
-                // notify observers
-                this.notifyObservers(event);
-            });
-        }
-    }
-    duice.ArrayHandler = ArrayHandler;
-})(duice || (duice = {}));
 var duice;
 (function (duice) {
     class ComponentControl extends duice.Observable {
@@ -2832,5 +2528,309 @@ var duice;
         }
     }
     duice.InputNumberControl = InputNumberControl;
+})(duice || (duice = {}));
+///<Reference path="Observable.ts"/>
+///<Reference path="Observer.ts"/>
+var duice;
+(function (duice) {
+    class AbstractHandler extends duice.Observable {
+        /**
+         * constructor
+         * @protected
+         */
+        constructor() {
+            super();
+            this.readonlyAll = false;
+            this.readonly = new Set();
+            this.listenerEnabled = true;
+        }
+        /**
+         * setTarget
+         * @param target
+         */
+        setTarget(target) {
+            this.target = target;
+        }
+        /**
+         * getTarget
+         */
+        getTarget() {
+            return this.target;
+        }
+        /**
+         * setReadonlyAll
+         * @param readonly
+         */
+        setReadonlyAll(readonly) {
+            this.readonlyAll = readonly;
+            if (readonly === false) {
+                this.readonly.clear();
+            }
+            this.notifyObservers(new duice.Event(this));
+        }
+        /**
+         * setReadonly
+         * @param property
+         * @param readonly
+         */
+        setReadonly(property, readonly) {
+            if (readonly) {
+                this.readonly.add(property);
+            }
+            else {
+                this.readonly.delete(property);
+            }
+            this.notifyObservers(new duice.Event(this));
+        }
+        /**
+         * isReadonly
+         * @param property
+         */
+        isReadonly(property) {
+            return this.readonlyAll || this.readonly.has(property);
+        }
+        /**
+         * suspends listener
+         */
+        suspendListener() {
+            this.listenerEnabled = false;
+        }
+        /**
+         * resumes listener
+         */
+        resumeListener() {
+            this.listenerEnabled = true;
+        }
+        /**
+         * checkListener
+         * @param listener
+         * @param event
+         */
+        checkListener(listener, event) {
+            return __awaiter(this, void 0, void 0, function* () {
+                if (this.listenerEnabled && listener) {
+                    let result = yield listener.call(this.getTarget(), event);
+                    if (result == false) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+        }
+    }
+    duice.AbstractHandler = AbstractHandler;
+})(duice || (duice = {}));
+///<reference path="Observable.ts"/>
+///<reference path="Observer.ts"/>
+///<reference path="ProxyHandler.ts"/>
+var duice;
+(function (duice) {
+    /**
+     * ObjectHandler
+     */
+    class ObjectHandler extends duice.AbstractHandler {
+        /**
+         * constructor
+         */
+        constructor() {
+            super();
+        }
+        /**
+         * get
+         * @param target
+         * @param property
+         * @param receiver
+         */
+        get(target, property, receiver) {
+            console.debug("ObjectHandler.get", target, property, receiver);
+            return Reflect.get(target, property, receiver);
+        }
+        /**
+         * set
+         * @param target
+         * @param property
+         * @param value
+         */
+        set(target, property, value) {
+            console.debug("ObjectHandler.set", target, property, value);
+            // change value
+            Reflect.set(target, property, value);
+            // notify
+            let event = new duice.PropertyChangeEvent(this, property, value);
+            this.notifyObservers(event);
+            // returns
+            return true;
+        }
+        /**
+         * update
+         * @param observable
+         * @param event
+         */
+        update(observable, event) {
+            return __awaiter(this, void 0, void 0, function* () {
+                console.log("ObjectHandler.update", observable, event);
+                // Element
+                if (observable instanceof duice.Control) {
+                    let property = observable.getProperty();
+                    let value = observable.getValue();
+                    if (yield this.checkListener(this.propertyChangingListener, event)) {
+                        this.setValue(property, value);
+                        yield this.checkListener(this.propertyChangedListener, event);
+                    }
+                }
+                // notify
+                this.notifyObservers(event);
+            });
+        }
+        /**
+         * getValue
+         * @param property
+         */
+        getValue(property) {
+            property = property.replace('.', '?.');
+            return new Function(`return this.${property};`).call(this.getTarget());
+        }
+        /**
+         * setValue
+         * @param property
+         * @param value
+         */
+        setValue(property, value) {
+            new Function('value', `this.${property} = value;`).call(this.getTarget(), value);
+        }
+    }
+    duice.ObjectHandler = ObjectHandler;
+})(duice || (duice = {}));
+///<reference path="ProxyHandler.ts"/>
+var duice;
+(function (duice) {
+    /**
+     * ArrayHandler
+     */
+    class ArrayHandler extends duice.AbstractHandler {
+        /**
+         * constructor
+         * @param arrayProxy
+         */
+        constructor() {
+            super();
+        }
+        /**
+         * get
+         * @param target
+         * @param property
+         * @param receiver
+         */
+        get(target, property, receiver) {
+            console.debug("ArrayHandler.get", '|', target, '|', property, '|', receiver);
+            let _this = this;
+            const value = target[property];
+            if (typeof value === 'function') {
+                // push, unshift
+                if (['push', 'unshift'].includes(property)) {
+                    return function () {
+                        return __awaiter(this, arguments, void 0, function* () {
+                            let index;
+                            if (property === 'push') {
+                                index = receiver['length'];
+                            }
+                            else if (property === 'unshift') {
+                                index = 0;
+                            }
+                            let rows = [];
+                            for (let i in arguments) {
+                                rows.push(arguments[i]);
+                            }
+                            yield target.insertRow(index, ...rows);
+                            return _this.target.length;
+                        });
+                    };
+                }
+                // splice
+                if (['splice'].includes(property)) {
+                    return function () {
+                        return __awaiter(this, arguments, void 0, function* () {
+                            // parse arguments
+                            let start = arguments[0];
+                            let deleteCount = arguments[1];
+                            let deleteRows = [];
+                            for (let i = start; i < (start + deleteCount); i++) {
+                                deleteRows.push(target[i]);
+                            }
+                            let insertRows = [];
+                            for (let i = 2; i < arguments.length; i++) {
+                                insertRows.push(arguments[i]);
+                            }
+                            // delete rows
+                            if (deleteCount > 0) {
+                                yield target.deleteRow(start, deleteCount);
+                            }
+                            // insert rows
+                            if (insertRows.length > 0) {
+                                yield target.insertRow(start, ...insertRows);
+                            }
+                            // returns deleted rows
+                            return deleteRows;
+                        });
+                    };
+                }
+                // pop, shift
+                if (['pop', 'shift'].includes(property)) {
+                    return function () {
+                        return __awaiter(this, void 0, void 0, function* () {
+                            let index;
+                            if (property === 'pop') {
+                                index = receiver['length'] - 1;
+                            }
+                            else if (property === 'shift') {
+                                index = 0;
+                            }
+                            let rows = [target[index]];
+                            yield target.deleteRow(index);
+                            return rows;
+                        });
+                    };
+                }
+                // bind
+                return value.bind(target);
+            }
+            // return
+            return value;
+        }
+        /**
+         * set
+         * @param target
+         * @param property
+         * @param value
+         */
+        set(target, property, value) {
+            console.debug("ArrayHandler.set", '|', target, '|', property, '|', value);
+            Reflect.set(target, property, value);
+            if (property === 'length') {
+                this.notifyObservers(new duice.Event(this));
+            }
+            return true;
+        }
+        /**
+         * update
+         * @param elementSet
+         * @param event
+         */
+        update(observable, event) {
+            return __awaiter(this, void 0, void 0, function* () {
+                console.debug("ArrayHandler.update", observable, event);
+                // ElementSet
+                if (observable instanceof duice.LoopControl) {
+                    if (event instanceof duice.RowMoveEvent) {
+                        let object = this.getTarget().splice(event.getFromIndex(), 1)[0];
+                        this.getTarget().splice(event.getToIndex(), 0, object);
+                    }
+                }
+                // notify observers
+                this.notifyObservers(event);
+            });
+        }
+    }
+    duice.ArrayHandler = ArrayHandler;
 })(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map
