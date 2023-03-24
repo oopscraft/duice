@@ -20,7 +20,7 @@
          * MyObjectComponent
          */
         duice.defineComponent("my-object-component", class MyObjectComponent extends duice.Component {
-            doTemplate(data) {
+            doRender(data) {
                 return `
                     <div>
                         <span duice:object="data" duice:property="name"></span>
@@ -41,7 +41,7 @@
          * MyArrayComponent
          */
         duice.defineComponent("my-array-component", class MyArrayComponent extends duice.Component {
-            doTemplate(data) {
+            doRender(data) {
                 return `
                 <div>
                     <div duice:array="data" duice:loop="item,status">
@@ -56,7 +56,7 @@
          * MyNestedComponent
          */
         duice.defineComponent("my-nested-component", class MyNestedComponent extends duice.Component {
-            doTemplate(data) {
+            doRender(data) {
                 return `
                 <div>
                     <div duice:array="data" duice:loop="item,status">
@@ -75,7 +75,7 @@
                 super();
                 this.attachShadow({mode:"open"});
             }
-            doTemplate(data) {
+            doRender(data) {
                 return `
                     <div>
                         <span duice:object="data" duice:property="name"></span>

@@ -109,7 +109,7 @@ const users = new duice.ArrayProxy([
  */
 duice.defineComponent("my-object-component", class MyObjectComponent extends duice.Component {
     // template literal
-    doTemplate(data) {
+    doRender(data) {
         return `
             <div>
                 <span duice:object="data" duice:property="name"></span>

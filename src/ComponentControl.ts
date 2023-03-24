@@ -70,7 +70,7 @@ namespace duice {
             }
 
             // create template element
-            let templateLiteral = this.element.doTemplate(data).trim();
+            let templateLiteral = this.element.doRender(data).trim();
             let templateElement = document.createElement('template');
             templateElement.innerHTML = templateLiteral;
             let htmlElement = templateElement.content.firstChild.cloneNode(true) as HTMLElement;

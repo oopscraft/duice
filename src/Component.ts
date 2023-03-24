@@ -20,7 +20,7 @@ namespace duice {
          * returns html template literal
          * @param data
          */
-        abstract doTemplate(data: DataProxy): string;
+        abstract doRender(data: DataProxy): string;
 
         /**
          * return style literal
