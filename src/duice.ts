@@ -150,25 +150,25 @@ namespace duice {
 
     /**
      * removeChildNodes
-     * @param element
+     * @param node
      */
-    export function removeChildNodes(element: HTMLElement): void {
+    export function removeChildNodes(node: Node): void {
         // Remove element nodes and prevent memory leaks
-        let node, nodes = element.childNodes, i = 0;
-        while (node = nodes[i++]) {
-            if (node.nodeType === 1 ) {
-                element.removeChild(node);
+        let childNode, childNodes = node.childNodes, i = 0;
+        while (childNode = childNodes[i++]) {
+            if (childNode.nodeType === 1 ) {
+                node.removeChild(childNode);
             }
         }
 
         // Remove any remaining nodes
-        while (element.firstChild) {
-            element.removeChild(element.firstChild);
+        while (node.firstChild) {
+            node.removeChild(node.firstChild);
         }
 
         // If this is a select, ensure that it displays empty
-        if(element instanceof HTMLSelectElement){
-            (<HTMLSelectElement>element).options.length = 0;
+        if(node instanceof HTMLSelectElement){
+            (<HTMLSelectElement>node).options.length = 0;
         }
     }
 

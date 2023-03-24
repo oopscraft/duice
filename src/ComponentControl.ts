@@ -38,28 +38,69 @@ namespace duice {
         }
 
         /**
-         * template
-          */
-        template(): HTMLElement {
-            let templateElement = document.createElement('template');
-            templateElement.innerHTML = this.element.doTemplate().trim();
-            return templateElement.content.firstChild.cloneNode(true) as HTMLElement;
+         * check shadow DOM
+         */
+        isShadowDom(): boolean {
+            if(this.element.shadowRoot){
+                return true;
+            }else{
+                return false;
+            }
         }
 
         /**
          * render
          */
         render(): void {
-
-            let templateElement = this.template();
-            this.element.shadowRoot.appendChild(templateElement);
-            initialize(this.element.shadowRoot, this.context);
-
-            // calls template method
-            this.element.doRender();
-
-            // executes script
+            this.doRender(this.dataProxy);
             this.executeScript();
+        }
+
+        /**
+         * doRender
+         * @param data
+         */
+        doRender(data: DataProxy): void {
+
+            // removes child
+            if(this.isShadowDom()){
+                removeChildNodes(this.element.shadowRoot);
+            }else{
+                removeChildNodes(this.element);
+            }
+
+            // create template element
+            let templateLiteral = this.element.doTemplate(data).trim();
+            let templateElement = document.createElement('template');
+            templateElement.innerHTML = templateLiteral;
+            let htmlElement = templateElement.content.firstChild.cloneNode(true) as HTMLElement;
+            if(this.element.shadowRoot){
+                this.element.shadowRoot.appendChild(htmlElement);
+            }else{
+                this.element.appendChild(htmlElement);
+            }
+
+            // add style if exists
+            let styleLiteral = this.element.doStyle(data);
+            if(styleLiteral){
+                let style = document.createElement('style');
+                style.textContent = styleLiteral.trim();
+                if(this.isShadowDom()){
+                    this.element.shadowRoot.appendChild(style);
+                }else{
+                    this.element.appendChild(style);
+                }
+            }
+
+            // initializes shadow root
+            let context = {
+                data: data
+            };
+            if(this.isShadowDom()){
+                initialize(this.element.shadowRoot, context);
+            }else{
+                initialize(this.element, context);
+            }
         }
 
         /**
@@ -70,7 +111,7 @@ namespace duice {
         update(observable: Observable, event: duice.Event): void {
             console.log("ComponentControl.update", observable, event);
             if(observable instanceof DataHandler) {
-                this.element.doUpdate(observable.getTarget(), event);
+                this.doRender(observable.getTarget());
                 this.executeScript();
             }
         }

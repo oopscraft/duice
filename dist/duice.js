@@ -709,23 +709,23 @@ var duice;
     duice.setAttribute = setAttribute;
     /**
      * removeChildNodes
-     * @param element
+     * @param node
      */
-    function removeChildNodes(element) {
+    function removeChildNodes(node) {
         // Remove element nodes and prevent memory leaks
-        let node, nodes = element.childNodes, i = 0;
-        while (node = nodes[i++]) {
-            if (node.nodeType === 1) {
-                element.removeChild(node);
+        let childNode, childNodes = node.childNodes, i = 0;
+        while (childNode = childNodes[i++]) {
+            if (childNode.nodeType === 1) {
+                node.removeChild(childNode);
             }
         }
         // Remove any remaining nodes
-        while (element.firstChild) {
-            element.removeChild(element.firstChild);
+        while (node.firstChild) {
+            node.removeChild(node.firstChild);
         }
         // If this is a select, ensure that it displays empty
-        if (element instanceof HTMLSelectElement) {
-            element.options.length = 0;
+        if (node instanceof HTMLSelectElement) {
+            node.options.length = 0;
         }
     }
     duice.removeChildNodes = removeChildNodes;
@@ -1641,18 +1641,13 @@ var duice;
          */
         constructor() {
             super();
-            this.attachShadow({ mode: 'open' });
-            // let templateElement = document.createElement('template');
-            // templateElement.innerHTML = this.template();
-            // this.htmlElement = templateElement.content.firstChild.cloneNode(true) as HTMLElement;
-            //
-            // //setAttribute(this.htmlElement, 'id', 'testfdfdfd');
-            //
-            // initialize(this.htmlElement, {});
-            // //markInitialized(this.htmlElement);
-            // this.shadowRoot.appendChild(this.htmlElement);
-            // //initialize(this.shadowRoot, {});
-            // console.log("========== tagName:", this.tagName);
+        }
+        /**
+         * return style literal
+         * @param data
+         */
+        doStyle(data) {
+            return null;
         }
     }
     duice.Component = Component;
@@ -1688,24 +1683,68 @@ var duice;
             objectHandler.addObserver(this);
         }
         /**
-         * template
-          */
-        template() {
-            let templateElement = document.createElement('template');
-            templateElement.innerHTML = this.element.doTemplate().trim();
-            return templateElement.content.firstChild.cloneNode(true);
+         * check shadow DOM
+         */
+        isShadowDom() {
+            if (this.element.shadowRoot) {
+                return true;
+            }
+            else {
+                return false;
+            }
         }
         /**
          * render
          */
         render() {
-            let templateElement = this.template();
-            this.element.shadowRoot.appendChild(templateElement);
-            duice.initialize(this.element.shadowRoot, this.context);
-            // calls template method
-            this.element.doRender();
-            // executes script
+            this.doRender(this.dataProxy);
             this.executeScript();
+        }
+        /**
+         * doRender
+         * @param data
+         */
+        doRender(data) {
+            // removes child
+            if (this.isShadowDom()) {
+                duice.removeChildNodes(this.element.shadowRoot);
+            }
+            else {
+                duice.removeChildNodes(this.element);
+            }
+            // create template element
+            let templateLiteral = this.element.doTemplate(data).trim();
+            let templateElement = document.createElement('template');
+            templateElement.innerHTML = templateLiteral;
+            let htmlElement = templateElement.content.firstChild.cloneNode(true);
+            if (this.element.shadowRoot) {
+                this.element.shadowRoot.appendChild(htmlElement);
+            }
+            else {
+                this.element.appendChild(htmlElement);
+            }
+            // add style if exists
+            let styleLiteral = this.element.doStyle(data);
+            if (styleLiteral) {
+                let style = document.createElement('style');
+                style.textContent = styleLiteral.trim();
+                if (this.isShadowDom()) {
+                    this.element.shadowRoot.appendChild(style);
+                }
+                else {
+                    this.element.appendChild(style);
+                }
+            }
+            // initializes shadow root
+            let context = {
+                data: data
+            };
+            if (this.isShadowDom()) {
+                duice.initialize(this.element.shadowRoot, context);
+            }
+            else {
+                duice.initialize(this.element, context);
+            }
         }
         /**
          * update
@@ -1715,7 +1754,7 @@ var duice;
         update(observable, event) {
             console.log("ComponentControl.update", observable, event);
             if (observable instanceof duice.DataHandler) {
-                this.element.doUpdate(observable.getTarget(), event);
+                this.doRender(observable.getTarget());
                 this.executeScript();
             }
         }
@@ -1745,6 +1784,7 @@ var duice;
             super();
             this.slot = document.createElement('slot');
             this.editable = false;
+            this.rowElements = [];
             // clone html element template
             this.element = element.cloneNode(true);
             duice.setAttribute(this.element, 'id', duice.generateId());
@@ -1786,6 +1826,7 @@ var duice;
          * render
          */
         render() {
+            // do render
             this.doRender(this.arrayProxy);
             // executes script
             this.executeScript();
@@ -1797,8 +1838,11 @@ var duice;
         doRender(arrayProxy) {
             var _a;
             let _this = this;
-            // removes elements
-            duice.removeChildNodes(this.slot);
+            // reset row elements
+            this.rowElements.forEach(rowElement => {
+                this.slot.parentNode.removeChild(rowElement);
+            });
+            this.rowElements.length = 0;
             // loop
             if (this.loop) {
                 let loopArgs = this.loop.split(',');
@@ -1816,20 +1860,20 @@ var duice;
                         last: (arrayProxy.length == index + 1)
                     });
                     // clones row elements
-                    let rowHtmlElement = this.element.cloneNode(true);
-                    duice.setAttribute(rowHtmlElement, 'index', index.toString());
+                    let rowElement = this.element.cloneNode(true);
+                    duice.setAttribute(rowElement, 'index', index.toString());
                     // editable
                     if (this.editable) {
-                        rowHtmlElement.setAttribute('draggable', 'true');
-                        rowHtmlElement.addEventListener('dragstart', function (event) {
+                        rowElement.setAttribute('draggable', 'true');
+                        rowElement.addEventListener('dragstart', function (event) {
                             let fromIndex = duice.getAttribute(this, 'index');
                             event.dataTransfer.setData("text", fromIndex);
                         });
-                        rowHtmlElement.addEventListener('dragover', function (event) {
+                        rowElement.addEventListener('dragover', function (event) {
                             event.preventDefault();
                             event.stopPropagation();
                         });
-                        rowHtmlElement.addEventListener('drop', function (event) {
+                        rowElement.addEventListener('drop', function (event) {
                             return __awaiter(this, void 0, void 0, function* () {
                                 event.preventDefault();
                                 event.stopPropagation();
@@ -1841,12 +1885,10 @@ var duice;
                         });
                     }
                     // initializes row element
-                    duice.initialize(rowHtmlElement, context);
-                    this.slot.appendChild(rowHtmlElement);
+                    duice.initialize(rowElement, context);
+                    this.slot.parentNode.insertBefore(rowElement, this.slot);
+                    this.rowElements.push(rowElement);
                 }
-            }
-            else {
-                this.slot.appendChild(this.element);
             }
         }
         /**

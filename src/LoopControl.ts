@@ -17,6 +17,8 @@ namespace duice {
 
         editable: boolean = false;
 
+        rowElements: HTMLElement[] = [];
+
         /**
          * constructor
          * @param element
@@ -71,6 +73,8 @@ namespace duice {
          * render
          */
         render(): void {
+
+            // do render
             this.doRender(this.arrayProxy);
 
             // executes script
@@ -84,8 +88,11 @@ namespace duice {
         doRender(arrayProxy: ArrayProxy): void {
             let _this = this;
 
-            // removes elements
-            removeChildNodes(this.slot);
+            // reset row elements
+            this.rowElements.forEach(rowElement => {
+                this.slot.parentNode.removeChild(rowElement);
+            });
+            this.rowElements.length = 0;
 
             // loop
             if(this.loop){
@@ -106,21 +113,21 @@ namespace duice {
                     });
 
                     // clones row elements
-                    let rowHtmlElement = this.element.cloneNode(true) as HTMLElement;
-                    setAttribute(rowHtmlElement, 'index', index.toString());
+                    let rowElement = this.element.cloneNode(true) as HTMLElement;
+                    setAttribute(rowElement, 'index', index.toString());
 
                     // editable
                     if(this.editable){
-                        rowHtmlElement.setAttribute('draggable', 'true');
-                        rowHtmlElement.addEventListener('dragstart', function(event){
+                        rowElement.setAttribute('draggable', 'true');
+                        rowElement.addEventListener('dragstart', function(event){
                             let fromIndex = getAttribute(this, 'index');
                             event.dataTransfer.setData("text", fromIndex);
                         });
-                        rowHtmlElement.addEventListener('dragover', function(event){
+                        rowElement.addEventListener('dragover', function(event){
                             event.preventDefault();
                             event.stopPropagation();
                         });
-                        rowHtmlElement.addEventListener('drop', async function(event){
+                        rowElement.addEventListener('drop', async function(event){
                             event.preventDefault();
                             event.stopPropagation();
                             let fromIndex = parseInt(event.dataTransfer.getData('text'));
@@ -131,12 +138,10 @@ namespace duice {
                     }
 
                     // initializes row element
-                    initialize(rowHtmlElement, context);
-                    this.slot.appendChild(rowHtmlElement);
+                    initialize(rowElement, context);
+                    this.slot.parentNode.insertBefore(rowElement, this.slot);
+                    this.rowElements.push(rowElement);
                 }
-
-            }else{
-                this.slot.appendChild(this.element);
             }
         }
 

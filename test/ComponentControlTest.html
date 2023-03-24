@@ -7,64 +7,102 @@
     <script>
         'use strict';
         let myObject = new duice.ObjectProxy({
+            id: 'apple',
             name: 'Apple',
-            phoneNo: '01012345678',
-            cardNo: '0000111122223333',
-            balanceAmount: 1234567.13,
-            password: 'p1a2s3s4w5o6r7d8!@',
-            datetime: '2019-03-16T18:00',
-            date: '2019-04-01',
-            time: '18:12',
-            type: 'human',
-            enabled: true,
-            enabledYn: 'Y',
-            gender: 'male',
-            description: "My name is apple.\n I am Fruit.",
-            address: {
-                country: 'USA',
-                city: 'LA'
-            },
-            items: [
-                {id:'a', name:'A'},
-                {id:'b', name:'B'},
-                {id:'c', name:'C'}
-            ]
         });
 
+        let myArray = new duice.ArrayProxy([
+            { id: 'apple', name: 'Apple' },
+            { id: 'orange', name: 'Orange' }
+        ]);
+
         /**
-         *
+         * MyObjectComponent
          */
-        class MyComponent extends duice.Component {
-            doTemplate(data){
-                let test1 = "<<<<<<<";
-                let test2 = ">>>>>>>";
+        duice.defineComponent("my-object-component", class MyObjectComponent extends duice.Component {
+            doTemplate(data) {
                 return `
-                    <span>
-                        ${test1}
-                        <input type="text" duice:object="myObject" duice:property="name"/>
-                        ${test2}
-                    </span>
+                    <div>
+                        <span duice:object="data" duice:property="name"></span>
+                        <input type="text" duice:object="data" duice:property="name" class="bg-red"/>
+                    </div>
                 `;
             }
             doStyle(data) {
+                return `
+                    .bg-red {
+                        background-color: red;
+                    }
+                `;
+            }
+        });
 
+        /**
+         * MyArrayComponent
+         */
+        duice.defineComponent("my-array-component", class MyArrayComponent extends duice.Component {
+            doTemplate(data) {
+                return `
+                <div>
+                    <div duice:array="data" duice:loop="item,status">
+                        <input type="text" duice:object="item" duice:property="name"></input>
+                    </div>
+                </div>
+                `;
             }
-            doRender(data) {
-                console.log("################### == doRender");
+        });
+
+        /**
+         * MyNestedComponent
+         */
+        duice.defineComponent("my-nested-component", class MyNestedComponent extends duice.Component {
+            doTemplate(data) {
+                return `
+                <div>
+                    <div duice:array="data" duice:loop="item,status">
+                        <my-object-component duice:data="item"></my-object-component>
+                    </div>
+                </div>
+                `;
             }
-            doUpdate(data, event) {
-                console.warn("======== doUpdate", data);
+        });
+
+        /**
+         * MyShadowComponent
+         */
+        duice.defineComponent("my-shadow-component", class MyShadowComponent extends duice.Component {
+            constructor(){
+                super();
+                this.attachShadow({mode:"open"});
             }
-        }
-        duice.defineComponent('my-component', MyComponent);
+            doTemplate(data) {
+                return `
+                    <div>
+                        <span duice:object="data" duice:property="name"></span>
+                        <input type="text" duice:object="data" duice:property="name"/>
+                    </div>
+                `;
+            }
+        });
 
     </script>
 </head>
 <body>
 
+<h2> Direct HTML</h2>
 <input type="text" duice:object="myObject" duice:property="name" style="background-color:red;"/>
 
-<my-component duice:data="myObject"/>
+<h2>Object to Component</h2>
+<my-object-component duice:data="myObject"></my-object-component>
+
+<h2>Array to Component</h2>
+<my-array-component duice:data="myArray"></my-array-component>
+
+<h2>Nested Component</h2>
+<my-nested-component duice:data="myArray"></my-nested-component>
+
+<h2>Shadow DOM Component</h2>
+<my-shadow-component duice:data="myObject"></my-shadow-component>
 
 </body>
 </html>

@@ -99,6 +99,61 @@ const users = new duice.ArrayProxy([
 
 -----------------------------------------------------------
 
+## Data and ComponentControl
+
+### javascript
+
+```javascript
+/**
+ * MyObjectComponent
+ */
+duice.defineComponent("my-object-component", class MyObjectComponent extends duice.Component {
+    // template literal
+    doTemplate(data) {
+        return `
+            <div>
+                <span duice:object="data" duice:property="name"></span>
+                <input type="text" duice:object="data" duice:property="name" class="bg-red"/>
+            </div>
+        `;
+    }
+    // style literal (optional)
+    doStyle(data) {
+        return `
+            .bg-red {
+                background-color: red;
+            }
+        `;
+    }
+});
+```
+
+### HTML
+
+| attribute                                 | description                                        |
+|:------------------------------------------|:---------------------------------------------------|
+| duice:data="[object or array]"            | Object or Array name to bind                       |
+
+
+```html
+<script>
+    let myObject = new duice.ObjectProxy({
+        id: 'apple',
+        name: 'Apple',
+    });
+</script>
+
+<my-object-component duice:data="myObject"></my-object-component>
+
+```
+
+### Test Case
+
+[Data to ComponentControl Test](test/ComponentControlTest.html)
+
+
+------------------------------------------------------
+
 
 ## Dialog(alert,confirm,prompt,custom dialog)
 
