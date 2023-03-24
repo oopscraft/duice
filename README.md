@@ -101,7 +101,7 @@ const users = new duice.ArrayProxy([
 
 ## Data and ComponentControl
 
-### javascript
+### Javascript
 
 ```javascript
 /**
