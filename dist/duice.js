@@ -2883,10 +2883,4 @@ var duice;
     }
     duice.ObjectHandler = ObjectHandler;
 })(duice || (duice = {}));
-var duice;
-(function (duice) {
-    class Context {
-    }
-    duice.Context = Context;
-})(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map
