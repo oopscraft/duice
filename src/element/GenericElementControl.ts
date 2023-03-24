@@ -1,10 +1,10 @@
-///<reference path="../Control.ts"/>
+///<reference path="../ElementControl.ts"/>
 namespace duice {
 
     /**
-     * GenericElement
+     * GenericElementControl
      */
-    export class GenericControl extends Control<HTMLElement> {
+    export class GenericElementControl extends ElementControl<HTMLElement> {
 
         textNode: Node;
 

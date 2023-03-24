@@ -154,7 +154,7 @@ namespace duice {
             console.log('ElementSet.update', observable, event);
 
             // ArrayHandler
-            if(observable instanceof ArrayHandler){
+            if(observable instanceof ArrayProxyHandler){
                 let array = observable.getTarget();
                 this.doRender(array);
 

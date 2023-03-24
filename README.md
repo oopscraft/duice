@@ -51,7 +51,7 @@ const user = new duice.ObjectProxy({
 ```
 
 ### Test Case
-[ObjectProxy to Element Test](test/ControlTest.html)
+[ObjectProxy - ElementControl Test](test/ElementControlTest.html)
 
 
 -----------------------------------------------------------
@@ -94,7 +94,7 @@ const users = new duice.ArrayProxy([
 
 ### Test Case 
 
-[ArrayProxy to LoopControl Test](test/LoopControlTest.html)
+[ArrayProxy - LoopControl Test](test/LoopControlTest.html)
 
 
 -----------------------------------------------------------
@@ -108,12 +108,12 @@ const users = new duice.ArrayProxy([
  * MyObjectComponent
  */
 duice.defineComponent("my-object-component", class MyObjectComponent extends duice.Component {
-    // template literal
-    doRender(data) {
+    // template literal to render
+    doRender(object) {
         return `
             <div>
-                <span duice:object="data" duice:property="name"></span>
-                <input type="text" duice:object="data" duice:property="name" class="bg-red"/>
+                <span duice:object="object" duice:property="name"></span>
+                <input type="text" duice:object="object" duice:property="name" class="bg-red"/>
             </div>
         `;
     }
@@ -130,9 +130,10 @@ duice.defineComponent("my-object-component", class MyObjectComponent extends dui
 
 ### HTML
 
-| attribute                                 | description                                        |
-|:------------------------------------------|:---------------------------------------------------|
-| duice:data="[object or array]"            | Object or Array name to bind                       |
+| attribute                    | description                              |
+|:-----------------------------|:-----------------------------------------|
+| duice:object="[object name]" | Object name to bind                      |
+| duice:array="[array name]"   | Array name to bind                       |
 
 
 ```html
@@ -143,13 +144,13 @@ duice.defineComponent("my-object-component", class MyObjectComponent extends dui
     });
 </script>
 
-<my-object-component duice:data="myObject"></my-object-component>
+<my-object-component duice:object="myObject"></my-object-component>
 
 ```
 
 ### Test Case
 
-[Data to ComponentControl Test](test/ComponentControlTest.html)
+[ObjectProxy|ArrayProxy - ComponentControl Test](test/ComponentControlTest.html)
 
 
 ------------------------------------------------------

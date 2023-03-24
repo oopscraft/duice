@@ -1,10 +1,10 @@
-///<reference path="InputControl.ts"/>
+///<reference path="InputElementControl.ts"/>
 namespace duice {
 
     /**
-     * InputRadioElement
+     * InputRadioElementControl
      */
-    export class InputRadioControl extends InputControl {
+    export class InputRadioElementControl extends InputElementControl {
 
         /**
          * constructor

@@ -1,26 +1,26 @@
 namespace duice {
 
     /**
-     * InputElementFactory
+     * InputElementControlFactory
      */
-    export class InputControlFactory extends ControlFactory<InputControl> {
+    export class InputElementControlFactory extends ElementControlFactory<InputElementControl> {
 
         /**
          * doCreateElement
          * @param element
          * @param context
          */
-        doCreateControl(element: HTMLInputElement, context: object): InputControl {
+        doCreateControl(element: HTMLInputElement, context: object): InputElementControl {
             let type = element.getAttribute('type');
             switch(type) {
                 case 'number':
-                    return new InputNumberControl(element, context);
+                    return new InputNumberElementControl(element, context);
                 case 'checkbox':
-                    return new InputCheckboxControl(element, context);
+                    return new InputCheckboxElementControl(element, context);
                 case 'radio':
-                    return new InputRadioControl(element, context);
+                    return new InputRadioElementControl(element, context);
                 default:
-                    return new InputControl(element, context);
+                    return new InputElementControl(element, context);
             }
         }
 
@@ -39,6 +39,6 @@ namespace duice {
     }
 
     // register
-    ControlFactory.registerControlFactory(new InputControlFactory());
+    ElementControlFactory.registerControlFactory(new InputElementControlFactory());
 
 }

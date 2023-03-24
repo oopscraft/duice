@@ -1,10 +1,10 @@
-///<reference path="InputControl.ts"/>
+///<reference path="InputElementControl.ts"/>
 namespace duice {
 
     /**
-     * InputCheckboxElement
+     * InputCheckboxElementControl
      */
-    export class InputCheckboxControl extends InputControl {
+    export class InputCheckboxElementControl extends InputElementControl {
 
         trueValue: any = true;
 

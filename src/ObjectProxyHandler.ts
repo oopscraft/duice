@@ -1,12 +1,12 @@
 ///<reference path="Observable.ts"/>
 ///<reference path="Observer.ts"/>
-///<reference path="DataHandler.ts"/>
+///<reference path="ProxyHandler.ts"/>
 namespace duice {
 
     /**
      * ObjectHandler
      */
-    export class ObjectHandler extends DataHandler<ObjectProxy> {
+    export class ObjectProxyHandler extends ProxyHandler<ObjectProxy> {
 
         propertyChangingListener: Function;
 
@@ -59,7 +59,7 @@ namespace duice {
             console.log("ObjectHandler.update", observable, event);
 
             // Element
-            if(observable instanceof Control){
+            if(observable instanceof ElementControl){
                 let property = observable.getProperty();
                 let value = observable.getValue();
                 if(await this.checkListener(this.propertyChangingListener, event)){

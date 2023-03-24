@@ -3,20 +3,20 @@ namespace duice {
     /**
      * ComponentControl
      */
-    export class ComponentControl<T extends Component> extends Observable implements Observer {
+    export class ComponentControl extends Observable implements Observer {
 
-        element: T;
+        element: Component;
 
         context: object;
 
-        dataProxy: DataProxy;
+        data: any;
 
         /**
          * constructor
          * @param element
          * @param context
          */
-        constructor(element: T, context: object) {
+        constructor(element: Component, context: object) {
             super();
             this.element = element;
             this.context = context;
@@ -24,35 +24,46 @@ namespace duice {
 
         /**
          * setData
-         * @param dataName
+         * @param objectName
          */
-        setData(dataName: string): void {
-            this.dataProxy = findObject(this.context, dataName);
-            if(!this.dataProxy){
-                console.warn(`ObjectProxy[${dataName}] is not found.`, this.dataProxy);
-                this.dataProxy = new ObjectProxy({});
+        setObject(objectName: string): void {
+            this.data = findObject(this.context, objectName);
+            if(!this.data){
+                console.warn(`ObjectProxy[${objectName}] is not found.`, this.data);
+                this.data = new ObjectProxy({});
             }
-            let objectHandler = ObjectProxy.getHandler(this.dataProxy);
+            let objectHandler = ObjectProxy.getHandler(this.data);
             this.addObserver(objectHandler);
             objectHandler.addObserver(this);
+        }
+
+        /**
+         * setArray
+         * @param arrayName
+         */
+        setArray(arrayName: string): void {
+            this.data = findObject(this.context, arrayName);
+            if(!this.data){
+                console.warn(`ArrayProxy[${arrayName}] is not found.`, this.data);
+                this.data = new ArrayProxy([]);
+            }
+            let arrayHandler = ArrayProxy.getHandler(this.data);
+            this.addObserver(arrayHandler);
+            arrayHandler.addObserver(this);
         }
 
         /**
          * check shadow DOM
          */
         isShadowDom(): boolean {
-            if(this.element.shadowRoot){
-                return true;
-            }else{
-                return false;
-            }
+            return (!!this.element.shadowRoot);
         }
 
         /**
          * render
          */
         render(): void {
-            this.doRender(this.dataProxy);
+            this.doRender(this.data);
             this.executeScript();
         }
 
@@ -60,7 +71,7 @@ namespace duice {
          * doRender
          * @param data
          */
-        doRender(data: DataProxy): void {
+        doRender(data: any): void {
 
             // removes child
             if(this.isShadowDom()){
@@ -94,7 +105,8 @@ namespace duice {
 
             // initializes shadow root
             let context = {
-                data: data
+                object: this.data,
+                array: this.data
             };
             if(this.isShadowDom()){
                 initialize(this.element.shadowRoot, context);
@@ -110,7 +122,7 @@ namespace duice {
          */
         update(observable: Observable, event: duice.Event): void {
             console.log("ComponentControl.update", observable, event);
-            if(observable instanceof DataHandler) {
+            if(observable instanceof ProxyHandler) {
                 this.doRender(observable.getTarget());
                 this.executeScript();
             }

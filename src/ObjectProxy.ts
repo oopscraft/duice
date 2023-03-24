@@ -3,7 +3,7 @@ namespace duice {
     /**
      * ObjectProxy
      */
-    export class ObjectProxy extends globalThis.Object implements DataProxy {
+    export class ObjectProxy extends globalThis.Object {
 
         /**
          * constructor
@@ -12,7 +12,7 @@ namespace duice {
             super();
 
             // object handler
-            let objectHandler = new ObjectHandler();
+            let objectHandler = new ObjectProxyHandler();
 
             // copy property
             for (let name in object) {
@@ -135,7 +135,7 @@ namespace duice {
          * @param objectProxy
          * @param objectHandler
          */
-        static setHandler(objectProxy: ObjectProxy, objectHandler: ObjectHandler): void {
+        static setHandler(objectProxy: ObjectProxy, objectHandler: ObjectProxyHandler): void {
             globalThis.Object.defineProperty(objectProxy, '_handler_', {
                 value: objectHandler,
                 writable: true
@@ -146,7 +146,7 @@ namespace duice {
          * getHandler
          * @param objectProxy
          */
-        static getHandler(objectProxy: ObjectProxy): ObjectHandler {
+        static getHandler(objectProxy: ObjectProxy): ObjectProxyHandler {
             let handler = globalThis.Object.getOwnPropertyDescriptor(objectProxy, '_handler_').value;
             assert(handler, 'handler is not found');
             return handler;

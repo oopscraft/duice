@@ -61,15 +61,21 @@ namespace duice {
          * @param element
          * @param context
          */
-        createComponentControl(element: Component, context: object): ComponentControl<Component> {
+        createComponentControl(element: Component, context: object): ComponentControl {
 
             // creates instance
             let componentControl = new ComponentControl(element, context);
 
-            // data
-            let dataName = getAttribute(element, 'data');
-            if(dataName){
-                componentControl.setData(dataName);
+            // set object
+            let objectName = getAttribute(element, 'object');
+            if(objectName){
+                componentControl.setObject(objectName);
+            }
+
+            // set array
+            let arrayName = getAttribute(element, 'array');
+            if(arrayName){
+                componentControl.setArray(arrayName);
             }
 
             // returns

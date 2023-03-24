@@ -3,9 +3,9 @@
 namespace duice {
 
     /**
-     * Control
+     * ElementControl
      */
-    export abstract class Control<T extends HTMLElement> extends Observable implements Observer {
+    export abstract class ElementControl<T extends HTMLElement> extends Observable implements Observer {
 
         slot: HTMLSlotElement = document.createElement('slot');
 
@@ -123,7 +123,7 @@ namespace duice {
             console.log('Element.update', observable, event);
 
             // ObjectHandler
-            if(observable instanceof ObjectHandler) {
+            if(observable instanceof ObjectProxyHandler) {
                 if(this.property){
 
                     // set value

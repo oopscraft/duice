@@ -2,7 +2,7 @@
 ///<Reference path="Observer.ts"/>
 namespace duice {
 
-    export abstract class DataHandler<T extends DataProxy> extends Observable implements Observer {
+    export abstract class ProxyHandler<T> extends Observable implements Observer {
 
         target: T;
 

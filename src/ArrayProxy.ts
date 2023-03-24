@@ -3,7 +3,7 @@ namespace duice {
     /**
      * ArrayProxy
      */
-    export class ArrayProxy extends globalThis.Array implements DataProxy {
+    export class ArrayProxy extends globalThis.Array {
 
         /**
          * constructor
@@ -12,7 +12,7 @@ namespace duice {
             super();
 
             // array handler
-            let arrayHandler = new ArrayHandler();
+            let arrayHandler = new ArrayProxyHandler();
 
             // copy array elements
             if(globalThis.Array.isArray(array)){
@@ -98,7 +98,7 @@ namespace duice {
          * @param arrayProxy
          * @param arrayHandler
          */
-        static setHandler(arrayProxy: ArrayProxy, arrayHandler: ArrayHandler): void {
+        static setHandler(arrayProxy: ArrayProxy, arrayHandler: ArrayProxyHandler): void {
             globalThis.Object.defineProperty(arrayProxy, '_handler_', {
                 value: arrayHandler,
                 writable: true
@@ -109,7 +109,7 @@ namespace duice {
          * getHandler
          * @param arrayProxy
          */
-        static getHandler(arrayProxy: ArrayProxy): ArrayHandler {
+        static getHandler(arrayProxy: ArrayProxy): ArrayProxyHandler {
             let handler = globalThis.Object.getOwnPropertyDescriptor(arrayProxy, '_handler_').value;
             assert(handler, 'handler is not found');
             return handler;

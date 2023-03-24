@@ -1,19 +1,19 @@
 namespace duice {
 
     /**
-     * Textarea
+     * InputElementControl
      */
-    export class TextareaControl extends Control<HTMLTextAreaElement> {
+    export class InputElementControl extends ElementControl<HTMLInputElement> {
 
         /**
          * constructor
          * @param element
          * @param context
          */
-        constructor(element: HTMLTextAreaElement, context: object) {
+        constructor(element: HTMLInputElement, context: object) {
             super(element, context);
 
-            // adds change event listener
+            // adds change listener
             this.getElement().addEventListener('change', e => {
                 let event = new PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
                 this.notifyObservers(event);
@@ -25,6 +25,11 @@ namespace duice {
          * @param value
          */
         setValue(value: any): void {
+            if(value) {
+                value = this.getMask() ? this.getMask().encode(value) : value;
+            }else{
+                value = '';
+            }
             this.getElement().value = value;
         }
 
@@ -33,6 +38,11 @@ namespace duice {
          */
         getValue(): any {
             let value = this.getElement().value;
+            if(value){
+                value = this.getMask() ? this.getMask().decode(value) : value;
+            }else{
+                value = null;
+            }
             return value;
         }
 
@@ -41,13 +51,10 @@ namespace duice {
          * @param readonly
          */
         setReadonly(readonly: boolean): void {
-            if(readonly){
-                this.getElement().setAttribute('readonly', 'readonly');
-            }else {
-                this.getElement().removeAttribute('readonly');
-            }
+            this.getElement().readOnly = readonly;
         }
 
     }
 
 }
+

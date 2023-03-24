@@ -2,7 +2,7 @@ declare namespace duice {
     /**
      * ArrayProxy
      */
-    class ArrayProxy extends globalThis.Array implements DataProxy {
+    class ArrayProxy extends globalThis.Array {
         /**
          * constructor
          */
@@ -29,12 +29,12 @@ declare namespace duice {
          * @param arrayProxy
          * @param arrayHandler
          */
-        static setHandler(arrayProxy: ArrayProxy, arrayHandler: ArrayHandler): void;
+        static setHandler(arrayProxy: ArrayProxy, arrayHandler: ArrayProxyHandler): void;
         /**
          * getHandler
          * @param arrayProxy
          */
-        static getHandler(arrayProxy: ArrayProxy): ArrayHandler;
+        static getHandler(arrayProxy: ArrayProxy): ArrayProxyHandler;
         /**
          * onPropertyChanging
          * @param arrayProxy
@@ -113,7 +113,7 @@ declare namespace duice {
     /**
      * ObjectProxy
      */
-    class ObjectProxy extends globalThis.Object implements DataProxy {
+    class ObjectProxy extends globalThis.Object {
         /**
          * constructor
          */
@@ -140,12 +140,12 @@ declare namespace duice {
          * @param objectProxy
          * @param objectHandler
          */
-        static setHandler(objectProxy: ObjectProxy, objectHandler: ObjectHandler): void;
+        static setHandler(objectProxy: ObjectProxy, objectHandler: ObjectProxyHandler): void;
         /**
          * getHandler
          * @param objectProxy
          */
-        static getHandler(objectProxy: ObjectProxy): ObjectHandler;
+        static getHandler(objectProxy: ObjectProxy): ObjectProxyHandler;
         /**
          * onPropertyChanging
          * @param objectProxy
@@ -257,7 +257,7 @@ declare namespace duice {
          * @param element
          * @param context
          */
-        createComponentControl(element: Component, context: object): ComponentControl<Component>;
+        createComponentControl(element: Component, context: object): ComponentControl;
         /**
          * support
          * @param element
@@ -736,8 +736,6 @@ declare namespace duice {
     abstract class Component extends HTMLElement {
         /**
          * constructor
-         * @param htmlElement
-         * @param context
          * @protected
          */
         protected constructor();
@@ -745,33 +743,38 @@ declare namespace duice {
          * returns html template literal
          * @param data
          */
-        abstract doRender(data: DataProxy): string;
+        abstract doRender(data: any): string;
         /**
          * return style literal
          * @param data
          */
-        doStyle(data: DataProxy): string;
+        doStyle(data: any): string;
     }
 }
 declare namespace duice {
     /**
      * ComponentControl
      */
-    class ComponentControl<T extends Component> extends Observable implements Observer {
-        element: T;
+    class ComponentControl extends Observable implements Observer {
+        element: Component;
         context: object;
-        dataProxy: DataProxy;
+        data: any;
         /**
          * constructor
          * @param element
          * @param context
          */
-        constructor(element: T, context: object);
+        constructor(element: Component, context: object);
         /**
          * setData
-         * @param dataName
+         * @param objectName
          */
-        setData(dataName: string): void;
+        setObject(objectName: string): void;
+        /**
+         * setArray
+         * @param arrayName
+         */
+        setArray(arrayName: string): void;
         /**
          * check shadow DOM
          */
@@ -784,7 +787,7 @@ declare namespace duice {
          * doRender
          * @param data
          */
-        doRender(data: DataProxy): void;
+        doRender(data: any): void;
         /**
          * update
          * @param observable
@@ -871,11 +874,20 @@ declare namespace duice {
         createLoopControl(element: HTMLElement, context: object): LoopControl<any>;
     }
 }
+/**
+ * DuicePagination
+ */
+declare namespace duice {
+    class PaginationComponent extends duice.Component {
+        constructor();
+        doRender(data: any): string;
+    }
+}
 declare namespace duice {
     /**
-     * Control
+     * ElementControl
      */
-    abstract class Control<T extends HTMLElement> extends Observable implements Observer {
+    abstract class ElementControl<T extends HTMLElement> extends Observable implements Observer {
         slot: HTMLSlotElement;
         element: T;
         context: object;
@@ -951,9 +963,48 @@ declare namespace duice {
 }
 declare namespace duice {
     /**
-     * GenericElement
+     * ElementControlFactory
      */
-    class GenericControl extends Control<HTMLElement> {
+    abstract class ElementControlFactory<T extends ElementControl<any>> {
+        static controlFactoryRegistry: ElementControlFactory<ElementControl<any>>[];
+        /**
+         * register control factory
+         * @param controlFactory
+         */
+        static registerControlFactory(controlFactory: ElementControlFactory<ElementControl<any>>): void;
+        /**
+         * getSelectors
+         */
+        static getQuerySelectors(): string[];
+        /**
+         * get instance
+         * @param element
+         */
+        static getInstance(element: HTMLElement): ElementControlFactory<ElementControl<any>>;
+        /**
+         * creates element control
+         * @param element
+         * @param context
+         */
+        createElementControl(element: HTMLElement, context: object): ElementControl<any>;
+        /**
+         * support
+         * @param element
+         */
+        abstract support(element: HTMLElement): boolean;
+        /**
+         * doCreateControl
+         * @param element
+         * @param context
+         */
+        abstract doCreateControl(element: HTMLElement, context: object): ElementControl<any>;
+    }
+}
+declare namespace duice {
+    /**
+     * GenericElementControl
+     */
+    class GenericElementControl extends ElementControl<HTMLElement> {
         textNode: Node;
         /**
          * constructor
@@ -978,54 +1029,15 @@ declare namespace duice {
 }
 declare namespace duice {
     /**
-     * ElementFactory
+     * GenericElementControlFactory
      */
-    abstract class ControlFactory<T extends Control<any>> {
-        static controlFactoryRegistry: ControlFactory<Control<any>>[];
-        /**
-         * register control factory
-         * @param controlFactory
-         */
-        static registerControlFactory(controlFactory: ControlFactory<Control<any>>): void;
-        /**
-         * getSelectors
-         */
-        static getQuerySelectors(): string[];
-        /**
-         * get instance
-         * @param element
-         */
-        static getInstance(element: HTMLElement): ControlFactory<Control<any>>;
-        /**
-         * creates control
-         * @param element
-         * @param context
-         */
-        createControl(element: HTMLElement, context: object): Control<any>;
-        /**
-         * support
-         * @param element
-         */
-        abstract support(element: HTMLElement): boolean;
-        /**
-         * doCreateControl
-         * @param element
-         * @param context
-         */
-        abstract doCreateControl(element: HTMLElement, context: object): Control<any>;
-    }
-}
-declare namespace duice {
-    /**
-     * GenericElementFactory
-     */
-    class GenericControlFactory extends ControlFactory<GenericControl> {
+    class GenericElementControlFactory extends ElementControlFactory<GenericElementControl> {
         /**
          * doCreateElement
          * @param element
          * @param context
          */
-        doCreateControl(element: HTMLElement, context: object): GenericControl;
+        doCreateControl(element: HTMLElement, context: object): GenericElementControl;
         /**
          * support
          * @param element
@@ -1035,9 +1047,9 @@ declare namespace duice {
 }
 declare namespace duice {
     /**
-     * InputElement
+     * InputElementControl
      */
-    class InputControl extends Control<HTMLInputElement> {
+    class InputElementControl extends ElementControl<HTMLInputElement> {
         /**
          * constructor
          * @param element
@@ -1062,9 +1074,26 @@ declare namespace duice {
 }
 declare namespace duice {
     /**
-     * InputCheckboxElement
+     * InputNumberElementControl
      */
-    class InputCheckboxControl extends InputControl {
+    class InputNumberElementControl extends InputElementControl {
+        /**
+         * constructor
+         * @param element
+         * @param context
+         */
+        constructor(element: HTMLInputElement, context: object);
+        /**
+         * getValue
+         */
+        getValue(): any;
+    }
+}
+declare namespace duice {
+    /**
+     * InputCheckboxElementControl
+     */
+    class InputCheckboxElementControl extends InputElementControl {
         trueValue: any;
         falseValue: any;
         /**
@@ -1091,27 +1120,9 @@ declare namespace duice {
 }
 declare namespace duice {
     /**
-     * InputElementFactory
+     * InputRadioElementControl
      */
-    class InputControlFactory extends ControlFactory<InputControl> {
-        /**
-         * doCreateElement
-         * @param element
-         * @param context
-         */
-        doCreateControl(element: HTMLInputElement, context: object): InputControl;
-        /**
-         * support
-         * @param element
-         */
-        support(element: HTMLElement): boolean;
-    }
-}
-declare namespace duice {
-    /**
-     * InputRadioElement
-     */
-    class InputRadioControl extends InputControl {
+    class InputRadioElementControl extends InputElementControl {
         /**
          * constructor
          * @param element
@@ -1136,9 +1147,9 @@ declare namespace duice {
 }
 declare namespace duice {
     /**
-     * SelectElement
+     * SelectElementControl
      */
-    class SelectControl extends Control<HTMLSelectElement> {
+    class SelectElementControl extends ElementControl<HTMLSelectElement> {
         /**
          * constructor
          * @param element
@@ -1163,27 +1174,9 @@ declare namespace duice {
 }
 declare namespace duice {
     /**
-     * SelectElementFactory
+     * TextareaElementControl
      */
-    class SelectControlFactory extends ControlFactory<SelectControl> {
-        /**
-         * doCreateElement
-         * @param element
-         * @param context
-         */
-        doCreateControl(element: HTMLSelectElement, context: object): SelectControl;
-        /**
-         * support
-         * @param element
-         */
-        support(element: HTMLElement): boolean;
-    }
-}
-declare namespace duice {
-    /**
-     * Textarea
-     */
-    class TextareaControl extends Control<HTMLTextAreaElement> {
+    class TextareaElementControl extends ElementControl<HTMLTextAreaElement> {
         /**
          * constructor
          * @param element
@@ -1208,15 +1201,15 @@ declare namespace duice {
 }
 declare namespace duice {
     /**
-     * TextareaElementFactory
+     * TextareaElementControlFactory
      */
-    class TextareaControlFactory extends ControlFactory<TextareaControl> {
+    class TextareaElementControlFactory extends ElementControlFactory<TextareaElementControl> {
         /**
          * doCreateElement
          * @param element
          * @param context
          */
-        doCreateControl(element: HTMLTextAreaElement, context: object): TextareaControl;
+        doCreateControl(element: HTMLTextAreaElement, context: object): TextareaElementControl;
         /**
          * support
          * @param element
@@ -1226,23 +1219,42 @@ declare namespace duice {
 }
 declare namespace duice {
     /**
-     * InputNumberElement
+     * InputElementControlFactory
      */
-    class InputNumberControl extends InputControl {
+    class InputElementControlFactory extends ElementControlFactory<InputElementControl> {
         /**
-         * constructor
+         * doCreateElement
          * @param element
          * @param context
          */
-        constructor(element: HTMLInputElement, context: object);
+        doCreateControl(element: HTMLInputElement, context: object): InputElementControl;
         /**
-         * getValue
+         * support
+         * @param element
          */
-        getValue(): any;
+        support(element: HTMLElement): boolean;
     }
 }
 declare namespace duice {
-    abstract class DataHandler<T extends DataProxy> extends Observable implements Observer {
+    /**
+     * SelectElementControlFactory
+     */
+    class SelectElementControlFactory extends ElementControlFactory<SelectElementControl> {
+        /**
+         * doCreateElement
+         * @param element
+         * @param context
+         */
+        doCreateControl(element: HTMLSelectElement, context: object): SelectElementControl;
+        /**
+         * support
+         * @param element
+         */
+        support(element: HTMLElement): boolean;
+    }
+}
+declare namespace duice {
+    abstract class ProxyHandler<T> extends Observable implements Observer {
         target: T;
         readonlyAll: boolean;
         readonly: Set<string>;
@@ -1301,47 +1313,9 @@ declare namespace duice {
 }
 declare namespace duice {
     /**
-     * ArrayHandler
-     */
-    class ArrayHandler extends DataHandler<ArrayProxy> {
-        propertyChangingListener: Function;
-        propertyChangedListener: Function;
-        rowInsertingListener: Function;
-        rowInsertedListener: Function;
-        rowDeletingListener: Function;
-        rowDeletedListener: Function;
-        /**
-         * constructor
-         * @param arrayProxy
-         */
-        constructor();
-        /**
-         * get
-         * @param target
-         * @param property
-         * @param receiver
-         */
-        get(target: ArrayProxy, property: string, receiver: object): any;
-        /**
-         * set
-         * @param target
-         * @param property
-         * @param value
-         */
-        set(target: ArrayProxy, property: string, value: any): boolean;
-        /**
-         * update
-         * @param elementSet
-         * @param event
-         */
-        update(observable: Observable, event: Event): Promise<void>;
-    }
-}
-declare namespace duice {
-    /**
      * ObjectHandler
      */
-    class ObjectHandler extends DataHandler<ObjectProxy> {
+    class ObjectProxyHandler extends ProxyHandler<ObjectProxy> {
         propertyChangingListener: Function;
         propertyChangedListener: Function;
         /**
@@ -1382,6 +1356,40 @@ declare namespace duice {
     }
 }
 declare namespace duice {
-    interface DataProxy {
+    /**
+     * ArrayHandler
+     */
+    class ArrayProxyHandler extends ProxyHandler<ArrayProxy> {
+        propertyChangingListener: Function;
+        propertyChangedListener: Function;
+        rowInsertingListener: Function;
+        rowInsertedListener: Function;
+        rowDeletingListener: Function;
+        rowDeletedListener: Function;
+        /**
+         * constructor
+         * @param arrayProxy
+         */
+        constructor();
+        /**
+         * get
+         * @param target
+         * @param property
+         * @param receiver
+         */
+        get(target: ArrayProxy, property: string, receiver: object): any;
+        /**
+         * set
+         * @param target
+         * @param property
+         * @param value
+         */
+        set(target: ArrayProxy, property: string, value: any): boolean;
+        /**
+         * update
+         * @param elementSet
+         * @param event
+         */
+        update(observable: Observable, event: Event): Promise<void>;
     }
 }

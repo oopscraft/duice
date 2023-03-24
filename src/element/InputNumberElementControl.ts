@@ -1,10 +1,11 @@
 ///<reference path="../mask/NumberMask.ts"/>
+///<reference path="InputElementControl.ts"/>
 namespace duice {
 
     /**
-     * InputNumberElement
+     * InputNumberElementControl
      */
-    export class InputNumberControl extends InputControl {
+    export class InputNumberElementControl extends InputElementControl {
 
         /**
          * constructor

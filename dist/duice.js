@@ -19,7 +19,7 @@ var duice;
         constructor(array) {
             super();
             // array handler
-            let arrayHandler = new duice.ArrayHandler();
+            let arrayHandler = new duice.ArrayProxyHandler();
             // copy array elements
             if (globalThis.Array.isArray(array)) {
                 array.forEach((object, index) => {
@@ -256,7 +256,7 @@ var duice;
         constructor(object) {
             super();
             // object handler
-            let objectHandler = new duice.ObjectHandler();
+            let objectHandler = new duice.ObjectProxyHandler();
             // copy property
             for (let name in object) {
                 let value = object[name];
@@ -538,10 +538,15 @@ var duice;
         createComponentControl(element, context) {
             // creates instance
             let componentControl = new duice.ComponentControl(element, context);
-            // data
-            let dataName = duice.getAttribute(element, 'data');
-            if (dataName) {
-                componentControl.setData(dataName);
+            // set object
+            let objectName = duice.getAttribute(element, 'object');
+            if (objectName) {
+                componentControl.setObject(objectName);
+            }
+            // set array
+            let arrayName = duice.getAttribute(element, 'array');
+            if (arrayName) {
+                componentControl.setArray(arrayName);
             }
             // returns
             return componentControl;
@@ -583,7 +588,7 @@ var duice;
         let querySelectors = [];
         querySelectors.push(...duice.ComponentControlFactory.getQuerySelectors());
         querySelectors.push(...duice.LoopControlFactory.getQuerySelectors());
-        querySelectors.push(...duice.ControlFactory.getQuerySelectors());
+        querySelectors.push(...duice.ElementControlFactory.getQuerySelectors());
         return querySelectors.join(',');
     }
     duice.getQuerySelectors = getQuerySelectors;
@@ -608,8 +613,8 @@ var duice;
                         loopControl.render();
                     }
                     else if (hasAttribute(element, 'object')) {
-                        let controlFactory = duice.ControlFactory.getInstance(element);
-                        let control = controlFactory.createControl(element, context);
+                        let controlFactory = duice.ElementControlFactory.getInstance(element);
+                        let control = controlFactory.createElementControl(element, context);
                         control.render();
                     }
                 }
@@ -1635,8 +1640,6 @@ var duice;
     class Component extends HTMLElement {
         /**
          * constructor
-         * @param htmlElement
-         * @param context
          * @protected
          */
         constructor() {
@@ -1670,34 +1673,43 @@ var duice;
         }
         /**
          * setData
-         * @param dataName
+         * @param objectName
          */
-        setData(dataName) {
-            this.dataProxy = duice.findObject(this.context, dataName);
-            if (!this.dataProxy) {
-                console.warn(`ObjectProxy[${dataName}] is not found.`, this.dataProxy);
-                this.dataProxy = new duice.ObjectProxy({});
+        setObject(objectName) {
+            this.data = duice.findObject(this.context, objectName);
+            if (!this.data) {
+                console.warn(`ObjectProxy[${objectName}] is not found.`, this.data);
+                this.data = new duice.ObjectProxy({});
             }
-            let objectHandler = duice.ObjectProxy.getHandler(this.dataProxy);
+            let objectHandler = duice.ObjectProxy.getHandler(this.data);
             this.addObserver(objectHandler);
             objectHandler.addObserver(this);
+        }
+        /**
+         * setArray
+         * @param arrayName
+         */
+        setArray(arrayName) {
+            this.data = duice.findObject(this.context, arrayName);
+            if (!this.data) {
+                console.warn(`ArrayProxy[${arrayName}] is not found.`, this.data);
+                this.data = new duice.ArrayProxy([]);
+            }
+            let arrayHandler = duice.ArrayProxy.getHandler(this.data);
+            this.addObserver(arrayHandler);
+            arrayHandler.addObserver(this);
         }
         /**
          * check shadow DOM
          */
         isShadowDom() {
-            if (this.element.shadowRoot) {
-                return true;
-            }
-            else {
-                return false;
-            }
+            return (!!this.element.shadowRoot);
         }
         /**
          * render
          */
         render() {
-            this.doRender(this.dataProxy);
+            this.doRender(this.data);
             this.executeScript();
         }
         /**
@@ -1737,7 +1749,8 @@ var duice;
             }
             // initializes shadow root
             let context = {
-                data: data
+                object: this.data,
+                array: this.data
             };
             if (this.isShadowDom()) {
                 duice.initialize(this.element.shadowRoot, context);
@@ -1753,7 +1766,7 @@ var duice;
          */
         update(observable, event) {
             console.log("ComponentControl.update", observable, event);
-            if (observable instanceof duice.DataHandler) {
+            if (observable instanceof duice.ProxyHandler) {
                 this.doRender(observable.getTarget());
                 this.executeScript();
             }
@@ -1899,7 +1912,7 @@ var duice;
         update(observable, event) {
             console.log('ElementSet.update', observable, event);
             // ArrayHandler
-            if (observable instanceof duice.ArrayHandler) {
+            if (observable instanceof duice.ArrayProxyHandler) {
                 let array = observable.getTarget();
                 this.doRender(array);
                 // executes script
@@ -1963,14 +1976,33 @@ var duice;
     }
     duice.LoopControlFactory = LoopControlFactory;
 })(duice || (duice = {}));
+/**
+ * DuicePagination
+ */
+var duice;
+(function (duice) {
+    class PaginationComponent extends duice.Component {
+        constructor() {
+            super();
+        }
+        doRender(data) {
+            return `
+                <div>TEST</div>
+                `;
+        }
+    }
+    duice.PaginationComponent = PaginationComponent;
+    // defines component
+    duice.defineComponent(`${duice.getNamespace()}-pagination`, PaginationComponent);
+})(duice || (duice = {}));
 ///<reference path="Observable.ts"/>
 ///<reference path="./mask/MaskFactory.ts"/>
 var duice;
 (function (duice) {
     /**
-     * Control
+     * ElementControl
      */
-    class Control extends duice.Observable {
+    class ElementControl extends duice.Observable {
         /**
          * constructor
          * @param element
@@ -2060,7 +2092,7 @@ var duice;
         update(observable, event) {
             console.log('Element.update', observable, event);
             // ObjectHandler
-            if (observable instanceof duice.ObjectHandler) {
+            if (observable instanceof duice.ObjectProxyHandler) {
                 if (this.property) {
                     // set value
                     this.setValue(observable.getValue(this.property));
@@ -2090,15 +2122,80 @@ var duice;
             }
         }
     }
-    duice.Control = Control;
+    duice.ElementControl = ElementControl;
 })(duice || (duice = {}));
-///<reference path="../Control.ts"/>
 var duice;
 (function (duice) {
     /**
-     * GenericElement
+     * ElementControlFactory
      */
-    class GenericControl extends duice.Control {
+    class ElementControlFactory {
+        /**
+         * register control factory
+         * @param controlFactory
+         */
+        static registerControlFactory(controlFactory) {
+            this.controlFactoryRegistry.push(controlFactory);
+        }
+        /**
+         * getSelectors
+         */
+        static getQuerySelectors() {
+            return [`*[${duice.getNamespace()}\\:object]:not([${duice.getNamespace()}\\:id])`];
+        }
+        /**
+         * get instance
+         * @param element
+         */
+        static getInstance(element) {
+            let instance;
+            this.controlFactoryRegistry.forEach(controlFactory => {
+                if (controlFactory.support(element)) {
+                    instance = controlFactory;
+                }
+            });
+            if (instance) {
+                return instance;
+            }
+            else {
+                return new duice.GenericElementControlFactory();
+            }
+        }
+        /**
+         * creates element control
+         * @param element
+         * @param context
+         */
+        createElementControl(element, context) {
+            // creates element
+            let control = this.doCreateControl(element, context);
+            // object
+            let object = duice.getAttribute(element, 'object');
+            control.setObject(object);
+            // property
+            let property = duice.getAttribute(element, 'property');
+            if (property) {
+                control.setProperty(property);
+            }
+            // mask
+            let mask = duice.getAttribute(element, 'mask');
+            if (mask) {
+                control.setMask(mask);
+            }
+            // returns
+            return control;
+        }
+    }
+    ElementControlFactory.controlFactoryRegistry = [];
+    duice.ElementControlFactory = ElementControlFactory;
+})(duice || (duice = {}));
+///<reference path="../ElementControl.ts"/>
+var duice;
+(function (duice) {
+    /**
+     * GenericElementControl
+     */
+    class GenericElementControl extends duice.ElementControl {
         /**
          * constructor
          * @param element
@@ -2133,87 +2230,22 @@ var duice;
             // no-op
         }
     }
-    duice.GenericControl = GenericControl;
+    duice.GenericElementControl = GenericElementControl;
 })(duice || (duice = {}));
+///<reference path="../ElementControlFactory.ts"/>
 var duice;
 (function (duice) {
     /**
-     * ElementFactory
+     * GenericElementControlFactory
      */
-    class ControlFactory {
-        /**
-         * register control factory
-         * @param controlFactory
-         */
-        static registerControlFactory(controlFactory) {
-            this.controlFactoryRegistry.push(controlFactory);
-        }
-        /**
-         * getSelectors
-         */
-        static getQuerySelectors() {
-            return [`*[${duice.getNamespace()}\\:object]:not([${duice.getNamespace()}\\:id])`];
-        }
-        /**
-         * get instance
-         * @param element
-         */
-        static getInstance(element) {
-            let instance;
-            this.controlFactoryRegistry.forEach(controlFactory => {
-                if (controlFactory.support(element)) {
-                    instance = controlFactory;
-                }
-            });
-            if (instance) {
-                return instance;
-            }
-            else {
-                return new duice.GenericControlFactory();
-            }
-        }
-        /**
-         * creates control
-         * @param element
-         * @param context
-         */
-        createControl(element, context) {
-            // creates element
-            let control = this.doCreateControl(element, context);
-            // object
-            let object = duice.getAttribute(element, 'object');
-            control.setObject(object);
-            // property
-            let property = duice.getAttribute(element, 'property');
-            if (property) {
-                control.setProperty(property);
-            }
-            // mask
-            let mask = duice.getAttribute(element, 'mask');
-            if (mask) {
-                control.setMask(mask);
-            }
-            // returns
-            return control;
-        }
-    }
-    ControlFactory.controlFactoryRegistry = [];
-    duice.ControlFactory = ControlFactory;
-})(duice || (duice = {}));
-///<reference path="../ControlFactory.ts"/>
-var duice;
-(function (duice) {
-    /**
-     * GenericElementFactory
-     */
-    class GenericControlFactory extends duice.ControlFactory {
+    class GenericElementControlFactory extends duice.ElementControlFactory {
         /**
          * doCreateElement
          * @param element
          * @param context
          */
         doCreateControl(element, context) {
-            return new duice.GenericControl(element, context);
+            return new duice.GenericElementControl(element, context);
         }
         /**
          * support
@@ -2223,14 +2255,14 @@ var duice;
             return true;
         }
     }
-    duice.GenericControlFactory = GenericControlFactory;
+    duice.GenericElementControlFactory = GenericElementControlFactory;
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
     /**
-     * InputElement
+     * InputElementControl
      */
-    class InputControl extends duice.Control {
+    class InputElementControl extends duice.ElementControl {
         /**
          * constructor
          * @param element
@@ -2278,15 +2310,50 @@ var duice;
             this.getElement().readOnly = readonly;
         }
     }
-    duice.InputControl = InputControl;
+    duice.InputElementControl = InputElementControl;
 })(duice || (duice = {}));
-///<reference path="InputControl.ts"/>
+///<reference path="../mask/NumberMask.ts"/>
+///<reference path="InputElementControl.ts"/>
 var duice;
 (function (duice) {
     /**
-     * InputCheckboxElement
+     * InputNumberElementControl
      */
-    class InputCheckboxControl extends duice.InputControl {
+    class InputNumberElementControl extends duice.InputElementControl {
+        /**
+         * constructor
+         * @param element
+         * @param context
+         */
+        constructor(element, context) {
+            super(element, context);
+            // changes type and style
+            this.getElement().removeAttribute('type');
+            this.getElement().style.textAlign = 'right';
+            // prevents invalid key press
+            this.getElement().addEventListener('keypress', event => {
+                if (/[\d|\.|,]/.test(event.key) === false) {
+                    event.preventDefault();
+                }
+            });
+        }
+        /**
+         * getValue
+         */
+        getValue() {
+            let value = super.getValue();
+            return Number(value);
+        }
+    }
+    duice.InputNumberElementControl = InputNumberElementControl;
+})(duice || (duice = {}));
+///<reference path="InputElementControl.ts"/>
+var duice;
+(function (duice) {
+    /**
+     * InputCheckboxElementControl
+     */
+    class InputCheckboxElementControl extends duice.InputElementControl {
         /**
          * constructor
          * @param element
@@ -2338,56 +2405,15 @@ var duice;
             }
         }
     }
-    duice.InputCheckboxControl = InputCheckboxControl;
+    duice.InputCheckboxElementControl = InputCheckboxElementControl;
 })(duice || (duice = {}));
+///<reference path="InputElementControl.ts"/>
 var duice;
 (function (duice) {
     /**
-     * InputElementFactory
+     * InputRadioElementControl
      */
-    class InputControlFactory extends duice.ControlFactory {
-        /**
-         * doCreateElement
-         * @param element
-         * @param context
-         */
-        doCreateControl(element, context) {
-            let type = element.getAttribute('type');
-            switch (type) {
-                case 'number':
-                    return new duice.InputNumberControl(element, context);
-                case 'checkbox':
-                    return new duice.InputCheckboxControl(element, context);
-                case 'radio':
-                    return new duice.InputRadioControl(element, context);
-                default:
-                    return new duice.InputControl(element, context);
-            }
-        }
-        /**
-         * support
-         * @param element
-         */
-        support(element) {
-            if (element.tagName.toLowerCase() === 'input') {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-    }
-    duice.InputControlFactory = InputControlFactory;
-    // register
-    duice.ControlFactory.registerControlFactory(new InputControlFactory());
-})(duice || (duice = {}));
-///<reference path="InputControl.ts"/>
-var duice;
-(function (duice) {
-    /**
-     * InputRadioElement
-     */
-    class InputRadioControl extends duice.InputControl {
+    class InputRadioElementControl extends duice.InputElementControl {
         /**
          * constructor
          * @param element
@@ -2427,14 +2453,14 @@ var duice;
             }
         }
     }
-    duice.InputRadioControl = InputRadioControl;
+    duice.InputRadioElementControl = InputRadioElementControl;
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
     /**
-     * SelectElement
+     * SelectElementControl
      */
-    class SelectControl extends duice.Control {
+    class SelectElementControl extends duice.ElementControl {
         /**
          * constructor
          * @param element
@@ -2485,40 +2511,14 @@ var duice;
             }
         }
     }
-    duice.SelectControl = SelectControl;
+    duice.SelectElementControl = SelectElementControl;
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
     /**
-     * SelectElementFactory
+     * TextareaElementControl
      */
-    class SelectControlFactory extends duice.ControlFactory {
-        /**
-         * doCreateElement
-         * @param element
-         * @param context
-         */
-        doCreateControl(element, context) {
-            return new duice.SelectControl(element, context);
-        }
-        /**
-         * support
-         * @param element
-         */
-        support(element) {
-            return (element.tagName.toLowerCase() === 'select');
-        }
-    }
-    duice.SelectControlFactory = SelectControlFactory;
-    // register
-    duice.ControlFactory.registerControlFactory(new SelectControlFactory());
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * Textarea
-     */
-    class TextareaControl extends duice.Control {
+    class TextareaElementControl extends duice.ElementControl {
         /**
          * constructor
          * @param element
@@ -2559,21 +2559,21 @@ var duice;
             }
         }
     }
-    duice.TextareaControl = TextareaControl;
+    duice.TextareaElementControl = TextareaElementControl;
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
     /**
-     * TextareaElementFactory
+     * TextareaElementControlFactory
      */
-    class TextareaControlFactory extends duice.ControlFactory {
+    class TextareaElementControlFactory extends duice.ElementControlFactory {
         /**
          * doCreateElement
          * @param element
          * @param context
          */
         doCreateControl(element, context) {
-            return new duice.TextareaControl(element, context);
+            return new duice.TextareaElementControl(element, context);
         }
         /**
          * support
@@ -2583,49 +2583,82 @@ var duice;
             return (element.tagName.toLowerCase() === 'textarea');
         }
     }
-    duice.TextareaControlFactory = TextareaControlFactory;
+    duice.TextareaElementControlFactory = TextareaElementControlFactory;
     // register
-    duice.ControlFactory.registerControlFactory(new TextareaControlFactory());
+    duice.ElementControlFactory.registerControlFactory(new TextareaElementControlFactory());
 })(duice || (duice = {}));
-///<reference path="../mask/NumberMask.ts"/>
 var duice;
 (function (duice) {
     /**
-     * InputNumberElement
+     * InputElementControlFactory
      */
-    class InputNumberControl extends duice.InputControl {
+    class InputElementControlFactory extends duice.ElementControlFactory {
         /**
-         * constructor
+         * doCreateElement
          * @param element
          * @param context
          */
-        constructor(element, context) {
-            super(element, context);
-            // changes type and style
-            this.getElement().removeAttribute('type');
-            this.getElement().style.textAlign = 'right';
-            // prevents invalid key press
-            this.getElement().addEventListener('keypress', event => {
-                if (/[\d|\.|,]/.test(event.key) === false) {
-                    event.preventDefault();
-                }
-            });
+        doCreateControl(element, context) {
+            let type = element.getAttribute('type');
+            switch (type) {
+                case 'number':
+                    return new duice.InputNumberElementControl(element, context);
+                case 'checkbox':
+                    return new duice.InputCheckboxElementControl(element, context);
+                case 'radio':
+                    return new duice.InputRadioElementControl(element, context);
+                default:
+                    return new duice.InputElementControl(element, context);
+            }
         }
         /**
-         * getValue
+         * support
+         * @param element
          */
-        getValue() {
-            let value = super.getValue();
-            return Number(value);
+        support(element) {
+            if (element.tagName.toLowerCase() === 'input') {
+                return true;
+            }
+            else {
+                return false;
+            }
         }
     }
-    duice.InputNumberControl = InputNumberControl;
+    duice.InputElementControlFactory = InputElementControlFactory;
+    // register
+    duice.ElementControlFactory.registerControlFactory(new InputElementControlFactory());
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    /**
+     * SelectElementControlFactory
+     */
+    class SelectElementControlFactory extends duice.ElementControlFactory {
+        /**
+         * doCreateElement
+         * @param element
+         * @param context
+         */
+        doCreateControl(element, context) {
+            return new duice.SelectElementControl(element, context);
+        }
+        /**
+         * support
+         * @param element
+         */
+        support(element) {
+            return (element.tagName.toLowerCase() === 'select');
+        }
+    }
+    duice.SelectElementControlFactory = SelectElementControlFactory;
+    // register
+    duice.ElementControlFactory.registerControlFactory(new SelectElementControlFactory());
 })(duice || (duice = {}));
 ///<Reference path="Observable.ts"/>
 ///<Reference path="Observer.ts"/>
 var duice;
 (function (duice) {
-    class DataHandler extends duice.Observable {
+    class ProxyHandler extends duice.Observable {
         /**
          * constructor
          * @protected
@@ -2710,15 +2743,96 @@ var duice;
             });
         }
     }
-    duice.DataHandler = DataHandler;
+    duice.ProxyHandler = ProxyHandler;
 })(duice || (duice = {}));
-///<reference path="DataHandler.ts"/>
+///<reference path="Observable.ts"/>
+///<reference path="Observer.ts"/>
+///<reference path="ProxyHandler.ts"/>
+var duice;
+(function (duice) {
+    /**
+     * ObjectHandler
+     */
+    class ObjectProxyHandler extends duice.ProxyHandler {
+        /**
+         * constructor
+         */
+        constructor() {
+            super();
+        }
+        /**
+         * get
+         * @param target
+         * @param property
+         * @param receiver
+         */
+        get(target, property, receiver) {
+            console.debug("ObjectHandler.get", target, property, receiver);
+            return Reflect.get(target, property, receiver);
+        }
+        /**
+         * set
+         * @param target
+         * @param property
+         * @param value
+         */
+        set(target, property, value) {
+            console.debug("ObjectHandler.set", target, property, value);
+            // change value
+            Reflect.set(target, property, value);
+            // notify
+            let event = new duice.PropertyChangeEvent(this, property, value);
+            this.notifyObservers(event);
+            // returns
+            return true;
+        }
+        /**
+         * update
+         * @param observable
+         * @param event
+         */
+        update(observable, event) {
+            return __awaiter(this, void 0, void 0, function* () {
+                console.log("ObjectHandler.update", observable, event);
+                // Element
+                if (observable instanceof duice.ElementControl) {
+                    let property = observable.getProperty();
+                    let value = observable.getValue();
+                    if (yield this.checkListener(this.propertyChangingListener, event)) {
+                        this.setValue(property, value);
+                        yield this.checkListener(this.propertyChangedListener, event);
+                    }
+                }
+                // notify
+                this.notifyObservers(event);
+            });
+        }
+        /**
+         * getValue
+         * @param property
+         */
+        getValue(property) {
+            property = property.replace('.', '?.');
+            return new Function(`return this.${property};`).call(this.getTarget());
+        }
+        /**
+         * setValue
+         * @param property
+         * @param value
+         */
+        setValue(property, value) {
+            new Function('value', `this.${property} = value;`).call(this.getTarget(), value);
+        }
+    }
+    duice.ObjectProxyHandler = ObjectProxyHandler;
+})(duice || (duice = {}));
+///<reference path="ProxyHandler.ts"/>
 var duice;
 (function (duice) {
     /**
      * ArrayHandler
      */
-    class ArrayHandler extends duice.DataHandler {
+    class ArrayProxyHandler extends duice.ProxyHandler {
         /**
          * constructor
          * @param arrayProxy
@@ -2842,87 +2956,6 @@ var duice;
             });
         }
     }
-    duice.ArrayHandler = ArrayHandler;
-})(duice || (duice = {}));
-///<reference path="Observable.ts"/>
-///<reference path="Observer.ts"/>
-///<reference path="DataHandler.ts"/>
-var duice;
-(function (duice) {
-    /**
-     * ObjectHandler
-     */
-    class ObjectHandler extends duice.DataHandler {
-        /**
-         * constructor
-         */
-        constructor() {
-            super();
-        }
-        /**
-         * get
-         * @param target
-         * @param property
-         * @param receiver
-         */
-        get(target, property, receiver) {
-            console.debug("ObjectHandler.get", target, property, receiver);
-            return Reflect.get(target, property, receiver);
-        }
-        /**
-         * set
-         * @param target
-         * @param property
-         * @param value
-         */
-        set(target, property, value) {
-            console.debug("ObjectHandler.set", target, property, value);
-            // change value
-            Reflect.set(target, property, value);
-            // notify
-            let event = new duice.PropertyChangeEvent(this, property, value);
-            this.notifyObservers(event);
-            // returns
-            return true;
-        }
-        /**
-         * update
-         * @param observable
-         * @param event
-         */
-        update(observable, event) {
-            return __awaiter(this, void 0, void 0, function* () {
-                console.log("ObjectHandler.update", observable, event);
-                // Element
-                if (observable instanceof duice.Control) {
-                    let property = observable.getProperty();
-                    let value = observable.getValue();
-                    if (yield this.checkListener(this.propertyChangingListener, event)) {
-                        this.setValue(property, value);
-                        yield this.checkListener(this.propertyChangedListener, event);
-                    }
-                }
-                // notify
-                this.notifyObservers(event);
-            });
-        }
-        /**
-         * getValue
-         * @param property
-         */
-        getValue(property) {
-            property = property.replace('.', '?.');
-            return new Function(`return this.${property};`).call(this.getTarget());
-        }
-        /**
-         * setValue
-         * @param property
-         * @param value
-         */
-        setValue(property, value) {
-            new Function('value', `this.${property} = value;`).call(this.getTarget(), value);
-        }
-    }
-    duice.ObjectHandler = ObjectHandler;
+    duice.ArrayProxyHandler = ArrayProxyHandler;
 })(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map

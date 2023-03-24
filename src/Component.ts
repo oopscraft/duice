@@ -5,11 +5,8 @@ namespace duice {
      */
     export abstract class Component extends HTMLElement {
 
-
         /**
          * constructor
-         * @param htmlElement
-         * @param context
          * @protected
          */
         protected constructor() {
@@ -20,16 +17,15 @@ namespace duice {
          * returns html template literal
          * @param data
          */
-        abstract doRender(data: DataProxy): string;
+        abstract doRender(data: any): string;
 
         /**
          * return style literal
          * @param data
          */
-        doStyle(data: DataProxy): string {
+        doStyle(data: any): string {
             return null;
         }
     }
-
 
 }

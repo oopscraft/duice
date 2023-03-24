@@ -25,7 +25,7 @@ namespace duice {
         let querySelectors = [];
         querySelectors.push(...ComponentControlFactory.getQuerySelectors());
         querySelectors.push(...LoopControlFactory.getQuerySelectors());
-        querySelectors.push(...ControlFactory.getQuerySelectors());
+        querySelectors.push(...ElementControlFactory.getQuerySelectors());
         return querySelectors.join(',');
     }
 
@@ -49,8 +49,8 @@ namespace duice {
                         let loopControl = loopControlFactory.createLoopControl(element, context);
                         loopControl.render();
                     } else if (hasAttribute(element, 'object')) {
-                        let controlFactory = ControlFactory.getInstance(element);
-                        let control = controlFactory.createControl(element, context);
+                        let controlFactory = ElementControlFactory.getInstance(element);
+                        let control = controlFactory.createElementControl(element, context);
                         control.render();
                     }
                 }catch(e){

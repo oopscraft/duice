@@ -1,17 +1,17 @@
 namespace duice {
 
     /**
-     * ElementFactory
+     * ElementControlFactory
      */
-    export abstract class ControlFactory<T extends Control<any>> {
+    export abstract class ElementControlFactory<T extends ElementControl<any>> {
 
-        static controlFactoryRegistry: ControlFactory<Control<any>>[] = [];
+        static controlFactoryRegistry: ElementControlFactory<ElementControl<any>>[] = [];
 
         /**
          * register control factory
          * @param controlFactory
          */
-        static registerControlFactory(controlFactory: ControlFactory<Control<any>>): void {
+        static registerControlFactory(controlFactory: ElementControlFactory<ElementControl<any>>): void {
             this.controlFactoryRegistry.push(controlFactory);
         }
 
@@ -26,7 +26,7 @@ namespace duice {
          * get instance
          * @param element
          */
-        static getInstance(element: HTMLElement): ControlFactory<Control<any>> {
+        static getInstance(element: HTMLElement): ElementControlFactory<ElementControl<any>> {
             let instance;
             this.controlFactoryRegistry.forEach(controlFactory => {
                 if(controlFactory.support(element)){
@@ -36,16 +36,16 @@ namespace duice {
             if(instance){
                 return instance;
             }else{
-                return new GenericControlFactory();
+                return new GenericElementControlFactory();
             }
         }
 
         /**
-         * creates control
+         * creates element control
          * @param element
          * @param context
          */
-        createControl(element: HTMLElement, context: object): Control<any> {
+        createElementControl(element: HTMLElement, context: object): ElementControl<any> {
 
             // creates element
             let control = this.doCreateControl(element, context);
@@ -81,7 +81,7 @@ namespace duice {
          * @param element
          * @param context
          */
-        abstract doCreateControl(element: HTMLElement, context: object): Control<any>;
+        abstract doCreateControl(element: HTMLElement, context: object): ElementControl<any>;
 
     }
 

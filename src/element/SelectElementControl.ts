@@ -1,9 +1,9 @@
 namespace duice {
 
     /**
-     * SelectElement
+     * SelectElementControl
      */
-    export class SelectControl extends Control<HTMLSelectElement> {
+    export class SelectElementControl extends ElementControl<HTMLSelectElement> {
 
         /**
          * constructor

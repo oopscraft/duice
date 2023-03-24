@@ -20,11 +20,11 @@
          * MyObjectComponent
          */
         duice.defineComponent("my-object-component", class MyObjectComponent extends duice.Component {
-            doRender(data) {
+            doRender(object) {
                 return `
                     <div>
-                        <span duice:object="data" duice:property="name"></span>
-                        <input type="text" duice:object="data" duice:property="name" class="bg-red"/>
+                        <span duice:object="object" duice:property="name"></span>
+                        <input type="text" duice:object="object" duice:property="name" class="bg-red"/>
                     </div>
                 `;
             }
@@ -41,10 +41,10 @@
          * MyArrayComponent
          */
         duice.defineComponent("my-array-component", class MyArrayComponent extends duice.Component {
-            doRender(data) {
+            doRender(array) {
                 return `
                 <div>
-                    <div duice:array="data" duice:loop="item,status">
+                    <div duice:array="array" duice:loop="item,status">
                         <input type="text" duice:object="item" duice:property="name"></input>
                     </div>
                 </div>
@@ -56,11 +56,11 @@
          * MyNestedComponent
          */
         duice.defineComponent("my-nested-component", class MyNestedComponent extends duice.Component {
-            doRender(data) {
+            doRender(array) {
                 return `
                 <div>
-                    <div duice:array="data" duice:loop="item,status">
-                        <my-object-component duice:data="item"></my-object-component>
+                    <div duice:array="array" duice:loop="item,status">
+                        <my-object-component duice:object="item"></my-object-component>
                     </div>
                 </div>
                 `;
@@ -75,11 +75,11 @@
                 super();
                 this.attachShadow({mode:"open"});
             }
-            doRender(data) {
+            doRender(object) {
                 return `
                     <div>
-                        <span duice:object="data" duice:property="name"></span>
-                        <input type="text" duice:object="data" duice:property="name"/>
+                        <span duice:object="object" duice:property="name"></span>
+                        <input type="text" duice:object="object" duice:property="name"/>
                     </div>
                 `;
             }
@@ -93,16 +93,16 @@
 <input type="text" duice:object="myObject" duice:property="name" style="background-color:red;"/>
 
 <h2>Object to Component</h2>
-<my-object-component duice:data="myObject"></my-object-component>
+<my-object-component duice:object="myObject"></my-object-component>
 
 <h2>Array to Component</h2>
-<my-array-component duice:data="myArray"></my-array-component>
+<my-array-component duice:array="myArray"></my-array-component>
 
 <h2>Nested Component</h2>
-<my-nested-component duice:data="myArray"></my-nested-component>
+<my-nested-component duice:array="myArray"></my-nested-component>
 
 <h2>Shadow DOM Component</h2>
-<my-shadow-component duice:data="myObject"></my-shadow-component>
+<my-shadow-component duice:object="myObject"></my-shadow-component>
 
 </body>
 </html>
