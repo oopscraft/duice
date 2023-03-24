@@ -50,40 +50,26 @@
         // }
 
         class TestElement extends duice.Component {
-            doTemplate(){
+            doTemplate(data){
                 let test1 = "<<<<<<<<<<<<<<";
                 let test2 = ">>>>>>>>>>>>>>";
-                return `<span>
+                return `<spaanc>
                             ${test1}
                             <input type="text" duice:object="myObject" duice:property="name"/>
                             ${test2}
-                        </span>`;
+                        </spaanc>`;
             }
-            doStyle() {
+            doStyle(data) {
 
             }
-            doRender() {
+            doRender(data) {
+                console.log("################### == doRender");
             }
-            doUpdate(observable, event) {
+            doUpdate(data, event) {
+                console.warn("======== doUpdate", data);
             }
         }
         duice.defineComponent('my-component', TestElement);
-
-
-
-
-        customElements.define('my-input', class Test extends HTMLElement {
-           constructor() {
-               super();
-               this.attachShadow({mode: 'open'});
-               let input = document.createElement('input');
-               input.addEventListener('change', event => {
-                    console.log(event);
-               });
-               this.shadowRoot.appendChild(input);
-           }
-        });
-
 
     </script>
 </head>
@@ -91,11 +77,9 @@
 
 <input type="text" duice:object="myObject" duice:property="name" style="background-color:red;"/>
 
-<my-component id="myComponent" duice:object="myObject">
+<my-component id="myComponent" duice:data="myObject">
     111
 </my-component>
-
-<my-input></my-input>
 
 </body>
 </html>

@@ -21,11 +21,12 @@ namespace duice {
     /**
      * returns query selector expression
      */
-    export function getQuerySelectorExpression(){
-        return [
-            `*[${getNamespace()}\\:array]:not([${getNamespace()}\\:id])`,
-            `*[${getNamespace()}\\:object]:not([${getNamespace()}\\:id])`
-        ].join(',');
+    export function getQuerySelectors(){
+        let querySelectors = [];
+        querySelectors.push(...ComponentControlFactory.getQuerySelectors());
+        querySelectors.push(...LoopControlFactory.getQuerySelectors());
+        querySelectors.push(...ControlFactory.getQuerySelectors());
+        return querySelectors.join(',');
     }
 
     /**
@@ -36,7 +37,7 @@ namespace duice {
     export function initialize(container: any, context: object): void {
 
         // initialize elementSet, element (order is important)
-        container.querySelectorAll(getQuerySelectorExpression()).forEach(element => {
+        container.querySelectorAll(getQuerySelectors()).forEach(element => {
             if(!hasAttribute(element, 'id')) {
                 try {
                     if(ComponentControlFactory.getInstance(element)){
@@ -64,7 +65,7 @@ namespace duice {
      * @param container
      */
     export function markInitialized(container: any): void {
-        container.querySelectorAll(getQuerySelectorExpression()).forEach(htmlElement => {
+        container.querySelectorAll(getQuerySelectors()).forEach(htmlElement => {
             setAttribute(htmlElement, 'id', generateId());
         });
     }

@@ -6,6 +6,13 @@ namespace duice {
     export class LoopControlFactory<T extends LoopControl<any>> {
 
         /**
+         * getSelectors
+         */
+        static getQuerySelectors(): string[] {
+            return [`*[${getNamespace()}\\:array]:not([${getNamespace()}\\:id])`];
+        }
+
+        /**
          * get instance
          * @param element
          */

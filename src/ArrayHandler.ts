@@ -1,10 +1,10 @@
-///<reference path="AbstractHandler.ts"/>
+///<reference path="DataHandler.ts"/>
 namespace duice {
 
     /**
      * ArrayHandler
      */
-    export class ArrayHandler extends AbstractHandler<ArrayProxy> {
+    export class ArrayHandler extends DataHandler<ArrayProxy> {
 
         propertyChangingListener: Function;
 

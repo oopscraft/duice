@@ -1,45 +1,88 @@
 namespace duice {
 
+    /**
+     * ComponentControl
+     */
     export class ComponentControl<T extends Component> extends Observable implements Observer {
 
         element: T;
 
         context: object;
 
-        objectProxy: ObjectProxy;
+        dataProxy: DataProxy;
 
-        arrayProxy: ArrayProxy;
-
+        /**
+         * constructor
+         * @param element
+         * @param context
+         */
         constructor(element: T, context: object) {
             super();
             this.element = element;
             this.context = context;
         }
 
-        setObject(objectName: string): void {
-            this.objectProxy = findObject(this.context, objectName);
-            if(!this.objectProxy){
-                console.warn(`ObjectProxy[${objectName}] is not found.`, this.objectProxy);
-                this.objectProxy = new ObjectProxy({});
+        /**
+         * setData
+         * @param dataName
+         */
+        setData(dataName: string): void {
+            this.dataProxy = findObject(this.context, dataName);
+            if(!this.dataProxy){
+                console.warn(`ObjectProxy[${dataName}] is not found.`, this.dataProxy);
+                this.dataProxy = new ObjectProxy({});
             }
-            let objectHandler = ObjectProxy.getHandler(this.objectProxy);
+            let objectHandler = ObjectProxy.getHandler(this.dataProxy);
             this.addObserver(objectHandler);
             objectHandler.addObserver(this);
         }
 
-        setArray(arrayName: string): void {
-
+        /**
+         * template
+          */
+        template(): HTMLElement {
+            let templateElement = document.createElement('template');
+            templateElement.innerHTML = this.element.doTemplate();
+            return templateElement.content.firstChild.cloneNode(true) as HTMLElement;
         }
 
+        /**
+         * render
+         */
         render(): void {
-            initialize(this.element, this.context);
+
+            let templateElement = this.template();
+            initialize(templateElement, this.context);
+            this.element.shadowRoot.appendChild(templateElement);
+
+            // calls template method
             this.element.doRender();
-            markInitialized(this.element);
+
+            // executes script
+            this.executeScript();
         }
 
+        /**
+         * update
+         * @param observable
+         * @param event
+         */
+        update(observable: Observable, event: duice.Event): void {
+            console.log("ComponentControl.update", observable, event);
+            if(observable instanceof DataHandler) {
+                this.element.doUpdate(observable.getTarget(), event);
+                this.executeScript();
+            }
+        }
 
-        update(observable: object, event: duice.Event): void {
-
+        /**
+         * executes script
+         */
+        executeScript(): void {
+            let script = getAttribute(this.element, 'script');
+            if(script) {
+                executeScript(script, this.element, this.context);
+            }
         }
 
     }

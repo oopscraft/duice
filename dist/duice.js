@@ -500,6 +500,18 @@ var duice;
             this.componentControlFactoryRegistry.push(componentControlFactory);
         }
         /**
+         * getQuerySelectors
+         */
+        static getQuerySelectors() {
+            let querySelectors = [];
+            this.componentControlFactoryRegistry.forEach(componentControlFactory => {
+                let tagName = componentControlFactory.getTagName();
+                let querySelector = `${tagName}:not([${duice.getNamespace()}\\:id])`;
+                querySelectors.push(querySelector);
+            });
+            return querySelectors;
+        }
+        /**
          * return instance
          * @param htmlElement
          */
@@ -513,6 +525,12 @@ var duice;
             return instance;
         }
         /**
+         * getTagName
+         */
+        getTagName() {
+            return this.tagName;
+        }
+        /**
          * creates element
          * @param element
          * @param context
@@ -520,15 +538,10 @@ var duice;
         createComponentControl(element, context) {
             // creates instance
             let componentControl = new duice.ComponentControl(element, context);
-            // object
-            let objectName = duice.getAttribute(element, 'object');
-            if (objectName) {
-                componentControl.setObject(objectName);
-            }
-            // array
-            let arrayName = duice.getAttribute(element, 'array');
-            if (arrayName) {
-                componentControl.setArray(arrayName);
+            // data
+            let dataName = duice.getAttribute(element, 'data');
+            if (dataName) {
+                componentControl.setData(dataName);
             }
             // returns
             return componentControl;
@@ -566,13 +579,14 @@ var duice;
     /**
      * returns query selector expression
      */
-    function getQuerySelectorExpression() {
-        return [
-            `*[${getNamespace()}\\:array]:not([${getNamespace()}\\:id])`,
-            `*[${getNamespace()}\\:object]:not([${getNamespace()}\\:id])`
-        ].join(',');
+    function getQuerySelectors() {
+        let querySelectors = [];
+        querySelectors.push(...duice.ComponentControlFactory.getQuerySelectors());
+        querySelectors.push(...duice.LoopControlFactory.getQuerySelectors());
+        querySelectors.push(...duice.ControlFactory.getQuerySelectors());
+        return querySelectors.join(',');
     }
-    duice.getQuerySelectorExpression = getQuerySelectorExpression;
+    duice.getQuerySelectors = getQuerySelectors;
     /**
      * initializes
      * @param container
@@ -580,7 +594,7 @@ var duice;
      */
     function initialize(container, context) {
         // initialize elementSet, element (order is important)
-        container.querySelectorAll(getQuerySelectorExpression()).forEach(element => {
+        container.querySelectorAll(getQuerySelectors()).forEach(element => {
             if (!hasAttribute(element, 'id')) {
                 try {
                     if (duice.ComponentControlFactory.getInstance(element)) {
@@ -611,7 +625,7 @@ var duice;
      * @param container
      */
     function markInitialized(container) {
-        container.querySelectorAll(getQuerySelectorExpression()).forEach(htmlElement => {
+        container.querySelectorAll(getQuerySelectors()).forEach(htmlElement => {
             setAttribute(htmlElement, 'id', generateId());
         });
     }
@@ -1627,68 +1641,92 @@ var duice;
          */
         constructor() {
             super();
-            this.observable = new duice.Observable();
             this.attachShadow({ mode: 'open' });
-            let templateElement = document.createElement('template');
-            templateElement.innerHTML = this.template();
-            this.htmlElement = templateElement.content.firstChild.cloneNode(true);
-            //setAttribute(this.htmlElement, 'id', 'testfdfdfd');
-            duice.initialize(this.htmlElement, {});
-            //markInitialized(this.htmlElement);
-            this.shadowRoot.appendChild(this.htmlElement);
-            //initialize(this.shadowRoot, {});
-            console.log("========== tagName:", this.tagName);
-        }
-        // setContext(context: object): void {
-        //     this.context = context;
-        // }
-        //
-        // setObject(objectName: string): void {
-        //     this.objectProxy = findObject(this.context, objectName);
-        //     if(!this.objectProxy){
-        //         console.warn(`ObjectProxy[${objectName}] is not found.`, this.objectProxy);
-        //         this.objectProxy = new ObjectProxy({});
-        //     }
-        //     let objectHandler = ObjectProxy.getHandler(this.objectProxy);
-        //     this.observable.addObserver(objectHandler);
-        //     // objectHandler.addObserver(this);
-        // }
-        //
-        // setArray(arrayName: string): void {
-        //
-        // }
-        template() {
-            return this.doTemplate();
+            // let templateElement = document.createElement('template');
+            // templateElement.innerHTML = this.template();
+            // this.htmlElement = templateElement.content.firstChild.cloneNode(true) as HTMLElement;
+            //
+            // //setAttribute(this.htmlElement, 'id', 'testfdfdfd');
+            //
+            // initialize(this.htmlElement, {});
+            // //markInitialized(this.htmlElement);
+            // this.shadowRoot.appendChild(this.htmlElement);
+            // //initialize(this.shadowRoot, {});
+            // console.log("========== tagName:", this.tagName);
         }
     }
     duice.Component = Component;
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
+    /**
+     * ComponentControl
+     */
     class ComponentControl extends duice.Observable {
+        /**
+         * constructor
+         * @param element
+         * @param context
+         */
         constructor(element, context) {
             super();
             this.element = element;
             this.context = context;
         }
-        setObject(objectName) {
-            this.objectProxy = duice.findObject(this.context, objectName);
-            if (!this.objectProxy) {
-                console.warn(`ObjectProxy[${objectName}] is not found.`, this.objectProxy);
-                this.objectProxy = new duice.ObjectProxy({});
+        /**
+         * setData
+         * @param dataName
+         */
+        setData(dataName) {
+            this.dataProxy = duice.findObject(this.context, dataName);
+            if (!this.dataProxy) {
+                console.warn(`ObjectProxy[${dataName}] is not found.`, this.dataProxy);
+                this.dataProxy = new duice.ObjectProxy({});
             }
-            let objectHandler = duice.ObjectProxy.getHandler(this.objectProxy);
+            let objectHandler = duice.ObjectProxy.getHandler(this.dataProxy);
             this.addObserver(objectHandler);
             objectHandler.addObserver(this);
         }
-        setArray(arrayName) {
+        /**
+         * template
+          */
+        template() {
+            let templateElement = document.createElement('template');
+            templateElement.innerHTML = this.element.doTemplate();
+            return templateElement.content.firstChild.cloneNode(true);
         }
+        /**
+         * render
+         */
         render() {
-            duice.initialize(this.element, this.context);
+            let templateElement = this.template();
+            duice.initialize(templateElement, this.context);
+            this.element.shadowRoot.appendChild(templateElement);
+            // calls template method
             this.element.doRender();
-            duice.markInitialized(this.element);
+            // executes script
+            this.executeScript();
         }
+        /**
+         * update
+         * @param observable
+         * @param event
+         */
         update(observable, event) {
+            console.log("ComponentControl.update", observable, event);
+            if (observable instanceof duice.DataHandler) {
+                this.element.doUpdate(observable.getTarget(), event);
+                this.executeScript();
+            }
+        }
+        /**
+         * executes script
+         */
+        executeScript() {
+            let script = duice.getAttribute(this.element, 'script');
+            if (script) {
+                duice.executeScript(script, this.element, this.context);
+            }
         }
     }
     duice.ComponentControl = ComponentControl;
@@ -1844,6 +1882,12 @@ var duice;
      * ElementFactory
      */
     class LoopControlFactory {
+        /**
+         * getSelectors
+         */
+        static getQuerySelectors() {
+            return [`*[${duice.getNamespace()}\\:array]:not([${duice.getNamespace()}\\:id])`];
+        }
         /**
          * get instance
          * @param element
@@ -2061,6 +2105,12 @@ var duice;
          */
         static registerControlFactory(controlFactory) {
             this.controlFactoryRegistry.push(controlFactory);
+        }
+        /**
+         * getSelectors
+         */
+        static getQuerySelectors() {
+            return [`*[${duice.getNamespace()}\\:object]:not([${duice.getNamespace()}\\:id])`];
         }
         /**
          * get instance
@@ -2533,7 +2583,7 @@ var duice;
 ///<Reference path="Observer.ts"/>
 var duice;
 (function (duice) {
-    class AbstractHandler extends duice.Observable {
+    class DataHandler extends duice.Observable {
         /**
          * constructor
          * @protected
@@ -2618,15 +2668,15 @@ var duice;
             });
         }
     }
-    duice.AbstractHandler = AbstractHandler;
+    duice.DataHandler = DataHandler;
 })(duice || (duice = {}));
-///<reference path="AbstractHandler.ts"/>
+///<reference path="DataHandler.ts"/>
 var duice;
 (function (duice) {
     /**
      * ArrayHandler
      */
-    class ArrayHandler extends duice.AbstractHandler {
+    class ArrayHandler extends duice.DataHandler {
         /**
          * constructor
          * @param arrayProxy
@@ -2754,13 +2804,13 @@ var duice;
 })(duice || (duice = {}));
 ///<reference path="Observable.ts"/>
 ///<reference path="Observer.ts"/>
-///<reference path="AbstractHandler.ts"/>
+///<reference path="DataHandler.ts"/>
 var duice;
 (function (duice) {
     /**
      * ObjectHandler
      */
-    class ObjectHandler extends duice.AbstractHandler {
+    class ObjectHandler extends duice.DataHandler {
         /**
          * constructor
          */
@@ -2832,5 +2882,11 @@ var duice;
         }
     }
     duice.ObjectHandler = ObjectHandler;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    class Context {
+    }
+    duice.Context = Context;
 })(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map

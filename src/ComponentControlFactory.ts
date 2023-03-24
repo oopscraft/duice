@@ -15,6 +15,19 @@ namespace duice {
         }
 
         /**
+         * getQuerySelectors
+         */
+        static getQuerySelectors(): string[] {
+            let querySelectors = [];
+            this.componentControlFactoryRegistry.forEach(componentControlFactory => {
+                let tagName = componentControlFactory.getTagName();
+                let querySelector = `${tagName}:not([${getNamespace()}\\:id])`;
+                querySelectors.push(querySelector);
+            });
+            return querySelectors;
+        }
+
+        /**
          * return instance
          * @param htmlElement
          */
@@ -37,6 +50,13 @@ namespace duice {
         }
 
         /**
+         * getTagName
+         */
+        getTagName(): string {
+            return this.tagName;
+        }
+
+        /**
          * creates element
          * @param element
          * @param context
@@ -46,21 +66,14 @@ namespace duice {
             // creates instance
             let componentControl = new ComponentControl(element, context);
 
-            // object
-            let objectName = getAttribute(element, 'object');
-            if(objectName){
-                componentControl.setObject(objectName);
-            }
-
-            // array
-            let arrayName = getAttribute(element, 'array');
-            if(arrayName){
-                componentControl.setArray(arrayName);
+            // data
+            let dataName = getAttribute(element, 'data');
+            if(dataName){
+                componentControl.setData(dataName);
             }
 
             // returns
             return componentControl;
-
         }
 
         /**

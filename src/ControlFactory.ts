@@ -16,6 +16,13 @@ namespace duice {
         }
 
         /**
+         * getSelectors
+         */
+        static getQuerySelectors(): string[] {
+            return [`*[${getNamespace()}\\:object]:not([${getNamespace()}\\:id])`];
+        }
+
+        /**
          * get instance
          * @param element
          */

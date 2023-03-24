@@ -1,12 +1,12 @@
 ///<reference path="Observable.ts"/>
 ///<reference path="Observer.ts"/>
-///<reference path="AbstractHandler.ts"/>
+///<reference path="DataHandler.ts"/>
 namespace duice {
 
     /**
      * ObjectHandler
      */
-    export class ObjectHandler extends AbstractHandler<ObjectProxy> {
+    export class ObjectHandler extends DataHandler<ObjectProxy> {
 
         propertyChangingListener: Function;
 
