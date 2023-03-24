@@ -42,7 +42,7 @@ namespace duice {
           */
         template(): HTMLElement {
             let templateElement = document.createElement('template');
-            templateElement.innerHTML = this.element.doTemplate();
+            templateElement.innerHTML = this.element.doTemplate().trim();
             return templateElement.content.firstChild.cloneNode(true) as HTMLElement;
         }
 
@@ -52,8 +52,8 @@ namespace duice {
         render(): void {
 
             let templateElement = this.template();
-            initialize(templateElement, this.context);
             this.element.shadowRoot.appendChild(templateElement);
+            initialize(this.element.shadowRoot, this.context);
 
             // calls template method
             this.element.doRender();

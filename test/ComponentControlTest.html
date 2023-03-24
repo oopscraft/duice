@@ -31,33 +31,20 @@
             ]
         });
 
-        // class TestElement extends HTMLElement {
-        //     constructor(){
-        //         super();
-        //         this.attachShadow({mode: 'open'});
-        //
-        //         const wrapper = document.createElement('span');
-        //
-        //
-        //         wrapper.style.backgroundColor = 'red';
-        //         wrapper.style.width = '100px';
-        //         wrapper.style.height = '100px';
-        //         let textNode = document.createTextNode(this.dataset.value);
-        //         wrapper.appendChild(textNode);
-        //
-        //         this.shadowRoot.appendChild(wrapper);
-        //     }
-        // }
-
-        class TestElement extends duice.Component {
+        /**
+         *
+         */
+        class MyComponent extends duice.Component {
             doTemplate(data){
-                let test1 = "<<<<<<<<<<<<<<";
-                let test2 = ">>>>>>>>>>>>>>";
-                return `<spaanc>
-                            ${test1}
-                            <input type="text" duice:object="myObject" duice:property="name"/>
-                            ${test2}
-                        </spaanc>`;
+                let test1 = "<<<<<<<";
+                let test2 = ">>>>>>>";
+                return `
+                    <span>
+                        ${test1}
+                        <input type="text" duice:object="myObject" duice:property="name"/>
+                        ${test2}
+                    </span>
+                `;
             }
             doStyle(data) {
 
@@ -69,7 +56,7 @@
                 console.warn("======== doUpdate", data);
             }
         }
-        duice.defineComponent('my-component', TestElement);
+        duice.defineComponent('my-component', MyComponent);
 
     </script>
 </head>
@@ -77,9 +64,7 @@
 
 <input type="text" duice:object="myObject" duice:property="name" style="background-color:red;"/>
 
-<my-component id="myComponent" duice:data="myObject">
-    111
-</my-component>
+<my-component duice:data="myObject"/>
 
 </body>
 </html>

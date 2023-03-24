@@ -1692,7 +1692,7 @@ var duice;
           */
         template() {
             let templateElement = document.createElement('template');
-            templateElement.innerHTML = this.element.doTemplate();
+            templateElement.innerHTML = this.element.doTemplate().trim();
             return templateElement.content.firstChild.cloneNode(true);
         }
         /**
@@ -1700,8 +1700,8 @@ var duice;
          */
         render() {
             let templateElement = this.template();
-            duice.initialize(templateElement, this.context);
             this.element.shadowRoot.appendChild(templateElement);
+            duice.initialize(this.element.shadowRoot, this.context);
             // calls template method
             this.element.doRender();
             // executes script
