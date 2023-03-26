@@ -10,425 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 var duice;
 (function (duice) {
     /**
-     * ArrayProxy
-     */
-    class ArrayProxy extends globalThis.Array {
-        /**
-         * constructor
-         */
-        constructor(array) {
-            super();
-            // array handler
-            let arrayHandler = new duice.ArrayProxyHandler();
-            // copy array elements
-            if (globalThis.Array.isArray(array)) {
-                array.forEach((object, index) => {
-                    let objectProxy = new duice.ObjectProxy(object);
-                    duice.ObjectProxy.getHandler(objectProxy).addObserver(arrayHandler);
-                    this[index] = objectProxy;
-                });
-            }
-            // create proxy
-            let arrayProxy = new Proxy(this, arrayHandler);
-            arrayHandler.setTarget(arrayProxy);
-            // set property
-            ArrayProxy.setHandler(arrayProxy, arrayHandler);
-            ArrayProxy.setTarget(arrayProxy, this);
-            // returns
-            return arrayProxy;
-        }
-        /**
-         * assign
-         * @param arrayProxy
-         * @param array
-         */
-        static assign(arrayProxy, array) {
-            console.log('ArrayProxy.assign', arrayProxy, array);
-            let arrayHandler = this.getHandler(arrayProxy);
-            try {
-                // suspend
-                arrayHandler.suspendListener();
-                arrayHandler.suspendNotify();
-                // clears elements
-                arrayProxy.length = 0;
-                // creates elements
-                array.forEach((object, index) => {
-                    let objectProxy = new duice.ObjectProxy(object);
-                    duice.ObjectProxy.getHandler(objectProxy).addObserver(arrayHandler);
-                    arrayProxy[index] = objectProxy;
-                    // add listener
-                    duice.ObjectProxy.onPropertyChanging(objectProxy, arrayHandler.propertyChangingListener);
-                    duice.ObjectProxy.onPropertyChanged(objectProxy, arrayHandler.propertyChangedListener);
-                });
-            }
-            finally {
-                // resume
-                arrayHandler.resumeListener();
-                arrayHandler.resumeNotify();
-            }
-            // notify observers
-            arrayHandler.notifyObservers(new duice.Event(this));
-        }
-        /**
-         * setTarget
-         * @param arrayProxy
-         * @param target
-         */
-        static setTarget(arrayProxy, target) {
-            globalThis.Object.defineProperty(arrayProxy, '_target_', {
-                value: target,
-                writable: true
-            });
-        }
-        /**
-         * getTarget
-         * @param arrayProxy
-         */
-        static getTarget(arrayProxy) {
-            return globalThis.Object.getOwnPropertyDescriptor(arrayProxy, '_target_').value;
-        }
-        /**
-         * setHandler
-         * @param arrayProxy
-         * @param arrayHandler
-         */
-        static setHandler(arrayProxy, arrayHandler) {
-            globalThis.Object.defineProperty(arrayProxy, '_handler_', {
-                value: arrayHandler,
-                writable: true
-            });
-        }
-        /**
-         * getHandler
-         * @param arrayProxy
-         */
-        static getHandler(arrayProxy) {
-            let handler = globalThis.Object.getOwnPropertyDescriptor(arrayProxy, '_handler_').value;
-            duice.assert(handler, 'handler is not found');
-            return handler;
-        }
-        /**
-         * onPropertyChanging
-         * @param arrayProxy
-         * @param listener
-         */
-        static onPropertyChanging(arrayProxy, listener) {
-            this.getHandler(arrayProxy).propertyChangingListener = listener;
-            arrayProxy.forEach(objectProxy => {
-                duice.ObjectProxy.getHandler(objectProxy).propertyChangingListener = listener;
-            });
-        }
-        /**
-         * onPropertyChanged
-         * @param arrayProxy
-         * @param listener
-         */
-        static onPropertyChanged(arrayProxy, listener) {
-            this.getHandler(arrayProxy).propertyChangedListener = listener;
-            arrayProxy.forEach(objectProxy => {
-                duice.ObjectProxy.getHandler(objectProxy).propertyChangedListener = listener;
-            });
-        }
-        /**
-         * onRowInserting
-         * @param arrayProxy
-         * @param listener
-         */
-        static onRowInserting(arrayProxy, listener) {
-            this.getHandler(arrayProxy).rowInsertingListener = listener;
-        }
-        /**
-         * onRowInserted
-         * @param arrayProxy
-         * @param listener
-         */
-        static onRowInserted(arrayProxy, listener) {
-            this.getHandler(arrayProxy).rowInsertedListener = listener;
-        }
-        /**
-         * onRowDeleting
-         * @param arrayProxy
-         * @param listener
-         */
-        static onRowDeleting(arrayProxy, listener) {
-            this.getHandler(arrayProxy).rowDeletingListener = listener;
-        }
-        /**
-         * onRowDeleted
-         * @param arrayProxy
-         * @param listener
-         */
-        static onRowDeleted(arrayProxy, listener) {
-            this.getHandler(arrayProxy).rowDeletedListener = listener;
-        }
-        /**
-         * setReadonly
-         * @param arrayProxy
-         * @param property
-         * @param readonly
-         */
-        static setReadonly(arrayProxy, property, readonly) {
-            this.getHandler(arrayProxy).setReadonly(property, readonly);
-        }
-        /**
-         * isReadonly
-         * @param arrayProxy
-         * @param property
-         */
-        static isReadonly(arrayProxy, property) {
-            return this.getHandler(arrayProxy).isReadonly(property);
-        }
-        /**
-         * setReadonlyAll
-         * @param arrayProxy
-         * @param readonly
-         */
-        static setReadonlyAll(arrayProxy, readonly) {
-            this.getHandler(arrayProxy).setReadonlyAll(readonly);
-            for (let index = 0; index >= this.length; index++) {
-                duice.ObjectProxy.setReadonlyAll(this[index], readonly);
-            }
-        }
-        /**
-         * insertRow
-         * @param index
-         * @param rows
-         */
-        insertRow(index, ...rows) {
-            return __awaiter(this, void 0, void 0, function* () {
-                let arrayHandler = ArrayProxy.getHandler(this);
-                let proxyTarget = ArrayProxy.getTarget(this);
-                rows.forEach((object, index) => {
-                    rows[index] = new duice.ObjectProxy(object);
-                });
-                let event = new duice.RowInsertEvent(this, index, rows);
-                if (yield arrayHandler.checkListener(arrayHandler.rowInsertingListener, event)) {
-                    proxyTarget.splice(index, 0, ...rows);
-                    yield arrayHandler.checkListener(arrayHandler.rowInsertedListener, event);
-                    arrayHandler.notifyObservers(event);
-                }
-            });
-        }
-        /**
-         * deleteRow
-         * @param index
-         * @param size
-         */
-        deleteRow(index, size) {
-            return __awaiter(this, void 0, void 0, function* () {
-                let arrayHandler = ArrayProxy.getHandler(this);
-                let proxyTarget = ArrayProxy.getTarget(this);
-                let sliceBegin = index;
-                let sliceEnd = (size ? index + size : index + 1);
-                let rows = proxyTarget.slice(sliceBegin, sliceEnd);
-                let event = new duice.RowDeleteEvent(this, index, rows);
-                if (yield arrayHandler.checkListener(arrayHandler.rowDeletingListener, event)) {
-                    let spliceStart = index;
-                    let spliceDeleteCount = (size ? size : 1);
-                    proxyTarget.splice(spliceStart, spliceDeleteCount);
-                    yield arrayHandler.checkListener(arrayHandler.rowDeletedListener, event);
-                    arrayHandler.notifyObservers(event);
-                }
-            });
-        }
-        /**
-         * appendRow
-         * @param rows
-         */
-        appendRow(...rows) {
-            return __awaiter(this, void 0, void 0, function* () {
-                let index = this.length;
-                return this.insertRow(index, ...rows);
-            });
-        }
-    }
-    duice.ArrayProxy = ArrayProxy;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * ObjectProxy
-     */
-    class ObjectProxy extends globalThis.Object {
-        /**
-         * constructor
-         */
-        constructor(object) {
-            super();
-            // object handler
-            let objectHandler = new duice.ObjectProxyHandler();
-            // copy property
-            for (let name in object) {
-                let value = object[name];
-                // value is array
-                if (Array.isArray(value)) {
-                    let arrayProxy = new duice.ArrayProxy(value);
-                    duice.ArrayProxy.getHandler(arrayProxy).addObserver(objectHandler);
-                    this[name] = arrayProxy;
-                    continue;
-                }
-                // value is object
-                if (value != null && typeof value === 'object') {
-                    let objectProxy = new ObjectProxy(value);
-                    ObjectProxy.getHandler(objectProxy).addObserver(objectHandler);
-                    this[name] = objectProxy;
-                    continue;
-                }
-                // value is primitive
-                this[name] = value;
-            }
-            // delete not exists property
-            for (let name in this) {
-                if (!Object.keys(object).includes(name)) {
-                    delete this[name];
-                }
-            }
-            // creates proxy
-            let objectProxy = new Proxy(this, objectHandler);
-            objectHandler.setTarget(objectProxy);
-            // set property
-            ObjectProxy.setHandler(objectProxy, objectHandler);
-            ObjectProxy.setTarget(objectProxy, this);
-            // returns
-            return objectProxy;
-        }
-        /**
-         * assign
-         * @param objectProxy
-         * @param object
-         */
-        static assign(objectProxy, object) {
-            let objectHandler = this.getHandler(objectProxy);
-            try {
-                // suspend
-                objectHandler.suspendListener();
-                objectHandler.suspendNotify();
-                // loop object properties
-                for (let name in object) {
-                    let value = object[name];
-                    // source value is array
-                    if (Array.isArray(value)) {
-                        if (Array.isArray(objectProxy[name])) {
-                            duice.ArrayProxy.assign(objectProxy[name], value);
-                        }
-                        else {
-                            objectProxy[name] = new duice.ArrayProxy(value);
-                        }
-                        continue;
-                    }
-                    // source value is object
-                    if (typeof value === 'object') {
-                        if (typeof objectProxy[name] === 'object') {
-                            ObjectProxy.assign(objectProxy[name], value);
-                        }
-                        else {
-                            let objectProxy = new ObjectProxy(value);
-                            ObjectProxy.getHandler(objectProxy).addObserver(objectHandler);
-                            objectProxy[name] = objectProxy;
-                        }
-                        continue;
-                    }
-                    // source value is primitive
-                    objectProxy[name] = value;
-                }
-            }
-            finally {
-                // resume
-                objectHandler.resumeListener();
-                objectHandler.resumeNotify();
-            }
-            // notify observers
-            objectHandler.notifyObservers(new duice.Event(this));
-        }
-        /**
-         * setTarget
-         * @param objectProxy
-         * @param target
-         */
-        static setTarget(objectProxy, target) {
-            globalThis.Object.defineProperty(objectProxy, '_target_', {
-                value: target,
-                writable: true
-            });
-        }
-        /**
-         * getTarget
-         * @param objectProxy
-         */
-        static getTarget(objectProxy) {
-            return globalThis.Object.getOwnPropertyDescriptor(objectProxy, '_target_').value;
-        }
-        /**
-         * setHandler
-         * @param objectProxy
-         * @param objectHandler
-         */
-        static setHandler(objectProxy, objectHandler) {
-            globalThis.Object.defineProperty(objectProxy, '_handler_', {
-                value: objectHandler,
-                writable: true
-            });
-        }
-        /**
-         * getHandler
-         * @param objectProxy
-         */
-        static getHandler(objectProxy) {
-            let handler = globalThis.Object.getOwnPropertyDescriptor(objectProxy, '_handler_').value;
-            duice.assert(handler, 'handler is not found');
-            return handler;
-        }
-        /**
-         * onPropertyChanging
-         * @param objectProxy
-         * @param listener
-         */
-        static onPropertyChanging(objectProxy, listener) {
-            this.getHandler(objectProxy).propertyChangingListener = listener;
-        }
-        /**
-         * onPropertyChanged
-         * @param objectProxy
-         * @param listener
-         */
-        static onPropertyChanged(objectProxy, listener) {
-            this.getHandler(objectProxy).propertyChangedListener = listener;
-        }
-        /**
-         * setReadonly
-         * @param objectProxy
-         * @param property
-         * @param readonly
-         */
-        static setReadonly(objectProxy, property, readonly) {
-            this.getHandler(objectProxy).setReadonly(property, readonly);
-        }
-        /**
-         * isReadonly
-         * @param objectProxy
-         * @param property
-         */
-        static isReadonly(objectProxy, property) {
-            return this.getHandler(objectProxy).isReadonly(property);
-        }
-        /**
-         * setReadonlyAll
-         * @param objectProxy
-         * @param readonly
-         */
-        static setReadonlyAll(objectProxy, readonly) {
-            let objectHandler = this.getHandler(objectProxy);
-            objectHandler.setReadonlyAll(readonly);
-            for (let property in this) {
-                objectHandler.setReadonly(property, readonly);
-            }
-        }
-    }
-    duice.ObjectProxy = ObjectProxy;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
      * Observable
      */
     class Observable {
@@ -463,7 +44,6 @@ var duice;
         }
         /**
          * resume notify
-         * @param enable
          */
         resumeNotify() {
             this.notifyEnabled = true;
@@ -484,85 +64,80 @@ var duice;
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
-    class ComponentControlFactory {
+    /**
+     * component factory abstract class
+     */
+    class ComponentFactory {
+    }
+    duice.ComponentFactory = ComponentFactory;
+})(duice || (duice = {}));
+///<reference path="ComponentFactory.ts"/>
+var duice;
+(function (duice) {
+    /**
+     * custom component factory
+     */
+    class CustomComponentFactory extends duice.ComponentFactory {
         /**
          * constructor
          * @param tagName
          */
         constructor(tagName) {
+            super();
             this.tagName = tagName;
         }
         /**
-         * register component factory
-         * @param componentControlFactory
+         * adds factory instance
+         * @param componentFactory
          */
-        static registerComponentFactory(componentControlFactory) {
-            this.componentControlFactoryRegistry.push(componentControlFactory);
+        static addInstance(componentFactory) {
+            this.instances.push(componentFactory);
         }
         /**
-         * getQuerySelectors
+         * returns factory instance to be supported
+         * @param element
          */
-        static getQuerySelectors() {
-            let querySelectors = [];
-            this.componentControlFactoryRegistry.forEach(componentControlFactory => {
-                let tagName = componentControlFactory.getTagName();
-                let querySelector = `${tagName}:not([${duice.getNamespace()}\\:id])`;
-                querySelectors.push(querySelector);
-            });
-            return querySelectors;
-        }
-        /**
-         * return instance
-         * @param htmlElement
-         */
-        static getInstance(htmlElement) {
-            let instance;
-            this.componentControlFactoryRegistry.forEach(componentControlFactory => {
-                if (componentControlFactory.support(htmlElement)) {
-                    instance = componentControlFactory;
+        static getInstance(element) {
+            for (let componentFactory of this.instances) {
+                if (componentFactory.support(element)) {
+                    return componentFactory;
                 }
-            });
-            return instance;
+            }
+            return null;
         }
         /**
-         * getTagName
-         */
-        getTagName() {
-            return this.tagName;
-        }
-        /**
-         * creates element
+         * creates component
          * @param element
          * @param context
          */
-        createComponentControl(element, context) {
+        createComponent(element, context) {
             // creates instance
-            let componentControl = new duice.ComponentControl(element, context);
+            let component = new duice.CustomComponent(element, context);
             // set object
-            let objectName = duice.getAttribute(element, 'object');
+            let objectName = duice.getComponentAttribute(element, 'object');
             if (objectName) {
-                componentControl.setObject(objectName);
+                component.setObject(objectName);
             }
             // set array
-            let arrayName = duice.getAttribute(element, 'array');
+            let arrayName = duice.getComponentAttribute(element, 'array');
             if (arrayName) {
-                componentControl.setArray(arrayName);
+                component.setArray(arrayName);
             }
             // returns
-            return componentControl;
+            return component;
         }
         /**
-         * support
+         * checks supported elements
          * @param element
          */
         support(element) {
             return (element.tagName.toLowerCase() === this.tagName);
         }
     }
-    ComponentControlFactory.componentControlFactoryRegistry = [];
-    duice.ComponentControlFactory = ComponentControlFactory;
+    CustomComponentFactory.instances = [];
+    duice.CustomComponentFactory = CustomComponentFactory;
 })(duice || (duice = {}));
-///<reference path="ComponentControlFactory.ts"/>
+///<reference path="CustomComponentFactory.ts"/>
 var duice;
 (function (duice) {
     let namespace = 'duice';
@@ -571,6 +146,7 @@ var duice;
      * @param value
      */
     function setNamespace(value) {
+        globalThis[value] = value;
         namespace = value;
     }
     duice.setNamespace = setNamespace;
@@ -582,40 +158,41 @@ var duice;
     }
     duice.getNamespace = getNamespace;
     /**
-     * returns query selector expression
+     * returns query selector for component scan
      */
-    function getQuerySelectors() {
-        let querySelectors = [];
-        querySelectors.push(...duice.ComponentControlFactory.getQuerySelectors());
-        querySelectors.push(...duice.LoopControlFactory.getQuerySelectors());
-        querySelectors.push(...duice.ElementControlFactory.getQuerySelectors());
-        return querySelectors.join(',');
+    function getComponentQuerySelector() {
+        return [
+            `*[data-${getNamespace()}-object]:not([data-${getNamespace()}-id])`,
+            `*[data-${getNamespace()}-array]:not([data-${getNamespace()}-id])`,
+        ].join(',');
     }
-    duice.getQuerySelectors = getQuerySelectors;
+    duice.getComponentQuerySelector = getComponentQuerySelector;
     /**
      * initializes
      * @param container
      * @param context
      */
     function initialize(container, context) {
-        // initialize elementSet, element (order is important)
-        container.querySelectorAll(getQuerySelectors()).forEach(element => {
-            if (!hasAttribute(element, 'id')) {
+        // scan DOM tree
+        container.querySelectorAll(getComponentQuerySelector()).forEach(element => {
+            var _a, _b, _c, _d, _e;
+            if (!hasComponentAttribute(element, 'id')) {
                 try {
-                    if (duice.ComponentControlFactory.getInstance(element)) {
-                        let componentControlFactory = duice.ComponentControlFactory.getInstance(element);
-                        let componentControl = componentControlFactory.createComponentControl(element, context);
-                        componentControl.render();
+                    // custom component
+                    let customComponentFactory = duice.CustomComponentFactory.getInstance(element);
+                    if (customComponentFactory) {
+                        (_a = customComponentFactory.createComponent(element, context)) === null || _a === void 0 ? void 0 : _a.render();
+                        return;
                     }
-                    else if (hasAttribute(element, 'array')) {
-                        let loopControlFactory = duice.LoopControlFactory.getInstance(element);
-                        let loopControl = loopControlFactory.createLoopControl(element, context);
-                        loopControl.render();
+                    // array component
+                    if (hasComponentAttribute(element, 'array')) {
+                        (_c = (_b = duice.ArrayComponentFactory.getInstance(element)) === null || _b === void 0 ? void 0 : _b.createComponent(element, context)) === null || _c === void 0 ? void 0 : _c.render();
+                        return;
                     }
-                    else if (hasAttribute(element, 'object')) {
-                        let controlFactory = duice.ElementControlFactory.getInstance(element);
-                        let control = controlFactory.createElementControl(element, context);
-                        control.render();
+                    // object component
+                    if (hasComponentAttribute(element, 'object')) {
+                        (_e = (_d = duice.ObjectComponentFactory.getInstance(element)) === null || _d === void 0 ? void 0 : _d.createComponent(element, context)) === null || _e === void 0 ? void 0 : _e.render();
+                        return;
                     }
                 }
                 catch (e) {
@@ -630,17 +207,17 @@ var duice;
      * @param container
      */
     function markInitialized(container) {
-        container.querySelectorAll(getQuerySelectors()).forEach(htmlElement => {
-            setAttribute(htmlElement, 'id', generateId());
+        container.querySelectorAll(getComponentQuerySelector()).forEach(element => {
+            setComponentAttribute(element, 'id', generateId());
         });
     }
     duice.markInitialized = markInitialized;
     /**
-     * findObject
+     * finds variable by name
      * @param context
      * @param name
      */
-    function findObject(context, name) {
+    function findVariable(context, name) {
         // find in context
         try {
             let object = new Function(`return this.${name};`).call(context);
@@ -661,9 +238,9 @@ var duice;
         console.warn(`Object[${name}] is not found`);
         return undefined;
     }
-    duice.findObject = findObject;
+    duice.findVariable = findVariable;
     /**
-     * Generates component ID
+     * generates component ID
      */
     function generateId() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -673,67 +250,33 @@ var duice;
     }
     duice.generateId = generateId;
     /**
-     * assert
-     * @param condition
-     * @param message
-     */
-    function assert(condition, message) {
-        console.assert(condition, message);
-        if (!condition) {
-            throw new Error(message || 'Assertion Failed');
-        }
-    }
-    duice.assert = assert;
-    /**
-     * hasAttribute
+     * checks has component attribute
      * @param element
      * @param name
      */
-    function hasAttribute(element, name) {
-        return element.hasAttribute(`${getNamespace()}:${name}`);
+    function hasComponentAttribute(element, name) {
+        return element.hasAttribute(`data-${getNamespace()}-${name}`);
     }
-    duice.hasAttribute = hasAttribute;
+    duice.hasComponentAttribute = hasComponentAttribute;
     /**
-     * getAttribute
+     * returns component attribute
      * @param element
      * @param name
      */
-    function getAttribute(element, name) {
-        return element.getAttribute(`${getNamespace()}:${name}`);
+    function getComponentAttribute(element, name) {
+        return element.getAttribute(`data-${getNamespace()}-${name}`);
     }
-    duice.getAttribute = getAttribute;
+    duice.getComponentAttribute = getComponentAttribute;
     /**
-     * setAttribute
+     * set component attribute
      * @param element
      * @param name
      * @param value
      */
-    function setAttribute(element, name, value) {
-        element.setAttribute(`${getNamespace()}:${name}`, value);
+    function setComponentAttribute(element, name, value) {
+        element.setAttribute(`data-${getNamespace()}-${name}`, value);
     }
-    duice.setAttribute = setAttribute;
-    /**
-     * removeChildNodes
-     * @param node
-     */
-    function removeChildNodes(node) {
-        // Remove element nodes and prevent memory leaks
-        let childNode, childNodes = node.childNodes, i = 0;
-        while (childNode = childNodes[i++]) {
-            if (childNode.nodeType === 1) {
-                node.removeChild(childNode);
-            }
-        }
-        // Remove any remaining nodes
-        while (node.firstChild) {
-            node.removeChild(node.firstChild);
-        }
-        // If this is a select, ensure that it displays empty
-        if (node instanceof HTMLSelectElement) {
-            node.options.length = 0;
-        }
-    }
-    duice.removeChildNodes = removeChildNodes;
+    duice.setComponentAttribute = setComponentAttribute;
     /**
      * execute script
      * @param script
@@ -756,6 +299,18 @@ var duice;
         }
     }
     duice.executeScript = executeScript;
+    /**
+     * assert
+     * @param condition
+     * @param message
+     */
+    function assert(condition, message) {
+        console.assert(condition, message);
+        if (!condition) {
+            throw new Error(message || 'Assertion Failed');
+        }
+    }
+    duice.assert = assert;
     /**
      * alert
      * @param message
@@ -875,13 +430,13 @@ var duice;
     }
     duice.fetch = fetch;
     /**
-     * defineComponent
+     * defines custom component
      * @param tagName
      * @param constructor
      */
     function defineComponent(tagName, constructor) {
         customElements.define(tagName, constructor);
-        duice.ComponentControlFactory.registerComponentFactory(new duice.ComponentControlFactory(tagName));
+        duice.CustomComponentFactory.addInstance(new duice.CustomComponentFactory(tagName));
     }
     duice.defineComponent = defineComponent;
     /**
@@ -902,7 +457,7 @@ var duice;
     class Dialog {
         /**
          * constructor
-         * @param contentDiv
+         * @param dialogElement
          */
         constructor(dialogElement) {
             this.dialogElement = dialogElement;
@@ -1635,201 +1190,101 @@ var duice;
 var duice;
 (function (duice) {
     /**
-     * Component
+     * component abstract class
      */
-    class Component extends HTMLElement {
+    class Component extends duice.Observable {
         /**
          * constructor
+         * @param element
+         * @param context
          * @protected
          */
-        constructor() {
+        constructor(element, context) {
             super();
+            this.element = element;
+            this.context = context;
+            duice.setComponentAttribute(this.element, 'id', duice.generateId());
         }
         /**
-         * return style literal
-         * @param data
+         * return element
          */
-        doStyle(data) {
-            return null;
+        getElement() {
+            return this.element;
+        }
+        /**
+         * return context
+         */
+        getContext() {
+            return this.context;
+        }
+        /**
+         * set data
+         * @param dataName
+         */
+        setData(dataName) {
+            var _a;
+            this.data = duice.findVariable(this.context, dataName);
+            let dataHandler = (_a = globalThis.Object.getOwnPropertyDescriptor(this.data, '_handler_')) === null || _a === void 0 ? void 0 : _a.value;
+            duice.assert(dataHandler, 'DataHandler is not found');
+            this.addObserver(dataHandler);
+            dataHandler.addObserver(this);
+        }
+        /**
+         * return data
+         */
+        getData() {
+            return this.data;
+        }
+        /**
+         * executes script if exists
+         */
+        executeScript() {
+            let script = duice.getComponentAttribute(this.element, 'script');
+            if (script) {
+                duice.executeScript(script, this.element, this.context);
+            }
         }
     }
     duice.Component = Component;
 })(duice || (duice = {}));
+///<reference path="Component.ts"/>
 var duice;
 (function (duice) {
     /**
-     * ComponentControl
+     * array component class
      */
-    class ComponentControl extends duice.Observable {
+    class ArrayComponent extends duice.Component {
         /**
          * constructor
          * @param element
          * @param context
          */
         constructor(element, context) {
-            super();
-            this.element = element;
-            this.context = context;
-        }
-        /**
-         * setData
-         * @param objectName
-         */
-        setObject(objectName) {
-            this.data = duice.findObject(this.context, objectName);
-            if (!this.data) {
-                console.warn(`ObjectProxy[${objectName}] is not found.`, this.data);
-                this.data = new duice.ObjectProxy({});
-            }
-            let objectHandler = duice.ObjectProxy.getHandler(this.data);
-            this.addObserver(objectHandler);
-            objectHandler.addObserver(this);
-        }
-        /**
-         * setArray
-         * @param arrayName
-         */
-        setArray(arrayName) {
-            this.data = duice.findObject(this.context, arrayName);
-            if (!this.data) {
-                console.warn(`ArrayProxy[${arrayName}] is not found.`, this.data);
-                this.data = new duice.ArrayProxy([]);
-            }
-            let arrayHandler = duice.ArrayProxy.getHandler(this.data);
-            this.addObserver(arrayHandler);
-            arrayHandler.addObserver(this);
-        }
-        /**
-         * check shadow DOM
-         */
-        isShadowDom() {
-            return (!!this.element.shadowRoot);
-        }
-        /**
-         * render
-         */
-        render() {
-            this.doRender(this.data);
-            this.executeScript();
-        }
-        /**
-         * doRender
-         * @param data
-         */
-        doRender(data) {
-            // removes child
-            if (this.isShadowDom()) {
-                duice.removeChildNodes(this.element.shadowRoot);
-            }
-            else {
-                duice.removeChildNodes(this.element);
-            }
-            // create template element
-            let templateLiteral = this.element.doRender(data).trim();
-            let templateElement = document.createElement('template');
-            templateElement.innerHTML = templateLiteral;
-            let htmlElement = templateElement.content.firstChild.cloneNode(true);
-            if (this.element.shadowRoot) {
-                this.element.shadowRoot.appendChild(htmlElement);
-            }
-            else {
-                this.element.appendChild(htmlElement);
-            }
-            // add style if exists
-            let styleLiteral = this.element.doStyle(data);
-            if (styleLiteral) {
-                let style = document.createElement('style');
-                style.textContent = styleLiteral.trim();
-                if (this.isShadowDom()) {
-                    this.element.shadowRoot.appendChild(style);
-                }
-                else {
-                    this.element.appendChild(style);
-                }
-            }
-            // initializes shadow root
-            let context = {
-                object: this.data,
-                array: this.data
-            };
-            if (this.isShadowDom()) {
-                duice.initialize(this.element.shadowRoot, context);
-            }
-            else {
-                duice.initialize(this.element, context);
-            }
-        }
-        /**
-         * update
-         * @param observable
-         * @param event
-         */
-        update(observable, event) {
-            console.log("ComponentControl.update", observable, event);
-            if (observable instanceof duice.ProxyHandler) {
-                this.doRender(observable.getTarget());
-                this.executeScript();
-            }
-        }
-        /**
-         * executes script
-         */
-        executeScript() {
-            let script = duice.getAttribute(this.element, 'script');
-            if (script) {
-                duice.executeScript(script, this.element, this.context);
-            }
-        }
-    }
-    duice.ComponentControl = ComponentControl;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * LoopControl
-     */
-    class LoopControl extends duice.Observable {
-        /**
-         * constructor
-         * @param element
-         */
-        constructor(element, context) {
-            super();
+            super(element.cloneNode(true), context);
             this.slot = document.createElement('slot');
             this.editable = false;
             this.rowElements = [];
-            // clone html element template
-            this.element = element.cloneNode(true);
-            duice.setAttribute(this.element, 'id', duice.generateId());
-            duice.markInitialized(element);
-            // replace slot element
+            // replace with slot for position
             element.replaceWith(this.slot);
-            // set context
-            this.context = context;
+            // mark initialized (not using after clone as templates)
+            duice.markInitialized(element);
         }
         /**
-         * setArray
+         * set array
          * @param arrayName
          */
         setArray(arrayName) {
-            this.arrayProxy = duice.findObject(this.context, arrayName);
-            if (!this.arrayProxy) {
-                console.warn(`ArrayProxy[${arrayName}] is not found.`, this.arrayProxy);
-                this.arrayProxy = new duice.ArrayProxy([]);
-            }
-            let arrayHandler = duice.ArrayProxy.getHandler(this.arrayProxy);
-            this.addObserver(arrayHandler);
-            arrayHandler.addObserver(this);
+            this.setData(arrayName);
         }
         /**
-         * setLoop
+         * set loop
          * @param loop
          */
         setLoop(loop) {
             this.loop = loop;
         }
         /**
-         * setEditable
+         * set editable
          * @param editable
          */
         setEditable(editable) {
@@ -1839,21 +1294,12 @@ var duice;
          * render
          */
         render() {
-            // do render
-            this.doRender(this.arrayProxy);
-            // executes script
-            this.executeScript();
-        }
-        /**
-         * doRender
-         * @param arrayProxy
-         */
-        doRender(arrayProxy) {
             var _a;
             let _this = this;
+            let arrayProxy = this.getData();
             // reset row elements
             this.rowElements.forEach(rowElement => {
-                this.slot.parentNode.removeChild(rowElement);
+                rowElement.parentNode.removeChild(rowElement);
             });
             this.rowElements.length = 0;
             // loop
@@ -1863,7 +1309,7 @@ var duice;
                 let statusName = (_a = loopArgs[1]) === null || _a === void 0 ? void 0 : _a.trim();
                 for (let index = 0; index < arrayProxy.length; index++) {
                     // context
-                    let context = Object.assign({}, this.context);
+                    let context = globalThis.Object.assign({}, this.context);
                     context[itemName] = arrayProxy[index];
                     context[statusName] = new duice.ObjectProxy({
                         index: index,
@@ -1873,13 +1319,13 @@ var duice;
                         last: (arrayProxy.length == index + 1)
                     });
                     // clones row elements
-                    let rowElement = this.element.cloneNode(true);
-                    duice.setAttribute(rowElement, 'index', index.toString());
+                    let rowElement = this.getElement().cloneNode(true);
+                    duice.setComponentAttribute(rowElement, 'index', index.toString());
                     // editable
                     if (this.editable) {
                         rowElement.setAttribute('draggable', 'true');
                         rowElement.addEventListener('dragstart', function (event) {
-                            let fromIndex = duice.getAttribute(this, 'index');
+                            let fromIndex = duice.getComponentAttribute(this, 'index');
                             event.dataTransfer.setData("text", fromIndex);
                         });
                         rowElement.addEventListener('dragover', function (event) {
@@ -1891,7 +1337,7 @@ var duice;
                                 event.preventDefault();
                                 event.stopPropagation();
                                 let fromIndex = parseInt(event.dataTransfer.getData('text'));
-                                let toIndex = parseInt(duice.getAttribute(this, 'index'));
+                                let toIndex = parseInt(duice.getComponentAttribute(this, 'index'));
                                 let rowIndexChangeEvent = new duice.RowMoveEvent(_this, fromIndex, toIndex);
                                 _this.notifyObservers(rowIndexChangeEvent);
                             });
@@ -1899,10 +1345,13 @@ var duice;
                     }
                     // initializes row element
                     duice.initialize(rowElement, context);
-                    this.slot.parentNode.insertBefore(rowElement, this.slot);
                     this.rowElements.push(rowElement);
+                    // insert before slot
+                    this.slot.parentNode.insertBefore(rowElement, this.slot);
                 }
             }
+            // execute script
+            this.executeScript();
         }
         /**
          * update
@@ -1910,135 +1359,113 @@ var duice;
          * @param event
          */
         update(observable, event) {
-            console.log('ElementSet.update', observable, event);
-            // ArrayHandler
-            if (observable instanceof duice.ArrayProxyHandler) {
-                let array = observable.getTarget();
-                this.doRender(array);
-                // executes script
-                this.executeScript();
-            }
-        }
-        /**
-         * executes script
-         */
-        executeScript() {
-            let script = duice.getAttribute(this.element, 'script');
-            if (script) {
-                duice.executeScript(script, this.element, this.context);
+            console.debug('ArrayComponent.update', observable, event);
+            if (observable instanceof duice.ArrayHandler) {
+                this.render();
             }
         }
     }
-    duice.LoopControl = LoopControl;
+    duice.ArrayComponent = ArrayComponent;
 })(duice || (duice = {}));
+///<reference path="ComponentFactory.ts"/>
 var duice;
 (function (duice) {
     /**
-     * ElementFactory
+     * array component factory class
      */
-    class LoopControlFactory {
+    class ArrayComponentFactory extends duice.ComponentFactory {
         /**
-         * getSelectors
+         * adds factory instance
+         * @param componentFactory
          */
-        static getQuerySelectors() {
-            return [`*[${duice.getNamespace()}\\:array]:not([${duice.getNamespace()}\\:id])`];
+        static addInstance(componentFactory) {
+            this.instances.push(componentFactory);
         }
         /**
-         * get instance
+         * return factory instance
          * @param element
          */
         static getInstance(element) {
-            return new LoopControlFactory();
+            for (let componentFactory of this.instances) {
+                if (componentFactory.support(element)) {
+                    return componentFactory;
+                }
+            }
+            if (this.defaultInstance.support(element)) {
+                return this.defaultInstance;
+            }
+            return null;
         }
         /**
-         * creates loop control
+         * check support
          * @param element
          */
-        createLoopControl(element, context) {
-            // creates element set
-            let loopControl = new duice.LoopControl(element, context);
-            // find data set
-            let array = duice.getAttribute(element, 'array');
-            loopControl.setArray(array);
+        support(element) {
+            if (duice.hasComponentAttribute(element, 'array')) {
+                if (this.doSupport(element)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        /**
+         * support template method
+         * @param element
+         */
+        doSupport(element) {
+            return true;
+        }
+        /**
+         * creates array component
+         * @param element
+         * @param context
+         */
+        createComponent(element, context) {
+            let component = new duice.ArrayComponent(element, context);
+            // array
+            let array = duice.getComponentAttribute(element, 'array');
+            component.setArray(array);
             // loop
-            let loop = duice.getAttribute(element, 'loop');
+            let loop = duice.getComponentAttribute(element, 'loop');
             if (loop) {
-                loopControl.setLoop(loop);
+                component.setLoop(loop);
             }
             // editable
-            let editable = duice.getAttribute(element, 'editable');
+            let editable = duice.getComponentAttribute(element, 'editable');
             if (editable) {
-                loopControl.setEditable(editable.toLowerCase() === 'true');
+                component.setEditable(editable.toLowerCase() === 'true');
             }
             // returns
-            return loopControl;
+            return component;
         }
     }
-    duice.LoopControlFactory = LoopControlFactory;
-})(duice || (duice = {}));
-/**
- * DuicePagination
- */
-var duice;
-(function (duice) {
-    class PaginationComponent extends duice.Component {
-        constructor() {
-            super();
-        }
-        doRender(data) {
-            return `
-                <div>TEST</div>
-                `;
-        }
-    }
-    duice.PaginationComponent = PaginationComponent;
-    // defines component
-    duice.defineComponent(`${duice.getNamespace()}-pagination`, PaginationComponent);
+    ArrayComponentFactory.defaultInstance = new ArrayComponentFactory();
+    ArrayComponentFactory.instances = [];
+    duice.ArrayComponentFactory = ArrayComponentFactory;
 })(duice || (duice = {}));
 ///<reference path="Observable.ts"/>
 ///<reference path="./mask/MaskFactory.ts"/>
+///<reference path="Component.ts"/>
 var duice;
 (function (duice) {
     /**
-     * ElementControl
+     * object component class
      */
-    class ElementControl extends duice.Observable {
+    class ObjectComponent extends duice.Component {
         /**
          * constructor
          * @param element
-         * @protected
+         * @param context
          */
         constructor(element, context) {
-            super();
-            this.slot = document.createElement('slot');
-            // clone html element template
-            this.element = element;
-            duice.setAttribute(this.element, 'id', duice.generateId());
-            duice.markInitialized(this.element);
-            // replace slot element
-            element.replaceWith(this.slot);
-            // set context
-            this.context = context;
+            super(element, context);
         }
         /**
          * set object
          * @param objectName
          */
         setObject(objectName) {
-            this.objectProxy = duice.findObject(this.context, objectName);
-            if (!this.objectProxy) {
-                console.warn(`ObjectProxy[${objectName}] is not found.`, this.objectProxy);
-                this.objectProxy = new duice.ObjectProxy({});
-            }
-            let objectHandler = duice.ObjectProxy.getHandler(this.objectProxy);
-            this.addObserver(objectHandler);
-            objectHandler.addObserver(this);
-        }
-        /**
-         * returns element
-         */
-        getElement() {
-            return this.element;
+            this.setData(objectName);
         }
         /**
          * set property
@@ -2048,20 +1475,20 @@ var duice;
             this.property = property;
         }
         /**
-         * get property
+         * return property
          */
         getProperty() {
             return this.property;
         }
         /**
          * set mask
-         * @param mask string from html mask attribute
+         * @param mask
          */
         setMask(mask) {
             this.mask = duice.MaskFactory.getMask(mask);
         }
         /**
-         * returns mask
+         * return mask
          */
         getMask() {
             return this.mask;
@@ -2071,7 +1498,7 @@ var duice;
          */
         render() {
             if (this.property) {
-                let objectHandler = duice.ObjectProxy.getHandler(this.objectProxy);
+                let objectHandler = duice.ObjectProxy.getHandler(this.getData());
                 // set value
                 let value = objectHandler.getValue(this.property);
                 this.setValue(value);
@@ -2081,18 +1508,16 @@ var duice;
             }
             // executes script
             this.executeScript();
-            // replace to slot element
-            this.slot.replaceWith(this.element);
         }
         /**
-         * update
+         * update event received
          * @param observable
          * @param event
          */
         update(observable, event) {
             console.log('Element.update', observable, event);
             // ObjectHandler
-            if (observable instanceof duice.ObjectProxyHandler) {
+            if (observable instanceof duice.ObjectHandler) {
                 if (this.property) {
                     // set value
                     this.setValue(observable.getValue(this.property));
@@ -2104,561 +1529,133 @@ var duice;
             }
         }
         /**
-         * executes script
-         */
-        executeScript() {
-            let script = duice.getAttribute(this.getElement(), 'script');
-            if (script) {
-                duice.executeScript(script, this.getElement(), this.context);
-            }
-        }
-        /**
-         * getIndex
-         */
-        getIndex() {
-            let index = duice.getAttribute(this.element, 'index');
-            if (index) {
-                return Number(index);
-            }
-        }
-    }
-    duice.ElementControl = ElementControl;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * ElementControlFactory
-     */
-    class ElementControlFactory {
-        /**
-         * register control factory
-         * @param controlFactory
-         */
-        static registerControlFactory(controlFactory) {
-            this.controlFactoryRegistry.push(controlFactory);
-        }
-        /**
-         * getSelectors
-         */
-        static getQuerySelectors() {
-            return [`*[${duice.getNamespace()}\\:object]:not([${duice.getNamespace()}\\:id])`];
-        }
-        /**
-         * get instance
-         * @param element
-         */
-        static getInstance(element) {
-            let instance;
-            this.controlFactoryRegistry.forEach(controlFactory => {
-                if (controlFactory.support(element)) {
-                    instance = controlFactory;
-                }
-            });
-            if (instance) {
-                return instance;
-            }
-            else {
-                return new duice.GenericElementControlFactory();
-            }
-        }
-        /**
-         * creates element control
-         * @param element
-         * @param context
-         */
-        createElementControl(element, context) {
-            // creates element
-            let control = this.doCreateControl(element, context);
-            // object
-            let object = duice.getAttribute(element, 'object');
-            control.setObject(object);
-            // property
-            let property = duice.getAttribute(element, 'property');
-            if (property) {
-                control.setProperty(property);
-            }
-            // mask
-            let mask = duice.getAttribute(element, 'mask');
-            if (mask) {
-                control.setMask(mask);
-            }
-            // returns
-            return control;
-        }
-    }
-    ElementControlFactory.controlFactoryRegistry = [];
-    duice.ElementControlFactory = ElementControlFactory;
-})(duice || (duice = {}));
-///<reference path="../ElementControl.ts"/>
-var duice;
-(function (duice) {
-    /**
-     * GenericElementControl
-     */
-    class GenericElementControl extends duice.ElementControl {
-        /**
-         * constructor
-         * @param element
-         */
-        constructor(element, context) {
-            super(element, context);
-            // appends text node
-            this.textNode = document.createTextNode('');
-            this.getElement().insertBefore(this.textNode, this.getElement().firstChild);
-        }
-        /**
-         * setValue
+         * set value
          * @param value
          */
         setValue(value) {
             value = this.getMask() ? this.getMask().encode(value) : value;
-            this.textNode.textContent = value;
+            this.element.innerText = value;
         }
         /**
-         * getValue
+         * return value
          */
         getValue() {
-            let value = this.textNode.textContent;
+            let value = this.element.innerText;
             value = this.getMask() ? this.getMask().decode(value) : value;
             return value;
         }
         /**
-         * setReadonly
+         * set readonly
          * @param readonly
          */
         setReadonly(readonly) {
             // no-op
         }
+        /**
+         * return index
+         */
+        getIndex() {
+            let index = duice.getComponentAttribute(this.element, 'index');
+            if (index) {
+                return Number(index);
+            }
+        }
     }
-    duice.GenericElementControl = GenericElementControl;
+    duice.ObjectComponent = ObjectComponent;
 })(duice || (duice = {}));
-///<reference path="../ElementControlFactory.ts"/>
+///<reference path="ComponentFactory.ts"/>
 var duice;
 (function (duice) {
     /**
-     * GenericElementControlFactory
+     * object component factory class
      */
-    class GenericElementControlFactory extends duice.ElementControlFactory {
+    class ObjectComponentFactory extends duice.ComponentFactory {
         /**
-         * doCreateElement
-         * @param element
-         * @param context
+         * adds factory instance to registry
+         * @param componentFactory
          */
-        doCreateControl(element, context) {
-            return new duice.GenericElementControl(element, context);
+        static addInstance(componentFactory) {
+            this.instances.push(componentFactory);
         }
         /**
-         * support
+         * returns supported instance
+         * @param element
+         */
+        static getInstance(element) {
+            for (let componentFactory of this.instances) {
+                if (componentFactory.support(element)) {
+                    return componentFactory;
+                }
+            }
+            if (this.defaultInstance.support(element)) {
+                return this.defaultInstance;
+            }
+            return null;
+        }
+        /**
+         * check support
          * @param element
          */
         support(element) {
+            if (duice.hasComponentAttribute(element, 'object')) {
+                if (this.doSupport(element)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        /**
+         * support template method
+         * @param element
+         */
+        doSupport(element) {
             return true;
         }
-    }
-    duice.GenericElementControlFactory = GenericElementControlFactory;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * InputElementControl
-     */
-    class InputElementControl extends duice.ElementControl {
         /**
-         * constructor
+         * create component
          * @param element
          * @param context
          */
-        constructor(element, context) {
-            super(element, context);
-            // adds change listener
-            this.getElement().addEventListener('change', e => {
-                let event = new duice.PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
-                this.notifyObservers(event);
-            }, true);
+        createComponent(element, context) {
+            // creates element
+            let component = this.doCreateComponent(element, context);
+            // object
+            let object = duice.getComponentAttribute(element, 'object');
+            component.setObject(object);
+            // property
+            let property = duice.getComponentAttribute(element, 'property');
+            if (property) {
+                component.setProperty(property);
+            }
+            // mask
+            let mask = duice.getComponentAttribute(element, 'mask');
+            if (mask) {
+                component.setMask(mask);
+            }
+            // returns
+            return component;
         }
         /**
-         * setValue
-         * @param value
-         */
-        setValue(value) {
-            if (value) {
-                value = this.getMask() ? this.getMask().encode(value) : value;
-            }
-            else {
-                value = '';
-            }
-            this.getElement().value = value;
-        }
-        /**
-         * getValue
-         */
-        getValue() {
-            let value = this.getElement().value;
-            if (value) {
-                value = this.getMask() ? this.getMask().decode(value) : value;
-            }
-            else {
-                value = null;
-            }
-            return value;
-        }
-        /**
-         * setReadonly
-         * @param readonly
-         */
-        setReadonly(readonly) {
-            this.getElement().readOnly = readonly;
-        }
-    }
-    duice.InputElementControl = InputElementControl;
-})(duice || (duice = {}));
-///<reference path="../mask/NumberMask.ts"/>
-///<reference path="InputElementControl.ts"/>
-var duice;
-(function (duice) {
-    /**
-     * InputNumberElementControl
-     */
-    class InputNumberElementControl extends duice.InputElementControl {
-        /**
-         * constructor
-         * @param element
+         * template method to create component
+         * @param htmlElement
          * @param context
          */
-        constructor(element, context) {
-            super(element, context);
-            // changes type and style
-            this.getElement().removeAttribute('type');
-            this.getElement().style.textAlign = 'right';
-            // prevents invalid key press
-            this.getElement().addEventListener('keypress', event => {
-                if (/[\d|\.|,]/.test(event.key) === false) {
-                    event.preventDefault();
-                }
-            });
-        }
-        /**
-         * getValue
-         */
-        getValue() {
-            let value = super.getValue();
-            return Number(value);
+        doCreateComponent(htmlElement, context) {
+            return new duice.ObjectComponent(htmlElement, context);
         }
     }
-    duice.InputNumberElementControl = InputNumberElementControl;
-})(duice || (duice = {}));
-///<reference path="InputElementControl.ts"/>
-var duice;
-(function (duice) {
-    /**
-     * InputCheckboxElementControl
-     */
-    class InputCheckboxElementControl extends duice.InputElementControl {
-        /**
-         * constructor
-         * @param element
-         * @param context
-         */
-        constructor(element, context) {
-            super(element, context);
-            this.trueValue = true;
-            this.falseValue = false;
-            // true false value
-            let trueValue = duice.getAttribute(this.getElement(), 'true-value');
-            this.trueValue = trueValue ? trueValue : this.trueValue;
-            let falseValue = duice.getAttribute(this.getElement(), 'false-value');
-            this.falseValue = falseValue ? falseValue : this.falseValue;
-        }
-        /**
-         * setValue
-         * @param value
-         */
-        setValue(value) {
-            if (value === this.trueValue) {
-                this.getElement().checked = true;
-            }
-            else {
-                this.element.checked = false;
-            }
-        }
-        /**
-         * getValue
-         */
-        getValue() {
-            if (this.element.checked) {
-                return this.trueValue;
-            }
-            else {
-                return this.falseValue;
-            }
-        }
-        /**
-         * setReadonly
-         * @param readonly
-         */
-        setReadonly(readonly) {
-            if (readonly) {
-                this.getElement().style.pointerEvents = 'none';
-            }
-            else {
-                this.getElement().style.pointerEvents = '';
-            }
-        }
-    }
-    duice.InputCheckboxElementControl = InputCheckboxElementControl;
-})(duice || (duice = {}));
-///<reference path="InputElementControl.ts"/>
-var duice;
-(function (duice) {
-    /**
-     * InputRadioElementControl
-     */
-    class InputRadioElementControl extends duice.InputElementControl {
-        /**
-         * constructor
-         * @param element
-         * @param context
-         */
-        constructor(element, context) {
-            super(element, context);
-        }
-        /**
-         * setValue
-         * @param value
-         */
-        setValue(value) {
-            if (this.getElement().value === value) {
-                this.getElement().checked = true;
-            }
-            else {
-                this.getElement().checked = false;
-            }
-        }
-        /**
-         * getValue
-         */
-        getValue() {
-            return this.getElement().value;
-        }
-        /**
-         * setReadonly
-         * @param readonly
-         */
-        setReadonly(readonly) {
-            if (readonly) {
-                this.getElement().style.pointerEvents = 'none';
-            }
-            else {
-                this.getElement().style.pointerEvents = '';
-            }
-        }
-    }
-    duice.InputRadioElementControl = InputRadioElementControl;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * SelectElementControl
-     */
-    class SelectElementControl extends duice.ElementControl {
-        /**
-         * constructor
-         * @param element
-         * @param context
-         */
-        constructor(element, context) {
-            super(element, context);
-            // adds event listener
-            this.getElement().addEventListener('change', (e) => {
-                let event = new duice.PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
-                this.notifyObservers(event);
-            }, true);
-        }
-        /**
-         * setValue
-         * @param value
-         */
-        setValue(value) {
-            this.getElement().value = value;
-            // force select option
-            if (!value) {
-                for (let i = 0; i < this.getElement().options.length; i++) {
-                    let option = this.getElement().options[i];
-                    if (!option.nodeValue) {
-                        option.selected = true;
-                        break;
-                    }
-                }
-            }
-        }
-        /**
-         * getValue
-         */
-        getValue() {
-            return this.getElement().value;
-        }
-        /**
-         * setReadonly
-         * @param readonly
-         */
-        setReadonly(readonly) {
-            if (readonly) {
-                console.warn("==ok");
-                this.getElement().style.pointerEvents = 'none';
-            }
-            else {
-                this.getElement().style.pointerEvents = '';
-            }
-        }
-    }
-    duice.SelectElementControl = SelectElementControl;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * TextareaElementControl
-     */
-    class TextareaElementControl extends duice.ElementControl {
-        /**
-         * constructor
-         * @param element
-         * @param context
-         */
-        constructor(element, context) {
-            super(element, context);
-            // adds change event listener
-            this.getElement().addEventListener('change', e => {
-                let event = new duice.PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
-                this.notifyObservers(event);
-            }, true);
-        }
-        /**
-         * setValue
-         * @param value
-         */
-        setValue(value) {
-            this.getElement().value = value;
-        }
-        /**
-         * getValue
-         */
-        getValue() {
-            let value = this.getElement().value;
-            return value;
-        }
-        /**
-         * setReadonly
-         * @param readonly
-         */
-        setReadonly(readonly) {
-            if (readonly) {
-                this.getElement().setAttribute('readonly', 'readonly');
-            }
-            else {
-                this.getElement().removeAttribute('readonly');
-            }
-        }
-    }
-    duice.TextareaElementControl = TextareaElementControl;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * TextareaElementControlFactory
-     */
-    class TextareaElementControlFactory extends duice.ElementControlFactory {
-        /**
-         * doCreateElement
-         * @param element
-         * @param context
-         */
-        doCreateControl(element, context) {
-            return new duice.TextareaElementControl(element, context);
-        }
-        /**
-         * support
-         * @param element
-         */
-        support(element) {
-            return (element.tagName.toLowerCase() === 'textarea');
-        }
-    }
-    duice.TextareaElementControlFactory = TextareaElementControlFactory;
-    // register
-    duice.ElementControlFactory.registerControlFactory(new TextareaElementControlFactory());
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * InputElementControlFactory
-     */
-    class InputElementControlFactory extends duice.ElementControlFactory {
-        /**
-         * doCreateElement
-         * @param element
-         * @param context
-         */
-        doCreateControl(element, context) {
-            let type = element.getAttribute('type');
-            switch (type) {
-                case 'number':
-                    return new duice.InputNumberElementControl(element, context);
-                case 'checkbox':
-                    return new duice.InputCheckboxElementControl(element, context);
-                case 'radio':
-                    return new duice.InputRadioElementControl(element, context);
-                default:
-                    return new duice.InputElementControl(element, context);
-            }
-        }
-        /**
-         * support
-         * @param element
-         */
-        support(element) {
-            if (element.tagName.toLowerCase() === 'input') {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-    }
-    duice.InputElementControlFactory = InputElementControlFactory;
-    // register
-    duice.ElementControlFactory.registerControlFactory(new InputElementControlFactory());
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * SelectElementControlFactory
-     */
-    class SelectElementControlFactory extends duice.ElementControlFactory {
-        /**
-         * doCreateElement
-         * @param element
-         * @param context
-         */
-        doCreateControl(element, context) {
-            return new duice.SelectElementControl(element, context);
-        }
-        /**
-         * support
-         * @param element
-         */
-        support(element) {
-            return (element.tagName.toLowerCase() === 'select');
-        }
-    }
-    duice.SelectElementControlFactory = SelectElementControlFactory;
-    // register
-    duice.ElementControlFactory.registerControlFactory(new SelectElementControlFactory());
+    ObjectComponentFactory.defaultInstance = new ObjectComponentFactory();
+    ObjectComponentFactory.instances = [];
+    duice.ObjectComponentFactory = ObjectComponentFactory;
 })(duice || (duice = {}));
 ///<Reference path="Observable.ts"/>
 ///<Reference path="Observer.ts"/>
 var duice;
 (function (duice) {
-    class ProxyHandler extends duice.Observable {
+    /**
+     * data handler class
+     */
+    class DataHandler extends duice.Observable {
         /**
          * constructor
          * @protected
@@ -2670,20 +1667,20 @@ var duice;
             this.listenerEnabled = true;
         }
         /**
-         * setTarget
+         * set target
          * @param target
          */
         setTarget(target) {
             this.target = target;
         }
         /**
-         * getTarget
+         * return target
          */
         getTarget() {
             return this.target;
         }
         /**
-         * setReadonlyAll
+         * set readonly all
          * @param readonly
          */
         setReadonlyAll(readonly) {
@@ -2694,7 +1691,7 @@ var duice;
             this.notifyObservers(new duice.Event(this));
         }
         /**
-         * setReadonly
+         * set readonly
          * @param property
          * @param readonly
          */
@@ -2708,7 +1705,7 @@ var duice;
             this.notifyObservers(new duice.Event(this));
         }
         /**
-         * isReadonly
+         * return whether readonly is
          * @param property
          */
         isReadonly(property) {
@@ -2727,7 +1724,7 @@ var duice;
             this.listenerEnabled = true;
         }
         /**
-         * checkListener
+         * executes listener
          * @param listener
          * @param event
          */
@@ -2743,99 +1740,17 @@ var duice;
             });
         }
     }
-    duice.ProxyHandler = ProxyHandler;
+    duice.DataHandler = DataHandler;
 })(duice || (duice = {}));
-///<reference path="Observable.ts"/>
-///<reference path="Observer.ts"/>
-///<reference path="ProxyHandler.ts"/>
+///<reference path="DataHandler.ts"/>
 var duice;
 (function (duice) {
     /**
-     * ObjectHandler
+     * array handler class
      */
-    class ObjectProxyHandler extends duice.ProxyHandler {
+    class ArrayHandler extends duice.DataHandler {
         /**
          * constructor
-         */
-        constructor() {
-            super();
-        }
-        /**
-         * get
-         * @param target
-         * @param property
-         * @param receiver
-         */
-        get(target, property, receiver) {
-            console.debug("ObjectHandler.get", target, property, receiver);
-            return Reflect.get(target, property, receiver);
-        }
-        /**
-         * set
-         * @param target
-         * @param property
-         * @param value
-         */
-        set(target, property, value) {
-            console.debug("ObjectHandler.set", target, property, value);
-            // change value
-            Reflect.set(target, property, value);
-            // notify
-            let event = new duice.PropertyChangeEvent(this, property, value);
-            this.notifyObservers(event);
-            // returns
-            return true;
-        }
-        /**
-         * update
-         * @param observable
-         * @param event
-         */
-        update(observable, event) {
-            return __awaiter(this, void 0, void 0, function* () {
-                console.log("ObjectHandler.update", observable, event);
-                // Element
-                if (observable instanceof duice.ElementControl) {
-                    let property = observable.getProperty();
-                    let value = observable.getValue();
-                    if (yield this.checkListener(this.propertyChangingListener, event)) {
-                        this.setValue(property, value);
-                        yield this.checkListener(this.propertyChangedListener, event);
-                    }
-                }
-                // notify
-                this.notifyObservers(event);
-            });
-        }
-        /**
-         * getValue
-         * @param property
-         */
-        getValue(property) {
-            property = property.replace('.', '?.');
-            return new Function(`return this.${property};`).call(this.getTarget());
-        }
-        /**
-         * setValue
-         * @param property
-         * @param value
-         */
-        setValue(property, value) {
-            new Function('value', `this.${property} = value;`).call(this.getTarget(), value);
-        }
-    }
-    duice.ObjectProxyHandler = ObjectProxyHandler;
-})(duice || (duice = {}));
-///<reference path="ProxyHandler.ts"/>
-var duice;
-(function (duice) {
-    /**
-     * ArrayHandler
-     */
-    class ArrayProxyHandler extends duice.ProxyHandler {
-        /**
-         * constructor
-         * @param arrayProxy
          */
         constructor() {
             super();
@@ -2938,14 +1853,14 @@ var duice;
         }
         /**
          * update
-         * @param elementSet
+         * @param observable
          * @param event
          */
         update(observable, event) {
             return __awaiter(this, void 0, void 0, function* () {
                 console.debug("ArrayHandler.update", observable, event);
-                // ElementSet
-                if (observable instanceof duice.LoopControl) {
+                // instance is array component
+                if (observable instanceof duice.ArrayComponent) {
                     if (event instanceof duice.RowMoveEvent) {
                         let object = this.getTarget().splice(event.getFromIndex(), 1)[0];
                         this.getTarget().splice(event.getToIndex(), 0, object);
@@ -2956,6 +1871,1054 @@ var duice;
             });
         }
     }
-    duice.ArrayProxyHandler = ArrayProxyHandler;
+    duice.ArrayHandler = ArrayHandler;
+})(duice || (duice = {}));
+///<reference path="Observable.ts"/>
+///<reference path="Observer.ts"/>
+///<reference path="DataHandler.ts"/>
+var duice;
+(function (duice) {
+    /**
+     * object handler class
+     */
+    class ObjectHandler extends duice.DataHandler {
+        /**
+         * constructor
+         */
+        constructor() {
+            super();
+        }
+        /**
+         * get
+         * @param target
+         * @param property
+         * @param receiver
+         */
+        get(target, property, receiver) {
+            console.debug("ObjectHandler.get", target, property, receiver);
+            return Reflect.get(target, property, receiver);
+        }
+        /**
+         * set
+         * @param target
+         * @param property
+         * @param value
+         */
+        set(target, property, value) {
+            console.debug("ObjectHandler.set", target, property, value);
+            // change value
+            Reflect.set(target, property, value);
+            // notify
+            let event = new duice.PropertyChangeEvent(this, property, value);
+            this.notifyObservers(event);
+            // returns
+            return true;
+        }
+        /**
+         * update
+         * @param observable
+         * @param event
+         */
+        update(observable, event) {
+            return __awaiter(this, void 0, void 0, function* () {
+                console.log("ObjectHandler.update", observable, event);
+                // Element
+                if (observable instanceof duice.ObjectComponent) {
+                    let property = observable.getProperty();
+                    let value = observable.getValue();
+                    if (yield this.checkListener(this.propertyChangingListener, event)) {
+                        this.setValue(property, value);
+                        yield this.checkListener(this.propertyChangedListener, event);
+                    }
+                }
+                // notify
+                this.notifyObservers(event);
+            });
+        }
+        /**
+         * getValue
+         * @param property
+         */
+        getValue(property) {
+            property = property.replace('.', '?.');
+            return new Function(`return this.${property};`).call(this.getTarget());
+        }
+        /**
+         * setValue
+         * @param property
+         * @param value
+         */
+        setValue(property, value) {
+            new Function('value', `this.${property} = value;`).call(this.getTarget(), value);
+        }
+    }
+    duice.ObjectHandler = ObjectHandler;
+})(duice || (duice = {}));
+///<reference path="Observable.ts"/>
+var duice;
+(function (duice) {
+    /**
+     * custom component
+     */
+    class CustomComponent extends duice.Component {
+        /**
+         * constructor
+         * @param element
+         * @param context
+         */
+        constructor(element, context) {
+            super(element, context);
+        }
+        /**
+         * set object data
+         * @param objectName
+         */
+        setObject(objectName) {
+            this.setData(objectName);
+        }
+        /**
+         * set array data
+         * @param arrayName
+         */
+        setArray(arrayName) {
+            this.setData(arrayName);
+        }
+        /**
+         * check element is shadow DOM
+         */
+        isShadowDom() {
+            return (!!this.element.shadowRoot);
+        }
+        /**
+         * render
+         */
+        render() {
+            // removes child
+            // if(this.isShadowDom()){
+            //     removeChildNodes(this.element.shadowRoot);
+            // }else{
+            //     removeChildNodes(this.element);
+            // }
+            // removes child
+            if (this.isShadowDom()) {
+                this.element.shadowRoot.innerHTML = '';
+            }
+            else {
+                this.element.innerHTML = '';
+            }
+            // create template element
+            let templateLiteral = this.element.doRender(this.getData()).trim();
+            let templateElement = document.createElement('template');
+            templateElement.innerHTML = templateLiteral;
+            let htmlElement = templateElement.content.firstChild.cloneNode(true);
+            if (this.element.shadowRoot) {
+                this.element.shadowRoot.appendChild(htmlElement);
+            }
+            else {
+                this.element.appendChild(htmlElement);
+            }
+            // add style if exists
+            let styleLiteral = this.element.doStyle(this.getData());
+            if (styleLiteral) {
+                let style = document.createElement('style');
+                style.textContent = styleLiteral.trim();
+                if (this.isShadowDom()) {
+                    this.element.shadowRoot.appendChild(style);
+                }
+                else {
+                    this.element.appendChild(style);
+                }
+            }
+            // initializes shadow root
+            let context = {};
+            Object.assign(context, this.context);
+            context['object'] = this.data;
+            context['array'] = this.data;
+            // globalThis.alert("start init");
+            if (this.isShadowDom()) {
+                duice.initialize(this.element.shadowRoot, context);
+            }
+            else {
+                duice.initialize(this.element, context);
+            }
+            // globalThis.alert('end');
+            // execute script
+            this.executeScript();
+        }
+        /**
+         * update
+         * @param observable
+         * @param event
+         */
+        update(observable, event) {
+            if (observable instanceof duice.DataHandler) {
+                this.render();
+            }
+        }
+    }
+    duice.CustomComponent = CustomComponent;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    /**
+     * custom element
+     */
+    class CustomElement extends HTMLElement {
+        /**
+         * constructor
+         * @protected
+         */
+        constructor() {
+            super();
+        }
+        /**
+         * return style literal
+         * @param data
+         */
+        doStyle(data) {
+            return null;
+        }
+    }
+    duice.CustomElement = CustomElement;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    /**
+     * object proxy class
+     */
+    class ObjectProxy extends Object {
+        /**
+         * constructor
+         */
+        constructor(object) {
+            super();
+            // object handler
+            let objectHandler = new duice.ObjectHandler();
+            // copy property
+            for (let name in object) {
+                let value = object[name];
+                // value is array
+                if (duice.ArrayProxy.isArray(value)) {
+                    let arrayProxy = new duice.ArrayProxy(value);
+                    duice.ArrayProxy.getHandler(arrayProxy).addObserver(objectHandler);
+                    this[name] = arrayProxy;
+                    continue;
+                }
+                // value is object
+                if (value != null && typeof value === 'object') {
+                    let objectProxy = new ObjectProxy(value);
+                    ObjectProxy.getHandler(objectProxy).addObserver(objectHandler);
+                    this[name] = objectProxy;
+                    continue;
+                }
+                // value is primitive
+                this[name] = value;
+            }
+            // delete not exists property
+            for (let name in this) {
+                if (!ObjectProxy.keys(object).includes(name)) {
+                    delete this[name];
+                }
+            }
+            // creates proxy
+            let objectProxy = new Proxy(this, objectHandler);
+            objectHandler.setTarget(objectProxy);
+            // set property
+            ObjectProxy.setHandler(objectProxy, objectHandler);
+            ObjectProxy.setTarget(objectProxy, this);
+            // returns
+            return objectProxy;
+        }
+        /**
+         * assign
+         * @param objectProxy
+         * @param object
+         */
+        static assign(objectProxy, object) {
+            let objectHandler = this.getHandler(objectProxy);
+            try {
+                // suspend
+                objectHandler.suspendListener();
+                objectHandler.suspendNotify();
+                // loop object properties
+                for (let name in object) {
+                    let value = object[name];
+                    // source value is array
+                    if (duice.ArrayProxy.isArray(value)) {
+                        if (duice.ArrayProxy.isArray(objectProxy[name])) {
+                            duice.ArrayProxy.assign(objectProxy[name], value);
+                        }
+                        else {
+                            objectProxy[name] = new duice.ArrayProxy(value);
+                        }
+                        continue;
+                    }
+                    // source value is object
+                    if (typeof value === 'object') {
+                        if (typeof objectProxy[name] === 'object') {
+                            ObjectProxy.assign(objectProxy[name], value);
+                        }
+                        else {
+                            let objectProxy = new ObjectProxy(value);
+                            ObjectProxy.getHandler(objectProxy).addObserver(objectHandler);
+                            objectProxy[name] = objectProxy;
+                        }
+                        continue;
+                    }
+                    // source value is primitive
+                    objectProxy[name] = value;
+                }
+            }
+            finally {
+                // resume
+                objectHandler.resumeListener();
+                objectHandler.resumeNotify();
+            }
+            // notify observers
+            objectHandler.notifyObservers(new duice.Event(this));
+        }
+        /**
+         * setTarget
+         * @param objectProxy
+         * @param target
+         */
+        static setTarget(objectProxy, target) {
+            globalThis.Object.defineProperty(objectProxy, '_target_', {
+                value: target,
+                writable: true
+            });
+        }
+        /**
+         * getTarget
+         * @param objectProxy
+         */
+        static getTarget(objectProxy) {
+            return globalThis.Object.getOwnPropertyDescriptor(objectProxy, '_target_').value;
+        }
+        /**
+         * setHandler
+         * @param objectProxy
+         * @param objectHandler
+         */
+        static setHandler(objectProxy, objectHandler) {
+            globalThis.Object.defineProperty(objectProxy, '_handler_', {
+                value: objectHandler,
+                writable: true
+            });
+        }
+        /**
+         * getHandler
+         * @param objectProxy
+         */
+        static getHandler(objectProxy) {
+            let handler = globalThis.Object.getOwnPropertyDescriptor(objectProxy, '_handler_').value;
+            duice.assert(handler, 'handler is not found');
+            return handler;
+        }
+        /**
+         * onPropertyChanging
+         * @param objectProxy
+         * @param listener
+         */
+        static onPropertyChanging(objectProxy, listener) {
+            this.getHandler(objectProxy).propertyChangingListener = listener;
+        }
+        /**
+         * onPropertyChanged
+         * @param objectProxy
+         * @param listener
+         */
+        static onPropertyChanged(objectProxy, listener) {
+            this.getHandler(objectProxy).propertyChangedListener = listener;
+        }
+        /**
+         * setReadonly
+         * @param objectProxy
+         * @param property
+         * @param readonly
+         */
+        static setReadonly(objectProxy, property, readonly) {
+            this.getHandler(objectProxy).setReadonly(property, readonly);
+        }
+        /**
+         * isReadonly
+         * @param objectProxy
+         * @param property
+         */
+        static isReadonly(objectProxy, property) {
+            return this.getHandler(objectProxy).isReadonly(property);
+        }
+        /**
+         * setReadonlyAll
+         * @param objectProxy
+         * @param readonly
+         */
+        static setReadonlyAll(objectProxy, readonly) {
+            let objectHandler = this.getHandler(objectProxy);
+            objectHandler.setReadonlyAll(readonly);
+            for (let property in this) {
+                objectHandler.setReadonly(property, readonly);
+            }
+        }
+    }
+    duice.ObjectProxy = ObjectProxy;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    /**
+     * array proxy class
+     */
+    class ArrayProxy extends Array {
+        /**
+         * constructor
+         */
+        constructor(array) {
+            super();
+            // array handler
+            let arrayHandler = new duice.ArrayHandler();
+            // copy array elements
+            if (globalThis.Array.isArray(array)) {
+                array.forEach((object, index) => {
+                    let objectProxy = new duice.ObjectProxy(object);
+                    duice.ObjectProxy.getHandler(objectProxy).addObserver(arrayHandler);
+                    this[index] = objectProxy;
+                });
+            }
+            // create proxy
+            let arrayProxy = new Proxy(this, arrayHandler);
+            arrayHandler.setTarget(arrayProxy);
+            // set property
+            ArrayProxy.setHandler(arrayProxy, arrayHandler);
+            ArrayProxy.setTarget(arrayProxy, this);
+            // returns
+            return arrayProxy;
+        }
+        /**
+         * assign
+         * @param arrayProxy
+         * @param array
+         */
+        static assign(arrayProxy, array) {
+            console.log('ArrayProxy.assign', arrayProxy, array);
+            let arrayHandler = this.getHandler(arrayProxy);
+            try {
+                // suspend
+                arrayHandler.suspendListener();
+                arrayHandler.suspendNotify();
+                // clears elements
+                arrayProxy.length = 0;
+                // creates elements
+                array.forEach((object, index) => {
+                    let objectProxy = new duice.ObjectProxy(object);
+                    duice.ObjectProxy.getHandler(objectProxy).addObserver(arrayHandler);
+                    arrayProxy[index] = objectProxy;
+                    // add listener
+                    duice.ObjectProxy.onPropertyChanging(objectProxy, arrayHandler.propertyChangingListener);
+                    duice.ObjectProxy.onPropertyChanged(objectProxy, arrayHandler.propertyChangedListener);
+                });
+            }
+            finally {
+                // resume
+                arrayHandler.resumeListener();
+                arrayHandler.resumeNotify();
+            }
+            // notify observers
+            arrayHandler.notifyObservers(new duice.Event(this));
+        }
+        /**
+         * setTarget
+         * @param arrayProxy
+         * @param target
+         */
+        static setTarget(arrayProxy, target) {
+            globalThis.Object.defineProperty(arrayProxy, '_target_', {
+                value: target,
+                writable: true
+            });
+        }
+        /**
+         * getTarget
+         * @param arrayProxy
+         */
+        static getTarget(arrayProxy) {
+            return globalThis.Object.getOwnPropertyDescriptor(arrayProxy, '_target_').value;
+        }
+        /**
+         * setHandler
+         * @param arrayProxy
+         * @param arrayHandler
+         */
+        static setHandler(arrayProxy, arrayHandler) {
+            globalThis.Object.defineProperty(arrayProxy, '_handler_', {
+                value: arrayHandler,
+                writable: true
+            });
+        }
+        /**
+         * getHandler
+         * @param arrayProxy
+         */
+        static getHandler(arrayProxy) {
+            let handler = globalThis.Object.getOwnPropertyDescriptor(arrayProxy, '_handler_').value;
+            duice.assert(handler, 'handler is not found');
+            return handler;
+        }
+        /**
+         * onPropertyChanging
+         * @param arrayProxy
+         * @param listener
+         */
+        static onPropertyChanging(arrayProxy, listener) {
+            this.getHandler(arrayProxy).propertyChangingListener = listener;
+            arrayProxy.forEach(objectProxy => {
+                duice.ObjectProxy.getHandler(objectProxy).propertyChangingListener = listener;
+            });
+        }
+        /**
+         * onPropertyChanged
+         * @param arrayProxy
+         * @param listener
+         */
+        static onPropertyChanged(arrayProxy, listener) {
+            this.getHandler(arrayProxy).propertyChangedListener = listener;
+            arrayProxy.forEach(objectProxy => {
+                duice.ObjectProxy.getHandler(objectProxy).propertyChangedListener = listener;
+            });
+        }
+        /**
+         * onRowInserting
+         * @param arrayProxy
+         * @param listener
+         */
+        static onRowInserting(arrayProxy, listener) {
+            this.getHandler(arrayProxy).rowInsertingListener = listener;
+        }
+        /**
+         * onRowInserted
+         * @param arrayProxy
+         * @param listener
+         */
+        static onRowInserted(arrayProxy, listener) {
+            this.getHandler(arrayProxy).rowInsertedListener = listener;
+        }
+        /**
+         * onRowDeleting
+         * @param arrayProxy
+         * @param listener
+         */
+        static onRowDeleting(arrayProxy, listener) {
+            this.getHandler(arrayProxy).rowDeletingListener = listener;
+        }
+        /**
+         * onRowDeleted
+         * @param arrayProxy
+         * @param listener
+         */
+        static onRowDeleted(arrayProxy, listener) {
+            this.getHandler(arrayProxy).rowDeletedListener = listener;
+        }
+        /**
+         * setReadonly
+         * @param arrayProxy
+         * @param property
+         * @param readonly
+         */
+        static setReadonly(arrayProxy, property, readonly) {
+            this.getHandler(arrayProxy).setReadonly(property, readonly);
+        }
+        /**
+         * isReadonly
+         * @param arrayProxy
+         * @param property
+         */
+        static isReadonly(arrayProxy, property) {
+            return this.getHandler(arrayProxy).isReadonly(property);
+        }
+        /**
+         * setReadonlyAll
+         * @param arrayProxy
+         * @param readonly
+         */
+        static setReadonlyAll(arrayProxy, readonly) {
+            this.getHandler(arrayProxy).setReadonlyAll(readonly);
+            for (let index = 0; index >= this.length; index++) {
+                duice.ObjectProxy.setReadonlyAll(this[index], readonly);
+            }
+        }
+        /**
+         * insertRow
+         * @param index
+         * @param rows
+         */
+        insertRow(index, ...rows) {
+            return __awaiter(this, void 0, void 0, function* () {
+                let arrayHandler = ArrayProxy.getHandler(this);
+                let proxyTarget = ArrayProxy.getTarget(this);
+                rows.forEach((object, index) => {
+                    rows[index] = new duice.ObjectProxy(object);
+                });
+                let event = new duice.RowInsertEvent(this, index, rows);
+                if (yield arrayHandler.checkListener(arrayHandler.rowInsertingListener, event)) {
+                    proxyTarget.splice(index, 0, ...rows);
+                    yield arrayHandler.checkListener(arrayHandler.rowInsertedListener, event);
+                    arrayHandler.notifyObservers(event);
+                }
+            });
+        }
+        /**
+         * deleteRow
+         * @param index
+         * @param size
+         */
+        deleteRow(index, size) {
+            return __awaiter(this, void 0, void 0, function* () {
+                let arrayHandler = ArrayProxy.getHandler(this);
+                let proxyTarget = ArrayProxy.getTarget(this);
+                let sliceBegin = index;
+                let sliceEnd = (size ? index + size : index + 1);
+                let rows = proxyTarget.slice(sliceBegin, sliceEnd);
+                let event = new duice.RowDeleteEvent(this, index, rows);
+                if (yield arrayHandler.checkListener(arrayHandler.rowDeletingListener, event)) {
+                    let spliceStart = index;
+                    let spliceDeleteCount = (size ? size : 1);
+                    proxyTarget.splice(spliceStart, spliceDeleteCount);
+                    yield arrayHandler.checkListener(arrayHandler.rowDeletedListener, event);
+                    arrayHandler.notifyObservers(event);
+                }
+            });
+        }
+        /**
+         * appendRow
+         * @param rows
+         */
+        appendRow(...rows) {
+            return __awaiter(this, void 0, void 0, function* () {
+                let index = this.length;
+                return this.insertRow(index, ...rows);
+            });
+        }
+    }
+    duice.ArrayProxy = ArrayProxy;
+})(duice || (duice = {}));
+// /**
+//  * DuicePagination
+//  */
+// namespace duice {
+//
+//     export class PaginationComponent extends duice.ComponentElement {
+//
+//         public constructor() {
+//             super();
+//         }
+//
+//         doRender(object: any): string {
+//
+//             // prev
+//             let template = `<div><span>Prev</span>`;
+//
+//             // pages
+//             for(let index = 0; index < 10; index ++) {
+//                 template += `<span>${index}</span>`;
+//             }
+//
+//             // next
+//             template += `<span>Next</span></div>`;
+//
+//             // returns
+//             console.warn("=========", template);
+//             return template;
+//         }
+//
+//     }
+//
+//     // defines component
+//     duice.defineComponent(`${duice.getNamespace()}-pagination`, PaginationComponent);
+//
+// }
+var duice;
+(function (duice) {
+    /**
+     * input element component
+     */
+    class InputElement extends duice.ObjectComponent {
+        /**
+         * constructor
+         * @param element
+         * @param context
+         */
+        constructor(element, context) {
+            super(element, context);
+            // adds change listener
+            this.getElement().addEventListener('change', e => {
+                let event = new duice.PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
+                this.notifyObservers(event);
+            }, true);
+        }
+        /**
+         * set value
+         * @param value
+         */
+        setValue(value) {
+            if (value) {
+                value = this.getMask() ? this.getMask().encode(value) : value;
+            }
+            else {
+                value = '';
+            }
+            this.getElement().value = value;
+        }
+        /**
+         * return value
+         */
+        getValue() {
+            let value = this.getElement().value;
+            if (value) {
+                value = this.getMask() ? this.getMask().decode(value) : value;
+            }
+            else {
+                value = null;
+            }
+            return value;
+        }
+        /**
+         * set readonly
+         * @param readonly
+         */
+        setReadonly(readonly) {
+            this.getElement().readOnly = readonly;
+        }
+    }
+    duice.InputElement = InputElement;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    /**
+     * input element factory class
+     */
+    class InputElementFactory extends duice.ObjectComponentFactory {
+        /**
+         * creates component
+         * @param element
+         * @param context
+         */
+        doCreateComponent(element, context) {
+            let type = element.getAttribute('type');
+            switch (type) {
+                case 'number':
+                    return new duice.InputNumberElement(element, context);
+                case 'checkbox':
+                    return new duice.InputCheckboxElement(element, context);
+                case 'radio':
+                    return new duice.InputRadioElement(element, context);
+                default:
+                    return new duice.InputElement(element, context);
+            }
+        }
+        /**
+         * check supported
+         * @param element
+         */
+        doSupport(element) {
+            return (element.tagName.toLowerCase() === 'input');
+        }
+    }
+    duice.InputElementFactory = InputElementFactory;
+    // register factory instance
+    duice.ObjectComponentFactory.addInstance(new InputElementFactory());
+})(duice || (duice = {}));
+///<reference path="InputElement.ts"/>
+var duice;
+(function (duice) {
+    /**
+     * InputCheckboxElement
+     */
+    class InputCheckboxElement extends duice.InputElement {
+        /**
+         * constructor
+         * @param element
+         * @param context
+         */
+        constructor(element, context) {
+            super(element, context);
+            this.trueValue = true;
+            this.falseValue = false;
+            // true false value
+            let trueValue = duice.getComponentAttribute(this.getElement(), 'true-value');
+            this.trueValue = trueValue ? trueValue : this.trueValue;
+            let falseValue = duice.getComponentAttribute(this.getElement(), 'false-value');
+            this.falseValue = falseValue ? falseValue : this.falseValue;
+        }
+        /**
+         * set value
+         * @param value
+         */
+        setValue(value) {
+            if (value === this.trueValue) {
+                this.getElement().checked = true;
+            }
+            else {
+                this.element.checked = false;
+            }
+        }
+        /**
+         * get value
+         */
+        getValue() {
+            if (this.element.checked) {
+                return this.trueValue;
+            }
+            else {
+                return this.falseValue;
+            }
+        }
+        /**
+         * set readonly
+         * @param readonly
+         */
+        setReadonly(readonly) {
+            if (readonly) {
+                this.getElement().style.pointerEvents = 'none';
+            }
+            else {
+                this.getElement().style.pointerEvents = '';
+            }
+        }
+    }
+    duice.InputCheckboxElement = InputCheckboxElement;
+})(duice || (duice = {}));
+///<reference path="../mask/NumberMask.ts"/>
+///<reference path="InputElement.ts"/>
+var duice;
+(function (duice) {
+    /**
+     * input number element component
+     */
+    class InputNumberElement extends duice.InputElement {
+        /**
+         * constructor
+         * @param element
+         * @param context
+         */
+        constructor(element, context) {
+            super(element, context);
+            // changes type and style
+            this.getElement().removeAttribute('type');
+            this.getElement().style.textAlign = 'right';
+            // prevents invalid key press
+            this.getElement().addEventListener('keypress', event => {
+                if (/[\d|\.|,]/.test(event.key) === false) {
+                    event.preventDefault();
+                }
+            });
+        }
+        /**
+         * return value
+         */
+        getValue() {
+            let value = super.getValue();
+            return Number(value);
+        }
+    }
+    duice.InputNumberElement = InputNumberElement;
+})(duice || (duice = {}));
+///<reference path="InputElement.ts"/>
+var duice;
+(function (duice) {
+    /**
+     * input radio element component
+     */
+    class InputRadioElement extends duice.InputElement {
+        /**
+         * constructor
+         * @param element
+         * @param context
+         */
+        constructor(element, context) {
+            super(element, context);
+        }
+        /**
+         * set value
+         * @param value
+         */
+        setValue(value) {
+            this.getElement().checked = (this.getElement().value === value);
+        }
+        /**
+         * return value
+         */
+        getValue() {
+            return this.getElement().value;
+        }
+        /**
+         * set readonly
+         * @param readonly
+         */
+        setReadonly(readonly) {
+            if (readonly) {
+                this.getElement().style.pointerEvents = 'none';
+            }
+            else {
+                this.getElement().style.pointerEvents = '';
+            }
+        }
+    }
+    duice.InputRadioElement = InputRadioElement;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    /**
+     * select element component
+     */
+    class SelectElement extends duice.ObjectComponent {
+        /**
+         * constructor
+         * @param element
+         * @param context
+         */
+        constructor(element, context) {
+            super(element, context);
+            // adds event listener
+            this.getElement().addEventListener('change', (e) => {
+                let event = new duice.PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
+                this.notifyObservers(event);
+            }, true);
+        }
+        /**
+         * set value
+         * @param value
+         */
+        setValue(value) {
+            this.getElement().value = value;
+            // force select option
+            if (!value) {
+                for (let i = 0; i < this.getElement().options.length; i++) {
+                    let option = this.getElement().options[i];
+                    if (!option.nodeValue) {
+                        option.selected = true;
+                        break;
+                    }
+                }
+            }
+        }
+        /**
+         * return value
+         */
+        getValue() {
+            return this.getElement().value;
+        }
+        /**
+         * set readonly
+         * @param readonly
+         */
+        setReadonly(readonly) {
+            if (readonly) {
+                console.warn("==ok");
+                this.getElement().style.pointerEvents = 'none';
+            }
+            else {
+                this.getElement().style.pointerEvents = '';
+            }
+        }
+    }
+    duice.SelectElement = SelectElement;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    /**
+     * select element factory class
+     */
+    class SelectElementFactory extends duice.ObjectComponentFactory {
+        /**
+         * create component
+         * @param element
+         * @param context
+         */
+        doCreateComponent(element, context) {
+            return new duice.SelectElement(element, context);
+        }
+        /**
+         * return supported
+         * @param element
+         */
+        doSupport(element) {
+            return (element.tagName.toLowerCase() === 'select');
+        }
+    }
+    duice.SelectElementFactory = SelectElementFactory;
+    // register factory instance
+    duice.ObjectComponentFactory.addInstance(new SelectElementFactory());
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    /**
+     * textarea element component
+     */
+    class TextareaElement extends duice.ObjectComponent {
+        /**
+         * constructor
+         * @param element
+         * @param context
+         */
+        constructor(element, context) {
+            super(element, context);
+            // adds change event listener
+            this.getElement().addEventListener('change', e => {
+                let event = new duice.PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
+                this.notifyObservers(event);
+            }, true);
+        }
+        /**
+         * set value
+         * @param value
+         */
+        setValue(value) {
+            this.getElement().value = value;
+        }
+        /**
+         * return value
+         */
+        getValue() {
+            return this.getElement().value;
+        }
+        /**
+         * set readonly
+         * @param readonly
+         */
+        setReadonly(readonly) {
+            if (readonly) {
+                this.getElement().setAttribute('readonly', 'readonly');
+            }
+            else {
+                this.getElement().removeAttribute('readonly');
+            }
+        }
+    }
+    duice.TextareaElement = TextareaElement;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    /**
+     * textarea element factory class
+      */
+    class TextareaElementFactory extends duice.ObjectComponentFactory {
+        /**
+         * creates component
+         * @param element
+         * @param context
+         */
+        doCreateComponent(element, context) {
+            return new duice.TextareaElement(element, context);
+        }
+        /**
+         * returns supported
+         * @param element
+         */
+        doSupport(element) {
+            return (element.tagName.toLowerCase() === 'textarea');
+        }
+    }
+    duice.TextareaElementFactory = TextareaElementFactory;
+    // register factory instance
+    duice.ObjectComponentFactory.addInstance(new TextareaElementFactory());
 })(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map

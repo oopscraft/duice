@@ -59,7 +59,7 @@ namespace duice {
         /**
          * open
          */
-        open() {
+        override open() {
             let promise = super.open();
             this.promptInput.focus();
             return promise;

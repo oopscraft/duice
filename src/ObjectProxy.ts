@@ -1,9 +1,9 @@
 namespace duice {
 
     /**
-     * ObjectProxy
+     * object proxy class
      */
-    export class ObjectProxy extends globalThis.Object {
+    export class ObjectProxy extends Object {
 
         /**
          * constructor
@@ -12,14 +12,14 @@ namespace duice {
             super();
 
             // object handler
-            let objectHandler = new ObjectProxyHandler();
+            let objectHandler = new ObjectHandler();
 
             // copy property
             for (let name in object) {
                 let value = object[name];
 
                 // value is array
-                if(Array.isArray(value)){
+                if(ArrayProxy.isArray(value)){
                     let arrayProxy = new ArrayProxy(value);
                     ArrayProxy.getHandler(arrayProxy).addObserver(objectHandler);
                     this[name] = arrayProxy;
@@ -40,7 +40,7 @@ namespace duice {
 
             // delete not exists property
             for(let name in this){
-                if(!Object.keys(object).includes(name)){
+                if(!ObjectProxy.keys(object).includes(name)){
                     delete this[name];
                 }
             }
@@ -62,7 +62,7 @@ namespace duice {
          * @param objectProxy
          * @param object
          */
-        static assign(objectProxy: ObjectProxy, object: object): void {
+        static override assign(objectProxy: ObjectProxy, object: object): void {
             let objectHandler = this.getHandler(objectProxy);
             try {
 
@@ -75,8 +75,8 @@ namespace duice {
                     let value = object[name];
 
                     // source value is array
-                    if(Array.isArray(value)){
-                        if(Array.isArray(objectProxy[name])){
+                    if(ArrayProxy.isArray(value)){
+                        if(ArrayProxy.isArray(objectProxy[name])){
                             ArrayProxy.assign(objectProxy[name], value);
                         }else{
                             objectProxy[name] = new ArrayProxy(value);
@@ -135,7 +135,7 @@ namespace duice {
          * @param objectProxy
          * @param objectHandler
          */
-        static setHandler(objectProxy: ObjectProxy, objectHandler: ObjectProxyHandler): void {
+        static setHandler(objectProxy: ObjectProxy, objectHandler: ObjectHandler): void {
             globalThis.Object.defineProperty(objectProxy, '_handler_', {
                 value: objectHandler,
                 writable: true
@@ -146,7 +146,7 @@ namespace duice {
          * getHandler
          * @param objectProxy
          */
-        static getHandler(objectProxy: ObjectProxy): ObjectProxyHandler {
+        static getHandler(objectProxy: ObjectProxy): ObjectHandler {
             let handler = globalThis.Object.getOwnPropertyDescriptor(objectProxy, '_handler_').value;
             assert(handler, 'handler is not found');
             return handler;

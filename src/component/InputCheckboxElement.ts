@@ -1,14 +1,14 @@
-///<reference path="InputElementControl.ts"/>
+///<reference path="InputElement.ts"/>
 namespace duice {
 
     /**
-     * InputCheckboxElementControl
+     * InputCheckboxElement
      */
-    export class InputCheckboxElementControl extends InputElementControl {
+    export class InputCheckboxElement extends InputElement {
 
-        trueValue: any = true;
+        private readonly trueValue: any = true;
 
-        falseValue: any = false;
+        private readonly falseValue: any = false;
 
         /**
          * constructor
@@ -19,17 +19,17 @@ namespace duice {
             super(element, context);
 
             // true false value
-            let trueValue = getAttribute(this.getElement(), 'true-value');
+            let trueValue = getComponentAttribute(this.getElement(), 'true-value');
             this.trueValue = trueValue ? trueValue : this.trueValue;
-            let falseValue = getAttribute(this.getElement(), 'false-value');
+            let falseValue = getComponentAttribute(this.getElement(), 'false-value');
             this.falseValue = falseValue ? falseValue : this.falseValue;
         }
 
         /**
-         * setValue
+         * set value
          * @param value
          */
-        setValue(value: any): void {
+        override setValue(value: any): void {
             if (value === this.trueValue) {
                 this.getElement().checked = true;
             } else {
@@ -38,9 +38,9 @@ namespace duice {
         }
 
         /**
-         * getValue
+         * get value
          */
-        getValue(): any {
+        override getValue(): any {
             if(this.element.checked){
                 return this.trueValue;
             }else{
@@ -49,10 +49,10 @@ namespace duice {
         }
 
         /**
-         * setReadonly
+         * set readonly
          * @param readonly
          */
-        setReadonly(readonly: boolean): void {
+        override setReadonly(readonly: boolean): void {
             if(readonly){
                 this.getElement().style.pointerEvents = 'none';
             }else{

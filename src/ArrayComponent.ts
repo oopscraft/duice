@@ -1,17 +1,12 @@
+///<reference path="Component.ts"/>
 namespace duice {
 
     /**
-     * LoopControl
+     * array component class
      */
-    export class LoopControl<T extends HTMLElement> extends Observable implements Observer {
+    export class ArrayComponent<T extends HTMLElement> extends Component<T> {
 
         slot: HTMLSlotElement = document.createElement('slot');
-
-        element: T;
-
-        context: object;
-
-        arrayProxy: ArrayProxy;
 
         loop: string;
 
@@ -22,39 +17,28 @@ namespace duice {
         /**
          * constructor
          * @param element
+         * @param context
          */
         constructor(element: T, context: object) {
-            super();
+            super(element.cloneNode(true) as T, context);
 
-            // clone html element template
-            this.element = element.cloneNode(true) as T;
-            setAttribute(this.element, 'id', generateId());
-            markInitialized(element);
-
-            // replace slot element
+            // replace with slot for position
             element.replaceWith(this.slot);
 
-            // set context
-            this.context = context;
+            // mark initialized (not using after clone as templates)
+            markInitialized(element);
         }
 
         /**
-         * setArray
+         * set array
          * @param arrayName
          */
         setArray(arrayName: string): void {
-            this.arrayProxy = findObject(this.context, arrayName);
-            if(!this.arrayProxy){
-                console.warn(`ArrayProxy[${arrayName}] is not found.`, this.arrayProxy);
-                this.arrayProxy = new ArrayProxy([]);
-            }
-            let arrayHandler = ArrayProxy.getHandler(this.arrayProxy);
-            this.addObserver(arrayHandler);
-            arrayHandler.addObserver(this);
+            this.setData(arrayName);
         }
 
         /**
-         * setLoop
+         * set loop
          * @param loop
          */
         setLoop(loop: string): void {
@@ -62,7 +46,7 @@ namespace duice {
         }
 
         /**
-         * setEditable
+         * set editable
          * @param editable
          */
         setEditable(editable: boolean): void {
@@ -72,25 +56,13 @@ namespace duice {
         /**
          * render
          */
-        render(): void {
-
-            // do render
-            this.doRender(this.arrayProxy);
-
-            // executes script
-            this.executeScript();
-        }
-
-        /**
-         * doRender
-         * @param arrayProxy
-         */
-        doRender(arrayProxy: ArrayProxy): void {
+        override render(): void {
             let _this = this;
+            let arrayProxy = this.getData() as ArrayProxy;
 
             // reset row elements
             this.rowElements.forEach(rowElement => {
-                this.slot.parentNode.removeChild(rowElement);
+                rowElement.parentNode.removeChild(rowElement);
             });
             this.rowElements.length = 0;
 
@@ -102,7 +74,7 @@ namespace duice {
                 for(let index = 0; index < arrayProxy.length; index ++){
 
                     // context
-                    let context = Object.assign({}, this.context);
+                    let context = globalThis.Object.assign({}, this.context);
                     context[itemName] = arrayProxy[index];
                     context[statusName] = new ObjectProxy({
                         index: index,
@@ -113,14 +85,14 @@ namespace duice {
                     });
 
                     // clones row elements
-                    let rowElement = this.element.cloneNode(true) as HTMLElement;
-                    setAttribute(rowElement, 'index', index.toString());
+                    let rowElement = this.getElement().cloneNode(true) as HTMLElement;
+                    setComponentAttribute(rowElement, 'index', index.toString());
 
                     // editable
                     if(this.editable){
                         rowElement.setAttribute('draggable', 'true');
                         rowElement.addEventListener('dragstart', function(event){
-                            let fromIndex = getAttribute(this, 'index');
+                            let fromIndex = getComponentAttribute(this, 'index');
                             event.dataTransfer.setData("text", fromIndex);
                         });
                         rowElement.addEventListener('dragover', function(event){
@@ -131,7 +103,7 @@ namespace duice {
                             event.preventDefault();
                             event.stopPropagation();
                             let fromIndex = parseInt(event.dataTransfer.getData('text'));
-                            let toIndex = parseInt(getAttribute(this, 'index'));
+                            let toIndex = parseInt(getComponentAttribute(this, 'index'));
                             let rowIndexChangeEvent = new RowMoveEvent(_this, fromIndex, toIndex);
                             _this.notifyObservers(rowIndexChangeEvent);
                         });
@@ -139,10 +111,15 @@ namespace duice {
 
                     // initializes row element
                     initialize(rowElement, context);
-                    this.slot.parentNode.insertBefore(rowElement, this.slot);
                     this.rowElements.push(rowElement);
+
+                    // insert before slot
+                    this.slot.parentNode.insertBefore(rowElement, this.slot);
                 }
             }
+
+            // execute script
+            this.executeScript();
         }
 
         /**
@@ -151,25 +128,9 @@ namespace duice {
          * @param event
          */
         update(observable: Observable, event: Event): void {
-            console.log('ElementSet.update', observable, event);
-
-            // ArrayHandler
-            if(observable instanceof ArrayProxyHandler){
-                let array = observable.getTarget();
-                this.doRender(array);
-
-                // executes script
-                this.executeScript();
-            }
-        }
-
-        /**
-         * executes script
-         */
-        executeScript(): void {
-            let script = getAttribute(this.element, 'script');
-            if(script) {
-                executeScript(script, this.element, this.context);
+            console.debug('ArrayComponent.update', observable, event);
+            if(observable instanceof ArrayHandler){
+                this.render();
             }
         }
 

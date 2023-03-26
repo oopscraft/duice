@@ -7,31 +7,31 @@ global.window = jdom.window;
 global.document = jdom.window.document;
 
 // create
-let myArray = new duice.ArrayProxy([
+let myArray = new duice.Array([
     { name: 'Apple' }
 ]);
 console.log(myArray);
 duice.assert(myArray[0].name === 'Apple');
 
 // assign
-duice.ArrayProxy.assign(myArray,[
+duice.Array.assign(myArray,[
     { name: 'Orange' }
 ]);
 console.log(myArray);
 duice.assert(myArray[0].name === 'Orange');
 
 // setReadonly
-duice.ArrayProxy.setReadonly(myArray, 'name', true);
-duice.assert(duice.ArrayProxy.isReadonly(myArray, 'name') === true);
-duice.ArrayProxy.setReadonly(myArray, 'name', false);
-duice.assert(duice.ArrayProxy.isReadonly(myArray,'name') === false);
+duice.Array.setReadonly(myArray, 'name', true);
+duice.assert(duice.Array.isReadonly(myArray, 'name') === true);
+duice.Array.setReadonly(myArray, 'name', false);
+duice.assert(duice.Array.isReadonly(myArray,'name') === false);
 
 // setReadonlyAll
 console.log('setReadonlyAll');
-duice.ArrayProxy.setReadonlyAll(myArray, true);
-console.assert(duice.ArrayProxy.isReadonly(myArray, 'name') === true);
-duice.ArrayProxy.setReadonlyAll(myArray, false);
-duice.assert(duice.ArrayProxy.isReadonly(myArray, 'name') === false);
+duice.Array.setReadonlyAll(myArray, true);
+console.assert(duice.Array.isReadonly(myArray, 'name') === true);
+duice.Array.setReadonlyAll(myArray, false);
+duice.assert(duice.Array.isReadonly(myArray, 'name') === false);
 
 
 

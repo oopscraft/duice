@@ -19,7 +19,7 @@ namespace duice {
 
         /**
          * constructor
-         * @param contentDiv
+         * @param dialogElement
          */
         constructor(dialogElement: HTMLDialogElement) {
             this.dialogElement = dialogElement;

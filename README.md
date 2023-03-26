@@ -51,7 +51,7 @@ const user = new duice.ObjectProxy({
 ```
 
 ### Test Case
-[ObjectProxy - ElementControl Test](test/ElementControlTest.html)
+[ObjectProxy - ElementControl Test](test/ObjectComponentTest.html)
 
 
 -----------------------------------------------------------
@@ -62,10 +62,10 @@ const user = new duice.ObjectProxy({
 ### Javascript
 
 ```javascript
-const users = new duice.ArrayProxy([
-    { id: 'apple', name: 'Apple' },
-    { id: 'monkey', name: 'Monkey' },
-    { id: 'orange', name: 'Orange' }
+const users = new duice.Array([
+    {id: 'apple', name: 'Apple'},
+    {id: 'monkey', name: 'Monkey'},
+    {id: 'orange', name: 'Orange'}
 ]);
 ```
 
@@ -94,7 +94,7 @@ const users = new duice.ArrayProxy([
 
 ### Test Case 
 
-[ArrayProxy - LoopControl Test](test/LoopControlTest.html)
+[ArrayProxy - LoopControl Test](test/ArrayComponentTest.html)
 
 
 -----------------------------------------------------------
@@ -107,7 +107,7 @@ const users = new duice.ArrayProxy([
 /**
  * MyObjectComponent
  */
-duice.defineComponent("my-object-component", class MyObjectComponent extends duice.Component {
+duice.defineComponent("my-object-component", class MyObjectComponent extends duice._deprecated_Component {
     // template literal to render
     doRender(object) {
         return `
@@ -117,6 +117,7 @@ duice.defineComponent("my-object-component", class MyObjectComponent extends dui
             </div>
         `;
     }
+
     // style literal (optional)
     doStyle(data) {
         return `
@@ -150,7 +151,7 @@ duice.defineComponent("my-object-component", class MyObjectComponent extends dui
 
 ### Test Case
 
-[ObjectProxy|ArrayProxy - ComponentControl Test](test/ComponentControlTest.html)
+[ObjectProxy|ArrayProxy - ComponentControl Test](test/CustomComponentTest.html)
 
 
 ------------------------------------------------------

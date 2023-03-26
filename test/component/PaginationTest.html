@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="../../dist/duice.js"></script>
+    <link rel="stylesheet" href="../../dist/duice.css">
+    <script>
+        'use strict';
+        const pagination = new duice.ObjectProxy({
+            size: 10,
+            page: 1,
+            count: 123
+        });
+    </script>
+</head>
+<body>
+
+<duice-pagination
+        duice:object="pagination"
+        data-size-property=""
+        data-page-property=""
+        data-count-property=""/>
+
+</body>
+</html>

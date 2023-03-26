@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Array Component Test</title>
     <script src="../dist/duice.js"></script>
     <link rel="stylesheet" href="../dist/duice.css">
     <script>
@@ -126,7 +126,7 @@
     </script>
 </head>
 <body>
-<h1>LoopControl Test</h1>
+<h1>Array Component Test</h1>
 <div class="container">
     <div class="row">
         <div class="col-2">
@@ -155,11 +155,11 @@
             </div>
         </div>
         <div class="col-10">
-            <h2>ElementSet</h2>
+            <h2>ArrayComponent</h2>
             <!-- simple table -->
             <h3>
                 Simple Table
-                <small>&lt;tr duice:array="myArray" duice:loop="myObject,status"&gt;</small>
+                <small>&lt;tr data-duice-array="myArray" data-duice-loop="myObject,status"&gt;</small>
             </h3>
             <table class="table table-bordered">
                 <tr>
@@ -176,18 +176,18 @@
                     <th>address.city</th>
                     <th>items[]</th>
                 </tr>
-                <tr duice:array="myArray" duice:loop="myObject,status">
-                    <td diuce:object="status" duice:property="index"></td>
-                    <td duice:object="status" duice:property="count"></td>
-                    <td duice:object="myObject" duice:property="name"></td>
-                    <td duice:object="myObject" duice:property="phoneNo" duice:mask="string('###-####-####')"></td>
-                    <td duice:object="myObject" duice:property="cardNo" duice:mask="string('####-####-####-####')"></td>
-                    <td duice:object="myObject" duice:property="balanceAmount" duice:mask="number(2)"></td>
-                    <td duice:object="myObject" duice:property="type"></td>
-                    <td duice:object="myObject" duice:property="enabled"></td>
-                    <td duice:object="myObject" duice:property="enabledYn"></td>
-                    <td duice:object="myObject" duice:property="address.country"></td>
-                    <td duice:object="myObject" duice:property="address.city"></td>
+                <tr data-duice-array="myArray" data-duice-loop="myObject,status">
+                    <td diuce:object="status" data-duice-property="index"></td>
+                    <td data-duice-object="status" data-duice-property="count"></td>
+                    <td data-duice-object="myObject" data-duice-property="name"></td>
+                    <td data-duice-object="myObject" data-duice-property="phoneNo" dc:mask="string('###-####-####')"></td>
+                    <td data-duice-object="myObject" data-duice-property="cardNo" dc:mask="string('####-####-####-####')"></td>
+                    <td data-duice-object="myObject" data-duice-property="balanceAmount" dc:mask="number(2)"></td>
+                    <td data-duice-object="myObject" data-duice-property="type"></td>
+                    <td data-duice-object="myObject" data-duice-property="enabled"></td>
+                    <td data-duice-object="myObject" data-duice-property="enabledYn"></td>
+                    <td data-duice-object="myObject" data-duice-property="address.country"></td>
+                    <td data-duice-object="myObject" data-duice-property="address.city"></td>
                     <td>
                         <table>
                             <tr>
@@ -195,10 +195,10 @@
                                 <th>id</th>
                                 <th>name</th>
                             </tr>
-                            <tr duice:array="myObject.items" duice:loop="item,status">
-                                <td duice:object="status" duice:property="index"></td>
-                                <td duice:object="item" duice:property="id"></td>
-                                <td duice:object="item" duice:property="name"></td>
+                            <tr data-duice-array="myObject.items" data-duice-loop="item,status">
+                                <td data-duice-object="status" data-duice-property="index"></td>
+                                <td data-duice-object="item" data-duice-property="id"></td>
+                                <td data-duice-object="item" data-duice-property="name"></td>
                             </tr>
                         </table>
                     </td>
@@ -207,7 +207,7 @@
             <!-- editable table -->
             <h3>
                 Complex Table
-                <small>&lt;tr duice:array="myArray" duice:loop="item,status" duice:editable="true"&gt;</small>
+                <small>&lt;tr data-duice-array="myArray" data-duice-loop="item,status"&gt;</small>
             </h3>
             <div style="border:solid 1px; width:fit-content; max-height:400px; overflow-y:scroll; border:var(--duice-table-border);">
                 <table class="b-none">
@@ -229,25 +229,25 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr duice:array="myArray" duice:loop="myObject,status" duice:editable="true">
-                        <td><span duice:object="status" duice:property="index"></span></td>
-                        <td><span duice:object="status" duice:property="count"></span></td>
-                        <td><input duice:object="myObject" duice:property="name"/></td>
-                        <td><input type="text" duice:object="myObject" duice:property="phoneNo" duice:mask="string('###-####-####')"/></td>
-                        <td><input type="text" duice:object="myObject" duice:property="cardNo" duice:mask="string('####-####-####-####')"/></td>
-                        <td><input type="number" duice:object="myObject" duice:property="balanceAmount" duice:mask="number(2)"/></td>
+                    <tr data-duice-array="myArray" data-duice-loop="myObject,status">
+                        <td><span data-duice-object="status" data-duice-property="index"></span></td>
+                        <td><span data-duice-object="status" data-duice-property="count"></span></td>
+                        <td><input data-duice-object="myObject" data-duice-property="name"/></td>
+                        <td><input type="text" data-duice-object="myObject" data-duice-property="phoneNo" dc:mask="string('###-####-####')"/></td>
+                        <td><input type="text" data-duice-object="myObject" data-duice-property="cardNo" dc:mask="string('####-####-####-####')"/></td>
+                        <td><input type="number" data-duice-object="myObject" data-duice-property="balanceAmount" dc:mask="number(2)"/></td>
                         <td>
-                            <select duice:object="myObject" duice:property="type">
+                            <select data-duice-object="myObject" data-duice-property="type">
                                 <option value>- type -</option>
                                 <option value="human">Human</option>
                                 <option value="fruit">Fruit</option>
                                 <option value="animal">Animal</option>
                             </select>
                         </td>
-                        <td><input type="checkbox" duice:object="myObject" duice:property="enabled"/></td>
-                        <td><input type="checkbox" duice:object="myObject" duice:property="enabledYn" duice:true-value="Y" duice:false-value="N"/></td>
-                        <td><input type="text" duice:object="myObject" duice:property="address.country"/></td>
-                        <td><input type="text" duice:object="myObject" duice:property="address.city"/></td>
+                        <td><input type="checkbox" data-duice-object="myObject" data-duice-property="enabled"/></td>
+                        <td><input type="checkbox" data-duice-object="myObject" data-duice-property="enabledYn" dc:true-value="Y" dc:false-value="N"/></td>
+                        <td><input type="text" data-duice-object="myObject" data-duice-property="address.country"/></td>
+                        <td><input type="text" data-duice-object="myObject" data-duice-property="address.city"/></td>
                         <td>
                             <table>
                                 <tr>
@@ -255,32 +255,32 @@
                                     <th>id</th>
                                     <th>name</th>
                                 </tr>
-                                <tr duice:array="myObject.items" duice:loop="item,status">
-                                    <td duice:object="status" duice:property="index"></td>
+                                <tr data-duice-array="myObject.items" data-duice-loop="item,status">
+                                    <td data-duice-object="status" data-duice-property="index"></td>
                                     <td>
-                                        <input duice:object="item" duice:property="id"/>
+                                        <input data-duice-object="item" data-duice-property="id"/>
                                     </td>
                                     <td>
-                                        <input duice:object="item" duice:property="name"/>
+                                        <input data-duice-object="item" data-duice-property="name"/>
                                     </td>
                                 </tr>
                             </table>
                         </td>
                         <td>
-                            <button duice:object="status" duice:script="this.dataset.index=status.index;"
+                            <button data-duice-object="status" data-duice-script="this.dataset.index=status.index;"
                                     onclick="myArray.deleteRow(Number(this.dataset.index));">
                                 myArray.deleteRow([index]);
                             </button>
                         </td>
                     </tr>
-                    <tr duice:array="myArray"
-                        duice:script="myArray.length > 0 ? this.style.display='none' : this.style.display='';">
+                    <tr data-duice-array="myArray"
+                        data-duice-script="myArray.length > 0 ? this.style.display='none' : this.style.display='';">
                         <td colspan="100%">Data Not Found</td>
                     </tr>
                     </tbody>
                     <tfoot>
                     <td colspan="100%" style="text-align:right;">
-                        <span duice:array="myArray" duice:script="this.innerHTML=myArray.length + ' Rows';"></span>
+                        <span data-duice-array="myArray" data-duice-script="this.innerHTML=myArray.length + ' Rows';"></span>
                     </td>
                     </tfoot>
                 </table>

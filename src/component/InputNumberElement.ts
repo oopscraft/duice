@@ -1,11 +1,11 @@
 ///<reference path="../mask/NumberMask.ts"/>
-///<reference path="InputElementControl.ts"/>
+///<reference path="InputElement.ts"/>
 namespace duice {
 
     /**
-     * InputNumberElementControl
+     * input number element component
      */
-    export class InputNumberElementControl extends InputElementControl {
+    export class InputNumberElement extends InputElement {
 
         /**
          * constructor
@@ -28,9 +28,9 @@ namespace duice {
         }
 
         /**
-         * getValue
+         * return value
          */
-        getValue(): any {
+        override getValue(): any {
             let value = super.getValue();
             return Number(value);
         }

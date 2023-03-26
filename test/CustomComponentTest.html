@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
+    <title>Custom Component Test</title>
     <script src="../dist/duice.js"></script>
     <link rel="stylesheet" href="../dist/duice.css">
     <script>
@@ -19,12 +20,12 @@
         /**
          * MyObjectComponent
          */
-        duice.defineComponent("my-object-component", class MyObjectComponent extends duice.Component {
+        duice.defineComponent("my-object", class MyObjectComponent extends duice.CustomElement {
             doRender(object) {
                 return `
                     <div>
-                        <span duice:object="object" duice:property="name"></span>
-                        <input type="text" duice:object="object" duice:property="name" class="bg-red"/>
+                        <span data-duice-object="object" data-duice-property="name"></span>
+                        <input type="text" data-duice-object="object" data-duice-property="name" class="bg-red"/>
                     </div>
                 `;
             }
@@ -40,12 +41,12 @@
         /**
          * MyArrayComponent
          */
-        duice.defineComponent("my-array-component", class MyArrayComponent extends duice.Component {
+        duice.defineComponent("my-array", class MyArrayComponent extends duice.CustomElement {
             doRender(array) {
                 return `
                 <div>
-                    <div duice:array="array" duice:loop="item,status">
-                        <input type="text" duice:object="item" duice:property="name"></input>
+                    <div data-duice-array="array" data-duice-loop="item,status">
+                        <input type="text" data-duice-object="item" data-duice-property="name"/>
                     </div>
                 </div>
                 `;
@@ -53,14 +54,14 @@
         });
 
         /**
-         * MyNestedComponent
+         * my-array-nested
          */
-        duice.defineComponent("my-nested-component", class MyNestedComponent extends duice.Component {
+        duice.defineComponent("my-array-nested", class MyNestedComponent extends duice.CustomElement {
             doRender(array) {
                 return `
                 <div>
-                    <div duice:array="array" duice:loop="item,status">
-                        <my-object-component duice:object="item"></my-object-component>
+                    <div data-duice-array="array" data-duice-loop="item,status">
+                        <my-object data-duice-object="item"></my-object>
                     </div>
                 </div>
                 `;
@@ -70,7 +71,7 @@
         /**
          * MyShadowComponent
          */
-        duice.defineComponent("my-shadow-component", class MyShadowComponent extends duice.Component {
+        duice.defineComponent("my-object-shadow", class MyShadowComponent extends duice.CustomElement {
             constructor(){
                 super();
                 this.attachShadow({mode:"open"});
@@ -78,8 +79,8 @@
             doRender(object) {
                 return `
                     <div>
-                        <span duice:object="object" duice:property="name"></span>
-                        <input type="text" duice:object="object" duice:property="name"/>
+                        <span data-duice-object="object" data-duice-property="name"></span>
+                        <input type="text" data-duice-object="object" data-duice-property="name"/>
                     </div>
                 `;
             }
@@ -90,19 +91,19 @@
 <body>
 
 <h2> Direct HTML</h2>
-<input type="text" duice:object="myObject" duice:property="name" style="background-color:red;"/>
+<input type="text" data-duice-object="myObject" data-duice-property="name" style="background-color:red;"/>
 
 <h2>Object to Component</h2>
-<my-object-component duice:object="myObject"></my-object-component>
+<my-object data-duice-object="myObject"></my-object>
 
 <h2>Array to Component</h2>
-<my-array-component duice:array="myArray"></my-array-component>
+<my-array data-duice-array="myArray"></my-array>
 
 <h2>Nested Component</h2>
-<my-nested-component duice:array="myArray"></my-nested-component>
+<my-array-nested data-duice-array="myArray"></my-array-nested>
 
 <h2>Shadow DOM Component</h2>
-<my-shadow-component duice:object="myObject"></my-shadow-component>
+<my-object-shadow data-duice-object="myObject"></my-object-shadow>
 
 </body>
 </html>

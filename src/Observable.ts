@@ -39,7 +39,6 @@ namespace duice {
 
         /**
          * resume notify
-         * @param enable
          */
         resumeNotify(): void {
             this.notifyEnabled = true;

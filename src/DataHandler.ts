@@ -2,7 +2,10 @@
 ///<Reference path="Observer.ts"/>
 namespace duice {
 
-    export abstract class ProxyHandler<T> extends Observable implements Observer {
+    /**
+     * data handler class
+     */
+    export abstract class DataHandler<T> extends Observable implements Observer {
 
         target: T;
 
@@ -21,7 +24,7 @@ namespace duice {
         }
 
         /**
-         * setTarget
+         * set target
          * @param target
          */
         setTarget(target: T): void {
@@ -29,7 +32,7 @@ namespace duice {
         }
 
         /**
-         * getTarget
+         * return target
          */
         getTarget(): T {
             return this.target;
@@ -43,7 +46,7 @@ namespace duice {
         abstract update(observable: object, event: Event): void;
 
         /**
-         * setReadonlyAll
+         * set readonly all
          * @param readonly
          */
         setReadonlyAll(readonly: boolean): void {
@@ -55,7 +58,7 @@ namespace duice {
         }
 
         /**
-         * setReadonly
+         * set readonly
          * @param property
          * @param readonly
          */
@@ -69,7 +72,7 @@ namespace duice {
         }
 
         /**
-         * isReadonly
+         * return whether readonly is
          * @param property
          */
         isReadonly(property: string): boolean {
@@ -90,7 +93,7 @@ namespace duice {
         }
 
         /**
-         * checkListener
+         * executes listener
          * @param listener
          * @param event
          */

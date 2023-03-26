@@ -1,4 +1,4 @@
-///<reference path="ComponentControlFactory.ts"/>
+///<reference path="CustomComponentFactory.ts"/>
 namespace duice {
 
     let namespace = 'duice';
@@ -8,6 +8,7 @@ namespace duice {
      * @param value
      */
     export function setNamespace(value:string): void {
+        globalThis[value] = value;
         namespace = value;
     }
 
@@ -19,14 +20,13 @@ namespace duice {
     }
 
     /**
-     * returns query selector expression
+     * returns query selector for component scan
      */
-    export function getQuerySelectors(){
-        let querySelectors = [];
-        querySelectors.push(...ComponentControlFactory.getQuerySelectors());
-        querySelectors.push(...LoopControlFactory.getQuerySelectors());
-        querySelectors.push(...ElementControlFactory.getQuerySelectors());
-        return querySelectors.join(',');
+    export function getComponentQuerySelector(): string {
+        return [
+            `*[data-${getNamespace()}-object]:not([data-${getNamespace()}-id])`,
+            `*[data-${getNamespace()}-array]:not([data-${getNamespace()}-id])`,
+        ].join(',');
     }
 
     /**
@@ -35,23 +35,31 @@ namespace duice {
      * @param context
      */
     export function initialize(container: any, context: object): void {
-
-        // initialize elementSet, element (order is important)
-        container.querySelectorAll(getQuerySelectors()).forEach(element => {
-            if(!hasAttribute(element, 'id')) {
+        // scan DOM tree
+        container.querySelectorAll(getComponentQuerySelector()).forEach(element => {
+            if(!hasComponentAttribute(element, 'id')) {
                 try {
-                    if(ComponentControlFactory.getInstance(element)){
-                        let componentControlFactory = ComponentControlFactory.getInstance(element);
-                        let componentControl = componentControlFactory.createComponentControl(element, context);
-                        componentControl.render();
-                    }else if (hasAttribute(element, 'array')) {
-                        let loopControlFactory = LoopControlFactory.getInstance(element);
-                        let loopControl = loopControlFactory.createLoopControl(element, context);
-                        loopControl.render();
-                    } else if (hasAttribute(element, 'object')) {
-                        let controlFactory = ElementControlFactory.getInstance(element);
-                        let control = controlFactory.createElementControl(element, context);
-                        control.render();
+                    // custom component
+                    let customComponentFactory = CustomComponentFactory.getInstance(element);
+                    if(customComponentFactory) {
+                        customComponentFactory.createComponent(element, context)?.render();
+                        return;
+                    }
+
+                    // array component
+                    if(hasComponentAttribute(element, 'array')) {
+                        ArrayComponentFactory.getInstance(element)
+                            ?.createComponent(element, context)
+                            ?.render();
+                        return;
+                    }
+
+                    // object component
+                    if(hasComponentAttribute(element, 'object')) {
+                        ObjectComponentFactory.getInstance(element)
+                            ?.createComponent(element, context)
+                            ?.render();
+                        return;
                     }
                 }catch(e){
                     console.error(e, element, container, JSON.stringify(context));
@@ -65,17 +73,17 @@ namespace duice {
      * @param container
      */
     export function markInitialized(container: any): void {
-        container.querySelectorAll(getQuerySelectors()).forEach(htmlElement => {
-            setAttribute(htmlElement, 'id', generateId());
+        container.querySelectorAll(getComponentQuerySelector()).forEach(element => {
+            setComponentAttribute(element, 'id', generateId());
         });
     }
 
     /**
-     * findObject
+     * finds variable by name
      * @param context
      * @param name
      */
-    export function findObject(context: object, name: string): any {
+    export function findVariable(context: object, name: string): any {
 
         // find in context
         try {
@@ -99,7 +107,7 @@ namespace duice {
     }
 
     /**
-     * Generates component ID
+     * generates component ID
      */
     export function generateId(): string {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -109,67 +117,31 @@ namespace duice {
     }
 
     /**
-     * assert
-     * @param condition
-     * @param message
-     */
-    export function assert(condition: any, message?: string): void {
-        console.assert(condition, message);
-        if(!condition){
-            throw new Error(message||'Assertion Failed');
-        }
-    }
-
-    /**
-     * hasAttribute
+     * checks has component attribute
      * @param element
      * @param name
      */
-    export function hasAttribute(element: HTMLElement, name: string): boolean {
-        return element.hasAttribute(`${getNamespace()}:${name}`)
+    export function hasComponentAttribute(element: HTMLElement, name: string): boolean {
+        return element.hasAttribute(`data-${getNamespace()}-${name}`)
     }
 
     /**
-     * getAttribute
+     * returns component attribute
      * @param element
      * @param name
      */
-    export function getAttribute(element: HTMLElement, name: string): string {
-        return element.getAttribute(`${getNamespace()}:${name}`);
+    export function getComponentAttribute(element: HTMLElement, name: string): string {
+        return element.getAttribute(`data-${getNamespace()}-${name}`);
     }
 
     /**
-     * setAttribute
+     * set component attribute
      * @param element
      * @param name
      * @param value
      */
-    export function setAttribute(element: HTMLElement, name: string, value: string): void {
-        element.setAttribute(`${getNamespace()}:${name}`, value);
-    }
-
-    /**
-     * removeChildNodes
-     * @param node
-     */
-    export function removeChildNodes(node: Node): void {
-        // Remove element nodes and prevent memory leaks
-        let childNode, childNodes = node.childNodes, i = 0;
-        while (childNode = childNodes[i++]) {
-            if (childNode.nodeType === 1 ) {
-                node.removeChild(childNode);
-            }
-        }
-
-        // Remove any remaining nodes
-        while (node.firstChild) {
-            node.removeChild(node.firstChild);
-        }
-
-        // If this is a select, ensure that it displays empty
-        if(node instanceof HTMLSelectElement){
-            (<HTMLSelectElement>node).options.length = 0;
-        }
+    export function setComponentAttribute(element: HTMLElement, name: string, value: string): void {
+        element.setAttribute(`data-${getNamespace()}-${name}`, value);
     }
 
     /**
@@ -190,6 +162,18 @@ namespace duice {
         }catch(e){
             console.error(script, e);
             throw e;
+        }
+    }
+
+    /**
+     * assert
+     * @param condition
+     * @param message
+     */
+    export function assert(condition: any, message?: string): void {
+        console.assert(condition, message);
+        if(!condition){
+            throw new Error(message||'Assertion Failed');
         }
     }
 
@@ -303,13 +287,13 @@ namespace duice {
     }
 
     /**
-     * defineComponent
+     * defines custom component
      * @param tagName
      * @param constructor
      */
     export function defineComponent(tagName: string, constructor: CustomElementConstructor): void {
         customElements.define(tagName, constructor);
-        ComponentControlFactory.registerComponentFactory(new duice.ComponentControlFactory(tagName));
+        CustomComponentFactory.addInstance(new CustomComponentFactory(tagName));
     }
 
     /**

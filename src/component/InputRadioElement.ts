@@ -1,10 +1,10 @@
-///<reference path="InputElementControl.ts"/>
+///<reference path="InputElement.ts"/>
 namespace duice {
 
     /**
-     * InputRadioElementControl
+     * input radio element component
      */
-    export class InputRadioElementControl extends InputElementControl {
+    export class InputRadioElement extends InputElement {
 
         /**
          * constructor
@@ -16,29 +16,25 @@ namespace duice {
         }
 
         /**
-         * setValue
+         * set value
          * @param value
          */
-        setValue(value: any): void {
-            if(this.getElement().value === value){
-                this.getElement().checked = true;
-            }else{
-                this.getElement().checked = false;
-            }
+        override setValue(value: any): void {
+            this.getElement().checked = (this.getElement().value === value);
         }
 
         /**
-         * getValue
+         * return value
          */
-        getValue(): any {
+        override getValue(): any {
             return this.getElement().value;
         }
 
         /**
-         * setReadonly
+         * set readonly
          * @param readonly
          */
-        setReadonly(readonly: boolean): void {
+        override setReadonly(readonly: boolean): void {
             if(readonly){
                 this.getElement().style.pointerEvents = 'none';
             }else{

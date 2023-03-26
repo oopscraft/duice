@@ -1,186 +1,5 @@
 declare namespace duice {
     /**
-     * ArrayProxy
-     */
-    class ArrayProxy extends globalThis.Array {
-        /**
-         * constructor
-         */
-        constructor(array?: object[]);
-        /**
-         * assign
-         * @param arrayProxy
-         * @param array
-         */
-        static assign(arrayProxy: ArrayProxy, array: object[]): void;
-        /**
-         * setTarget
-         * @param arrayProxy
-         * @param target
-         */
-        static setTarget(arrayProxy: ArrayProxy, target: object): void;
-        /**
-         * getTarget
-         * @param arrayProxy
-         */
-        static getTarget(arrayProxy: ArrayProxy): any;
-        /**
-         * setHandler
-         * @param arrayProxy
-         * @param arrayHandler
-         */
-        static setHandler(arrayProxy: ArrayProxy, arrayHandler: ArrayProxyHandler): void;
-        /**
-         * getHandler
-         * @param arrayProxy
-         */
-        static getHandler(arrayProxy: ArrayProxy): ArrayProxyHandler;
-        /**
-         * onPropertyChanging
-         * @param arrayProxy
-         * @param listener
-         */
-        static onPropertyChanging(arrayProxy: ArrayProxy, listener: Function): void;
-        /**
-         * onPropertyChanged
-         * @param arrayProxy
-         * @param listener
-         */
-        static onPropertyChanged(arrayProxy: ArrayProxy, listener: Function): void;
-        /**
-         * onRowInserting
-         * @param arrayProxy
-         * @param listener
-         */
-        static onRowInserting(arrayProxy: ArrayProxy, listener: Function): void;
-        /**
-         * onRowInserted
-         * @param arrayProxy
-         * @param listener
-         */
-        static onRowInserted(arrayProxy: ArrayProxy, listener: Function): void;
-        /**
-         * onRowDeleting
-         * @param arrayProxy
-         * @param listener
-         */
-        static onRowDeleting(arrayProxy: ArrayProxy, listener: Function): void;
-        /**
-         * onRowDeleted
-         * @param arrayProxy
-         * @param listener
-         */
-        static onRowDeleted(arrayProxy: ArrayProxy, listener: Function): void;
-        /**
-         * setReadonly
-         * @param arrayProxy
-         * @param property
-         * @param readonly
-         */
-        static setReadonly(arrayProxy: ArrayProxy, property: string, readonly: boolean): void;
-        /**
-         * isReadonly
-         * @param arrayProxy
-         * @param property
-         */
-        static isReadonly(arrayProxy: ArrayProxy, property: string): boolean;
-        /**
-         * setReadonlyAll
-         * @param arrayProxy
-         * @param readonly
-         */
-        static setReadonlyAll(arrayProxy: ArrayProxy, readonly: boolean): void;
-        /**
-         * insertRow
-         * @param index
-         * @param rows
-         */
-        insertRow(index: number, ...rows: object[]): Promise<void>;
-        /**
-         * deleteRow
-         * @param index
-         * @param size
-         */
-        deleteRow(index: number, size?: number): Promise<void>;
-        /**
-         * appendRow
-         * @param rows
-         */
-        appendRow(...rows: object[]): Promise<void>;
-    }
-}
-declare namespace duice {
-    /**
-     * ObjectProxy
-     */
-    class ObjectProxy extends globalThis.Object {
-        /**
-         * constructor
-         */
-        constructor(object: object);
-        /**
-         * assign
-         * @param objectProxy
-         * @param object
-         */
-        static assign(objectProxy: ObjectProxy, object: object): void;
-        /**
-         * setTarget
-         * @param objectProxy
-         * @param target
-         */
-        static setTarget(objectProxy: ObjectProxy, target: object): void;
-        /**
-         * getTarget
-         * @param objectProxy
-         */
-        static getTarget(objectProxy: ObjectProxy): any;
-        /**
-         * setHandler
-         * @param objectProxy
-         * @param objectHandler
-         */
-        static setHandler(objectProxy: ObjectProxy, objectHandler: ObjectProxyHandler): void;
-        /**
-         * getHandler
-         * @param objectProxy
-         */
-        static getHandler(objectProxy: ObjectProxy): ObjectProxyHandler;
-        /**
-         * onPropertyChanging
-         * @param objectProxy
-         * @param listener
-         */
-        static onPropertyChanging(objectProxy: ObjectProxy, listener: Function): void;
-        /**
-         * onPropertyChanged
-         * @param objectProxy
-         * @param listener
-         */
-        static onPropertyChanged(objectProxy: ObjectProxy, listener: Function): void;
-        /**
-         * setReadonly
-         * @param objectProxy
-         * @param property
-         * @param readonly
-         */
-        static setReadonly(objectProxy: ObjectProxy, property: string, readonly: boolean): void;
-        /**
-         * isReadonly
-         * @param objectProxy
-         * @param property
-         */
-        static isReadonly(objectProxy: ObjectProxy, property: string): boolean;
-        /**
-         * setReadonlyAll
-         * @param objectProxy
-         * @param readonly
-         */
-        static setReadonlyAll(objectProxy: ObjectProxy, readonly: boolean): void;
-    }
-}
-declare namespace duice {
-    /**
      * Observable
      */
     class Observable {
@@ -202,7 +21,6 @@ declare namespace duice {
         suspendNotify(): void;
         /**
          * resume notify
-         * @param enable
          */
         resumeNotify(): void;
         /**
@@ -226,43 +44,56 @@ declare namespace duice {
     }
 }
 declare namespace duice {
-    class ComponentControlFactory {
-        static componentControlFactoryRegistry: ComponentControlFactory[];
+    /**
+     * component factory abstract class
+     */
+    abstract class ComponentFactory<T extends HTMLElement> {
+        /**
+         * check support
+         * @param element
+         */
+        abstract support(element: T): boolean;
+        /**
+         * creates component
+         * @param element
+         * @param context
+         */
+        abstract createComponent(element: T, context: object): Component<HTMLElement>;
+    }
+}
+declare namespace duice {
+    /**
+     * custom component factory
+     */
+    class CustomComponentFactory<T extends CustomElement> extends ComponentFactory<CustomElement> {
+        static instances: CustomComponentFactory<CustomElement>[];
         tagName: string;
         /**
-         * register component factory
-         * @param componentControlFactory
+         * adds factory instance
+         * @param componentFactory
          */
-        static registerComponentFactory(componentControlFactory: ComponentControlFactory): void;
+        static addInstance(componentFactory: CustomComponentFactory<CustomElement>): void;
         /**
-         * getQuerySelectors
+         * returns factory instance to be supported
+         * @param element
          */
-        static getQuerySelectors(): string[];
-        /**
-         * return instance
-         * @param htmlElement
-         */
-        static getInstance(htmlElement: HTMLElement): ComponentControlFactory;
+        static getInstance(element: CustomElement): CustomComponentFactory<CustomElement>;
         /**
          * constructor
          * @param tagName
          */
         constructor(tagName: string);
         /**
-         * getTagName
-         */
-        getTagName(): string;
-        /**
-         * creates element
+         * creates component
          * @param element
          * @param context
          */
-        createComponentControl(element: Component, context: object): ComponentControl;
+        createComponent(element: T, context: object): CustomComponent<T>;
         /**
-         * support
+         * checks supported elements
          * @param element
          */
-        support(element: HTMLElement): boolean;
+        support(element: T): boolean;
     }
 }
 declare namespace duice {
@@ -276,9 +107,9 @@ declare namespace duice {
      */
     function getNamespace(): string;
     /**
-     * returns query selector expression
+     * returns query selector for component scan
      */
-    function getQuerySelectors(): string;
+    function getComponentQuerySelector(): string;
     /**
      * initializes
      * @param container
@@ -291,45 +122,34 @@ declare namespace duice {
      */
     function markInitialized(container: any): void;
     /**
-     * findObject
+     * finds variable by name
      * @param context
      * @param name
      */
-    function findObject(context: object, name: string): any;
+    function findVariable(context: object, name: string): any;
     /**
-     * Generates component ID
+     * generates component ID
      */
     function generateId(): string;
     /**
-     * assert
-     * @param condition
-     * @param message
-     */
-    function assert(condition: any, message?: string): void;
-    /**
-     * hasAttribute
+     * checks has component attribute
      * @param element
      * @param name
      */
-    function hasAttribute(element: HTMLElement, name: string): boolean;
+    function hasComponentAttribute(element: HTMLElement, name: string): boolean;
     /**
-     * getAttribute
+     * returns component attribute
      * @param element
      * @param name
      */
-    function getAttribute(element: HTMLElement, name: string): string;
+    function getComponentAttribute(element: HTMLElement, name: string): string;
     /**
-     * setAttribute
+     * set component attribute
      * @param element
      * @param name
      * @param value
      */
-    function setAttribute(element: HTMLElement, name: string, value: string): void;
-    /**
-     * removeChildNodes
-     * @param node
-     */
-    function removeChildNodes(node: Node): void;
+    function setComponentAttribute(element: HTMLElement, name: string, value: string): void;
     /**
      * execute script
      * @param script
@@ -337,6 +157,12 @@ declare namespace duice {
      * @param context
      */
     function executeScript(script: string, thisArg: any, context: object): any;
+    /**
+     * assert
+     * @param condition
+     * @param message
+     */
+    function assert(condition: any, message?: string): void;
     /**
      * alert
      * @param message
@@ -382,7 +208,7 @@ declare namespace duice {
      */
     function fetch(url: URL, options: any, _bypass: boolean): Promise<Response>;
     /**
-     * defineComponent
+     * defines custom component
      * @param tagName
      * @param constructor
      */
@@ -401,7 +227,7 @@ declare namespace duice {
         protected promiseReject: Function;
         /**
          * constructor
-         * @param contentDiv
+         * @param dialogElement
          */
         constructor(dialogElement: HTMLDialogElement);
         /**
@@ -731,104 +557,79 @@ declare namespace duice {
 }
 declare namespace duice {
     /**
-     * Component
+     * component abstract class
      */
-    abstract class Component extends HTMLElement {
-        /**
-         * constructor
-         * @protected
-         */
-        protected constructor();
-        /**
-         * returns html template literal
-         * @param data
-         */
-        abstract doRender(data: any): string;
-        /**
-         * return style literal
-         * @param data
-         */
-        doStyle(data: any): string;
-    }
-}
-declare namespace duice {
-    /**
-     * ComponentControl
-     */
-    class ComponentControl extends Observable implements Observer {
-        element: Component;
+    abstract class Component<T extends HTMLElement> extends Observable implements Observer {
+        element: T;
         context: object;
-        data: any;
+        data: Data;
         /**
          * constructor
          * @param element
          * @param context
+         * @protected
          */
-        constructor(element: Component, context: object);
+        protected constructor(element: T, context: object);
         /**
-         * setData
-         * @param objectName
+         * return element
          */
-        setObject(objectName: string): void;
+        getElement(): T;
         /**
-         * setArray
-         * @param arrayName
+         * return context
          */
-        setArray(arrayName: string): void;
+        getContext(): object;
         /**
-         * check shadow DOM
+         * set data
+         * @param dataName
          */
-        isShadowDom(): boolean;
+        setData(dataName: string): void;
         /**
-         * render
+         * return data
          */
-        render(): void;
+        getData(): Data;
         /**
-         * doRender
-         * @param data
+         * executes script if exists
          */
-        doRender(data: any): void;
+        executeScript(): void;
         /**
-         * update
+         * render abstract method
+         */
+        abstract render(): void;
+        /**
+         * update abstract method
          * @param observable
          * @param event
          */
-        update(observable: Observable, event: duice.Event): void;
-        /**
-         * executes script
-         */
-        executeScript(): void;
+        abstract update(observable: object, event: duice.Event): void;
     }
 }
 declare namespace duice {
     /**
-     * LoopControl
+     * array component class
      */
-    class LoopControl<T extends HTMLElement> extends Observable implements Observer {
+    class ArrayComponent<T extends HTMLElement> extends Component<T> {
         slot: HTMLSlotElement;
-        element: T;
-        context: object;
-        arrayProxy: ArrayProxy;
         loop: string;
         editable: boolean;
         rowElements: HTMLElement[];
         /**
          * constructor
          * @param element
+         * @param context
          */
         constructor(element: T, context: object);
         /**
-         * setArray
+         * set array
          * @param arrayName
          */
         setArray(arrayName: string): void;
         /**
-         * setLoop
+         * set loop
          * @param loop
          */
         setLoop(loop: string): void;
         /**
-         * setEditable
+         * set editable
          * @param editable
          */
         setEditable(editable: boolean): void;
@@ -837,94 +638,82 @@ declare namespace duice {
          */
         render(): void;
         /**
-         * doRender
-         * @param arrayProxy
-         */
-        doRender(arrayProxy: ArrayProxy): void;
-        /**
          * update
          * @param observable
          * @param event
          */
         update(observable: Observable, event: Event): void;
-        /**
-         * executes script
-         */
-        executeScript(): void;
     }
 }
 declare namespace duice {
     /**
-     * ElementFactory
+     * array component factory class
      */
-    class LoopControlFactory<T extends LoopControl<any>> {
+    class ArrayComponentFactory<T extends HTMLElement> extends ComponentFactory<HTMLElement> {
+        static defaultInstance: ArrayComponentFactory<HTMLElement>;
+        static instances: ArrayComponentFactory<HTMLElement>[];
         /**
-         * getSelectors
+         * adds factory instance
+         * @param componentFactory
          */
-        static getQuerySelectors(): string[];
+        static addInstance(componentFactory: ArrayComponentFactory<HTMLElement>): void;
         /**
-         * get instance
+         * return factory instance
          * @param element
          */
-        static getInstance(element: HTMLElement): LoopControlFactory<LoopControl<any>>;
+        static getInstance(element: HTMLElement): ArrayComponentFactory<HTMLElement>;
         /**
-         * creates loop control
+         * check support
          * @param element
          */
-        createLoopControl(element: HTMLElement, context: object): LoopControl<any>;
-    }
-}
-/**
- * DuicePagination
- */
-declare namespace duice {
-    class PaginationComponent extends duice.Component {
-        constructor();
-        doRender(data: any): string;
+        support(element: T): boolean;
+        /**
+         * support template method
+         * @param element
+         */
+        doSupport(element: T): boolean;
+        /**
+         * creates array component
+         * @param element
+         * @param context
+         */
+        createComponent(element: T, context: object): ArrayComponent<any>;
     }
 }
 declare namespace duice {
     /**
-     * ElementControl
+     * object component class
      */
-    abstract class ElementControl<T extends HTMLElement> extends Observable implements Observer {
-        slot: HTMLSlotElement;
-        element: T;
-        context: object;
-        objectProxy: ObjectProxy;
+    class ObjectComponent<T extends HTMLElement> extends Component<T> {
         property: string;
         mask: Mask;
         /**
          * constructor
          * @param element
-         * @protected
+         * @param context
          */
-        protected constructor(element: T, context: object);
+        constructor(element: T, context: object);
         /**
          * set object
          * @param objectName
          */
         setObject(objectName: string): void;
         /**
-         * returns element
-         */
-        getElement(): T;
-        /**
          * set property
          * @param property
          */
         setProperty(property: string): void;
         /**
-         * get property
+         * return property
          */
         getProperty(): string;
         /**
          * set mask
-         * @param mask string from html mask attribute
+         * @param mask
          */
         setMask(mask: string): void;
         /**
-         * returns mask
+         * return mask
          */
         getMask(): Mask;
         /**
@@ -932,329 +721,77 @@ declare namespace duice {
          */
         render(): void;
         /**
-         * update
+         * update event received
          * @param observable
          * @param event
          */
         update(observable: Observable, event: Event): void;
         /**
-         * setValue
+         * set value
          * @param value
          */
-        abstract setValue(value: any): void;
+        setValue(value: any): void;
         /**
-         * getValue
+         * return value
          */
-        abstract getValue(): any;
+        getValue(): any;
         /**
-         * executes script
+         * set readonly
+         * @param readonly
          */
-        executeScript(): void;
+        setReadonly(readonly: boolean): void;
         /**
-         * getIndex
+         * return index
          */
         getIndex(): number;
-        /**
-         * setReadonly
-         * @param readonly
-         */
-        abstract setReadonly(readonly: boolean): void;
     }
 }
 declare namespace duice {
     /**
-     * ElementControlFactory
+     * object component factory class
      */
-    abstract class ElementControlFactory<T extends ElementControl<any>> {
-        static controlFactoryRegistry: ElementControlFactory<ElementControl<any>>[];
+    class ObjectComponentFactory<T extends HTMLElement> extends ComponentFactory<T> {
+        static defaultInstance: ObjectComponentFactory<HTMLElement>;
+        static instances: ObjectComponentFactory<HTMLElement>[];
         /**
-         * register control factory
-         * @param controlFactory
+         * adds factory instance to registry
+         * @param componentFactory
          */
-        static registerControlFactory(controlFactory: ElementControlFactory<ElementControl<any>>): void;
+        static addInstance(componentFactory: ObjectComponentFactory<HTMLElement>): void;
         /**
-         * getSelectors
-         */
-        static getQuerySelectors(): string[];
-        /**
-         * get instance
+         * returns supported instance
          * @param element
          */
-        static getInstance(element: HTMLElement): ElementControlFactory<ElementControl<any>>;
+        static getInstance(element: HTMLElement): ObjectComponentFactory<HTMLElement>;
         /**
-         * creates element control
-         * @param element
-         * @param context
-         */
-        createElementControl(element: HTMLElement, context: object): ElementControl<any>;
-        /**
-         * support
+         * check support
          * @param element
          */
-        abstract support(element: HTMLElement): boolean;
+        support(element: T): boolean;
         /**
-         * doCreateControl
+         * support template method
+         * @param element
+         */
+        doSupport(element: T): boolean;
+        /**
+         * create component
          * @param element
          * @param context
          */
-        abstract doCreateControl(element: HTMLElement, context: object): ElementControl<any>;
+        createComponent(element: T, context: object): ObjectComponent<T>;
+        /**
+         * template method to create component
+         * @param htmlElement
+         * @param context
+         */
+        doCreateComponent(htmlElement: T, context: object): ObjectComponent<T>;
     }
 }
 declare namespace duice {
     /**
-     * GenericElementControl
+     * data handler class
      */
-    class GenericElementControl extends ElementControl<HTMLElement> {
-        textNode: Node;
-        /**
-         * constructor
-         * @param element
-         */
-        constructor(element: HTMLElement, context: object);
-        /**
-         * setValue
-         * @param value
-         */
-        setValue(value: any): void;
-        /**
-         * getValue
-         */
-        getValue(): any;
-        /**
-         * setReadonly
-         * @param readonly
-         */
-        setReadonly(readonly: boolean): void;
-    }
-}
-declare namespace duice {
-    /**
-     * GenericElementControlFactory
-     */
-    class GenericElementControlFactory extends ElementControlFactory<GenericElementControl> {
-        /**
-         * doCreateElement
-         * @param element
-         * @param context
-         */
-        doCreateControl(element: HTMLElement, context: object): GenericElementControl;
-        /**
-         * support
-         * @param element
-         */
-        support(element: HTMLElement): boolean;
-    }
-}
-declare namespace duice {
-    /**
-     * InputElementControl
-     */
-    class InputElementControl extends ElementControl<HTMLInputElement> {
-        /**
-         * constructor
-         * @param element
-         * @param context
-         */
-        constructor(element: HTMLInputElement, context: object);
-        /**
-         * setValue
-         * @param value
-         */
-        setValue(value: any): void;
-        /**
-         * getValue
-         */
-        getValue(): any;
-        /**
-         * setReadonly
-         * @param readonly
-         */
-        setReadonly(readonly: boolean): void;
-    }
-}
-declare namespace duice {
-    /**
-     * InputNumberElementControl
-     */
-    class InputNumberElementControl extends InputElementControl {
-        /**
-         * constructor
-         * @param element
-         * @param context
-         */
-        constructor(element: HTMLInputElement, context: object);
-        /**
-         * getValue
-         */
-        getValue(): any;
-    }
-}
-declare namespace duice {
-    /**
-     * InputCheckboxElementControl
-     */
-    class InputCheckboxElementControl extends InputElementControl {
-        trueValue: any;
-        falseValue: any;
-        /**
-         * constructor
-         * @param element
-         * @param context
-         */
-        constructor(element: HTMLInputElement, context: object);
-        /**
-         * setValue
-         * @param value
-         */
-        setValue(value: any): void;
-        /**
-         * getValue
-         */
-        getValue(): any;
-        /**
-         * setReadonly
-         * @param readonly
-         */
-        setReadonly(readonly: boolean): void;
-    }
-}
-declare namespace duice {
-    /**
-     * InputRadioElementControl
-     */
-    class InputRadioElementControl extends InputElementControl {
-        /**
-         * constructor
-         * @param element
-         * @param context
-         */
-        constructor(element: HTMLInputElement, context: object);
-        /**
-         * setValue
-         * @param value
-         */
-        setValue(value: any): void;
-        /**
-         * getValue
-         */
-        getValue(): any;
-        /**
-         * setReadonly
-         * @param readonly
-         */
-        setReadonly(readonly: boolean): void;
-    }
-}
-declare namespace duice {
-    /**
-     * SelectElementControl
-     */
-    class SelectElementControl extends ElementControl<HTMLSelectElement> {
-        /**
-         * constructor
-         * @param element
-         * @param context
-         */
-        constructor(element: HTMLSelectElement, context: object);
-        /**
-         * setValue
-         * @param value
-         */
-        setValue(value: any): void;
-        /**
-         * getValue
-         */
-        getValue(): any;
-        /**
-         * setReadonly
-         * @param readonly
-         */
-        setReadonly(readonly: boolean): void;
-    }
-}
-declare namespace duice {
-    /**
-     * TextareaElementControl
-     */
-    class TextareaElementControl extends ElementControl<HTMLTextAreaElement> {
-        /**
-         * constructor
-         * @param element
-         * @param context
-         */
-        constructor(element: HTMLTextAreaElement, context: object);
-        /**
-         * setValue
-         * @param value
-         */
-        setValue(value: any): void;
-        /**
-         * getValue
-         */
-        getValue(): any;
-        /**
-         * setReadonly
-         * @param readonly
-         */
-        setReadonly(readonly: boolean): void;
-    }
-}
-declare namespace duice {
-    /**
-     * TextareaElementControlFactory
-     */
-    class TextareaElementControlFactory extends ElementControlFactory<TextareaElementControl> {
-        /**
-         * doCreateElement
-         * @param element
-         * @param context
-         */
-        doCreateControl(element: HTMLTextAreaElement, context: object): TextareaElementControl;
-        /**
-         * support
-         * @param element
-         */
-        support(element: HTMLElement): boolean;
-    }
-}
-declare namespace duice {
-    /**
-     * InputElementControlFactory
-     */
-    class InputElementControlFactory extends ElementControlFactory<InputElementControl> {
-        /**
-         * doCreateElement
-         * @param element
-         * @param context
-         */
-        doCreateControl(element: HTMLInputElement, context: object): InputElementControl;
-        /**
-         * support
-         * @param element
-         */
-        support(element: HTMLElement): boolean;
-    }
-}
-declare namespace duice {
-    /**
-     * SelectElementControlFactory
-     */
-    class SelectElementControlFactory extends ElementControlFactory<SelectElementControl> {
-        /**
-         * doCreateElement
-         * @param element
-         * @param context
-         */
-        doCreateControl(element: HTMLSelectElement, context: object): SelectElementControl;
-        /**
-         * support
-         * @param element
-         */
-        support(element: HTMLElement): boolean;
-    }
-}
-declare namespace duice {
-    abstract class ProxyHandler<T> extends Observable implements Observer {
+    abstract class DataHandler<T> extends Observable implements Observer {
         target: T;
         readonlyAll: boolean;
         readonly: Set<string>;
@@ -1265,12 +802,12 @@ declare namespace duice {
          */
         protected constructor();
         /**
-         * setTarget
+         * set target
          * @param target
          */
         setTarget(target: T): void;
         /**
-         * getTarget
+         * return target
          */
         getTarget(): T;
         /**
@@ -1280,18 +817,18 @@ declare namespace duice {
          */
         abstract update(observable: object, event: Event): void;
         /**
-         * setReadonlyAll
+         * set readonly all
          * @param readonly
          */
         setReadonlyAll(readonly: boolean): void;
         /**
-         * setReadonly
+         * set readonly
          * @param property
          * @param readonly
          */
         setReadonly(property: string, readonly: boolean): void;
         /**
-         * isReadonly
+         * return whether readonly is
          * @param property
          */
         isReadonly(property: string): boolean;
@@ -1304,7 +841,7 @@ declare namespace duice {
          */
         resumeListener(): void;
         /**
-         * checkListener
+         * executes listener
          * @param listener
          * @param event
          */
@@ -1313,9 +850,46 @@ declare namespace duice {
 }
 declare namespace duice {
     /**
-     * ObjectHandler
+     * array handler class
      */
-    class ObjectProxyHandler extends ProxyHandler<ObjectProxy> {
+    class ArrayHandler extends DataHandler<ArrayProxy> {
+        propertyChangingListener: Function;
+        propertyChangedListener: Function;
+        rowInsertingListener: Function;
+        rowInsertedListener: Function;
+        rowDeletingListener: Function;
+        rowDeletedListener: Function;
+        /**
+         * constructor
+         */
+        constructor();
+        /**
+         * get
+         * @param target
+         * @param property
+         * @param receiver
+         */
+        get(target: ArrayProxy, property: string, receiver: object): any;
+        /**
+         * set
+         * @param target
+         * @param property
+         * @param value
+         */
+        set(target: ArrayProxy, property: string, value: any): boolean;
+        /**
+         * update
+         * @param observable
+         * @param event
+         */
+        update(observable: Observable, event: Event): Promise<void>;
+    }
+}
+declare namespace duice {
+    /**
+     * object handler class
+     */
+    class ObjectHandler extends DataHandler<ObjectProxy> {
         propertyChangingListener: Function;
         propertyChangedListener: Function;
         /**
@@ -1357,39 +931,456 @@ declare namespace duice {
 }
 declare namespace duice {
     /**
-     * ArrayHandler
+     * custom component
      */
-    class ArrayProxyHandler extends ProxyHandler<ArrayProxy> {
-        propertyChangingListener: Function;
-        propertyChangedListener: Function;
-        rowInsertingListener: Function;
-        rowInsertedListener: Function;
-        rowDeletingListener: Function;
-        rowDeletedListener: Function;
+    class CustomComponent<T> extends Component<CustomElement> {
         /**
          * constructor
-         * @param arrayProxy
+         * @param element
+         * @param context
          */
-        constructor();
+        constructor(element: CustomElement, context: object);
         /**
-         * get
-         * @param target
-         * @param property
-         * @param receiver
+         * set object data
+         * @param objectName
          */
-        get(target: ArrayProxy, property: string, receiver: object): any;
+        setObject(objectName: string): void;
         /**
-         * set
-         * @param target
-         * @param property
-         * @param value
+         * set array data
+         * @param arrayName
          */
-        set(target: ArrayProxy, property: string, value: any): boolean;
+        setArray(arrayName: string): void;
+        /**
+         * check element is shadow DOM
+         */
+        isShadowDom(): boolean;
+        /**
+         * render
+         */
+        render(): void;
         /**
          * update
-         * @param elementSet
+         * @param observable
          * @param event
          */
-        update(observable: Observable, event: Event): Promise<void>;
+        update(observable: Observable, event: duice.Event): void;
+    }
+}
+declare namespace duice {
+    /**
+     * custom element
+     */
+    abstract class CustomElement extends HTMLElement {
+        /**
+         * constructor
+         * @protected
+         */
+        protected constructor();
+        /**
+         * returns html template literal
+         * @param data
+         */
+        abstract doRender(data: Data): string;
+        /**
+         * return style literal
+         * @param data
+         */
+        doStyle(data: any): string;
+    }
+}
+declare namespace duice {
+    /**
+     * object proxy class
+     */
+    class ObjectProxy extends Object {
+        /**
+         * constructor
+         */
+        constructor(object: object);
+        /**
+         * assign
+         * @param objectProxy
+         * @param object
+         */
+        static assign(objectProxy: ObjectProxy, object: object): void;
+        /**
+         * setTarget
+         * @param objectProxy
+         * @param target
+         */
+        static setTarget(objectProxy: ObjectProxy, target: object): void;
+        /**
+         * getTarget
+         * @param objectProxy
+         */
+        static getTarget(objectProxy: ObjectProxy): any;
+        /**
+         * setHandler
+         * @param objectProxy
+         * @param objectHandler
+         */
+        static setHandler(objectProxy: ObjectProxy, objectHandler: ObjectHandler): void;
+        /**
+         * getHandler
+         * @param objectProxy
+         */
+        static getHandler(objectProxy: ObjectProxy): ObjectHandler;
+        /**
+         * onPropertyChanging
+         * @param objectProxy
+         * @param listener
+         */
+        static onPropertyChanging(objectProxy: ObjectProxy, listener: Function): void;
+        /**
+         * onPropertyChanged
+         * @param objectProxy
+         * @param listener
+         */
+        static onPropertyChanged(objectProxy: ObjectProxy, listener: Function): void;
+        /**
+         * setReadonly
+         * @param objectProxy
+         * @param property
+         * @param readonly
+         */
+        static setReadonly(objectProxy: ObjectProxy, property: string, readonly: boolean): void;
+        /**
+         * isReadonly
+         * @param objectProxy
+         * @param property
+         */
+        static isReadonly(objectProxy: ObjectProxy, property: string): boolean;
+        /**
+         * setReadonlyAll
+         * @param objectProxy
+         * @param readonly
+         */
+        static setReadonlyAll(objectProxy: ObjectProxy, readonly: boolean): void;
+    }
+}
+declare namespace duice {
+    /**
+     * array proxy class
+     */
+    class ArrayProxy extends Array {
+        /**
+         * constructor
+         */
+        constructor(array?: object[]);
+        /**
+         * assign
+         * @param arrayProxy
+         * @param array
+         */
+        static assign(arrayProxy: ArrayProxy, array: object[]): void;
+        /**
+         * setTarget
+         * @param arrayProxy
+         * @param target
+         */
+        static setTarget(arrayProxy: ArrayProxy, target: object): void;
+        /**
+         * getTarget
+         * @param arrayProxy
+         */
+        static getTarget(arrayProxy: ArrayProxy): any;
+        /**
+         * setHandler
+         * @param arrayProxy
+         * @param arrayHandler
+         */
+        static setHandler(arrayProxy: ArrayProxy, arrayHandler: ArrayHandler): void;
+        /**
+         * getHandler
+         * @param arrayProxy
+         */
+        static getHandler(arrayProxy: ArrayProxy): ArrayHandler;
+        /**
+         * onPropertyChanging
+         * @param arrayProxy
+         * @param listener
+         */
+        static onPropertyChanging(arrayProxy: ArrayProxy, listener: Function): void;
+        /**
+         * onPropertyChanged
+         * @param arrayProxy
+         * @param listener
+         */
+        static onPropertyChanged(arrayProxy: ArrayProxy, listener: Function): void;
+        /**
+         * onRowInserting
+         * @param arrayProxy
+         * @param listener
+         */
+        static onRowInserting(arrayProxy: ArrayProxy, listener: Function): void;
+        /**
+         * onRowInserted
+         * @param arrayProxy
+         * @param listener
+         */
+        static onRowInserted(arrayProxy: ArrayProxy, listener: Function): void;
+        /**
+         * onRowDeleting
+         * @param arrayProxy
+         * @param listener
+         */
+        static onRowDeleting(arrayProxy: ArrayProxy, listener: Function): void;
+        /**
+         * onRowDeleted
+         * @param arrayProxy
+         * @param listener
+         */
+        static onRowDeleted(arrayProxy: ArrayProxy, listener: Function): void;
+        /**
+         * setReadonly
+         * @param arrayProxy
+         * @param property
+         * @param readonly
+         */
+        static setReadonly(arrayProxy: ArrayProxy, property: string, readonly: boolean): void;
+        /**
+         * isReadonly
+         * @param arrayProxy
+         * @param property
+         */
+        static isReadonly(arrayProxy: ArrayProxy, property: string): boolean;
+        /**
+         * setReadonlyAll
+         * @param arrayProxy
+         * @param readonly
+         */
+        static setReadonlyAll(arrayProxy: ArrayProxy, readonly: boolean): void;
+        /**
+         * insertRow
+         * @param index
+         * @param rows
+         */
+        insertRow(index: number, ...rows: object[]): Promise<void>;
+        /**
+         * deleteRow
+         * @param index
+         * @param size
+         */
+        deleteRow(index: number, size?: number): Promise<void>;
+        /**
+         * appendRow
+         * @param rows
+         */
+        appendRow(...rows: object[]): Promise<void>;
+    }
+}
+declare namespace duice {
+    /**
+     * data interface (object,array)
+     */
+    interface Data {
+    }
+}
+declare namespace duice {
+    /**
+     * input element component
+     */
+    class InputElement extends ObjectComponent<HTMLInputElement> {
+        /**
+         * constructor
+         * @param element
+         * @param context
+         */
+        constructor(element: HTMLInputElement, context: object);
+        /**
+         * set value
+         * @param value
+         */
+        setValue(value: any): void;
+        /**
+         * return value
+         */
+        getValue(): any;
+        /**
+         * set readonly
+         * @param readonly
+         */
+        setReadonly(readonly: boolean): void;
+    }
+}
+declare namespace duice {
+    /**
+     * input element factory class
+     */
+    class InputElementFactory extends ObjectComponentFactory<HTMLInputElement> {
+        /**
+         * creates component
+         * @param element
+         * @param context
+         */
+        doCreateComponent(element: HTMLInputElement, context: object): InputElement;
+        /**
+         * check supported
+         * @param element
+         */
+        doSupport(element: HTMLElement): boolean;
+    }
+}
+declare namespace duice {
+    /**
+     * InputCheckboxElement
+     */
+    class InputCheckboxElement extends InputElement {
+        private readonly trueValue;
+        private readonly falseValue;
+        /**
+         * constructor
+         * @param element
+         * @param context
+         */
+        constructor(element: HTMLInputElement, context: object);
+        /**
+         * set value
+         * @param value
+         */
+        setValue(value: any): void;
+        /**
+         * get value
+         */
+        getValue(): any;
+        /**
+         * set readonly
+         * @param readonly
+         */
+        setReadonly(readonly: boolean): void;
+    }
+}
+declare namespace duice {
+    /**
+     * input number element component
+     */
+    class InputNumberElement extends InputElement {
+        /**
+         * constructor
+         * @param element
+         * @param context
+         */
+        constructor(element: HTMLInputElement, context: object);
+        /**
+         * return value
+         */
+        getValue(): any;
+    }
+}
+declare namespace duice {
+    /**
+     * input radio element component
+     */
+    class InputRadioElement extends InputElement {
+        /**
+         * constructor
+         * @param element
+         * @param context
+         */
+        constructor(element: HTMLInputElement, context: object);
+        /**
+         * set value
+         * @param value
+         */
+        setValue(value: any): void;
+        /**
+         * return value
+         */
+        getValue(): any;
+        /**
+         * set readonly
+         * @param readonly
+         */
+        setReadonly(readonly: boolean): void;
+    }
+}
+declare namespace duice {
+    /**
+     * select element component
+     */
+    class SelectElement extends ObjectComponent<HTMLSelectElement> {
+        /**
+         * constructor
+         * @param element
+         * @param context
+         */
+        constructor(element: HTMLSelectElement, context: object);
+        /**
+         * set value
+         * @param value
+         */
+        setValue(value: any): void;
+        /**
+         * return value
+         */
+        getValue(): any;
+        /**
+         * set readonly
+         * @param readonly
+         */
+        setReadonly(readonly: boolean): void;
+    }
+}
+declare namespace duice {
+    /**
+     * select element factory class
+     */
+    class SelectElementFactory extends ObjectComponentFactory<HTMLSelectElement> {
+        /**
+         * create component
+         * @param element
+         * @param context
+         */
+        doCreateComponent(element: HTMLSelectElement, context: object): SelectElement;
+        /**
+         * return supported
+         * @param element
+         */
+        doSupport(element: HTMLElement): boolean;
+    }
+}
+declare namespace duice {
+    /**
+     * textarea element component
+     */
+    class TextareaElement extends ObjectComponent<HTMLTextAreaElement> {
+        /**
+         * constructor
+         * @param element
+         * @param context
+         */
+        constructor(element: HTMLTextAreaElement, context: object);
+        /**
+         * set value
+         * @param value
+         */
+        setValue(value: any): void;
+        /**
+         * return value
+         */
+        getValue(): any;
+        /**
+         * set readonly
+         * @param readonly
+         */
+        setReadonly(readonly: boolean): void;
+    }
+}
+declare namespace duice {
+    /**
+     * textarea element factory class
+      */
+    class TextareaElementFactory extends ObjectComponentFactory<HTMLTextAreaElement> {
+        /**
+         * creates component
+         * @param element
+         * @param context
+         */
+        doCreateComponent(element: HTMLTextAreaElement, context: object): TextareaElement;
+        /**
+         * returns supported
+         * @param element
+         */
+        doSupport(element: HTMLElement): boolean;
     }
 }

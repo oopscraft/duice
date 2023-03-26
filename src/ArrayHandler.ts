@@ -1,10 +1,10 @@
-///<reference path="ProxyHandler.ts"/>
+///<reference path="DataHandler.ts"/>
 namespace duice {
 
     /**
-     * ArrayHandler
+     * array handler class
      */
-    export class ArrayProxyHandler extends ProxyHandler<ArrayProxy> {
+    export class ArrayHandler extends DataHandler<ArrayProxy> {
 
         propertyChangingListener: Function;
 
@@ -20,7 +20,6 @@ namespace duice {
 
         /**
          * constructor
-         * @param arrayProxy
          */
         constructor() {
             super();
@@ -127,14 +126,14 @@ namespace duice {
 
         /**
          * update
-         * @param elementSet
+         * @param observable
          * @param event
          */
         async update(observable: Observable, event: Event): Promise<void> {
             console.debug("ArrayHandler.update", observable, event);
 
-            // ElementSet
-            if(observable instanceof LoopControl){
+            // instance is array component
+            if(observable instanceof ArrayComponent){
                 if (event instanceof RowMoveEvent) {
                     let object = this.getTarget().splice(event.getFromIndex(), 1)[0];
                     this.getTarget().splice(event.getToIndex(), 0, object);

@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
+    <title>Object Component Test</title>
     <script src="../dist/duice.js"></script>
     <link rel="stylesheet" href="../dist/duice.css">
     <script>
@@ -71,7 +72,7 @@
     </script>
 </head>
 <body>
-<h1>ElementControl Test</h1>
+<h1>Object Component Test</h1>
 <div class="container">
     <div class="row">
         <div class="col-3">
@@ -97,7 +98,7 @@
             </div>
         </div>
         <div class="col-9">
-            <h2>Element</h2>
+            <h2>ObjectComponent</h2>
             <table class="table table-bordered">
                 <thead>
                 <tr>
@@ -111,20 +112,20 @@
                 <tbody>
                 <tr>
                     <td rowspan="2" class="fw-bold">name</td>
-                    <td rowspan="2" duice:object="myObject" duice:property="name"></td>
+                    <td rowspan="2" data-duice-object="myObject" data-duice-property="name"></td>
                     <td>
-                        <span duice:object="myObject" duice:property="name"/></span>
+                        <span data-duice-object="myObject" data-duice-property="name"/></span>
                     </td>
                     <td class="fw-light">
-                        &lt;* duice:object="myObject" duice:property="name"&gt; &lt;/*&gt;
+                        &lt;* data-duice-object="myObject" data-duice-property="name"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="text" duice:object="myObject" duice:property="name"/>
+                        <input type="text" data-duice-object="myObject" data-duice-property="name"/>
                     </td>
                     <td class="fw-light">
-                        &lt;input type="text" duice:object="myObject" duice:property="name"/&gt;
+                        &lt;input type="text" data-duice-object="myObject" data-duice-property="name"/&gt;
                     </td>
                 </tr>
                 </tbody>
@@ -132,34 +133,34 @@
                 <tbody>
                 <tr>
                     <td rowspan="4" class="fw-bold">phoneNo</td>
-                    <td rowspan="4" duice:object="myObject" duice:property="phoneNo"></td>
+                    <td rowspan="4" data-duice-object="myObject" data-duice-property="phoneNo"></td>
                     <td>
-                        <span duice:object="myObject" duice:property="phoneNo"/></span>
+                        <span data-duice-object="myObject" data-duice-property="phoneNo"/></span>
                     </td>
                     <td class="fw-light">
-                        &lt;* duice:object="myObject" duice:property="phoneNo"&gt; &lt;/*&gt;
+                        &lt;* data-duice-object="myObject" data-duice-property="phoneNo"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
-                    <td duice:object="myObject" duice:property="phoneNo" duice:mask="string('###-####-####')"></td>
+                    <td data-duice-object="myObject" data-duice-property="phoneNo" duice:mask="string('###-####-####')"></td>
                     <td class="fw-light">
-                        &lt;* duice:object="myObject" duice:property="phoneNo" duice:mask="string('###-####-####')"&gt; &lt;/*&gt;
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <input type="text" duice:object="myObject" duice:property="phoneNo"/>
-                    </td>
-                    <td class="fw-light">
-                        &lt;input type="text" duice:object="myObject" duice:property="phoneNo"/&gt;
+                        &lt;* data-duice-object="myObject" data-duice-property="phoneNo" duice:mask="string('###-####-####')"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="text" duice:object="myObject" duice:property="phoneNo" duice:mask="string('###-####-####')"/>
+                        <input type="text" data-duice-object="myObject" data-duice-property="phoneNo"/>
                     </td>
                     <td class="fw-light">
-                        &lt;input type="text" duice:object="myObject" duice:property="phoneNo" duice:mask="string('###-####-####')"/&gt;
+                        &lt;input type="text" data-duice-object="myObject" data-duice-property="phoneNo"/&gt;
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="text" data-duice-object="myObject" data-duice-property="phoneNo" duice:mask="string('###-####-####')"/>
+                    </td>
+                    <td class="fw-light">
+                        &lt;input type="text" data-duice-object="myObject" data-duice-property="phoneNo" duice:mask="string('###-####-####')"/&gt;
                     </td>
                 </tr>
                 </tbody>
@@ -167,34 +168,34 @@
                 <tbody>
                 <tr>
                     <td rowspan="4" class="fw-bold">cardNo</td>
-                    <td rowspan="4" duice:object="myObject" duice:property="cardNo"></td>
+                    <td rowspan="4" data-duice-object="myObject" data-duice-property="cardNo"></td>
                     <td>
-                        <span duice:object="myObject" duice:property="cardNo"/></span>
+                        <span data-duice-object="myObject" data-duice-property="cardNo"/></span>
                     </td>
                     <td class="fw-light">
-                        &lt;* duice:object="myObject" duice:property="cardNo"&gt; &lt;/*&gt;
+                        &lt;* data-duice-object="myObject" data-duice-property="cardNo"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
-                    <td duice:object="myObject" duice:property="cardNo" duice:mask="string('####-####-####-####')"></td>
+                    <td data-duice-object="myObject" data-duice-property="cardNo" duice:mask="string('####-####-####-####')"></td>
                     <td class="fw-light">
-                        &lt;* duice:object="myObject" duice:property="cardNo" duice:mask="string('####-####-####-####')"&gt; &lt;/*&gt;
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <input type="text" duice:object="myObject" duice:property="cardNo"/>
-                    </td>
-                    <td class="fw-light">
-                        &lt;input type="text" duice:object="myObject" duice:property="cardNo"/&gt;
+                        &lt;* data-duice-object="myObject" data-duice-property="cardNo" duice:mask="string('####-####-####-####')"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="text" duice:object="myObject" duice:property="cardNo" duice:mask="string('####-####-####-####')"/>
+                        <input type="text" data-duice-object="myObject" data-duice-property="cardNo"/>
                     </td>
                     <td class="fw-light">
-                        &lt;input type="text" duice:object="myObject" duice:property="cardNo" duice:mask="string('####-####-####-####')"/&gt;
+                        &lt;input type="text" data-duice-object="myObject" data-duice-property="cardNo"/&gt;
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="text" data-duice-object="myObject" data-duice-property="cardNo" duice:mask="string('####-####-####-####')"/>
+                    </td>
+                    <td class="fw-light">
+                        &lt;input type="text" data-duice-object="myObject" data-duice-property="cardNo" duice:mask="string('####-####-####-####')"/&gt;
                     </td>
                 </tr>
                 </tbody>
@@ -202,46 +203,46 @@
                 <tbody>
                 <tr>
                     <td rowspan="4" class="fw-bold">balanceAmount</td>
-                    <td rowspan="4" duice:object="myObject" duice:property="balanceAmount"></td>
+                    <td rowspan="4" data-duice-object="myObject" data-duice-property="balanceAmount"></td>
                     <td>
-                        <span duice:object="myObject" duice:property="balanceAmount"></span>
+                        <span data-duice-object="myObject" data-duice-property="balanceAmount"></span>
                     </td>
                     <td class="fw-light">
-                        &lt;* duice:object="myObject" duice:property="balanceAmount"&gt; &lt;/*&gt;
+                        &lt;* data-duice-object="myObject" data-duice-property="balanceAmount"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
-                    <td type="number" duice:object="myObject" duice:property="balanceAmount" duice:mask="number(2)"></td>
+                    <td type="number" data-duice-object="myObject" data-duice-property="balanceAmount" duice:mask="number(2)"></td>
                     <td class="fw-light">
-                        &lt;* duice:object="myObject" duice:property="balanceAmount" duice:mask="number(2)"&gt &lt;/*&gt;
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <input type="number" duice:object="myObject" duice:property="balanceAmount"/>
-                    </td>
-                    <td class="fw-light">
-                        &lt;input type="number" duice:object="myObject" duice:property="balanceAmount"/&gt;
+                        &lt;* data-duice-object="myObject" data-duice-property="balanceAmount" duice:mask="number(2)"&gt &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="number" duice:object="myObject" duice:property="balanceAmount" duice:mask="number(2)"/>
+                        <input type="number" data-duice-object="myObject" data-duice-property="balanceAmount"/>
                     </td>
                     <td class="fw-light">
-                        &lt;input type="number" duice:object="myObject" duice:property="balanceAmount" duice:mask="number(2)"/&gt;
+                        &lt;input type="number" data-duice-object="myObject" data-duice-property="balanceAmount"/&gt;
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="number" data-duice-object="myObject" data-duice-property="balanceAmount" duice:mask="number(2)"/>
+                    </td>
+                    <td class="fw-light">
+                        &lt;input type="number" data-duice-object="myObject" data-duice-property="balanceAmount" duice:mask="number(2)"/&gt;
                     </td>
                 </tr>
                 <!-- password -->
                 <tbody>
                 <tr>
                     <td class="fw-bold">password</td>
-                    <td duice:object="myObject" duice:property="password"></td>
+                    <td data-duice-object="myObject" data-duice-property="password"></td>
                     <td>
-                        <input type="password" duice:object="myObject" duice:property="password"></input>
+                        <input type="password" data-duice-object="myObject" data-duice-property="password"></input>
                     </td>
                     <td class="fw-light">
-                        &lt;input type="password" duice:object="myObject" duice:property="password"&gt; &lt;/*&gt;
+                        &lt;input type="password" data-duice-object="myObject" data-duice-property="password"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 </tbody>
@@ -249,20 +250,20 @@
                 <tbody>
                 <tr>
                     <td rowspan="2" class="fw-bold">datetime</td>
-                    <td rowspan="2" duice:object="myObject" duice:property="datetime"></td>
+                    <td rowspan="2" data-duice-object="myObject" data-duice-property="datetime"></td>
                     <td>
-                        <span duice:object="myObject" duice:property="datetime" duice:mask="date('yyyy-MM-dd HH:mm:ss')"></span>
+                        <span data-duice-object="myObject" data-duice-property="datetime" duice:mask="date('yyyy-MM-dd HH:mm:ss')"></span>
                     </td>
                     <td class="fw-light">
-                        &lt;* duice:object="myObject" duice:property="datetime" duice:mask="date('yyyy-MM-dd HH:mm:ss')"&gt; &lt;/*&gt;
+                        &lt;* data-duice-object="myObject" data-duice-property="datetime" duice:mask="date('yyyy-MM-dd HH:mm:ss')"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="datetime-local" duice:object="myObject" duice:property="datetime"/>
+                        <input type="datetime-local" data-duice-object="myObject" data-duice-property="datetime"/>
                     </td>
                     <td class="fw-light">
-                        &lt;input type="datetime-local" duice:object="myObject" duice:property="datetime"/&gt;
+                        &lt;input type="datetime-local" data-duice-object="myObject" data-duice-property="datetime"/&gt;
                     </td>
                 </tr>
                 </tbody>
@@ -270,20 +271,20 @@
                 <tbody>
                 <tr>
                     <td rowspan="2" class="fw-bold">date</td>
-                    <td rowspan="2" duice:object="myObject" duice:property="date"></td>
+                    <td rowspan="2" data-duice-object="myObject" data-duice-property="date"></td>
                     <td>
-                        <span duice:object="myObject" duice:property="date" duice:mask="date('yyyy-MM-dd')"></span>
+                        <span data-duice-object="myObject" data-duice-property="date" duice:mask="date('yyyy-MM-dd')"></span>
                     </td>
                     <td class="fw-light">
-                        &lt;* duice:object="myObject" duice:property="date" duice:mask="date('yyyy-MM-dd HH:mm:ss')"&gt; &lt;/*&gt;
+                        &lt;* data-duice-object="myObject" data-duice-property="date" duice:mask="date('yyyy-MM-dd HH:mm:ss')"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="date" duice:object="myObject" duice:property="date"/>
+                        <input type="date" data-duice-object="myObject" data-duice-property="date"/>
                     </td>
                     <td class="fw-light">
-                        &lt;input type="date" duice:object="myObject" duice:property="date"/&gt;
+                        &lt;input type="date" data-duice-object="myObject" data-duice-property="date"/&gt;
                     </td>
                 </tr>
                 </tbody>
@@ -291,20 +292,20 @@
                 <tbody>
                 <tr>
                     <td rowspan="2" class="fw-bold">time</td>
-                    <td rowspan="2" duice:object="myObject" duice:property="time"></td>
+                    <td rowspan="2" data-duice-object="myObject" data-duice-property="time"></td>
                     <td>
-                        <span duice:object="myObject" duice:property="time"></span>
+                        <span data-duice-object="myObject" data-duice-property="time"></span>
                     </td>
                     <td class="fw-light">
-                        &lt;* duice:object="myObject" duice:property="time"&gt; &lt;/*&gt;
+                        &lt;* data-duice-object="myObject" data-duice-property="time"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="time" duice:object="myObject" duice:property="time"/>
+                        <input type="time" data-duice-object="myObject" data-duice-property="time"/>
                     </td>
                     <td class="fw-light">
-                        &lt;input type="time" duice:object="myObject" duice:property="time"/&gt;
+                        &lt;input type="time" data-duice-object="myObject" data-duice-property="time"/&gt;
                     </td>
                 </tr>
                 </tbody>
@@ -312,17 +313,17 @@
                 <tbody>
                 <tr>
                     <td rowspan="2" class="fw-bold">type</td>
-                    <td rowspan="2" duice:object="myObject" duice:property="type"></td>
+                    <td rowspan="2" data-duice-object="myObject" data-duice-property="type"></td>
                     <td>
-                        <span duice:object="myObject" duice:property="type"></span>
+                        <span data-duice-object="myObject" data-duice-property="type"></span>
                     </td>
                     <td class="fw-light">
-                        &lt;* duice:object="myObject" duice:property="type"&gt; &lt;/*&gt;
+                        &lt;* data-duice-object="myObject" data-duice-property="type"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <select duice:object="myObject" duice:property="type">
+                        <select data-duice-object="myObject" data-duice-property="type">
                             <option value>- Select Type -</option>
                             <option value="human">Human</option>
                             <option value="fruit">Fruit</option>
@@ -330,7 +331,7 @@
                         </select>
                     </td>
                     <td class="fw-light">
-                        &lt;select duice:object="myObject" duice:property="type"/&gt; ... &lt;/select&gt;
+                        &lt;select data-duice-object="myObject" data-duice-property="type"/&gt; ... &lt;/select&gt;
                     </td>
                 </tr>
                 </tbody>
@@ -338,20 +339,20 @@
                 <tbody>
                 <tr>
                     <td rowspan="2" class="fw-bold">enable</td>
-                    <td rowspan="2" duice:object="myObject" duice:property="enabled"></td>
+                    <td rowspan="2" data-duice-object="myObject" data-duice-property="enabled"></td>
                     <td>
-                        <span duice:object="myObject" duice:property="enabled"></span>
+                        <span data-duice-object="myObject" data-duice-property="enabled"></span>
                     </td>
                     <td class="fw-light">
-                        &lt;* duice:object="myObject" duice:property="enabled"&gt; &lt;/*&gt;
+                        &lt;* data-duice-object="myObject" data-duice-property="enabled"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="checkbox" duice:object="myObject" duice:property="enabled"/>
+                        <input type="checkbox" data-duice-object="myObject" data-duice-property="enabled"/>
                     </td>
                     <td class="fw-light">
-                        &lt;input type="checkbox" duice:object="myObject" duice:property="enabled"/&gt;
+                        &lt;input type="checkbox" data-duice-object="myObject" data-duice-property="enabled"/&gt;
                     </td>
                 </tr>
                 </tbody>
@@ -359,20 +360,20 @@
                 <tbody>
                 <tr>
                     <td rowspan="2" class="fw-bold">enableYn</td>
-                    <td rowspan="2" duice:object="myObject" duice:property="enabledYn"></td>
+                    <td rowspan="2" data-duice-object="myObject" data-duice-property="enabledYn"></td>
                     <td>
-                        <span duice:object="myObject" duice:property="enabledYn"></span>
+                        <span data-duice-object="myObject" data-duice-property="enabledYn"></span>
                     </td>
                     <td class="fw-light">
-                        &lt;* duice:object="myObject" duice:property="enabledYn"&gt; &lt;/*&gt;
+                        &lt;* data-duice-object="myObject" data-duice-property="enabledYn"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="checkbox" duice:object="myObject" duice:property="enabledYn" duice:true-value="Y" duice:false-value="N"/>
+                        <input type="checkbox" data-duice-object="myObject" data-duice-property="enabledYn" duice:true-value="Y" duice:false-value="N"/>
                     </td>
                     <td class="fw-light">
-                        &lt;input type="checkbox" duice:object="myObject" duice:property="enabled" duice:true-value="Y" duice:false-value="N"/&gt;
+                        &lt;input type="checkbox" data-duice-object="myObject" data-duice-property="enabled" duice:true-value="Y" duice:false-value="N"/&gt;
                     </td>
                 </tr>
                 </tbody>
@@ -380,23 +381,23 @@
                 <tbody>
                 <tr>
                     <td rowspan="2" class="fw-bold">gender</td>
-                    <td rowspan="2" duice:object="myObject" duice:property="gender"></td>
+                    <td rowspan="2" data-duice-object="myObject" data-duice-property="gender"></td>
                     <td>
-                        <span duice:object="myObject" duice:property="gender"></span>
+                        <span data-duice-object="myObject" data-duice-property="gender"></span>
                     </td>
                     <td class="fw-light">
-                        &lt;* duice:object="myObject" duice:property="enabledYn"&gt; &lt;/*&gt;
+                        &lt;* data-duice-object="myObject" data-duice-property="enabledYn"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="radio" duice:object="myObject" duice:property="gender" value="male"/>
-                        <input type="radio" duice:object="myObject" duice:property="gender" value="female"/>
+                        <input type="radio" data-duice-object="myObject" data-duice-property="gender" value="male"/>
+                        <input type="radio" data-duice-object="myObject" data-duice-property="gender" value="female"/>
                     </td>
                     <td class="fw-light">
-                        &lt;input type="radio" duice:object="myObject" duice:property="gender" value="male"/&gt;
+                        &lt;input type="radio" data-duice-object="myObject" data-duice-property="gender" value="male"/&gt;
                         <br/>
-                        &lt;input type="radio" duice:object="myObject" duice:property="gender" value="female"/&gt;
+                        &lt;input type="radio" data-duice-object="myObject" data-duice-property="gender" value="female"/&gt;
                     </td>
                 </tr>
                 </tbody>
@@ -404,20 +405,20 @@
                 <tbody>
                 <tr>
                     <td rowspan="2" class="fw-bold">description</td>
-                    <td rowspan="2" duice:object="myObject" duice:property="description" style="white-space: pre-wrap;"></td>
+                    <td rowspan="2" data-duice-object="myObject" data-duice-property="description" style="white-space: pre-wrap;"></td>
                     <td>
-                        <pre duice:object="myObject" duice:property="description"></pre>
+                        <pre data-duice-object="myObject" data-duice-property="description"></pre>
                     </td>
                     <td class="fw-light">
-                        &lt;* duice:object="myObject" duice:property="description"&gt; &lt;/*&gt;
+                        &lt;* data-duice-object="myObject" data-duice-property="description"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <textarea duice:object="myObject" duice:property="description"/></textarea>
+                        <textarea data-duice-object="myObject" data-duice-property="description"/></textarea>
                     </td>
                     <td class="fw-light">
-                        &lt;textarea duice:object="myObject" duice:property="description"&gt; &lt;/textarea&gt;
+                        &lt;textarea data-duice-object="myObject" data-duice-property="description"&gt; &lt;/textarea&gt;
                     </td>
                 </tr>
                 </tbody>
@@ -425,20 +426,20 @@
                 <tbody>
                 <tr>
                     <td rowspan="2" class="fw-bold">address.country</td>
-                    <td rowspan="2" duice:object="myObject" duice:property="address.country"></td>
+                    <td rowspan="2" data-duice-object="myObject" data-duice-property="address.country"></td>
                     <td>
-                        <span duice:object="myObject" duice:property="address.country"></span>
+                        <span data-duice-object="myObject" data-duice-property="address.country"></span>
                     </td>
                     <td class="fw-light">
-                        &lt;* duice:object="myObject" duice:property="address.country"&gt; &lt;/*&gt;
+                        &lt;* data-duice-object="myObject" data-duice-property="address.country"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="text" duice:object="myObject" duice:property="address.country"/>
+                        <input type="text" data-duice-object="myObject" data-duice-property="address.country"/>
                     </td>
                     <td class="fw-light">
-                        &lt;input type="text" duice:object="myObject" duice:property="address.country"/&gt;
+                        &lt;input type="text" data-duice-object="myObject" data-duice-property="address.country"/&gt;
                     </td>
                 </tr>
                 </tbody>
@@ -446,20 +447,20 @@
                 <tbody>
                 <tr>
                     <td rowspan="2" class="fw-bold">items[0].name</td>
-                    <td rowspan="2" duice:object="myObject" duice:property="items[0].name"></td>
+                    <td rowspan="2" data-duice-object="myObject" data-duice-property="items[0].name"></td>
                     <td>
-                        <span duice:object="myObject" duice:property="items[0].name"></span>
+                        <span data-duice-object="myObject" data-duice-property="items[0].name"></span>
                     </td>
                     <td class="fw-light">
-                        &lt;* duice:object="myObject" duice:property="items[0].name"&gt; &lt;/*&gt;
+                        &lt;* data-duice-object="myObject" data-duice-property="items[0].name"&gt; &lt;/*&gt;
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="text" duice:object="myObject" duice:property="items[0].name"/>
+                        <input type="text" data-duice-object="myObject" data-duice-property="items[0].name"/>
                     </td>
                     <td class="fw-light">
-                        &lt;input type="text" duice:object="myObject" duice:property="items[0].name"/&gt;
+                        &lt;input type="text" data-duice-object="myObject" data-duice-property="items[0].name"/&gt;
                     </td>
                 </tr>
                 </tbody>
@@ -467,30 +468,30 @@
                 <tbody>
                 <tr>
                     <td rowspan="2" class="fw-bold">items</td>
-                    <td rowspan="2" duice:object="myObject" duice:script="this.innerHTML=JSON.stringify(myObject.items,null,4);" style="white-space:pre;text-align:left;"></td>
+                    <td rowspan="2" data-duice-object="myObject" data-duice-script="this.innerHTML=JSON.stringify(myObject.items,null,4);" style="white-space:pre;text-align:left;"></td>
                     <td>
                         <table>
                             <tr>
                                 <th>id</th>
                                 <th>name</th>
                             </tr>
-                            <tr duice:array="myObject.items" duice:loop="item,status">
+                            <tr data-duice-array="myObject.items" data-duice-loop="item,status">
                                 <td>
-                                    <input type="text" duice:object="item" duice:property="id">
+                                    <input type="text" data-duice-object="item" data-duice-property="id">
                                 </td>
                                 <td>
-                                    <input type="text" duice:object="item" duice:property="name">
+                                    <input type="text" data-duice-object="item" data-duice-property="name">
                                 </td>
                             </tr>
                         </table>
                     </td>
                     <td class="fw-light ta-left" style="white-space:pre;">
-&lt;tr duice:array="myObject.items" duice:loop="item,status"&gt;
+&lt;tr data-duice-array="myObject.items" data-duice-loop="item,status"&gt;
     &lt;td&gt;
-        &lt;input type="text" duice:object="item" duice:property="id"&gt;
+        &lt;input type="text" data-duice-object="item" data-duice-property="id"&gt;
     &lt;/td&gt;
     &lt;td&gt;
-        &lt;input type="text" duice:object="item" duice:property="name"&gt;
+        &lt;input type="text" data-duice-object="item" data-duice-property="name"&gt;
     &lt;/td&gt;
 &lt;/tr&gt;
                     </td>

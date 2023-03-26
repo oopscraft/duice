@@ -5,7 +5,8 @@
     "target": "es6",
     "outFile": "dist/duice.js",
     "sourceMap": true,
-    "declaration": true
+    "declaration": true,
+    "noImplicitOverride": true
   },
   "include": [
     "src/**/*"

@@ -1,9 +1,9 @@
 namespace duice {
 
     /**
-     * SelectElementControl
+     * select element component
      */
-    export class SelectElementControl extends ElementControl<HTMLSelectElement> {
+    export class SelectElement extends ObjectComponent<HTMLSelectElement> {
 
         /**
          * constructor
@@ -21,10 +21,10 @@ namespace duice {
         }
 
         /**
-         * setValue
+         * set value
          * @param value
          */
-        setValue(value: any): void {
+        override setValue(value: any): void {
             this.getElement().value = value;
 
             // force select option
@@ -40,17 +40,17 @@ namespace duice {
         }
 
         /**
-         * getValue
+         * return value
          */
-        getValue(): any {
+        override getValue(): any {
             return this.getElement().value;
         }
 
         /**
-         * setReadonly
+         * set readonly
          * @param readonly
          */
-        setReadonly(readonly: boolean): void {
+        override setReadonly(readonly: boolean): void {
             if(readonly){
                 console.warn("==ok");
                 this.getElement().style.pointerEvents = 'none';
