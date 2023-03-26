@@ -44,13 +44,6 @@ namespace duice {
         override render(): void {
 
             // removes child
-            // if(this.isShadowDom()){
-            //     removeChildNodes(this.element.shadowRoot);
-            // }else{
-            //     removeChildNodes(this.element);
-            // }
-
-            // removes child
             if(this.isShadowDom()){
                 this.element.shadowRoot.innerHTML = '';
             }else{
