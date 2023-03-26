@@ -24,7 +24,7 @@ Therefore you can use it with another javascript library together.
 --------------------------------------------------
 
 
-## Object(Proxy) and Control
+## Object Component
 
 
 ### Javascript
@@ -38,20 +38,20 @@ const user = new duice.ObjectProxy({
 
 ### HTML
 
-| attribute                             | description                                          |
-|:--------------------------------------|:-----------------------------------------------------|
-| duice:object="[object]"               | Object name to bind                                  |
-| duice:property="[property of object]" | Object Property name to bind                         |
-| duice:script="[script code]"          | javascript code to execute when element is updated   |
-| duice:mask="[data masking clause]"    | ex) string('###-###'), number(2), date('yyyy-MM-dd') |
+| attribute                                  | description                                          |
+|:-------------------------------------------|:-----------------------------------------------------|
+| data-duice-object="[object]"               | Object name to bind                                  |
+| data-duice-property="[property of object]" | Object Property name to bind                         |
+| data-duice-script="[script code]"          | javascript code to execute when element is updated   |
+| data-duice-mask="[data masking clause]"    | ex) string('###-###'), number(2), date('yyyy-MM-dd') |
 
 ```html
-<span duice:object="user" duice:property="id"></span>
-<input type="text" duice:object="user" duice:property="name"/>
+<span data-duice-object="user" data-duice-property="id"></span>
+<input type="text" data-duice-object="user" data-duice-property="name"/>
 ```
 
 ### Test Case
-[ObjectProxy - ElementControl Test](test/ObjectComponentTest.html)
+[Object Component Test](test/ObjectComponentTest.html)
 
 
 -----------------------------------------------------------
@@ -71,11 +71,11 @@ const users = new duice.Array([
 
 ### HTML
 
-| attribute                                 | description                              |
-|:------------------------------------------|:-----------------------------------------|
-| duice:array="[array]"                     | Object name to bind                      |
-| duice:loop="[element name],[status name]" | element object and status variable name  |
-| duice:script="[script code]"          | javascript code to execute when element is updated   |
+| attribute                                      | description                              |
+|:-----------------------------------------------|:-----------------------------------------|
+| data-duice-array="[array]"                     | Object name to bind                      |
+| data-duice-loop="[element name],[status name]" | element object and status variable name  |
+| data-duice-script="[script code]"              | javascript code to execute when element is updated   |
 
 ```html
 <table>
@@ -84,10 +84,10 @@ const users = new duice.Array([
         <th>name</th>
         <th>name</th>
     </tr>
-    <tr duice:array="users" duice:loop="user,status">
-        <td duice:object="status" duice:property="count"></td>
-        <td duice:object="user" duice:property="id"></td>
-        <td><input type="text" duice:object="user" duice:property="name"/></td>
+    <tr data-duice-array="users" data-duice-loop="user,status">
+        <td data-duice-object="status" data-duice-property="count"></td>
+        <td data-duice-object="user" data-duice-property="id"></td>
+        <td><input type="text" data-duice-object="user" data-duice-property="name"/></td>
     </tr>
 </table>
 ```
@@ -107,24 +107,21 @@ const users = new duice.Array([
 /**
  * MyObjectComponent
  */
-duice.defineComponent("my-object-component", class MyObjectComponent extends duice._deprecated_Component {
-    // template literal to render
+duice.defineComponent("my-object", class MyObjectComponent extends duice.CustomElement {
     doRender(object) {
         return `
-            <div>
-                <span duice:object="object" duice:property="name"></span>
-                <input type="text" duice:object="object" duice:property="name" class="bg-red"/>
-            </div>
-        `;
+                    <div>
+                        <span data-duice-object="object" data-duice-property="name"></span>
+                        <input type="text" data-duice-object="object" data-duice-property="name" class="bg-red"/>
+                    </div>
+                `;
     }
-
-    // style literal (optional)
     doStyle(data) {
         return `
-            .bg-red {
-                background-color: red;
-            }
-        `;
+                    .bg-red {
+                        background-color: red;
+                    }
+                `;
     }
 });
 ```
@@ -133,8 +130,8 @@ duice.defineComponent("my-object-component", class MyObjectComponent extends dui
 
 | attribute                    | description                              |
 |:-----------------------------|:-----------------------------------------|
-| duice:object="[object name]" | Object name to bind                      |
-| duice:array="[array name]"   | Array name to bind                       |
+| data-duice-object="[object name]" | Object name to bind                      |
+| data-duice-array="[array name]"   | Array name to bind                       |
 
 
 ```html
@@ -145,7 +142,7 @@ duice.defineComponent("my-object-component", class MyObjectComponent extends dui
     });
 </script>
 
-<my-object-component duice:object="myObject"></my-object-component>
+<my-object data-duice-object="myObject"></my-object>
 
 ```
 
