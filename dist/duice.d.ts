@@ -1226,8 +1226,8 @@ declare namespace duice {
      * InputCheckboxElement
      */
     class InputCheckboxElement extends InputElement {
-        private readonly trueValue;
-        private readonly falseValue;
+        trueValue: any;
+        falseValue: any;
         /**
          * constructor
          * @param element

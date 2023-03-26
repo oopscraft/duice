@@ -6,9 +6,9 @@ namespace duice {
      */
     export class InputCheckboxElement extends InputElement {
 
-        private readonly trueValue: any = true;
+        trueValue: any = true;
 
-        private readonly falseValue: any = false;
+        falseValue: any = false;
 
         /**
          * constructor
