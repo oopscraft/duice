@@ -94,7 +94,7 @@ const users = new duice.Array([
 
 ### Test Case 
 
-[ArrayProxy - LoopControl Test](test/ArrayComponentTest.html)
+[Array Component Test](test/ArrayComponentTest.html)
 
 
 -----------------------------------------------------------
@@ -148,7 +148,7 @@ duice.defineComponent("my-object", class MyObjectComponent extends duice.CustomE
 
 ### Test Case
 
-[ObjectProxy|ArrayProxy - ComponentControl Test](test/CustomComponentTest.html)
+[Custom Component Test](test/CustomComponentTest.html)
 
 
 ------------------------------------------------------
