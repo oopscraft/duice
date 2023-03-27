@@ -2315,41 +2315,33 @@ var duice;
     }
     duice.ArrayProxy = ArrayProxy;
 })(duice || (duice = {}));
-// /**
-//  * DuicePagination
-//  */
-// namespace duice {
-//
-//     export class PaginationComponent extends duice.ComponentElement {
-//
-//         public constructor() {
-//             super();
-//         }
-//
-//         doRender(object: any): string {
-//
-//             // prev
-//             let template = `<div><span>Prev</span>`;
-//
-//             // pages
-//             for(let index = 0; index < 10; index ++) {
-//                 template += `<span>${index}</span>`;
-//             }
-//
-//             // next
-//             template += `<span>Next</span></div>`;
-//
-//             // returns
-//             console.warn("=========", template);
-//             return template;
-//         }
-//
-//     }
-//
-//     // defines component
-//     duice.defineComponent(`${duice.getNamespace()}-pagination`, PaginationComponent);
-//
-// }
+var duice;
+(function (duice) {
+    var component;
+    (function (component) {
+        class Pagination extends duice.CustomElement {
+            constructor() {
+                super();
+            }
+            doRender(object) {
+                // prev
+                let template = `<div><span>Prev</span>`;
+                // pages
+                for (let index = 0; index < 10; index++) {
+                    template += `<span>${index}</span>`;
+                }
+                // next
+                template += `<span>Next</span></div>`;
+                // returns
+                console.warn("=========", template);
+                return template;
+            }
+        }
+        component.Pagination = Pagination;
+        // defines component
+        duice.defineComponent(`${duice.getNamespace()}-pagination`, Pagination);
+    })(component = duice.component || (duice.component = {}));
+})(duice || (duice = {}));
 var duice;
 (function (duice) {
     var component;

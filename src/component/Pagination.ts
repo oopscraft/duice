@@ -1,9 +1,6 @@
-// /**
-//  * DuicePagination
-//  */
-// namespace duice {
+// namespace duice.component {
 //
-//     export class PaginationComponent extends duice.ComponentElement {
+//     export class Pagination extends duice.CustomElement {
 //
 //         public constructor() {
 //             super();
@@ -29,7 +26,9 @@
 //
 //     }
 //
+//     ObjectComponentFactory.addInstance(new CustomComponentFactory("duice-name"));
+//
 //     // defines component
-//     duice.defineComponent(`${duice.getNamespace()}-pagination`, PaginationComponent);
+//     duice.defineComponent(`${duice.getNamespace()}-pagination`, Pagination);
 //
 // }
