@@ -48,7 +48,7 @@ namespace duice {
          * notifyObservers
          * @param event
          */
-        notifyObservers(event: Event): void {
+        notifyObservers(event: event.Event): void {
             if(this.notifyEnabled){
                 this.observers.forEach(observer => {
                     observer.update(this, event);

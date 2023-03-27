@@ -1,9 +1,9 @@
-namespace duice {
+namespace duice.format {
 
     /**
-     * DateFormat
+     * date format
      */
-    export class DateMask implements Mask {
+    export class DateFormat implements Format {
 
         pattern:string;
 

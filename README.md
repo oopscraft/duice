@@ -43,7 +43,7 @@ const user = new duice.ObjectProxy({
 | data-duice-object="[object]"               | Object name to bind                                  |
 | data-duice-property="[property of object]" | Object Property name to bind                         |
 | data-duice-script="[script code]"          | javascript code to execute when element is updated   |
-| data-duice-mask="[data masking clause]"    | ex) string('###-###'), number(2), date('yyyy-MM-dd') |
+| data-duice-format="[data format clause]"   | ex) string('###-###'), number(2), date('yyyy-MM-dd') |
 
 ```html
 <span data-duice-object="user" data-duice-property="id"></span>
@@ -57,12 +57,12 @@ const user = new duice.ObjectProxy({
 -----------------------------------------------------------
 
 
-## Array(Proxy) and LoopControl 
+## Array Component
 
 ### Javascript
 
 ```javascript
-const users = new duice.Array([
+const users = new duice.ArrayProxy([
     {id: 'apple', name: 'Apple'},
     {id: 'monkey', name: 'Monkey'},
     {id: 'orange', name: 'Orange'}
@@ -99,7 +99,7 @@ const users = new duice.Array([
 
 -----------------------------------------------------------
 
-## Data and ComponentControl
+## Custom Component
 
 ### Javascript
 
@@ -107,7 +107,7 @@ const users = new duice.Array([
 /**
  * MyObjectComponent
  */
-duice.defineComponent("my-object", class MyObjectComponent extends duice.CustomElement {
+duice.defineComponent("my-object", class MyObject extends duice.CustomElement {
     doRender(object) {
         return `
                     <div>
@@ -180,7 +180,7 @@ async function confirmThen() {
 
 // custom dialog from HTML Dialog Element
 async function openDialog() {
-    duice.dialog(document.getElementById('myDialog')).then(()=>{
+    duice.openDialog(document.getElementById('myDialog')).then(()=>{
         alert('do next');
     });
 }

@@ -91,20 +91,20 @@ namespace duice {
                     // editable
                     if(this.editable){
                         rowElement.setAttribute('draggable', 'true');
-                        rowElement.addEventListener('dragstart', function(event){
+                        rowElement.addEventListener('dragstart', function(e){
                             let fromIndex = getComponentAttribute(this, 'index');
-                            event.dataTransfer.setData("text", fromIndex);
+                            e.dataTransfer.setData("text", fromIndex);
                         });
-                        rowElement.addEventListener('dragover', function(event){
-                            event.preventDefault();
-                            event.stopPropagation();
+                        rowElement.addEventListener('dragover', function(e){
+                            e.preventDefault();
+                            e.stopPropagation();
                         });
-                        rowElement.addEventListener('drop', async function(event){
-                            event.preventDefault();
-                            event.stopPropagation();
-                            let fromIndex = parseInt(event.dataTransfer.getData('text'));
+                        rowElement.addEventListener('drop', async function(e){
+                            e.preventDefault();
+                            e.stopPropagation();
+                            let fromIndex = parseInt(e.dataTransfer.getData('text'));
                             let toIndex = parseInt(getComponentAttribute(this, 'index'));
-                            let rowIndexChangeEvent = new RowMoveEvent(_this, fromIndex, toIndex);
+                            let rowIndexChangeEvent = new event.RowMoveEvent(_this, fromIndex, toIndex);
                             _this.notifyObservers(rowIndexChangeEvent);
                         });
                     }
@@ -127,7 +127,7 @@ namespace duice {
          * @param observable
          * @param event
          */
-        update(observable: Observable, event: Event): void {
+        update(observable: Observable, event: event.Event): void {
             console.debug('ArrayComponent.update', observable, event);
             if(observable instanceof ArrayHandler){
                 this.render();

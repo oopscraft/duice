@@ -1,5 +1,5 @@
 ///<reference path="Dialog.ts"/>
-namespace duice {
+namespace duice.dialog {
 
     /**
      * AlertDialog
@@ -49,6 +49,7 @@ namespace duice {
          */
         confirm() {
             this.resolve();
+            this.getDialogElement().parentNode.removeChild(this.getDialogElement());
         }
 
         /**
@@ -56,6 +57,7 @@ namespace duice {
          */
         override close() {
             this.resolve();
+            this.getDialogElement().parentNode.removeChild(this.getDialogElement());
         }
     }
 

@@ -1,9 +1,9 @@
-namespace duice {
+namespace duice.format {
 
     /**
-     * Mask interface
+     * format interface
      */
-    export interface Mask {
+    export interface Format {
 
         /**
          * Encodes original value as formatted value
@@ -18,6 +18,7 @@ namespace duice {
          * @return original value
          */
         decode(value: any): any;
+
     }
 
 }

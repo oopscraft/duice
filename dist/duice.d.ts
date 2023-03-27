@@ -27,7 +27,7 @@ declare namespace duice {
          * notifyObservers
          * @param event
          */
-        notifyObservers(event: Event): void;
+        notifyObservers(event: event.Event): void;
     }
 }
 declare namespace duice {
@@ -40,7 +40,7 @@ declare namespace duice {
          * @param observable
          * @param event
          */
-        update(observable: object, event: Event): void;
+        update(observable: object, event: event.Event): void;
     }
 }
 declare namespace duice {
@@ -179,10 +179,10 @@ declare namespace duice {
      */
     function prompt(message: string): Promise<string>;
     /**
-     * dialog
+     * open dialog
      * @param dialogElement
      */
-    function dialog(dialogElement: HTMLDialogElement): Promise<void>;
+    function openDialog(dialogElement: HTMLDialogElement): Promise<void>;
     /**
      * Gets cookie value
      * @param name
@@ -214,7 +214,7 @@ declare namespace duice {
      */
     function defineComponent(tagName: string, constructor: CustomElementConstructor): void;
 }
-declare namespace duice {
+declare namespace duice.dialog {
     /**
      * Dialog
      */
@@ -266,7 +266,7 @@ declare namespace duice {
         reject(...args: any[]): void;
     }
 }
-declare namespace duice {
+declare namespace duice.dialog {
     /**
      * AlertDialog
      */
@@ -292,7 +292,7 @@ declare namespace duice {
         close(): void;
     }
 }
-declare namespace duice {
+declare namespace duice.dialog {
     /**
      * Confirm
      */
@@ -323,7 +323,7 @@ declare namespace duice {
         close(): void;
     }
 }
-declare namespace duice {
+declare namespace duice.dialog {
     /**
      * PromptDialog
      */
@@ -341,9 +341,21 @@ declare namespace duice {
          * open
          */
         open(): Promise<any>;
+        /**
+         * confirm
+         */
+        confirm(value: string): void;
+        /**
+         * cancel
+         */
+        cancel(): void;
+        /**
+         * close
+         */
+        close(): void;
     }
 }
-declare namespace duice {
+declare namespace duice.event {
     /**
      * Event
      */
@@ -356,7 +368,7 @@ declare namespace duice {
         constructor(source: any);
     }
 }
-declare namespace duice {
+declare namespace duice.event {
     /**
      * PropertyChangeEvent
      */
@@ -369,6 +381,7 @@ declare namespace duice {
          * @param source
          * @param property
          * @param value
+         * @param index
          */
         constructor(source: any, property: string, value: any, index?: number);
         /**
@@ -385,7 +398,7 @@ declare namespace duice {
         getIndex(): number;
     }
 }
-declare namespace duice {
+declare namespace duice.event {
     /**
      * RowInsertEvent
      */
@@ -408,7 +421,7 @@ declare namespace duice {
         getRows(): object[];
     }
 }
-declare namespace duice {
+declare namespace duice.event {
     /**
      * RowDeleteEvent
      */
@@ -431,7 +444,7 @@ declare namespace duice {
         getRows(): object[];
     }
 }
-declare namespace duice {
+declare namespace duice.event {
     /**
      * RowMoveEvent
      */
@@ -453,106 +466,6 @@ declare namespace duice {
          * getToIndex
          */
         getToIndex(): number;
-    }
-}
-declare namespace duice {
-    /**
-     * DateFormat
-     */
-    class DateMask implements Mask {
-        pattern: string;
-        patternRex: RegExp;
-        /**
-         * Constructor
-         * @param pattern
-         */
-        constructor(pattern?: string);
-        /**
-         * Encodes date string
-         * @param string
-         */
-        encode(string: string): string;
-        /**
-         * Decodes formatted date string to ISO date string.
-         * @param string
-         */
-        decode(string: string): string;
-    }
-}
-declare namespace duice {
-    /**
-     * Mask interface
-     */
-    interface Mask {
-        /**
-         * Encodes original value as formatted value
-         * @param value value
-         * @return formatted value
-         */
-        encode(value: any): any;
-        /**
-         * Decodes formatted value to original value
-         * @param value value
-         * @return original value
-         */
-        decode(value: any): any;
-    }
-}
-declare namespace duice {
-    class MaskFactory {
-        /**
-         * getMask
-         * @param mask
-         */
-        static getMask(mask: string): Mask;
-    }
-}
-declare namespace duice {
-    /**
-     * NumberFormat
-     * @param scale number
-     */
-    class NumberMask implements Mask {
-        scale: number;
-        /**
-         * Constructor
-         * @param scale
-         */
-        constructor(scale?: number);
-        /**
-         * Encodes number as format
-         * @param number
-         */
-        encode(number: number): string;
-        /**
-         * Decodes formatted value as original value
-         * @param string
-         */
-        decode(string: string): number;
-    }
-}
-declare namespace duice {
-    /**
-     * StringFormat
-     * @param string format
-     */
-    class StringMask implements Mask {
-        pattern: string;
-        /**
-         * Constructor
-         * @param pattern
-         */
-        constructor(pattern: string);
-        /**
-         * encode string as format
-         * @param value
-         */
-        encode(value: string): string;
-        /**
-         * decodes string as format
-         * @param value
-         */
-        decode(value: string): string;
     }
 }
 declare namespace duice {
@@ -600,7 +513,7 @@ declare namespace duice {
          * @param observable
          * @param event
          */
-        abstract update(observable: object, event: duice.Event): void;
+        abstract update(observable: object, event: event.Event): void;
     }
 }
 declare namespace duice {
@@ -642,7 +555,7 @@ declare namespace duice {
          * @param observable
          * @param event
          */
-        update(observable: Observable, event: Event): void;
+        update(observable: Observable, event: event.Event): void;
     }
 }
 declare namespace duice {
@@ -680,13 +593,22 @@ declare namespace duice {
         createComponent(element: T, context: object): ArrayComponent<any>;
     }
 }
+declare namespace duice.format {
+    class FormatFactory {
+        /**
+         * return format instance
+         * @param format
+         */
+        static getFormat(format: string): Format;
+    }
+}
 declare namespace duice {
     /**
      * object component class
      */
     class ObjectComponent<T extends HTMLElement> extends Component<T> {
         property: string;
-        mask: Mask;
+        format: format.Format;
         /**
          * constructor
          * @param element
@@ -708,14 +630,14 @@ declare namespace duice {
          */
         getProperty(): string;
         /**
-         * set mask
-         * @param mask
+         * set format
+         * @param format
          */
-        setMask(mask: string): void;
+        setFormat(format: string): void;
         /**
-         * return mask
+         * return format
          */
-        getMask(): Mask;
+        getFormat(): format.Format;
         /**
          * render
          */
@@ -725,7 +647,7 @@ declare namespace duice {
          * @param observable
          * @param event
          */
-        update(observable: Observable, event: Event): void;
+        update(observable: Observable, event: event.Event): void;
         /**
          * set value
          * @param value
@@ -815,7 +737,7 @@ declare namespace duice {
          * @param observable
          * @param event
          */
-        abstract update(observable: object, event: Event): void;
+        abstract update(observable: object, event: event.Event): void;
         /**
          * set readonly all
          * @param readonly
@@ -845,7 +767,7 @@ declare namespace duice {
          * @param listener
          * @param event
          */
-        checkListener(listener: Function, event: Event): Promise<boolean>;
+        checkListener(listener: Function, event: event.Event): Promise<boolean>;
     }
 }
 declare namespace duice {
@@ -882,7 +804,7 @@ declare namespace duice {
          * @param observable
          * @param event
          */
-        update(observable: Observable, event: Event): Promise<void>;
+        update(observable: Observable, event: event.Event): Promise<void>;
     }
 }
 declare namespace duice {
@@ -915,7 +837,7 @@ declare namespace duice {
          * @param observable
          * @param event
          */
-        update(observable: Observable, event: Event): Promise<void>;
+        update(observable: Observable, event: event.Event): Promise<void>;
         /**
          * getValue
          * @param property
@@ -963,7 +885,7 @@ declare namespace duice {
          * @param observable
          * @param event
          */
-        update(observable: Observable, event: duice.Event): void;
+        update(observable: Observable, event: event.Event): void;
     }
 }
 declare namespace duice {
@@ -1176,7 +1098,7 @@ declare namespace duice {
     interface Data {
     }
 }
-declare namespace duice {
+declare namespace duice.component {
     /**
      * input element component
      */
@@ -1203,7 +1125,7 @@ declare namespace duice {
         setReadonly(readonly: boolean): void;
     }
 }
-declare namespace duice {
+declare namespace duice.component {
     /**
      * input element factory class
      */
@@ -1221,7 +1143,7 @@ declare namespace duice {
         doSupport(element: HTMLElement): boolean;
     }
 }
-declare namespace duice {
+declare namespace duice.component {
     /**
      * InputCheckboxElement
      */
@@ -1250,7 +1172,31 @@ declare namespace duice {
         setReadonly(readonly: boolean): void;
     }
 }
-declare namespace duice {
+declare namespace duice.format {
+    /**
+     * NumberFormat
+     * @param scale number
+     */
+    class NumberFormat implements Format {
+        scale: number;
+        /**
+         * Constructor
+         * @param scale
+         */
+        constructor(scale?: number);
+        /**
+         * Encodes number as format
+         * @param number
+         */
+        encode(number: number): string;
+        /**
+         * Decodes formatted value as original value
+         * @param string
+         */
+        decode(string: string): number;
+    }
+}
+declare namespace duice.component {
     /**
      * input number element component
      */
@@ -1267,7 +1213,7 @@ declare namespace duice {
         getValue(): any;
     }
 }
-declare namespace duice {
+declare namespace duice.component {
     /**
      * input radio element component
      */
@@ -1294,7 +1240,7 @@ declare namespace duice {
         setReadonly(readonly: boolean): void;
     }
 }
-declare namespace duice {
+declare namespace duice.component {
     /**
      * select element component
      */
@@ -1321,7 +1267,7 @@ declare namespace duice {
         setReadonly(readonly: boolean): void;
     }
 }
-declare namespace duice {
+declare namespace duice.component {
     /**
      * select element factory class
      */
@@ -1339,7 +1285,7 @@ declare namespace duice {
         doSupport(element: HTMLElement): boolean;
     }
 }
-declare namespace duice {
+declare namespace duice.component {
     /**
      * textarea element component
      */
@@ -1366,7 +1312,7 @@ declare namespace duice {
         setReadonly(readonly: boolean): void;
     }
 }
-declare namespace duice {
+declare namespace duice.component {
     /**
      * textarea element factory class
       */
@@ -1382,5 +1328,72 @@ declare namespace duice {
          * @param element
          */
         doSupport(element: HTMLElement): boolean;
+    }
+}
+declare namespace duice.format {
+    /**
+     * date format
+     */
+    class DateFormat implements Format {
+        pattern: string;
+        patternRex: RegExp;
+        /**
+         * Constructor
+         * @param pattern
+         */
+        constructor(pattern?: string);
+        /**
+         * Encodes date string
+         * @param string
+         */
+        encode(string: string): string;
+        /**
+         * Decodes formatted date string to ISO date string.
+         * @param string
+         */
+        decode(string: string): string;
+    }
+}
+declare namespace duice.format {
+    /**
+     * format interface
+     */
+    interface Format {
+        /**
+         * Encodes original value as formatted value
+         * @param value value
+         * @return formatted value
+         */
+        encode(value: any): any;
+        /**
+         * Decodes formatted value to original value
+         * @param value value
+         * @return original value
+         */
+        decode(value: any): any;
+    }
+}
+declare namespace duice.format {
+    /**
+     * StringFormat
+     * @param string format
+     */
+    class StringFormat implements Format {
+        pattern: string;
+        /**
+         * Constructor
+         * @param pattern
+         */
+        constructor(pattern: string);
+        /**
+         * encode string as format
+         * @param value
+         */
+        encode(value: string): string;
+        /**
+         * decodes string as format
+         * @param value
+         */
+        decode(value: string): string;
     }
 }

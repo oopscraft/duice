@@ -1,6 +1,7 @@
 ///<reference path="Observable.ts"/>
 ///<reference path="Observer.ts"/>
 ///<reference path="DataHandler.ts"/>
+///<reference path="event/PropertyChangeEvent.ts"/>
 namespace duice {
 
     /**
@@ -43,7 +44,7 @@ namespace duice {
             Reflect.set(target, property, value);
 
             // notify
-            let event = new PropertyChangeEvent(this, property, value);
+            let event = new duice.event.PropertyChangeEvent(this, property, value);
             this.notifyObservers(event);
 
             // returns
@@ -55,7 +56,7 @@ namespace duice {
          * @param observable
          * @param event
          */
-        async update(observable: Observable, event: Event): Promise<void> {
+        async update(observable: Observable, event: event.Event): Promise<void> {
             console.log("ObjectHandler.update", observable, event);
 
             // Element

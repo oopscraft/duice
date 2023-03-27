@@ -1,10 +1,10 @@
-namespace duice {
+namespace duice.format {
 
     /**
      * StringFormat
      * @param string format
      */
-    export class StringMask implements Mask {
+    export class StringFormat implements Format {
 
         pattern: string;
 

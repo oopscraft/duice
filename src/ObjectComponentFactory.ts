@@ -75,10 +75,10 @@ namespace duice {
                 component.setProperty(property);
             }
 
-            // mask
-            let mask = getComponentAttribute(element, 'mask');
-            if (mask) {
-                component.setMask(mask);
+            // format
+            let format = getComponentAttribute(element, 'format');
+            if (format) {
+                component.setFormat(format);
             }
 
             // returns

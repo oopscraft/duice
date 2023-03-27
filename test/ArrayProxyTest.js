@@ -1,37 +1,38 @@
 import fs from "fs";
 import vm from "vm";
-import { JSDOM } from 'jsdom';
-vm.runInThisContext(fs.readFileSync("../dist/duice.js"));
+import {JSDOM} from "jsdom";
 let jdom = new JSDOM('<!DOCTYPE html>');
 global.window = jdom.window;
 global.document = jdom.window.document;
+global.HTMLElement = jdom.window.HTMLElement;
+vm.runInThisContext(fs.readFileSync("../dist/duice.js"));
 
 // create
-let myArray = new duice.Array([
+let myArray = new duice.ArrayProxy([
     { name: 'Apple' }
 ]);
 console.log(myArray);
 duice.assert(myArray[0].name === 'Apple');
 
 // assign
-duice.Array.assign(myArray,[
+duice.ArrayProxy.assign(myArray,[
     { name: 'Orange' }
 ]);
 console.log(myArray);
 duice.assert(myArray[0].name === 'Orange');
 
 // setReadonly
-duice.Array.setReadonly(myArray, 'name', true);
-duice.assert(duice.Array.isReadonly(myArray, 'name') === true);
-duice.Array.setReadonly(myArray, 'name', false);
-duice.assert(duice.Array.isReadonly(myArray,'name') === false);
+duice.ArrayProxy.setReadonly(myArray, 'name', true);
+duice.assert(duice.ArrayProxy.isReadonly(myArray, 'name') === true);
+duice.ArrayProxy.setReadonly(myArray, 'name', false);
+duice.assert(duice.ArrayProxy.isReadonly(myArray,'name') === false);
 
 // setReadonlyAll
 console.log('setReadonlyAll');
-duice.Array.setReadonlyAll(myArray, true);
-console.assert(duice.Array.isReadonly(myArray, 'name') === true);
-duice.Array.setReadonlyAll(myArray, false);
-duice.assert(duice.Array.isReadonly(myArray, 'name') === false);
+duice.ArrayProxy.setReadonlyAll(myArray, true);
+console.assert(duice.ArrayProxy.isReadonly(myArray, 'name') === true);
+duice.ArrayProxy.setReadonlyAll(myArray, false);
+duice.assert(duice.ArrayProxy.isReadonly(myArray, 'name') === false);
 
 
 

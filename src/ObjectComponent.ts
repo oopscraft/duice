@@ -1,5 +1,5 @@
 ///<reference path="Observable.ts"/>
-///<reference path="./mask/MaskFactory.ts"/>
+///<reference path="./format/FormatFactory.ts"/>
 ///<reference path="Component.ts"/>
 namespace duice {
 
@@ -10,7 +10,7 @@ namespace duice {
 
         property: string;
 
-        mask: Mask;
+        format: format.Format;
 
         /**
          * constructor
@@ -45,18 +45,18 @@ namespace duice {
         }
 
         /**
-         * set mask
-         * @param mask
+         * set format
+         * @param format
          */
-        setMask(mask: string): void {
-            this.mask = MaskFactory.getMask(mask);
+        setFormat(format: string): void {
+            this.format = duice.format.FormatFactory.getFormat(format);
         }
 
         /**
-         * return mask
+         * return format
          */
-        getMask(): Mask {
-            return this.mask;
+        getFormat(): format.Format {
+            return this.format;
         }
 
         /**
@@ -84,7 +84,7 @@ namespace duice {
          * @param observable
          * @param event
          */
-        override update(observable: Observable, event: Event): void {
+        override update(observable: Observable, event: event.Event): void {
             console.log('Element.update', observable, event);
 
             // ObjectHandler
@@ -108,7 +108,7 @@ namespace duice {
          * @param value
          */
         setValue(value: any): void {
-            value = this.getMask() ? this.getMask().encode(value) : value;
+            value = this.getFormat() ? this.getFormat().encode(value) : value;
             this.element.innerText = value;
         }
 
@@ -117,7 +117,7 @@ namespace duice {
          */
         getValue(): any {
             let value = this.element.innerText;
-            value = this.getMask() ? this.getMask().decode(value) : value;
+            value = this.getFormat() ? this.getFormat().decode(value) : value;
             return value;
         }
 

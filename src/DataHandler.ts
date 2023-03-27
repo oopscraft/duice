@@ -43,7 +43,7 @@ namespace duice {
          * @param observable
          * @param event
          */
-        abstract update(observable: object, event: Event): void;
+        abstract update(observable: object, event: event.Event): void;
 
         /**
          * set readonly all
@@ -54,7 +54,7 @@ namespace duice {
             if(readonly === false){
                 this.readonly.clear();
             }
-            this.notifyObservers(new Event(this));
+            this.notifyObservers(new event.Event(this));
         }
 
         /**
@@ -68,7 +68,7 @@ namespace duice {
             }else{
                 this.readonly.delete(property);
             }
-            this.notifyObservers(new Event(this));
+            this.notifyObservers(new event.Event(this));
         }
 
         /**
@@ -97,7 +97,7 @@ namespace duice {
          * @param listener
          * @param event
          */
-        async checkListener(listener: Function, event: Event): Promise<boolean> {
+        async checkListener(listener: Function, event: event.Event): Promise<boolean> {
             if(this.listenerEnabled && listener){
                 let result = await listener.call(this.getTarget(), event);
                 if(result == false){

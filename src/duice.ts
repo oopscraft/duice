@@ -182,7 +182,7 @@ namespace duice {
      * @param message
      */
     export async function alert(message: string): Promise<void> {
-        await new duice.AlertDialog(message).open();
+        await new duice.dialog.AlertDialog(message).open();
     }
 
     /**
@@ -190,7 +190,7 @@ namespace duice {
      * @param message
      */
     export async function confirm(message: string): Promise<boolean> {
-        return await new duice.ConfirmDialog(message).open();
+        return await new duice.dialog.ConfirmDialog(message).open();
     }
 
     /**
@@ -198,15 +198,15 @@ namespace duice {
      * @param message
      */
     export async function prompt(message: string): Promise<string> {
-        return await new duice.PromptDialog(message).open();
+        return await new duice.dialog.PromptDialog(message).open();
     }
 
     /**
-     * dialog
+     * open dialog
      * @param dialogElement
      */
-    export async function dialog(dialogElement: HTMLDialogElement): Promise<void> {
-        return await new duice.Dialog(dialogElement).open();
+    export async function openDialog(dialogElement: HTMLDialogElement): Promise<void> {
+        return await new duice.dialog.Dialog(dialogElement).open();
     }
 
     /**

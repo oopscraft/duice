@@ -1,4 +1,4 @@
-namespace duice {
+namespace duice.event {
 
     /**
      * PropertyChangeEvent
@@ -16,6 +16,7 @@ namespace duice {
          * @param source
          * @param property
          * @param value
+         * @param index
          */
         constructor(source: any, property: string, value: any, index?: number){
             super(source);

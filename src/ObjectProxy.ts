@@ -107,7 +107,7 @@ namespace duice {
             }
 
             // notify observers
-            objectHandler.notifyObservers(new Event(this));
+            objectHandler.notifyObservers(new event.Event(this));
         }
 
         /**

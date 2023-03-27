@@ -1,4 +1,4 @@
-namespace duice {
+namespace duice.component {
 
     /**
      * input element component
@@ -15,7 +15,7 @@ namespace duice {
 
             // adds change listener
             this.getElement().addEventListener('change', e => {
-                let event = new PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
+                let event = new duice.event.PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
                 this.notifyObservers(event);
             }, true);
         }
@@ -26,7 +26,7 @@ namespace duice {
          */
         override setValue(value: any): void {
             if(value) {
-                value = this.getMask() ? this.getMask().encode(value) : value;
+                value = this.getFormat() ? this.getFormat().encode(value) : value;
             }else{
                 value = '';
             }
@@ -39,7 +39,7 @@ namespace duice {
         override getValue(): any {
             let value = this.getElement().value;
             if(value){
-                value = this.getMask() ? this.getMask().decode(value) : value;
+                value = this.getFormat() ? this.getFormat().decode(value) : value;
             }else{
                 value = null;
             }

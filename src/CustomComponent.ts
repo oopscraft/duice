@@ -95,7 +95,7 @@ namespace duice {
          * @param observable
          * @param event
          */
-        override update(observable: Observable, event: duice.Event): void {
+        override update(observable: Observable, event: event.Event): void {
             if(observable instanceof DataHandler) {
                 this.render();
             }

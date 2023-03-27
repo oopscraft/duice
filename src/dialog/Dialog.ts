@@ -1,4 +1,4 @@
-namespace duice {
+namespace duice.dialog {
 
     /**
      * Dialog

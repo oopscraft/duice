@@ -1,5 +1,5 @@
 ///<reference path="Dialog.ts"/>
-namespace duice {
+namespace duice.dialog {
 
     /**
      * PromptDialog
@@ -42,7 +42,7 @@ namespace duice {
             this.confirmButton.appendChild(document.createTextNode('Yes'));
             this.confirmButton.style.width = '3rem';
             this.confirmButton.addEventListener('click', event => {
-                this.resolve(this.promptInput.value);
+                this.confirm(this.promptInput.value);
             });
             this.getDialogElement().appendChild(this.confirmButton);
 
@@ -51,7 +51,7 @@ namespace duice {
             this.cancelButton.appendChild(document.createTextNode('No'));
             this.cancelButton.style.width = '3rem';
             this.cancelButton.addEventListener('click', event => {
-                this.resolve();
+                this.cancel();
             });
             this.getDialogElement().appendChild(this.cancelButton);
         }
@@ -63,6 +63,30 @@ namespace duice {
             let promise = super.open();
             this.promptInput.focus();
             return promise;
+        }
+
+        /**
+         * confirm
+         */
+        confirm(value: string) {
+            this.resolve(value);
+            this.getDialogElement().parentNode.removeChild(this.getDialogElement());
+        }
+
+        /**
+         * cancel
+         */
+        cancel() {
+            this.resolve();
+            this.getDialogElement().parentNode.removeChild(this.getDialogElement());
+        }
+
+        /**
+         * close
+         */
+        override close() {
+            this.resolve();
+            this.getDialogElement().parentNode.removeChild(this.getDialogElement());
         }
 
     }

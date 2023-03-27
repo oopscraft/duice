@@ -1,5 +1,5 @@
 ///<reference path="Dialog.ts"/>
-namespace duice {
+namespace duice.dialog {
 
     /**
      * Confirm
@@ -60,6 +60,7 @@ namespace duice {
          */
         confirm() {
            this.resolve(true);
+           this.getDialogElement().parentNode.removeChild(this.getDialogElement());
         }
 
         /**
@@ -67,6 +68,7 @@ namespace duice {
          */
         cancel() {
            this.resolve(false);
+           this.getDialogElement().parentNode.removeChild(this.getDialogElement());
         }
 
         /**
@@ -74,6 +76,7 @@ namespace duice {
          */
         override close() {
            this.resolve(false);
+           this.getDialogElement().parentNode.removeChild(this.getDialogElement());
         }
 
     }

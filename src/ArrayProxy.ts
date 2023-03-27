@@ -70,7 +70,7 @@ namespace duice {
             }
 
             // notify observers
-            arrayHandler.notifyObservers(new Event(this));
+            arrayHandler.notifyObservers(new event.Event(this));
         }
 
         /**
@@ -217,7 +217,7 @@ namespace duice {
             rows.forEach((object, index) => {
                 rows[index] = new ObjectProxy(object);
             });
-            let event = new RowInsertEvent(this, index, rows);
+            let event = new duice.event.RowInsertEvent(this, index, rows);
             if (await arrayHandler.checkListener(arrayHandler.rowInsertingListener, event)) {
                 proxyTarget.splice(index, 0, ...rows);
                 await arrayHandler.checkListener(arrayHandler.rowInsertedListener, event);
@@ -236,7 +236,7 @@ namespace duice {
             let sliceBegin = index;
             let sliceEnd = (size ? index + size : index + 1);
             let rows = proxyTarget.slice(sliceBegin, sliceEnd);
-            let event = new RowDeleteEvent(this, index, rows);
+            let event = new duice.event.RowDeleteEvent(this, index, rows);
             if (await arrayHandler.checkListener(arrayHandler.rowDeletingListener, event)) {
                 let spliceStart = index;
                 let spliceDeleteCount = (size ? size : 1);

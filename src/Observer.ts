@@ -10,7 +10,7 @@ namespace duice {
          * @param observable
          * @param event
          */
-        update(observable: object, event: Event): void;
+        update(observable: object, event: event.Event): void;
 
     }
 }

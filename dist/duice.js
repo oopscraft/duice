@@ -317,7 +317,7 @@ var duice;
      */
     function alert(message) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield new duice.AlertDialog(message).open();
+            yield new duice.dialog.AlertDialog(message).open();
         });
     }
     duice.alert = alert;
@@ -327,7 +327,7 @@ var duice;
      */
     function confirm(message) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield new duice.ConfirmDialog(message).open();
+            return yield new duice.dialog.ConfirmDialog(message).open();
         });
     }
     duice.confirm = confirm;
@@ -337,20 +337,20 @@ var duice;
      */
     function prompt(message) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield new duice.PromptDialog(message).open();
+            return yield new duice.dialog.PromptDialog(message).open();
         });
     }
     duice.prompt = prompt;
     /**
-     * dialog
+     * open dialog
      * @param dialogElement
      */
-    function dialog(dialogElement) {
+    function openDialog(dialogElement) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield new duice.Dialog(dialogElement).open();
+            return yield new duice.dialog.Dialog(dialogElement).open();
         });
     }
-    duice.dialog = dialog;
+    duice.openDialog = openDialog;
     /**
      * Gets cookie value
      * @param name
@@ -451,741 +451,535 @@ var duice;
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
-    /**
-     * Dialog
-     */
-    class Dialog {
+    var dialog;
+    (function (dialog) {
         /**
-         * constructor
-         * @param dialogElement
+         * Dialog
          */
-        constructor(dialogElement) {
-            this.dialogElement = dialogElement;
-            let _this = this;
-            // dialog fixed style
-            this.dialogElement.style.position = 'absolute';
-            this.dialogElement.style.left = '0';
-            this.dialogElement.style.right = '0';
-            this.dialogElement.style.margin = 'auto';
-            this.dialogElement.style.height = 'fit-content';
-            this.dialogElement.style.borderStyle = 'solid';
-            this.dialogElement.style.borderWidth = '1px';
-            // header
-            this.header = document.createElement('span');
-            this.dialogElement.appendChild(this.header);
-            this.header.style.display = 'block';
-            this.header.style.position = 'absolute';
-            this.header.style.left = '0';
-            this.header.style.top = '0';
-            this.header.style.width = '100%';
-            this.header.style.height = '1rem';
-            this.header.style.cursor = 'pointer';
-            // drag
-            this.dialogElement.style.margin = '0px';
-            this.header.onmousedown = function (event) {
-                let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-                pos3 = event.clientX;
-                pos4 = event.clientY;
-                window.document.onmouseup = function (event) {
-                    window.document.onmousemove = null;
-                    window.document.onmouseup = null;
-                };
-                window.document.onmousemove = function (event) {
-                    pos1 = pos3 - event.clientX;
-                    pos2 = pos4 - event.clientY;
+        class Dialog {
+            /**
+             * constructor
+             * @param dialogElement
+             */
+            constructor(dialogElement) {
+                this.dialogElement = dialogElement;
+                let _this = this;
+                // dialog fixed style
+                this.dialogElement.style.position = 'absolute';
+                this.dialogElement.style.left = '0';
+                this.dialogElement.style.right = '0';
+                this.dialogElement.style.margin = 'auto';
+                this.dialogElement.style.height = 'fit-content';
+                this.dialogElement.style.borderStyle = 'solid';
+                this.dialogElement.style.borderWidth = '1px';
+                // header
+                this.header = document.createElement('span');
+                this.dialogElement.appendChild(this.header);
+                this.header.style.display = 'block';
+                this.header.style.position = 'absolute';
+                this.header.style.left = '0';
+                this.header.style.top = '0';
+                this.header.style.width = '100%';
+                this.header.style.height = '1rem';
+                this.header.style.cursor = 'pointer';
+                // drag
+                this.dialogElement.style.margin = '0px';
+                this.header.onmousedown = function (event) {
+                    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
                     pos3 = event.clientX;
                     pos4 = event.clientY;
-                    _this.dialogElement.style.left = (_this.dialogElement.offsetLeft - pos1) + 'px';
-                    _this.dialogElement.style.top = (_this.dialogElement.offsetTop - pos2) + 'px';
+                    window.document.onmouseup = function (event) {
+                        window.document.onmousemove = null;
+                        window.document.onmouseup = null;
+                    };
+                    window.document.onmousemove = function (event) {
+                        pos1 = pos3 - event.clientX;
+                        pos2 = pos4 - event.clientY;
+                        pos3 = event.clientX;
+                        pos4 = event.clientY;
+                        _this.dialogElement.style.left = (_this.dialogElement.offsetLeft - pos1) + 'px';
+                        _this.dialogElement.style.top = (_this.dialogElement.offsetTop - pos2) + 'px';
+                    };
                 };
-            };
-            // creates close button
-            this.closeButton = document.createElement('span');
-            this.closeButton.style.position = 'absolute';
-            this.closeButton.style.top = '0';
-            this.closeButton.style.right = '0';
-            this.closeButton.style.cursor = 'pointer';
-            this.closeButton.style.width = '1rem';
-            this.closeButton.style.height = '1rem';
-            this.closeButton.style.lineHeight = '1rem';
-            this.closeButton.style.margin = '1px';
-            this.closeButton.style.textAlign = 'center';
-            this.closeButton.style.fontFamily = 'sans-serif';
-            this.closeButton.style.fontSize = '0.75rem';
-            this.closeButton.appendChild(document.createTextNode('X'));
-            this.closeButton.addEventListener('click', event => {
-                _this.close();
-            });
-            this.dialogElement.appendChild(this.closeButton);
-            // on resize event
-            window.addEventListener('resize', function (event) {
-                _this.moveToCenterPosition();
-            });
-        }
-        /**
-         * moveToCenterPosition
-         */
-        moveToCenterPosition() {
-            let computedStyle = window.getComputedStyle(this.dialogElement);
-            let computedWidth = parseInt(computedStyle.getPropertyValue('width').replace(/px/gi, ''));
-            let computedHeight = parseInt(computedStyle.getPropertyValue('height').replace(/px/gi, ''));
-            let scrollX = window.scrollX;
-            let scrollY = window.scrollY;
-            this.dialogElement.style.left = Math.max(0, window.innerWidth / 2 - computedWidth / 2) + scrollX + 'px';
-            this.dialogElement.style.top = Math.max(0, window.innerHeight / 3 - computedHeight / 3) + scrollY + 'px';
-        }
-        /**
-         * getDialogElement
-         */
-        getDialogElement() {
-            return this.dialogElement;
-        }
-        /**
-         * Shows modal
-         */
-        show() {
-            // saves current scroll position
-            let scrollX = window.scrollX;
-            let scrollY = window.scrollY;
-            // show dialog modal
-            window.document.body.appendChild(this.dialogElement);
-            this.dialogElement.showModal();
-            // restore previous scroll position
-            window.scrollTo(scrollX, scrollY);
-            // adjusting position
-            this.moveToCenterPosition();
-        }
-        /**
-         * Hides modal
-         */
-        hide() {
-            // closes modal
-            this.dialogElement.close();
-        }
-        /**
-         * open
-         */
-        open() {
-            return __awaiter(this, void 0, void 0, function* () {
-                // show modal
-                this.show();
-                // creates promise
-                let _this = this;
-                this.promise = new Promise(function (resolve, reject) {
-                    _this.promiseResolve = resolve;
-                    _this.promiseReject = reject;
+                // creates close button
+                this.closeButton = document.createElement('span');
+                this.closeButton.style.position = 'absolute';
+                this.closeButton.style.top = '0';
+                this.closeButton.style.right = '0';
+                this.closeButton.style.cursor = 'pointer';
+                this.closeButton.style.width = '1rem';
+                this.closeButton.style.height = '1rem';
+                this.closeButton.style.lineHeight = '1rem';
+                this.closeButton.style.margin = '1px';
+                this.closeButton.style.textAlign = 'center';
+                this.closeButton.style.fontFamily = 'sans-serif';
+                this.closeButton.style.fontSize = '0.75rem';
+                this.closeButton.appendChild(document.createTextNode('X'));
+                this.closeButton.addEventListener('click', event => {
+                    _this.close();
                 });
-                return this.promise;
-            });
+                this.dialogElement.appendChild(this.closeButton);
+                // on resize event
+                window.addEventListener('resize', function (event) {
+                    _this.moveToCenterPosition();
+                });
+            }
+            /**
+             * moveToCenterPosition
+             */
+            moveToCenterPosition() {
+                let computedStyle = window.getComputedStyle(this.dialogElement);
+                let computedWidth = parseInt(computedStyle.getPropertyValue('width').replace(/px/gi, ''));
+                let computedHeight = parseInt(computedStyle.getPropertyValue('height').replace(/px/gi, ''));
+                let scrollX = window.scrollX;
+                let scrollY = window.scrollY;
+                this.dialogElement.style.left = Math.max(0, window.innerWidth / 2 - computedWidth / 2) + scrollX + 'px';
+                this.dialogElement.style.top = Math.max(0, window.innerHeight / 3 - computedHeight / 3) + scrollY + 'px';
+            }
+            /**
+             * getDialogElement
+             */
+            getDialogElement() {
+                return this.dialogElement;
+            }
+            /**
+             * Shows modal
+             */
+            show() {
+                // saves current scroll position
+                let scrollX = window.scrollX;
+                let scrollY = window.scrollY;
+                // show dialog modal
+                window.document.body.appendChild(this.dialogElement);
+                this.dialogElement.showModal();
+                // restore previous scroll position
+                window.scrollTo(scrollX, scrollY);
+                // adjusting position
+                this.moveToCenterPosition();
+            }
+            /**
+             * Hides modal
+             */
+            hide() {
+                // closes modal
+                this.dialogElement.close();
+            }
+            /**
+             * open
+             */
+            open() {
+                return __awaiter(this, void 0, void 0, function* () {
+                    // show modal
+                    this.show();
+                    // creates promise
+                    let _this = this;
+                    this.promise = new Promise(function (resolve, reject) {
+                        _this.promiseResolve = resolve;
+                        _this.promiseReject = reject;
+                    });
+                    return this.promise;
+                });
+            }
+            /**
+             * close
+             */
+            close() {
+                this.reject();
+            }
+            /**
+             * confirm
+             * @param args
+             */
+            resolve(...args) {
+                this.hide();
+                this.promiseResolve(...args);
+            }
+            /**
+             * close
+             * @param args
+             */
+            reject(...args) {
+                this.hide();
+                this.promiseReject(...args);
+            }
         }
-        /**
-         * close
-         */
-        close() {
-            this.reject();
-        }
-        /**
-         * confirm
-         * @param args
-         */
-        resolve(...args) {
-            this.hide();
-            this.promiseResolve(...args);
-        }
-        /**
-         * close
-         * @param args
-         */
-        reject(...args) {
-            this.hide();
-            this.promiseReject(...args);
-        }
-    }
-    duice.Dialog = Dialog;
+        dialog.Dialog = Dialog;
+    })(dialog = duice.dialog || (duice.dialog = {}));
 })(duice || (duice = {}));
 ///<reference path="Dialog.ts"/>
 var duice;
 (function (duice) {
-    /**
-     * AlertDialog
-     */
-    class AlertDialog extends duice.Dialog {
+    var dialog;
+    (function (dialog) {
         /**
-         * constructor
-         * @param message
+         * AlertDialog
          */
-        constructor(message) {
-            super(document.createElement('dialog'));
-            this.getDialogElement().style.padding = '1rem';
-            this.getDialogElement().style.minWidth = '15rem';
-            this.getDialogElement().style.textAlign = 'center';
-            // message pre
-            this.messagePre = document.createElement('pre');
-            this.messagePre.innerHTML = message;
-            this.getDialogElement().appendChild(this.messagePre);
-            // confirm button
-            this.confirmButton = document.createElement('button');
-            this.confirmButton.appendChild(document.createTextNode('Yes'));
-            this.confirmButton.style.width = '3rem';
-            this.confirmButton.addEventListener('click', event => {
-                this.confirm();
-            });
-            this.getDialogElement().appendChild(this.confirmButton);
-        }
-        /**
-         * open
-         */
-        open() {
-            let promise = super.open();
-            this.confirmButton.focus();
-            return promise;
-        }
-        /**
-         * confirm
-         */
-        confirm() {
-            this.resolve();
-        }
-        /**
-         * close
-         */
-        close() {
-            this.resolve();
-        }
-    }
-    duice.AlertDialog = AlertDialog;
-})(duice || (duice = {}));
-///<reference path="Dialog.ts"/>
-var duice;
-(function (duice) {
-    /**
-     * Confirm
-     */
-    class ConfirmDialog extends duice.Dialog {
-        /**
-         * constructor
-         * @param message
-         */
-        constructor(message) {
-            super(document.createElement('dialog'));
-            this.getDialogElement().style.padding = '1rem';
-            this.getDialogElement().style.minWidth = '15rem';
-            this.getDialogElement().style.textAlign = 'center';
-            // message pre
-            this.messagePre = document.createElement('pre');
-            this.messagePre.innerHTML = message;
-            this.getDialogElement().appendChild(this.messagePre);
-            // confirm button
-            this.confirmButton = document.createElement('button');
-            this.confirmButton.appendChild(document.createTextNode('Yes'));
-            this.confirmButton.style.width = '3rem';
-            this.confirmButton.addEventListener('click', event => {
-                this.confirm();
-            });
-            this.getDialogElement().appendChild(this.confirmButton);
-            // cancel button
-            this.cancelButton = document.createElement('button');
-            this.cancelButton.appendChild(document.createTextNode('No'));
-            this.cancelButton.style.width = '3rem';
-            this.cancelButton.addEventListener('click', event => {
-                this.cancel();
-            });
-            this.getDialogElement().appendChild(this.cancelButton);
-        }
-        /**
-         * open
-         */
-        open() {
-            let promise = super.open();
-            this.confirmButton.focus();
-            return promise;
-        }
-        /**
-         * confirm
-         */
-        confirm() {
-            this.resolve(true);
-        }
-        /**
-         * cancel
-         */
-        cancel() {
-            this.resolve(false);
-        }
-        /**
-         * close
-         */
-        close() {
-            this.resolve(false);
-        }
-    }
-    duice.ConfirmDialog = ConfirmDialog;
-})(duice || (duice = {}));
-///<reference path="Dialog.ts"/>
-var duice;
-(function (duice) {
-    /**
-     * PromptDialog
-     */
-    class PromptDialog extends duice.Dialog {
-        /**
-         * constructor
-         * @param message
-         */
-        constructor(message) {
-            super(document.createElement('dialog'));
-            this.getDialogElement().style.padding = '1rem';
-            this.getDialogElement().style.minWidth = '15rem';
-            this.getDialogElement().style.textAlign = 'center';
-            // message pre
-            this.messagePre = document.createElement('pre');
-            this.messagePre.innerHTML = message;
-            this.getDialogElement().appendChild(this.messagePre);
-            // prompt input
-            this.promptInput = document.createElement('input');
-            this.promptInput.style.display = 'block';
-            this.promptInput.style.textAlign = 'center';
-            this.promptInput.style.margin = '0.75rem 0';
-            this.promptInput.style.width = '100%';
-            this.getDialogElement().appendChild(this.promptInput);
-            // confirm button
-            this.confirmButton = document.createElement('button');
-            this.confirmButton.appendChild(document.createTextNode('Yes'));
-            this.confirmButton.style.width = '3rem';
-            this.confirmButton.addEventListener('click', event => {
-                this.resolve(this.promptInput.value);
-            });
-            this.getDialogElement().appendChild(this.confirmButton);
-            // cancel button
-            this.cancelButton = document.createElement('button');
-            this.cancelButton.appendChild(document.createTextNode('No'));
-            this.cancelButton.style.width = '3rem';
-            this.cancelButton.addEventListener('click', event => {
+        class AlertDialog extends dialog.Dialog {
+            /**
+             * constructor
+             * @param message
+             */
+            constructor(message) {
+                super(document.createElement('dialog'));
+                this.getDialogElement().style.padding = '1rem';
+                this.getDialogElement().style.minWidth = '15rem';
+                this.getDialogElement().style.textAlign = 'center';
+                // message pre
+                this.messagePre = document.createElement('pre');
+                this.messagePre.innerHTML = message;
+                this.getDialogElement().appendChild(this.messagePre);
+                // confirm button
+                this.confirmButton = document.createElement('button');
+                this.confirmButton.appendChild(document.createTextNode('Yes'));
+                this.confirmButton.style.width = '3rem';
+                this.confirmButton.addEventListener('click', event => {
+                    this.confirm();
+                });
+                this.getDialogElement().appendChild(this.confirmButton);
+            }
+            /**
+             * open
+             */
+            open() {
+                let promise = super.open();
+                this.confirmButton.focus();
+                return promise;
+            }
+            /**
+             * confirm
+             */
+            confirm() {
                 this.resolve();
-            });
-            this.getDialogElement().appendChild(this.cancelButton);
+                this.getDialogElement().parentNode.removeChild(this.getDialogElement());
+            }
+            /**
+             * close
+             */
+            close() {
+                this.resolve();
+                this.getDialogElement().parentNode.removeChild(this.getDialogElement());
+            }
         }
+        dialog.AlertDialog = AlertDialog;
+    })(dialog = duice.dialog || (duice.dialog = {}));
+})(duice || (duice = {}));
+///<reference path="Dialog.ts"/>
+var duice;
+(function (duice) {
+    var dialog;
+    (function (dialog) {
         /**
-         * open
+         * Confirm
          */
-        open() {
-            let promise = super.open();
-            this.promptInput.focus();
-            return promise;
+        class ConfirmDialog extends dialog.Dialog {
+            /**
+             * constructor
+             * @param message
+             */
+            constructor(message) {
+                super(document.createElement('dialog'));
+                this.getDialogElement().style.padding = '1rem';
+                this.getDialogElement().style.minWidth = '15rem';
+                this.getDialogElement().style.textAlign = 'center';
+                // message pre
+                this.messagePre = document.createElement('pre');
+                this.messagePre.innerHTML = message;
+                this.getDialogElement().appendChild(this.messagePre);
+                // confirm button
+                this.confirmButton = document.createElement('button');
+                this.confirmButton.appendChild(document.createTextNode('Yes'));
+                this.confirmButton.style.width = '3rem';
+                this.confirmButton.addEventListener('click', event => {
+                    this.confirm();
+                });
+                this.getDialogElement().appendChild(this.confirmButton);
+                // cancel button
+                this.cancelButton = document.createElement('button');
+                this.cancelButton.appendChild(document.createTextNode('No'));
+                this.cancelButton.style.width = '3rem';
+                this.cancelButton.addEventListener('click', event => {
+                    this.cancel();
+                });
+                this.getDialogElement().appendChild(this.cancelButton);
+            }
+            /**
+             * open
+             */
+            open() {
+                let promise = super.open();
+                this.confirmButton.focus();
+                return promise;
+            }
+            /**
+             * confirm
+             */
+            confirm() {
+                this.resolve(true);
+                this.getDialogElement().parentNode.removeChild(this.getDialogElement());
+            }
+            /**
+             * cancel
+             */
+            cancel() {
+                this.resolve(false);
+                this.getDialogElement().parentNode.removeChild(this.getDialogElement());
+            }
+            /**
+             * close
+             */
+            close() {
+                this.resolve(false);
+                this.getDialogElement().parentNode.removeChild(this.getDialogElement());
+            }
         }
-    }
-    duice.PromptDialog = PromptDialog;
+        dialog.ConfirmDialog = ConfirmDialog;
+    })(dialog = duice.dialog || (duice.dialog = {}));
+})(duice || (duice = {}));
+///<reference path="Dialog.ts"/>
+var duice;
+(function (duice) {
+    var dialog;
+    (function (dialog) {
+        /**
+         * PromptDialog
+         */
+        class PromptDialog extends dialog.Dialog {
+            /**
+             * constructor
+             * @param message
+             */
+            constructor(message) {
+                super(document.createElement('dialog'));
+                this.getDialogElement().style.padding = '1rem';
+                this.getDialogElement().style.minWidth = '15rem';
+                this.getDialogElement().style.textAlign = 'center';
+                // message pre
+                this.messagePre = document.createElement('pre');
+                this.messagePre.innerHTML = message;
+                this.getDialogElement().appendChild(this.messagePre);
+                // prompt input
+                this.promptInput = document.createElement('input');
+                this.promptInput.style.display = 'block';
+                this.promptInput.style.textAlign = 'center';
+                this.promptInput.style.margin = '0.75rem 0';
+                this.promptInput.style.width = '100%';
+                this.getDialogElement().appendChild(this.promptInput);
+                // confirm button
+                this.confirmButton = document.createElement('button');
+                this.confirmButton.appendChild(document.createTextNode('Yes'));
+                this.confirmButton.style.width = '3rem';
+                this.confirmButton.addEventListener('click', event => {
+                    this.confirm(this.promptInput.value);
+                });
+                this.getDialogElement().appendChild(this.confirmButton);
+                // cancel button
+                this.cancelButton = document.createElement('button');
+                this.cancelButton.appendChild(document.createTextNode('No'));
+                this.cancelButton.style.width = '3rem';
+                this.cancelButton.addEventListener('click', event => {
+                    this.cancel();
+                });
+                this.getDialogElement().appendChild(this.cancelButton);
+            }
+            /**
+             * open
+             */
+            open() {
+                let promise = super.open();
+                this.promptInput.focus();
+                return promise;
+            }
+            /**
+             * confirm
+             */
+            confirm(value) {
+                this.resolve(value);
+                this.getDialogElement().parentNode.removeChild(this.getDialogElement());
+            }
+            /**
+             * cancel
+             */
+            cancel() {
+                this.resolve();
+                this.getDialogElement().parentNode.removeChild(this.getDialogElement());
+            }
+            /**
+             * close
+             */
+            close() {
+                this.resolve();
+                this.getDialogElement().parentNode.removeChild(this.getDialogElement());
+            }
+        }
+        dialog.PromptDialog = PromptDialog;
+    })(dialog = duice.dialog || (duice.dialog = {}));
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
-    /**
-     * Event
-     */
-    class Event {
+    var event;
+    (function (event) {
         /**
-         * constructor
-         * @param source
+         * Event
          */
-        constructor(source) {
-            this.source = source;
+        class Event {
+            /**
+             * constructor
+             * @param source
+             */
+            constructor(source) {
+                this.source = source;
+            }
         }
-    }
-    duice.Event = Event;
+        event.Event = Event;
+    })(event = duice.event || (duice.event = {}));
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
-    /**
-     * PropertyChangeEvent
-     */
-    class PropertyChangeEvent extends duice.Event {
+    var event;
+    (function (event) {
         /**
-         * constructor
-         * @param source
-         * @param property
-         * @param value
+         * PropertyChangeEvent
          */
-        constructor(source, property, value, index) {
-            super(source);
-            this.property = property;
-            this.value = value;
-            this.index = index;
+        class PropertyChangeEvent extends event.Event {
+            /**
+             * constructor
+             * @param source
+             * @param property
+             * @param value
+             * @param index
+             */
+            constructor(source, property, value, index) {
+                super(source);
+                this.property = property;
+                this.value = value;
+                this.index = index;
+            }
+            /**
+             * getProperty
+             */
+            getProperty() {
+                return this.property;
+            }
+            /**
+             * getValue
+             */
+            getValue() {
+                return this.value;
+            }
+            /**
+             * getIndex
+             */
+            getIndex() {
+                return this.index;
+            }
         }
-        /**
-         * getProperty
-         */
-        getProperty() {
-            return this.property;
-        }
-        /**
-         * getValue
-         */
-        getValue() {
-            return this.value;
-        }
-        /**
-         * getIndex
-         */
-        getIndex() {
-            return this.index;
-        }
-    }
-    duice.PropertyChangeEvent = PropertyChangeEvent;
+        event.PropertyChangeEvent = PropertyChangeEvent;
+    })(event = duice.event || (duice.event = {}));
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
-    /**
-     * RowInsertEvent
-     */
-    class RowInsertEvent extends duice.Event {
+    var event;
+    (function (event) {
         /**
-         * constructor
-         * @param source
-         * @param index
+         * RowInsertEvent
          */
-        constructor(source, index, rows) {
-            super(source);
-            this.rows = [];
-            this.index = index;
-            this.rows = rows;
+        class RowInsertEvent extends event.Event {
+            /**
+             * constructor
+             * @param source
+             * @param index
+             */
+            constructor(source, index, rows) {
+                super(source);
+                this.rows = [];
+                this.index = index;
+                this.rows = rows;
+            }
+            /**
+             * return index
+             */
+            getIndex() {
+                return this.index;
+            }
+            /**
+             * getRows
+             */
+            getRows() {
+                return this.rows;
+            }
         }
-        /**
-         * return index
-         */
-        getIndex() {
-            return this.index;
-        }
-        /**
-         * getRows
-         */
-        getRows() {
-            return this.rows;
-        }
-    }
-    duice.RowInsertEvent = RowInsertEvent;
+        event.RowInsertEvent = RowInsertEvent;
+    })(event = duice.event || (duice.event = {}));
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
-    /**
-     * RowDeleteEvent
-     */
-    class RowDeleteEvent extends duice.Event {
+    var event;
+    (function (event) {
         /**
-         * constructor
-         * @param source
-         * @param index
+         * RowDeleteEvent
          */
-        constructor(source, index, rows) {
-            super(source);
-            this.rows = [];
-            this.index = index;
-            this.rows = rows;
+        class RowDeleteEvent extends event.Event {
+            /**
+             * constructor
+             * @param source
+             * @param index
+             */
+            constructor(source, index, rows) {
+                super(source);
+                this.rows = [];
+                this.index = index;
+                this.rows = rows;
+            }
+            /**
+             * return index
+             */
+            getIndex() {
+                return this.index;
+            }
+            /**
+             * getRows
+             */
+            getRows() {
+                return this.rows;
+            }
         }
-        /**
-         * return index
-         */
-        getIndex() {
-            return this.index;
-        }
-        /**
-         * getRows
-         */
-        getRows() {
-            return this.rows;
-        }
-    }
-    duice.RowDeleteEvent = RowDeleteEvent;
+        event.RowDeleteEvent = RowDeleteEvent;
+    })(event = duice.event || (duice.event = {}));
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
-    /**
-     * RowMoveEvent
-     */
-    class RowMoveEvent extends duice.Event {
+    var event;
+    (function (event) {
         /**
-         * constructor
-         * @param source
-         * @param fromIndex
-         * @param toIndex
+         * RowMoveEvent
          */
-        constructor(source, fromIndex, toIndex) {
-            super(source);
-            this.fromIndex = fromIndex;
-            this.toIndex = toIndex;
+        class RowMoveEvent extends event.Event {
+            /**
+             * constructor
+             * @param source
+             * @param fromIndex
+             * @param toIndex
+             */
+            constructor(source, fromIndex, toIndex) {
+                super(source);
+                this.fromIndex = fromIndex;
+                this.toIndex = toIndex;
+            }
+            /**
+             * getFromIndex
+             */
+            getFromIndex() {
+                return this.fromIndex;
+            }
+            /**
+             * getToIndex
+             */
+            getToIndex() {
+                return this.toIndex;
+            }
         }
-        /**
-         * getFromIndex
-         */
-        getFromIndex() {
-            return this.fromIndex;
-        }
-        /**
-         * getToIndex
-         */
-        getToIndex() {
-            return this.toIndex;
-        }
-    }
-    duice.RowMoveEvent = RowMoveEvent;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * DateFormat
-     */
-    class DateMask {
-        /**
-         * Constructor
-         * @param pattern
-         */
-        constructor(pattern) {
-            this.patternRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
-            this.pattern = pattern;
-        }
-        /**
-         * Encodes date string
-         * @param string
-         */
-        encode(string) {
-            if (!string) {
-                return '';
-            }
-            if (!this.pattern) {
-                return new Date(string).toString();
-            }
-            let date = new Date(string);
-            string = this.pattern.replace(this.patternRex, function ($1) {
-                switch ($1) {
-                    case "yyyy":
-                        return date.getFullYear();
-                    case "yy":
-                        return String(date.getFullYear() % 1000).padStart(2, '0');
-                    case "MM":
-                        return String(date.getMonth() + 1).padStart(2, '0');
-                    case "dd":
-                        return String(date.getDate()).padStart(2, '0');
-                    case "HH":
-                        return String(date.getHours()).padStart(2, '0');
-                    case "hh":
-                        return String(date.getHours() <= 12 ? date.getHours() : date.getHours() % 12).padStart(2, '0');
-                    case "mm":
-                        return String(date.getMinutes()).padStart(2, '0');
-                    case "ss":
-                        return String(date.getSeconds()).padStart(2, '0');
-                    default:
-                        return $1;
-                }
-            });
-            return string;
-        }
-        /**
-         * Decodes formatted date string to ISO date string.
-         * @param string
-         */
-        decode(string) {
-            if (!string) {
-                return null;
-            }
-            if (!this.pattern) {
-                return new Date(string).toISOString();
-            }
-            let date = new Date(0, 0, 0, 0, 0, 0);
-            let match;
-            while ((match = this.patternRex.exec(this.pattern)) != null) {
-                let formatString = match[0];
-                let formatIndex = match.index;
-                let formatLength = formatString.length;
-                let matchValue = string.substr(formatIndex, formatLength);
-                matchValue = matchValue.padEnd(formatLength, '0');
-                switch (formatString) {
-                    case 'yyyy': {
-                        let fullYear = parseInt(matchValue);
-                        date.setFullYear(fullYear);
-                        break;
-                    }
-                    case 'yy': {
-                        let yyValue = parseInt(matchValue);
-                        let yearPrefix = Math.floor(new Date().getFullYear() / 100);
-                        let fullYear = yearPrefix * 100 + yyValue;
-                        date.setFullYear(fullYear);
-                        break;
-                    }
-                    case 'MM': {
-                        let monthValue = parseInt(matchValue);
-                        date.setMonth(monthValue - 1);
-                        break;
-                    }
-                    case 'dd': {
-                        let dateValue = parseInt(matchValue);
-                        date.setDate(dateValue);
-                        break;
-                    }
-                    case 'HH': {
-                        let hoursValue = parseInt(matchValue);
-                        date.setHours(hoursValue);
-                        break;
-                    }
-                    case 'hh': {
-                        let hoursValue = parseInt(matchValue);
-                        date.setHours(hoursValue > 12 ? (hoursValue + 12) : hoursValue);
-                        break;
-                    }
-                    case 'mm': {
-                        let minutesValue = parseInt(matchValue);
-                        date.setMinutes(minutesValue);
-                        break;
-                    }
-                    case 'ss': {
-                        let secondsValue = parseInt(matchValue);
-                        date.setSeconds(secondsValue);
-                        break;
-                    }
-                }
-            }
-            return date.toISOString();
-        }
-    }
-    duice.DateMask = DateMask;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    class MaskFactory {
-        /**
-         * getMask
-         * @param mask
-         */
-        static getMask(mask) {
-            if (mask.startsWith('string')) {
-                mask = mask.replace('string', 'StringMask');
-            }
-            if (mask.startsWith('number')) {
-                mask = mask.replace('number', 'NumberMask');
-            }
-            if (mask.startsWith('date')) {
-                mask = mask.replace('date', 'DateMask');
-            }
-            return Function(`return new duice.${mask};`).call(null);
-        }
-    }
-    duice.MaskFactory = MaskFactory;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * NumberFormat
-     * @param scale number
-     */
-    class NumberMask {
-        /**
-         * Constructor
-         * @param scale
-         */
-        constructor(scale) {
-            this.scale = 0;
-            this.scale = scale;
-        }
-        /**
-         * Encodes number as format
-         * @param number
-         */
-        encode(number) {
-            if (!number || isNaN(Number(number))) {
-                return '';
-            }
-            number = Number(number);
-            let string = String(number.toFixed(this.scale));
-            let reg = /(^[+-]?\d+)(\d{3})/;
-            while (reg.test(string)) {
-                string = string.replace(reg, '$1' + ',' + '$2');
-            }
-            return string;
-        }
-        /**
-         * Decodes formatted value as original value
-         * @param string
-         */
-        decode(string) {
-            if (!string) {
-                return null;
-            }
-            if (string.length === 1 && /[+-]/.test(string)) {
-                string += '0';
-            }
-            string = string.replace(/,/gi, '');
-            if (isNaN(Number(string))) {
-                throw 'NaN';
-            }
-            let number = Number(string);
-            number = Number(number.toFixed(this.scale));
-            return number;
-        }
-    }
-    duice.NumberMask = NumberMask;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * StringFormat
-     * @param string format
-     */
-    class StringMask {
-        /**
-         * Constructor
-         * @param pattern
-         */
-        constructor(pattern) {
-            this.pattern = pattern;
-        }
-        /**
-         * encode string as format
-         * @param value
-         */
-        encode(value) {
-            if (!value) {
-                return value;
-            }
-            let encodedValue = '';
-            let patternChars = this.pattern.split('');
-            let valueChars = value.split('');
-            let valueCharsPosition = 0;
-            for (let i = 0, size = patternChars.length; i < size; i++) {
-                let patternChar = patternChars[i];
-                if (patternChar === '#') {
-                    encodedValue += valueChars[valueCharsPosition++] || '';
-                }
-                else {
-                    encodedValue += patternChar;
-                }
-                if (valueCharsPosition >= valueChars.length) {
-                    break;
-                }
-            }
-            return encodedValue;
-        }
-        /**
-         * decodes string as format
-         * @param value
-         */
-        decode(value) {
-            if (!value) {
-                return value;
-            }
-            let decodedValue = '';
-            let patternChars = this.pattern.split('');
-            let valueChars = value.split('');
-            let valueCharsPosition = 0;
-            for (let i = 0, size = patternChars.length; i < size; i++) {
-                let patternChar = patternChars[i];
-                if (patternChar === '#') {
-                    decodedValue += valueChars[valueCharsPosition++] || '';
-                }
-                else {
-                    valueCharsPosition++;
-                }
-            }
-            return decodedValue;
-        }
-    }
-    duice.StringMask = StringMask;
+        event.RowMoveEvent = RowMoveEvent;
+    })(event = duice.event || (duice.event = {}));
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
@@ -1324,21 +1118,21 @@ var duice;
                     // editable
                     if (this.editable) {
                         rowElement.setAttribute('draggable', 'true');
-                        rowElement.addEventListener('dragstart', function (event) {
+                        rowElement.addEventListener('dragstart', function (e) {
                             let fromIndex = duice.getComponentAttribute(this, 'index');
-                            event.dataTransfer.setData("text", fromIndex);
+                            e.dataTransfer.setData("text", fromIndex);
                         });
-                        rowElement.addEventListener('dragover', function (event) {
-                            event.preventDefault();
-                            event.stopPropagation();
+                        rowElement.addEventListener('dragover', function (e) {
+                            e.preventDefault();
+                            e.stopPropagation();
                         });
-                        rowElement.addEventListener('drop', function (event) {
+                        rowElement.addEventListener('drop', function (e) {
                             return __awaiter(this, void 0, void 0, function* () {
-                                event.preventDefault();
-                                event.stopPropagation();
-                                let fromIndex = parseInt(event.dataTransfer.getData('text'));
+                                e.preventDefault();
+                                e.stopPropagation();
+                                let fromIndex = parseInt(e.dataTransfer.getData('text'));
                                 let toIndex = parseInt(duice.getComponentAttribute(this, 'index'));
-                                let rowIndexChangeEvent = new duice.RowMoveEvent(_this, fromIndex, toIndex);
+                                let rowIndexChangeEvent = new duice.event.RowMoveEvent(_this, fromIndex, toIndex);
                                 _this.notifyObservers(rowIndexChangeEvent);
                             });
                         });
@@ -1443,8 +1237,33 @@ var duice;
     ArrayComponentFactory.instances = [];
     duice.ArrayComponentFactory = ArrayComponentFactory;
 })(duice || (duice = {}));
+var duice;
+(function (duice) {
+    var format;
+    (function (format_1) {
+        class FormatFactory {
+            /**
+             * return format instance
+             * @param format
+             */
+            static getFormat(format) {
+                if (format.startsWith('string')) {
+                    format = format.replace('string', 'StringFormat');
+                }
+                if (format.startsWith('number')) {
+                    format = format.replace('number', 'NumberFormat');
+                }
+                if (format.startsWith('date')) {
+                    format = format.replace('date', 'DateFormat');
+                }
+                return Function(`return new duice.format.${format};`).call(null);
+            }
+        }
+        format_1.FormatFactory = FormatFactory;
+    })(format = duice.format || (duice.format = {}));
+})(duice || (duice = {}));
 ///<reference path="Observable.ts"/>
-///<reference path="./mask/MaskFactory.ts"/>
+///<reference path="./format/FormatFactory.ts"/>
 ///<reference path="Component.ts"/>
 var duice;
 (function (duice) {
@@ -1481,17 +1300,17 @@ var duice;
             return this.property;
         }
         /**
-         * set mask
-         * @param mask
+         * set format
+         * @param format
          */
-        setMask(mask) {
-            this.mask = duice.MaskFactory.getMask(mask);
+        setFormat(format) {
+            this.format = duice.format.FormatFactory.getFormat(format);
         }
         /**
-         * return mask
+         * return format
          */
-        getMask() {
-            return this.mask;
+        getFormat() {
+            return this.format;
         }
         /**
          * render
@@ -1533,7 +1352,7 @@ var duice;
          * @param value
          */
         setValue(value) {
-            value = this.getMask() ? this.getMask().encode(value) : value;
+            value = this.getFormat() ? this.getFormat().encode(value) : value;
             this.element.innerText = value;
         }
         /**
@@ -1541,7 +1360,7 @@ var duice;
          */
         getValue() {
             let value = this.element.innerText;
-            value = this.getMask() ? this.getMask().decode(value) : value;
+            value = this.getFormat() ? this.getFormat().decode(value) : value;
             return value;
         }
         /**
@@ -1627,10 +1446,10 @@ var duice;
             if (property) {
                 component.setProperty(property);
             }
-            // mask
-            let mask = duice.getComponentAttribute(element, 'mask');
-            if (mask) {
-                component.setMask(mask);
+            // format
+            let format = duice.getComponentAttribute(element, 'format');
+            if (format) {
+                component.setFormat(format);
             }
             // returns
             return component;
@@ -1688,7 +1507,7 @@ var duice;
             if (readonly === false) {
                 this.readonly.clear();
             }
-            this.notifyObservers(new duice.Event(this));
+            this.notifyObservers(new duice.event.Event(this));
         }
         /**
          * set readonly
@@ -1702,7 +1521,7 @@ var duice;
             else {
                 this.readonly.delete(property);
             }
-            this.notifyObservers(new duice.Event(this));
+            this.notifyObservers(new duice.event.Event(this));
         }
         /**
          * return whether readonly is
@@ -1743,6 +1562,7 @@ var duice;
     duice.DataHandler = DataHandler;
 })(duice || (duice = {}));
 ///<reference path="DataHandler.ts"/>
+///<reference path="event/RowMoveEvent.ts"/>
 var duice;
 (function (duice) {
     /**
@@ -1847,7 +1667,7 @@ var duice;
             console.debug("ArrayHandler.set", '|', target, '|', property, '|', value);
             Reflect.set(target, property, value);
             if (property === 'length') {
-                this.notifyObservers(new duice.Event(this));
+                this.notifyObservers(new duice.event.Event(this));
             }
             return true;
         }
@@ -1861,7 +1681,7 @@ var duice;
                 console.debug("ArrayHandler.update", observable, event);
                 // instance is array component
                 if (observable instanceof duice.ArrayComponent) {
-                    if (event instanceof duice.RowMoveEvent) {
+                    if (event instanceof duice.event.RowMoveEvent) {
                         let object = this.getTarget().splice(event.getFromIndex(), 1)[0];
                         this.getTarget().splice(event.getToIndex(), 0, object);
                     }
@@ -1876,6 +1696,7 @@ var duice;
 ///<reference path="Observable.ts"/>
 ///<reference path="Observer.ts"/>
 ///<reference path="DataHandler.ts"/>
+///<reference path="event/PropertyChangeEvent.ts"/>
 var duice;
 (function (duice) {
     /**
@@ -1909,7 +1730,7 @@ var duice;
             // change value
             Reflect.set(target, property, value);
             // notify
-            let event = new duice.PropertyChangeEvent(this, property, value);
+            let event = new duice.event.PropertyChangeEvent(this, property, value);
             this.notifyObservers(event);
             // returns
             return true;
@@ -2169,7 +1990,7 @@ var duice;
                 objectHandler.resumeNotify();
             }
             // notify observers
-            objectHandler.notifyObservers(new duice.Event(this));
+            objectHandler.notifyObservers(new duice.event.Event(this));
         }
         /**
          * setTarget
@@ -2317,7 +2138,7 @@ var duice;
                 arrayHandler.resumeNotify();
             }
             // notify observers
-            arrayHandler.notifyObservers(new duice.Event(this));
+            arrayHandler.notifyObservers(new duice.event.Event(this));
         }
         /**
          * setTarget
@@ -2451,7 +2272,7 @@ var duice;
                 rows.forEach((object, index) => {
                     rows[index] = new duice.ObjectProxy(object);
                 });
-                let event = new duice.RowInsertEvent(this, index, rows);
+                let event = new duice.event.RowInsertEvent(this, index, rows);
                 if (yield arrayHandler.checkListener(arrayHandler.rowInsertingListener, event)) {
                     proxyTarget.splice(index, 0, ...rows);
                     yield arrayHandler.checkListener(arrayHandler.rowInsertedListener, event);
@@ -2471,7 +2292,7 @@ var duice;
                 let sliceBegin = index;
                 let sliceEnd = (size ? index + size : index + 1);
                 let rows = proxyTarget.slice(sliceBegin, sliceEnd);
-                let event = new duice.RowDeleteEvent(this, index, rows);
+                let event = new duice.event.RowDeleteEvent(this, index, rows);
                 if (yield arrayHandler.checkListener(arrayHandler.rowDeletingListener, event)) {
                     let spliceStart = index;
                     let spliceDeleteCount = (size ? size : 1);
@@ -2531,388 +2352,662 @@ var duice;
 // }
 var duice;
 (function (duice) {
-    /**
-     * input element component
-     */
-    class InputElement extends duice.ObjectComponent {
+    var component;
+    (function (component) {
         /**
-         * constructor
-         * @param element
-         * @param context
+         * input element component
          */
-        constructor(element, context) {
-            super(element, context);
-            // adds change listener
-            this.getElement().addEventListener('change', e => {
-                let event = new duice.PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
-                this.notifyObservers(event);
-            }, true);
-        }
-        /**
-         * set value
-         * @param value
-         */
-        setValue(value) {
-            if (value) {
-                value = this.getMask() ? this.getMask().encode(value) : value;
+        class InputElement extends duice.ObjectComponent {
+            /**
+             * constructor
+             * @param element
+             * @param context
+             */
+            constructor(element, context) {
+                super(element, context);
+                // adds change listener
+                this.getElement().addEventListener('change', e => {
+                    let event = new duice.event.PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
+                    this.notifyObservers(event);
+                }, true);
             }
-            else {
-                value = '';
-            }
-            this.getElement().value = value;
-        }
-        /**
-         * return value
-         */
-        getValue() {
-            let value = this.getElement().value;
-            if (value) {
-                value = this.getMask() ? this.getMask().decode(value) : value;
-            }
-            else {
-                value = null;
-            }
-            return value;
-        }
-        /**
-         * set readonly
-         * @param readonly
-         */
-        setReadonly(readonly) {
-            this.getElement().readOnly = readonly;
-        }
-    }
-    duice.InputElement = InputElement;
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * input element factory class
-     */
-    class InputElementFactory extends duice.ObjectComponentFactory {
-        /**
-         * creates component
-         * @param element
-         * @param context
-         */
-        doCreateComponent(element, context) {
-            let type = element.getAttribute('type');
-            switch (type) {
-                case 'number':
-                    return new duice.InputNumberElement(element, context);
-                case 'checkbox':
-                    return new duice.InputCheckboxElement(element, context);
-                case 'radio':
-                    return new duice.InputRadioElement(element, context);
-                default:
-                    return new duice.InputElement(element, context);
-            }
-        }
-        /**
-         * check supported
-         * @param element
-         */
-        doSupport(element) {
-            return (element.tagName.toLowerCase() === 'input');
-        }
-    }
-    duice.InputElementFactory = InputElementFactory;
-    // register factory instance
-    duice.ObjectComponentFactory.addInstance(new InputElementFactory());
-})(duice || (duice = {}));
-///<reference path="InputElement.ts"/>
-var duice;
-(function (duice) {
-    /**
-     * InputCheckboxElement
-     */
-    class InputCheckboxElement extends duice.InputElement {
-        /**
-         * constructor
-         * @param element
-         * @param context
-         */
-        constructor(element, context) {
-            super(element, context);
-            this.trueValue = true;
-            this.falseValue = false;
-            // true false value
-            let trueValue = duice.getComponentAttribute(this.getElement(), 'true-value');
-            this.trueValue = trueValue ? trueValue : this.trueValue;
-            let falseValue = duice.getComponentAttribute(this.getElement(), 'false-value');
-            this.falseValue = falseValue ? falseValue : this.falseValue;
-        }
-        /**
-         * set value
-         * @param value
-         */
-        setValue(value) {
-            if (value === this.trueValue) {
-                this.getElement().checked = true;
-            }
-            else {
-                this.element.checked = false;
-            }
-        }
-        /**
-         * get value
-         */
-        getValue() {
-            if (this.element.checked) {
-                return this.trueValue;
-            }
-            else {
-                return this.falseValue;
-            }
-        }
-        /**
-         * set readonly
-         * @param readonly
-         */
-        setReadonly(readonly) {
-            if (readonly) {
-                this.getElement().style.pointerEvents = 'none';
-            }
-            else {
-                this.getElement().style.pointerEvents = '';
-            }
-        }
-    }
-    duice.InputCheckboxElement = InputCheckboxElement;
-})(duice || (duice = {}));
-///<reference path="../mask/NumberMask.ts"/>
-///<reference path="InputElement.ts"/>
-var duice;
-(function (duice) {
-    /**
-     * input number element component
-     */
-    class InputNumberElement extends duice.InputElement {
-        /**
-         * constructor
-         * @param element
-         * @param context
-         */
-        constructor(element, context) {
-            super(element, context);
-            // changes type and style
-            this.getElement().removeAttribute('type');
-            this.getElement().style.textAlign = 'right';
-            // prevents invalid key press
-            this.getElement().addEventListener('keypress', event => {
-                if (/[\d|\.|,]/.test(event.key) === false) {
-                    event.preventDefault();
+            /**
+             * set value
+             * @param value
+             */
+            setValue(value) {
+                if (value) {
+                    value = this.getFormat() ? this.getFormat().encode(value) : value;
                 }
-            });
+                else {
+                    value = '';
+                }
+                this.getElement().value = value;
+            }
+            /**
+             * return value
+             */
+            getValue() {
+                let value = this.getElement().value;
+                if (value) {
+                    value = this.getFormat() ? this.getFormat().decode(value) : value;
+                }
+                else {
+                    value = null;
+                }
+                return value;
+            }
+            /**
+             * set readonly
+             * @param readonly
+             */
+            setReadonly(readonly) {
+                this.getElement().readOnly = readonly;
+            }
         }
+        component.InputElement = InputElement;
+    })(component = duice.component || (duice.component = {}));
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    var component;
+    (function (component) {
         /**
-         * return value
+         * input element factory class
          */
-        getValue() {
-            let value = super.getValue();
-            return Number(value);
+        class InputElementFactory extends duice.ObjectComponentFactory {
+            /**
+             * creates component
+             * @param element
+             * @param context
+             */
+            doCreateComponent(element, context) {
+                let type = element.getAttribute('type');
+                switch (type) {
+                    case 'number':
+                        return new component.InputNumberElement(element, context);
+                    case 'checkbox':
+                        return new component.InputCheckboxElement(element, context);
+                    case 'radio':
+                        return new component.InputRadioElement(element, context);
+                    default:
+                        return new component.InputElement(element, context);
+                }
+            }
+            /**
+             * check supported
+             * @param element
+             */
+            doSupport(element) {
+                return (element.tagName.toLowerCase() === 'input');
+            }
         }
-    }
-    duice.InputNumberElement = InputNumberElement;
+        component.InputElementFactory = InputElementFactory;
+        // register factory instance
+        duice.ObjectComponentFactory.addInstance(new InputElementFactory());
+    })(component = duice.component || (duice.component = {}));
 })(duice || (duice = {}));
 ///<reference path="InputElement.ts"/>
 var duice;
 (function (duice) {
-    /**
-     * input radio element component
-     */
-    class InputRadioElement extends duice.InputElement {
+    var component;
+    (function (component) {
         /**
-         * constructor
-         * @param element
-         * @param context
+         * InputCheckboxElement
          */
-        constructor(element, context) {
-            super(element, context);
-        }
-        /**
-         * set value
-         * @param value
-         */
-        setValue(value) {
-            this.getElement().checked = (this.getElement().value === value);
-        }
-        /**
-         * return value
-         */
-        getValue() {
-            return this.getElement().value;
-        }
-        /**
-         * set readonly
-         * @param readonly
-         */
-        setReadonly(readonly) {
-            if (readonly) {
-                this.getElement().style.pointerEvents = 'none';
+        class InputCheckboxElement extends component.InputElement {
+            /**
+             * constructor
+             * @param element
+             * @param context
+             */
+            constructor(element, context) {
+                super(element, context);
+                this.trueValue = true;
+                this.falseValue = false;
+                // true false value
+                let trueValue = duice.getComponentAttribute(this.getElement(), 'true-value');
+                this.trueValue = trueValue ? trueValue : this.trueValue;
+                let falseValue = duice.getComponentAttribute(this.getElement(), 'false-value');
+                this.falseValue = falseValue ? falseValue : this.falseValue;
             }
-            else {
-                this.getElement().style.pointerEvents = '';
+            /**
+             * set value
+             * @param value
+             */
+            setValue(value) {
+                if (value === this.trueValue) {
+                    this.getElement().checked = true;
+                }
+                else {
+                    this.element.checked = false;
+                }
+            }
+            /**
+             * get value
+             */
+            getValue() {
+                if (this.element.checked) {
+                    return this.trueValue;
+                }
+                else {
+                    return this.falseValue;
+                }
+            }
+            /**
+             * set readonly
+             * @param readonly
+             */
+            setReadonly(readonly) {
+                if (readonly) {
+                    this.getElement().style.pointerEvents = 'none';
+                }
+                else {
+                    this.getElement().style.pointerEvents = '';
+                }
             }
         }
-    }
-    duice.InputRadioElement = InputRadioElement;
+        component.InputCheckboxElement = InputCheckboxElement;
+    })(component = duice.component || (duice.component = {}));
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
-    /**
-     * select element component
-     */
-    class SelectElement extends duice.ObjectComponent {
+    var format;
+    (function (format) {
         /**
-         * constructor
-         * @param element
-         * @param context
+         * NumberFormat
+         * @param scale number
          */
-        constructor(element, context) {
-            super(element, context);
-            // adds event listener
-            this.getElement().addEventListener('change', (e) => {
-                let event = new duice.PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
-                this.notifyObservers(event);
-            }, true);
+        class NumberFormat {
+            /**
+             * Constructor
+             * @param scale
+             */
+            constructor(scale) {
+                this.scale = 0;
+                this.scale = scale;
+            }
+            /**
+             * Encodes number as format
+             * @param number
+             */
+            encode(number) {
+                if (!number || isNaN(Number(number))) {
+                    return '';
+                }
+                number = Number(number);
+                let string = String(number.toFixed(this.scale));
+                let reg = /(^[+-]?\d+)(\d{3})/;
+                while (reg.test(string)) {
+                    string = string.replace(reg, '$1' + ',' + '$2');
+                }
+                return string;
+            }
+            /**
+             * Decodes formatted value as original value
+             * @param string
+             */
+            decode(string) {
+                if (!string) {
+                    return null;
+                }
+                if (string.length === 1 && /[+-]/.test(string)) {
+                    string += '0';
+                }
+                string = string.replace(/,/gi, '');
+                if (isNaN(Number(string))) {
+                    throw 'NaN';
+                }
+                let number = Number(string);
+                number = Number(number.toFixed(this.scale));
+                return number;
+            }
         }
+        format.NumberFormat = NumberFormat;
+    })(format = duice.format || (duice.format = {}));
+})(duice || (duice = {}));
+///<reference path="../format/NumberFormat.ts"/>
+///<reference path="InputElement.ts"/>
+var duice;
+(function (duice) {
+    var component;
+    (function (component) {
         /**
-         * set value
-         * @param value
+         * input number element component
          */
-        setValue(value) {
-            this.getElement().value = value;
-            // force select option
-            if (!value) {
-                for (let i = 0; i < this.getElement().options.length; i++) {
-                    let option = this.getElement().options[i];
-                    if (!option.nodeValue) {
-                        option.selected = true;
-                        break;
+        class InputNumberElement extends component.InputElement {
+            /**
+             * constructor
+             * @param element
+             * @param context
+             */
+            constructor(element, context) {
+                super(element, context);
+                // changes type and style
+                this.getElement().removeAttribute('type');
+                this.getElement().style.textAlign = 'right';
+                // prevents invalid key press
+                this.getElement().addEventListener('keypress', event => {
+                    if (/[\d|\.|,]/.test(event.key) === false) {
+                        event.preventDefault();
+                    }
+                });
+            }
+            /**
+             * return value
+             */
+            getValue() {
+                let value = super.getValue();
+                return Number(value);
+            }
+        }
+        component.InputNumberElement = InputNumberElement;
+    })(component = duice.component || (duice.component = {}));
+})(duice || (duice = {}));
+///<reference path="InputElement.ts"/>
+var duice;
+(function (duice) {
+    var component;
+    (function (component) {
+        /**
+         * input radio element component
+         */
+        class InputRadioElement extends component.InputElement {
+            /**
+             * constructor
+             * @param element
+             * @param context
+             */
+            constructor(element, context) {
+                super(element, context);
+            }
+            /**
+             * set value
+             * @param value
+             */
+            setValue(value) {
+                this.getElement().checked = (this.getElement().value === value);
+            }
+            /**
+             * return value
+             */
+            getValue() {
+                return this.getElement().value;
+            }
+            /**
+             * set readonly
+             * @param readonly
+             */
+            setReadonly(readonly) {
+                if (readonly) {
+                    this.getElement().style.pointerEvents = 'none';
+                }
+                else {
+                    this.getElement().style.pointerEvents = '';
+                }
+            }
+        }
+        component.InputRadioElement = InputRadioElement;
+    })(component = duice.component || (duice.component = {}));
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    var component;
+    (function (component) {
+        /**
+         * select element component
+         */
+        class SelectElement extends duice.ObjectComponent {
+            /**
+             * constructor
+             * @param element
+             * @param context
+             */
+            constructor(element, context) {
+                super(element, context);
+                // adds event listener
+                this.getElement().addEventListener('change', (e) => {
+                    let event = new duice.event.PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
+                    this.notifyObservers(event);
+                }, true);
+            }
+            /**
+             * set value
+             * @param value
+             */
+            setValue(value) {
+                this.getElement().value = value;
+                // force select option
+                if (!value) {
+                    for (let i = 0; i < this.getElement().options.length; i++) {
+                        let option = this.getElement().options[i];
+                        if (!option.nodeValue) {
+                            option.selected = true;
+                            break;
+                        }
                     }
                 }
             }
-        }
-        /**
-         * return value
-         */
-        getValue() {
-            return this.getElement().value;
-        }
-        /**
-         * set readonly
-         * @param readonly
-         */
-        setReadonly(readonly) {
-            if (readonly) {
-                console.warn("==ok");
-                this.getElement().style.pointerEvents = 'none';
+            /**
+             * return value
+             */
+            getValue() {
+                return this.getElement().value;
             }
-            else {
-                this.getElement().style.pointerEvents = '';
+            /**
+             * set readonly
+             * @param readonly
+             */
+            setReadonly(readonly) {
+                if (readonly) {
+                    console.warn("==ok");
+                    this.getElement().style.pointerEvents = 'none';
+                }
+                else {
+                    this.getElement().style.pointerEvents = '';
+                }
             }
         }
-    }
-    duice.SelectElement = SelectElement;
+        component.SelectElement = SelectElement;
+    })(component = duice.component || (duice.component = {}));
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
-    /**
-     * select element factory class
-     */
-    class SelectElementFactory extends duice.ObjectComponentFactory {
+    var component;
+    (function (component) {
         /**
-         * create component
-         * @param element
-         * @param context
+         * select element factory class
          */
-        doCreateComponent(element, context) {
-            return new duice.SelectElement(element, context);
+        class SelectElementFactory extends duice.ObjectComponentFactory {
+            /**
+             * create component
+             * @param element
+             * @param context
+             */
+            doCreateComponent(element, context) {
+                return new component.SelectElement(element, context);
+            }
+            /**
+             * return supported
+             * @param element
+             */
+            doSupport(element) {
+                return (element.tagName.toLowerCase() === 'select');
+            }
         }
-        /**
-         * return supported
-         * @param element
-         */
-        doSupport(element) {
-            return (element.tagName.toLowerCase() === 'select');
-        }
-    }
-    duice.SelectElementFactory = SelectElementFactory;
-    // register factory instance
-    duice.ObjectComponentFactory.addInstance(new SelectElementFactory());
+        component.SelectElementFactory = SelectElementFactory;
+        // register factory instance
+        duice.ObjectComponentFactory.addInstance(new SelectElementFactory());
+    })(component = duice.component || (duice.component = {}));
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
-    /**
-     * textarea element component
-     */
-    class TextareaElement extends duice.ObjectComponent {
+    var component;
+    (function (component) {
         /**
-         * constructor
-         * @param element
-         * @param context
+         * textarea element component
          */
-        constructor(element, context) {
-            super(element, context);
-            // adds change event listener
-            this.getElement().addEventListener('change', e => {
-                let event = new duice.PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
-                this.notifyObservers(event);
-            }, true);
-        }
-        /**
-         * set value
-         * @param value
-         */
-        setValue(value) {
-            this.getElement().value = value;
-        }
-        /**
-         * return value
-         */
-        getValue() {
-            return this.getElement().value;
-        }
-        /**
-         * set readonly
-         * @param readonly
-         */
-        setReadonly(readonly) {
-            if (readonly) {
-                this.getElement().setAttribute('readonly', 'readonly');
+        class TextareaElement extends duice.ObjectComponent {
+            /**
+             * constructor
+             * @param element
+             * @param context
+             */
+            constructor(element, context) {
+                super(element, context);
+                // adds change event listener
+                this.getElement().addEventListener('change', e => {
+                    let event = new duice.event.PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
+                    this.notifyObservers(event);
+                }, true);
             }
-            else {
-                this.getElement().removeAttribute('readonly');
+            /**
+             * set value
+             * @param value
+             */
+            setValue(value) {
+                this.getElement().value = value;
+            }
+            /**
+             * return value
+             */
+            getValue() {
+                return this.getElement().value;
+            }
+            /**
+             * set readonly
+             * @param readonly
+             */
+            setReadonly(readonly) {
+                if (readonly) {
+                    this.getElement().setAttribute('readonly', 'readonly');
+                }
+                else {
+                    this.getElement().removeAttribute('readonly');
+                }
             }
         }
-    }
-    duice.TextareaElement = TextareaElement;
+        component.TextareaElement = TextareaElement;
+    })(component = duice.component || (duice.component = {}));
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
-    /**
-     * textarea element factory class
-      */
-    class TextareaElementFactory extends duice.ObjectComponentFactory {
+    var component;
+    (function (component) {
         /**
-         * creates component
-         * @param element
-         * @param context
-         */
-        doCreateComponent(element, context) {
-            return new duice.TextareaElement(element, context);
+         * textarea element factory class
+          */
+        class TextareaElementFactory extends duice.ObjectComponentFactory {
+            /**
+             * creates component
+             * @param element
+             * @param context
+             */
+            doCreateComponent(element, context) {
+                return new component.TextareaElement(element, context);
+            }
+            /**
+             * returns supported
+             * @param element
+             */
+            doSupport(element) {
+                return (element.tagName.toLowerCase() === 'textarea');
+            }
         }
+        component.TextareaElementFactory = TextareaElementFactory;
+        // register factory instance
+        duice.ObjectComponentFactory.addInstance(new TextareaElementFactory());
+    })(component = duice.component || (duice.component = {}));
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    var format;
+    (function (format) {
         /**
-         * returns supported
-         * @param element
+         * date format
          */
-        doSupport(element) {
-            return (element.tagName.toLowerCase() === 'textarea');
+        class DateFormat {
+            /**
+             * Constructor
+             * @param pattern
+             */
+            constructor(pattern) {
+                this.patternRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
+                this.pattern = pattern;
+            }
+            /**
+             * Encodes date string
+             * @param string
+             */
+            encode(string) {
+                if (!string) {
+                    return '';
+                }
+                if (!this.pattern) {
+                    return new Date(string).toString();
+                }
+                let date = new Date(string);
+                string = this.pattern.replace(this.patternRex, function ($1) {
+                    switch ($1) {
+                        case "yyyy":
+                            return date.getFullYear();
+                        case "yy":
+                            return String(date.getFullYear() % 1000).padStart(2, '0');
+                        case "MM":
+                            return String(date.getMonth() + 1).padStart(2, '0');
+                        case "dd":
+                            return String(date.getDate()).padStart(2, '0');
+                        case "HH":
+                            return String(date.getHours()).padStart(2, '0');
+                        case "hh":
+                            return String(date.getHours() <= 12 ? date.getHours() : date.getHours() % 12).padStart(2, '0');
+                        case "mm":
+                            return String(date.getMinutes()).padStart(2, '0');
+                        case "ss":
+                            return String(date.getSeconds()).padStart(2, '0');
+                        default:
+                            return $1;
+                    }
+                });
+                return string;
+            }
+            /**
+             * Decodes formatted date string to ISO date string.
+             * @param string
+             */
+            decode(string) {
+                if (!string) {
+                    return null;
+                }
+                if (!this.pattern) {
+                    return new Date(string).toISOString();
+                }
+                let date = new Date(0, 0, 0, 0, 0, 0);
+                let match;
+                while ((match = this.patternRex.exec(this.pattern)) != null) {
+                    let formatString = match[0];
+                    let formatIndex = match.index;
+                    let formatLength = formatString.length;
+                    let matchValue = string.substr(formatIndex, formatLength);
+                    matchValue = matchValue.padEnd(formatLength, '0');
+                    switch (formatString) {
+                        case 'yyyy': {
+                            let fullYear = parseInt(matchValue);
+                            date.setFullYear(fullYear);
+                            break;
+                        }
+                        case 'yy': {
+                            let yyValue = parseInt(matchValue);
+                            let yearPrefix = Math.floor(new Date().getFullYear() / 100);
+                            let fullYear = yearPrefix * 100 + yyValue;
+                            date.setFullYear(fullYear);
+                            break;
+                        }
+                        case 'MM': {
+                            let monthValue = parseInt(matchValue);
+                            date.setMonth(monthValue - 1);
+                            break;
+                        }
+                        case 'dd': {
+                            let dateValue = parseInt(matchValue);
+                            date.setDate(dateValue);
+                            break;
+                        }
+                        case 'HH': {
+                            let hoursValue = parseInt(matchValue);
+                            date.setHours(hoursValue);
+                            break;
+                        }
+                        case 'hh': {
+                            let hoursValue = parseInt(matchValue);
+                            date.setHours(hoursValue > 12 ? (hoursValue + 12) : hoursValue);
+                            break;
+                        }
+                        case 'mm': {
+                            let minutesValue = parseInt(matchValue);
+                            date.setMinutes(minutesValue);
+                            break;
+                        }
+                        case 'ss': {
+                            let secondsValue = parseInt(matchValue);
+                            date.setSeconds(secondsValue);
+                            break;
+                        }
+                    }
+                }
+                return date.toISOString();
+            }
         }
-    }
-    duice.TextareaElementFactory = TextareaElementFactory;
-    // register factory instance
-    duice.ObjectComponentFactory.addInstance(new TextareaElementFactory());
+        format.DateFormat = DateFormat;
+    })(format = duice.format || (duice.format = {}));
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    var format;
+    (function (format) {
+        /**
+         * StringFormat
+         * @param string format
+         */
+        class StringFormat {
+            /**
+             * Constructor
+             * @param pattern
+             */
+            constructor(pattern) {
+                this.pattern = pattern;
+            }
+            /**
+             * encode string as format
+             * @param value
+             */
+            encode(value) {
+                if (!value) {
+                    return value;
+                }
+                let encodedValue = '';
+                let patternChars = this.pattern.split('');
+                let valueChars = value.split('');
+                let valueCharsPosition = 0;
+                for (let i = 0, size = patternChars.length; i < size; i++) {
+                    let patternChar = patternChars[i];
+                    if (patternChar === '#') {
+                        encodedValue += valueChars[valueCharsPosition++] || '';
+                    }
+                    else {
+                        encodedValue += patternChar;
+                    }
+                    if (valueCharsPosition >= valueChars.length) {
+                        break;
+                    }
+                }
+                return encodedValue;
+            }
+            /**
+             * decodes string as format
+             * @param value
+             */
+            decode(value) {
+                if (!value) {
+                    return value;
+                }
+                let decodedValue = '';
+                let patternChars = this.pattern.split('');
+                let valueChars = value.split('');
+                let valueCharsPosition = 0;
+                for (let i = 0, size = patternChars.length; i < size; i++) {
+                    let patternChar = patternChars[i];
+                    if (patternChar === '#') {
+                        decodedValue += valueChars[valueCharsPosition++] || '';
+                    }
+                    else {
+                        valueCharsPosition++;
+                    }
+                }
+                return decodedValue;
+            }
+        }
+        format.StringFormat = StringFormat;
+    })(format = duice.format || (duice.format = {}));
 })(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map

@@ -77,7 +77,7 @@ namespace duice {
          * @param observable
          * @param event
          */
-        abstract update(observable: object, event: duice.Event): void;
+        abstract update(observable: object, event: event.Event): void;
 
     }
 

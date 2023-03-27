@@ -1,10 +1,10 @@
-namespace duice {
+namespace duice.format {
 
     /**
      * NumberFormat
      * @param scale number
      */
-    export class NumberMask implements Mask {
+    export class NumberFormat implements Format {
 
         scale:number = 0;
 

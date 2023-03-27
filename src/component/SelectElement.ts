@@ -1,4 +1,4 @@
-namespace duice {
+namespace duice.component {
 
     /**
      * select element component
@@ -15,7 +15,7 @@ namespace duice {
 
             // adds event listener
             this.getElement().addEventListener('change', (e) => {
-                let event = new PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
+                let event = new duice.event.PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
                 this.notifyObservers(event);
             }, true);
         }

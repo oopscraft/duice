@@ -1,4 +1,5 @@
 ///<reference path="DataHandler.ts"/>
+///<reference path="event/RowMoveEvent.ts"/>
 namespace duice {
 
     /**
@@ -119,7 +120,7 @@ namespace duice {
             console.debug("ArrayHandler.set", '|', target, '|', property, '|', value);
             Reflect.set(target, property, value);
             if (property === 'length') {
-                this.notifyObservers(new Event(this));
+                this.notifyObservers(new event.Event(this));
             }
             return true;
         }
@@ -129,12 +130,12 @@ namespace duice {
          * @param observable
          * @param event
          */
-        async update(observable: Observable, event: Event): Promise<void> {
+        async update(observable: Observable, event: event.Event): Promise<void> {
             console.debug("ArrayHandler.update", observable, event);
 
             // instance is array component
             if(observable instanceof ArrayComponent){
-                if (event instanceof RowMoveEvent) {
+                if (event instanceof duice.event.RowMoveEvent) {
                     let object = this.getTarget().splice(event.getFromIndex(), 1)[0];
                     this.getTarget().splice(event.getToIndex(), 0, object);
                 }
