@@ -1099,12 +1099,6 @@ declare namespace duice {
     }
 }
 declare namespace duice.component {
-    class Pagination extends duice.CustomElement {
-        constructor();
-        doRender(object: any): string;
-    }
-}
-declare namespace duice.component {
     /**
      * input element component
      */

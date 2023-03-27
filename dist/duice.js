@@ -2315,33 +2315,40 @@ var duice;
     }
     duice.ArrayProxy = ArrayProxy;
 })(duice || (duice = {}));
-var duice;
-(function (duice) {
-    var component;
-    (function (component) {
-        class Pagination extends duice.CustomElement {
-            constructor() {
-                super();
-            }
-            doRender(object) {
-                // prev
-                let template = `<div><span>Prev</span>`;
-                // pages
-                for (let index = 0; index < 10; index++) {
-                    template += `<span>${index}</span>`;
-                }
-                // next
-                template += `<span>Next</span></div>`;
-                // returns
-                console.warn("=========", template);
-                return template;
-            }
-        }
-        component.Pagination = Pagination;
-        // defines component
-        duice.defineComponent(`${duice.getNamespace()}-pagination`, Pagination);
-    })(component = duice.component || (duice.component = {}));
-})(duice || (duice = {}));
+// namespace duice.component {
+//
+//     export class Pagination extends duice.CustomElement {
+//
+//         public constructor() {
+//             super();
+//         }
+//
+//         doRender(object: any): string {
+//
+//             // prev
+//             let template = `<div><span>Prev</span>`;
+//
+//             // pages
+//             for(let index = 0; index < 10; index ++) {
+//                 template += `<span>${index}</span>`;
+//             }
+//
+//             // next
+//             template += `<span>Next</span></div>`;
+//
+//             // returns
+//             console.warn("=========", template);
+//             return template;
+//         }
+//
+//     }
+//
+//     ObjectComponentFactory.addInstance(new CustomComponentFactory("duice-name"));
+//
+//     // defines component
+//     duice.defineComponent(`${duice.getNamespace()}-pagination`, Pagination);
+//
+// }
 var duice;
 (function (duice) {
     var component;
@@ -3002,4 +3009,34 @@ var duice;
         format.StringFormat = StringFormat;
     })(format = duice.format || (duice.format = {}));
 })(duice || (duice = {}));
+// namespace duice.component {
+//
+//     /**
+//      * textarea element factory class
+//       */
+//     export class PaginationFactory extends ObjectComponentFactory<HTMLTextAreaElement> {
+//
+//         /**
+//          * creates component
+//          * @param element
+//          * @param context
+//          */
+//         override doCreateComponent(element: HTMLTextAreaElement, context: object): TextareaElement {
+//             return new TextareaElement(element, context);
+//         }
+//
+//         /**
+//          * returns supported
+//          * @param element
+//          */
+//         override doSupport(element: HTMLElement): boolean {
+//             return (element.tagName.toLowerCase() === 'textarea');
+//         }
+//
+//     }
+//
+//     // register factory instance
+//     ObjectComponentFactory.addInstance(new TextareaElementFactory());
+//
+// }
 //# sourceMappingURL=duice.js.map
