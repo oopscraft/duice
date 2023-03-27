@@ -18,9 +18,9 @@
         ]);
 
         /**
-         * MyObjectComponent
+         * MyObjectElement
          */
-        duice.defineComponent("my-object", class MyObjectComponent extends duice.CustomElement {
+        duice.defineElement("my-object", class extends duice.CustomElement {
             doRender(object) {
                 return `
                     <div>
@@ -41,7 +41,7 @@
         /**
          * MyArrayComponent
          */
-        duice.defineComponent("my-array", class MyArrayComponent extends duice.CustomElement {
+        duice.defineElement("my-array", class extends duice.CustomElement {
             doRender(array) {
                 return `
                 <div>
@@ -56,7 +56,7 @@
         /**
          * my-array-nested
          */
-        duice.defineComponent("my-array-nested", class MyNestedComponent extends duice.CustomElement {
+        duice.defineElement("my-array-nested", class extends duice.CustomElement {
             doRender(array) {
                 return `
                 <div>
@@ -68,42 +68,23 @@
             }
         });
 
-        /**
-         * MyShadowComponent
-         */
-        duice.defineComponent("my-object-shadow", class MyShadowComponent extends duice.CustomElement {
-            constructor(){
-                super();
-                this.attachShadow({mode:"open"});
-            }
-            doRender(object) {
-                return `
-                    <div>
-                        <span data-duice-object="object" data-duice-property="name"></span>
-                        <input type="text" data-duice-object="object" data-duice-property="name"/>
-                    </div>
-                `;
-            }
-        });
-
     </script>
 </head>
 <body>
 
+<h1>Custom Element Test</h1>
+
 <h2> Direct HTML</h2>
 <input type="text" data-duice-object="myObject" data-duice-property="name" style="background-color:red;"/>
 
-<h2>Object to Component</h2>
+<h2>Custom Object Element</h2>
 <my-object data-duice-object="myObject"></my-object>
 
-<h2>Array to Component</h2>
+<h2>Custom Array Element</h2>
 <my-array data-duice-array="myArray"></my-array>
 
-<h2>Nested Component</h2>
+<h2>Custom Nested Element</h2>
 <my-array-nested data-duice-array="myArray"></my-array-nested>
-
-<h2>Shadow DOM Component</h2>
-<my-object-shadow data-duice-object="myObject"></my-object-shadow>
 
 </body>
 </html>

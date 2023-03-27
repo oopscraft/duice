@@ -45,55 +45,57 @@ declare namespace duice {
 }
 declare namespace duice {
     /**
-     * component factory abstract class
+     * element factory abstract class
      */
-    abstract class ComponentFactory<T extends HTMLElement> {
+    abstract class ElementFactory<T extends HTMLElement> {
         /**
          * check support
          * @param element
          */
         abstract support(element: T): boolean;
         /**
-         * creates component
-         * @param element
+         * creates element
+         * @param htmlElement
          * @param context
          */
-        abstract createComponent(element: T, context: object): Component<HTMLElement>;
+        abstract createElement(htmlElement: T, context: object): Element<HTMLElement>;
     }
 }
 declare namespace duice {
     /**
      * custom component factory
      */
-    class CustomComponentFactory<T extends CustomElement> extends ComponentFactory<CustomElement> {
-        static instances: CustomComponentFactory<CustomElement>[];
+    class CustomElementFactory extends ElementFactory<HTMLElement> {
+        static instances: CustomElementFactory[];
         tagName: string;
+        elementType: Function;
         /**
          * adds factory instance
-         * @param componentFactory
+         * @param elementFactory
          */
-        static addInstance(componentFactory: CustomComponentFactory<CustomElement>): void;
+        static addInstance(elementFactory: CustomElementFactory): void;
         /**
          * returns factory instance to be supported
-         * @param element
+         * @param htmlElement
          */
-        static getInstance(element: CustomElement): CustomComponentFactory<CustomElement>;
+        static getInstance(htmlElement: HTMLElement): CustomElementFactory;
         /**
          * constructor
          * @param tagName
+         * @param elementType
          */
-        constructor(tagName: string);
+        constructor(tagName: string, elementType: Function);
         /**
          * creates component
-         * @param element
+         * @param htmlElement
          * @param context
          */
-        createComponent(element: T, context: object): CustomComponent<T>;
+        createElement(htmlElement: HTMLElement, context: object): CustomElement;
         /**
          * checks supported elements
-         * @param element
+         * @param htmlElement
          */
-        support(element: T): boolean;
+        support(htmlElement: HTMLElement): boolean;
     }
 }
 declare namespace duice {
@@ -107,9 +109,9 @@ declare namespace duice {
      */
     function getNamespace(): string;
     /**
-     * returns query selector for component scan
+     * returns query selector for element scan
      */
-    function getComponentQuerySelector(): string;
+    function getElementQuerySelector(): string;
     /**
      * initializes
      * @param container
@@ -133,23 +135,23 @@ declare namespace duice {
     function generateId(): string;
     /**
      * checks has component attribute
-     * @param element
+     * @param htmlElement
      * @param name
      */
-    function hasComponentAttribute(element: HTMLElement, name: string): boolean;
+    function hasElementAttribute(htmlElement: HTMLElement, name: string): boolean;
     /**
-     * returns component attribute
-     * @param element
+     * returns element attribute
+     * @param htmlElement
      * @param name
      */
-    function getComponentAttribute(element: HTMLElement, name: string): string;
+    function getElementAttribute(htmlElement: HTMLElement, name: string): string;
     /**
      * set component attribute
-     * @param element
+     * @param htmlElement
      * @param name
      * @param value
      */
-    function setComponentAttribute(element: HTMLElement, name: string, value: string): void;
+    function setElementAttribute(htmlElement: HTMLElement, name: string, value: string): void;
     /**
      * execute script
      * @param script
@@ -208,11 +210,11 @@ declare namespace duice {
      */
     function fetch(url: URL, options: any, _bypass: boolean): Promise<Response>;
     /**
-     * defines custom component
+     * defines custom element
      * @param tagName
-     * @param constructor
+     * @param elementType
      */
-    function defineComponent(tagName: string, constructor: CustomElementConstructor): void;
+    function defineElement(tagName: string, elementType: Function): void;
 }
 declare namespace duice.dialog {
     /**
@@ -470,247 +472,6 @@ declare namespace duice.event {
 }
 declare namespace duice {
     /**
-     * component abstract class
-     */
-    abstract class Component<T extends HTMLElement> extends Observable implements Observer {
-        element: T;
-        context: object;
-        data: Data;
-        /**
-         * constructor
-         * @param element
-         * @param context
-         * @protected
-         */
-        protected constructor(element: T, context: object);
-        /**
-         * return element
-         */
-        getElement(): T;
-        /**
-         * return context
-         */
-        getContext(): object;
-        /**
-         * set data
-         * @param dataName
-         */
-        setData(dataName: string): void;
-        /**
-         * return data
-         */
-        getData(): Data;
-        /**
-         * executes script if exists
-         */
-        executeScript(): void;
-        /**
-         * render abstract method
-         */
-        abstract render(): void;
-        /**
-         * update abstract method
-         * @param observable
-         * @param event
-         */
-        abstract update(observable: object, event: event.Event): void;
-    }
-}
-declare namespace duice {
-    /**
-     * array component class
-     */
-    class ArrayComponent<T extends HTMLElement> extends Component<T> {
-        slot: HTMLSlotElement;
-        loop: string;
-        editable: boolean;
-        rowElements: HTMLElement[];
-        /**
-         * constructor
-         * @param element
-         * @param context
-         */
-        constructor(element: T, context: object);
-        /**
-         * set array
-         * @param arrayName
-         */
-        setArray(arrayName: string): void;
-        /**
-         * set loop
-         * @param loop
-         */
-        setLoop(loop: string): void;
-        /**
-         * set editable
-         * @param editable
-         */
-        setEditable(editable: boolean): void;
-        /**
-         * render
-         */
-        render(): void;
-        /**
-         * update
-         * @param observable
-         * @param event
-         */
-        update(observable: Observable, event: event.Event): void;
-    }
-}
-declare namespace duice {
-    /**
-     * array component factory class
-     */
-    class ArrayComponentFactory<T extends HTMLElement> extends ComponentFactory<HTMLElement> {
-        static defaultInstance: ArrayComponentFactory<HTMLElement>;
-        static instances: ArrayComponentFactory<HTMLElement>[];
-        /**
-         * adds factory instance
-         * @param componentFactory
-         */
-        static addInstance(componentFactory: ArrayComponentFactory<HTMLElement>): void;
-        /**
-         * return factory instance
-         * @param element
-         */
-        static getInstance(element: HTMLElement): ArrayComponentFactory<HTMLElement>;
-        /**
-         * check support
-         * @param element
-         */
-        support(element: T): boolean;
-        /**
-         * support template method
-         * @param element
-         */
-        doSupport(element: T): boolean;
-        /**
-         * creates array component
-         * @param element
-         * @param context
-         */
-        createComponent(element: T, context: object): ArrayComponent<any>;
-    }
-}
-declare namespace duice.format {
-    class FormatFactory {
-        /**
-         * return format instance
-         * @param format
-         */
-        static getFormat(format: string): Format;
-    }
-}
-declare namespace duice {
-    /**
-     * object component class
-     */
-    class ObjectComponent<T extends HTMLElement> extends Component<T> {
-        property: string;
-        format: format.Format;
-        /**
-         * constructor
-         * @param element
-         * @param context
-         */
-        constructor(element: T, context: object);
-        /**
-         * set object
-         * @param objectName
-         */
-        setObject(objectName: string): void;
-        /**
-         * set property
-         * @param property
-         */
-        setProperty(property: string): void;
-        /**
-         * return property
-         */
-        getProperty(): string;
-        /**
-         * set format
-         * @param format
-         */
-        setFormat(format: string): void;
-        /**
-         * return format
-         */
-        getFormat(): format.Format;
-        /**
-         * render
-         */
-        render(): void;
-        /**
-         * update event received
-         * @param observable
-         * @param event
-         */
-        update(observable: Observable, event: event.Event): void;
-        /**
-         * set value
-         * @param value
-         */
-        setValue(value: any): void;
-        /**
-         * return value
-         */
-        getValue(): any;
-        /**
-         * set readonly
-         * @param readonly
-         */
-        setReadonly(readonly: boolean): void;
-        /**
-         * return index
-         */
-        getIndex(): number;
-    }
-}
-declare namespace duice {
-    /**
-     * object component factory class
-     */
-    class ObjectComponentFactory<T extends HTMLElement> extends ComponentFactory<T> {
-        static defaultInstance: ObjectComponentFactory<HTMLElement>;
-        static instances: ObjectComponentFactory<HTMLElement>[];
-        /**
-         * adds factory instance to registry
-         * @param componentFactory
-         */
-        static addInstance(componentFactory: ObjectComponentFactory<HTMLElement>): void;
-        /**
-         * returns supported instance
-         * @param element
-         */
-        static getInstance(element: HTMLElement): ObjectComponentFactory<HTMLElement>;
-        /**
-         * check support
-         * @param element
-         */
-        support(element: T): boolean;
-        /**
-         * support template method
-         * @param element
-         */
-        doSupport(element: T): boolean;
-        /**
-         * create component
-         * @param element
-         * @param context
-         */
-        createComponent(element: T, context: object): ObjectComponent<T>;
-        /**
-         * template method to create component
-         * @param htmlElement
-         * @param context
-         */
-        doCreateComponent(htmlElement: T, context: object): ObjectComponent<T>;
-    }
-}
-declare namespace duice {
-    /**
      * data handler class
      */
     abstract class DataHandler<T> extends Observable implements Observer {
@@ -849,65 +610,6 @@ declare namespace duice {
          * @param value
          */
         setValue(property: string, value: any): void;
-    }
-}
-declare namespace duice {
-    /**
-     * custom component
-     */
-    class CustomComponent<T> extends Component<CustomElement> {
-        /**
-         * constructor
-         * @param element
-         * @param context
-         */
-        constructor(element: CustomElement, context: object);
-        /**
-         * set object data
-         * @param objectName
-         */
-        setObject(objectName: string): void;
-        /**
-         * set array data
-         * @param arrayName
-         */
-        setArray(arrayName: string): void;
-        /**
-         * check element is shadow DOM
-         */
-        isShadowDom(): boolean;
-        /**
-         * render
-         */
-        render(): void;
-        /**
-         * update
-         * @param observable
-         * @param event
-         */
-        update(observable: Observable, event: event.Event): void;
-    }
-}
-declare namespace duice {
-    /**
-     * custom element
-     */
-    abstract class CustomElement extends HTMLElement {
-        /**
-         * constructor
-         * @protected
-         */
-        protected constructor();
-        /**
-         * returns html template literal
-         * @param data
-         */
-        abstract doRender(data: Data): string;
-        /**
-         * return style literal
-         * @param data
-         */
-        doStyle(data: any): string;
     }
 }
 declare namespace duice {
@@ -1098,11 +800,343 @@ declare namespace duice {
     interface Data {
     }
 }
+declare namespace duice.format {
+    /**
+     * date format
+     */
+    class DateFormat implements Format {
+        pattern: string;
+        patternRex: RegExp;
+        /**
+         * Constructor
+         * @param pattern
+         */
+        constructor(pattern?: string);
+        /**
+         * Encodes date string
+         * @param string
+         */
+        encode(string: string): string;
+        /**
+         * Decodes formatted date string to ISO date string.
+         * @param string
+         */
+        decode(string: string): string;
+    }
+}
+declare namespace duice.format {
+    /**
+     * format interface
+     */
+    interface Format {
+        /**
+         * Encodes original value as formatted value
+         * @param value value
+         * @return formatted value
+         */
+        encode(value: any): any;
+        /**
+         * Decodes formatted value to original value
+         * @param value value
+         * @return original value
+         */
+        decode(value: any): any;
+    }
+}
+declare namespace duice.format {
+    class FormatFactory {
+        /**
+         * return format instance
+         * @param format
+         */
+        static getFormat(format: string): Format;
+    }
+}
+declare namespace duice.format {
+    /**
+     * NumberFormat
+     * @param scale number
+     */
+    class NumberFormat implements Format {
+        scale: number;
+        /**
+         * Constructor
+         * @param scale
+         */
+        constructor(scale?: number);
+        /**
+         * Encodes number as format
+         * @param number
+         */
+        encode(number: number): string;
+        /**
+         * Decodes formatted value as original value
+         * @param string
+         */
+        decode(string: string): number;
+    }
+}
+declare namespace duice.format {
+    /**
+     * StringFormat
+     * @param string format
+     */
+    class StringFormat implements Format {
+        pattern: string;
+        /**
+         * Constructor
+         * @param pattern
+         */
+        constructor(pattern: string);
+        /**
+         * encode string as format
+         * @param value
+         */
+        encode(value: string): string;
+        /**
+         * decodes string as format
+         * @param value
+         */
+        decode(value: string): string;
+    }
+}
+declare namespace duice {
+    /**
+     * element abstract class
+     */
+    abstract class Element<T extends HTMLElement> extends Observable implements Observer {
+        htmlElement: T;
+        context: object;
+        data: Data;
+        /**
+         * constructor
+         * @param htmlElement
+         * @param context
+         * @protected
+         */
+        protected constructor(htmlElement: T, context: object);
+        /**
+         * return HTML element
+         */
+        getHtmlElement(): T;
+        /**
+         * return context
+         */
+        getContext(): object;
+        /**
+         * set data
+         * @param dataName
+         */
+        setData(dataName: string): void;
+        /**
+         * return data
+         */
+        getData(): Data;
+        /**
+         * executes script if exists
+         */
+        executeScript(): void;
+        /**
+         * render abstract method
+         */
+        abstract render(): void;
+        /**
+         * update abstract method
+         * @param observable
+         * @param event
+         */
+        abstract update(observable: object, event: event.Event): void;
+    }
+}
+declare namespace duice {
+    /**
+     * object element class
+     */
+    class ObjectElement<T extends HTMLElement> extends Element<T> {
+        property: string;
+        format: format.Format;
+        /**
+         * constructor
+         * @param htmlElement
+         * @param context
+         */
+        constructor(htmlElement: T, context: object);
+        /**
+         * set object
+         * @param objectName
+         */
+        setObject(objectName: string): void;
+        /**
+         * set property
+         * @param property
+         */
+        setProperty(property: string): void;
+        /**
+         * return property
+         */
+        getProperty(): string;
+        /**
+         * set format
+         * @param format
+         */
+        setFormat(format: string): void;
+        /**
+         * return format
+         */
+        getFormat(): format.Format;
+        /**
+         * render
+         */
+        render(): void;
+        /**
+         * update event received
+         * @param observable
+         * @param event
+         */
+        update(observable: Observable, event: event.Event): void;
+        /**
+         * set value
+         * @param value
+         */
+        setValue(value: any): void;
+        /**
+         * return value
+         */
+        getValue(): any;
+        /**
+         * set readonly
+         * @param readonly
+         */
+        setReadonly(readonly: boolean): void;
+        /**
+         * return index
+         */
+        getIndex(): number;
+    }
+}
+declare namespace duice {
+    /**
+     * object element factory class
+     */
+    class ObjectElementFactory<T extends HTMLElement> extends ElementFactory<T> {
+        static defaultInstance: ObjectElementFactory<HTMLElement>;
+        static instances: ObjectElementFactory<HTMLElement>[];
+        /**
+         * adds factory instance to registry
+         * @param elementFactory
+         */
+        static addInstance(elementFactory: ObjectElementFactory<HTMLElement>): void;
+        /**
+         * returns supported instance
+         * @param htmlElement
+         */
+        static getInstance(htmlElement: HTMLElement): ObjectElementFactory<HTMLElement>;
+        /**
+         * check support
+         * @param htmlElement
+         */
+        support(htmlElement: T): boolean;
+        /**
+         * support template method
+         * @param htmlElement
+         */
+        doSupport(htmlElement: T): boolean;
+        /**
+         * create component
+         * @param element
+         * @param context
+         */
+        createElement(element: T, context: object): ObjectElement<T>;
+        /**
+         * template method to create component
+         * @param htmlElement
+         * @param context
+         */
+        doCreateElement(htmlElement: T, context: object): ObjectElement<T>;
+    }
+}
+declare namespace duice {
+    /**
+     * array element class
+     */
+    class ArrayElement<T extends HTMLElement> extends Element<T> {
+        slot: HTMLSlotElement;
+        loop: string;
+        editable: boolean;
+        rowHtmlElements: HTMLElement[];
+        /**
+         * constructor
+         * @param htmlElement
+         * @param context
+         */
+        constructor(htmlElement: T, context: object);
+        /**
+         * set array
+         * @param arrayName
+         */
+        setArray(arrayName: string): void;
+        /**
+         * set loop
+         * @param loop
+         */
+        setLoop(loop: string): void;
+        /**
+         * set editable
+         * @param editable
+         */
+        setEditable(editable: boolean): void;
+        /**
+         * render
+         */
+        render(): void;
+        /**
+         * update
+         * @param observable
+         * @param event
+         */
+        update(observable: Observable, event: event.Event): void;
+    }
+}
+declare namespace duice {
+    /**
+     * array element factory class
+     */
+    class ArrayElementFactory<T extends HTMLElement> extends ElementFactory<HTMLElement> {
+        static defaultInstance: ArrayElementFactory<HTMLElement>;
+        static instances: ArrayElementFactory<HTMLElement>[];
+        /**
+         * adds factory instance
+         * @param elementFactory
+         */
+        static addInstance(elementFactory: ArrayElementFactory<HTMLElement>): void;
+        /**
+         * return factory instance
+         * @param htmlElement
+         */
+        static getInstance(htmlElement: HTMLElement): ArrayElementFactory<HTMLElement>;
+        /**
+         * check support
+         * @param htmlElement
+         */
+        support(htmlElement: T): boolean;
+        /**
+         * support template method
+         * @param htmlElement
+         */
+        doSupport(htmlElement: T): boolean;
+        /**
+         * creates array component
+         * @param htmlElement
+         * @param context
+         */
+        createElement(htmlElement: T, context: object): ArrayElement<any>;
+    }
+}
 declare namespace duice.component {
     /**
      * input element component
      */
-    class InputElement extends ObjectComponent<HTMLInputElement> {
+    class InputElement extends ObjectElement<HTMLInputElement> {
         /**
          * constructor
          * @param element
@@ -1123,24 +1157,6 @@ declare namespace duice.component {
          * @param readonly
          */
         setReadonly(readonly: boolean): void;
-    }
-}
-declare namespace duice.component {
-    /**
-     * input element factory class
-     */
-    class InputElementFactory extends ObjectComponentFactory<HTMLInputElement> {
-        /**
-         * creates component
-         * @param element
-         * @param context
-         */
-        doCreateComponent(element: HTMLInputElement, context: object): InputElement;
-        /**
-         * check supported
-         * @param element
-         */
-        doSupport(element: HTMLElement): boolean;
     }
 }
 declare namespace duice.component {
@@ -1172,28 +1188,22 @@ declare namespace duice.component {
         setReadonly(readonly: boolean): void;
     }
 }
-declare namespace duice.format {
+declare namespace duice.component {
     /**
-     * NumberFormat
-     * @param scale number
+     * input element factory class
      */
-    class NumberFormat implements Format {
-        scale: number;
+    class InputElementFactory extends ObjectElementFactory<HTMLInputElement> {
         /**
-         * Constructor
-         * @param scale
+         * creates component
+         * @param element
+         * @param context
          */
-        constructor(scale?: number);
+        doCreateElement(element: HTMLInputElement, context: object): InputElement;
         /**
-         * Encodes number as format
-         * @param number
+         * check supported
+         * @param element
          */
-        encode(number: number): string;
-        /**
-         * Decodes formatted value as original value
-         * @param string
-         */
-        decode(string: string): number;
+        doSupport(element: HTMLElement): boolean;
     }
 }
 declare namespace duice.component {
@@ -1244,7 +1254,7 @@ declare namespace duice.component {
     /**
      * select element component
      */
-    class SelectElement extends ObjectComponent<HTMLSelectElement> {
+    class SelectElement extends ObjectElement<HTMLSelectElement> {
         /**
          * constructor
          * @param element
@@ -1271,13 +1281,13 @@ declare namespace duice.component {
     /**
      * select element factory class
      */
-    class SelectElementFactory extends ObjectComponentFactory<HTMLSelectElement> {
+    class SelectElementFactory extends ObjectElementFactory<HTMLSelectElement> {
         /**
          * create component
          * @param element
          * @param context
          */
-        doCreateComponent(element: HTMLSelectElement, context: object): SelectElement;
+        doCreateElement(element: HTMLSelectElement, context: object): SelectElement;
         /**
          * return supported
          * @param element
@@ -1289,7 +1299,7 @@ declare namespace duice.component {
     /**
      * textarea element component
      */
-    class TextareaElement extends ObjectComponent<HTMLTextAreaElement> {
+    class TextareaElement extends ObjectElement<HTMLTextAreaElement> {
         /**
          * constructor
          * @param element
@@ -1316,13 +1326,13 @@ declare namespace duice.component {
     /**
      * textarea element factory class
       */
-    class TextareaElementFactory extends ObjectComponentFactory<HTMLTextAreaElement> {
+    class TextareaElementFactory extends ObjectElementFactory<HTMLTextAreaElement> {
         /**
          * creates component
          * @param element
          * @param context
          */
-        doCreateComponent(element: HTMLTextAreaElement, context: object): TextareaElement;
+        doCreateElement(element: HTMLTextAreaElement, context: object): TextareaElement;
         /**
          * returns supported
          * @param element
@@ -1330,70 +1340,46 @@ declare namespace duice.component {
         doSupport(element: HTMLElement): boolean;
     }
 }
-declare namespace duice.format {
+declare namespace duice {
     /**
-     * date format
+     * custom element
      */
-    class DateFormat implements Format {
-        pattern: string;
-        patternRex: RegExp;
+    abstract class CustomElement extends Element<HTMLElement> {
         /**
-         * Constructor
-         * @param pattern
+         * constructor
+         * @param htmlElement
+         * @param context
          */
-        constructor(pattern?: string);
+        protected constructor(htmlElement: HTMLElement, context: object);
         /**
-         * Encodes date string
-         * @param string
+         * set object data
+         * @param objectName
          */
-        encode(string: string): string;
+        setObject(objectName: string): void;
         /**
-         * Decodes formatted date string to ISO date string.
-         * @param string
+         * set array data
+         * @param arrayName
          */
-        decode(string: string): string;
-    }
-}
-declare namespace duice.format {
-    /**
-     * format interface
-     */
-    interface Format {
+        setArray(arrayName: string): void;
         /**
-         * Encodes original value as formatted value
-         * @param value value
-         * @return formatted value
+         * render
          */
-        encode(value: any): any;
+        render(): void;
         /**
-         * Decodes formatted value to original value
-         * @param value value
-         * @return original value
+         * do render template method
+         * @param data
          */
-        decode(value: any): any;
-    }
-}
-declare namespace duice.format {
-    /**
-     * StringFormat
-     * @param string format
-     */
-    class StringFormat implements Format {
-        pattern: string;
+        abstract doRender(data: Data): string;
         /**
-         * Constructor
-         * @param pattern
+         * setting style
+         * @param data
          */
-        constructor(pattern: string);
+        doStyle(data: Data): string;
         /**
-         * encode string as format
-         * @param value
+         * update
+         * @param observable
+         * @param event
          */
-        encode(value: string): string;
-        /**
-         * decodes string as format
-         * @param value
-         */
-        decode(value: string): string;
+        update(observable: Observable, event: event.Event): void;
     }
 }

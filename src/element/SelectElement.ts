@@ -3,7 +3,7 @@ namespace duice.component {
     /**
      * select element component
      */
-    export class SelectElement extends ObjectComponent<HTMLSelectElement> {
+    export class SelectElement extends ObjectElement<HTMLSelectElement> {
 
         /**
          * constructor
@@ -14,7 +14,7 @@ namespace duice.component {
             super(element, context);
 
             // adds event listener
-            this.getElement().addEventListener('change', (e) => {
+            this.getHtmlElement().addEventListener('change', (e) => {
                 let event = new duice.event.PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
                 this.notifyObservers(event);
             }, true);
@@ -25,12 +25,12 @@ namespace duice.component {
          * @param value
          */
         override setValue(value: any): void {
-            this.getElement().value = value;
+            this.getHtmlElement().value = value;
 
             // force select option
             if(!value) {
-                for(let i = 0; i < this.getElement().options.length; i++){
-                    let option = this.getElement().options[i];
+                for(let i = 0; i < this.getHtmlElement().options.length; i++){
+                    let option = this.getHtmlElement().options[i];
                     if(!option.nodeValue){
                         option.selected = true;
                         break;
@@ -43,7 +43,7 @@ namespace duice.component {
          * return value
          */
         override getValue(): any {
-            return this.getElement().value;
+            return this.getHtmlElement().value;
         }
 
         /**
@@ -53,9 +53,9 @@ namespace duice.component {
         override setReadonly(readonly: boolean): void {
             if(readonly){
                 console.warn("==ok");
-                this.getElement().style.pointerEvents = 'none';
+                this.getHtmlElement().style.pointerEvents = 'none';
             }else{
-                this.getElement().style.pointerEvents = '';
+                this.getHtmlElement().style.pointerEvents = '';
             }
         }
 

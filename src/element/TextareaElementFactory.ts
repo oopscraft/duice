@@ -3,14 +3,14 @@ namespace duice.component {
     /**
      * textarea element factory class
       */
-    export class TextareaElementFactory extends ObjectComponentFactory<HTMLTextAreaElement> {
+    export class TextareaElementFactory extends ObjectElementFactory<HTMLTextAreaElement> {
 
         /**
          * creates component
          * @param element
          * @param context
          */
-        override doCreateComponent(element: HTMLTextAreaElement, context: object): TextareaElement {
+        override doCreateElement(element: HTMLTextAreaElement, context: object): TextareaElement {
             return new TextareaElement(element, context);
         }
 
@@ -25,6 +25,6 @@ namespace duice.component {
     }
 
     // register factory instance
-    ObjectComponentFactory.addInstance(new TextareaElementFactory());
+    ObjectElementFactory.addInstance(new TextareaElementFactory());
 
 }

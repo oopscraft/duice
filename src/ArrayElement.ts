@@ -1,10 +1,10 @@
-///<reference path="Component.ts"/>
+///<reference path="Element.ts"/>
 namespace duice {
 
     /**
-     * array component class
+     * array element class
      */
-    export class ArrayComponent<T extends HTMLElement> extends Component<T> {
+    export class ArrayElement<T extends HTMLElement> extends Element<T> {
 
         slot: HTMLSlotElement = document.createElement('slot');
 
@@ -12,21 +12,21 @@ namespace duice {
 
         editable: boolean = false;
 
-        rowElements: HTMLElement[] = [];
+        rowHtmlElements: HTMLElement[] = [];
 
         /**
          * constructor
-         * @param element
+         * @param htmlElement
          * @param context
          */
-        constructor(element: T, context: object) {
-            super(element.cloneNode(true) as T, context);
+        constructor(htmlElement: T, context: object) {
+            super(htmlElement.cloneNode(true) as T, context);
 
             // replace with slot for position
-            element.replaceWith(this.slot);
+            htmlElement.replaceWith(this.slot);
 
             // mark initialized (not using after clone as templates)
-            markInitialized(element);
+            markInitialized(htmlElement);
         }
 
         /**
@@ -61,10 +61,10 @@ namespace duice {
             let arrayProxy = this.getData() as ArrayProxy;
 
             // reset row elements
-            this.rowElements.forEach(rowElement => {
+            this.rowHtmlElements.forEach(rowElement => {
                 rowElement.parentNode.removeChild(rowElement);
             });
-            this.rowElements.length = 0;
+            this.rowHtmlElements.length = 0;
 
             // loop
             if(this.loop){
@@ -85,36 +85,36 @@ namespace duice {
                     });
 
                     // clones row elements
-                    let rowElement = this.getElement().cloneNode(true) as HTMLElement;
-                    setComponentAttribute(rowElement, 'index', index.toString());
+                    let rowHtmlElement = this.getHtmlElement().cloneNode(true) as HTMLElement;
+                    setElementAttribute(rowHtmlElement, 'index', index.toString());
 
                     // editable
                     if(this.editable){
-                        rowElement.setAttribute('draggable', 'true');
-                        rowElement.addEventListener('dragstart', function(e){
-                            let fromIndex = getComponentAttribute(this, 'index');
+                        rowHtmlElement.setAttribute('draggable', 'true');
+                        rowHtmlElement.addEventListener('dragstart', function(e){
+                            let fromIndex = getElementAttribute(this, 'index');
                             e.dataTransfer.setData("text", fromIndex);
                         });
-                        rowElement.addEventListener('dragover', function(e){
+                        rowHtmlElement.addEventListener('dragover', function(e){
                             e.preventDefault();
                             e.stopPropagation();
                         });
-                        rowElement.addEventListener('drop', async function(e){
+                        rowHtmlElement.addEventListener('drop', async function(e){
                             e.preventDefault();
                             e.stopPropagation();
                             let fromIndex = parseInt(e.dataTransfer.getData('text'));
-                            let toIndex = parseInt(getComponentAttribute(this, 'index'));
+                            let toIndex = parseInt(getElementAttribute(this, 'index'));
                             let rowIndexChangeEvent = new event.RowMoveEvent(_this, fromIndex, toIndex);
                             _this.notifyObservers(rowIndexChangeEvent);
                         });
                     }
 
                     // initializes row element
-                    initialize(rowElement, context);
-                    this.rowElements.push(rowElement);
+                    initialize(rowHtmlElement, context);
+                    this.rowHtmlElements.push(rowHtmlElement);
 
                     // insert before slot
-                    this.slot.parentNode.insertBefore(rowElement, this.slot);
+                    this.slot.parentNode.insertBefore(rowHtmlElement, this.slot);
                 }
             }
 
@@ -128,7 +128,7 @@ namespace duice {
          * @param event
          */
         update(observable: Observable, event: event.Event): void {
-            console.debug('ArrayComponent.update', observable, event);
+            console.debug('ArrayElement.update', observable, event);
             if(observable instanceof ArrayHandler){
                 this.render();
             }

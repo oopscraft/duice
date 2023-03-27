@@ -3,14 +3,14 @@ namespace duice.component {
     /**
      * select element factory class
      */
-    export class SelectElementFactory extends ObjectComponentFactory<HTMLSelectElement> {
+    export class SelectElementFactory extends ObjectElementFactory<HTMLSelectElement> {
 
         /**
          * create component
          * @param element
          * @param context
          */
-        override doCreateComponent(element: HTMLSelectElement, context: object): SelectElement {
+        override doCreateElement(element: HTMLSelectElement, context: object): SelectElement {
             return new SelectElement(element, context);
         }
 
@@ -25,6 +25,6 @@ namespace duice.component {
     }
 
     // register factory instance
-    ObjectComponentFactory.addInstance(new SelectElementFactory());
+    ObjectElementFactory.addInstance(new SelectElementFactory());
 
 }

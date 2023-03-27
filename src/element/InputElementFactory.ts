@@ -3,14 +3,14 @@ namespace duice.component {
     /**
      * input element factory class
      */
-    export class InputElementFactory extends ObjectComponentFactory<HTMLInputElement> {
+    export class InputElementFactory extends ObjectElementFactory<HTMLInputElement> {
 
         /**
          * creates component
          * @param element
          * @param context
          */
-        override doCreateComponent(element: HTMLInputElement, context: object): InputElement {
+        override doCreateElement(element: HTMLInputElement, context: object): InputElement {
             let type = element.getAttribute('type');
             switch(type) {
                 case 'number':
@@ -35,6 +35,6 @@ namespace duice.component {
     }
 
     // register factory instance
-    ObjectComponentFactory.addInstance(new InputElementFactory());
+    ObjectElementFactory.addInstance(new InputElementFactory());
 
 }

@@ -16,11 +16,11 @@ namespace duice.component {
             super(element, context);
 
             // changes type and style
-            this.getElement().removeAttribute('type');
-            this.getElement().style.textAlign = 'right';
+            this.getHtmlElement().removeAttribute('type');
+            this.getHtmlElement().style.textAlign = 'right';
 
             // prevents invalid key press
-            this.getElement().addEventListener('keypress', event => {
+            this.getHtmlElement().addEventListener('keypress', event => {
                 if(/[\d|\.|,]/.test(event.key) === false) {
                     event.preventDefault();
                 }

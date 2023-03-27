@@ -20,14 +20,14 @@ namespace duice.component {
          * @param value
          */
         override setValue(value: any): void {
-            this.getElement().checked = (this.getElement().value === value);
+            this.getHtmlElement().checked = (this.getHtmlElement().value === value);
         }
 
         /**
          * return value
          */
         override getValue(): any {
-            return this.getElement().value;
+            return this.getHtmlElement().value;
         }
 
         /**
@@ -36,9 +36,9 @@ namespace duice.component {
          */
         override setReadonly(readonly: boolean): void {
             if(readonly){
-                this.getElement().style.pointerEvents = 'none';
+                this.getHtmlElement().style.pointerEvents = 'none';
             }else{
-                this.getElement().style.pointerEvents = '';
+                this.getHtmlElement().style.pointerEvents = '';
             }
         }
 

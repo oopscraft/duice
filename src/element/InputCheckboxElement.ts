@@ -19,9 +19,9 @@ namespace duice.component {
             super(element, context);
 
             // true false value
-            let trueValue = getComponentAttribute(this.getElement(), 'true-value');
+            let trueValue = getElementAttribute(this.getHtmlElement(), 'true-value');
             this.trueValue = trueValue ? trueValue : this.trueValue;
-            let falseValue = getComponentAttribute(this.getElement(), 'false-value');
+            let falseValue = getElementAttribute(this.getHtmlElement(), 'false-value');
             this.falseValue = falseValue ? falseValue : this.falseValue;
         }
 
@@ -31,9 +31,9 @@ namespace duice.component {
          */
         override setValue(value: any): void {
             if (value === this.trueValue) {
-                this.getElement().checked = true;
+                this.getHtmlElement().checked = true;
             } else {
-                this.element.checked = false;
+                this.htmlElement.checked = false;
             }
         }
 
@@ -41,7 +41,7 @@ namespace duice.component {
          * get value
          */
         override getValue(): any {
-            if(this.element.checked){
+            if(this.htmlElement.checked){
                 return this.trueValue;
             }else{
                 return this.falseValue;
@@ -54,9 +54,9 @@ namespace duice.component {
          */
         override setReadonly(readonly: boolean): void {
             if(readonly){
-                this.getElement().style.pointerEvents = 'none';
+                this.getHtmlElement().style.pointerEvents = 'none';
             }else{
-                this.getElement().style.pointerEvents = '';
+                this.getHtmlElement().style.pointerEvents = '';
             }
         }
 

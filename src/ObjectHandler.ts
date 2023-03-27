@@ -57,10 +57,10 @@ namespace duice {
          * @param event
          */
         async update(observable: Observable, event: event.Event): Promise<void> {
-            console.log("ObjectHandler.update", observable, event);
+            console.debug("ObjectHandler.update", observable, event);
 
             // Element
-            if(observable instanceof ObjectComponent){
+            if(observable instanceof ObjectElement){
                 let property = observable.getProperty();
                 let value = observable.getValue();
                 if(await this.checkListener(this.propertyChangingListener, event)){

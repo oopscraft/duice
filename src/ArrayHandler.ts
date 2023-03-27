@@ -134,7 +134,7 @@ namespace duice {
             console.debug("ArrayHandler.update", observable, event);
 
             // instance is array component
-            if(observable instanceof ArrayComponent){
+            if(observable instanceof ArrayElement){
                 if (event instanceof duice.event.RowMoveEvent) {
                     let object = this.getTarget().splice(event.getFromIndex(), 1)[0];
                     this.getTarget().splice(event.getToIndex(), 0, object);

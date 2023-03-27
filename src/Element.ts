@@ -1,11 +1,11 @@
 namespace duice {
 
     /**
-     * component abstract class
+     * element abstract class
      */
-    export abstract class Component<T extends HTMLElement> extends Observable implements Observer {
+    export abstract class Element<T extends HTMLElement> extends Observable implements Observer {
 
-        element: T;
+        htmlElement: T;
 
         context: object;
 
@@ -13,22 +13,22 @@ namespace duice {
 
         /**
          * constructor
-         * @param element
+         * @param htmlElement
          * @param context
          * @protected
          */
-        protected constructor(element: T, context: object) {
+        protected constructor(htmlElement: T, context: object) {
             super();
-            this.element = element;
+            this.htmlElement = htmlElement;
             this.context = context;
-            setComponentAttribute(this.element, 'id', generateId());
+            setElementAttribute(this.htmlElement, 'id', generateId());
         }
 
         /**
-         * return element
+         * return HTML element
          */
-        getElement(): T {
-            return this.element;
+        getHtmlElement(): T {
+            return this.htmlElement;
         }
 
         /**
@@ -61,9 +61,9 @@ namespace duice {
          * executes script if exists
          */
         executeScript(): void {
-            let script = getComponentAttribute(this.element, 'script');
+            let script = getElementAttribute(this.htmlElement, 'script');
             if(script) {
-                executeScript(script, this.element, this.context);
+                executeScript(script, this.htmlElement, this.context);
             }
         }
 

@@ -51,7 +51,7 @@ const user = new duice.ObjectProxy({
 ```
 
 ### Test Case
-[Object Component Test](test/ObjectComponentTest.html)
+[Object Component Test](test/ObjectElementTest.html)
 
 
 -----------------------------------------------------------
@@ -94,7 +94,7 @@ const users = new duice.ArrayProxy([
 
 ### Test Case 
 
-[Array Component Test](test/ArrayComponentTest.html)
+[Array Component Test](test/ArrayElementTest.html)
 
 
 -----------------------------------------------------------
@@ -107,7 +107,7 @@ const users = new duice.ArrayProxy([
 /**
  * MyObjectComponent
  */
-duice.defineComponent("my-object", class MyObject extends duice.CustomElement {
+duice.defineElement("my-object", class MyObject extends duice._deprecated_CustomElement {
     doRender(object) {
         return `
                     <div>
@@ -116,6 +116,7 @@ duice.defineComponent("my-object", class MyObject extends duice.CustomElement {
                     </div>
                 `;
     }
+
     doStyle(data) {
         return `
                     .bg-red {
@@ -148,7 +149,7 @@ duice.defineComponent("my-object", class MyObject extends duice.CustomElement {
 
 ### Test Case
 
-[Custom Component Test](test/CustomComponentTest.html)
+[Custom Component Test](test/CustomElementTest.html)
 
 
 ------------------------------------------------------

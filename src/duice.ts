@@ -1,4 +1,4 @@
-///<reference path="CustomComponentFactory.ts"/>
+///<reference path="CustomElementFactory.ts"/>
 namespace duice {
 
     let namespace = 'duice';
@@ -20,9 +20,9 @@ namespace duice {
     }
 
     /**
-     * returns query selector for component scan
+     * returns query selector for element scan
      */
-    export function getComponentQuerySelector(): string {
+    export function getElementQuerySelector(): string {
         return [
             `*[data-${getNamespace()}-object]:not([data-${getNamespace()}-id])`,
             `*[data-${getNamespace()}-array]:not([data-${getNamespace()}-id])`,
@@ -36,33 +36,33 @@ namespace duice {
      */
     export function initialize(container: any, context: object): void {
         // scan DOM tree
-        container.querySelectorAll(getComponentQuerySelector()).forEach(element => {
-            if(!hasComponentAttribute(element, 'id')) {
+        container.querySelectorAll(getElementQuerySelector()).forEach(htmlElement => {
+            if(!hasElementAttribute(htmlElement, 'id')) {
                 try {
-                    // custom component
-                    let customComponentFactory = CustomComponentFactory.getInstance(element);
-                    if(customComponentFactory) {
-                        customComponentFactory.createComponent(element, context)?.render();
+                    // custom element
+                    let customElementFactory = CustomElementFactory.getInstance(htmlElement);
+                    if(customElementFactory) {
+                        customElementFactory.createElement(htmlElement, context)?.render();
                         return;
                     }
 
-                    // array component
-                    if(hasComponentAttribute(element, 'array')) {
-                        ArrayComponentFactory.getInstance(element)
-                            ?.createComponent(element, context)
+                    // array element
+                    if(hasElementAttribute(htmlElement, 'array')) {
+                        ArrayElementFactory.getInstance(htmlElement)
+                            ?.createElement(htmlElement, context)
                             ?.render();
                         return;
                     }
 
-                    // object component
-                    if(hasComponentAttribute(element, 'object')) {
-                        ObjectComponentFactory.getInstance(element)
-                            ?.createComponent(element, context)
+                    // object element
+                    if(hasElementAttribute(htmlElement, 'object')) {
+                        ObjectElementFactory.getInstance(htmlElement)
+                            ?.createElement(htmlElement, context)
                             ?.render();
                         return;
                     }
                 }catch(e){
-                    console.error(e, element, container, JSON.stringify(context));
+                    console.error(e, htmlElement, container, JSON.stringify(context));
                 }
             }
         });
@@ -73,8 +73,8 @@ namespace duice {
      * @param container
      */
     export function markInitialized(container: any): void {
-        container.querySelectorAll(getComponentQuerySelector()).forEach(element => {
-            setComponentAttribute(element, 'id', generateId());
+        container.querySelectorAll(getElementQuerySelector()).forEach(element => {
+            setElementAttribute(element, 'id', generateId());
         });
     }
 
@@ -118,30 +118,30 @@ namespace duice {
 
     /**
      * checks has component attribute
-     * @param element
+     * @param htmlElement
      * @param name
      */
-    export function hasComponentAttribute(element: HTMLElement, name: string): boolean {
-        return element.hasAttribute(`data-${getNamespace()}-${name}`)
+    export function hasElementAttribute(htmlElement: HTMLElement, name: string): boolean {
+        return htmlElement.hasAttribute(`data-${getNamespace()}-${name}`)
     }
 
     /**
-     * returns component attribute
-     * @param element
+     * returns element attribute
+     * @param htmlElement
      * @param name
      */
-    export function getComponentAttribute(element: HTMLElement, name: string): string {
-        return element.getAttribute(`data-${getNamespace()}-${name}`);
+    export function getElementAttribute(htmlElement: HTMLElement, name: string): string {
+        return htmlElement.getAttribute(`data-${getNamespace()}-${name}`);
     }
 
     /**
      * set component attribute
-     * @param element
+     * @param htmlElement
      * @param name
      * @param value
      */
-    export function setComponentAttribute(element: HTMLElement, name: string, value: string): void {
-        element.setAttribute(`data-${getNamespace()}-${name}`, value);
+    export function setElementAttribute(htmlElement: HTMLElement, name: string, value: string): void {
+        htmlElement.setAttribute(`data-${getNamespace()}-${name}`, value);
     }
 
     /**
@@ -287,13 +287,13 @@ namespace duice {
     }
 
     /**
-     * defines custom component
+     * defines custom element
      * @param tagName
-     * @param constructor
+     * @param elementType
      */
-    export function defineComponent(tagName: string, constructor: CustomElementConstructor): void {
-        customElements.define(tagName, constructor);
-        CustomComponentFactory.addInstance(new CustomComponentFactory(tagName));
+    export function defineElement(tagName: string, elementType: Function): void {
+        let customElementFactory = new CustomElementFactory(tagName, elementType);
+        CustomElementFactory.addInstance(customElementFactory);
     }
 
     /**

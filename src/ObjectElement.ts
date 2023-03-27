@@ -1,12 +1,12 @@
 ///<reference path="Observable.ts"/>
 ///<reference path="./format/FormatFactory.ts"/>
-///<reference path="Component.ts"/>
+///<reference path="Element.ts"/>
 namespace duice {
 
     /**
-     * object component class
+     * object element class
      */
-    export class ObjectComponent<T extends HTMLElement> extends Component<T> {
+    export class ObjectElement<T extends HTMLElement> extends Element<T> {
 
         property: string;
 
@@ -14,11 +14,11 @@ namespace duice {
 
         /**
          * constructor
-         * @param element
+         * @param htmlElement
          * @param context
          */
-        constructor(element: T, context: object) {
-            super(element, context);
+        constructor(htmlElement: T, context: object) {
+            super(htmlElement, context);
         }
 
         /**
@@ -85,7 +85,7 @@ namespace duice {
          * @param event
          */
         override update(observable: Observable, event: event.Event): void {
-            console.log('Element.update', observable, event);
+            console.debug('ObjectElement.update', observable, event);
 
             // ObjectHandler
             if(observable instanceof ObjectHandler) {
@@ -109,14 +109,14 @@ namespace duice {
          */
         setValue(value: any): void {
             value = this.getFormat() ? this.getFormat().encode(value) : value;
-            this.element.innerText = value;
+            this.htmlElement.innerText = value;
         }
 
         /**
          * return value
          */
         getValue(): any {
-            let value = this.element.innerText;
+            let value = this.htmlElement.innerText;
             value = this.getFormat() ? this.getFormat().decode(value) : value;
             return value;
         }
@@ -133,7 +133,7 @@ namespace duice {
          * return index
          */
         getIndex(): number {
-            let index = getComponentAttribute(this.element, 'index');
+            let index = getElementAttribute(this.htmlElement, 'index');
             if(index){
                 return Number(index);
             }
