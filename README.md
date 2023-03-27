@@ -24,7 +24,7 @@ Therefore you can use it with another javascript library together.
 --------------------------------------------------
 
 
-## Object Component
+## Object Element 
 
 
 ### Javascript
@@ -51,13 +51,13 @@ const user = new duice.ObjectProxy({
 ```
 
 ### Test Case
-[Object Component Test](test/ObjectElementTest.html)
+[Object Element Test](test/ObjectElementTest.html)
 
 
 -----------------------------------------------------------
 
 
-## Array Component
+## Array Element 
 
 ### Javascript
 
@@ -94,20 +94,17 @@ const users = new duice.ArrayProxy([
 
 ### Test Case 
 
-[Array Component Test](test/ArrayElementTest.html)
+[Array Element Test](test/ArrayElementTest.html)
 
 
 -----------------------------------------------------------
 
-## Custom Component
+## Custom Element 
 
 ### Javascript
 
 ```javascript
-/**
- * MyObjectComponent
- */
-duice.defineElement("my-object", class MyObject extends duice._deprecated_CustomElement {
+duice.defineElement("my-object", class extends duice.CustomElement {
     doRender(object) {
         return `
                     <div>
@@ -116,7 +113,7 @@ duice.defineElement("my-object", class MyObject extends duice._deprecated_Custom
                     </div>
                 `;
     }
-
+    // (optional)
     doStyle(data) {
         return `
                     .bg-red {
@@ -149,7 +146,7 @@ duice.defineElement("my-object", class MyObject extends duice._deprecated_Custom
 
 ### Test Case
 
-[Custom Component Test](test/CustomElementTest.html)
+[Custom Element Test](test/CustomElementTest.html)
 
 
 ------------------------------------------------------
