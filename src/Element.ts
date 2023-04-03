@@ -1,3 +1,4 @@
+///<reference path="Observable.ts"/>
 namespace duice {
 
     /**

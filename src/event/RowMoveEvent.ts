@@ -1,3 +1,4 @@
+///<reference path="Event.ts"/>
 namespace duice.event {
 
     /**
