@@ -882,15 +882,12 @@ var duice;
             // removes child
             this.htmlElement.innerHTML = '';
             // create template element
-            let templateLiteral = this.doRender(this.getData()).trim();
-            let templateElement = document.createElement('template');
-            templateElement.innerHTML = templateLiteral;
-            let htmlElement = templateElement.content.firstChild.cloneNode(true);
+            let templateElement = this.doRender(this.getData());
             if (this.htmlElement.shadowRoot) {
-                this.htmlElement.shadowRoot.appendChild(htmlElement);
+                this.htmlElement.shadowRoot.appendChild(templateElement);
             }
             else {
-                this.htmlElement.appendChild(htmlElement);
+                this.htmlElement.appendChild(templateElement);
             }
             // add style if exists
             let styleLiteral = this.doStyle(this.getData());
@@ -914,6 +911,15 @@ var duice;
          */
         doStyle(data) {
             return null;
+        }
+        /**
+         * create element
+         * @param templateLiteral
+         */
+        createElement(templateLiteral) {
+            let templateElement = document.createElement('template');
+            templateElement.innerHTML = templateLiteral;
+            return templateElement.content.firstElementChild.cloneNode(true);
         }
         /**
          * update
@@ -2514,40 +2520,105 @@ var duice;
         component.InputRadioElement = InputRadioElement;
     })(component = duice.component || (duice.component = {}));
 })(duice || (duice = {}));
-// namespace duice.component {
-//
-//     export class Pagination extends duice.CustomElement {
-//
-//         public constructor() {
-//             super();
-//         }
-//
-//         doRender(object: any): string {
-//
-//             // prev
-//             let template = `<div><span>Prev</span>`;
-//
-//             // pages
-//             for(let index = 0; index < 10; index ++) {
-//                 template += `<span>${index}</span>`;
-//             }
-//
-//             // next
-//             template += `<span>Next</span></div>`;
-//
-//             // returns
-//             console.warn("=========", template);
-//             return template;
-//         }
-//
-//     }
-//
-//     ObjectComponentFactory.addInstance(new CustomComponentFactory("duice-name"));
-//
-//     // defines component
-//     duice.defineComponent(`${duice.getNamespace()}-pagination`, Pagination);
-//
-// }
+var duice;
+(function (duice) {
+    var component;
+    (function (component) {
+        class Pagination extends duice.CustomElement {
+            doRender(object) {
+                // attribute
+                let pageProperty = duice.getElementAttribute(this.getHtmlElement(), 'page-property');
+                let sizeProperty = duice.getElementAttribute(this.getHtmlElement(), 'size-property');
+                let countProperty = duice.getElementAttribute(this.getHtmlElement(), 'count-property');
+                let onclick = duice.getElementAttribute(this.getHtmlElement(), 'onclick');
+                // optional
+                let prevText = duice.getElementAttribute(this.getHtmlElement(), 'prev-text') || '◀︎';
+                let nextText = duice.getElementAttribute(this.getHtmlElement(), 'next-text') || '▶︎';
+                // page,size,count
+                let page = Number(object[pageProperty]);
+                let size = Number(object[sizeProperty]);
+                let count = Number(object[countProperty]);
+                // calculate page
+                let totalPage = Math.ceil(count / size);
+                let startPage = Math.ceil(page / 10) * 10 - 9;
+                let endPage = Math.min(startPage + 10 - 1, totalPage);
+                console.debug('totalPage', totalPage);
+                console.debug('startPage', startPage);
+                console.debug('endPage', endPage);
+                // template
+                let pagination = document.createElement('ul');
+                pagination.classList.add(`${duice.getNamespace()}-pagination`);
+                // prev
+                let prev = document.createElement('li');
+                prev.appendChild(document.createTextNode(prevText));
+                prev.classList.add(`${duice.getNamespace()}-pagination__item`);
+                prev.dataset.page = String(Math.min(startPage - 9, 1));
+                prev.addEventListener('click', function () {
+                    Function(onclick).call(prev);
+                });
+                if (page <= 10) {
+                    prev.classList.add(`${duice.getNamespace()}-pagination__item--disable`);
+                }
+                pagination.appendChild(prev);
+                // pages
+                for (let index = startPage; index <= endPage; index++) {
+                    let item = document.createElement('li');
+                    item.appendChild(document.createTextNode(String(index)));
+                    item.dataset.page = String(index);
+                    item.classList.add(`${duice.getNamespace()}-pagination__item`);
+                    if (index === page) {
+                        item.classList.add(`${duice.getNamespace()}-pagination__item--active`);
+                    }
+                    item.addEventListener('click', function () {
+                        Function(onclick).call(item);
+                    });
+                    pagination.appendChild(item);
+                }
+                // next
+                let next = document.createElement('li');
+                next.appendChild(document.createTextNode(nextText));
+                next.classList.add(`${duice.getNamespace()}-pagination__item`);
+                next.dataset.page = String(Math.min(endPage + 1, totalPage));
+                next.addEventListener('click', function () {
+                    Function(onclick).call(next);
+                });
+                if (endPage >= totalPage) {
+                    next.classList.add(`${duice.getNamespace()}-pagination__item--disable`);
+                }
+                pagination.appendChild(next);
+                // returns
+                return pagination;
+                // return pagination.outerHTML;
+            }
+            doStyle(object) {
+                return `
+               .${duice.getNamespace()}-pagination {
+                   list-style: none;
+                   display: flex;
+                   padding-left: 0;
+               }
+               .${duice.getNamespace()}-pagination__item {
+                   cursor: pointer;
+                   padding: 0 0.5rem;
+               }
+               .${duice.getNamespace()}-pagination__item--active {
+                   font-weight: bold;
+                   text-decoration: underline;
+                   pointer-events: none;
+               }
+               .${duice.getNamespace()}-pagination__item--disable {
+                   pointer-events: none;
+                   opacity: 0.5;
+               }
+           `;
+            }
+        }
+        component.Pagination = Pagination;
+        // register
+        let customElementFactory = new duice.CustomElementFactory(`${duice.getNamespace()}-pagination`, Pagination);
+        duice.CustomElementFactory.addInstance(customElementFactory);
+    })(component = duice.component || (duice.component = {}));
+})(duice || (duice = {}));
 // namespace duice.component {
 //
 //     /**

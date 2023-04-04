@@ -11,15 +11,21 @@
             page: 1,
             count: 123
         });
+
+        function gotoPage(page) {
+            console.log(page);
+            pagination.page = page;
+        }
     </script>
 </head>
 <body>
 
-<duice-pagination
-        data-duice-object="pagination"
-        data-duice-size-property=""
-        data-duice-page-property=""
-        data-duice-count-property=""/>
+<duice-pagination data-duice-object="pagination"
+        data-duice-size-property="size"
+        data-duice-page-property="page"
+        data-duice-count-property="count"
+        data-duice-onclick="gotoPage(this.dataset.page);"/>
+
 
 </body>
 </html>

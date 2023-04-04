@@ -40,14 +40,11 @@ namespace duice {
             this.htmlElement.innerHTML = '';
 
             // create template element
-            let templateLiteral = this.doRender(this.getData()).trim();
-            let templateElement = document.createElement('template');
-            templateElement.innerHTML = templateLiteral;
-            let htmlElement = templateElement.content.firstChild.cloneNode(true) as HTMLElement;
+            let templateElement = this.doRender(this.getData());
             if(this.htmlElement.shadowRoot){
-                this.htmlElement.shadowRoot.appendChild(htmlElement);
+                this.htmlElement.shadowRoot.appendChild(templateElement);
             }else{
-                this.htmlElement.appendChild(htmlElement);
+                this.htmlElement.appendChild(templateElement);
             }
 
             // add style if exists
@@ -73,7 +70,7 @@ namespace duice {
          * do render template method
          * @param data
          */
-        abstract doRender(data: Data): string;
+        abstract doRender(data: Data): HTMLElement;
 
         /**
          * setting style
@@ -81,6 +78,16 @@ namespace duice {
          */
         doStyle(data: Data): string {
             return null;
+        }
+
+        /**
+         * create element
+         * @param templateLiteral
+         */
+        createElement(templateLiteral: string): HTMLElement {
+            let templateElement = document.createElement('template');
+            templateElement.innerHTML = templateLiteral;
+            return templateElement.content.firstElementChild.cloneNode(true) as HTMLElement;
         }
 
         /**

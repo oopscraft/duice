@@ -461,12 +461,17 @@ declare namespace duice {
          * do render template method
          * @param data
          */
-        abstract doRender(data: Data): string;
+        abstract doRender(data: Data): HTMLElement;
         /**
          * setting style
          * @param data
          */
         doStyle(data: Data): string;
+        /**
+         * create element
+         * @param templateLiteral
+         */
+        createElement(templateLiteral: string): HTMLElement;
         /**
          * update
          * @param observable
@@ -1178,6 +1183,12 @@ declare namespace duice.component {
          * @param readonly
          */
         setReadonly(readonly: boolean): void;
+    }
+}
+declare namespace duice.component {
+    class Pagination extends duice.CustomElement {
+        doRender(object: ObjectProxy): HTMLElement;
+        doStyle(object: ObjectProxy): string;
     }
 }
 declare namespace duice.component {

@@ -106,12 +106,12 @@ const users = new duice.ArrayProxy([
 ```javascript
 duice.defineElement("my-object", class extends duice.CustomElement {
     doRender(object) {
-        return `
+        return this.createElement(`
                     <div>
                         <span data-duice-object="object" data-duice-property="name"></span>
                         <input type="text" data-duice-object="object" data-duice-property="name" class="bg-red"/>
                     </div>
-                `;
+                `);
     }
     // (optional)
     doStyle(data) {
