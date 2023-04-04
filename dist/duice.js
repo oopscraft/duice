@@ -2563,8 +2563,8 @@ var duice;
                 let size = Number(object[sizeProperty]);
                 let count = Number(object[countProperty]);
                 // calculate page
-                let totalPage = Math.ceil(count / size);
-                let startPage = Math.ceil(page / 10) * 10 - 9;
+                let totalPage = Math.floor(count / size);
+                let startPage = Math.floor(page / 10) * 10;
                 let endPage = Math.min(startPage + 10 - 1, totalPage);
                 console.debug('totalPage', totalPage);
                 console.debug('startPage', startPage);
@@ -2576,18 +2576,18 @@ var duice;
                 let prev = document.createElement('li');
                 prev.appendChild(document.createTextNode(prevText));
                 prev.classList.add(`${duice.getNamespace()}-pagination__item`);
-                prev.dataset.page = String(Math.min(startPage - 9, 1));
+                prev.dataset.page = String(Math.max(startPage - 10, 0));
                 prev.addEventListener('click', function () {
                     Function(onclick).call(prev);
                 });
-                if (page <= 10) {
+                if (page < 10) {
                     prev.classList.add(`${duice.getNamespace()}-pagination__item--disable`);
                 }
                 pagination.appendChild(prev);
                 // pages
                 for (let index = startPage; index <= endPage; index++) {
                     let item = document.createElement('li');
-                    item.appendChild(document.createTextNode(String(index)));
+                    item.appendChild(document.createTextNode(String(index + 1)));
                     item.dataset.page = String(index);
                     item.classList.add(`${duice.getNamespace()}-pagination__item`);
                     if (index === page) {
