@@ -210,6 +210,30 @@ namespace duice {
     }
 
     /**
+     * tab folder
+     * @param tabItems
+     */
+    export function tabFolder(...tabItems: duice.tab.TabItem[]): duice.tab.TabFolder {
+        let tab = new duice.tab.TabFolder();
+        if(tabItems) {
+            tabItems.forEach(tabItem => {
+                tab.addItem(tabItem);
+            });
+        }
+        return tab;
+    }
+
+    /**
+     * tab item
+     * @param button
+     * @param content
+     * @param listener
+     */
+    export function tabItem(button: HTMLElement, content: HTMLElement, listener: Function): duice.tab.TabItem {
+        return new duice.tab.TabItem(button, content, listener);
+    }
+
+    /**
      * Gets cookie value
      * @param name
      */

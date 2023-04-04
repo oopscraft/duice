@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="../../dist/duice.js"></script>
+    <link rel="stylesheet" href="../../dist/duice.css">
+    <script>
+        'use strict';
+        const pagination = new duice.ObjectProxy({
+            size: 10,
+            page: 1,
+            count: 123
+        });
+
+        function gotoTab(message) {
+            console.log(message);
+        }
+
+
+        document.addEventListener('DOMContentLoaded',() => {
+            // tab
+            let tabFolder = duice.tabFolder(
+                duice.tabItem(document.getElementById('tabIndex1'), document.getElementById('tabContent1'), () => {
+                    gotoTab('tabContent1');
+                }),
+                duice.tabItem(document.getElementById('tabIndex2'), document.getElementById('tabContent2'), () => {
+                    gotoTab('tabContent2');
+                })
+            );
+            tabFolder.setActive(0);
+        });
+
+    </script>
+</head>
+<body>
+
+<div style="border-bottom:solid 1px #ccc;">
+    <button id="tabIndex1" style="border-bottom:none;">Tab Index 1</button>
+    <button id="tabIndex2" style="border-bottom:none;">Tab Index 2</button>
+</div>
+<div>
+    <div id="tabContent1">
+        Tab Content 1
+    </div>
+    <div id="tabContent2">
+        Tab Content 2
+    </div>
+</div>
+
+</body>
+</html>

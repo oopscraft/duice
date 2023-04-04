@@ -1758,6 +1758,30 @@ var duice;
     }
     duice.openDialog = openDialog;
     /**
+     * tab folder
+     * @param tabItems
+     */
+    function tabFolder(...tabItems) {
+        let tab = new duice.tab.TabFolder();
+        if (tabItems) {
+            tabItems.forEach(tabItem => {
+                tab.addItem(tabItem);
+            });
+        }
+        return tab;
+    }
+    duice.tabFolder = tabFolder;
+    /**
+     * tab item
+     * @param button
+     * @param content
+     * @param listener
+     */
+    function tabItem(button, content, listener) {
+        return new duice.tab.TabItem(button, content, listener);
+    }
+    duice.tabItem = tabItem;
+    /**
      * Gets cookie value
      * @param name
      */
@@ -3078,5 +3102,87 @@ var duice;
         }
         format.StringFormat = StringFormat;
     })(format = duice.format || (duice.format = {}));
+})(duice || (duice = {}));
+///<reference path="TabItem.ts"/>
+var duice;
+(function (duice) {
+    var tab;
+    (function (tab) {
+        class TabFolder {
+            constructor() {
+                this.items = [];
+            }
+            addItem(item) {
+                item.setTabFolder(this);
+                item.setTabIndex(this.items.length);
+                this.items.push(item);
+            }
+            setActive(index) {
+                for (let i = 0; i < this.items.length; i++) {
+                    this.items[i].setActive(i === index);
+                }
+            }
+        }
+        tab.TabFolder = TabFolder;
+    })(tab = duice.tab || (duice.tab = {}));
+})(duice || (duice = {}));
+///<reference path="TabFolder.ts"/>
+var duice;
+(function (duice) {
+    var tab;
+    (function (tab) {
+        class TabItem {
+            /**
+             * constructor
+             * @param button
+             * @param content
+             * @param listener
+             */
+            constructor(button, content, listener) {
+                this.button = button;
+                this.content = content;
+                this.listener = listener;
+                // default style
+                button.style.cursor = 'pointer';
+                // add listener
+                let _this = this;
+                button.addEventListener('click', () => {
+                    _this.tabFolder.setActive(_this.tabIndex);
+                });
+                // set de-active
+                this.setActive(false);
+            }
+            /**
+             * set tab folder
+             * @param tabFolder
+             */
+            setTabFolder(tabFolder) {
+                this.tabFolder = tabFolder;
+            }
+            /**
+             * set tab index
+             * @param tabIndex
+             */
+            setTabIndex(tabIndex) {
+                this.tabIndex = tabIndex;
+            }
+            /**
+             * set active
+             * @param active
+             */
+            setActive(active) {
+                if (active === true) {
+                    this.button.style.opacity = 'unset';
+                    this.content.style.display = null;
+                    this.listener.call(this);
+                }
+                else {
+                    this.button.style.opacity = '0.5';
+                    this.content.style.display = 'none';
+                }
+            }
+        }
+        tab.TabItem = TabItem;
+    })(tab = duice.tab || (duice.tab = {}));
 })(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map

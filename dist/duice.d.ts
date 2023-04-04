@@ -872,6 +872,18 @@ declare namespace duice {
      */
     function openDialog(dialogElement: HTMLDialogElement): Promise<void>;
     /**
+     * tab folder
+     * @param tabItems
+     */
+    function tabFolder(...tabItems: duice.tab.TabItem[]): duice.tab.TabFolder;
+    /**
+     * tab item
+     * @param button
+     * @param content
+     * @param listener
+     */
+    function tabItem(button: HTMLElement, content: HTMLElement, listener: Function): duice.tab.TabItem;
+    /**
      * Gets cookie value
      * @param name
      */
@@ -1392,5 +1404,43 @@ declare namespace duice.format {
          * @param value
          */
         decode(value: string): string;
+    }
+}
+declare namespace duice.tab {
+    class TabFolder {
+        items: TabItem[];
+        addItem(item: TabItem): void;
+        setActive(index: number): void;
+    }
+}
+declare namespace duice.tab {
+    class TabItem {
+        button: HTMLElement;
+        content: HTMLElement;
+        listener: Function;
+        tabFolder: TabFolder;
+        tabIndex: number;
+        /**
+         * constructor
+         * @param button
+         * @param content
+         * @param listener
+         */
+        constructor(button: HTMLElement, content: HTMLElement, listener: Function);
+        /**
+         * set tab folder
+         * @param tabFolder
+         */
+        setTabFolder(tabFolder: TabFolder): void;
+        /**
+         * set tab index
+         * @param tabIndex
+         */
+        setTabIndex(tabIndex: number): void;
+        /**
+         * set active
+         * @param active
+         */
+        setActive(active: boolean): void;
     }
 }
