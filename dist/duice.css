@@ -114,6 +114,7 @@ table tr th {
     white-space: nowrap;
     overflow: hidden;
     vertical-align: middle;
+    text-align: left;
 }
 table tr th:last-of-type {
     border-right: none;
