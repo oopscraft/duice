@@ -210,6 +210,9 @@ button {
     text-decoration: none;
     transition-duration: 0.3s;
 }
+button:has(img) {
+    padding-right: 1rem;
+}
 button:hover {
     background-color: var(--duice-button-background-color-hover);
     border: var(--duice-button-border-hover);
