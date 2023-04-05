@@ -354,5 +354,12 @@ dialog {
     vertical-align: middle;
 }
 
+/* tab */
+.tab {
+    border-bottom: solid 1px #ccc;
+}
+.tab__button {
+    border-bottom: none;
+}
 
 
