@@ -105,10 +105,9 @@ table {
 table tr th {
     background-color: var(--duice-table-header-color);
     border: var(--duice-table-th-border);
-    line-height: calc(var(--duice-line-height) + 6px);
     border-top: none;
     border-left: none;
-    padding: 2px 0.5rem;
+    padding: 3px 0.5rem;
     font-weight: bold;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -119,14 +118,14 @@ table tr th {
 table tr th:last-of-type {
     border-right: none;
 }
-table tr th:has(input,select,textarea,table) {
-    padding: 1px;
+table tr th:has(button,input,select,textarea,table) {
+    padding: 0;
 }
 table tr td {
     border: var(--duice-table-td-border);
     border-top: none;
     border-left: none;
-    padding: 2px 0.5rem;
+    padding: 3px 0.5rem;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -138,8 +137,8 @@ table tr td:last-of-type {
 table tr:last-of-type td {
     border-bottom: none;
 }
-table tr td:has(*) {
-    padding: 1px;
+table tr td:has(button,input,select,textarea,table) {
+    padding: 0;
 }
 table thead {
     position: sticky;
