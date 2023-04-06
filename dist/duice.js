@@ -1933,8 +1933,8 @@ var duice;
                 // creates close button
                 this.closeButton = document.createElement('span');
                 this.closeButton.style.position = 'absolute';
-                this.closeButton.style.top = '1';
-                this.closeButton.style.right = '1';
+                this.closeButton.style.top = '1px';
+                this.closeButton.style.right = '1px';
                 this.closeButton.style.cursor = 'pointer';
                 this.closeButton.style.width = '1rem';
                 this.closeButton.style.height = '1rem';
