@@ -75,6 +75,7 @@
         }
 
         function assignMyArray(){
+            duice.ArrayProxy.clear(myArray);
             let array = JSON.parse(document.getElementById('myArray').value);
             duice.ArrayProxy.assign(myArray, array);
         }

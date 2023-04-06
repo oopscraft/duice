@@ -19,7 +19,7 @@ namespace duice {
                 let value = object[name];
 
                 // value is array
-                if(ArrayProxy.isArray(value)){
+                if(Array.isArray(value)){
                     let arrayProxy = new ArrayProxy(value);
                     ArrayProxy.getHandler(arrayProxy).addObserver(objectHandler);
                     this[name] = arrayProxy;
@@ -58,6 +58,40 @@ namespace duice {
         }
 
         /**
+         * clear
+         * @param objectProxy
+         */
+        static clear(objectProxy: ObjectProxy): void {
+            let objectHandler = this.getHandler(objectProxy);
+            try {
+                // suspend
+                objectHandler.suspendListener();
+                objectHandler.suspendNotify();
+
+                // clear properties
+                for(let name in objectProxy) {
+                    let value = objectProxy[name];
+                    if(value instanceof ArrayProxy) {
+                        ArrayProxy.clear(value);
+                        continue;
+                    }
+                    if(value instanceof ObjectProxy) {
+                        ObjectProxy.clear(value);
+                        continue;
+                    }
+                    objectProxy[name] = null;
+                }
+            } finally {
+                // resume
+                objectHandler.resumeListener();
+                objectHandler.resumeNotify();
+            }
+
+            // notify observers
+            objectHandler.notifyObservers(new event.Event(this));
+        }
+
+        /**
          * assign
          * @param objectProxy
          * @param object
@@ -65,18 +99,17 @@ namespace duice {
         static override assign(objectProxy: ObjectProxy, object: object): void {
             let objectHandler = this.getHandler(objectProxy);
             try {
-
                 // suspend
                 objectHandler.suspendListener()
                 objectHandler.suspendNotify();
 
                 // loop object properties
-                for(let name in object){
+                for(let name in object) {
                     let value = object[name];
 
                     // source value is array
-                    if(ArrayProxy.isArray(value)){
-                        if(ArrayProxy.isArray(objectProxy[name])){
+                    if(Array.isArray(value)){
+                        if(Array.isArray(objectProxy[name])){
                             ArrayProxy.assign(objectProxy[name], value);
                         }else{
                             objectProxy[name] = new ArrayProxy(value);
@@ -99,7 +132,6 @@ namespace duice {
                     // source value is primitive
                     objectProxy[name] = value;
                 }
-
             } finally {
                 // resume
                 objectHandler.resumeListener();

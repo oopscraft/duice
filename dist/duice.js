@@ -640,12 +640,32 @@ var duice;
             return arrayProxy;
         }
         /**
+         * clear
+         * @param arrayProxy
+         */
+        static clear(arrayProxy) {
+            let arrayHandler = this.getHandler(arrayProxy);
+            try {
+                // suspend
+                arrayHandler.suspendListener();
+                arrayHandler.suspendNotify();
+                // clear element
+                arrayProxy.length = 0;
+            }
+            finally {
+                // resume
+                arrayHandler.resumeListener();
+                arrayHandler.resumeNotify();
+            }
+            // notify observers
+            arrayHandler.notifyObservers(new duice.event.Event(this));
+        }
+        /**
          * assign
          * @param arrayProxy
          * @param array
          */
         static assign(arrayProxy, array) {
-            console.log('ArrayProxy.assign', arrayProxy, array);
             let arrayHandler = this.getHandler(arrayProxy);
             try {
                 // suspend
@@ -1378,7 +1398,7 @@ var duice;
             for (let name in object) {
                 let value = object[name];
                 // value is array
-                if (duice.ArrayProxy.isArray(value)) {
+                if (Array.isArray(value)) {
                     let arrayProxy = new duice.ArrayProxy(value);
                     duice.ArrayProxy.getHandler(arrayProxy).addObserver(objectHandler);
                     this[name] = arrayProxy;
@@ -1410,6 +1430,38 @@ var duice;
             return objectProxy;
         }
         /**
+         * clear
+         * @param objectProxy
+         */
+        static clear(objectProxy) {
+            let objectHandler = this.getHandler(objectProxy);
+            try {
+                // suspend
+                objectHandler.suspendListener();
+                objectHandler.suspendNotify();
+                // clear properties
+                for (let name in objectProxy) {
+                    let value = objectProxy[name];
+                    if (value instanceof duice.ArrayProxy) {
+                        duice.ArrayProxy.clear(value);
+                        continue;
+                    }
+                    if (value instanceof ObjectProxy) {
+                        ObjectProxy.clear(value);
+                        continue;
+                    }
+                    objectProxy[name] = null;
+                }
+            }
+            finally {
+                // resume
+                objectHandler.resumeListener();
+                objectHandler.resumeNotify();
+            }
+            // notify observers
+            objectHandler.notifyObservers(new duice.event.Event(this));
+        }
+        /**
          * assign
          * @param objectProxy
          * @param object
@@ -1424,8 +1476,8 @@ var duice;
                 for (let name in object) {
                     let value = object[name];
                     // source value is array
-                    if (duice.ArrayProxy.isArray(value)) {
-                        if (duice.ArrayProxy.isArray(objectProxy[name])) {
+                    if (Array.isArray(value)) {
+                        if (Array.isArray(objectProxy[name])) {
                             duice.ArrayProxy.assign(objectProxy[name], value);
                         }
                         else {

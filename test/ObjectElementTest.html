@@ -43,6 +43,7 @@
          * assignMyObject
          */
         function assignMyObject() {
+            duice.ObjectProxy.clear(myObject);
             let object = JSON.parse(document.getElementById('myObject').value);
             duice.ObjectProxy.assign(myObject, object);
         }

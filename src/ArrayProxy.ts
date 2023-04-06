@@ -36,12 +36,35 @@ namespace duice {
         }
 
         /**
+         * clear
+         * @param arrayProxy
+         */
+        static clear(arrayProxy: ArrayProxy): void {
+            let arrayHandler = this.getHandler(arrayProxy);
+            try {
+                // suspend
+                arrayHandler.suspendListener();
+                arrayHandler.suspendNotify();
+
+                // clear element
+                arrayProxy.length = 0;
+
+            } finally {
+                // resume
+                arrayHandler.resumeListener();
+                arrayHandler.resumeNotify();
+            }
+
+            // notify observers
+            arrayHandler.notifyObservers(new event.Event(this));
+        }
+
+        /**
          * assign
          * @param arrayProxy
          * @param array
          */
         static assign(arrayProxy: ArrayProxy, array: object[]): void {
-            console.log('ArrayProxy.assign', arrayProxy, array);
             let arrayHandler = this.getHandler(arrayProxy);
             try {
 

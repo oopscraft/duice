@@ -331,6 +331,11 @@ declare namespace duice {
          */
         constructor(array?: object[]);
         /**
+         * clear
+         * @param arrayProxy
+         */
+        static clear(arrayProxy: ArrayProxy): void;
+        /**
          * assign
          * @param arrayProxy
          * @param array
@@ -723,6 +728,11 @@ declare namespace duice {
          * constructor
          */
         constructor(object: object);
+        /**
+         * clear
+         * @param objectProxy
+         */
+        static clear(objectProxy: ObjectProxy): void;
         /**
          * assign
          * @param objectProxy
