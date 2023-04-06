@@ -963,14 +963,14 @@ declare namespace duice.dialog {
         /**
          * close
          */
-        close(): void;
+        protected close(...args: any[]): void;
         /**
-         * confirm
+         * resolve
          * @param args
          */
         resolve(...args: any[]): void;
         /**
-         * close
+         * reject
          * @param args
          */
         reject(...args: any[]): void;
@@ -1020,6 +1020,10 @@ declare namespace duice.dialog {
          */
         open(): Promise<any>;
         /**
+         * close
+         */
+        close(...args: any[]): void;
+        /**
          * confirm
          */
         confirm(): void;
@@ -1027,10 +1031,6 @@ declare namespace duice.dialog {
          * cancel
          */
         cancel(): void;
-        /**
-         * close
-         */
-        close(): void;
     }
 }
 declare namespace duice.dialog {
@@ -1052,6 +1052,10 @@ declare namespace duice.dialog {
          */
         open(): Promise<any>;
         /**
+         * close
+         */
+        close(...args: any[]): void;
+        /**
          * confirm
          */
         confirm(value: string): void;
@@ -1059,10 +1063,6 @@ declare namespace duice.dialog {
          * cancel
          */
         cancel(): void;
-        /**
-         * close
-         */
-        close(): void;
     }
 }
 declare namespace duice.component {

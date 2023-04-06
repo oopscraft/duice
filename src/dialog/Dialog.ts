@@ -170,12 +170,12 @@ namespace duice.dialog {
         /**
          * close
          */
-        close() {
-            this.reject();
+        protected close(...args: any[]) {
+            this.reject(...args);
         }
 
         /**
-         * confirm
+         * resolve
          * @param args
          */
         resolve(...args: any[]) {
@@ -184,7 +184,7 @@ namespace duice.dialog {
         }
 
         /**
-         * close
+         * reject
          * @param args
          */
         reject(...args: any[]) {

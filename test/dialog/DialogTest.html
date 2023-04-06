@@ -44,6 +44,7 @@
          */
         async function confirmThen() {
             duice.confirm('<b>Hello~</b>\nThis is confirm message!\nYes or No?').then((result) =>{
+                console.log("==> result:", result);
                 if(result) {
                     alert(true);
                 }else{

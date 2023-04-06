@@ -56,25 +56,25 @@ namespace duice.dialog {
         }
 
         /**
+         * close
+         */
+        override close(...args: any[]) {
+            this.resolve(false);
+            this.getDialogElement().parentNode.removeChild(this.getDialogElement());
+        }
+
+        /**
          * confirm
          */
         confirm() {
-           this.resolve(true);
-           this.getDialogElement().parentNode.removeChild(this.getDialogElement());
+            this.resolve(true);
+            this.getDialogElement().parentNode.removeChild(this.getDialogElement());
         }
 
         /**
          * cancel
          */
         cancel() {
-           this.resolve(false);
-           this.getDialogElement().parentNode.removeChild(this.getDialogElement());
-        }
-
-        /**
-         * close
-         */
-        override close() {
            this.resolve(false);
            this.getDialogElement().parentNode.removeChild(this.getDialogElement());
         }

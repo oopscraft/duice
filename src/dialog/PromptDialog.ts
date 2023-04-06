@@ -66,6 +66,14 @@ namespace duice.dialog {
         }
 
         /**
+         * close
+         */
+        override close(...args: any[]) {
+            this.resolve();
+            this.getDialogElement().parentNode.removeChild(this.getDialogElement());
+        }
+
+        /**
          * confirm
          */
         confirm(value: string) {
@@ -81,13 +89,6 @@ namespace duice.dialog {
             this.getDialogElement().parentNode.removeChild(this.getDialogElement());
         }
 
-        /**
-         * close
-         */
-        override close() {
-            this.resolve();
-            this.getDialogElement().parentNode.removeChild(this.getDialogElement());
-        }
 
     }
 

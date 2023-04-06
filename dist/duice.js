@@ -2074,11 +2074,11 @@ var duice;
             /**
              * close
              */
-            close() {
-                this.reject();
+            close(...args) {
+                this.reject(...args);
             }
             /**
-             * confirm
+             * resolve
              * @param args
              */
             resolve(...args) {
@@ -2086,7 +2086,7 @@ var duice;
                 this.promiseResolve(...args);
             }
             /**
-             * close
+             * reject
              * @param args
              */
             reject(...args) {
@@ -2202,6 +2202,13 @@ var duice;
                 return promise;
             }
             /**
+             * close
+             */
+            close(...args) {
+                this.resolve(false);
+                this.getDialogElement().parentNode.removeChild(this.getDialogElement());
+            }
+            /**
              * confirm
              */
             confirm() {
@@ -2212,13 +2219,6 @@ var duice;
              * cancel
              */
             cancel() {
-                this.resolve(false);
-                this.getDialogElement().parentNode.removeChild(this.getDialogElement());
-            }
-            /**
-             * close
-             */
-            close() {
                 this.resolve(false);
                 this.getDialogElement().parentNode.removeChild(this.getDialogElement());
             }
@@ -2281,6 +2281,13 @@ var duice;
                 return promise;
             }
             /**
+             * close
+             */
+            close(...args) {
+                this.resolve();
+                this.getDialogElement().parentNode.removeChild(this.getDialogElement());
+            }
+            /**
              * confirm
              */
             confirm(value) {
@@ -2291,13 +2298,6 @@ var duice;
              * cancel
              */
             cancel() {
-                this.resolve();
-                this.getDialogElement().parentNode.removeChild(this.getDialogElement());
-            }
-            /**
-             * close
-             */
-            close() {
                 this.resolve();
                 this.getDialogElement().parentNode.removeChild(this.getDialogElement());
             }
