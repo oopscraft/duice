@@ -1898,7 +1898,6 @@ var duice;
                 this.dialogElement.style.position = 'absolute';
                 this.dialogElement.style.left = '0';
                 this.dialogElement.style.right = '0';
-                this.dialogElement.style.margin = 'auto';
                 this.dialogElement.style.height = 'fit-content';
                 this.dialogElement.style.borderStyle = 'solid';
                 this.dialogElement.style.borderWidth = '1px';
@@ -1934,8 +1933,8 @@ var duice;
                 // creates close button
                 this.closeButton = document.createElement('span');
                 this.closeButton.style.position = 'absolute';
-                this.closeButton.style.top = '0';
-                this.closeButton.style.right = '0';
+                this.closeButton.style.top = '1';
+                this.closeButton.style.right = '1';
                 this.closeButton.style.cursor = 'pointer';
                 this.closeButton.style.width = '1rem';
                 this.closeButton.style.height = '1rem';
@@ -1943,7 +1942,7 @@ var duice;
                 this.closeButton.style.margin = '1px';
                 this.closeButton.style.textAlign = 'center';
                 this.closeButton.style.fontFamily = 'sans-serif';
-                this.closeButton.style.fontSize = '0.75rem';
+                this.closeButton.style.fontSize = '1rem';
                 this.closeButton.appendChild(document.createTextNode('X'));
                 this.closeButton.addEventListener('click', event => {
                     _this.close();
@@ -1980,12 +1979,22 @@ var duice;
                 let scrollX = window.scrollX;
                 let scrollY = window.scrollY;
                 // show dialog modal
+                this.dialogElement.style.opacity = '0';
                 window.document.body.appendChild(this.dialogElement);
                 this.dialogElement.showModal();
                 // restore previous scroll position
                 window.scrollTo(scrollX, scrollY);
                 // adjusting position
                 this.moveToCenterPosition();
+                // fade in
+                let _this = this;
+                (function fade() {
+                    let val = parseFloat(_this.dialogElement.style.opacity);
+                    if (!((val += .1) > 1)) {
+                        _this.dialogElement.style.opacity = String(val);
+                        requestAnimationFrame(fade);
+                    }
+                })();
             }
             /**
              * Hides modal
