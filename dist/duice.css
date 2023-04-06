@@ -229,6 +229,16 @@ button:hover {
     background-color: var(--duice-button-background-color-hover);
     border: var(--duice-button-border-hover);
 }
+button.tab {
+    border-bottom: none;
+}
+button.tab:hover {
+    border-bottom: none;
+}
+button.tab:focus {
+    border-bottom: none;
+}
+
 
 /* img */
 img {
@@ -374,17 +384,4 @@ dialog {
     vertical-align: middle;
 }
 
-/* tab */
-.tab {
-    border-bottom: solid 1px #ccc;
-}
-.tab__button {
-    border-bottom: none;
-}
-.tab__button:hover {
-    border-bottom: none;
-}
-.tab__button:focus {
-    border-bottom: none;
-}
 
