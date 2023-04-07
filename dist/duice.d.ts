@@ -1288,7 +1288,7 @@ declare namespace duice.component {
 declare namespace duice.component {
     /**
      * textarea element factory class
-      */
+     */
     class TextareaElementFactory extends ObjectElementFactory<HTMLTextAreaElement> {
         /**
          * creates component
@@ -1452,5 +1452,46 @@ declare namespace duice.tab {
          * @param active
          */
         setActive(active: boolean): void;
+    }
+}
+declare namespace duice.component {
+    /**
+     * image element factory class
+     */
+    class ImageElementFactory extends ObjectElementFactory<HTMLImageElement> {
+        /**
+         * creates component
+         * @param element
+         * @param context
+         */
+        doCreateElement(element: HTMLImageElement, context: object): ImageElement;
+        /**
+         * returns supported
+         * @param element
+         */
+        doSupport(element: HTMLElement): boolean;
+    }
+}
+declare namespace duice.component {
+    /**
+     * image element component
+     */
+    class ImageElement extends ObjectElement<HTMLImageElement> {
+        originSrc: string;
+        /**
+         * constructor
+         * @param element
+         * @param context
+         */
+        constructor(element: HTMLImageElement, context: object);
+        /**
+          * set value
+          * @param value
+          */
+        setValue(value: any): void;
+        /**
+         * return value
+         */
+        getValue(): any;
     }
 }

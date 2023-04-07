@@ -2,7 +2,7 @@ namespace duice.component {
 
     /**
      * textarea element factory class
-      */
+     */
     export class TextareaElementFactory extends ObjectElementFactory<HTMLTextAreaElement> {
 
         /**

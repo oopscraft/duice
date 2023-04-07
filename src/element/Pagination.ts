@@ -11,8 +11,8 @@ namespace duice.component {
             let onclick = getElementAttribute(this.getHtmlElement(), 'onclick');
 
             // optional
-            let prevText = getElementAttribute(this.getHtmlElement(), 'prev-text')||'◀︎';
-            let nextText = getElementAttribute(this.getHtmlElement(), 'next-text')||'▶︎';
+            let prevText = getElementAttribute(this.getHtmlElement(), 'prev-text')||'<︎';
+            let nextText = getElementAttribute(this.getHtmlElement(), 'next-text')||'>︎';
 
             // page,size,count
             let page = Number(object[pageProperty]);

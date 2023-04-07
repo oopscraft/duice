@@ -21,6 +21,7 @@
             enabledYn: 'Y',
             gender: 'male',
             description: "My name is apple.\n I am Fruit.",
+            image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABC0lEQVRIibXVQUrDQBjF8Z/deQBd9wSC4DWk4GVcuBEVCl5Aj+FBxOINXEltV6JIXcVFm5KMyUwmbR7MYr687/0nM2FCu2b4xmXE06Yr/OIlZioq4zoj/DboTQLeMiBleNnTCTDuCLmphI9zAAJIbJThYX8S0AVSDd/2HyQAEPOkFmjUs7mzRrjAEgtMEv57rDBN1Gpa4gSn+KjUmw5ptfH9JGq1/iIoxgDTTdBdotYbkKMCxQjvPQNeJe6aNmptBcHzhfV+n2HeMA+z/u1ACjCx/hDmOG+Y7wzI0fYMBlUI+MLRkMBHPOHYnrYoLB7iAZ8thhiwyZt1XfcCDH7IXf4HOyn2BrM95D//AUGPi1ZZA00cAAAAAElFTkSuQmCC',
             address: {
                 country: 'USA',
                 city: 'LA'
@@ -417,6 +418,27 @@
                 <tr>
                     <td>
                         <textarea data-duice-object="myObject" data-duice-property="description"/></textarea>
+                    </td>
+                    <td class="fw-light">
+                        &lt;textarea data-duice-object="myObject" data-duice-property="description"&gt; &lt;/textarea&gt;
+                    </td>
+                </tr>
+                </tbody>
+                <!-- image -->
+                <tbody>
+                <tr>
+                    <td rowspan="2" class="fw-bold">description</td>
+                    <td rowspan="2" data-duice-object="myObject" data-duice-property="description" style="white-space: pre-wrap;"></td>
+                    <td>
+                        <img data-duice-object="myObject" data-duice-property="image" src=""/>
+                    </td>
+                    <td class="fw-light">
+                        &lt;* data-duice-object="myObject" data-duice-property="description"&gt; &lt;/*&gt;
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <img data-duice-object="myObject" data-duice-property="image" src=""/>
                     </td>
                     <td class="fw-light">
                         &lt;textarea data-duice-object="myObject" data-duice-property="description"&gt; &lt;/textarea&gt;

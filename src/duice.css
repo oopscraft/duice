@@ -213,7 +213,6 @@ textarea {
 
 /* button */
 button {
-    margin: 1px;
     border: var(--duice-button-border);
     border-radius: var(--duice-button-border-radius);
     background-color: var(--duice-button-background-color);
