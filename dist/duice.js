@@ -1442,11 +1442,11 @@ var duice;
                 // clear properties
                 for (let name in objectProxy) {
                     let value = objectProxy[name];
-                    if (value instanceof duice.ArrayProxy) {
+                    if (Array.isArray(value)) {
                         duice.ArrayProxy.clear(value);
                         continue;
                     }
-                    if (value instanceof ObjectProxy) {
+                    if (value != null && typeof value === 'object') {
                         ObjectProxy.clear(value);
                         continue;
                     }
@@ -1486,8 +1486,8 @@ var duice;
                         continue;
                     }
                     // source value is object
-                    if (typeof value === 'object') {
-                        if (typeof objectProxy[name] === 'object') {
+                    if (value != null && typeof value === 'object') {
+                        if (objectProxy[name] != null && typeof objectProxy[name] === 'object') {
                             ObjectProxy.assign(objectProxy[name], value);
                         }
                         else {

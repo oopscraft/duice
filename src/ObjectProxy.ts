@@ -71,11 +71,11 @@ namespace duice {
                 // clear properties
                 for(let name in objectProxy) {
                     let value = objectProxy[name];
-                    if(value instanceof ArrayProxy) {
-                        ArrayProxy.clear(value);
+                    if(Array.isArray(value)) {
+                        ArrayProxy.clear(value as ArrayProxy);
                         continue;
                     }
-                    if(value instanceof ObjectProxy) {
+                    if(value != null && typeof value === 'object') {
                         ObjectProxy.clear(value);
                         continue;
                     }
@@ -118,8 +118,8 @@ namespace duice {
                     }
 
                     // source value is object
-                    if(typeof value === 'object'){
-                        if(typeof objectProxy[name] === 'object'){
+                    if(value != null && typeof value === 'object'){
+                        if(objectProxy[name] != null && typeof objectProxy[name] === 'object'){
                             ObjectProxy.assign(objectProxy[name], value);
                         }else{
                             let objectProxy = new ObjectProxy(value);
