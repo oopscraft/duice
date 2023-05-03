@@ -1067,6 +1067,47 @@ declare namespace duice.dialog {
 }
 declare namespace duice.component {
     /**
+     * image element component
+     */
+    class ImageElement extends ObjectElement<HTMLImageElement> {
+        originSrc: string;
+        /**
+         * constructor
+         * @param element
+         * @param context
+         */
+        constructor(element: HTMLImageElement, context: object);
+        /**
+          * set value
+          * @param value
+          */
+        setValue(value: any): void;
+        /**
+         * return value
+         */
+        getValue(): any;
+    }
+}
+declare namespace duice.component {
+    /**
+     * image element factory class
+     */
+    class ImageElementFactory extends ObjectElementFactory<HTMLImageElement> {
+        /**
+         * creates component
+         * @param element
+         * @param context
+         */
+        doCreateElement(element: HTMLImageElement, context: object): ImageElement;
+        /**
+         * returns supported
+         * @param element
+         */
+        doSupport(element: HTMLElement): boolean;
+    }
+}
+declare namespace duice.component {
+    /**
      * input element component
      */
     class InputElement extends ObjectElement<HTMLInputElement> {
@@ -1417,13 +1458,6 @@ declare namespace duice.format {
     }
 }
 declare namespace duice.tab {
-    class TabFolder {
-        items: TabItem[];
-        addItem(item: TabItem): void;
-        setActive(index: number): void;
-    }
-}
-declare namespace duice.tab {
     class TabItem {
         button: HTMLElement;
         content: HTMLElement;
@@ -1454,44 +1488,10 @@ declare namespace duice.tab {
         setActive(active: boolean): void;
     }
 }
-declare namespace duice.component {
-    /**
-     * image element factory class
-     */
-    class ImageElementFactory extends ObjectElementFactory<HTMLImageElement> {
-        /**
-         * creates component
-         * @param element
-         * @param context
-         */
-        doCreateElement(element: HTMLImageElement, context: object): ImageElement;
-        /**
-         * returns supported
-         * @param element
-         */
-        doSupport(element: HTMLElement): boolean;
-    }
-}
-declare namespace duice.component {
-    /**
-     * image element component
-     */
-    class ImageElement extends ObjectElement<HTMLImageElement> {
-        originSrc: string;
-        /**
-         * constructor
-         * @param element
-         * @param context
-         */
-        constructor(element: HTMLImageElement, context: object);
-        /**
-          * set value
-          * @param value
-          */
-        setValue(value: any): void;
-        /**
-         * return value
-         */
-        getValue(): any;
+declare namespace duice.tab {
+    class TabFolder {
+        items: TabItem[];
+        addItem(item: TabItem): void;
+        setActive(index: number): void;
     }
 }

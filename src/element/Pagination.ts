@@ -83,6 +83,7 @@ namespace duice.component {
                    list-style: none;
                    display: flex;
                    padding-left: 0;
+                   margin: 0;
                }
                .${getNamespace()}-pagination__item {
                    cursor: pointer;
