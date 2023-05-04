@@ -57,7 +57,7 @@ namespace duice {
 
             // initializes
             let context = {};
-            ObjectProxy.assign(context, this.context);
+            globalThis.Object.assign(context, this.context);
             context['object'] = this.data;
             context['array'] = this.data;
             initialize(this.htmlElement, context);

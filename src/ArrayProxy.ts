@@ -139,6 +139,27 @@ namespace duice {
         }
 
         /**
+         * save
+         * @param arrayProxy
+         */
+        static save(arrayProxy: ArrayProxy): void {
+            let origin = JSON.stringify(arrayProxy);
+            globalThis.Object.defineProperty(arrayProxy, '_origin_', {
+                value: origin,
+                writable: true
+            });
+        }
+
+        /**
+         * reset
+         * @param arrayProxy
+         */
+        static reset(arrayProxy: ArrayProxy): void {
+            let origin = JSON.parse(globalThis.Object.getOwnPropertyDescriptor(arrayProxy,'_origin_').value);
+            this.assign(arrayProxy, origin);
+        }
+
+        /**
          * onPropertyChanging
          * @param arrayProxy
          * @param listener

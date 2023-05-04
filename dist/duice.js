@@ -661,7 +661,7 @@ var duice;
             }
             // initializes
             let context = {};
-            duice.ObjectProxy.assign(context, this.context);
+            globalThis.Object.assign(context, this.context);
             context['object'] = this.data;
             context['array'] = this.data;
             duice.initialize(this.htmlElement, context);
@@ -3169,6 +3169,25 @@ var duice;
             let handler = globalThis.Object.getOwnPropertyDescriptor(arrayProxy, '_handler_').value;
             duice.assert(handler, 'handler is not found');
             return handler;
+        }
+        /**
+         * save
+         * @param arrayProxy
+         */
+        static save(arrayProxy) {
+            let origin = JSON.stringify(arrayProxy);
+            globalThis.Object.defineProperty(arrayProxy, '_origin_', {
+                value: origin,
+                writable: true
+            });
+        }
+        /**
+         * reset
+         * @param arrayProxy
+         */
+        static reset(arrayProxy) {
+            let origin = JSON.parse(globalThis.Object.getOwnPropertyDescriptor(arrayProxy, '_origin_').value);
+            this.assign(arrayProxy, origin);
         }
         /**
          * onPropertyChanging

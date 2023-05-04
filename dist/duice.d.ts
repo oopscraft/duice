@@ -1425,6 +1425,16 @@ declare namespace duice {
          */
         static getHandler(arrayProxy: ArrayProxy): ArrayHandler;
         /**
+         * save
+         * @param arrayProxy
+         */
+        static save(arrayProxy: ArrayProxy): void;
+        /**
+         * reset
+         * @param arrayProxy
+         */
+        static reset(arrayProxy: ArrayProxy): void;
+        /**
          * onPropertyChanging
          * @param arrayProxy
          * @param listener
