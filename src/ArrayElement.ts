@@ -115,11 +115,23 @@ namespace duice {
 
                     // insert before slot
                     this.slot.parentNode.insertBefore(rowHtmlElement, this.slot);
+
+                    // execute script
+                    this.executeScript(rowHtmlElement, context);
                 }
             }
+            // not loop
+            else {
+                // initialize
+                let rowHtmlElement = this.getHtmlElement().cloneNode(true) as HTMLElement;
+                let context = this.getContext();
+                initialize(rowHtmlElement, context);
+                this.rowHtmlElements.push(rowHtmlElement);
+                this.slot.parentNode.appendChild(rowHtmlElement);
 
-            // execute script
-            this.executeScript();
+                // execute script
+                this.executeScript(rowHtmlElement, context);
+            }
         }
 
         /**

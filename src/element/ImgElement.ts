@@ -3,7 +3,7 @@ namespace duice.component {
     /**
      * image element component
      */
-    export class ImageElement extends ObjectElement<HTMLImageElement> {
+    export class ImgElement extends ObjectElement<HTMLImageElement> {
 
         originSrc: string;
 

@@ -112,12 +112,14 @@ var duice;
             return this.data;
         }
         /**
-         * executes script if exists
+         * execute script if exists
+         * @param htmlElement
+         * @param context
          */
-        executeScript() {
-            let script = duice.getElementAttribute(this.htmlElement, 'script');
+        executeScript(htmlElement, context) {
+            let script = duice.getElementAttribute(htmlElement, 'script');
             if (script) {
-                duice.executeScript(script, this.htmlElement, this.context);
+                duice.executeScript(script, htmlElement, context);
             }
         }
     }
@@ -224,10 +226,21 @@ var duice;
                     this.rowHtmlElements.push(rowHtmlElement);
                     // insert before slot
                     this.slot.parentNode.insertBefore(rowHtmlElement, this.slot);
+                    // execute script
+                    this.executeScript(rowHtmlElement, context);
                 }
             }
-            // execute script
-            this.executeScript();
+            // not loop
+            else {
+                // initialize
+                let rowHtmlElement = this.getHtmlElement().cloneNode(true);
+                let context = this.getContext();
+                duice.initialize(rowHtmlElement, context);
+                this.rowHtmlElements.push(rowHtmlElement);
+                this.slot.parentNode.appendChild(rowHtmlElement);
+                // execute script
+                this.executeScript(rowHtmlElement, context);
+            }
         }
         /**
          * update
@@ -666,7 +679,7 @@ var duice;
             context['array'] = this.data;
             duice.initialize(this.htmlElement, context);
             // execute script
-            this.executeScript();
+            this.executeScript(this.htmlElement, context);
         }
         /**
          * setting style
@@ -858,7 +871,7 @@ var duice;
                 this.setReadonly(readonly);
             }
             // executes script
-            this.executeScript();
+            this.executeScript(this.htmlElement, this.context);
         }
         /**
          * update event received
@@ -876,7 +889,7 @@ var duice;
                     this.setReadonly(observable.isReadonly(this.property));
                 }
                 // executes script
-                this.executeScript();
+                this.executeScript(this.htmlElement, this.context);
             }
         }
         /**
@@ -1839,55 +1852,16 @@ var duice;
     var component;
     (function (component) {
         /**
-         * image element component
-         */
-        class ImageElement extends duice.ObjectElement {
-            /**
-             * constructor
-             * @param element
-             * @param context
-             */
-            constructor(element, context) {
-                super(element, context);
-                this.originSrc = String(this.getHtmlElement().src);
-            }
-            /**
-              * set value
-              * @param value
-              */
-            setValue(value) {
-                if (value) {
-                    this.getHtmlElement().src = value;
-                }
-                else {
-                    this.getHtmlElement().src = this.originSrc;
-                }
-            }
-            /**
-             * return value
-             */
-            getValue() {
-                return this.getHtmlElement().src;
-            }
-        }
-        component.ImageElement = ImageElement;
-    })(component = duice.component || (duice.component = {}));
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    var component;
-    (function (component) {
-        /**
          * image element factory class
          */
-        class ImageElementFactory extends duice.ObjectElementFactory {
+        class ImgElementFactory extends duice.ObjectElementFactory {
             /**
              * creates component
              * @param element
              * @param context
              */
             doCreateElement(element, context) {
-                return new component.ImageElement(element, context);
+                return new component.ImgElement(element, context);
             }
             /**
              * returns supported
@@ -1897,9 +1871,9 @@ var duice;
                 return (element.tagName.toLowerCase() === 'img');
             }
         }
-        component.ImageElementFactory = ImageElementFactory;
+        component.ImgElementFactory = ImgElementFactory;
         // register factory instance
-        duice.ObjectElementFactory.addInstance(new ImageElementFactory());
+        duice.ObjectElementFactory.addInstance(new ImgElementFactory());
     })(component = duice.component || (duice.component = {}));
 })(duice || (duice = {}));
 var duice;
@@ -3325,5 +3299,44 @@ var duice;
         }
     }
     duice.ArrayProxy = ArrayProxy;
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    var component;
+    (function (component) {
+        /**
+         * image element component
+         */
+        class ImgElement extends duice.ObjectElement {
+            /**
+             * constructor
+             * @param element
+             * @param context
+             */
+            constructor(element, context) {
+                super(element, context);
+                this.originSrc = String(this.getHtmlElement().src);
+            }
+            /**
+              * set value
+              * @param value
+              */
+            setValue(value) {
+                if (value) {
+                    this.getHtmlElement().src = value;
+                }
+                else {
+                    this.getHtmlElement().src = this.originSrc;
+                }
+            }
+            /**
+             * return value
+             */
+            getValue() {
+                return this.getHtmlElement().src;
+            }
+        }
+        component.ImgElement = ImgElement;
+    })(component = duice.component || (duice.component = {}));
 })(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map

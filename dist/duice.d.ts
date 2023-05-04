@@ -63,9 +63,11 @@ declare namespace duice {
          */
         getData(): DataProxy;
         /**
-         * executes script if exists
+         * execute script if exists
+         * @param htmlElement
+         * @param context
          */
-        executeScript(): void;
+        executeScript(htmlElement: HTMLElement, context: object): void;
         /**
          * render abstract method
          */
@@ -869,38 +871,15 @@ declare namespace duice.dialog {
 }
 declare namespace duice.component {
     /**
-     * image element component
-     */
-    class ImageElement extends ObjectElement<HTMLImageElement> {
-        originSrc: string;
-        /**
-         * constructor
-         * @param element
-         * @param context
-         */
-        constructor(element: HTMLImageElement, context: object);
-        /**
-          * set value
-          * @param value
-          */
-        setValue(value: any): void;
-        /**
-         * return value
-         */
-        getValue(): any;
-    }
-}
-declare namespace duice.component {
-    /**
      * image element factory class
      */
-    class ImageElementFactory extends ObjectElementFactory<HTMLImageElement> {
+    class ImgElementFactory extends ObjectElementFactory<HTMLImageElement> {
         /**
          * creates component
          * @param element
          * @param context
          */
-        doCreateElement(element: HTMLImageElement, context: object): ImageElement;
+        doCreateElement(element: HTMLImageElement, context: object): ImgElement;
         /**
          * returns supported
          * @param element
@@ -1513,5 +1492,28 @@ declare namespace duice {
      * data interface (object,array)
      */
     interface DataProxy {
+    }
+}
+declare namespace duice.component {
+    /**
+     * image element component
+     */
+    class ImgElement extends ObjectElement<HTMLImageElement> {
+        originSrc: string;
+        /**
+         * constructor
+         * @param element
+         * @param context
+         */
+        constructor(element: HTMLImageElement, context: object);
+        /**
+          * set value
+          * @param value
+          */
+        setValue(value: any): void;
+        /**
+         * return value
+         */
+        getValue(): any;
     }
 }

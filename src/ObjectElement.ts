@@ -76,7 +76,7 @@ namespace duice {
             }
 
             // executes script
-            this.executeScript();
+            this.executeScript(this.htmlElement, this.context);
         }
 
         /**
@@ -99,7 +99,7 @@ namespace duice {
                 }
 
                 // executes script
-                this.executeScript();
+                this.executeScript(this.htmlElement, this.context);
             }
         }
 

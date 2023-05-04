@@ -3,15 +3,15 @@ namespace duice.component {
     /**
      * image element factory class
      */
-    export class ImageElementFactory extends ObjectElementFactory<HTMLImageElement> {
+    export class ImgElementFactory extends ObjectElementFactory<HTMLImageElement> {
 
         /**
          * creates component
          * @param element
          * @param context
          */
-        override doCreateElement(element: HTMLImageElement, context: object): ImageElement {
-            return new ImageElement(element, context);
+        override doCreateElement(element: HTMLImageElement, context: object): ImgElement {
+            return new ImgElement(element, context);
         }
 
         /**
@@ -25,6 +25,6 @@ namespace duice.component {
     }
 
     // register factory instance
-    ObjectElementFactory.addInstance(new ImageElementFactory());
+    ObjectElementFactory.addInstance(new ImgElementFactory());
 
 }

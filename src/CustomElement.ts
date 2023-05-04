@@ -63,7 +63,7 @@ namespace duice {
             initialize(this.htmlElement, context);
 
             // execute script
-            this.executeScript();
+            this.executeScript(this.htmlElement, context);
         }
 
         /**

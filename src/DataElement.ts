@@ -59,12 +59,14 @@ namespace duice {
         }
 
         /**
-         * executes script if exists
+         * execute script if exists
+         * @param htmlElement
+         * @param context
          */
-        executeScript(): void {
-            let script = getElementAttribute(this.htmlElement, 'script');
+        executeScript(htmlElement: HTMLElement, context: object): void {
+            let script = getElementAttribute(htmlElement, 'script');
             if(script) {
-                executeScript(script, this.htmlElement, this.context);
+                executeScript(script, htmlElement, context);
             }
         }
 
