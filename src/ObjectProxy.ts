@@ -3,12 +3,12 @@ namespace duice {
     /**
      * object proxy class
      */
-    export class ObjectProxy extends globalThis.Object implements Data {
+    export class ObjectProxy extends globalThis.Object implements DataProxy {
 
         /**
          * constructor
          */
-        public constructor(object: object) {
+        public constructor(object: globalThis.Object) {
             super();
 
             // object handler
@@ -19,7 +19,7 @@ namespace duice {
                 let value = object[name];
 
                 // value is array
-                if(Array.isArray(value)){
+                if(ArrayProxy.isArray(value)){
                     let arrayProxy = new ArrayProxy(value);
                     ArrayProxy.getHandler(arrayProxy).addObserver(objectHandler);
                     this[name] = arrayProxy;
@@ -74,7 +74,7 @@ namespace duice {
                 // clear properties
                 for(let name in objectProxy) {
                     let value = objectProxy[name];
-                    if(Array.isArray(value)) {
+                    if(ArrayProxy.isArray(value)) {
                         ArrayProxy.clear(value as ArrayProxy);
                         continue;
                     }
@@ -112,8 +112,8 @@ namespace duice {
                     let value = object[name];
 
                     // source value is array
-                    if(Array.isArray(value)){
-                        if(Array.isArray(objectProxy[name])){
+                    if(ArrayProxy.isArray(value)){
+                        if(ArrayProxy.isArray(objectProxy[name])){
                             ArrayProxy.assign(objectProxy[name], value);
                         }else{
                             objectProxy[name] = new ArrayProxy(value);

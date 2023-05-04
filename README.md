@@ -131,8 +131,8 @@ duice.defineElement("my-object", class extends duice.CustomElement {
 | data-duice-object="[object name]" | Object name to bind                      |
 | data-duice-array="[array name]"   | Array name to bind                       |
 
-
 ```html
+
 <script>
     let myObject = new duice.ObjectProxy({
         id: 'apple',

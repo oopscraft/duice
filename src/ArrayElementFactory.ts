@@ -1,10 +1,10 @@
-///<reference path="ElementFactory.ts"/>
+///<reference path="DataElementFactory.ts"/>
 namespace duice {
 
     /**
      * array element factory class
      */
-    export class ArrayElementFactory<T extends HTMLElement> extends ElementFactory<HTMLElement> {
+    export class ArrayElementFactory<T extends HTMLElement> extends DataElementFactory<HTMLElement> {
 
         static defaultInstance = new ArrayElementFactory<HTMLElement>();
 

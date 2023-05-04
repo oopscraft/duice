@@ -4,7 +4,7 @@ namespace duice {
     /**
      * custom element
      */
-    export abstract class CustomElement extends Element<HTMLElement> {
+    export abstract class CustomElement extends DataElement<HTMLElement> {
 
         /**
          * constructor
@@ -57,7 +57,7 @@ namespace duice {
 
             // initializes
             let context = {};
-            Object.assign(context, this.context);
+            ObjectProxy.assign(context, this.context);
             context['object'] = this.data;
             context['array'] = this.data;
             initialize(this.htmlElement, context);
@@ -70,13 +70,13 @@ namespace duice {
          * do render template method
          * @param data
          */
-        abstract doRender(data: Data): HTMLElement;
+        abstract doRender(data: DataProxy): HTMLElement;
 
         /**
          * setting style
          * @param data
          */
-        doStyle(data: Data): string {
+        doStyle(data: DataProxy): string {
             return null;
         }
 

@@ -1,12 +1,12 @@
 ///<reference path="Observable.ts"/>
 ///<reference path="./format/FormatFactory.ts"/>
-///<reference path="Element.ts"/>
+///<reference path="DataElement.ts"/>
 namespace duice {
 
     /**
      * object element class
      */
-    export class ObjectElement<T extends HTMLElement> extends Element<T> {
+    export class ObjectElement<T extends HTMLElement> extends DataElement<T> {
 
         property: string;
 

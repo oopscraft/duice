@@ -1,10 +1,10 @@
-///<reference path="ElementFactory.ts"/>
+///<reference path="DataElementFactory.ts"/>
 namespace duice {
 
     /**
      * custom component factory
      */
-    export class CustomElementFactory extends ElementFactory<HTMLElement> {
+    export class CustomElementFactory extends DataElementFactory<HTMLElement> {
 
         static instances: CustomElementFactory[] = [];
 

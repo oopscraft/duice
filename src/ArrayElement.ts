@@ -1,10 +1,10 @@
-///<reference path="Element.ts"/>
+///<reference path="DataElement.ts"/>
 namespace duice {
 
     /**
      * array element class
      */
-    export class ArrayElement<T extends HTMLElement> extends Element<T> {
+    export class ArrayElement<T extends HTMLElement> extends DataElement<T> {
 
         slot: HTMLSlotElement = document.createElement('slot');
 

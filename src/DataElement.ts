@@ -4,13 +4,13 @@ namespace duice {
     /**
      * element abstract class
      */
-    export abstract class Element<T extends HTMLElement> extends Observable implements Observer {
+    export abstract class DataElement<T extends HTMLElement> extends Observable implements Observer {
 
         htmlElement: T;
 
         context: object;
 
-        data: Data;
+        data: DataProxy;
 
         /**
          * constructor
@@ -54,7 +54,7 @@ namespace duice {
         /**
          * return data
          */
-        getData(): Data {
+        getData(): DataProxy {
             return this.data;
         }
 

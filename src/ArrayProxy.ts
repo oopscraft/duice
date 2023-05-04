@@ -3,7 +3,7 @@ namespace duice {
     /**
      * array proxy class
      */
-    export class ArrayProxy extends globalThis.Array implements Data {
+    export class ArrayProxy extends globalThis.Array implements DataProxy {
 
         /**
          * constructor
