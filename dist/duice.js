@@ -237,6 +237,7 @@ var duice;
                 let context = this.getContext();
                 duice.initialize(rowHtmlElement, context);
                 this.rowHtmlElements.push(rowHtmlElement);
+                // append to slot
                 this.slot.appendChild(rowHtmlElement);
                 // execute script
                 this.executeScript(rowHtmlElement, context);

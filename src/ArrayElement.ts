@@ -127,6 +127,8 @@ namespace duice {
                 let context = this.getContext();
                 initialize(rowHtmlElement, context);
                 this.rowHtmlElements.push(rowHtmlElement);
+
+                // append to slot
                 this.slot.appendChild(rowHtmlElement);
 
                 // execute script
