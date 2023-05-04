@@ -325,7 +325,7 @@ declare namespace duice {
     /**
      * array proxy class
      */
-    class ArrayProxy extends Array {
+    class ArrayProxy extends Array implements Data {
         /**
          * constructor
          */
@@ -522,13 +522,6 @@ declare namespace duice {
         support(htmlElement: HTMLElement): boolean;
     }
 }
-declare namespace duice {
-    /**
-     * data interface (object,array)
-     */
-    interface Data {
-    }
-}
 declare namespace duice.format {
     class FormatFactory {
         /**
@@ -723,7 +716,7 @@ declare namespace duice {
     /**
      * object proxy class
      */
-    class ObjectProxy extends Object {
+    class ObjectProxy extends globalThis.Object implements Data {
         /**
          * constructor
          */
@@ -1503,5 +1496,12 @@ declare namespace duice.tab {
         items: TabItem[];
         addItem(item: TabItem): void;
         setActive(index: number): void;
+    }
+}
+declare namespace duice {
+    /**
+     * data interface (object,array)
+     */
+    interface Data {
     }
 }

@@ -1386,7 +1386,7 @@ var duice;
     /**
      * object proxy class
      */
-    class ObjectProxy extends Object {
+    class ObjectProxy extends globalThis.Object {
         /**
          * constructor
          */
