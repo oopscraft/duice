@@ -113,8 +113,8 @@ namespace duice {
                     initialize(rowHtmlElement, context);
                     this.rowHtmlElements.push(rowHtmlElement);
 
-                    // insert before slot
-                    this.slot.parentNode.insertBefore(rowHtmlElement, this.slot);
+                    // insert into slot
+                    this.slot.appendChild(rowHtmlElement);
 
                     // execute script
                     this.executeScript(rowHtmlElement, context);
@@ -127,7 +127,7 @@ namespace duice {
                 let context = this.getContext();
                 initialize(rowHtmlElement, context);
                 this.rowHtmlElements.push(rowHtmlElement);
-                this.slot.parentNode.appendChild(rowHtmlElement);
+                this.slot.appendChild(rowHtmlElement);
 
                 // execute script
                 this.executeScript(rowHtmlElement, context);

@@ -224,8 +224,8 @@ var duice;
                     // initializes row element
                     duice.initialize(rowHtmlElement, context);
                     this.rowHtmlElements.push(rowHtmlElement);
-                    // insert before slot
-                    this.slot.parentNode.insertBefore(rowHtmlElement, this.slot);
+                    // insert into slot
+                    this.slot.appendChild(rowHtmlElement);
                     // execute script
                     this.executeScript(rowHtmlElement, context);
                 }
@@ -237,7 +237,7 @@ var duice;
                 let context = this.getContext();
                 duice.initialize(rowHtmlElement, context);
                 this.rowHtmlElements.push(rowHtmlElement);
-                this.slot.parentNode.appendChild(rowHtmlElement);
+                this.slot.appendChild(rowHtmlElement);
                 // execute script
                 this.executeScript(rowHtmlElement, context);
             }

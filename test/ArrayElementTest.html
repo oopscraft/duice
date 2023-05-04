@@ -205,8 +205,8 @@
                     </td>
                 </tr>
                 <tr data-duice-array="myArray"
-                    data-duice-script="myArray.length === 0 ? this.style.display='' : this.style.display='none';">
-                    <td colspan="100%">Data Not Found</td>
+                    data-duice-script="if(myArray.length > 0) this.hidden=true;">
+                    <td colspan="100%" class="ta-center">Data Not Found</td>
                 </tr>
             </table>
             <!-- editable table -->
@@ -279,8 +279,8 @@
                         </td>
                     </tr>
                     <tr data-duice-array="myArray"
-                        data-duice-script="myArray.length === 0 ? this.style.display='' : this.style.display='none';">
-                        <td colspan="100%">Data Not Found</td>
+                        data-duice-script="if(myArray.length > 0) this.hidden=true;">
+                        <td colspan="100%" class="ta-center">Data Not Found</td>
                     </tr>
                     </tbody>
                     <tfoot>
