@@ -762,6 +762,16 @@ declare namespace duice {
          */
         static getHandler(objectProxy: ObjectProxy): ObjectHandler;
         /**
+         * save
+         * @param objectProxy
+         */
+        static save(objectProxy: ObjectProxy): void;
+        /**
+         * reset
+         * @param objectProxy
+         */
+        static reset(objectProxy: ObjectProxy): void;
+        /**
          * onPropertyChanging
          * @param objectProxy
          * @param listener

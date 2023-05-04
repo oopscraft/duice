@@ -1426,6 +1426,8 @@ var duice;
             // set property
             ObjectProxy.setHandler(objectProxy, objectHandler);
             ObjectProxy.setTarget(objectProxy, this);
+            // save
+            ObjectProxy.save(objectProxy);
             // returns
             return objectProxy;
         }
@@ -1500,6 +1502,8 @@ var duice;
                     // source value is primitive
                     objectProxy[name] = value;
                 }
+                // save
+                this.save(objectProxy);
             }
             finally {
                 // resume
@@ -1546,6 +1550,25 @@ var duice;
             let handler = globalThis.Object.getOwnPropertyDescriptor(objectProxy, '_handler_').value;
             duice.assert(handler, 'handler is not found');
             return handler;
+        }
+        /**
+         * save
+         * @param objectProxy
+         */
+        static save(objectProxy) {
+            let origin = JSON.stringify(objectProxy);
+            globalThis.Object.defineProperty(objectProxy, '_origin_', {
+                value: origin,
+                writable: true
+            });
+        }
+        /**
+         * reset
+         * @param objectProxy
+         */
+        static reset(objectProxy) {
+            let origin = JSON.parse(globalThis.Object.getOwnPropertyDescriptor(objectProxy, '_origin_').value);
+            this.assign(objectProxy, origin);
         }
         /**
          * onPropertyChanging

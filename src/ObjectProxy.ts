@@ -53,6 +53,9 @@ namespace duice {
             ObjectProxy.setHandler(objectProxy, objectHandler);
             ObjectProxy.setTarget(objectProxy, this);
 
+            // save
+            ObjectProxy.save(objectProxy);
+
             // returns
             return objectProxy;
         }
@@ -81,6 +84,7 @@ namespace duice {
                     }
                     objectProxy[name] = null;
                 }
+
             } finally {
                 // resume
                 objectHandler.resumeListener();
@@ -132,6 +136,10 @@ namespace duice {
                     // source value is primitive
                     objectProxy[name] = value;
                 }
+
+                // save
+                this.save(objectProxy);
+
             } finally {
                 // resume
                 objectHandler.resumeListener();
@@ -182,6 +190,27 @@ namespace duice {
             let handler = globalThis.Object.getOwnPropertyDescriptor(objectProxy, '_handler_').value;
             assert(handler, 'handler is not found');
             return handler;
+        }
+
+        /**
+         * save
+         * @param objectProxy
+         */
+        static save(objectProxy: ObjectProxy): void {
+            let origin = JSON.stringify(objectProxy);
+            globalThis.Object.defineProperty(objectProxy, '_origin_', {
+                value: origin,
+                writable: true
+            });
+        }
+
+        /**
+         * reset
+         * @param objectProxy
+         */
+        static reset(objectProxy: ObjectProxy): void {
+            let origin = JSON.parse(globalThis.Object.getOwnPropertyDescriptor(objectProxy, '_origin_').value);
+            this.assign(objectProxy, origin);
         }
 
         /**
