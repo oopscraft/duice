@@ -91,6 +91,22 @@ namespace duice {
             new Function('value', `this.${property} = value;`).call(this.getTarget(), value);
         }
 
+        /**
+         * focus
+         * @param property
+         */
+        focus(property: string) {
+            this.observers.forEach(observer => {
+                if(observer instanceof ObjectElement) {
+                    if(observer.getProperty() === property) {
+                        if(observer.focus()) {
+                            return false;
+                        }
+                    }
+                }
+            });
+        }
+
     }
 
 }

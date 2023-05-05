@@ -18,6 +18,9 @@ namespace duice.component {
                 let event = new duice.event.PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
                 this.notifyObservers(event);
             }, true);
+
+            // turn off autocomplete
+            this.getHtmlElement().setAttribute('autocomplete','off');
         }
 
         /**
@@ -52,6 +55,14 @@ namespace duice.component {
          */
         override setReadonly(readonly: boolean): void {
             this.getHtmlElement().readOnly = readonly;
+        }
+
+        /**
+         * focus
+         */
+        override focus(): boolean {
+            this.getHtmlElement().focus();
+            return true;
         }
 
     }

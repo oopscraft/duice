@@ -481,6 +481,10 @@ declare namespace duice {
          * return index
          */
         getIndex(): number;
+        /**
+         * focus
+         */
+        focus(): boolean;
     }
 }
 declare namespace duice {
@@ -596,6 +600,11 @@ declare namespace duice {
          * @param value
          */
         setValue(property: string, value: any): void;
+        /**
+         * focus
+         * @param property
+         */
+        focus(property: string): void;
     }
 }
 declare namespace duice {
@@ -912,6 +921,10 @@ declare namespace duice.component {
          * @param readonly
          */
         setReadonly(readonly: boolean): void;
+        /**
+         * focus
+         */
+        focus(): boolean;
     }
 }
 declare namespace duice.component {
@@ -1359,6 +1372,12 @@ declare namespace duice {
          * @param readonly
          */
         static setReadonlyAll(objectProxy: ObjectProxy, readonly: boolean): void;
+        /**
+         * focus
+         * @param objectProxy
+         * @param property
+         */
+        static focus(objectProxy: ObjectProxy, property: string): void;
     }
 }
 declare namespace duice {

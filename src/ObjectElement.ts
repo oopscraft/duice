@@ -139,6 +139,14 @@ namespace duice {
             }
         }
 
+        /**
+         * focus
+         */
+        focus(): boolean {
+            // no-ops
+            return false;
+        }
+
     }
 
 }

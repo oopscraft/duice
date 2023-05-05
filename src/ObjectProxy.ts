@@ -263,6 +263,15 @@ namespace duice {
             }
         }
 
+        /**
+         * focus
+         * @param objectProxy
+         * @param property
+         */
+        static focus(objectProxy: ObjectProxy, property: string): void {
+            this.getHandler(objectProxy).focus(property);
+        }
+
     }
 
 }
