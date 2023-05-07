@@ -707,30 +707,6 @@ declare namespace duice {
      */
     function tabItem(button: HTMLElement, content: HTMLElement, listener: Function): duice.tab.TabItem;
     /**
-     * Gets cookie value
-     * @param name
-     */
-    function getCookie(name: string): string;
-    /**
-     * Sets cookie value
-     * @param name
-     * @param value
-     * @param day
-     */
-    function setCookie(name: string, value: string, day: number): void;
-    /**
-     * Deletes cookie
-     * @param name
-     */
-    function deleteCookie(name: string): void;
-    /**
-     * fetch
-     * @param url
-     * @param options
-     * @param _bypass
-     */
-    function fetch(url: URL, options: any, _bypass: boolean): Promise<Response>;
-    /**
      * defines custom element
      * @param tagName
      * @param elementType
