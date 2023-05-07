@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Array Element Test</title>
     <script src="../dist/duice.js"></script>
-    <link rel="stylesheet" href="../dist/duice.css">
     <script>
         //'use strict';
         let myArray = new duice.ArrayProxy([
@@ -123,176 +122,192 @@
                 assignMyArray();
             });
         });
-
     </script>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+        table th {
+            border: solid 1px gray;
+            background-color: lightgray;
+            padding: 0.5rem;
+        }
+        table td {
+            border: solid 1px gray;
+            padding: 0.5rem;
+        }
+    </style>
 </head>
 <body>
 <h1>Array Element Test</h1>
-<div class="container">
-    <div class="row">
-        <div class="col-2">
-            <h2>ArrayProxy</h2>
-            <textarea id="myArray" rows="20" class="font-weight-light" >
-            </textarea>
-            <div style="display:flex; flex-direction:column; align-items:flex-start;">
-                <button onclick="myArray.appendRow({name: 'Kitty'});">
-                    myArray.appendRow([object]);
-                </button>
-                <button onclick="myArray.push({name: 'Kitty'});">
-                    myArray.push([object]);
-                </button>
-                <button onclick="myArray.unshift({name: 'Kitty'});">
-                    myArray.unshift([object]);
-                </button>
-                <button onclick="myArray.pop();">
-                    myArray.pop();
-                </button>
-                <button onclick="myArray.shift();">
-                    myArray.shift();
-                </button>
-                <button onclick="myArray.splice(1,1,{name: 'Kitty'})">
-                    myArray.splice(1,1,[object]);
-                </button>
-            </div>
+<div style="display:flex; flex-wrap:nowrap; gap:0.5rem;">
+    <div>
+        <h2>ArrayProxy</h2>
+        <textarea id="myArray" rows="20" cols="30" style="white-space:nowrap;">
+        </textarea>
+        <div style="display:flex; flex-direction:column; align-items:flex-start;">
+            <button onclick="myArray.appendRow({name: 'Kitty'});">
+                myArray.appendRow([object]);
+            </button>
+            <button onclick="myArray.push({name: 'Kitty'});">
+                myArray.push([object]);
+            </button>
+            <button onclick="myArray.unshift({name: 'Kitty'});">
+                myArray.unshift([object]);
+            </button>
+            <button onclick="myArray.pop();">
+                myArray.pop();
+            </button>
+            <button onclick="myArray.shift();">
+                myArray.shift();
+            </button>
+            <button onclick="myArray.splice(1,1,{name: 'Kitty'})">
+                myArray.splice(1,1,[object]);
+            </button>
         </div>
-        <div class="col-10">
-            <h2>ArrayElement</h2>
-            <!-- simple table -->
-            <h3>
-                Simple Table
-                <small>&lt;tr data-duice-array="myArray" data-duice-loop="myObject,status"&gt;</small>
-            </h3>
-            <table class="table table-bordered">
-                <tr>
-                    <th>index</th>
-                    <th>count</th>
-                    <th>name</th>
-                    <th>phoneNo</th>
-                    <th>cardNo</th>
-                    <th>balanceAmount</th>
-                    <th>type</th>
-                    <th>enabled</th>
-                    <th>enabledYn</th>
-                    <th>address.country</th>
-                    <th>address.city</th>
-                    <th>items[]</th>
-                </tr>
-                <tr data-duice-array="myArray" data-duice-loop="myObject,status">
-                    <td data-duice-object="status" data-duice-property="index"></td>
-                    <td data-duice-object="status" data-duice-property="count"></td>
-                    <td data-duice-object="myObject" data-duice-property="name"></td>
-                    <td data-duice-object="myObject" data-duice-property="phoneNo" dc:mask="string('###-####-####')"></td>
-                    <td data-duice-object="myObject" data-duice-property="cardNo" dc:mask="string('####-####-####-####')"></td>
-                    <td data-duice-object="myObject" data-duice-property="balanceAmount" dc:mask="number(2)"></td>
-                    <td data-duice-object="myObject" data-duice-property="type"></td>
-                    <td data-duice-object="myObject" data-duice-property="enabled"></td>
-                    <td data-duice-object="myObject" data-duice-property="enabledYn"></td>
-                    <td data-duice-object="myObject" data-duice-property="address.country"></td>
-                    <td data-duice-object="myObject" data-duice-property="address.city"></td>
-                    <td>
-                        <table>
-                            <tr>
-                                <th>index</th>
-                                <th>id</th>
-                                <th>name</th>
-                            </tr>
-                            <tr data-duice-array="myObject.items" data-duice-loop="item,status">
-                                <td data-duice-object="status" data-duice-property="index"></td>
-                                <td data-duice-object="item" data-duice-property="id"></td>
-                                <td data-duice-object="item" data-duice-property="name"></td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-                <tr data-duice-array="myArray"
-                    data-duice-script="if(myArray.length > 0) this.hidden=true;">
-                    <td colspan="100%" class="ta-center">Data Not Found</td>
-                </tr>
-            </table>
-            <!-- editable table -->
-            <h3>
-                Complex Table
-                <small>&lt;tr data-duice-array="myArray" data-duice-loop="item,status"&gt;</small>
-            </h3>
-            <div style="border:solid 1px; width:fit-content; max-height:400px; overflow-y:scroll; border:var(--duice-table-border);">
-                <table class="b-none">
-                    <thead>
-                    <tr>
-                        <th>index</th>
-                        <th>count</th>
-                        <th>name</th>
-                        <th>phoneNo</th>
-                        <th>cardNo</th>
-                        <th>balanceAmount</th>
-                        <th>type</th>
-                        <th>enabled</th>
-                        <th>enabledYn</th>
-                        <th>address.country</th>
-                        <th>address.city</th>
-                        <th>items[]</th>
-                        <th>-</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr data-duice-array="myArray" data-duice-loop="myObject,status">
-                        <td><span data-duice-object="status" data-duice-property="index"></span></td>
-                        <td><span data-duice-object="status" data-duice-property="count"></span></td>
-                        <td><input data-duice-object="myObject" data-duice-property="name"/></td>
-                        <td><input type="text" data-duice-object="myObject" data-duice-property="phoneNo" dc:mask="string('###-####-####')"/></td>
-                        <td><input type="text" data-duice-object="myObject" data-duice-property="cardNo" dc:mask="string('####-####-####-####')"/></td>
-                        <td><input type="number" data-duice-object="myObject" data-duice-property="balanceAmount" dc:mask="number(2)"/></td>
-                        <td>
-                            <select data-duice-object="myObject" data-duice-property="type">
-                                <option value>- type -</option>
-                                <option value="human">Human</option>
-                                <option value="fruit">Fruit</option>
-                                <option value="animal">Animal</option>
-                            </select>
-                        </td>
-                        <td><input type="checkbox" data-duice-object="myObject" data-duice-property="enabled"/></td>
-                        <td><input type="checkbox" data-duice-object="myObject" data-duice-property="enabledYn" dc:true-value="Y" dc:false-value="N"/></td>
-                        <td><input type="text" data-duice-object="myObject" data-duice-property="address.country"/></td>
-                        <td><input type="text" data-duice-object="myObject" data-duice-property="address.city"/></td>
-                        <td>
-                            <table>
-                                <tr>
-                                    <th>index</th>
-                                    <th>id</th>
-                                    <th>name</th>
-                                </tr>
-                                <tr data-duice-array="myObject.items" data-duice-loop="item,status">
-                                    <td data-duice-object="status" data-duice-property="index"></td>
-                                    <td>
-                                        <input data-duice-object="item" data-duice-property="id"/>
-                                    </td>
-                                    <td>
-                                        <input data-duice-object="item" data-duice-property="name"/>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                        <td>
-                            <button data-duice-object="status" data-duice-script="this.dataset.index=status.index;"
-                                    onclick="myArray.deleteRow(Number(this.dataset.index));">
-                                myArray.deleteRow([index]);
-                            </button>
-                        </td>
-                    </tr>
-                    <tr data-duice-array="myArray"
-                        data-duice-script="if(myArray.length > 0) this.hidden=true;">
-                        <td colspan="100%" class="ta-center">Data Not Found</td>
-                    </tr>
-                    </tbody>
-                    <tfoot>
-                    <tr>
-                        <td colspan="100%" style="text-align:right;">
-                            <span data-duice-array="myArray" data-duice-script="this.innerHTML=myArray.length + ' Rows';"></span>
-                        </td>
-                    </tr>
-                    </tfoot>
-                </table>
-            </div>
-        </div>
+    </div>
+    <div>
+        <h2>ArrayElement</h2>
+        <!-- simple table -->
+        <h3>
+            Simple Table
+            <small>&lt;tr data-duice-array="myArray" data-duice-loop="myObject,status"&gt;</small>
+        </h3>
+        <table>
+            <tr>
+                <th>index</th>
+                <th>count</th>
+                <th>name</th>
+                <th>phoneNo</th>
+                <th>cardNo</th>
+                <th>balanceAmount</th>
+                <th>type</th>
+                <th>enabled</th>
+                <th>enabledYn</th>
+                <th>address.country</th>
+                <th>address.city</th>
+                <th>items[]</th>
+            </tr>
+            <tr data-duice-array="myArray" data-duice-loop="myObject,status">
+                <td data-duice-object="status" data-duice-property="index"></td>
+                <td data-duice-object="status" data-duice-property="count"></td>
+                <td data-duice-object="myObject" data-duice-property="name"></td>
+                <td data-duice-object="myObject" data-duice-property="phoneNo" dc:mask="string('###-####-####')"></td>
+                <td data-duice-object="myObject" data-duice-property="cardNo" dc:mask="string('####-####-####-####')"></td>
+                <td data-duice-object="myObject" data-duice-property="balanceAmount" dc:mask="number(2)"></td>
+                <td data-duice-object="myObject" data-duice-property="type"></td>
+                <td data-duice-object="myObject" data-duice-property="enabled"></td>
+                <td data-duice-object="myObject" data-duice-property="enabledYn"></td>
+                <td data-duice-object="myObject" data-duice-property="address.country"></td>
+                <td data-duice-object="myObject" data-duice-property="address.city"></td>
+                <td>
+                    <table>
+                        <tr>
+                            <th>index</th>
+                            <th>id</th>
+                            <th>name</th>
+                        </tr>
+                        <tr data-duice-array="myObject.items" data-duice-loop="item,status">
+                            <td data-duice-object="status" data-duice-property="index"></td>
+                            <td data-duice-object="item" data-duice-property="id"></td>
+                            <td data-duice-object="item" data-duice-property="name"></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr data-duice-array="myArray"
+                data-duice-script="if(myArray.length > 0) this.hidden=true;">
+                <td colspan="100%" class="ta-center">Data Not Found</td>
+            </tr>
+        </table>
+        <!-- end of simple table -->
+        <!-- start of editable table -->
+        <h3>
+            Complex Table
+            <small>&lt;tr data-duice-array="myArray" data-duice-loop="item,status"&gt;</small>
+        </h3>
+        <table>
+            <thead>
+            <tr>
+                <th>index</th>
+                <th>count</th>
+                <th>name</th>
+                <th>phoneNo</th>
+                <th>cardNo</th>
+                <th>balanceAmount</th>
+                <th>type</th>
+                <th>enabled</th>
+                <th>enabledYn</th>
+                <th>address.country</th>
+                <th>address.city</th>
+                <th>items[]</th>
+                <th>-</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr data-duice-array="myArray" data-duice-loop="myObject,status">
+                <td><span data-duice-object="status" data-duice-property="index"></span></td>
+                <td><span data-duice-object="status" data-duice-property="count"></span></td>
+                <td><input data-duice-object="myObject" data-duice-property="name"/></td>
+                <td><input type="text" data-duice-object="myObject" data-duice-property="phoneNo"
+                           dc:mask="string('###-####-####')"/></td>
+                <td><input type="text" data-duice-object="myObject" data-duice-property="cardNo"
+                           dc:mask="string('####-####-####-####')"/></td>
+                <td><input type="number" data-duice-object="myObject" data-duice-property="balanceAmount"
+                           dc:mask="number(2)"/></td>
+                <td>
+                    <select data-duice-object="myObject" data-duice-property="type">
+                        <option value>- type -</option>
+                        <option value="human">Human</option>
+                        <option value="fruit">Fruit</option>
+                        <option value="animal">Animal</option>
+                    </select>
+                </td>
+                <td><input type="checkbox" data-duice-object="myObject" data-duice-property="enabled"/></td>
+                <td><input type="checkbox" data-duice-object="myObject" data-duice-property="enabledYn"
+                           dc:true-value="Y" dc:false-value="N"/></td>
+                <td><input type="text" data-duice-object="myObject" data-duice-property="address.country"/></td>
+                <td><input type="text" data-duice-object="myObject" data-duice-property="address.city"/></td>
+                <td>
+                    <table>
+                        <tr>
+                            <th>index</th>
+                            <th>id</th>
+                            <th>name</th>
+                        </tr>
+                        <tr data-duice-array="myObject.items" data-duice-loop="item,status">
+                            <td data-duice-object="status" data-duice-property="index"></td>
+                            <td>
+                                <input data-duice-object="item" data-duice-property="id"/>
+                            </td>
+                            <td>
+                                <input data-duice-object="item" data-duice-property="name"/>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <button data-duice-object="status" data-duice-script="this.dataset.index=status.index;"
+                            onclick="myArray.deleteRow(Number(this.dataset.index));">
+                        myArray.deleteRow([index]);
+                    </button>
+                </td>
+            </tr>
+            <tr data-duice-array="myArray"
+                data-duice-script="if(myArray.length > 0) this.hidden=true;">
+                <td colspan="100%" class="ta-center">Data Not Found</td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="100%" style="text-align:right;">
+                    <span data-duice-array="myArray"
+                          data-duice-script="this.innerHTML=myArray.length + ' Rows';"></span>
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+        <!-- end of editable table -->
     </div>
 </div>
 </body>
