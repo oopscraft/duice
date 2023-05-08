@@ -1495,6 +1495,9 @@ declare namespace duice.component {
      */
     class ImgElement extends ObjectElement<HTMLImageElement> {
         originSrc: string;
+        editable: boolean;
+        width: number;
+        height: number;
         /**
          * constructor
          * @param element
@@ -1502,9 +1505,20 @@ declare namespace duice.component {
          */
         constructor(element: HTMLImageElement, context: object);
         /**
-          * set value
-          * @param value
-          */
+         * open image
+         */
+        changeImage(): void;
+        /**
+         * convert image
+         * @param dataUrl
+         * @param width
+         * @param height
+         */
+        convertImage(dataUrl: any, width?: number, height?: number): Promise<unknown>;
+        /**
+         * set value
+         * @param value
+         */
         setValue(value: any): void;
         /**
          * return value

@@ -1437,8 +1437,6 @@ var duice;
                 this.dialogElement.style.position = 'absolute';
                 this.dialogElement.style.left = '0';
                 this.dialogElement.style.right = '0';
-                this.dialogElement.style.height = 'fit-content';
-                this.dialogElement.style.width = 'fit-content';
                 // header
                 this.header = document.createElement('span');
                 this.dialogElement.appendChild(this.header);
@@ -3290,12 +3288,96 @@ var duice;
              */
             constructor(element, context) {
                 super(element, context);
+                this.editable = false;
                 this.originSrc = String(this.getHtmlElement().src);
+                // editable
+                let editable = duice.getElementAttribute(this.getHtmlElement(), 'editable');
+                if (editable) {
+                    this.editable = (editable === 'true');
+                }
+                if (this.editable) {
+                    this.getHtmlElement().style.cursor = 'pointer';
+                    this.getHtmlElement().addEventListener('click', event => {
+                        this.changeImage();
+                    });
+                }
+                // size
+                let size = duice.getElementAttribute(this.getHtmlElement(), 'size');
+                if (size) {
+                    let sizeArgs = size.split(',');
+                    this.width = parseInt(sizeArgs[0].trim());
+                    this.height = parseInt(sizeArgs[1].trim());
+                }
             }
             /**
-              * set value
-              * @param value
-              */
+             * open image
+             */
+            changeImage() {
+                let input = document.createElement('input');
+                input.setAttribute("type", "file");
+                input.setAttribute("accept", "image/gif, image/jpeg, image/png");
+                let _this = this;
+                input.addEventListener('change', function (e) {
+                    let fileReader = new FileReader();
+                    if (this.files && this.files[0]) {
+                        fileReader.addEventListener("load", (e) => __awaiter(this, void 0, void 0, function* () {
+                            let image = e.target.result;
+                            let value;
+                            if (_this.width && _this.height) {
+                                value = yield _this.convertImage(image, _this.width, _this.height);
+                            }
+                            else {
+                                value = yield _this.convertImage(image);
+                            }
+                            _this.setValue(value);
+                            // notify observers
+                            let event = new duice.event.PropertyChangeEvent(_this, _this.getProperty(), _this.getValue(), _this.getIndex());
+                            _this.notifyObservers(event);
+                        }));
+                        fileReader.readAsDataURL(this.files[0]);
+                    }
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+                input.click();
+            }
+            /**
+             * convert image
+             * @param dataUrl
+             * @param width
+             * @param height
+             */
+            convertImage(dataUrl, width, height) {
+                return new Promise(function (resolve, reject) {
+                    try {
+                        let canvas = document.createElement("canvas");
+                        let ctx = canvas.getContext("2d");
+                        let image = new Image();
+                        image.onload = function () {
+                            if (width && height) {
+                                canvas.width = width;
+                                canvas.height = height;
+                                ctx.drawImage(image, 0, 0, width, height);
+                            }
+                            else {
+                                canvas.width = image.naturalWidth;
+                                canvas.height = image.naturalHeight;
+                                ctx.drawImage(image, 0, 0);
+                            }
+                            let dataUrl = canvas.toDataURL("image/png");
+                            resolve(dataUrl);
+                        };
+                        image.src = dataUrl;
+                    }
+                    catch (e) {
+                        reject(e);
+                    }
+                });
+            }
+            /**
+             * set value
+             * @param value
+             */
             setValue(value) {
                 if (value) {
                     this.getHtmlElement().src = value;

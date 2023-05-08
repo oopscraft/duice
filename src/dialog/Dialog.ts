@@ -29,8 +29,6 @@ namespace duice.dialog {
             this.dialogElement.style.position = 'absolute';
             this.dialogElement.style.left = '0';
             this.dialogElement.style.right = '0';
-            this.dialogElement.style.height = 'fit-content';
-            this.dialogElement.style.width = 'fit-content';
 
             // header
             this.header = document.createElement('span');
