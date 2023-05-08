@@ -1438,8 +1438,7 @@ var duice;
                 this.dialogElement.style.left = '0';
                 this.dialogElement.style.right = '0';
                 this.dialogElement.style.height = 'fit-content';
-                this.dialogElement.style.borderStyle = 'solid';
-                this.dialogElement.style.borderWidth = '1px';
+                this.dialogElement.style.width = 'fit-content';
                 // header
                 this.header = document.createElement('span');
                 this.dialogElement.appendChild(this.header);
@@ -1671,6 +1670,8 @@ var duice;
                     this.confirm();
                 });
                 this.getDialogElement().appendChild(this.confirmButton);
+                // divider
+                this.getDialogElement().appendChild(document.createTextNode(' '));
                 // cancel button
                 this.cancelButton = document.createElement('button');
                 this.cancelButton.appendChild(document.createTextNode('No'));
@@ -1737,9 +1738,8 @@ var duice;
                 this.getDialogElement().appendChild(this.messagePre);
                 // prompt input
                 this.promptInput = document.createElement('input');
-                this.promptInput.style.display = 'block';
                 this.promptInput.style.textAlign = 'center';
-                this.promptInput.style.margin = '0.75rem 0';
+                this.promptInput.style.marginBottom = '1rem';
                 this.promptInput.style.width = '100%';
                 this.getDialogElement().appendChild(this.promptInput);
                 // confirm button
@@ -1750,6 +1750,8 @@ var duice;
                     this.confirm(this.promptInput.value);
                 });
                 this.getDialogElement().appendChild(this.confirmButton);
+                // divider
+                this.getDialogElement().appendChild(document.createTextNode(' '));
                 // cancel button
                 this.cancelButton = document.createElement('button');
                 this.cancelButton.appendChild(document.createTextNode('No'));

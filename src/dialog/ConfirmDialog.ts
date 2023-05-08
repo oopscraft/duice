@@ -36,6 +36,9 @@ namespace duice.dialog {
             });
             this.getDialogElement().appendChild(this.confirmButton);
 
+            // divider
+            this.getDialogElement().appendChild(document.createTextNode(' '));
+
             // cancel button
             this.cancelButton = document.createElement('button');
             this.cancelButton.appendChild(document.createTextNode('No'));

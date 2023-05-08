@@ -31,9 +31,8 @@ namespace duice.dialog {
 
             // prompt input
             this.promptInput = document.createElement('input');
-            this.promptInput.style.display = 'block';
             this.promptInput.style.textAlign = 'center';
-            this.promptInput.style.margin = '0.75rem 0';
+            this.promptInput.style.marginBottom = '1rem';
             this.promptInput.style.width = '100%';
             this.getDialogElement().appendChild(this.promptInput);
 
@@ -45,6 +44,9 @@ namespace duice.dialog {
                 this.confirm(this.promptInput.value);
             });
             this.getDialogElement().appendChild(this.confirmButton);
+
+            // divider
+            this.getDialogElement().appendChild(document.createTextNode(' '));
 
             // cancel button
             this.cancelButton = document.createElement('button');
