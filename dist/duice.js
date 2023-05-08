@@ -1609,6 +1609,7 @@ var duice;
                 this.confirmButton = document.createElement('button');
                 this.confirmButton.appendChild(document.createTextNode('Yes'));
                 this.confirmButton.style.width = '3rem';
+                this.confirmButton.style.cursor = 'pointer';
                 this.confirmButton.addEventListener('click', event => {
                     this.confirm();
                 });
@@ -1666,6 +1667,7 @@ var duice;
                 this.confirmButton = document.createElement('button');
                 this.confirmButton.appendChild(document.createTextNode('Yes'));
                 this.confirmButton.style.width = '3rem';
+                this.confirmButton.style.cursor = 'pointer';
                 this.confirmButton.addEventListener('click', event => {
                     this.confirm();
                 });
@@ -1676,6 +1678,7 @@ var duice;
                 this.cancelButton = document.createElement('button');
                 this.cancelButton.appendChild(document.createTextNode('No'));
                 this.cancelButton.style.width = '3rem';
+                this.cancelButton.style.cursor = 'pointer';
                 this.cancelButton.addEventListener('click', event => {
                     this.cancel();
                 });
@@ -1746,6 +1749,7 @@ var duice;
                 this.confirmButton = document.createElement('button');
                 this.confirmButton.appendChild(document.createTextNode('Yes'));
                 this.confirmButton.style.width = '3rem';
+                this.confirmButton.style.cursor = 'pointer';
                 this.confirmButton.addEventListener('click', event => {
                     this.confirm(this.promptInput.value);
                 });
@@ -1756,6 +1760,7 @@ var duice;
                 this.cancelButton = document.createElement('button');
                 this.cancelButton.appendChild(document.createTextNode('No'));
                 this.cancelButton.style.width = '3rem';
+                this.cancelButton.style.cursor = 'pointer';
                 this.cancelButton.addEventListener('click', event => {
                     this.cancel();
                 });

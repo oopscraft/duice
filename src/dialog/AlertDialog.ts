@@ -29,6 +29,7 @@ namespace duice.dialog {
             this.confirmButton = document.createElement('button');
             this.confirmButton.appendChild(document.createTextNode('Yes'));
             this.confirmButton.style.width = '3rem';
+            this.confirmButton.style.cursor = 'pointer';
             this.confirmButton.addEventListener('click', event => {
                 this.confirm();
             });
