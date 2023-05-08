@@ -2160,20 +2160,21 @@ var duice;
                 let size = Number(object[sizeProperty]);
                 let count = Number(object[countProperty]);
                 // calculate page
-                let totalPage = Math.floor(count / size);
-                let startPage = Math.floor(page / 10) * 10;
-                let endPage = Math.min(startPage + 10 - 1, totalPage);
+                let totalPage = Math.ceil(count / size);
+                let startPageIndex = Math.floor(page / 10) * 10;
+                let endPageIndex = Math.min(startPageIndex + 9, totalPage - 1);
+                console.debug('page', page);
                 console.debug('totalPage', totalPage);
-                console.debug('startPage', startPage);
-                console.debug('endPage', endPage);
+                console.debug('startPage', startPageIndex);
+                console.debug('endPage', endPageIndex);
                 // template
                 let pagination = document.createElement('ul');
                 pagination.classList.add(`${duice.getNamespace()}-pagination`);
                 // prev
                 let prev = document.createElement('li');
                 prev.appendChild(document.createTextNode(prevText));
-                prev.classList.add(`${duice.getNamespace()}-pagination__item`);
-                prev.dataset.page = String(Math.max(startPage - 10, 0));
+                prev.classList.add(`${duice.getNamespace()}-pagination__item-prev`);
+                prev.dataset.page = String(Math.max(startPageIndex - 10, 0));
                 prev.addEventListener('click', function () {
                     Function(onclick).call(prev);
                 });
@@ -2182,11 +2183,11 @@ var duice;
                 }
                 pagination.appendChild(prev);
                 // pages
-                for (let index = startPage; index <= endPage; index++) {
+                for (let index = startPageIndex; index <= endPageIndex; index++) {
                     let item = document.createElement('li');
                     item.appendChild(document.createTextNode(String(index + 1)));
                     item.dataset.page = String(index);
-                    item.classList.add(`${duice.getNamespace()}-pagination__item`);
+                    item.classList.add(`${duice.getNamespace()}-pagination__item-page`);
                     if (index === page) {
                         item.classList.add(`${duice.getNamespace()}-pagination__item--active`);
                     }
@@ -2198,39 +2199,48 @@ var duice;
                 // next
                 let next = document.createElement('li');
                 next.appendChild(document.createTextNode(nextText));
-                next.classList.add(`${duice.getNamespace()}-pagination__item`);
-                next.dataset.page = String(Math.min(endPage + 1, totalPage));
+                next.classList.add(`${duice.getNamespace()}-pagination__item-next`);
+                next.dataset.page = String(Math.min(endPageIndex + 1, totalPage));
                 next.addEventListener('click', function () {
                     Function(onclick).call(next);
                 });
-                if (endPage >= totalPage) {
+                if (endPageIndex >= (totalPage - 1)) {
                     next.classList.add(`${duice.getNamespace()}-pagination__item--disable`);
                 }
                 pagination.appendChild(next);
                 // returns
                 return pagination;
-                // return pagination.outerHTML;
             }
             doStyle(object) {
                 return `
-               .${duice.getNamespace()}-pagination {
-                   list-style: none;
-                   display: flex;
-                   padding-left: 0;
-                   margin: 0;
-               }
-               .${duice.getNamespace()}-pagination__item {
-                   cursor: pointer;
-                   padding: 0 0.5rem;
-               }
-               .${duice.getNamespace()}-pagination__item--active {
-                   font-weight: bold;
-                   text-decoration: underline;
-                   pointer-events: none;
-               }
-               .${duice.getNamespace()}-pagination__item--disable {
-                   pointer-events: none;
-               }
+                .${duice.getNamespace()}-pagination {
+                    list-style: none;
+                    display: flex;
+                    padding-left: 0;
+                    margin: 0;
+                }
+                .${duice.getNamespace()}-pagination__item-page {
+                    cursor: pointer;
+                    padding: 0 0.5rem;
+                }
+                .${duice.getNamespace()}-pagination__item-prev {
+                    cursor: pointer;
+                    padding: 0 0.5rem;
+                    font-size: smaller;    
+                }
+                .${duice.getNamespace()}-pagination__item-next {
+                    cursor: pointer;
+                    padding: 0 0.5rem;
+                    font-size: smaller;
+                }
+                .${duice.getNamespace()}-pagination__item--active {
+                    font-weight: bold;
+                    text-decoration: underline;
+                    pointer-events: none;
+                }
+                .${duice.getNamespace()}-pagination__item--disable {
+                    pointer-events: none;
+                }
            `;
             }
         }
