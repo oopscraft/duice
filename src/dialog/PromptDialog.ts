@@ -21,7 +21,7 @@ namespace duice.dialog {
         constructor(message: string) {
             super(document.createElement('dialog'));
             this.getDialogElement().style.padding = '1rem';
-            this.getDialogElement().style.minWidth = '15rem';
+            this.getDialogElement().style.minWidth = '20rem';
             this.getDialogElement().style.textAlign = 'center';
 
             // message pre
