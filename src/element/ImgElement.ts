@@ -130,6 +130,14 @@ namespace duice.component {
             return this.getHtmlElement().src;
         }
 
+        /**
+         * set readonly
+         * @param readonly
+         */
+        override setReadonly(readonly: boolean): void {
+            this.getHtmlElement().style.pointerEvents = (readonly ? 'none' : 'unset');
+        }
+
     }
 
 }

@@ -1524,5 +1524,10 @@ declare namespace duice.component {
          * return value
          */
         getValue(): any;
+        /**
+         * set readonly
+         * @param readonly
+         */
+        setReadonly(readonly: boolean): void;
     }
 }

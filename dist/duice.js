@@ -3392,6 +3392,13 @@ var duice;
             getValue() {
                 return this.getHtmlElement().src;
             }
+            /**
+             * set readonly
+             * @param readonly
+             */
+            setReadonly(readonly) {
+                this.getHtmlElement().style.pointerEvents = (readonly ? 'none' : 'unset');
+            }
         }
         component.ImgElement = ImgElement;
     })(component = duice.component || (duice.component = {}));
