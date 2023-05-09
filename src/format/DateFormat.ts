@@ -13,7 +13,7 @@ namespace duice.format {
          * Constructor
          * @param pattern
          */
-        constructor(pattern?: string){
+        constructor(pattern: string){
             this.pattern = pattern;
         }
 
@@ -21,12 +21,9 @@ namespace duice.format {
          * Encodes date string
          * @param string
          */
-        encode(string: string): string {
+        format(string: string): string {
             if (!string) {
                 return '';
-            }
-            if (!this.pattern) {
-                return new Date(string).toString();
             }
             let date = new Date(string);
             string = this.pattern.replace(this.patternRex, function ($1: any) {
@@ -58,12 +55,9 @@ namespace duice.format {
          * Decodes formatted date string to ISO date string.
          * @param string
          */
-        decode(string:string):string{
+        parse(string:string):string{
             if(!string){
                 return null;
-            }
-            if(!this.pattern){
-                return new Date(string).toISOString();
             }
             let date = new Date(0,0,0,0,0,0);
             let match;
@@ -118,7 +112,23 @@ namespace duice.format {
                     }
                 }
             }
-            return date.toISOString();
+
+            // timezone offset
+            let tzo = new Date().getTimezoneOffset() * -1,
+                dif = tzo >= 0 ? '+' : '-',
+                pad = function(num) {
+                    return (num < 10 ? '0' : '') + num;
+                };
+
+            // return iso string
+            return date.getFullYear() +
+                '-' + pad(date.getMonth() + 1) +
+                '-' + pad(date.getDate()) +
+                'T' + pad(date.getHours()) +
+                ':' + pad(date.getMinutes()) +
+                ':' + pad(date.getSeconds()) +
+                dif + pad(Math.floor(Math.abs(tzo) / 60)) +
+                ':' + pad(Math.abs(tzo) % 60);
         }
     }
 

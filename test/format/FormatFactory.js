@@ -5,6 +5,7 @@ let jdom = new JSDOM('<!DOCTYPE html>');
 global.window = jdom.window;
 global.document = jdom.window.document;
 global.HTMLElement = jdom.window.HTMLElement;
+global.customElements = jdom.window.customElements
 vm.runInThisContext(fs.readFileSync("../../dist/duice.js"));
 
 

@@ -108,7 +108,7 @@ namespace duice {
          * @param value
          */
         setValue(value: any): void {
-            value = this.getFormat() ? this.getFormat().encode(value) : value;
+            value = this.getFormat() ? this.getFormat().format(value) : value;
             this.htmlElement.innerText = value;
         }
 
@@ -117,7 +117,7 @@ namespace duice {
          */
         getValue(): any {
             let value = this.htmlElement.innerText;
-            value = this.getFormat() ? this.getFormat().decode(value) : value;
+            value = this.getFormat() ? this.getFormat().parse(value) : value;
             return value;
         }
 

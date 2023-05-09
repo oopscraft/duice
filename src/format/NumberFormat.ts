@@ -20,7 +20,7 @@ namespace duice.format {
          * Encodes number as format
          * @param number
          */
-        encode(number: number): string {
+        format(number: number): string {
             if(!number || isNaN(Number(number))){
                 return '';
             }
@@ -37,7 +37,7 @@ namespace duice.format {
          * Decodes formatted value as original value
          * @param string
          */
-        decode(string: string): number{
+        parse(string: string): number{
             if(!string) {
                 return null;
             }

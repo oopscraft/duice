@@ -29,7 +29,7 @@ namespace duice.component {
          */
         override setValue(value: any): void {
             if(value) {
-                value = this.getFormat() ? this.getFormat().encode(value) : value;
+                value = this.getFormat() ? this.getFormat().format(value) : value;
             }else{
                 value = '';
             }
@@ -42,7 +42,7 @@ namespace duice.component {
         override getValue(): any {
             let value = this.getHtmlElement().value;
             if(value){
-                value = this.getFormat() ? this.getFormat().decode(value) : value;
+                value = this.getFormat() ? this.getFormat().parse(value) : value;
             }else{
                 value = null;
             }

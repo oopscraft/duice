@@ -20,7 +20,7 @@ namespace duice.format {
          * encode string as format
          * @param value
          */
-        encode(value: string): string{
+        format(value: string): string{
             if(!value) {
                 return value;
             }
@@ -46,7 +46,7 @@ namespace duice.format {
          * decodes string as format
          * @param value
          */
-        decode(value: string): string {
+        parse(value: string): string {
             if(!value) {
                 return value;
             }

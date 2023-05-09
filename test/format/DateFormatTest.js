@@ -8,7 +8,9 @@ global.HTMLElement = jdom.window.HTMLElement;
 global.customElements = jdom.window.customElements
 vm.runInThisContext(fs.readFileSync("../../dist/duice.js"));
 
-let stringFormat = new duice.format.StringFormat("###-####-####");
-console.log(stringFormat.format('01012345678'));
-console.log(stringFormat.format('010'));
-console.log(stringFormat.format('010123'));
+let dateFormat = new duice.format.DateFormat("yyyy-MM-dd HH:mm:ss");
+console.log(dateFormat.format('1981-02-22T09:00+09:00'));
+console.log(dateFormat.parse('1981-02-22 09:00'));
+
+
+

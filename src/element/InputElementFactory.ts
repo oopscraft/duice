@@ -19,6 +19,8 @@ namespace duice.component {
                     return new InputCheckboxElement(element, context);
                 case 'radio':
                     return new InputRadioElement(element, context);
+                case 'datetime-local':
+                    return new InputDatetimeLocalElement(element, context);
                 default:
                     return new InputElement(element, context);
             }

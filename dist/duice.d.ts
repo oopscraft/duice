@@ -966,12 +966,12 @@ declare namespace duice.format {
          * Encodes number as format
          * @param number
          */
-        encode(number: number): string;
+        format(number: number): string;
         /**
          * Decodes formatted value as original value
          * @param string
          */
-        decode(string: string): number;
+        parse(string: string): number;
     }
 }
 declare namespace duice.component {
@@ -1171,17 +1171,17 @@ declare namespace duice.format {
          * Constructor
          * @param pattern
          */
-        constructor(pattern?: string);
+        constructor(pattern: string);
         /**
          * Encodes date string
          * @param string
          */
-        encode(string: string): string;
+        format(string: string): string;
         /**
          * Decodes formatted date string to ISO date string.
          * @param string
          */
-        decode(string: string): string;
+        parse(string: string): string;
     }
 }
 declare namespace duice.format {
@@ -1194,13 +1194,13 @@ declare namespace duice.format {
          * @param value value
          * @return formatted value
          */
-        encode(value: any): any;
+        format(value: any): any;
         /**
          * Decodes formatted value to original value
          * @param value value
          * @return original value
          */
-        decode(value: any): any;
+        parse(value: any): any;
     }
 }
 declare namespace duice.format {
@@ -1219,12 +1219,12 @@ declare namespace duice.format {
          * encode string as format
          * @param value
          */
-        encode(value: string): string;
+        format(value: string): string;
         /**
          * decodes string as format
          * @param value
          */
-        decode(value: string): string;
+        parse(value: string): string;
     }
 }
 declare namespace duice.tab {
@@ -1529,5 +1529,28 @@ declare namespace duice.component {
          * @param readonly
          */
         setReadonly(readonly: boolean): void;
+    }
+}
+declare namespace duice.component {
+    /**
+     * input datetime-local element component
+     */
+    class InputDatetimeLocalElement extends InputElement {
+        dateFormat: duice.format.DateFormat;
+        /**
+         * constructor
+         * @param element
+         * @param context
+         */
+        constructor(element: HTMLInputElement, context: object);
+        /**
+         * set value
+         * @param value
+         */
+        setValue(value: string): void;
+        /**
+         * return value
+         */
+        getValue(): any;
     }
 }
