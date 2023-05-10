@@ -27,6 +27,8 @@ namespace duice.component {
         override setValue(value: any): void {
             if(value) {
                 this.getHtmlElement().value = value;
+            }else{
+                this.getHtmlElement().value = '';
             }
         }
 

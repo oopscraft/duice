@@ -2371,6 +2371,9 @@ var duice;
                 if (value) {
                     this.getHtmlElement().value = value;
                 }
+                else {
+                    this.getHtmlElement().value = '';
+                }
             }
             /**
              * return value
