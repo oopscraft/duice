@@ -30,7 +30,6 @@ namespace duice.component {
          * return value
          */
         override getValue(): any {
-            console.log("==========", this.getHtmlElement().value);
             return this.dateFormat.parse(this.getHtmlElement().value);
         }
 

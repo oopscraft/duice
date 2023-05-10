@@ -2368,13 +2368,21 @@ var duice;
              * @param value
              */
             setValue(value) {
-                this.getHtmlElement().value = value;
+                if (value) {
+                    this.getHtmlElement().value = value;
+                }
             }
             /**
              * return value
              */
             getValue() {
-                return this.getHtmlElement().value;
+                let value = this.getHtmlElement().value;
+                if (value != null && value.length > 0) {
+                    return value;
+                }
+                else {
+                    return null;
+                }
             }
             /**
              * set readonly
@@ -3451,7 +3459,6 @@ var duice;
              * return value
              */
             getValue() {
-                console.log("==========", this.getHtmlElement().value);
                 return this.dateFormat.parse(this.getHtmlElement().value);
             }
         }

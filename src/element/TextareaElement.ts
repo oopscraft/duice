@@ -25,14 +25,21 @@ namespace duice.component {
          * @param value
          */
         override setValue(value: any): void {
-            this.getHtmlElement().value = value;
+            if(value) {
+                this.getHtmlElement().value = value;
+            }
         }
 
         /**
          * return value
          */
         override getValue(): any {
-            return this.getHtmlElement().value;
+            let value = this.getHtmlElement().value;
+            if(value != null && value.length > 0) {
+                return value;
+            }else{
+                return null;
+            }
         }
 
         /**
