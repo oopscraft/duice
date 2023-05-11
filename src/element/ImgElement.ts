@@ -104,6 +104,10 @@ namespace duice.component {
             }else{
                 this.getHtmlElement().src = null;
             }
+
+            // notify observers
+            let event = new duice.event.PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
+            this.notifyObservers(event);
         }
 
         /**
