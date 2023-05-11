@@ -71,8 +71,8 @@ namespace duice.dialog {
             this.closeButton.style.top = '5px';
             this.closeButton.style.right = '5px';
             this.closeButton.style.cursor = 'pointer';
-            this.closeButton.style.width = '1rem';
-            this.closeButton.style.height = '1rem';
+            this.closeButton.style.width = '16px';
+            this.closeButton.style.height = '16px';
             this.closeButton.addEventListener('click', event => {
                 _this.close();
             });

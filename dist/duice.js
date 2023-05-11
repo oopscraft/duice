@@ -1474,8 +1474,8 @@ var duice;
                 this.closeButton.style.top = '5px';
                 this.closeButton.style.right = '5px';
                 this.closeButton.style.cursor = 'pointer';
-                this.closeButton.style.width = '1rem';
-                this.closeButton.style.height = '1rem';
+                this.closeButton.style.width = '16px';
+                this.closeButton.style.height = '16px';
                 this.closeButton.addEventListener('click', event => {
                     _this.close();
                 });
@@ -3331,8 +3331,8 @@ var duice;
                     this.clearButton = document.createElement('img');
                     this.clearButton.src = this.closeButtonImg;
                     this.clearButton.style.cursor = 'pointer';
-                    this.clearButton.style.width = '1rem';
-                    this.clearButton.style.height = '1rem';
+                    this.clearButton.style.width = '16px';
+                    this.clearButton.style.height = '16px';
                     this.clearButton.addEventListener('mouseout', event => {
                         this.hideClearImageButton();
                     }, true);

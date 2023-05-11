@@ -46,8 +46,8 @@ namespace duice.component {
                 this.clearButton = document.createElement('img');
                 this.clearButton.src = this.closeButtonImg;
                 this.clearButton.style.cursor = 'pointer';
-                this.clearButton.style.width = '1rem';
-                this.clearButton.style.height = '1rem';
+                this.clearButton.style.width = '16px';
+                this.clearButton.style.height = '16px';
                 this.clearButton.addEventListener('mouseout', event => {
                     this.hideClearImageButton();
                 },true);
