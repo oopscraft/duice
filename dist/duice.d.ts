@@ -720,7 +720,8 @@ declare namespace duice.dialog {
     class Dialog {
         protected dialogElement: HTMLDialogElement;
         protected header: HTMLSpanElement;
-        protected closeButton: HTMLSpanElement;
+        protected closeButton: HTMLImageElement;
+        protected closeButtonImg: string;
         protected promise: Promise<any>;
         protected promiseResolve: Function;
         protected promiseReject: Function;
@@ -1498,12 +1499,26 @@ declare namespace duice.component {
         editable: boolean;
         width: number;
         height: number;
+        clearButton: HTMLImageElement;
+        closeButtonImg: string;
         /**
          * constructor
          * @param element
          * @param context
          */
         constructor(element: HTMLImageElement, context: object);
+        /**
+         * show clear image button
+         */
+        showClearImageButton(): void;
+        /**
+         * hide clear image button
+         */
+        hideClearImageButton(): void;
+        /**
+         * clear image
+         */
+        clearImage(): void;
         /**
          * open image
          */

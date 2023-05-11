@@ -9,7 +9,9 @@ namespace duice.dialog {
 
         protected header: HTMLSpanElement;
 
-        protected closeButton: HTMLSpanElement;
+        protected closeButton: HTMLImageElement;
+
+        protected closeButtonImg = 'data:image/svg+xml;base64,' + window.btoa('<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M6 6L18 18M18 6L6 18" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>');
 
         protected promise: Promise<any>;
 
@@ -63,19 +65,14 @@ namespace duice.dialog {
             };
 
             // creates close button
-            this.closeButton = document.createElement('span');
+            this.closeButton = document.createElement('img');
+            this.closeButton.src = this.closeButtonImg;
             this.closeButton.style.position = 'absolute';
             this.closeButton.style.top = '5px';
             this.closeButton.style.right = '5px';
             this.closeButton.style.cursor = 'pointer';
             this.closeButton.style.width = '1rem';
             this.closeButton.style.height = '1rem';
-            this.closeButton.style.lineHeight = '1rem';
-            this.closeButton.style.margin = '1px';
-            this.closeButton.style.textAlign = 'center';
-            this.closeButton.style.fontFamily = 'sans-serif';
-            this.closeButton.style.fontSize = '1rem';
-            this.closeButton.appendChild(document.createTextNode('X'));
             this.closeButton.addEventListener('click', event => {
                 _this.close();
             });
