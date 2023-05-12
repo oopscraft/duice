@@ -360,15 +360,15 @@ var duice;
             if (loop) {
                 component.setLoop(loop);
             }
-            // editable
-            let editable = duice.getElementAttribute(htmlElement, 'editable');
-            if (editable) {
-                component.setEditable(editable.toLowerCase() === 'true');
-            }
             // hierarchy
             let hierarchy = duice.getElementAttribute(htmlElement, 'hierarchy');
             if (hierarchy) {
                 component.setHierarchy(hierarchy);
+            }
+            // editable
+            let editable = duice.getElementAttribute(htmlElement, 'editable');
+            if (editable) {
+                component.setEditable(editable.toLowerCase() === 'true');
             }
             // returns
             return component;
