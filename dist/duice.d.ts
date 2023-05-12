@@ -87,6 +87,7 @@ declare namespace duice {
     class ArrayElement<T extends HTMLElement> extends DataElement<T> {
         slot: HTMLSlotElement;
         loop: string;
+        hierarchy: string;
         editable: boolean;
         rowHtmlElements: HTMLElement[];
         /**
@@ -110,6 +111,11 @@ declare namespace duice {
          * @param editable
          */
         setEditable(editable: boolean): void;
+        /**
+         * set hierarchy
+         * @param hierarchy
+         */
+        setHierarchy(hierarchy: string): void;
         /**
          * render
          */

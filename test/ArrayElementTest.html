@@ -8,6 +8,8 @@
         //'use strict';
         let myArray = new duice.ArrayProxy([
             {
+                id: 'apple',
+                parentId: 'tom',
                 name: 'Apple',
                 phoneNo: '01012345678',
                 cardNo: '0000111122223333',
@@ -27,6 +29,8 @@
                 ]
             },
             {
+                id: 'monkey',
+                parentId: null,
                 name: 'Monkey',
                 phoneNo: '01098765432',
                 cardNo: '9999888877776666',
@@ -46,6 +50,8 @@
                 ]
             },
             {
+                id: 'tom',
+                parentId: null,
                 name: 'Tom',
                 phoneNo: '01098765432',
                 cardNo: '9999888877776666',
@@ -245,7 +251,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr data-duice-array="myArray" data-duice-loop="myObject,status">
+            <tr data-duice-array="myArray" data-duice-loop="myObject,status" data-duice-editable="true">
                 <td><span data-duice-object="status" data-duice-property="index"></span></td>
                 <td><span data-duice-object="status" data-duice-property="count"></span></td>
                 <td><input data-duice-object="myObject" data-duice-property="name"/></td>
@@ -308,6 +314,19 @@
             </tfoot>
         </table>
         <!-- end of editable table -->
+
+        <!-- start of hierarchy -->
+        <h3>
+            Hierarchy Tree
+            <small>&lt;tr data-duice-array="myArray" data-duice-loop="item,status" data-duice-hierarchy="id,parentId"&gt;</small>
+        </h3>
+        <div>
+            <div data-duice-array="myArray" data-duice-loop="item,status" data-duice-hierarchy="id,parentId" style="border:solid 1px #ccc; margin-left:1rem;">
+                <span data-duice-object="item" data-duice-property="name"></span>
+            </div>
+        </div>
+        <!-- end of hierarchy -->
+
     </div>
 </div>
 </body>

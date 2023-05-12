@@ -169,6 +169,13 @@ var duice;
             this.editable = editable;
         }
         /**
+         * set hierarchy
+         * @param hierarchy
+         */
+        setHierarchy(hierarchy) {
+            this.hierarchy = hierarchy;
+        }
+        /**
          * render
          */
         render() {
@@ -198,7 +205,13 @@ var duice;
                     });
                     // clones row elements
                     let rowHtmlElement = this.getHtmlElement().cloneNode(true);
+                    // adds embedded attribute
                     duice.setElementAttribute(rowHtmlElement, 'index', index.toString());
+                    if (this.hierarchy) {
+                        let hierarchyArray = this.hierarchy.split(',');
+                        duice.setElementAttribute(rowHtmlElement, 'hierarchy-id', arrayProxy[index][hierarchyArray[0]]);
+                        duice.setElementAttribute(rowHtmlElement, 'hierarchy-pid', arrayProxy[index][hierarchyArray[1]]);
+                    }
                     // editable
                     if (this.editable) {
                         rowHtmlElement.setAttribute('draggable', 'true');
@@ -228,6 +241,24 @@ var duice;
                     this.slot.appendChild(rowHtmlElement);
                     // execute script
                     this.executeScript(rowHtmlElement, context);
+                }
+                // hierarchy
+                if (this.hierarchy) {
+                    let _this = this;
+                    let visit = function (currentElement) {
+                        let currentPid = duice.getElementAttribute(currentElement, 'hierarchy-pid');
+                        _this.slot.querySelectorAll(`*[data-${duice.getNamespace()}-index]`).forEach(element => {
+                            let id = duice.getElementAttribute(element, 'hierarchy-id');
+                            let pid = duice.getElementAttribute(element, 'hierarchy-pid');
+                            if (currentPid === id) {
+                                element.appendChild(currentElement.parentNode.removeChild(currentElement));
+                                return false;
+                            }
+                        });
+                    };
+                    this.rowHtmlElements.forEach(element => {
+                        visit(element);
+                    });
                 }
             }
             // not loop
@@ -333,6 +364,11 @@ var duice;
             let editable = duice.getElementAttribute(htmlElement, 'editable');
             if (editable) {
                 component.setEditable(editable.toLowerCase() === 'true');
+            }
+            // hierarchy
+            let hierarchy = duice.getElementAttribute(htmlElement, 'hierarchy');
+            if (hierarchy) {
+                component.setHierarchy(hierarchy);
             }
             // returns
             return component;

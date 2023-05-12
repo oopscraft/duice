@@ -10,6 +10,8 @@ namespace duice {
 
         loop: string;
 
+        hierarchy: string;
+
         editable: boolean = false;
 
         rowHtmlElements: HTMLElement[] = [];
@@ -54,6 +56,14 @@ namespace duice {
         }
 
         /**
+         * set hierarchy
+         * @param hierarchy
+         */
+        setHierarchy(hierarchy: string): void {
+            this.hierarchy = hierarchy;
+        }
+
+        /**
          * render
          */
         override render(): void {
@@ -86,7 +96,14 @@ namespace duice {
 
                     // clones row elements
                     let rowHtmlElement = this.getHtmlElement().cloneNode(true) as HTMLElement;
+
+                    // adds embedded attribute
                     setElementAttribute(rowHtmlElement, 'index', index.toString());
+                    if(this.hierarchy) {
+                        let hierarchyArray = this.hierarchy.split(',');
+                        setElementAttribute(rowHtmlElement, 'hierarchy-id', arrayProxy[index][hierarchyArray[0]]);
+                        setElementAttribute(rowHtmlElement, 'hierarchy-pid', arrayProxy[index][hierarchyArray[1]]);
+                    }
 
                     // editable
                     if(this.editable){
@@ -118,6 +135,25 @@ namespace duice {
 
                     // execute script
                     this.executeScript(rowHtmlElement, context);
+                }
+
+                // hierarchy
+                if(this.hierarchy) {
+                    let _this = this;
+                    let visit = function(currentElement:HTMLElement) {
+                        let currentPid = getElementAttribute(currentElement, 'hierarchy-pid');
+                        _this.slot.querySelectorAll(`*[data-${getNamespace()}-index]`).forEach(element=> {
+                            let id = getElementAttribute(element as HTMLElement, 'hierarchy-id');
+                            let pid = getElementAttribute(element as HTMLElement, 'hierarchy-pid');
+                            if(currentPid === id) {
+                                element.appendChild(currentElement.parentNode.removeChild(currentElement));
+                                return false;
+                            }
+                        });
+                    }
+                    this.rowHtmlElements.forEach(element => {
+                        visit(element);
+                    });
                 }
             }
             // not loop

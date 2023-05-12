@@ -73,6 +73,12 @@ namespace duice {
                 component.setLoop(loop);
             }
 
+            // hierarchy
+            let hierarchy = getElementAttribute(htmlElement, 'hierarchy');
+            if(hierarchy) {
+                component.setHierarchy(hierarchy);
+            }
+
             // editable
             let editable = getElementAttribute(htmlElement, 'editable');
             if(editable){
