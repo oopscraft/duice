@@ -3079,7 +3079,7 @@ var duice;
                     let a = duice.ObjectProxy.getHandler(objectProxy);
                     console.log(a);
                     // TODO test
-                    //this[index] = objectProxy;
+                    this[index] = objectProxy;
                 });
             }
             // create proxy
