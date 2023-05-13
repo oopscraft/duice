@@ -5,7 +5,7 @@ namespace duice {
      */
     export class Observable {
 
-        observers: Observer[] = []
+        observers: Observer[] = [];
 
         notifyEnabled: boolean = true;
 
