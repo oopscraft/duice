@@ -22,7 +22,7 @@ namespace duice {
                     let a = ObjectProxy.getHandler(objectProxy);
                     //console.log(a);
                     // TODO test
-                    //this[index] = objectProxy;
+                    this[index] = objectProxy;
                 });
             }
 
