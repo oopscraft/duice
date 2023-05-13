@@ -18,11 +18,11 @@ namespace duice {
             if(globalThis.Array.isArray(array)){
                 array.forEach((object, index) => {
                     let objectProxy = new ObjectProxy(object);
-                    ObjectProxy.getHandler(objectProxy).addObserver(arrayHandler);
+                    //ObjectProxy.getHandler(objectProxy).addObserver(arrayHandler);
                     let a = ObjectProxy.getHandler(objectProxy);
                     console.log(a);
                     // TODO test
-                    this[index] = objectProxy;
+                    //this[index] = objectProxy;
                 });
             }
 
