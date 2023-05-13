@@ -58,7 +58,7 @@
         });
 
         // adds after change listener
-        duice.ObjectProxy.onPropertyChanged(myObject, (property, value) => {
+        duice.ObjectProxy.onPropertyChanged(myObject, event => {
             viewMyObject();
         });
 

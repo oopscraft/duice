@@ -19,7 +19,8 @@ namespace duice {
                 array.forEach((object, index) => {
                     let objectProxy = new ObjectProxy(object);
                     ObjectProxy.getHandler(objectProxy).addObserver(arrayHandler);
-                    this[index] = objectProxy;
+                    // TODO test
+                    //this[index] = objectProxy;
                 });
             }
 
