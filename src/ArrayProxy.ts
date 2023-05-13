@@ -23,6 +23,7 @@ namespace duice {
                     console.log(a);
                     // TODO test
                     //this[index] = objectProxy;
+                    this.push(objectProxy);
                 });
             }
 
