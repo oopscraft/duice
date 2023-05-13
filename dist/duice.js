@@ -3075,7 +3075,7 @@ var duice;
             if (globalThis.Array.isArray(array)) {
                 array.forEach((object, index) => {
                     let objectProxy = new duice.ObjectProxy(object);
-                    duice.ObjectProxy.getHandler(objectProxy).addObserver(arrayHandler);
+                    //ObjectProxy.getHandler(objectProxy).addObserver(arrayHandler);
                     // TODO test
                     //this[index] = objectProxy;
                 });
