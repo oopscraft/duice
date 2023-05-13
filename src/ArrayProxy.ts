@@ -20,7 +20,7 @@ namespace duice {
                     let objectProxy = new ObjectProxy(object);
                     //ObjectProxy.getHandler(objectProxy).addObserver(arrayHandler);
                     let a = ObjectProxy.getHandler(objectProxy);
-                    console.log(a);
+                    console.log("=========>", a);
                     // TODO test
                     //this[index] = objectProxy;
                 });
