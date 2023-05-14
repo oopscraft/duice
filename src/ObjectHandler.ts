@@ -7,7 +7,7 @@ namespace duice {
     /**
      * object handler class
      */
-    export class ObjectHandler extends DataHandler<ObjectProxy> {
+    export class ObjectHandler extends DataHandler<object> {
 
         propertyChangingListener: Function;
 

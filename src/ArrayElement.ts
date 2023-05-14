@@ -68,7 +68,7 @@ namespace duice {
          */
         override render(): void {
             let _this = this;
-            let arrayProxy = this.getData() as ArrayProxy;
+            let arrayProxy = this.getData() as Array<object>;
 
             // reset row elements
             this.rowHtmlElements.forEach(rowElement => {

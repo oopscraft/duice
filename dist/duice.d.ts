@@ -296,7 +296,7 @@ declare namespace duice {
     /**
      * array handler class
      */
-    class ArrayHandler extends DataHandler<ArrayProxy> {
+    class ArrayHandler extends DataHandler<object[]> {
         propertyChangingListener: Function;
         propertyChangedListener: Function;
         rowInsertingListener: Function;
@@ -313,7 +313,7 @@ declare namespace duice {
          * @param property
          * @param receiver
          */
-        get(target: ArrayProxy, property: string, receiver: object): any;
+        get(target: object[], property: string, receiver: object): any;
         /**
          * set
          * @param target
@@ -327,6 +327,26 @@ declare namespace duice {
          * @param event
          */
         update(observable: Observable, event: event.Event): Promise<void>;
+        /**
+         * insertRow
+         * @param arrayProxy
+         * @param index
+         * @param rows
+         */
+        insertRow(arrayProxy: object[], index: number, ...rows: object[]): Promise<void>;
+        /**
+         * deleteRow
+         * @param arrayProxy
+         * @param index
+         * @param size
+         */
+        deleteRow(arrayProxy: object[], index: number, size?: number): Promise<void>;
+        /**
+         * appendRow
+         * @param arrayProxy
+         * @param rows
+         */
+        appendRow(arrayProxy: object[], ...rows: object[]): Promise<void>;
     }
 }
 declare namespace duice {
@@ -568,7 +588,7 @@ declare namespace duice {
     /**
      * object handler class
      */
-    class ObjectHandler extends DataHandler<ObjectProxy> {
+    class ObjectHandler extends DataHandler<object> {
         propertyChangingListener: Function;
         propertyChangedListener: Function;
         /**
@@ -1276,217 +1296,200 @@ declare namespace duice {
     /**
      * object proxy class
      */
-    class ObjectProxy extends globalThis.Object implements DataProxy {
+    class ObjectProxy implements DataProxy {
         /**
          * constructor
          */
-        constructor(object: globalThis.Object);
+        constructor(object: object);
         /**
          * clear
          * @param objectProxy
          */
-        static clear(objectProxy: ObjectProxy): void;
+        static clear(objectProxy: object): void;
         /**
          * assign
          * @param objectProxy
          * @param object
          */
-        static assign(objectProxy: ObjectProxy, object: object): void;
+        static assign(objectProxy: object, object: object): void;
         /**
          * setTarget
          * @param objectProxy
          * @param target
          */
-        static setTarget(objectProxy: ObjectProxy, target: object): void;
+        static setTarget(objectProxy: object, target: object): void;
         /**
          * getTarget
          * @param objectProxy
          */
-        static getTarget(objectProxy: ObjectProxy): any;
+        static getTarget(objectProxy: object): any;
         /**
          * setHandler
          * @param objectProxy
          * @param objectHandler
          */
-        static setHandler(objectProxy: ObjectProxy, objectHandler: ObjectHandler): void;
+        static setHandler(objectProxy: object, objectHandler: ObjectHandler): void;
         /**
          * getHandler
          * @param objectProxy
          */
-        static getHandler(objectProxy: ObjectProxy): ObjectHandler;
+        static getHandler(objectProxy: object): ObjectHandler;
         /**
          * save
          * @param objectProxy
          */
-        static save(objectProxy: ObjectProxy): void;
+        static save(objectProxy: object): void;
         /**
          * reset
          * @param objectProxy
          */
-        static reset(objectProxy: ObjectProxy): void;
+        static reset(objectProxy: object): void;
         /**
          * onPropertyChanging
          * @param objectProxy
          * @param listener
          */
-        static onPropertyChanging(objectProxy: ObjectProxy, listener: Function): void;
+        static onPropertyChanging(objectProxy: object, listener: Function): void;
         /**
          * onPropertyChanged
          * @param objectProxy
          * @param listener
          */
-        static onPropertyChanged(objectProxy: ObjectProxy, listener: Function): void;
+        static onPropertyChanged(objectProxy: object, listener: Function): void;
         /**
          * setReadonly
          * @param objectProxy
          * @param property
          * @param readonly
          */
-        static setReadonly(objectProxy: ObjectProxy, property: string, readonly: boolean): void;
+        static setReadonly(objectProxy: object, property: string, readonly: boolean): void;
         /**
          * isReadonly
          * @param objectProxy
          * @param property
          */
-        static isReadonly(objectProxy: ObjectProxy, property: string): boolean;
+        static isReadonly(objectProxy: object, property: string): boolean;
         /**
          * setReadonlyAll
          * @param objectProxy
          * @param readonly
          */
-        static setReadonlyAll(objectProxy: ObjectProxy, readonly: boolean): void;
+        static setReadonlyAll(objectProxy: object, readonly: boolean): void;
         /**
          * focus
          * @param objectProxy
          * @param property
          */
-        static focus(objectProxy: ObjectProxy, property: string): void;
+        static focus(objectProxy: object, property: string): void;
     }
 }
 declare namespace duice {
     /**
      * array proxy class
      */
-    class ArrayProxy extends globalThis.Array implements DataProxy {
+    class ArrayProxy implements DataProxy {
         /**
          * constructor
          */
-        constructor(array?: object[]);
+        constructor(array: object[]);
         /**
          * clear
          * @param arrayProxy
          */
-        static clear(arrayProxy: ArrayProxy): void;
+        static clear(arrayProxy: object[]): void;
         /**
          * assign
          * @param arrayProxy
          * @param array
          */
-        static assign(arrayProxy: ArrayProxy, array: object[]): void;
+        static assign(arrayProxy: object[], array: object[]): void;
         /**
          * setTarget
          * @param arrayProxy
          * @param target
          */
-        static setTarget(arrayProxy: ArrayProxy, target: object): void;
+        static setTarget(arrayProxy: object[], target: object[]): void;
         /**
          * getTarget
          * @param arrayProxy
          */
-        static getTarget(arrayProxy: ArrayProxy): any;
+        static getTarget(arrayProxy: object[]): any;
         /**
          * setHandler
          * @param arrayProxy
          * @param arrayHandler
          */
-        static setHandler(arrayProxy: ArrayProxy, arrayHandler: ArrayHandler): void;
+        static setHandler(arrayProxy: object[], arrayHandler: ArrayHandler): void;
         /**
          * getHandler
          * @param arrayProxy
          */
-        static getHandler(arrayProxy: ArrayProxy): ArrayHandler;
+        static getHandler(arrayProxy: object[]): ArrayHandler;
         /**
          * save
          * @param arrayProxy
          */
-        static save(arrayProxy: ArrayProxy): void;
+        static save(arrayProxy: object[]): void;
         /**
          * reset
          * @param arrayProxy
          */
-        static reset(arrayProxy: ArrayProxy): void;
+        static reset(arrayProxy: object[]): void;
         /**
          * onPropertyChanging
          * @param arrayProxy
          * @param listener
          */
-        static onPropertyChanging(arrayProxy: ArrayProxy, listener: Function): void;
+        static onPropertyChanging(arrayProxy: object[], listener: Function): void;
         /**
          * onPropertyChanged
          * @param arrayProxy
          * @param listener
          */
-        static onPropertyChanged(arrayProxy: ArrayProxy, listener: Function): void;
+        static onPropertyChanged(arrayProxy: object[], listener: Function): void;
         /**
          * onRowInserting
          * @param arrayProxy
          * @param listener
          */
-        static onRowInserting(arrayProxy: ArrayProxy, listener: Function): void;
+        static onRowInserting(arrayProxy: object[], listener: Function): void;
         /**
          * onRowInserted
          * @param arrayProxy
          * @param listener
          */
-        static onRowInserted(arrayProxy: ArrayProxy, listener: Function): void;
+        static onRowInserted(arrayProxy: object[], listener: Function): void;
         /**
          * onRowDeleting
          * @param arrayProxy
          * @param listener
          */
-        static onRowDeleting(arrayProxy: ArrayProxy, listener: Function): void;
+        static onRowDeleting(arrayProxy: object[], listener: Function): void;
         /**
          * onRowDeleted
          * @param arrayProxy
          * @param listener
          */
-        static onRowDeleted(arrayProxy: ArrayProxy, listener: Function): void;
+        static onRowDeleted(arrayProxy: object[], listener: Function): void;
         /**
          * setReadonly
          * @param arrayProxy
          * @param property
          * @param readonly
          */
-        static setReadonly(arrayProxy: ArrayProxy, property: string, readonly: boolean): void;
+        static setReadonly(arrayProxy: object[], property: string, readonly: boolean): void;
         /**
          * isReadonly
          * @param arrayProxy
          * @param property
          */
-        static isReadonly(arrayProxy: ArrayProxy, property: string): boolean;
+        static isReadonly(arrayProxy: object[], property: string): boolean;
         /**
          * setReadonlyAll
          * @param arrayProxy
          * @param readonly
          */
-        static setReadonlyAll(arrayProxy: ArrayProxy, readonly: boolean): void;
-        /**
-         * insertRow
-         * @param index
-         * @param rows
-         */
-        insertRow(index: number, ...rows: object[]): Promise<void>;
-        /**
-         * deleteRow
-         * @param index
-         * @param size
-         */
-        deleteRow(index: number, size?: number): Promise<void>;
-        /**
-         * appendRow
-         * @param rows
-         */
-        appendRow(...rows: object[]): Promise<void>;
+        static setReadonlyAll(arrayProxy: object[], readonly: boolean): void;
     }
 }
 declare namespace duice {

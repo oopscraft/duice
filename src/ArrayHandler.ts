@@ -5,7 +5,7 @@ namespace duice {
     /**
      * array handler class
      */
-    export class ArrayHandler extends DataHandler<ArrayProxy> {
+    export class ArrayHandler extends DataHandler<object[]> {
 
         propertyChangingListener: Function;
 
@@ -32,7 +32,7 @@ namespace duice {
          * @param property
          * @param receiver
          */
-        get(target: ArrayProxy, property: string, receiver: object): any {
+        get(target: object[], property: string, receiver: object): any {
             console.debug("ArrayHandler.get", '|', target, '|', property, '|', receiver);
             let _this = this;
             const value = target[property];
@@ -51,8 +51,8 @@ namespace duice {
                         for (let i in arguments) {
                             rows.push(arguments[i]);
                         }
-                        await target.insertRow(index, ...rows);
-                        return _this.target.length;
+                        await _this.insertRow(target, index, ...rows);
+                        return target.length;
                     }
                 }
 
@@ -74,12 +74,12 @@ namespace duice {
 
                         // delete rows
                         if(deleteCount > 0) {
-                            await target.deleteRow(start, deleteCount);
+                            await _this.deleteRow(target, start, deleteCount);
                         }
 
                         // insert rows
                         if(insertRows.length > 0){
-                            await target.insertRow(start, ...insertRows);
+                            await _this.insertRow(target, start, ...insertRows);
                         }
 
                         // returns deleted rows
@@ -97,7 +97,7 @@ namespace duice {
                             index = 0;
                         }
                         let rows = [target[index]];
-                        await target.deleteRow(index);
+                        await _this.deleteRow(target, index);
                         return rows;
                     }
                 }
@@ -143,6 +143,58 @@ namespace duice {
 
             // notify observers
             this.notifyObservers(event);
+        }
+
+        /**
+         * insertRow
+         * @param arrayProxy
+         * @param index
+         * @param rows
+         */
+        async insertRow(arrayProxy: object[], index: number, ...rows: object[]): Promise<void> {
+            let arrayHandler = ArrayProxy.getHandler(arrayProxy);
+            let proxyTarget = ArrayProxy.getTarget(arrayProxy);
+            rows.forEach((object, index) => {
+                rows[index] = new ObjectProxy(object);
+            });
+            let event = new duice.event.RowInsertEvent(this, index, rows);
+            if (await arrayHandler.checkListener(arrayHandler.rowInsertingListener, event)) {
+                proxyTarget.splice(index, 0, ...rows);
+                await arrayHandler.checkListener(arrayHandler.rowInsertedListener, event);
+                arrayHandler.notifyObservers(event);
+            }
+        }
+
+        /**
+         * deleteRow
+         * @param arrayProxy
+         * @param index
+         * @param size
+         */
+        async deleteRow(arrayProxy: object[], index: number, size?: number): Promise<void> {
+            let arrayHandler = ArrayProxy.getHandler(arrayProxy);
+            let proxyTarget = ArrayProxy.getTarget(arrayProxy);
+            let sliceBegin = index;
+            let sliceEnd = (size ? index + size : index + 1);
+            let rows = proxyTarget.slice(sliceBegin, sliceEnd);
+            let event = new duice.event.RowDeleteEvent(this, index, rows);
+            if (await arrayHandler.checkListener(arrayHandler.rowDeletingListener, event)) {
+                let spliceStart = index;
+                let spliceDeleteCount = (size ? size : 1);
+                proxyTarget.splice(spliceStart, spliceDeleteCount);
+                await arrayHandler.checkListener(arrayHandler.rowDeletedListener, event);
+                arrayHandler.notifyObservers(event);
+            }
+        }
+
+        /**
+         * appendRow
+         * @param arrayProxy
+         * @param rows
+         */
+        async appendRow(arrayProxy: object[], ...rows: object[]): Promise<void> {
+            let index = arrayProxy.length;
+            return this.insertRow(arrayProxy, index, ...rows);
         }
 
     }

@@ -567,8 +567,8 @@ var duice;
                             for (let i in arguments) {
                                 rows.push(arguments[i]);
                             }
-                            yield target.insertRow(index, ...rows);
-                            return _this.target.length;
+                            yield _this.insertRow(target, index, ...rows);
+                            return target.length;
                         });
                     };
                 }
@@ -589,11 +589,11 @@ var duice;
                             }
                             // delete rows
                             if (deleteCount > 0) {
-                                yield target.deleteRow(start, deleteCount);
+                                yield _this.deleteRow(target, start, deleteCount);
                             }
                             // insert rows
                             if (insertRows.length > 0) {
-                                yield target.insertRow(start, ...insertRows);
+                                yield _this.insertRow(target, start, ...insertRows);
                             }
                             // returns deleted rows
                             return deleteRows;
@@ -612,7 +612,7 @@ var duice;
                                 index = 0;
                             }
                             let rows = [target[index]];
-                            yield target.deleteRow(index);
+                            yield _this.deleteRow(target, index);
                             return rows;
                         });
                     };
@@ -654,6 +654,61 @@ var duice;
                 }
                 // notify observers
                 this.notifyObservers(event);
+            });
+        }
+        /**
+         * insertRow
+         * @param arrayProxy
+         * @param index
+         * @param rows
+         */
+        insertRow(arrayProxy, index, ...rows) {
+            return __awaiter(this, void 0, void 0, function* () {
+                let arrayHandler = duice.ArrayProxy.getHandler(arrayProxy);
+                let proxyTarget = duice.ArrayProxy.getTarget(arrayProxy);
+                rows.forEach((object, index) => {
+                    rows[index] = new duice.ObjectProxy(object);
+                });
+                let event = new duice.event.RowInsertEvent(this, index, rows);
+                if (yield arrayHandler.checkListener(arrayHandler.rowInsertingListener, event)) {
+                    proxyTarget.splice(index, 0, ...rows);
+                    yield arrayHandler.checkListener(arrayHandler.rowInsertedListener, event);
+                    arrayHandler.notifyObservers(event);
+                }
+            });
+        }
+        /**
+         * deleteRow
+         * @param arrayProxy
+         * @param index
+         * @param size
+         */
+        deleteRow(arrayProxy, index, size) {
+            return __awaiter(this, void 0, void 0, function* () {
+                let arrayHandler = duice.ArrayProxy.getHandler(arrayProxy);
+                let proxyTarget = duice.ArrayProxy.getTarget(arrayProxy);
+                let sliceBegin = index;
+                let sliceEnd = (size ? index + size : index + 1);
+                let rows = proxyTarget.slice(sliceBegin, sliceEnd);
+                let event = new duice.event.RowDeleteEvent(this, index, rows);
+                if (yield arrayHandler.checkListener(arrayHandler.rowDeletingListener, event)) {
+                    let spliceStart = index;
+                    let spliceDeleteCount = (size ? size : 1);
+                    proxyTarget.splice(spliceStart, spliceDeleteCount);
+                    yield arrayHandler.checkListener(arrayHandler.rowDeletedListener, event);
+                    arrayHandler.notifyObservers(event);
+                }
+            });
+        }
+        /**
+         * appendRow
+         * @param arrayProxy
+         * @param rows
+         */
+        appendRow(arrayProxy, ...rows) {
+            return __awaiter(this, void 0, void 0, function* () {
+                let index = arrayProxy.length;
+                return this.insertRow(arrayProxy, index, ...rows);
             });
         }
     }
@@ -2818,46 +2873,45 @@ var duice;
     /**
      * object proxy class
      */
-    class ObjectProxy extends globalThis.Object {
+    class ObjectProxy {
         /**
          * constructor
          */
         constructor(object) {
-            super();
             // object handler
             let objectHandler = new duice.ObjectHandler();
             // copy property
             for (let name in object) {
                 let value = object[name];
                 // value is array
-                if (duice.ArrayProxy.isArray(value)) {
+                if (Array.isArray(value)) {
                     let arrayProxy = new duice.ArrayProxy(value);
                     duice.ArrayProxy.getHandler(arrayProxy).addObserver(objectHandler);
-                    this[name] = arrayProxy;
+                    object[name] = arrayProxy;
                     continue;
                 }
                 // value is object
                 if (value != null && typeof value === 'object') {
                     let objectProxy = new ObjectProxy(value);
                     ObjectProxy.getHandler(objectProxy).addObserver(objectHandler);
-                    this[name] = objectProxy;
+                    object[name] = objectProxy;
                     continue;
                 }
                 // value is primitive
-                this[name] = value;
+                object[name] = value;
             }
             // delete not exists property
-            for (let name in this) {
-                if (!ObjectProxy.keys(object).includes(name)) {
+            for (let name in object) {
+                if (!Object.keys(object).includes(name)) {
                     delete this[name];
                 }
             }
             // creates proxy
-            let objectProxy = new Proxy(this, objectHandler);
+            let objectProxy = new Proxy(object, objectHandler);
             objectHandler.setTarget(objectProxy);
             // set property
             ObjectProxy.setHandler(objectProxy, objectHandler);
-            ObjectProxy.setTarget(objectProxy, this);
+            ObjectProxy.setTarget(objectProxy, object);
             // save
             ObjectProxy.save(objectProxy);
             // returns
@@ -2876,7 +2930,7 @@ var duice;
                 // clear properties
                 for (let name in objectProxy) {
                     let value = objectProxy[name];
-                    if (duice.ArrayProxy.isArray(value)) {
+                    if (Array.isArray(value)) {
                         duice.ArrayProxy.clear(value);
                         continue;
                     }
@@ -2910,8 +2964,8 @@ var duice;
                 for (let name in object) {
                     let value = object[name];
                     // source value is array
-                    if (duice.ArrayProxy.isArray(value)) {
-                        if (duice.ArrayProxy.isArray(objectProxy[name])) {
+                    if (Array.isArray(value)) {
+                        if (Array.isArray(objectProxy[name])) {
                             duice.ArrayProxy.assign(objectProxy[name], value);
                         }
                         else {
@@ -3063,12 +3117,12 @@ var duice;
     /**
      * array proxy class
      */
-    class ArrayProxy extends globalThis.Array {
+    class ArrayProxy {
         /**
          * constructor
          */
         constructor(array) {
-            super();
+            //super();
             // array handler
             let arrayHandler = new duice.ArrayHandler();
             // copy array elements
@@ -3076,15 +3130,15 @@ var duice;
                 array.forEach((object, index) => {
                     let objectProxy = new duice.ObjectProxy(object);
                     duice.ObjectProxy.getHandler(objectProxy).addObserver(arrayHandler);
-                    this.push(objectProxy);
+                    object = objectProxy;
                 });
             }
             // create proxy
-            let arrayProxy = new Proxy(this, arrayHandler);
+            let arrayProxy = new Proxy(array, arrayHandler);
             arrayHandler.setTarget(arrayProxy);
             // set property
             ArrayProxy.setHandler(arrayProxy, arrayHandler);
-            ArrayProxy.setTarget(arrayProxy, this);
+            ArrayProxy.setTarget(arrayProxy, array);
             // returns
             return arrayProxy;
         }
@@ -3278,58 +3332,6 @@ var duice;
             for (let index = 0; index >= this.length; index++) {
                 duice.ObjectProxy.setReadonlyAll(this[index], readonly);
             }
-        }
-        /**
-         * insertRow
-         * @param index
-         * @param rows
-         */
-        insertRow(index, ...rows) {
-            return __awaiter(this, void 0, void 0, function* () {
-                let arrayHandler = ArrayProxy.getHandler(this);
-                let proxyTarget = ArrayProxy.getTarget(this);
-                rows.forEach((object, index) => {
-                    rows[index] = new duice.ObjectProxy(object);
-                });
-                let event = new duice.event.RowInsertEvent(this, index, rows);
-                if (yield arrayHandler.checkListener(arrayHandler.rowInsertingListener, event)) {
-                    proxyTarget.splice(index, 0, ...rows);
-                    yield arrayHandler.checkListener(arrayHandler.rowInsertedListener, event);
-                    arrayHandler.notifyObservers(event);
-                }
-            });
-        }
-        /**
-         * deleteRow
-         * @param index
-         * @param size
-         */
-        deleteRow(index, size) {
-            return __awaiter(this, void 0, void 0, function* () {
-                let arrayHandler = ArrayProxy.getHandler(this);
-                let proxyTarget = ArrayProxy.getTarget(this);
-                let sliceBegin = index;
-                let sliceEnd = (size ? index + size : index + 1);
-                let rows = proxyTarget.slice(sliceBegin, sliceEnd);
-                let event = new duice.event.RowDeleteEvent(this, index, rows);
-                if (yield arrayHandler.checkListener(arrayHandler.rowDeletingListener, event)) {
-                    let spliceStart = index;
-                    let spliceDeleteCount = (size ? size : 1);
-                    proxyTarget.splice(spliceStart, spliceDeleteCount);
-                    yield arrayHandler.checkListener(arrayHandler.rowDeletedListener, event);
-                    arrayHandler.notifyObservers(event);
-                }
-            });
-        }
-        /**
-         * appendRow
-         * @param rows
-         */
-        appendRow(...rows) {
-            return __awaiter(this, void 0, void 0, function* () {
-                let index = this.length;
-                return this.insertRow(index, ...rows);
-            });
         }
     }
     duice.ArrayProxy = ArrayProxy;
