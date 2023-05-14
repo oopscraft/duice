@@ -1,6 +1,6 @@
 namespace duice.component {
 
-    export class Pagination extends duice.CustomElement {
+    export class Pagination extends duice.CustomElement<object> {
 
         override doRender(object: ObjectProxy): HTMLElement {
 

@@ -3,7 +3,7 @@ namespace duice {
     /**
      * element factory abstract class
      */
-    export abstract class DataElementFactory<T extends HTMLElement> {
+    export abstract class DataElementFactory<T extends HTMLElement, V> {
 
         /**
          * check support
@@ -16,7 +16,7 @@ namespace duice {
          * @param htmlElement
          * @param context
          */
-        abstract createElement(htmlElement: T, context: object): DataElement<HTMLElement>;
+        abstract createElement(htmlElement: T, context: object): DataElement<HTMLElement, V>;
 
     }
 

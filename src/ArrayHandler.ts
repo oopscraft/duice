@@ -33,7 +33,6 @@ namespace duice {
          * @param receiver
          */
         get(target: object[], property: string, receiver: object): any {
-            console.debug("ArrayHandler.get", '|', target, '|', property, '|', receiver);
             let _this = this;
             const value = target[property];
             if (typeof value === 'function') {
@@ -117,7 +116,6 @@ namespace duice {
          * @param value
          */
         set(target: ArrayProxy, property: string, value: any): boolean {
-            console.debug("ArrayHandler.set", '|', target, '|', property, '|', value);
             Reflect.set(target, property, value);
             if (property === 'length') {
                 this.notifyObservers(new event.Event(this));

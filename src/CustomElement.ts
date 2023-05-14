@@ -4,7 +4,7 @@ namespace duice {
     /**
      * custom element
      */
-    export abstract class CustomElement extends DataElement<HTMLElement> {
+    export abstract class CustomElement<V> extends DataElement<HTMLElement, V> {
 
         /**
          * constructor
@@ -70,13 +70,13 @@ namespace duice {
          * do render template method
          * @param data
          */
-        abstract doRender(data: DataProxy): HTMLElement;
+        abstract doRender(data: V): HTMLElement;
 
         /**
          * setting style
          * @param data
          */
-        doStyle(data: DataProxy): string {
+        doStyle(data: V): string {
             return null;
         }
 

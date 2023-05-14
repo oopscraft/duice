@@ -27,7 +27,6 @@ namespace duice {
          * @param receiver
          */
         get(target: object, property: string, receiver: object): any {
-            console.debug("ObjectHandler.get", target, property, receiver);
             return Reflect.get(target, property, receiver);
         }
 
@@ -38,7 +37,6 @@ namespace duice {
          * @param value
          */
         set(target: object, property: string, value: any) {
-            console.debug("ObjectHandler.set", target, property, value);
 
             // change value
             Reflect.set(target, property, value);

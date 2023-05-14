@@ -6,7 +6,7 @@ namespace duice {
     /**
      * object element class
      */
-    export class ObjectElement<T extends HTMLElement> extends DataElement<T> {
+    export class ObjectElement<T extends HTMLElement> extends DataElement<T, object> {
 
         property: string;
 

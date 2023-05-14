@@ -4,9 +4,9 @@ namespace duice {
     /**
      * custom component factory
      */
-    export class CustomElementFactory extends DataElementFactory<HTMLElement> {
+    export class CustomElementFactory<V> extends DataElementFactory<HTMLElement, V> {
 
-        static instances: CustomElementFactory[] = [];
+        static instances: CustomElementFactory<any>[] = [];
 
         tagName: string;
 
@@ -16,7 +16,7 @@ namespace duice {
          * adds factory instance
          * @param elementFactory
          */
-        static addInstance(elementFactory: CustomElementFactory): void {
+        static addInstance(elementFactory: CustomElementFactory<any>): void {
 
             // register custom html element
             customElements.define(elementFactory.tagName, class extends HTMLElement {});
@@ -29,7 +29,7 @@ namespace duice {
          * returns factory instance to be supported
          * @param htmlElement
          */
-        static getInstance(htmlElement: HTMLElement): CustomElementFactory {
+        static getInstance(htmlElement: HTMLElement): CustomElementFactory<any> {
             for(let componentFactory of this.instances){
                 if(componentFactory.support(htmlElement)) {
                     return componentFactory;
@@ -54,7 +54,7 @@ namespace duice {
          * @param htmlElement
          * @param context
          */
-        override createElement(htmlElement: HTMLElement, context: object): CustomElement {
+        override createElement(htmlElement: HTMLElement, context: object): CustomElement<any> {
 
             // creates instance
             let element =  Reflect.construct(this.elementType, [htmlElement, context]);

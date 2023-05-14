@@ -99,11 +99,15 @@ var duice;
          */
         setData(dataName) {
             var _a;
-            this.data = duice.findVariable(this.context, dataName);
-            let dataHandler = (_a = globalThis.Object.getOwnPropertyDescriptor(this.data, '_handler_')) === null || _a === void 0 ? void 0 : _a.value;
+            // finds proxy data
+            let data = duice.findVariable(this.context, dataName);
+            // bind with data handler
+            let dataHandler = (_a = globalThis.Object.getOwnPropertyDescriptor(data, '_handler_')) === null || _a === void 0 ? void 0 : _a.value;
             duice.assert(dataHandler, 'DataHandler is not found');
             this.addObserver(dataHandler);
             dataHandler.addObserver(this);
+            // set data
+            this.data = dataHandler.getTarget();
         }
         /**
          * return data
@@ -548,7 +552,6 @@ var duice;
          * @param receiver
          */
         get(target, property, receiver) {
-            console.debug("ArrayHandler.get", '|', target, '|', property, '|', receiver);
             let _this = this;
             const value = target[property];
             if (typeof value === 'function') {
@@ -630,7 +633,6 @@ var duice;
          * @param value
          */
         set(target, property, value) {
-            console.debug("ArrayHandler.set", '|', target, '|', property, '|', value);
             Reflect.set(target, property, value);
             if (property === 'length') {
                 this.notifyObservers(new duice.event.Event(this));
@@ -1177,7 +1179,6 @@ var duice;
          * @param receiver
          */
         get(target, property, receiver) {
-            console.debug("ObjectHandler.get", target, property, receiver);
             return Reflect.get(target, property, receiver);
         }
         /**
@@ -1187,7 +1188,6 @@ var duice;
          * @param value
          */
         set(target, property, value) {
-            console.debug("ObjectHandler.set", target, property, value);
             // change value
             Reflect.set(target, property, value);
             // notify
@@ -2873,7 +2873,7 @@ var duice;
     /**
      * object proxy class
      */
-    class ObjectProxy {
+    class ObjectProxy /*implements DataProxy*/ {
         /**
          * constructor
          */
@@ -2908,7 +2908,7 @@ var duice;
             }
             // creates proxy
             let objectProxy = new Proxy(object, objectHandler);
-            objectHandler.setTarget(objectProxy);
+            objectHandler.setTarget(object);
             // set property
             ObjectProxy.setHandler(objectProxy, objectHandler);
             ObjectProxy.setTarget(objectProxy, object);
@@ -3117,7 +3117,7 @@ var duice;
     /**
      * array proxy class
      */
-    class ArrayProxy {
+    class ArrayProxy /*implements DataProxy*/ {
         /**
          * constructor
          */
@@ -3134,7 +3134,7 @@ var duice;
             }
             // create proxy
             let arrayProxy = new Proxy(array, arrayHandler);
-            arrayHandler.setTarget(arrayProxy);
+            arrayHandler.setTarget(array);
             // set property
             ArrayProxy.setHandler(arrayProxy, arrayHandler);
             ArrayProxy.setTarget(arrayProxy, array);

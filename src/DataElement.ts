@@ -4,13 +4,13 @@ namespace duice {
     /**
      * element abstract class
      */
-    export abstract class DataElement<T extends HTMLElement> extends Observable implements Observer {
+    export abstract class DataElement<T extends HTMLElement, V> extends Observable implements Observer {
 
         htmlElement: T;
 
         context: object;
 
-        data: DataProxy;
+        data: V;
 
         /**
          * constructor
@@ -44,17 +44,24 @@ namespace duice {
          * @param dataName
          */
         setData(dataName: string): void {
-            this.data = findVariable(this.context, dataName);
-            let dataHandler = globalThis.Object.getOwnPropertyDescriptor(this.data, '_handler_')?.value;
+
+            // finds proxy data
+            let data = findVariable(this.context, dataName);
+
+            // bind with data handler
+            let dataHandler = globalThis.Object.getOwnPropertyDescriptor(data, '_handler_')?.value;
             assert(dataHandler, 'DataHandler is not found');
             this.addObserver(dataHandler);
             dataHandler.addObserver(this);
+
+            // set data
+            this.data = dataHandler.getTarget();
         }
 
         /**
          * return data
          */
-        getData(): DataProxy {
+        getData(): V {
             return this.data;
         }
 

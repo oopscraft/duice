@@ -3,7 +3,7 @@ namespace duice {
     /**
      * object proxy class
      */
-    export class ObjectProxy implements DataProxy {
+    export class ObjectProxy /*implements DataProxy*/ {
 
         /**
          * constructor
@@ -45,8 +45,8 @@ namespace duice {
             }
 
             // creates proxy
-            let objectProxy = new Proxy<ObjectProxy>(object, objectHandler);
-            objectHandler.setTarget(objectProxy);
+            let objectProxy = new Proxy<object>(object, objectHandler);
+            objectHandler.setTarget(object);
 
             // set property
             ObjectProxy.setHandler(objectProxy, objectHandler);

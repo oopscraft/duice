@@ -3,7 +3,7 @@ namespace duice {
     /**
      * array proxy class
      */
-    export class ArrayProxy implements DataProxy {
+    export class ArrayProxy /*implements DataProxy*/ {
 
         /**
          * constructor
@@ -24,7 +24,7 @@ namespace duice {
 
             // create proxy
             let arrayProxy = new Proxy<object[]>(array, arrayHandler);
-            arrayHandler.setTarget(arrayProxy);
+            arrayHandler.setTarget(array);
 
             // set property
             ArrayProxy.setHandler(arrayProxy, arrayHandler);
@@ -248,55 +248,6 @@ namespace duice {
                  ObjectProxy.setReadonlyAll(this[index], readonly);
             }
         }
-
-        // /**
-        //  * insertRow
-        //  * @param index
-        //  * @param rows
-        //  */
-        // async insertRow(index: number, ...rows: object[]): Promise<void> {
-        //     let arrayHandler = ArrayProxy.getHandler(this);
-        //     let proxyTarget = ArrayProxy.getTarget(this);
-        //     rows.forEach((object, index) => {
-        //         rows[index] = new ObjectProxy(object);
-        //     });
-        //     let event = new duice.event.RowInsertEvent(this, index, rows);
-        //     if (await arrayHandler.checkListener(arrayHandler.rowInsertingListener, event)) {
-        //         proxyTarget.splice(index, 0, ...rows);
-        //         await arrayHandler.checkListener(arrayHandler.rowInsertedListener, event);
-        //         arrayHandler.notifyObservers(event);
-        //     }
-        // }
-        //
-        // /**
-        //  * deleteRow
-        //  * @param index
-        //  * @param size
-        //  */
-        // async deleteRow(index: number, size?: number): Promise<void> {
-        //     let arrayHandler = ArrayProxy.getHandler(this);
-        //     let proxyTarget = ArrayProxy.getTarget(this);
-        //     let sliceBegin = index;
-        //     let sliceEnd = (size ? index + size : index + 1);
-        //     let rows = proxyTarget.slice(sliceBegin, sliceEnd);
-        //     let event = new duice.event.RowDeleteEvent(this, index, rows);
-        //     if (await arrayHandler.checkListener(arrayHandler.rowDeletingListener, event)) {
-        //         let spliceStart = index;
-        //         let spliceDeleteCount = (size ? size : 1);
-        //         proxyTarget.splice(spliceStart, spliceDeleteCount);
-        //         await arrayHandler.checkListener(arrayHandler.rowDeletedListener, event);
-        //         arrayHandler.notifyObservers(event);
-        //     }
-        // }
-        //
-        // /**
-        //  * appendRow
-        //  * @param rows
-        //  */
-        // async appendRow(...rows: object[]): Promise<void> {
-        //     let index = this.length;
-        //     return this.insertRow(index, ...rows);
-        // }
 
     }
 

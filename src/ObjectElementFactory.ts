@@ -4,7 +4,7 @@ namespace duice {
     /**
      * object element factory class
      */
-    export class ObjectElementFactory<T extends HTMLElement> extends DataElementFactory<T> {
+    export class ObjectElementFactory<T extends HTMLElement> extends DataElementFactory<T, object> {
 
         static defaultInstance = new ObjectElementFactory();
 

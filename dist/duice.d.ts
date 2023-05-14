@@ -34,10 +34,10 @@ declare namespace duice {
     /**
      * element abstract class
      */
-    abstract class DataElement<T extends HTMLElement> extends Observable implements Observer {
+    abstract class DataElement<T extends HTMLElement, V> extends Observable implements Observer {
         htmlElement: T;
         context: object;
-        data: DataProxy;
+        data: V;
         /**
          * constructor
          * @param htmlElement
@@ -61,7 +61,7 @@ declare namespace duice {
         /**
          * return data
          */
-        getData(): DataProxy;
+        getData(): V;
         /**
          * execute script if exists
          * @param htmlElement
@@ -84,7 +84,7 @@ declare namespace duice {
     /**
      * array element class
      */
-    class ArrayElement<T extends HTMLElement> extends DataElement<T> {
+    class ArrayElement<T extends HTMLElement> extends DataElement<T, object[]> {
         slot: HTMLSlotElement;
         loop: string;
         hierarchy: string;
@@ -132,7 +132,7 @@ declare namespace duice {
     /**
      * element factory abstract class
      */
-    abstract class DataElementFactory<T extends HTMLElement> {
+    abstract class DataElementFactory<T extends HTMLElement, V> {
         /**
          * check support
          * @param element
@@ -143,14 +143,14 @@ declare namespace duice {
          * @param htmlElement
          * @param context
          */
-        abstract createElement(htmlElement: T, context: object): DataElement<HTMLElement>;
+        abstract createElement(htmlElement: T, context: object): DataElement<HTMLElement, V>;
     }
 }
 declare namespace duice {
     /**
      * array element factory class
      */
-    class ArrayElementFactory<T extends HTMLElement> extends DataElementFactory<HTMLElement> {
+    class ArrayElementFactory<T extends HTMLElement> extends DataElementFactory<HTMLElement, object[]> {
         static defaultInstance: ArrayElementFactory<HTMLElement>;
         static instances: ArrayElementFactory<HTMLElement>[];
         /**
@@ -353,7 +353,7 @@ declare namespace duice {
     /**
      * custom element
      */
-    abstract class CustomElement extends DataElement<HTMLElement> {
+    abstract class CustomElement<V> extends DataElement<HTMLElement, V> {
         /**
          * constructor
          * @param htmlElement
@@ -378,12 +378,12 @@ declare namespace duice {
          * do render template method
          * @param data
          */
-        abstract doRender(data: DataProxy): HTMLElement;
+        abstract doRender(data: V): HTMLElement;
         /**
          * setting style
          * @param data
          */
-        doStyle(data: DataProxy): string;
+        doStyle(data: V): string;
         /**
          * create element
          * @param templateLiteral
@@ -401,20 +401,20 @@ declare namespace duice {
     /**
      * custom component factory
      */
-    class CustomElementFactory extends DataElementFactory<HTMLElement> {
-        static instances: CustomElementFactory[];
+    class CustomElementFactory<V> extends DataElementFactory<HTMLElement, V> {
+        static instances: CustomElementFactory<any>[];
         tagName: string;
         elementType: Function;
         /**
          * adds factory instance
          * @param elementFactory
          */
-        static addInstance(elementFactory: CustomElementFactory): void;
+        static addInstance(elementFactory: CustomElementFactory<any>): void;
         /**
          * returns factory instance to be supported
          * @param htmlElement
          */
-        static getInstance(htmlElement: HTMLElement): CustomElementFactory;
+        static getInstance(htmlElement: HTMLElement): CustomElementFactory<any>;
         /**
          * constructor
          * @param tagName
@@ -426,7 +426,7 @@ declare namespace duice {
          * @param htmlElement
          * @param context
          */
-        createElement(htmlElement: HTMLElement, context: object): CustomElement;
+        createElement(htmlElement: HTMLElement, context: object): CustomElement<any>;
         /**
          * checks supported elements
          * @param htmlElement
@@ -447,7 +447,7 @@ declare namespace duice {
     /**
      * object element class
      */
-    class ObjectElement<T extends HTMLElement> extends DataElement<T> {
+    class ObjectElement<T extends HTMLElement> extends DataElement<T, object> {
         property: string;
         format: format.Format;
         /**
@@ -517,7 +517,7 @@ declare namespace duice {
     /**
      * object element factory class
      */
-    class ObjectElementFactory<T extends HTMLElement> extends DataElementFactory<T> {
+    class ObjectElementFactory<T extends HTMLElement> extends DataElementFactory<T, object> {
         static defaultInstance: ObjectElementFactory<HTMLElement>;
         static instances: ObjectElementFactory<HTMLElement>[];
         /**
@@ -1046,7 +1046,7 @@ declare namespace duice.component {
     }
 }
 declare namespace duice.component {
-    class Pagination extends duice.CustomElement {
+    class Pagination extends duice.CustomElement<object> {
         doRender(object: ObjectProxy): HTMLElement;
         doStyle(object: ObjectProxy): string;
     }
@@ -1296,7 +1296,7 @@ declare namespace duice {
     /**
      * object proxy class
      */
-    class ObjectProxy implements DataProxy {
+    class ObjectProxy {
         /**
          * constructor
          */
@@ -1387,7 +1387,7 @@ declare namespace duice {
     /**
      * array proxy class
      */
-    class ArrayProxy implements DataProxy {
+    class ArrayProxy {
         /**
          * constructor
          */
@@ -1490,13 +1490,6 @@ declare namespace duice {
          * @param readonly
          */
         static setReadonlyAll(arrayProxy: object[], readonly: boolean): void;
-    }
-}
-declare namespace duice {
-    /**
-     * data interface (object,array)
-     */
-    interface DataProxy {
     }
 }
 declare namespace duice.component {

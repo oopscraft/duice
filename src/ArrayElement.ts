@@ -4,7 +4,7 @@ namespace duice {
     /**
      * array element class
      */
-    export class ArrayElement<T extends HTMLElement> extends DataElement<T> {
+    export class ArrayElement<T extends HTMLElement> extends DataElement<T, object[]> {
 
         slot: HTMLSlotElement = document.createElement('slot');
 
