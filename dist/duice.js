@@ -3122,7 +3122,6 @@ var duice;
          * constructor
          */
         constructor(array) {
-            //super();
             // array handler
             let arrayHandler = new duice.ArrayHandler();
             // copy array elements

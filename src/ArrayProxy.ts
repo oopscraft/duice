@@ -9,7 +9,6 @@ namespace duice {
          * constructor
          */
         constructor(array: object[]) {
-            //super();
 
             // array handler
             let arrayHandler = new ArrayHandler();
