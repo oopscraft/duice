@@ -1154,6 +1154,11 @@ declare namespace duice.component {
          * @param readonly
          */
         setReadonly(readonly: boolean): void;
+        /**
+         * set disable
+         * @param disable
+         */
+        setDisable(disable: boolean): void;
     }
 }
 declare namespace duice.component {
@@ -1598,6 +1603,11 @@ declare namespace duice.component {
          * @param readonly
          */
         setReadonly(readonly: boolean): void;
+        /**
+         * set disable
+         * @param disable
+         */
+        setDisable(disable: boolean): void;
     }
 }
 declare namespace duice.component {

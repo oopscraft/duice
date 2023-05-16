@@ -207,6 +207,14 @@ namespace duice.component {
             this.getHtmlElement().style.pointerEvents = (readonly ? 'none' : 'unset');
         }
 
+        /**
+         * set disable
+         * @param disable
+         */
+        override setDisable(disable: boolean): void {
+            this.getHtmlElement().style.pointerEvents = (disable ? 'none' : 'unset');
+        }
+
     }
 
 }

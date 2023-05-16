@@ -2553,6 +2553,18 @@ var duice;
                     this.getHtmlElement().removeAttribute('readonly');
                 }
             }
+            /**
+             * set disable
+             * @param disable
+             */
+            setDisable(disable) {
+                if (disable) {
+                    this.getHtmlElement().setAttribute('disabled', 'disabled');
+                }
+                else {
+                    this.getHtmlElement().removeAttribute('disabled');
+                }
+            }
         }
         component.TextareaElement = TextareaElement;
     })(component = duice.component || (duice.component = {}));
@@ -3608,6 +3620,13 @@ var duice;
              */
             setReadonly(readonly) {
                 this.getHtmlElement().style.pointerEvents = (readonly ? 'none' : 'unset');
+            }
+            /**
+             * set disable
+             * @param disable
+             */
+            setDisable(disable) {
+                this.getHtmlElement().style.pointerEvents = (disable ? 'none' : 'unset');
             }
         }
         component.ImgElement = ImgElement;
