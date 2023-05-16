@@ -59,6 +59,18 @@ namespace duice.component {
             }
         }
 
+        /**
+         * set disable
+         * @param disable
+         */
+        override setDisable(disable: boolean): void {
+            if(disable) {
+                this.getHtmlElement().setAttribute('disabled', 'disabled');
+            }else{
+                this.getHtmlElement().removeAttribute('disabled');
+            }
+        }
+
     }
 
 }

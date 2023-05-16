@@ -255,11 +255,36 @@ namespace duice {
          * @param readonly
          */
         static setReadonlyAll(objectProxy: object, readonly: boolean): void {
-            let objectHandler = this.getHandler(objectProxy);
-            objectHandler.setReadonlyAll(readonly);
-            for(let property in this) {
-                objectHandler.setReadonly(property, readonly);
-            }
+            this.getHandler(objectProxy).setReadonlyAll(readonly);
+
+        }
+
+        /**
+         * setDisable
+         * @param objectProxy
+         * @param property
+         * @param disable
+         */
+        static setDisable(objectProxy: object, property: string, disable: boolean): void {
+            this.getHandler(objectProxy).setDisable(property, disable);
+        }
+
+        /**
+         * isDisable
+         * @param objectProxy
+         * @param property
+         */
+        static isDisable(objectProxy: object, property: string): boolean {
+            return this.getHandler(objectProxy).isDisable(property);
+        }
+
+        /**
+         * setDisableAll
+         * @param objectProxy
+         * @param disable
+         */
+        static setDisableAll(objectProxy: object, disable: boolean): void {
+            this.getHandler(objectProxy).setDisableAll(disable);
         }
 
         /**

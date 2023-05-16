@@ -202,6 +202,8 @@ declare namespace duice {
         target: T;
         readonlyAll: boolean;
         readonly: Set<string>;
+        disableAll: boolean;
+        disable: Set<string>;
         listenerEnabled: boolean;
         /**
          * constructor
@@ -239,6 +241,22 @@ declare namespace duice {
          * @param property
          */
         isReadonly(property: string): boolean;
+        /**
+         * set disable all
+         * @param disable
+         */
+        setDisableAll(disable: boolean): void;
+        /**
+         * set disable
+         * @param property
+         * @param disable
+         */
+        setDisable(property: string, disable: boolean): void;
+        /**
+         * returns property is disabled
+         * @param property
+         */
+        isDisable(property: string): boolean;
         /**
          * suspends listener
          */
@@ -503,6 +521,11 @@ declare namespace duice {
          * @param readonly
          */
         setReadonly(readonly: boolean): void;
+        /**
+         * set disable
+         * @param disable
+         */
+        setDisable(disable: boolean): void;
         /**
          * return index
          */
@@ -925,6 +948,11 @@ declare namespace duice.component {
          */
         setReadonly(readonly: boolean): void;
         /**
+         * set disable
+         * @param disable
+         */
+        setDisable(disable: boolean): void;
+        /**
          * focus
          */
         focus(): boolean;
@@ -1076,6 +1104,11 @@ declare namespace duice.component {
          * @param readonly
          */
         setReadonly(readonly: boolean): void;
+        /**
+         * set disable
+         * @param disable
+         */
+        setDisable(disable: boolean): void;
     }
 }
 declare namespace duice.component {
@@ -1375,6 +1408,25 @@ declare namespace duice {
          * @param readonly
          */
         static setReadonlyAll(objectProxy: object, readonly: boolean): void;
+        /**
+         * setDisable
+         * @param objectProxy
+         * @param property
+         * @param disable
+         */
+        static setDisable(objectProxy: object, property: string, disable: boolean): void;
+        /**
+         * isDisable
+         * @param objectProxy
+         * @param property
+         */
+        static isDisable(objectProxy: object, property: string): boolean;
+        /**
+         * setDisableAll
+         * @param objectProxy
+         * @param disable
+         */
+        static setDisableAll(objectProxy: object, disable: boolean): void;
         /**
          * focus
          * @param objectProxy

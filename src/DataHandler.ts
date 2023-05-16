@@ -13,6 +13,10 @@ namespace duice {
 
         readonly: Set<string> = new Set<string>();
 
+        disableAll: boolean = false;
+
+        disable: Set<string> = new Set<string>();
+
         listenerEnabled: boolean = true;
 
         /**
@@ -78,6 +82,41 @@ namespace duice {
         isReadonly(property: string): boolean {
             return this.readonlyAll || this.readonly.has(property);
         }
+
+        /**
+         * set disable all
+         * @param disable
+         */
+        setDisableAll(disable: boolean): void {
+            this.disableAll = disable;
+            if(disable === false) {
+                this.disable.clear();
+            }
+            this.notifyObservers(new event.Event(this));
+        }
+
+        /**
+         * set disable
+         * @param property
+         * @param disable
+         */
+        setDisable(property: string, disable: boolean): void {
+            if(disable) {
+                this.disable.add(property);
+            }else{
+                this.disable.delete(property);
+            }
+            this.notifyObservers(new event.Event(this));
+        }
+
+        /**
+         * returns property is disabled
+         * @param property
+         */
+        isDisable(property: string): boolean {
+            return this.disableAll || this.disable.has(property);
+        }
+
         /**
          * suspends listener
          */

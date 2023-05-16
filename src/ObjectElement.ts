@@ -96,6 +96,9 @@ namespace duice {
 
                     // set readonly
                     this.setReadonly(observable.isReadonly(this.property));
+
+                    // set disable
+                    this.setDisable(observable.isDisable(this.property));
                 }
 
                 // executes script
@@ -126,6 +129,14 @@ namespace duice {
          * @param readonly
          */
         setReadonly(readonly: boolean): void {
+            // no-op
+        }
+
+        /**
+         * set disable
+         * @param disable
+         */
+        setDisable(disable: boolean): void {
             // no-op
         }
 
