@@ -3,7 +3,7 @@ namespace duice {
     /**
      * array proxy class
      */
-    export class ArrayProxy /*implements DataProxy*/ {
+    export class ArrayProxy {
 
         /**
          * constructor

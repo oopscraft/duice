@@ -142,6 +142,9 @@
             border: solid 1px gray;
             padding: 0.5rem;
         }
+        .selected {
+            background-color: #efefef;
+        }
     </style>
 </head>
 <body>
@@ -177,7 +180,7 @@
         <!-- simple table -->
         <h3>
             Simple Table
-            <small>&lt;tr data-duice-array="myArray" data-duice-loop="myObject,status"&gt;</small>
+            <small>&lt;tr data-duice-array="myArray" data-duice-loop="myObject,status" data-duice-toggle-class="selected"&gt;</small>
         </h3>
         <table>
             <tr>
@@ -194,7 +197,7 @@
                 <th>address.city</th>
                 <th>items[]</th>
             </tr>
-            <tr data-duice-array="myArray" data-duice-loop="myObject,status">
+            <tr data-duice-array="myArray" data-duice-loop="myObject,status" data-duice-toggle-class="selected">
                 <td data-duice-object="status" data-duice-property="index"></td>
                 <td data-duice-object="status" data-duice-property="count"></td>
                 <td data-duice-object="myObject" data-duice-property="name"></td>
@@ -230,7 +233,7 @@
         <!-- start of editable table -->
         <h3>
             Complex Table
-            <small>&lt;tr data-duice-array="myArray" data-duice-loop="item,status"&gt;</small>
+            <small>&lt;tr data-duice-array="myArray" data-duice-loop="item,status" data-duice-toggle-class="selected" data-duice-editable="true" &gt;</small>
         </h3>
         <table>
             <thead>
@@ -251,7 +254,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr data-duice-array="myArray" data-duice-loop="myObject,status" data-duice-editable="true">
+            <tr data-duice-array="myArray" data-duice-loop="myObject,status" data-duice-toggle-class="selected" data-duice-editable="true" >
                 <td><span data-duice-object="status" data-duice-property="index"></span></td>
                 <td><span data-duice-object="status" data-duice-property="count"></span></td>
                 <td><input data-duice-object="myObject" data-duice-property="name"/></td>
@@ -318,11 +321,11 @@
         <!-- start of hierarchy -->
         <h3>
             Hierarchy Tree
-            <small>&lt;tr data-duice-array="myArray" data-duice-loop="item,status" data-duice-hierarchy="id,parentId"&gt;</small>
+            <small>&lt;tr data-duice-array="myArray" data-duice-loop="item,status" data-duice-toggle-class="selected" data-duice-hierarchy="id,parentId"&gt;</small>
         </h3>
         <div>
-            <div data-duice-array="myArray" data-duice-loop="item,status" data-duice-hierarchy="id,parentId" style="border:solid 1px #ccc; margin-left:1rem;">
-                <span data-duice-object="item" data-duice-property="name"></span>
+            <div data-duice-array="myArray" data-duice-loop="item,status" data-duice-toggle-class="selected" data-duice-hierarchy="id,parentId" style="border:solid 1px #ccc; margin-left:1rem;">
+                <span data-duice-object="item" data-duice-property="name" tabIndex="0"></span>
             </div>
         </div>
         <!-- end of hierarchy -->

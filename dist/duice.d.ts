@@ -89,6 +89,7 @@ declare namespace duice {
         loop: string;
         hierarchy: string;
         editable: boolean;
+        toggleClass: string;
         rowHtmlElements: HTMLElement[];
         /**
          * constructor
@@ -111,6 +112,11 @@ declare namespace duice {
          * @param editable
          */
         setEditable(editable: boolean): void;
+        /**
+         * set toggle class
+         * @param toggleClass
+         */
+        setToggleClass(toggleClass: string): void;
         /**
          * set hierarchy
          * @param hierarchy
@@ -365,6 +371,115 @@ declare namespace duice {
          * @param rows
          */
         appendRow(arrayProxy: object[], ...rows: object[]): Promise<void>;
+    }
+}
+declare namespace duice {
+    /**
+     * array proxy class
+     */
+    class ArrayProxy {
+        /**
+         * constructor
+         */
+        constructor(array: object[]);
+        /**
+         * clear
+         * @param arrayProxy
+         */
+        static clear(arrayProxy: object[]): void;
+        /**
+         * assign
+         * @param arrayProxy
+         * @param array
+         */
+        static assign(arrayProxy: object[], array: object[]): void;
+        /**
+         * setTarget
+         * @param arrayProxy
+         * @param target
+         */
+        static setTarget(arrayProxy: object[], target: object[]): void;
+        /**
+         * getTarget
+         * @param arrayProxy
+         */
+        static getTarget(arrayProxy: object[]): any;
+        /**
+         * setHandler
+         * @param arrayProxy
+         * @param arrayHandler
+         */
+        static setHandler(arrayProxy: object[], arrayHandler: ArrayHandler): void;
+        /**
+         * getHandler
+         * @param arrayProxy
+         */
+        static getHandler(arrayProxy: object[]): ArrayHandler;
+        /**
+         * save
+         * @param arrayProxy
+         */
+        static save(arrayProxy: object[]): void;
+        /**
+         * reset
+         * @param arrayProxy
+         */
+        static reset(arrayProxy: object[]): void;
+        /**
+         * onPropertyChanging
+         * @param arrayProxy
+         * @param listener
+         */
+        static onPropertyChanging(arrayProxy: object[], listener: Function): void;
+        /**
+         * onPropertyChanged
+         * @param arrayProxy
+         * @param listener
+         */
+        static onPropertyChanged(arrayProxy: object[], listener: Function): void;
+        /**
+         * onRowInserting
+         * @param arrayProxy
+         * @param listener
+         */
+        static onRowInserting(arrayProxy: object[], listener: Function): void;
+        /**
+         * onRowInserted
+         * @param arrayProxy
+         * @param listener
+         */
+        static onRowInserted(arrayProxy: object[], listener: Function): void;
+        /**
+         * onRowDeleting
+         * @param arrayProxy
+         * @param listener
+         */
+        static onRowDeleting(arrayProxy: object[], listener: Function): void;
+        /**
+         * onRowDeleted
+         * @param arrayProxy
+         * @param listener
+         */
+        static onRowDeleted(arrayProxy: object[], listener: Function): void;
+        /**
+         * setReadonly
+         * @param arrayProxy
+         * @param property
+         * @param readonly
+         */
+        static setReadonly(arrayProxy: object[], property: string, readonly: boolean): void;
+        /**
+         * isReadonly
+         * @param arrayProxy
+         * @param property
+         */
+        static isReadonly(arrayProxy: object[], property: string): boolean;
+        /**
+         * setReadonlyAll
+         * @param arrayProxy
+         * @param readonly
+         */
+        static setReadonlyAll(arrayProxy: object[], readonly: boolean): void;
     }
 }
 declare namespace duice {
@@ -658,6 +773,116 @@ declare namespace duice {
 }
 declare namespace duice {
     /**
+     * object proxy class
+     */
+    class ObjectProxy {
+        /**
+         * constructor
+         */
+        constructor(object: object);
+        /**
+         * clear
+         * @param objectProxy
+         */
+        static clear(objectProxy: object): void;
+        /**
+         * assign
+         * @param objectProxy
+         * @param object
+         */
+        static assign(objectProxy: object, object: object): void;
+        /**
+         * setTarget
+         * @param objectProxy
+         * @param target
+         */
+        static setTarget(objectProxy: object, target: object): void;
+        /**
+         * getTarget
+         * @param objectProxy
+         */
+        static getTarget(objectProxy: object): any;
+        /**
+         * setHandler
+         * @param objectProxy
+         * @param objectHandler
+         */
+        static setHandler(objectProxy: object, objectHandler: ObjectHandler): void;
+        /**
+         * getHandler
+         * @param objectProxy
+         */
+        static getHandler(objectProxy: object): ObjectHandler;
+        /**
+         * save
+         * @param objectProxy
+         */
+        static save(objectProxy: object): void;
+        /**
+         * reset
+         * @param objectProxy
+         */
+        static reset(objectProxy: object): void;
+        /**
+         * onPropertyChanging
+         * @param objectProxy
+         * @param listener
+         */
+        static onPropertyChanging(objectProxy: object, listener: Function): void;
+        /**
+         * onPropertyChanged
+         * @param objectProxy
+         * @param listener
+         */
+        static onPropertyChanged(objectProxy: object, listener: Function): void;
+        /**
+         * setReadonly
+         * @param objectProxy
+         * @param property
+         * @param readonly
+         */
+        static setReadonly(objectProxy: object, property: string, readonly: boolean): void;
+        /**
+         * isReadonly
+         * @param objectProxy
+         * @param property
+         */
+        static isReadonly(objectProxy: object, property: string): boolean;
+        /**
+         * setReadonlyAll
+         * @param objectProxy
+         * @param readonly
+         */
+        static setReadonlyAll(objectProxy: object, readonly: boolean): void;
+        /**
+         * setDisable
+         * @param objectProxy
+         * @param property
+         * @param disable
+         */
+        static setDisable(objectProxy: object, property: string, disable: boolean): void;
+        /**
+         * isDisable
+         * @param objectProxy
+         * @param property
+         */
+        static isDisable(objectProxy: object, property: string): boolean;
+        /**
+         * setDisableAll
+         * @param objectProxy
+         * @param disable
+         */
+        static setDisableAll(objectProxy: object, disable: boolean): void;
+        /**
+         * focus
+         * @param objectProxy
+         * @param property
+         */
+        static focus(objectProxy: object, property: string): void;
+    }
+}
+declare namespace duice {
+    /**
      * sets namespace
      * @param value
      */
@@ -906,6 +1131,67 @@ declare namespace duice.dialog {
 }
 declare namespace duice.component {
     /**
+     * image element component
+     */
+    class ImgElement extends ObjectElement<HTMLImageElement> {
+        originSrc: string;
+        editable: boolean;
+        width: number;
+        height: number;
+        clearButton: HTMLImageElement;
+        closeButtonImg: string;
+        /**
+         * constructor
+         * @param element
+         * @param context
+         */
+        constructor(element: HTMLImageElement, context: object);
+        /**
+         * show clear image button
+         */
+        showClearImageButton(): void;
+        /**
+         * hide clear image button
+         */
+        hideClearImageButton(): void;
+        /**
+         * clear image
+         */
+        clearImage(): void;
+        /**
+         * open image
+         */
+        changeImage(): void;
+        /**
+         * convert image
+         * @param dataUrl
+         * @param width
+         * @param height
+         */
+        convertImage(dataUrl: any, width?: number, height?: number): Promise<unknown>;
+        /**
+         * set value
+         * @param value
+         */
+        setValue(value: any): void;
+        /**
+         * return value
+         */
+        getValue(): any;
+        /**
+         * set readonly
+         * @param readonly
+         */
+        setReadonly(readonly: boolean): void;
+        /**
+         * set disable
+         * @param disable
+         */
+        setDisable(disable: boolean): void;
+    }
+}
+declare namespace duice.component {
+    /**
      * image element factory class
      */
     class ImgElementFactory extends ObjectElementFactory<HTMLImageElement> {
@@ -987,24 +1273,6 @@ declare namespace duice.component {
         setReadonly(readonly: boolean): void;
     }
 }
-declare namespace duice.component {
-    /**
-     * input element factory class
-     */
-    class InputElementFactory extends ObjectElementFactory<HTMLInputElement> {
-        /**
-         * creates component
-         * @param element
-         * @param context
-         */
-        doCreateElement(element: HTMLInputElement, context: object): InputElement;
-        /**
-         * check supported
-         * @param element
-         */
-        doSupport(element: HTMLElement): boolean;
-    }
-}
 declare namespace duice.format {
     /**
      * NumberFormat
@@ -1027,6 +1295,47 @@ declare namespace duice.format {
          * @param string
          */
         parse(string: string): number;
+    }
+}
+declare namespace duice.component {
+    /**
+     * input datetime-local element component
+     */
+    class InputDatetimeLocalElement extends InputElement {
+        dateFormat: duice.format.DateFormat;
+        /**
+         * constructor
+         * @param element
+         * @param context
+         */
+        constructor(element: HTMLInputElement, context: object);
+        /**
+         * set value
+         * @param value
+         */
+        setValue(value: string): void;
+        /**
+         * return value
+         */
+        getValue(): any;
+    }
+}
+declare namespace duice.component {
+    /**
+     * input element factory class
+     */
+    class InputElementFactory extends ObjectElementFactory<HTMLInputElement> {
+        /**
+         * creates component
+         * @param element
+         * @param context
+         */
+        doCreateElement(element: HTMLInputElement, context: object): InputElement;
+        /**
+         * check supported
+         * @param element
+         */
+        doSupport(element: HTMLElement): boolean;
     }
 }
 declare namespace duice.component {
@@ -1328,308 +1637,5 @@ declare namespace duice.tab {
         items: TabItem[];
         addItem(item: TabItem): void;
         setActive(index: number): void;
-    }
-}
-declare namespace duice {
-    /**
-     * object proxy class
-     */
-    class ObjectProxy {
-        /**
-         * constructor
-         */
-        constructor(object: object);
-        /**
-         * clear
-         * @param objectProxy
-         */
-        static clear(objectProxy: object): void;
-        /**
-         * assign
-         * @param objectProxy
-         * @param object
-         */
-        static assign(objectProxy: object, object: object): void;
-        /**
-         * setTarget
-         * @param objectProxy
-         * @param target
-         */
-        static setTarget(objectProxy: object, target: object): void;
-        /**
-         * getTarget
-         * @param objectProxy
-         */
-        static getTarget(objectProxy: object): any;
-        /**
-         * setHandler
-         * @param objectProxy
-         * @param objectHandler
-         */
-        static setHandler(objectProxy: object, objectHandler: ObjectHandler): void;
-        /**
-         * getHandler
-         * @param objectProxy
-         */
-        static getHandler(objectProxy: object): ObjectHandler;
-        /**
-         * save
-         * @param objectProxy
-         */
-        static save(objectProxy: object): void;
-        /**
-         * reset
-         * @param objectProxy
-         */
-        static reset(objectProxy: object): void;
-        /**
-         * onPropertyChanging
-         * @param objectProxy
-         * @param listener
-         */
-        static onPropertyChanging(objectProxy: object, listener: Function): void;
-        /**
-         * onPropertyChanged
-         * @param objectProxy
-         * @param listener
-         */
-        static onPropertyChanged(objectProxy: object, listener: Function): void;
-        /**
-         * setReadonly
-         * @param objectProxy
-         * @param property
-         * @param readonly
-         */
-        static setReadonly(objectProxy: object, property: string, readonly: boolean): void;
-        /**
-         * isReadonly
-         * @param objectProxy
-         * @param property
-         */
-        static isReadonly(objectProxy: object, property: string): boolean;
-        /**
-         * setReadonlyAll
-         * @param objectProxy
-         * @param readonly
-         */
-        static setReadonlyAll(objectProxy: object, readonly: boolean): void;
-        /**
-         * setDisable
-         * @param objectProxy
-         * @param property
-         * @param disable
-         */
-        static setDisable(objectProxy: object, property: string, disable: boolean): void;
-        /**
-         * isDisable
-         * @param objectProxy
-         * @param property
-         */
-        static isDisable(objectProxy: object, property: string): boolean;
-        /**
-         * setDisableAll
-         * @param objectProxy
-         * @param disable
-         */
-        static setDisableAll(objectProxy: object, disable: boolean): void;
-        /**
-         * focus
-         * @param objectProxy
-         * @param property
-         */
-        static focus(objectProxy: object, property: string): void;
-    }
-}
-declare namespace duice {
-    /**
-     * array proxy class
-     */
-    class ArrayProxy {
-        /**
-         * constructor
-         */
-        constructor(array: object[]);
-        /**
-         * clear
-         * @param arrayProxy
-         */
-        static clear(arrayProxy: object[]): void;
-        /**
-         * assign
-         * @param arrayProxy
-         * @param array
-         */
-        static assign(arrayProxy: object[], array: object[]): void;
-        /**
-         * setTarget
-         * @param arrayProxy
-         * @param target
-         */
-        static setTarget(arrayProxy: object[], target: object[]): void;
-        /**
-         * getTarget
-         * @param arrayProxy
-         */
-        static getTarget(arrayProxy: object[]): any;
-        /**
-         * setHandler
-         * @param arrayProxy
-         * @param arrayHandler
-         */
-        static setHandler(arrayProxy: object[], arrayHandler: ArrayHandler): void;
-        /**
-         * getHandler
-         * @param arrayProxy
-         */
-        static getHandler(arrayProxy: object[]): ArrayHandler;
-        /**
-         * save
-         * @param arrayProxy
-         */
-        static save(arrayProxy: object[]): void;
-        /**
-         * reset
-         * @param arrayProxy
-         */
-        static reset(arrayProxy: object[]): void;
-        /**
-         * onPropertyChanging
-         * @param arrayProxy
-         * @param listener
-         */
-        static onPropertyChanging(arrayProxy: object[], listener: Function): void;
-        /**
-         * onPropertyChanged
-         * @param arrayProxy
-         * @param listener
-         */
-        static onPropertyChanged(arrayProxy: object[], listener: Function): void;
-        /**
-         * onRowInserting
-         * @param arrayProxy
-         * @param listener
-         */
-        static onRowInserting(arrayProxy: object[], listener: Function): void;
-        /**
-         * onRowInserted
-         * @param arrayProxy
-         * @param listener
-         */
-        static onRowInserted(arrayProxy: object[], listener: Function): void;
-        /**
-         * onRowDeleting
-         * @param arrayProxy
-         * @param listener
-         */
-        static onRowDeleting(arrayProxy: object[], listener: Function): void;
-        /**
-         * onRowDeleted
-         * @param arrayProxy
-         * @param listener
-         */
-        static onRowDeleted(arrayProxy: object[], listener: Function): void;
-        /**
-         * setReadonly
-         * @param arrayProxy
-         * @param property
-         * @param readonly
-         */
-        static setReadonly(arrayProxy: object[], property: string, readonly: boolean): void;
-        /**
-         * isReadonly
-         * @param arrayProxy
-         * @param property
-         */
-        static isReadonly(arrayProxy: object[], property: string): boolean;
-        /**
-         * setReadonlyAll
-         * @param arrayProxy
-         * @param readonly
-         */
-        static setReadonlyAll(arrayProxy: object[], readonly: boolean): void;
-    }
-}
-declare namespace duice.component {
-    /**
-     * image element component
-     */
-    class ImgElement extends ObjectElement<HTMLImageElement> {
-        originSrc: string;
-        editable: boolean;
-        width: number;
-        height: number;
-        clearButton: HTMLImageElement;
-        closeButtonImg: string;
-        /**
-         * constructor
-         * @param element
-         * @param context
-         */
-        constructor(element: HTMLImageElement, context: object);
-        /**
-         * show clear image button
-         */
-        showClearImageButton(): void;
-        /**
-         * hide clear image button
-         */
-        hideClearImageButton(): void;
-        /**
-         * clear image
-         */
-        clearImage(): void;
-        /**
-         * open image
-         */
-        changeImage(): void;
-        /**
-         * convert image
-         * @param dataUrl
-         * @param width
-         * @param height
-         */
-        convertImage(dataUrl: any, width?: number, height?: number): Promise<unknown>;
-        /**
-         * set value
-         * @param value
-         */
-        setValue(value: any): void;
-        /**
-         * return value
-         */
-        getValue(): any;
-        /**
-         * set readonly
-         * @param readonly
-         */
-        setReadonly(readonly: boolean): void;
-        /**
-         * set disable
-         * @param disable
-         */
-        setDisable(disable: boolean): void;
-    }
-}
-declare namespace duice.component {
-    /**
-     * input datetime-local element component
-     */
-    class InputDatetimeLocalElement extends InputElement {
-        dateFormat: duice.format.DateFormat;
-        /**
-         * constructor
-         * @param element
-         * @param context
-         */
-        constructor(element: HTMLInputElement, context: object);
-        /**
-         * set value
-         * @param value
-         */
-        setValue(value: string): void;
-        /**
-         * return value
-         */
-        getValue(): any;
     }
 }

@@ -85,6 +85,12 @@ namespace duice {
                 component.setEditable(editable.toLowerCase() === 'true');
             }
 
+            // toggle class
+            let toggleClass = getElementAttribute(htmlElement, 'toggle-class');
+            if(toggleClass) {
+                component.setToggleClass(toggleClass);
+            }
+
             // returns
             return component;
         }

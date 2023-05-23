@@ -14,6 +14,8 @@ namespace duice {
 
         editable: boolean = false;
 
+        toggleClass: string;
+
         rowHtmlElements: HTMLElement[] = [];
 
         /**
@@ -53,6 +55,14 @@ namespace duice {
          */
         setEditable(editable: boolean): void {
             this.editable = editable;
+        }
+
+        /**
+         * set toggle class
+         * @param toggleClass
+         */
+        setToggleClass(toggleClass: string): void {
+            this.toggleClass = toggleClass;
         }
 
         /**
@@ -135,6 +145,17 @@ namespace duice {
 
                     // execute script
                     this.executeScript(rowHtmlElement, context);
+
+                    // selectable
+                    if(this.toggleClass) {
+                        rowHtmlElement.addEventListener('click', e => {
+                            this.rowHtmlElements.forEach(element => {
+                                element.classList.remove(this.toggleClass);
+                            });
+                            (e.currentTarget as HTMLElement).classList.add(this.toggleClass);
+                            e.stopPropagation();
+                        });
+                    }
                 }
 
                 // hierarchy
