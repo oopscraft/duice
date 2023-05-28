@@ -127,6 +127,13 @@ declare namespace duice {
          */
         render(): void;
         /**
+         * create row html element
+         * @param index
+         * @param object
+         * @param context
+         */
+        createRowHtmlElement(index: number, object: object, context: object): void;
+        /**
          * update
          * @param observable
          * @param event
@@ -1384,8 +1391,8 @@ declare namespace duice.component {
 }
 declare namespace duice.component {
     class Pagination extends duice.CustomElement<object> {
-        doRender(object: ObjectProxy): HTMLElement;
-        doStyle(object: ObjectProxy): string;
+        doRender(object: object): HTMLElement;
+        doStyle(object: object): string;
     }
 }
 declare namespace duice.component {
@@ -1637,5 +1644,32 @@ declare namespace duice.tab {
         items: TabItem[];
         addItem(item: TabItem): void;
         setActive(index: number): void;
+    }
+}
+declare namespace duice.component {
+    class Tree extends duice.CustomElement<object[]> {
+        idProperty: string;
+        parentIdProperty: string;
+        iconProperty: string;
+        textProperty: string;
+        onclick: string;
+        uls: HTMLUListElement[];
+        /**
+         * doReader
+         * @param array
+         */
+        doRender(array: object[]): HTMLElement;
+        /**
+         * array to tree ul
+         * @param array
+         * @param parentId
+         * @param depth
+         */
+        arrayToTreeUl(array: any, parentId: any, depth: any): HTMLUListElement;
+        /**
+         * doStyle
+         * @param array
+         */
+        doStyle(array: object[]): string;
     }
 }

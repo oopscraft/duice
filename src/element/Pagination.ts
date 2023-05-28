@@ -2,7 +2,7 @@ namespace duice.component {
 
     export class Pagination extends duice.CustomElement<object> {
 
-        override doRender(object: ObjectProxy): HTMLElement {
+        override doRender(object: object): HTMLElement {
 
             // attribute
             let pageProperty = getElementAttribute(this.getHtmlElement(), 'page-property');
@@ -77,7 +77,7 @@ namespace duice.component {
             return pagination;
         }
 
-        override doStyle(object: ObjectProxy): string {
+        override doStyle(object: object): string {
            return `
                 .${getNamespace()}-pagination {
                     list-style: none;
