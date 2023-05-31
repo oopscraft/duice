@@ -112,6 +112,10 @@ namespace duice.component {
             return ulElement;
         }
 
+        override doUpdate(data: object[]): void {
+            this.render();
+        }
+
         /**
          * doStyle
          * @param array

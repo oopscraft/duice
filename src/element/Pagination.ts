@@ -77,6 +77,10 @@ namespace duice.component {
             return pagination;
         }
 
+        override doUpdate(object: object): void {
+            this.render();
+        }
+
         override doStyle(object: object): string {
            return `
                 .${getNamespace()}-pagination {

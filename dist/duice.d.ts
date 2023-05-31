@@ -520,6 +520,17 @@ declare namespace duice {
          */
         abstract doRender(data: V): HTMLElement;
         /**
+         * update
+         * @param observable
+         * @param event
+         */
+        update(observable: Observable, event: event.Event): void;
+        /**
+         * do update template method
+         * @param data
+         */
+        abstract doUpdate(data: V): void;
+        /**
          * setting style
          * @param data
          */
@@ -529,12 +540,6 @@ declare namespace duice {
          * @param templateLiteral
          */
         createElement(templateLiteral: string): HTMLElement;
-        /**
-         * update
-         * @param observable
-         * @param event
-         */
-        update(observable: Observable, event: event.Event): void;
     }
 }
 declare namespace duice {
@@ -1392,6 +1397,7 @@ declare namespace duice.component {
 declare namespace duice.component {
     class Pagination extends duice.CustomElement<object> {
         doRender(object: object): HTMLElement;
+        doUpdate(object: object): void;
         doStyle(object: object): string;
     }
 }
@@ -1666,6 +1672,7 @@ declare namespace duice.component {
          * @param depth
          */
         arrayToTreeUl(array: any, parentId: any, depth: any): HTMLUListElement;
+        doUpdate(data: object[]): void;
         /**
          * doStyle
          * @param array

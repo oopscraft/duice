@@ -1083,6 +1083,17 @@ var duice;
             this.executeScript(this.htmlElement, context);
         }
         /**
+         * update
+         * @param observable
+         * @param event
+         */
+        update(observable, event) {
+            if (observable instanceof duice.DataHandler) {
+                //this.render();
+                this.doUpdate(observable);
+            }
+        }
+        /**
          * setting style
          * @param data
          */
@@ -1097,16 +1108,6 @@ var duice;
             let templateElement = document.createElement('template');
             templateElement.innerHTML = templateLiteral;
             return templateElement.content.firstElementChild.cloneNode(true);
-        }
-        /**
-         * update
-         * @param observable
-         * @param event
-         */
-        update(observable, event) {
-            if (observable instanceof duice.DataHandler) {
-                this.render();
-            }
         }
     }
     duice.CustomElement = CustomElement;
@@ -3129,6 +3130,9 @@ var duice;
                 // returns
                 return pagination;
             }
+            doUpdate(object) {
+                this.render();
+            }
             doStyle(object) {
                 return `
                 .${duice.getNamespace()}-pagination {
@@ -3814,6 +3818,9 @@ var duice;
                 }
                 // returns
                 return ulElement;
+            }
+            doUpdate(data) {
+                this.render();
             }
             /**
              * doStyle

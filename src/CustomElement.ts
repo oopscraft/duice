@@ -73,6 +73,24 @@ namespace duice {
         abstract doRender(data: V): HTMLElement;
 
         /**
+         * update
+         * @param observable
+         * @param event
+         */
+        override update(observable: Observable, event: event.Event): void {
+            if(observable instanceof DataHandler) {
+                //this.render();
+                this.doUpdate(observable as V);
+            }
+        }
+
+        /**
+         * do update template method
+         * @param data
+         */
+        abstract doUpdate(data: V): void;
+
+        /**
          * setting style
          * @param data
          */
@@ -88,17 +106,6 @@ namespace duice {
             let templateElement = document.createElement('template');
             templateElement.innerHTML = templateLiteral;
             return templateElement.content.firstElementChild.cloneNode(true) as HTMLElement;
-        }
-
-        /**
-         * update
-         * @param observable
-         * @param event
-         */
-        override update(observable: Observable, event: event.Event): void {
-            if(observable instanceof DataHandler) {
-                this.render();
-            }
         }
 
     }
