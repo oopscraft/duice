@@ -1,3 +1,4 @@
+///<reference path="../CustomElementFactoryRegistry.ts"/>
 namespace duice.component {
 
     export class Pagination extends duice.CustomElement<object> {
@@ -118,6 +119,6 @@ namespace duice.component {
 
     // register
     let customElementFactory = new CustomElementFactory(`${duice.getNamespace()}-pagination`, Pagination);
-    CustomElementFactory.addInstance(customElementFactory);
+    CustomElementFactoryRegistry.addInstance(customElementFactory);
 
 }

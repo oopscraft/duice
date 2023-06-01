@@ -6,37 +6,9 @@ namespace duice {
      */
     export class CustomElementFactory<V> extends DataElementFactory<HTMLElement, V> {
 
-        static instances: CustomElementFactory<any>[] = [];
-
         tagName: string;
 
         elementType: Function;
-
-        /**
-         * adds factory instance
-         * @param elementFactory
-         */
-        static addInstance(elementFactory: CustomElementFactory<any>): void {
-
-            // register custom html element
-            customElements.define(elementFactory.tagName, class extends HTMLElement {});
-
-            // register instance
-            this.instances.push(elementFactory);
-        }
-
-        /**
-         * returns factory instance to be supported
-         * @param htmlElement
-         */
-        static getInstance(htmlElement: HTMLElement): CustomElementFactory<any> {
-            for(let componentFactory of this.instances){
-                if(componentFactory.support(htmlElement)) {
-                    return componentFactory;
-                }
-            }
-            return null;
-        }
 
         /**
          * constructor
@@ -54,21 +26,54 @@ namespace duice {
          * @param htmlElement
          * @param context
          */
-        override createElement(htmlElement: HTMLElement, context: object): CustomElement<any> {
+        override createElement(htmlElement: HTMLElement, context: object): DataElement<any, any> {
 
             // creates instance
             let element =  Reflect.construct(this.elementType, [htmlElement, context]);
 
-            // set object
-            let objectName = getElementAttribute(htmlElement, 'object');
-            if (objectName) {
-                element.setObject(objectName);
-            }
+            // array element
+            if(element instanceof ArrayElement) {
 
-            // set array
-            let arrayName = getElementAttribute(htmlElement, 'array');
-            if (arrayName) {
-                element.setArray(arrayName);
+                // loop
+                let loop = getElementAttribute(htmlElement, 'loop');
+                if(loop){
+                    element.setLoop(loop);
+                }
+
+                // hierarchy
+                let hierarchy = getElementAttribute(htmlElement, 'hierarchy');
+                if(hierarchy) {
+                    element.setHierarchy(hierarchy);
+                }
+
+                // editable
+                let editable = getElementAttribute(htmlElement, 'editable');
+                if(editable){
+                    element.setEditable(editable.toLowerCase() === 'true');
+                }
+
+                // toggle class
+                let toggleClass = getElementAttribute(htmlElement, 'toggle-class');
+                if(toggleClass) {
+                    element.setToggleClass(toggleClass);
+                }
+
+            }
+            // object element
+            else if(element instanceof ObjectElement) {
+
+                // property
+                let property = getElementAttribute(htmlElement, 'property');
+                if (property) {
+                    element.setProperty(property);
+                }
+
+                // format
+                let format = getElementAttribute(htmlElement, 'format');
+                if (format) {
+                    element.setFormat(format);
+                }
+
             }
 
             // returns

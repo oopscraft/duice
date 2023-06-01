@@ -1,3 +1,4 @@
+///<reference path="../ObjectElementFactoryRegistry.ts"/>
 namespace duice.component {
 
     /**
@@ -25,6 +26,6 @@ namespace duice.component {
     }
 
     // register factory instance
-    ObjectElementFactory.addInstance(new ImgElementFactory());
+    ObjectElementFactoryRegistry.addInstance(new ImgElementFactory());
 
 }

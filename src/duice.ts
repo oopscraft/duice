@@ -23,10 +23,7 @@ namespace duice {
      * returns query selector for element scan
      */
     export function getElementQuerySelector(): string {
-        return [
-            `*[data-${getNamespace()}-object]:not([data-${getNamespace()}-id])`,
-            `*[data-${getNamespace()}-array]:not([data-${getNamespace()}-id])`,
-        ].join(',');
+        return `*[data-${getNamespace()}-bind]:not([data-${getNamespace()}-id])`;
     }
 
     /**
@@ -39,28 +36,31 @@ namespace duice {
         container.querySelectorAll(getElementQuerySelector()).forEach(htmlElement => {
             if(!hasElementAttribute(htmlElement, 'id')) {
                 try {
+                    let bindName = getElementAttribute(htmlElement, 'bind');
+                    let bindData = findVariable(context, bindName);
+
                     // custom element
-                    let customElementFactory = CustomElementFactory.getInstance(htmlElement);
+                    let customElementFactory = CustomElementFactoryRegistry.getInstance(htmlElement);
                     if(customElementFactory) {
-                        customElementFactory.createElement(htmlElement, context)?.render();
+                        customElementFactory.createElement(htmlElement, bindData)?.render();
                         return;
                     }
 
                     // array element
-                    if(hasElementAttribute(htmlElement, 'array')) {
-                        ArrayElementFactory.getInstance(htmlElement)
-                            ?.createElement(htmlElement, context)
+                    if(Array.isArray(bindData)) {
+                        ArrayElementFactoryRegistry.getInstance(htmlElement)
+                            ?.createElement(htmlElement, bindData)
+                            ?.render();
+                        return;
+                    }
+                    // object element
+                    else{
+                        ObjectElementFactoryRegistry.getInstance(htmlElement)
+                            ?.createElement(htmlElement, bindData)
                             ?.render();
                         return;
                     }
 
-                    // object element
-                    if(hasElementAttribute(htmlElement, 'object')) {
-                        ObjectElementFactory.getInstance(htmlElement)
-                            ?.createElement(htmlElement, context)
-                            ?.render();
-                        return;
-                    }
                 }catch(e){
                     console.error(e, htmlElement, container, JSON.stringify(context));
                 }
@@ -74,7 +74,7 @@ namespace duice {
      */
     export function markInitialized(container: any): void {
         container.querySelectorAll(getElementQuerySelector()).forEach(element => {
-            setElementAttribute(element, 'id', generateId());
+            setElementAttribute(element, 'id', '_');
         });
     }
 
@@ -107,16 +107,6 @@ namespace duice {
     }
 
     /**
-     * generates component ID
-     */
-    export function generateId(): string {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            let r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-        });
-    }
-
-    /**
      * checks has component attribute
      * @param htmlElement
      * @param name
@@ -142,27 +132,6 @@ namespace duice {
      */
     export function setElementAttribute(htmlElement: HTMLElement, name: string, value: string): void {
         htmlElement.setAttribute(`data-${getNamespace()}-${name}`, value);
-    }
-
-    /**
-     * execute script
-     * @param script
-     * @param thisArg
-     * @param context
-     */
-    export function executeScript(script:string, thisArg: any, context: object): any {
-        try {
-            let args = [];
-            let values = [];
-            for(let property in context){
-                args.push(property);
-                values.push(context[property]);
-            }
-            return Function(...args, script).call(thisArg, ...values);
-        }catch(e){
-            console.error(script, e);
-            throw e;
-        }
     }
 
     /**
@@ -238,9 +207,9 @@ namespace duice {
      * @param tagName
      * @param elementType
      */
-    export function defineElement(tagName: string, elementType: Function): void {
+    export function defineCustomElement(tagName: string, elementType: Function): void {
         let customElementFactory = new CustomElementFactory(tagName, elementType);
-        CustomElementFactory.addInstance(customElementFactory);
+        CustomElementFactoryRegistry.addInstance(customElementFactory);
     }
 
     /**

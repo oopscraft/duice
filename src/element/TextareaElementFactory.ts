@@ -25,6 +25,6 @@ namespace duice.component {
     }
 
     // register factory instance
-    ObjectElementFactory.addInstance(new TextareaElementFactory());
+    ObjectElementFactoryRegistry.addInstance(new TextareaElementFactory());
 
 }

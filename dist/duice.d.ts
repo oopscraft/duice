@@ -36,28 +36,22 @@ declare namespace duice {
      */
     abstract class DataElement<T extends HTMLElement, V> extends Observable implements Observer {
         htmlElement: T;
-        context: object;
         data: V;
         /**
          * constructor
          * @param htmlElement
-         * @param context
+         * @param data
          * @protected
          */
-        protected constructor(htmlElement: T, context: object);
+        protected constructor(htmlElement: T, data: V);
+        /**
+         * generates component ID
+         */
+        generateId(): string;
         /**
          * return HTML element
          */
         getHtmlElement(): T;
-        /**
-         * return context
-         */
-        getContext(): object;
-        /**
-         * set data
-         * @param dataName
-         */
-        setData(dataName: string): void;
         /**
          * return data
          */
@@ -94,14 +88,9 @@ declare namespace duice {
         /**
          * constructor
          * @param htmlElement
-         * @param context
+         * @param array
          */
-        constructor(htmlElement: T, context: object);
-        /**
-         * set array
-         * @param arrayName
-         */
-        setArray(arrayName: string): void;
+        constructor(htmlElement: T, array: object[]);
         /**
          * set loop
          * @param loop
@@ -164,18 +153,6 @@ declare namespace duice {
      * array element factory class
      */
     class ArrayElementFactory<T extends HTMLElement> extends DataElementFactory<HTMLElement, object[]> {
-        static defaultInstance: ArrayElementFactory<HTMLElement>;
-        static instances: ArrayElementFactory<HTMLElement>[];
-        /**
-         * adds factory instance
-         * @param elementFactory
-         */
-        static addInstance(elementFactory: ArrayElementFactory<HTMLElement>): void;
-        /**
-         * return factory instance
-         * @param htmlElement
-         */
-        static getInstance(htmlElement: HTMLElement): ArrayElementFactory<HTMLElement>;
         /**
          * check support
          * @param htmlElement
@@ -189,9 +166,9 @@ declare namespace duice {
         /**
          * creates array component
          * @param htmlElement
-         * @param context
+         * @param array
          */
-        createElement(htmlElement: T, context: object): ArrayElement<any>;
+        createElement(htmlElement: T, array: object[]): ArrayElement<any>;
     }
 }
 declare namespace duice {
@@ -497,19 +474,9 @@ declare namespace duice {
         /**
          * constructor
          * @param htmlElement
-         * @param context
+         * @param data
          */
-        protected constructor(htmlElement: HTMLElement, context: object);
-        /**
-         * set object data
-         * @param objectName
-         */
-        setObject(objectName: string): void;
-        /**
-         * set array data
-         * @param arrayName
-         */
-        setArray(arrayName: string): void;
+        protected constructor(htmlElement: HTMLElement, data: V);
         /**
          * render
          */
@@ -547,19 +514,8 @@ declare namespace duice {
      * custom component factory
      */
     class CustomElementFactory<V> extends DataElementFactory<HTMLElement, V> {
-        static instances: CustomElementFactory<any>[];
         tagName: string;
         elementType: Function;
-        /**
-         * adds factory instance
-         * @param elementFactory
-         */
-        static addInstance(elementFactory: CustomElementFactory<any>): void;
-        /**
-         * returns factory instance to be supported
-         * @param htmlElement
-         */
-        static getInstance(htmlElement: HTMLElement): CustomElementFactory<any>;
         /**
          * constructor
          * @param tagName
@@ -571,7 +527,7 @@ declare namespace duice {
          * @param htmlElement
          * @param context
          */
-        createElement(htmlElement: HTMLElement, context: object): CustomElement<any>;
+        createElement(htmlElement: HTMLElement, context: object): DataElement<any, any>;
         /**
          * checks supported elements
          * @param htmlElement
@@ -598,14 +554,9 @@ declare namespace duice {
         /**
          * constructor
          * @param htmlElement
-         * @param context
+         * @param data
          */
-        constructor(htmlElement: T, context: object);
-        /**
-         * set object
-         * @param objectName
-         */
-        setObject(objectName: string): void;
+        constructor(htmlElement: T, data: object);
         /**
          * set property
          * @param property
@@ -628,6 +579,7 @@ declare namespace duice {
          * render
          */
         render(): void;
+        executeScript(): void;
         /**
          * update event received
          * @param observable
@@ -668,18 +620,6 @@ declare namespace duice {
      * object element factory class
      */
     class ObjectElementFactory<T extends HTMLElement> extends DataElementFactory<T, object> {
-        static defaultInstance: ObjectElementFactory<HTMLElement>;
-        static instances: ObjectElementFactory<HTMLElement>[];
-        /**
-         * adds factory instance to registry
-         * @param elementFactory
-         */
-        static addInstance(elementFactory: ObjectElementFactory<HTMLElement>): void;
-        /**
-         * returns supported instance
-         * @param htmlElement
-         */
-        static getInstance(htmlElement: HTMLElement): ObjectElementFactory<HTMLElement>;
         /**
          * check support
          * @param htmlElement
@@ -693,15 +633,15 @@ declare namespace duice {
         /**
          * create component
          * @param element
-         * @param context
+         * @param object
          */
-        createElement(element: T, context: object): ObjectElement<T>;
+        createElement(element: T, object: object): ObjectElement<T>;
         /**
          * template method to create component
          * @param htmlElement
-         * @param context
+         * @param object
          */
-        doCreateElement(htmlElement: T, context: object): ObjectElement<T>;
+        doCreateElement(htmlElement: T, object: object): ObjectElement<T>;
     }
 }
 declare namespace duice.event {
@@ -925,10 +865,6 @@ declare namespace duice {
      */
     function findVariable(context: object, name: string): any;
     /**
-     * generates component ID
-     */
-    function generateId(): string;
-    /**
      * checks has component attribute
      * @param htmlElement
      * @param name
@@ -947,13 +883,6 @@ declare namespace duice {
      * @param value
      */
     function setElementAttribute(htmlElement: HTMLElement, name: string, value: string): void;
-    /**
-     * execute script
-     * @param script
-     * @param thisArg
-     * @param context
-     */
-    function executeScript(script: string, thisArg: any, context: object): any;
     /**
      * assert
      * @param condition
@@ -997,7 +926,7 @@ declare namespace duice {
      * @param tagName
      * @param elementType
      */
-    function defineElement(tagName: string, elementType: Function): void;
+    function defineCustomElement(tagName: string, elementType: Function): void;
 }
 declare namespace duice.dialog {
     /**
@@ -1155,9 +1084,9 @@ declare namespace duice.component {
         /**
          * constructor
          * @param element
-         * @param context
+         * @param object
          */
-        constructor(element: HTMLImageElement, context: object);
+        constructor(element: HTMLImageElement, object: object);
         /**
          * show clear image button
          */
@@ -1202,6 +1131,25 @@ declare namespace duice.component {
         setDisable(disable: boolean): void;
     }
 }
+declare namespace duice {
+    /**
+     * object element factory class
+     */
+    class ObjectElementFactoryRegistry {
+        static defaultInstance: ObjectElementFactory<HTMLElement>;
+        static instances: ObjectElementFactory<HTMLElement>[];
+        /**
+         * adds factory instance to registry
+         * @param elementFactory
+         */
+        static addInstance(elementFactory: ObjectElementFactory<HTMLElement>): void;
+        /**
+         * returns supported instance
+         * @param htmlElement
+         */
+        static getInstance(htmlElement: HTMLElement): ObjectElementFactory<HTMLElement>;
+    }
+}
 declare namespace duice.component {
     /**
      * image element factory class
@@ -1228,9 +1176,9 @@ declare namespace duice.component {
         /**
          * constructor
          * @param element
-         * @param context
+         * @param object
          */
-        constructor(element: HTMLInputElement, context: object);
+        constructor(element: HTMLInputElement, object: object);
         /**
          * set value
          * @param value
@@ -1266,9 +1214,9 @@ declare namespace duice.component {
         /**
          * constructor
          * @param element
-         * @param context
+         * @param object
          */
-        constructor(element: HTMLInputElement, context: object);
+        constructor(element: HTMLInputElement, object: object);
         /**
          * set value
          * @param value
@@ -1358,9 +1306,9 @@ declare namespace duice.component {
         /**
          * constructor
          * @param element
-         * @param context
+         * @param object
          */
-        constructor(element: HTMLInputElement, context: object);
+        constructor(element: HTMLInputElement, object: object);
         /**
          * return value
          */
@@ -1375,9 +1323,9 @@ declare namespace duice.component {
         /**
          * constructor
          * @param element
-         * @param context
+         * @param object
          */
-        constructor(element: HTMLInputElement, context: object);
+        constructor(element: HTMLInputElement, object: object);
         /**
          * set value
          * @param value
@@ -1392,6 +1340,24 @@ declare namespace duice.component {
          * @param readonly
          */
         setReadonly(readonly: boolean): void;
+    }
+}
+declare namespace duice {
+    /**
+     * custom component factory registry
+     */
+    class CustomElementFactoryRegistry {
+        static instances: CustomElementFactory<any>[];
+        /**
+         * adds factory instance
+         * @param elementFactory
+         */
+        static addInstance(elementFactory: CustomElementFactory<any>): void;
+        /**
+         * returns factory instance to be supported
+         * @param htmlElement
+         */
+        static getInstance(htmlElement: HTMLElement): CustomElementFactory<any>;
     }
 }
 declare namespace duice.component {
@@ -1409,9 +1375,9 @@ declare namespace duice.component {
         /**
          * constructor
          * @param element
-         * @param context
+         * @param object
          */
-        constructor(element: HTMLSelectElement, context: object);
+        constructor(element: HTMLSelectElement, object: object);
         /**
          * set value
          * @param value
@@ -1459,9 +1425,9 @@ declare namespace duice.component {
         /**
          * constructor
          * @param element
-         * @param context
+         * @param object
          */
-        constructor(element: HTMLTextAreaElement, context: object);
+        constructor(element: HTMLTextAreaElement, object: object);
         /**
          * set value
          * @param value
@@ -1678,5 +1644,24 @@ declare namespace duice.component {
          * @param array
          */
         doStyle(array: object[]): string;
+    }
+}
+declare namespace duice {
+    /**
+     * array element factory registry class
+     */
+    class ArrayElementFactoryRegistry {
+        static defaultInstance: ArrayElementFactory<HTMLElement>;
+        static instances: ArrayElementFactory<HTMLElement>[];
+        /**
+         * adds factory instance
+         * @param elementFactory
+         */
+        static addInstance(elementFactory: ArrayElementFactory<HTMLElement>): void;
+        /**
+         * return factory instance
+         * @param htmlElement
+         */
+        static getInstance(htmlElement: HTMLElement): ArrayElementFactory<HTMLElement>;
     }
 }

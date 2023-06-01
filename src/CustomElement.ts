@@ -9,26 +9,10 @@ namespace duice {
         /**
          * constructor
          * @param htmlElement
-         * @param context
+         * @param data
          */
-        protected constructor(htmlElement: HTMLElement, context: object) {
-            super(htmlElement, context);
-        }
-
-        /**
-         * set object data
-         * @param objectName
-         */
-        setObject(objectName: string): void {
-            this.setData(objectName);
-        }
-
-        /**
-         * set array data
-         * @param arrayName
-         */
-        setArray(arrayName: string): void {
-            this.setData(arrayName);
+        protected constructor(htmlElement: HTMLElement, data: V) {
+            super(htmlElement, data);
         }
 
         /**
@@ -57,9 +41,7 @@ namespace duice {
 
             // initializes
             let context = {};
-            globalThis.Object.assign(context, this.context);
-            context['object'] = this.data;
-            context['array'] = this.data;
+            context['data'] = this.data;
             initialize(this.htmlElement, context);
 
             // execute script
@@ -79,7 +61,6 @@ namespace duice {
          */
         override update(observable: Observable, event: event.Event): void {
             if(observable instanceof DataHandler) {
-                //this.render();
                 this.doUpdate(observable as V);
             }
         }

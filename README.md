@@ -40,14 +40,14 @@ const user = new duice.ObjectProxy({
 
 | attribute                                  | description                                          |
 |:-------------------------------------------|:-----------------------------------------------------|
-| data-duice-object="[object]"               | Object name to bind                                  |
+| data-duice-bind="[object]"               | Object name to bind                                  |
 | data-duice-property="[property of object]" | Object Property name to bind                         |
 | data-duice-script="[script code]"          | javascript code to execute when element is updated   |
 | data-duice-format="[data format clause]"   | ex) string('###-###'), number(2), date('yyyy-MM-dd') |
 
 ```html
-<span data-duice-object="user" data-duice-property="id"></span>
-<input type="text" data-duice-object="user" data-duice-property="name"/>
+<span data-duice-bind="user" data-duice-property="id"></span>
+<input type="text" data-duice-bind="user" data-duice-property="name"/>
 ```
 
 ### Test Case
@@ -73,7 +73,7 @@ const users = new duice.ArrayProxy([
 
 | attribute                                      | description                              |
 |:-----------------------------------------------|:-----------------------------------------|
-| data-duice-array="[array]"                     | Object name to bind                      |
+| data-duice-bind="[array]"                     | Object name to bind                      |
 | data-duice-loop="[element name],[status name]" | element object and status variable name  |
 | data-duice-script="[script code]"              | javascript code to execute when element is updated   |
 
@@ -84,10 +84,10 @@ const users = new duice.ArrayProxy([
         <th>name</th>
         <th>name</th>
     </tr>
-    <tr data-duice-array="users" data-duice-loop="user,status">
-        <td data-duice-object="status" data-duice-property="count"></td>
-        <td data-duice-object="user" data-duice-property="id"></td>
-        <td><input type="text" data-duice-object="user" data-duice-property="name"/></td>
+    <tr data-duice-bind="users" data-duice-loop="user,status">
+        <td data-duice-bind="status" data-duice-property="count"></td>
+        <td data-duice-bind="user" data-duice-property="id"></td>
+        <td><input type="text" data-duice-bind="user" data-duice-property="name"/></td>
     </tr>
 </table>
 ```
@@ -104,15 +104,16 @@ const users = new duice.ArrayProxy([
 ### Javascript
 
 ```javascript
-duice.defineElement("my-object", class extends duice.CustomElement {
+duice.defineCustomElement("my-object", class extends duice.CustomElement {
     doRender(object) {
         return this.createElement(`
                     <div>
-                        <span data-duice-object="object" data-duice-property="name"></span>
-                        <input type="text" data-duice-object="object" data-duice-property="name" class="bg-red"/>
+                        <span data-duice-bind="object" data-duice-property="name"></span>
+                        <input type="text" data-duice-bind="object" data-duice-property="name" class="bg-red"/>
                     </div>
                 `);
     }
+
     // (optional)
     doStyle(data) {
         return `
@@ -128,8 +129,8 @@ duice.defineElement("my-object", class extends duice.CustomElement {
 
 | attribute                    | description                              |
 |:-----------------------------|:-----------------------------------------|
-| data-duice-object="[object name]" | Object name to bind                      |
-| data-duice-array="[array name]"   | Array name to bind                       |
+| data-duice-bind="[object name]" | Object name to bind                      |
+| data-duice-bind="[array name]"   | Array name to bind                       |
 
 ```html
 
@@ -140,7 +141,7 @@ duice.defineElement("my-object", class extends duice.CustomElement {
     });
 </script>
 
-<my-object data-duice-object="myObject"></my-object>
+<my-object data-duice-bind="myObject"></my-object>
 
 ```
 

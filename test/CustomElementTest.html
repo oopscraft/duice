@@ -20,12 +20,12 @@
         /**
          * MyObjectElement
          */
-        duice.defineElement("my-object", class extends duice.CustomElement {
+        duice.defineCustomElement("my-object", class extends duice.CustomElement {
             doRender(object) {
                 return this.createElement(`
                     <div>
-                        <span data-duice-object="object" data-duice-property="name"></span>
-                        <input type="text" data-duice-object="object" data-duice-property="name" class="bg-red"/>
+                        <span data-duice-bind="data" data-duice-property="name"></span>
+                        <input type="text" data-duice-bind="data" data-duice-property="name" class="bg-red"/>
                     </div>
                 `);
             }
@@ -41,12 +41,12 @@
         /**
          * MyArrayComponent
          */
-        duice.defineElement("my-array", class extends duice.CustomElement {
+        duice.defineCustomElement("my-array", class extends duice.CustomElement {
             doRender(array) {
                 let templateElement = this.createElement(`
                 <div>
-                    <div data-duice-array="array" data-duice-loop="item,status">
-                        <input type="text" data-duice-object="item" data-duice-property="name"/>
+                    <div data-duice-bind="data" data-duice-loop="item,status">
+                        <input type="text" data-duice-bind="item" data-duice-property="name"/>
                     </div>
                 </div>
                 `);
@@ -58,12 +58,12 @@
         /**
          * my-array-nested
          */
-        duice.defineElement("my-array-nested", class extends duice.CustomElement {
+        duice.defineCustomElement("my-array-nested", class extends duice.CustomElement {
             doRender(array) {
                 return this.createElement(`
                 <div>
-                    <div data-duice-array="array" data-duice-loop="item,status">
-                        <my-object data-duice-object="item"></my-object>
+                    <div data-duice-bind="data" data-duice-loop="item,status">
+                        <my-object data-duice-bind="item"></my-object>
                     </div>
                 </div>
                 `);
@@ -77,16 +77,16 @@
 <h1>Custom Element Test</h1>
 
 <h2> Direct HTML</h2>
-<input type="text" data-duice-object="myObject" data-duice-property="name" style="background-color:red;"/>
+<input type="text" data-duice-bind="myObject" data-duice-property="name" style="background-color:red;"/>
 
 <h2>Custom Object Element</h2>
-<my-object data-duice-object="myObject"></my-object>
+<my-object data-duice-bind="myObject"></my-object>
 
 <h2>Custom Array Element</h2>
-<my-array data-duice-array="myArray"></my-array>
+<my-array data-duice-bind="myArray"></my-array>
 
 <h2>Custom Nested Element</h2>
-<my-array-nested data-duice-array="myArray"></my-array-nested>
+<my-array-nested data-duice-bind="myArray"></my-array-nested>
 
 </body>
 </html>

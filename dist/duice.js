@@ -72,35 +72,15 @@ var duice;
         /**
          * constructor
          * @param htmlElement
-         * @param context
+         * @param data
          * @protected
          */
-        constructor(htmlElement, context) {
+        constructor(htmlElement, data) {
+            var _a;
             super();
             this.htmlElement = htmlElement;
-            this.context = context;
-            duice.setElementAttribute(this.htmlElement, 'id', duice.generateId());
-        }
-        /**
-         * return HTML element
-         */
-        getHtmlElement() {
-            return this.htmlElement;
-        }
-        /**
-         * return context
-         */
-        getContext() {
-            return this.context;
-        }
-        /**
-         * set data
-         * @param dataName
-         */
-        setData(dataName) {
-            var _a;
-            // finds proxy data
-            let data = duice.findVariable(this.context, dataName);
+            this.data = data;
+            duice.setElementAttribute(this.htmlElement, 'id', this.generateId());
             // bind with data handler
             let dataHandler = (_a = globalThis.Object.getOwnPropertyDescriptor(data, '_handler_')) === null || _a === void 0 ? void 0 : _a.value;
             duice.assert(dataHandler, 'DataHandler is not found');
@@ -108,6 +88,21 @@ var duice;
             dataHandler.addObserver(this);
             // set data
             this.data = dataHandler.getTarget();
+        }
+        /**
+         * generates component ID
+         */
+        generateId() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                let r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+        /**
+         * return HTML element
+         */
+        getHtmlElement() {
+            return this.htmlElement;
         }
         /**
          * return data
@@ -123,7 +118,19 @@ var duice;
         executeScript(htmlElement, context) {
             let script = duice.getElementAttribute(htmlElement, 'script');
             if (script) {
-                duice.executeScript(script, htmlElement, context);
+                try {
+                    let args = [];
+                    let values = [];
+                    for (let property in context) {
+                        args.push(property);
+                        values.push(context[property]);
+                    }
+                    return Function(...args, script).call(this.getHtmlElement(), ...values);
+                }
+                catch (e) {
+                    console.error(script, e);
+                    throw e;
+                }
             }
         }
     }
@@ -139,10 +146,10 @@ var duice;
         /**
          * constructor
          * @param htmlElement
-         * @param context
+         * @param array
          */
-        constructor(htmlElement, context) {
-            super(htmlElement.cloneNode(true), context);
+        constructor(htmlElement, array) {
+            super(htmlElement.cloneNode(true), array);
             this.slot = document.createElement('slot');
             this.editable = false;
             this.rowHtmlElements = [];
@@ -150,13 +157,6 @@ var duice;
             htmlElement.replaceWith(this.slot);
             // mark initialized (not using after clone as templates)
             duice.markInitialized(htmlElement);
-        }
-        /**
-         * set array
-         * @param arrayName
-         */
-        setArray(arrayName) {
-            this.setData(arrayName);
         }
         /**
          * set loop
@@ -191,7 +191,6 @@ var duice;
          */
         render() {
             var _a;
-            let _this = this;
             let arrayProxy = this.getData();
             // reset row elements
             this.rowHtmlElements.forEach(rowElement => {
@@ -216,7 +215,7 @@ var duice;
                             if (object[parentIdName] === parentId) {
                                 // context
                                 index++;
-                                let context = globalThis.Object.assign({}, _this.context);
+                                let context = {};
                                 context[itemName] = object;
                                 context[statusName] = new duice.ObjectProxy({
                                     index: index,
@@ -244,7 +243,7 @@ var duice;
                         // element data
                         let object = arrayProxy[index];
                         // context
-                        let context = globalThis.Object.assign({}, this.context);
+                        let context = {};
                         context[itemName] = object;
                         context[statusName] = new duice.ObjectProxy({
                             index: index,
@@ -262,7 +261,9 @@ var duice;
             else {
                 // initialize
                 let rowHtmlElement = this.getHtmlElement().cloneNode(true);
-                let context = this.getContext();
+                let arrayName = duice.getElementAttribute(this.getHtmlElement(), 'bind');
+                let context = {};
+                context[arrayName] = this.getData();
                 duice.initialize(rowHtmlElement, context);
                 this.rowHtmlElements.push(rowHtmlElement);
                 // append to slot
@@ -354,38 +355,11 @@ var duice;
      */
     class ArrayElementFactory extends duice.DataElementFactory {
         /**
-         * adds factory instance
-         * @param elementFactory
-         */
-        static addInstance(elementFactory) {
-            this.instances.push(elementFactory);
-        }
-        /**
-         * return factory instance
-         * @param htmlElement
-         */
-        static getInstance(htmlElement) {
-            for (let componentFactory of this.instances) {
-                if (componentFactory.support(htmlElement)) {
-                    return componentFactory;
-                }
-            }
-            if (this.defaultInstance.support(htmlElement)) {
-                return this.defaultInstance;
-            }
-            return null;
-        }
-        /**
          * check support
          * @param htmlElement
          */
         support(htmlElement) {
-            if (duice.hasElementAttribute(htmlElement, 'array')) {
-                if (this.doSupport(htmlElement)) {
-                    return true;
-                }
-            }
-            return false;
+            return this.doSupport(htmlElement);
         }
         /**
          * support template method
@@ -397,39 +371,35 @@ var duice;
         /**
          * creates array component
          * @param htmlElement
-         * @param context
+         * @param array
          */
-        createElement(htmlElement, context) {
-            let component = new duice.ArrayElement(htmlElement, context);
-            // array
-            let array = duice.getElementAttribute(htmlElement, 'array');
-            component.setArray(array);
+        createElement(htmlElement, array) {
+            // create array element
+            let arrayElement = new duice.ArrayElement(htmlElement, array);
             // loop
             let loop = duice.getElementAttribute(htmlElement, 'loop');
             if (loop) {
-                component.setLoop(loop);
+                arrayElement.setLoop(loop);
             }
             // hierarchy
             let hierarchy = duice.getElementAttribute(htmlElement, 'hierarchy');
             if (hierarchy) {
-                component.setHierarchy(hierarchy);
+                arrayElement.setHierarchy(hierarchy);
             }
             // editable
             let editable = duice.getElementAttribute(htmlElement, 'editable');
             if (editable) {
-                component.setEditable(editable.toLowerCase() === 'true');
+                arrayElement.setEditable(editable.toLowerCase() === 'true');
             }
             // toggle class
             let toggleClass = duice.getElementAttribute(htmlElement, 'toggle-class');
             if (toggleClass) {
-                component.setToggleClass(toggleClass);
+                arrayElement.setToggleClass(toggleClass);
             }
             // returns
-            return component;
+            return arrayElement;
         }
     }
-    ArrayElementFactory.defaultInstance = new ArrayElementFactory();
-    ArrayElementFactory.instances = [];
     duice.ArrayElementFactory = ArrayElementFactory;
 })(duice || (duice = {}));
 ///<Reference path="Observable.ts"/>
@@ -1033,24 +1003,10 @@ var duice;
         /**
          * constructor
          * @param htmlElement
-         * @param context
+         * @param data
          */
-        constructor(htmlElement, context) {
-            super(htmlElement, context);
-        }
-        /**
-         * set object data
-         * @param objectName
-         */
-        setObject(objectName) {
-            this.setData(objectName);
-        }
-        /**
-         * set array data
-         * @param arrayName
-         */
-        setArray(arrayName) {
-            this.setData(arrayName);
+        constructor(htmlElement, data) {
+            super(htmlElement, data);
         }
         /**
          * render
@@ -1075,9 +1031,7 @@ var duice;
             }
             // initializes
             let context = {};
-            globalThis.Object.assign(context, this.context);
-            context['object'] = this.data;
-            context['array'] = this.data;
+            context['data'] = this.data;
             duice.initialize(this.htmlElement, context);
             // execute script
             this.executeScript(this.htmlElement, context);
@@ -1089,7 +1043,6 @@ var duice;
          */
         update(observable, event) {
             if (observable instanceof duice.DataHandler) {
-                //this.render();
                 this.doUpdate(observable);
             }
         }
@@ -1130,29 +1083,6 @@ var duice;
             this.elementType = elementType;
         }
         /**
-         * adds factory instance
-         * @param elementFactory
-         */
-        static addInstance(elementFactory) {
-            // register custom html element
-            customElements.define(elementFactory.tagName, class extends HTMLElement {
-            });
-            // register instance
-            this.instances.push(elementFactory);
-        }
-        /**
-         * returns factory instance to be supported
-         * @param htmlElement
-         */
-        static getInstance(htmlElement) {
-            for (let componentFactory of this.instances) {
-                if (componentFactory.support(htmlElement)) {
-                    return componentFactory;
-                }
-            }
-            return null;
-        }
-        /**
          * creates component
          * @param htmlElement
          * @param context
@@ -1160,15 +1090,41 @@ var duice;
         createElement(htmlElement, context) {
             // creates instance
             let element = Reflect.construct(this.elementType, [htmlElement, context]);
-            // set object
-            let objectName = duice.getElementAttribute(htmlElement, 'object');
-            if (objectName) {
-                element.setObject(objectName);
+            // array element
+            if (element instanceof duice.ArrayElement) {
+                // loop
+                let loop = duice.getElementAttribute(htmlElement, 'loop');
+                if (loop) {
+                    element.setLoop(loop);
+                }
+                // hierarchy
+                let hierarchy = duice.getElementAttribute(htmlElement, 'hierarchy');
+                if (hierarchy) {
+                    element.setHierarchy(hierarchy);
+                }
+                // editable
+                let editable = duice.getElementAttribute(htmlElement, 'editable');
+                if (editable) {
+                    element.setEditable(editable.toLowerCase() === 'true');
+                }
+                // toggle class
+                let toggleClass = duice.getElementAttribute(htmlElement, 'toggle-class');
+                if (toggleClass) {
+                    element.setToggleClass(toggleClass);
+                }
             }
-            // set array
-            let arrayName = duice.getElementAttribute(htmlElement, 'array');
-            if (arrayName) {
-                element.setArray(arrayName);
+            // object element
+            else if (element instanceof duice.ObjectElement) {
+                // property
+                let property = duice.getElementAttribute(htmlElement, 'property');
+                if (property) {
+                    element.setProperty(property);
+                }
+                // format
+                let format = duice.getElementAttribute(htmlElement, 'format');
+                if (format) {
+                    element.setFormat(format);
+                }
             }
             // returns
             return element;
@@ -1181,7 +1137,6 @@ var duice;
             return (htmlElement.tagName.toLowerCase() === this.tagName);
         }
     }
-    CustomElementFactory.instances = [];
     duice.CustomElementFactory = CustomElementFactory;
 })(duice || (duice = {}));
 var duice;
@@ -1221,18 +1176,18 @@ var duice;
         /**
          * constructor
          * @param htmlElement
-         * @param context
+         * @param data
          */
-        constructor(htmlElement, context) {
-            super(htmlElement, context);
+        constructor(htmlElement, data) {
+            super(htmlElement, data);
         }
-        /**
-         * set object
-         * @param objectName
-         */
-        setObject(objectName) {
-            this.setData(objectName);
-        }
+        // /**
+        //  * set object
+        //  * @param objectName
+        //  */
+        // setObject(objectName: string): void {
+        //     this.setData(objectName);
+        // }
         /**
          * set property
          * @param property
@@ -1276,7 +1231,14 @@ var duice;
                 this.setDisable(disable);
             }
             // executes script
-            this.executeScript(this.htmlElement, this.context);
+            this.executeScript();
+        }
+        executeScript() {
+            // executes script
+            let objectName = duice.getElementAttribute(this.getHtmlElement(), 'bind');
+            let context = {};
+            context[objectName] = this.getData();
+            super.executeScript(this.htmlElement, context);
         }
         /**
          * update event received
@@ -1296,7 +1258,7 @@ var duice;
                     this.setDisable(observable.isDisable(this.property));
                 }
                 // executes script
-                this.executeScript(this.htmlElement, this.context);
+                this.executeScript();
             }
         }
         /**
@@ -1356,38 +1318,11 @@ var duice;
      */
     class ObjectElementFactory extends duice.DataElementFactory {
         /**
-         * adds factory instance to registry
-         * @param elementFactory
-         */
-        static addInstance(elementFactory) {
-            this.instances.push(elementFactory);
-        }
-        /**
-         * returns supported instance
-         * @param htmlElement
-         */
-        static getInstance(htmlElement) {
-            for (let componentFactory of this.instances) {
-                if (componentFactory.support(htmlElement)) {
-                    return componentFactory;
-                }
-            }
-            if (this.defaultInstance.support(htmlElement)) {
-                return this.defaultInstance;
-            }
-            return null;
-        }
-        /**
          * check support
          * @param htmlElement
          */
         support(htmlElement) {
-            if (duice.hasElementAttribute(htmlElement, 'object')) {
-                if (this.doSupport(htmlElement)) {
-                    return true;
-                }
-            }
-            return false;
+            return this.doSupport(htmlElement);
         }
         /**
          * support template method
@@ -1399,38 +1334,33 @@ var duice;
         /**
          * create component
          * @param element
-         * @param context
+         * @param object
          */
-        createElement(element, context) {
-            // creates element
-            let component = this.doCreateElement(element, context);
-            // object
-            let object = duice.getElementAttribute(element, 'object');
-            component.setObject(object);
+        createElement(element, object) {
+            // create object element
+            let objectElement = this.doCreateElement(element, object);
             // property
             let property = duice.getElementAttribute(element, 'property');
             if (property) {
-                component.setProperty(property);
+                objectElement.setProperty(property);
             }
             // format
             let format = duice.getElementAttribute(element, 'format');
             if (format) {
-                component.setFormat(format);
+                objectElement.setFormat(format);
             }
             // returns
-            return component;
+            return objectElement;
         }
         /**
          * template method to create component
          * @param htmlElement
-         * @param context
+         * @param object
          */
-        doCreateElement(htmlElement, context) {
-            return new duice.ObjectElement(htmlElement, context);
+        doCreateElement(htmlElement, object) {
+            return new duice.ObjectElement(htmlElement, object);
         }
     }
-    ObjectElementFactory.defaultInstance = new ObjectElementFactory();
-    ObjectElementFactory.instances = [];
     duice.ObjectElementFactory = ObjectElementFactory;
 })(duice || (duice = {}));
 var duice;
@@ -1860,10 +1790,7 @@ var duice;
      * returns query selector for element scan
      */
     function getElementQuerySelector() {
-        return [
-            `*[data-${getNamespace()}-object]:not([data-${getNamespace()}-id])`,
-            `*[data-${getNamespace()}-array]:not([data-${getNamespace()}-id])`,
-        ].join(',');
+        return `*[data-${getNamespace()}-bind]:not([data-${getNamespace()}-id])`;
     }
     duice.getElementQuerySelector = getElementQuerySelector;
     /**
@@ -1877,20 +1804,22 @@ var duice;
             var _a, _b, _c, _d, _e;
             if (!hasElementAttribute(htmlElement, 'id')) {
                 try {
+                    let bindName = getElementAttribute(htmlElement, 'bind');
+                    let bindData = findVariable(context, bindName);
                     // custom element
-                    let customElementFactory = duice.CustomElementFactory.getInstance(htmlElement);
+                    let customElementFactory = duice.CustomElementFactoryRegistry.getInstance(htmlElement);
                     if (customElementFactory) {
-                        (_a = customElementFactory.createElement(htmlElement, context)) === null || _a === void 0 ? void 0 : _a.render();
+                        (_a = customElementFactory.createElement(htmlElement, bindData)) === null || _a === void 0 ? void 0 : _a.render();
                         return;
                     }
                     // array element
-                    if (hasElementAttribute(htmlElement, 'array')) {
-                        (_c = (_b = duice.ArrayElementFactory.getInstance(htmlElement)) === null || _b === void 0 ? void 0 : _b.createElement(htmlElement, context)) === null || _c === void 0 ? void 0 : _c.render();
+                    if (Array.isArray(bindData)) {
+                        (_c = (_b = duice.ArrayElementFactoryRegistry.getInstance(htmlElement)) === null || _b === void 0 ? void 0 : _b.createElement(htmlElement, bindData)) === null || _c === void 0 ? void 0 : _c.render();
                         return;
                     }
                     // object element
-                    if (hasElementAttribute(htmlElement, 'object')) {
-                        (_e = (_d = duice.ObjectElementFactory.getInstance(htmlElement)) === null || _d === void 0 ? void 0 : _d.createElement(htmlElement, context)) === null || _e === void 0 ? void 0 : _e.render();
+                    else {
+                        (_e = (_d = duice.ObjectElementFactoryRegistry.getInstance(htmlElement)) === null || _d === void 0 ? void 0 : _d.createElement(htmlElement, bindData)) === null || _e === void 0 ? void 0 : _e.render();
                         return;
                     }
                 }
@@ -1907,7 +1836,7 @@ var duice;
      */
     function markInitialized(container) {
         container.querySelectorAll(getElementQuerySelector()).forEach(element => {
-            setElementAttribute(element, 'id', generateId());
+            setElementAttribute(element, 'id', '_');
         });
     }
     duice.markInitialized = markInitialized;
@@ -1939,16 +1868,6 @@ var duice;
     }
     duice.findVariable = findVariable;
     /**
-     * generates component ID
-     */
-    function generateId() {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            let r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-        });
-    }
-    duice.generateId = generateId;
-    /**
      * checks has component attribute
      * @param htmlElement
      * @param name
@@ -1976,28 +1895,6 @@ var duice;
         htmlElement.setAttribute(`data-${getNamespace()}-${name}`, value);
     }
     duice.setElementAttribute = setElementAttribute;
-    /**
-     * execute script
-     * @param script
-     * @param thisArg
-     * @param context
-     */
-    function executeScript(script, thisArg, context) {
-        try {
-            let args = [];
-            let values = [];
-            for (let property in context) {
-                args.push(property);
-                values.push(context[property]);
-            }
-            return Function(...args, script).call(thisArg, ...values);
-        }
-        catch (e) {
-            console.error(script, e);
-            throw e;
-        }
-    }
-    duice.executeScript = executeScript;
     /**
      * assert
      * @param condition
@@ -2079,11 +1976,11 @@ var duice;
      * @param tagName
      * @param elementType
      */
-    function defineElement(tagName, elementType) {
+    function defineCustomElement(tagName, elementType) {
         let customElementFactory = new duice.CustomElementFactory(tagName, elementType);
-        duice.CustomElementFactory.addInstance(customElementFactory);
+        duice.CustomElementFactoryRegistry.addInstance(customElementFactory);
     }
-    duice.defineElement = defineElement;
+    duice.defineCustomElement = defineCustomElement;
     /**
      * listens DOMContentLoaded event
      */
@@ -2486,10 +2383,10 @@ var duice;
             /**
              * constructor
              * @param element
-             * @param context
+             * @param object
              */
-            constructor(element, context) {
-                super(element, context);
+            constructor(element, object) {
+                super(element, object);
                 this.editable = false;
                 this.closeButtonImg = 'data:image/svg+xml;base64,' + window.btoa('<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path opacity="0.4" d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" fill="#292D32"></path> <path d="M13.0594 12.0001L15.3594 9.70011C15.6494 9.41011 15.6494 8.93011 15.3594 8.64011C15.0694 8.35011 14.5894 8.35011 14.2994 8.64011L11.9994 10.9401L9.69937 8.64011C9.40937 8.35011 8.92937 8.35011 8.63938 8.64011C8.34938 8.93011 8.34938 9.41011 8.63938 9.70011L10.9394 12.0001L8.63938 14.3001C8.34938 14.5901 8.34938 15.0701 8.63938 15.3601C8.78938 15.5101 8.97937 15.5801 9.16937 15.5801C9.35937 15.5801 9.54937 15.5101 9.69937 15.3601L11.9994 13.0601L14.2994 15.3601C14.4494 15.5101 14.6394 15.5801 14.8294 15.5801C15.0194 15.5801 15.2094 15.5101 15.3594 15.3601C15.6494 15.0701 15.6494 14.5901 15.3594 14.3001L13.0594 12.0001Z" fill="#292D32"></path> </g></svg>');
                 this.originSrc = String(this.getHtmlElement().src);
@@ -2674,6 +2571,40 @@ var duice;
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
+    /**
+     * object element factory class
+     */
+    class ObjectElementFactoryRegistry {
+        /**
+         * adds factory instance to registry
+         * @param elementFactory
+         */
+        static addInstance(elementFactory) {
+            this.instances.push(elementFactory);
+        }
+        /**
+         * returns supported instance
+         * @param htmlElement
+         */
+        static getInstance(htmlElement) {
+            for (let componentFactory of this.instances) {
+                if (componentFactory.support(htmlElement)) {
+                    return componentFactory;
+                }
+            }
+            if (this.defaultInstance.support(htmlElement)) {
+                return this.defaultInstance;
+            }
+            return null;
+        }
+    }
+    ObjectElementFactoryRegistry.defaultInstance = new duice.ObjectElementFactory();
+    ObjectElementFactoryRegistry.instances = [];
+    duice.ObjectElementFactoryRegistry = ObjectElementFactoryRegistry;
+})(duice || (duice = {}));
+///<reference path="../ObjectElementFactoryRegistry.ts"/>
+var duice;
+(function (duice) {
     var component;
     (function (component) {
         /**
@@ -2698,7 +2629,7 @@ var duice;
         }
         component.ImgElementFactory = ImgElementFactory;
         // register factory instance
-        duice.ObjectElementFactory.addInstance(new ImgElementFactory());
+        duice.ObjectElementFactoryRegistry.addInstance(new ImgElementFactory());
     })(component = duice.component || (duice.component = {}));
 })(duice || (duice = {}));
 var duice;
@@ -2712,10 +2643,10 @@ var duice;
             /**
              * constructor
              * @param element
-             * @param context
+             * @param object
              */
-            constructor(element, context) {
-                super(element, context);
+            constructor(element, object) {
+                super(element, object);
                 // adds change listener
                 this.getHtmlElement().addEventListener('change', e => {
                     let event = new duice.event.PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
@@ -2792,10 +2723,10 @@ var duice;
             /**
              * constructor
              * @param element
-             * @param context
+             * @param object
              */
-            constructor(element, context) {
-                super(element, context);
+            constructor(element, object) {
+                super(element, object);
                 this.trueValue = true;
                 this.falseValue = false;
                 // true false value
@@ -2973,7 +2904,7 @@ var duice;
         }
         component.InputElementFactory = InputElementFactory;
         // register factory instance
-        duice.ObjectElementFactory.addInstance(new InputElementFactory());
+        duice.ObjectElementFactoryRegistry.addInstance(new InputElementFactory());
     })(component = duice.component || (duice.component = {}));
 })(duice || (duice = {}));
 ///<reference path="../format/NumberFormat.ts"/>
@@ -2989,10 +2920,10 @@ var duice;
             /**
              * constructor
              * @param element
-             * @param context
+             * @param object
              */
-            constructor(element, context) {
-                super(element, context);
+            constructor(element, object) {
+                super(element, object);
                 // changes type and style
                 this.getHtmlElement().removeAttribute('type');
                 this.getHtmlElement().style.textAlign = 'right';
@@ -3026,10 +2957,10 @@ var duice;
             /**
              * constructor
              * @param element
-             * @param context
+             * @param object
              */
-            constructor(element, context) {
-                super(element, context);
+            constructor(element, object) {
+                super(element, object);
             }
             /**
              * set value
@@ -3060,6 +2991,40 @@ var duice;
         component.InputRadioElement = InputRadioElement;
     })(component = duice.component || (duice.component = {}));
 })(duice || (duice = {}));
+var duice;
+(function (duice) {
+    /**
+     * custom component factory registry
+     */
+    class CustomElementFactoryRegistry {
+        /**
+         * adds factory instance
+         * @param elementFactory
+         */
+        static addInstance(elementFactory) {
+            // register custom html element
+            customElements.define(elementFactory.tagName, class extends HTMLElement {
+            });
+            // register instance
+            this.instances.push(elementFactory);
+        }
+        /**
+         * returns factory instance to be supported
+         * @param htmlElement
+         */
+        static getInstance(htmlElement) {
+            for (let componentFactory of this.instances) {
+                if (componentFactory.support(htmlElement)) {
+                    return componentFactory;
+                }
+            }
+            return null;
+        }
+    }
+    CustomElementFactoryRegistry.instances = [];
+    duice.CustomElementFactoryRegistry = CustomElementFactoryRegistry;
+})(duice || (duice = {}));
+///<reference path="../CustomElementFactoryRegistry.ts"/>
 var duice;
 (function (duice) {
     var component;
@@ -3169,7 +3134,7 @@ var duice;
         component.Pagination = Pagination;
         // register
         let customElementFactory = new duice.CustomElementFactory(`${duice.getNamespace()}-pagination`, Pagination);
-        duice.CustomElementFactory.addInstance(customElementFactory);
+        duice.CustomElementFactoryRegistry.addInstance(customElementFactory);
     })(component = duice.component || (duice.component = {}));
 })(duice || (duice = {}));
 var duice;
@@ -3183,10 +3148,10 @@ var duice;
             /**
              * constructor
              * @param element
-             * @param context
+             * @param object
              */
-            constructor(element, context) {
-                super(element, context);
+            constructor(element, object) {
+                super(element, object);
                 // adds event listener
                 this.getHtmlElement().addEventListener('change', (e) => {
                     let event = new duice.event.PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
@@ -3271,7 +3236,7 @@ var duice;
         }
         component.SelectElementFactory = SelectElementFactory;
         // register factory instance
-        duice.ObjectElementFactory.addInstance(new SelectElementFactory());
+        duice.ObjectElementFactoryRegistry.addInstance(new SelectElementFactory());
     })(component = duice.component || (duice.component = {}));
 })(duice || (duice = {}));
 var duice;
@@ -3285,10 +3250,10 @@ var duice;
             /**
              * constructor
              * @param element
-             * @param context
+             * @param object
              */
-            constructor(element, context) {
-                super(element, context);
+            constructor(element, object) {
+                super(element, object);
                 // adds change event listener
                 this.getHtmlElement().addEventListener('change', e => {
                     let event = new duice.event.PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
@@ -3373,7 +3338,7 @@ var duice;
         }
         component.TextareaElementFactory = TextareaElementFactory;
         // register factory instance
-        duice.ObjectElementFactory.addInstance(new TextareaElementFactory());
+        duice.ObjectElementFactoryRegistry.addInstance(new TextareaElementFactory());
     })(component = duice.component || (duice.component = {}));
 })(duice || (duice = {}));
 var duice;
@@ -3827,7 +3792,7 @@ var duice;
              * @param array
              */
             doStyle(array) {
-                return ` 
+                return `
                 .${duice.getNamespace()}-side-navigation li {
                     line-height: inherit;
                 }
@@ -3841,23 +3806,23 @@ var duice;
                     background-position-x: center;
                     background-position-y: center;
                     cursor: pointer;
-                } 
+                }
                 .${duice.getNamespace()}-side-navigation li.__fold__::before {
                     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAOUlEQVR42mNgGEygoaHhP8OQBqM+GBgXE8I0DRJaWPB/yFrwHwuGy+OiR1YQ0S4V0TQfjIJRMEIAAEXLZ9KMlg2EAAAAAElFTkSuQmCC);
-                } 
+                }
                 .${duice.getNamespace()}-side-navigation li.__fold__ > ul {
                     display: none;
                 }
                 .${duice.getNamespace()}-side-navigation li.__unfold__::before {
-                    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAANklEQVR42mNgGEygoaHhP8OQBqM+GBgXE8I0DZJRC5AN+I8Fw+Vx0aNxQB0LaJoPRsEoGCEAAGOiY9YrvpoQAAAAAElFTkSuQmCC); 
-                } 
+                    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAANklEQVR42mNgGEygoaHhP8OQBqM+GBgXE8I0DZJRC5AN+I8Fw+Vx0aNxQB0LaJoPRsEoGCEAAGOiY9YrvpoQAAAAAElFTkSuQmCC);
+                }
                 .${duice.getNamespace()}-side-navigation li.__unfold__ > ul {
                     display: '';
                 }
                 .${duice.getNamespace()}-side-navigation li > a {
                     display: inline-block;
                     color: inherit;
-                    text-decoration: none; 
+                    text-decoration: none;
                     cursor: pointer;
                 }
                 .${duice.getNamespace()}-side-navigation li > a > img {
@@ -3874,7 +3839,40 @@ var duice;
         component.Tree = Tree;
         // register
         let customElementFactory = new duice.CustomElementFactory(`${duice.getNamespace()}-side-navigation`, Tree);
-        duice.CustomElementFactory.addInstance(customElementFactory);
+        duice.CustomElementFactoryRegistry.addInstance(customElementFactory);
     })(component = duice.component || (duice.component = {}));
+})(duice || (duice = {}));
+var duice;
+(function (duice) {
+    /**
+     * array element factory registry class
+     */
+    class ArrayElementFactoryRegistry {
+        /**
+         * adds factory instance
+         * @param elementFactory
+         */
+        static addInstance(elementFactory) {
+            this.instances.push(elementFactory);
+        }
+        /**
+         * return factory instance
+         * @param htmlElement
+         */
+        static getInstance(htmlElement) {
+            for (let componentFactory of this.instances) {
+                if (componentFactory.support(htmlElement)) {
+                    return componentFactory;
+                }
+            }
+            if (this.defaultInstance.support(htmlElement)) {
+                return this.defaultInstance;
+            }
+            return null;
+        }
+    }
+    ArrayElementFactoryRegistry.defaultInstance = new duice.ArrayElementFactory();
+    ArrayElementFactoryRegistry.instances = [];
+    duice.ArrayElementFactoryRegistry = ArrayElementFactoryRegistry;
 })(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map

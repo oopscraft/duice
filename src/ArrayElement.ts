@@ -21,24 +21,16 @@ namespace duice {
         /**
          * constructor
          * @param htmlElement
-         * @param context
+         * @param array
          */
-        constructor(htmlElement: T, context: object) {
-            super(htmlElement.cloneNode(true) as T, context);
+        constructor(htmlElement: T, array: object[]) {
+            super(htmlElement.cloneNode(true) as T, array);
 
             // replace with slot for position
             htmlElement.replaceWith(this.slot);
 
             // mark initialized (not using after clone as templates)
             markInitialized(htmlElement);
-        }
-
-        /**
-         * set array
-         * @param arrayName
-         */
-        setArray(arrayName: string): void {
-            this.setData(arrayName);
         }
 
         /**
@@ -77,7 +69,6 @@ namespace duice {
          * render
          */
         override render(): void {
-            let _this = this;
             let arrayProxy = this.getData() as Array<object>;
 
             // reset row elements
@@ -106,7 +97,7 @@ namespace duice {
 
                                 // context
                                 index ++;
-                                let context = globalThis.Object.assign({}, _this.context);
+                                let context = {};
                                 context[itemName] = object;
                                 context[statusName] = new ObjectProxy({
                                     index: index,
@@ -139,7 +130,7 @@ namespace duice {
                         let object = arrayProxy[index];
 
                         // context
-                        let context = globalThis.Object.assign({}, this.context);
+                        let context = {};
                         context[itemName] = object;
                         context[statusName] = new ObjectProxy({
                             index: index,
@@ -159,7 +150,9 @@ namespace duice {
             else {
                 // initialize
                 let rowHtmlElement = this.getHtmlElement().cloneNode(true) as HTMLElement;
-                let context = this.getContext();
+                let arrayName = getElementAttribute(this.getHtmlElement(),'bind');
+                let context = {};
+                context[arrayName] = this.getData();
                 initialize(rowHtmlElement, context);
                 this.rowHtmlElements.push(rowHtmlElement);
 

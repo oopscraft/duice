@@ -15,19 +15,19 @@ namespace duice {
         /**
          * constructor
          * @param htmlElement
-         * @param context
+         * @param data
          */
-        constructor(htmlElement: T, context: object) {
-            super(htmlElement, context);
+        constructor(htmlElement: T, data: object) {
+            super(htmlElement, data);
         }
 
-        /**
-         * set object
-         * @param objectName
-         */
-        setObject(objectName: string): void {
-            this.setData(objectName);
-        }
+        // /**
+        //  * set object
+        //  * @param objectName
+        //  */
+        // setObject(objectName: string): void {
+        //     this.setData(objectName);
+        // }
 
         /**
          * set property
@@ -80,7 +80,15 @@ namespace duice {
             }
 
             // executes script
-            this.executeScript(this.htmlElement, this.context);
+            this.executeScript();
+        }
+
+        override executeScript():void {
+            // executes script
+            let objectName = getElementAttribute(this.getHtmlElement(), 'bind');
+            let context = {};
+            context[objectName] = this.getData();
+            super.executeScript(this.htmlElement, context);
         }
 
         /**
@@ -106,7 +114,7 @@ namespace duice {
                 }
 
                 // executes script
-                this.executeScript(this.htmlElement, this.context);
+                this.executeScript();
             }
         }
 

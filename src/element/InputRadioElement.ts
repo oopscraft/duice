@@ -9,10 +9,10 @@ namespace duice.component {
         /**
          * constructor
          * @param element
-         * @param context
+         * @param object
          */
-        constructor(element: HTMLInputElement, context: object) {
-            super(element, context);
+        constructor(element: HTMLInputElement, object: object) {
+            super(element, object);
         }
 
         /**

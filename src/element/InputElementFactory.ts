@@ -37,6 +37,6 @@ namespace duice.component {
     }
 
     // register factory instance
-    ObjectElementFactory.addInstance(new InputElementFactory());
+    ObjectElementFactoryRegistry.addInstance(new InputElementFactory());
 
 }

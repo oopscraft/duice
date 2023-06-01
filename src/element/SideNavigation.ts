@@ -121,7 +121,7 @@ namespace duice.component {
          * @param array
          */
         override doStyle(array: object[]): string {
-            return ` 
+            return `
                 .${getNamespace()}-side-navigation li {
                     line-height: inherit;
                 }
@@ -135,23 +135,23 @@ namespace duice.component {
                     background-position-x: center;
                     background-position-y: center;
                     cursor: pointer;
-                } 
+                }
                 .${getNamespace()}-side-navigation li.__fold__::before {
                     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAOUlEQVR42mNgGEygoaHhP8OQBqM+GBgXE8I0DRJaWPB/yFrwHwuGy+OiR1YQ0S4V0TQfjIJRMEIAAEXLZ9KMlg2EAAAAAElFTkSuQmCC);
-                } 
+                }
                 .${getNamespace()}-side-navigation li.__fold__ > ul {
                     display: none;
                 }
                 .${getNamespace()}-side-navigation li.__unfold__::before {
-                    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAANklEQVR42mNgGEygoaHhP8OQBqM+GBgXE8I0DZJRC5AN+I8Fw+Vx0aNxQB0LaJoPRsEoGCEAAGOiY9YrvpoQAAAAAElFTkSuQmCC); 
-                } 
+                    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAANklEQVR42mNgGEygoaHhP8OQBqM+GBgXE8I0DZJRC5AN+I8Fw+Vx0aNxQB0LaJoPRsEoGCEAAGOiY9YrvpoQAAAAAElFTkSuQmCC);
+                }
                 .${getNamespace()}-side-navigation li.__unfold__ > ul {
                     display: '';
                 }
                 .${getNamespace()}-side-navigation li > a {
                     display: inline-block;
                     color: inherit;
-                    text-decoration: none; 
+                    text-decoration: none;
                     cursor: pointer;
                 }
                 .${getNamespace()}-side-navigation li > a > img {
@@ -169,6 +169,6 @@ namespace duice.component {
 
     // register
     let customElementFactory = new CustomElementFactory(`${duice.getNamespace()}-side-navigation`, Tree);
-    CustomElementFactory.addInstance(customElementFactory);
+    CustomElementFactoryRegistry.addInstance(customElementFactory);
 
 }
