@@ -25,12 +25,13 @@ namespace duice {
         /**
          * creates array component
          * @param htmlElement
-         * @param array
+         * @param bindData
+         * @param context
          */
-        override createElement(htmlElement: T, array: object[]): ArrayElement<any> {
+        override createElement(htmlElement: T, bindData: object[], context: object): ArrayElement<any> {
 
             // create array element
-            let arrayElement = new ArrayElement(htmlElement, array);
+            let arrayElement = new ArrayElement(htmlElement, bindData, context);
 
             // loop
             let loop = getElementAttribute(htmlElement, 'loop');

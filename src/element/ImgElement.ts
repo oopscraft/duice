@@ -22,10 +22,11 @@ namespace duice.component {
         /**
          * constructor
          * @param element
-         * @param object
+         * @param bindData
+         * @param context
          */
-        constructor(element: HTMLImageElement, object: object) {
-            super(element, object);
+        constructor(element: HTMLImageElement, bindData: object, context: object) {
+            super(element, bindData, context);
             this.originSrc = String(this.getHtmlElement().src);
 
             // editable

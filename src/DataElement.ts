@@ -8,28 +8,35 @@ namespace duice {
 
         htmlElement: T;
 
-        data: V;
+        bindName: string;
+
+        bindData: V;
+
+        context: object;
 
         /**
          * constructor
          * @param htmlElement
-         * @param data
+         * @param bindData
+         * @param context
          * @protected
          */
-        protected constructor(htmlElement: T, data: V) {
+        protected constructor(htmlElement: T, bindData: V, context: object) {
             super();
             this.htmlElement = htmlElement;
-            this.data = data;
+            this.bindData = bindData;
+            this.bindName = getElementAttribute(this.htmlElement, 'bind');
+            this.context = context;
             setElementAttribute(this.htmlElement, 'id', this.generateId());
 
             // bind with data handler
-            let dataHandler = globalThis.Object.getOwnPropertyDescriptor(data, '_handler_')?.value;
+            let dataHandler = globalThis.Object.getOwnPropertyDescriptor(bindData, '_handler_')?.value;
             assert(dataHandler, 'DataHandler is not found');
             this.addObserver(dataHandler);
             dataHandler.addObserver(this);
 
             // set data
-            this.data = dataHandler.getTarget();
+            this.bindData = dataHandler.getTarget();
         }
 
         /**
@@ -50,10 +57,24 @@ namespace duice {
         }
 
         /**
-         * return data
+         * return bind name
          */
-        getData(): V {
-            return this.data;
+        getBindName(): string {
+            return this.bindName;
+        }
+
+        /**
+         * return bind data
+         */
+        getBindData(): V {
+            return this.bindData;
+        }
+
+        /**
+         * return context
+         */
+        getContext(): object {
+            return this.context;
         }
 
         /**
@@ -71,7 +92,7 @@ namespace duice {
                         args.push(property);
                         values.push(context[property]);
                     }
-                    return Function(...args, script).call(this.getHtmlElement(), ...values);
+                    return Function(...args, script).call(htmlElement, ...values);
                 }catch(e){
                     console.error(script, e);
                     throw e;

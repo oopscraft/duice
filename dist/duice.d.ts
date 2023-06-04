@@ -36,14 +36,17 @@ declare namespace duice {
      */
     abstract class DataElement<T extends HTMLElement, V> extends Observable implements Observer {
         htmlElement: T;
-        data: V;
+        bindName: string;
+        bindData: V;
+        context: object;
         /**
          * constructor
          * @param htmlElement
-         * @param data
+         * @param bindData
+         * @param context
          * @protected
          */
-        protected constructor(htmlElement: T, data: V);
+        protected constructor(htmlElement: T, bindData: V, context: object);
         /**
          * generates component ID
          */
@@ -53,9 +56,17 @@ declare namespace duice {
          */
         getHtmlElement(): T;
         /**
-         * return data
+         * return bind name
          */
-        getData(): V;
+        getBindName(): string;
+        /**
+         * return bind data
+         */
+        getBindData(): V;
+        /**
+         * return context
+         */
+        getContext(): object;
         /**
          * execute script if exists
          * @param htmlElement
@@ -88,9 +99,10 @@ declare namespace duice {
         /**
          * constructor
          * @param htmlElement
-         * @param array
+         * @param bindData
+         * @param context
          */
-        constructor(htmlElement: T, array: object[]);
+        constructor(htmlElement: T, bindData: object[], context: object);
         /**
          * set loop
          * @param loop
@@ -143,9 +155,10 @@ declare namespace duice {
         /**
          * creates element
          * @param htmlElement
+         * @param bindData
          * @param context
          */
-        abstract createElement(htmlElement: T, context: object): DataElement<HTMLElement, V>;
+        abstract createElement(htmlElement: T, bindData: V, context: object): DataElement<HTMLElement, V>;
     }
 }
 declare namespace duice {
@@ -166,9 +179,10 @@ declare namespace duice {
         /**
          * creates array component
          * @param htmlElement
-         * @param array
+         * @param bindData
+         * @param context
          */
-        createElement(htmlElement: T, array: object[]): ArrayElement<any>;
+        createElement(htmlElement: T, bindData: object[], context: object): ArrayElement<any>;
     }
 }
 declare namespace duice {
@@ -474,9 +488,10 @@ declare namespace duice {
         /**
          * constructor
          * @param htmlElement
-         * @param data
+         * @param bindData
+         * @param context
          */
-        protected constructor(htmlElement: HTMLElement, data: V);
+        protected constructor(htmlElement: HTMLElement, bindData: V, context: object);
         /**
          * render
          */
@@ -525,9 +540,10 @@ declare namespace duice {
         /**
          * creates component
          * @param htmlElement
+         * @param bindData
          * @param context
          */
-        createElement(htmlElement: HTMLElement, context: object): DataElement<any, any>;
+        createElement(htmlElement: HTMLElement, bindData: V, context: object): DataElement<any, any>;
         /**
          * checks supported elements
          * @param htmlElement
@@ -554,9 +570,10 @@ declare namespace duice {
         /**
          * constructor
          * @param htmlElement
-         * @param data
+         * @param bindData
+         * @param context
          */
-        constructor(htmlElement: T, data: object);
+        constructor(htmlElement: T, bindData: object, context: object);
         /**
          * set property
          * @param property
@@ -579,6 +596,9 @@ declare namespace duice {
          * render
          */
         render(): void;
+        /**
+         * execute script
+         */
         executeScript(): void;
         /**
          * update event received
@@ -634,14 +654,16 @@ declare namespace duice {
          * create component
          * @param element
          * @param object
+         * @param context
          */
-        createElement(element: T, object: object): ObjectElement<T>;
+        createElement(element: T, object: object, context: object): ObjectElement<T>;
         /**
          * template method to create component
          * @param htmlElement
          * @param object
+         * @param context
          */
-        doCreateElement(htmlElement: T, object: object): ObjectElement<T>;
+        doCreateElement(htmlElement: T, object: object, context: object): ObjectElement<T>;
     }
 }
 declare namespace duice.event {
@@ -1084,9 +1106,10 @@ declare namespace duice.component {
         /**
          * constructor
          * @param element
-         * @param object
+         * @param bindData
+         * @param context
          */
-        constructor(element: HTMLImageElement, object: object);
+        constructor(element: HTMLImageElement, bindData: object, context: object);
         /**
          * show clear image button
          */
@@ -1158,9 +1181,10 @@ declare namespace duice.component {
         /**
          * creates component
          * @param element
+         * @param bindData
          * @param context
          */
-        doCreateElement(element: HTMLImageElement, context: object): ImgElement;
+        doCreateElement(element: HTMLImageElement, bindData: object, context: object): ImgElement;
         /**
          * returns supported
          * @param element
@@ -1176,9 +1200,10 @@ declare namespace duice.component {
         /**
          * constructor
          * @param element
-         * @param object
+         * @param bindData
+         * @param context
          */
-        constructor(element: HTMLInputElement, object: object);
+        constructor(element: HTMLInputElement, bindData: object, context: object);
         /**
          * set value
          * @param value
@@ -1214,9 +1239,10 @@ declare namespace duice.component {
         /**
          * constructor
          * @param element
-         * @param object
+         * @param bindData
+         * @param context
          */
-        constructor(element: HTMLInputElement, object: object);
+        constructor(element: HTMLInputElement, bindData: object, context: object);
         /**
          * set value
          * @param value
@@ -1266,9 +1292,10 @@ declare namespace duice.component {
         /**
          * constructor
          * @param element
+         * @param bindData
          * @param context
          */
-        constructor(element: HTMLInputElement, context: object);
+        constructor(element: HTMLInputElement, bindData: object, context: object);
         /**
          * set value
          * @param value
@@ -1288,9 +1315,10 @@ declare namespace duice.component {
         /**
          * creates component
          * @param element
+         * @param bindData
          * @param context
          */
-        doCreateElement(element: HTMLInputElement, context: object): InputElement;
+        doCreateElement(element: HTMLInputElement, bindData: object, context: object): InputElement;
         /**
          * check supported
          * @param element
@@ -1306,9 +1334,10 @@ declare namespace duice.component {
         /**
          * constructor
          * @param element
-         * @param object
+         * @param bindData
+         * @param context
          */
-        constructor(element: HTMLInputElement, object: object);
+        constructor(element: HTMLInputElement, bindData: object, context: object);
         /**
          * return value
          */
@@ -1323,9 +1352,10 @@ declare namespace duice.component {
         /**
          * constructor
          * @param element
-         * @param object
+         * @param bindData
+         * @param context
          */
-        constructor(element: HTMLInputElement, object: object);
+        constructor(element: HTMLInputElement, bindData: object, context: object);
         /**
          * set value
          * @param value
@@ -1375,9 +1405,10 @@ declare namespace duice.component {
         /**
          * constructor
          * @param element
-         * @param object
+         * @param bindData
+         * @param context
          */
-        constructor(element: HTMLSelectElement, object: object);
+        constructor(element: HTMLSelectElement, bindData: object, context: object);
         /**
          * set value
          * @param value
@@ -1407,9 +1438,10 @@ declare namespace duice.component {
         /**
          * create component
          * @param element
+         * @param bindData
          * @param context
          */
-        doCreateElement(element: HTMLSelectElement, context: object): SelectElement;
+        doCreateElement(element: HTMLSelectElement, bindData: object, context: object): SelectElement;
         /**
          * return supported
          * @param element
@@ -1425,9 +1457,10 @@ declare namespace duice.component {
         /**
          * constructor
          * @param element
-         * @param object
+         * @param bindData
+         * @param context
          */
-        constructor(element: HTMLTextAreaElement, object: object);
+        constructor(element: HTMLTextAreaElement, bindData: object, context: object);
         /**
          * set value
          * @param value
@@ -1457,9 +1490,10 @@ declare namespace duice.component {
         /**
          * creates component
          * @param element
+         * @param bindData
          * @param context
          */
-        doCreateElement(element: HTMLTextAreaElement, context: object): TextareaElement;
+        doCreateElement(element: HTMLTextAreaElement, bindData: object, context: object): TextareaElement;
         /**
          * returns supported
          * @param element

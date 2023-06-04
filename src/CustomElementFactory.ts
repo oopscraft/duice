@@ -24,12 +24,13 @@ namespace duice {
         /**
          * creates component
          * @param htmlElement
+         * @param bindData
          * @param context
          */
-        override createElement(htmlElement: HTMLElement, context: object): DataElement<any, any> {
+        override createElement(htmlElement: HTMLElement, bindData: V, context: object): DataElement<any, any> {
 
             // creates instance
-            let element =  Reflect.construct(this.elementType, [htmlElement, context]);
+            let element =  Reflect.construct(this.elementType, [htmlElement, bindData, context]);
 
             // array element
             if(element instanceof ArrayElement) {

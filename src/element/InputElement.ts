@@ -8,10 +8,11 @@ namespace duice.component {
         /**
          * constructor
          * @param element
-         * @param object
+         * @param bindData
+         * @param context
          */
-        constructor(element: HTMLInputElement, object: object) {
-            super(element, object);
+        constructor(element: HTMLInputElement, bindData: object, context: object) {
+            super(element, bindData, context);
 
             // adds change listener
             this.getHtmlElement().addEventListener('change', e => {

@@ -14,9 +14,10 @@ namespace duice {
         /**
          * creates element
          * @param htmlElement
+         * @param bindData
          * @param context
          */
-        abstract createElement(htmlElement: T, context: object): DataElement<HTMLElement, V>;
+        abstract createElement(htmlElement: T, bindData: V, context: object): DataElement<HTMLElement, V>;
 
     }
 

@@ -21,10 +21,11 @@ namespace duice {
         /**
          * constructor
          * @param htmlElement
-         * @param array
+         * @param bindData
+         * @param context
          */
-        constructor(htmlElement: T, array: object[]) {
-            super(htmlElement.cloneNode(true) as T, array);
+        constructor(htmlElement: T, bindData: object[], context: object) {
+            super(htmlElement.cloneNode(true) as T, bindData, context);
 
             // replace with slot for position
             htmlElement.replaceWith(this.slot);
@@ -69,7 +70,7 @@ namespace duice {
          * render
          */
         override render(): void {
-            let arrayProxy = this.getData() as Array<object>;
+            let arrayProxy = this.getBindData() as Array<object>;
 
             // reset row elements
             this.rowHtmlElements.forEach(rowElement => {
@@ -97,7 +98,7 @@ namespace duice {
 
                                 // context
                                 index ++;
-                                let context = {};
+                                let context = Object.assign({}, _this.getContext());
                                 context[itemName] = object;
                                 context[statusName] = new ObjectProxy({
                                     index: index,
@@ -130,7 +131,7 @@ namespace duice {
                         let object = arrayProxy[index];
 
                         // context
-                        let context = {};
+                        let context = Object.assign({}, this.getContext());
                         context[itemName] = object;
                         context[statusName] = new ObjectProxy({
                             index: index,
@@ -150,10 +151,8 @@ namespace duice {
             else {
                 // initialize
                 let rowHtmlElement = this.getHtmlElement().cloneNode(true) as HTMLElement;
-                let arrayName = getElementAttribute(this.getHtmlElement(),'bind');
-                let context = {};
-                context[arrayName] = this.getData();
-                initialize(rowHtmlElement, context);
+                let context = Object.assign({}, this.getContext());
+                initialize(rowHtmlElement, this.getContext());
                 this.rowHtmlElements.push(rowHtmlElement);
 
                 // append to slot

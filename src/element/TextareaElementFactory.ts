@@ -8,10 +8,11 @@ namespace duice.component {
         /**
          * creates component
          * @param element
+         * @param bindData
          * @param context
          */
-        override doCreateElement(element: HTMLTextAreaElement, context: object): TextareaElement {
-            return new TextareaElement(element, context);
+        override doCreateElement(element: HTMLTextAreaElement, bindData: object, context: object): TextareaElement {
+            return new TextareaElement(element, bindData, context);
         }
 
         /**

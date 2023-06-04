@@ -26,11 +26,12 @@ namespace duice {
          * create component
          * @param element
          * @param object
+         * @param context
          */
-        override createElement(element: T, object: object): ObjectElement<T> {
+        override createElement(element: T, object: object, context: object): ObjectElement<T> {
 
             // create object element
-            let objectElement = this.doCreateElement(element, object);
+            let objectElement = this.doCreateElement(element, object, context);
 
             // property
             let property = getElementAttribute(element, 'property');
@@ -52,9 +53,10 @@ namespace duice {
          * template method to create component
          * @param htmlElement
          * @param object
+         * @param context
          */
-        doCreateElement(htmlElement: T, object: object): ObjectElement<T> {
-            return new ObjectElement(htmlElement, object);
+        doCreateElement(htmlElement: T, object: object, context: object): ObjectElement<T> {
+            return new ObjectElement(htmlElement, object, context);
         }
 
     }

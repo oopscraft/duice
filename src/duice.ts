@@ -42,21 +42,21 @@ namespace duice {
                     // custom element
                     let customElementFactory = CustomElementFactoryRegistry.getInstance(htmlElement);
                     if(customElementFactory) {
-                        customElementFactory.createElement(htmlElement, bindData)?.render();
+                        customElementFactory.createElement(htmlElement, bindData, context)?.render();
                         return;
                     }
 
                     // array element
                     if(Array.isArray(bindData)) {
                         ArrayElementFactoryRegistry.getInstance(htmlElement)
-                            ?.createElement(htmlElement, bindData)
+                            ?.createElement(htmlElement, bindData, context)
                             ?.render();
                         return;
                     }
                     // object element
                     else{
                         ObjectElementFactoryRegistry.getInstance(htmlElement)
-                            ?.createElement(htmlElement, bindData)
+                            ?.createElement(htmlElement, bindData, context)
                             ?.render();
                         return;
                     }

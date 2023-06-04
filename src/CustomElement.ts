@@ -9,10 +9,11 @@ namespace duice {
         /**
          * constructor
          * @param htmlElement
-         * @param data
+         * @param bindData
+         * @param context
          */
-        protected constructor(htmlElement: HTMLElement, data: V) {
-            super(htmlElement, data);
+        protected constructor(htmlElement: HTMLElement, bindData: V, context: object) {
+            super(htmlElement, bindData, context);
         }
 
         /**
@@ -24,7 +25,7 @@ namespace duice {
             this.htmlElement.innerHTML = '';
 
             // create template element
-            let templateElement = this.doRender(this.getData());
+            let templateElement = this.doRender(this.getBindData());
             if(this.htmlElement.shadowRoot){
                 this.htmlElement.shadowRoot.appendChild(templateElement);
             }else{
@@ -32,7 +33,7 @@ namespace duice {
             }
 
             // add style if exists
-            let styleLiteral = this.doStyle(this.getData());
+            let styleLiteral = this.doStyle(this.getBindData());
             if(styleLiteral){
                 let style = document.createElement('style');
                 style.textContent = styleLiteral.trim();
@@ -40,8 +41,8 @@ namespace duice {
             }
 
             // initializes
-            let context = {};
-            context['data'] = this.data;
+            let context = Object.assign({}, this.getContext());
+            context['data'] = this.bindData;
             initialize(this.htmlElement, context);
 
             // execute script

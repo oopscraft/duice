@@ -8,10 +8,11 @@ namespace duice.component {
         /**
          * create component
          * @param element
+         * @param bindData
          * @param context
          */
-        override doCreateElement(element: HTMLSelectElement, context: object): SelectElement {
-            return new SelectElement(element, context);
+        override doCreateElement(element: HTMLSelectElement, bindData: object, context: object): SelectElement {
+            return new SelectElement(element, bindData, context);
         }
 
         /**

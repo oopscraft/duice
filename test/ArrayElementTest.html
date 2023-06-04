@@ -197,7 +197,7 @@
                 <th>address.city</th>
                 <th>items[]</th>
             </tr>
-            <tr data-duice-bind="myArray" data-duice-loop="myObject,status" data-duice-toggle-class="selected">
+            <tr data-duice-bind="myArray" data-duice-loop="myObject,status" data-duice-toggle-class="selected" data-duice-script="this.dataset.name=myObject.name;" onclick="alert(this.dataset.name);">
                 <td data-duice-bind="status" data-duice-property="index"></td>
                 <td data-duice-bind="status" data-duice-property="count"></td>
                 <td data-duice-bind="myObject" data-duice-property="name"></td>
@@ -293,11 +293,15 @@
                                 <input data-duice-bind="item" data-duice-property="name"/>
                             </td>
                         </tr>
+                        <tr data-duice-bind="myObject.items"
+                            data-duice-script="if(myObject.items.length > 0) this.hidden=true;">
+                            <td colspan="100%">Data Not Found</td>
+                        </tr>
                     </table>
                 </td>
                 <td>
                     <button data-duice-bind="status" data-duice-script="this.dataset.index=status.index;"
-                            onclick="myArray.deleteRow(Number(this.dataset.index));">
+                            onclick="myArray.splice(Number(this.dataset.index),1);">
                         myArray.deleteRow([index]);
                     </button>
                 </td>

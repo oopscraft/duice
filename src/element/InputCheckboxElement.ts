@@ -13,10 +13,11 @@ namespace duice.component {
         /**
          * constructor
          * @param element
-         * @param object
+         * @param bindData
+         * @param context
          */
-        constructor(element: HTMLInputElement, object: object) {
-            super(element, object);
+        constructor(element: HTMLInputElement, bindData: object, context: object) {
+            super(element, bindData, context);
 
             // true false value
             let trueValue = getElementAttribute(this.getHtmlElement(), 'true-value');

@@ -15,19 +15,12 @@ namespace duice {
         /**
          * constructor
          * @param htmlElement
-         * @param data
+         * @param bindData
+         * @param context
          */
-        constructor(htmlElement: T, data: object) {
-            super(htmlElement, data);
+        constructor(htmlElement: T, bindData: object, context: object) {
+            super(htmlElement, bindData, context);
         }
-
-        // /**
-        //  * set object
-        //  * @param objectName
-        //  */
-        // setObject(objectName: string): void {
-        //     this.setData(objectName);
-        // }
 
         /**
          * set property
@@ -64,7 +57,7 @@ namespace duice {
          */
         override render(): void {
             if(this.property){
-                let objectHandler = ObjectProxy.getHandler(this.getData());
+                let objectHandler = ObjectProxy.getHandler(this.getBindData());
 
                 // set value
                 let value = objectHandler.getValue(this.property);
@@ -83,11 +76,12 @@ namespace duice {
             this.executeScript();
         }
 
+        /**
+         * execute script
+         */
         override executeScript():void {
-            // executes script
-            let objectName = getElementAttribute(this.getHtmlElement(), 'bind');
-            let context = {};
-            context[objectName] = this.getData();
+            let context = Object.assign({}, this.getContext());
+            context[this.getBindName()] = this.getBindData();
             super.executeScript(this.htmlElement, context);
         }
 

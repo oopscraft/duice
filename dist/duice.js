@@ -72,22 +72,25 @@ var duice;
         /**
          * constructor
          * @param htmlElement
-         * @param data
+         * @param bindData
+         * @param context
          * @protected
          */
-        constructor(htmlElement, data) {
+        constructor(htmlElement, bindData, context) {
             var _a;
             super();
             this.htmlElement = htmlElement;
-            this.data = data;
+            this.bindData = bindData;
+            this.bindName = duice.getElementAttribute(this.htmlElement, 'bind');
+            this.context = context;
             duice.setElementAttribute(this.htmlElement, 'id', this.generateId());
             // bind with data handler
-            let dataHandler = (_a = globalThis.Object.getOwnPropertyDescriptor(data, '_handler_')) === null || _a === void 0 ? void 0 : _a.value;
+            let dataHandler = (_a = globalThis.Object.getOwnPropertyDescriptor(bindData, '_handler_')) === null || _a === void 0 ? void 0 : _a.value;
             duice.assert(dataHandler, 'DataHandler is not found');
             this.addObserver(dataHandler);
             dataHandler.addObserver(this);
             // set data
-            this.data = dataHandler.getTarget();
+            this.bindData = dataHandler.getTarget();
         }
         /**
          * generates component ID
@@ -105,10 +108,22 @@ var duice;
             return this.htmlElement;
         }
         /**
-         * return data
+         * return bind name
          */
-        getData() {
-            return this.data;
+        getBindName() {
+            return this.bindName;
+        }
+        /**
+         * return bind data
+         */
+        getBindData() {
+            return this.bindData;
+        }
+        /**
+         * return context
+         */
+        getContext() {
+            return this.context;
         }
         /**
          * execute script if exists
@@ -125,7 +140,7 @@ var duice;
                         args.push(property);
                         values.push(context[property]);
                     }
-                    return Function(...args, script).call(this.getHtmlElement(), ...values);
+                    return Function(...args, script).call(htmlElement, ...values);
                 }
                 catch (e) {
                     console.error(script, e);
@@ -146,10 +161,11 @@ var duice;
         /**
          * constructor
          * @param htmlElement
-         * @param array
+         * @param bindData
+         * @param context
          */
-        constructor(htmlElement, array) {
-            super(htmlElement.cloneNode(true), array);
+        constructor(htmlElement, bindData, context) {
+            super(htmlElement.cloneNode(true), bindData, context);
             this.slot = document.createElement('slot');
             this.editable = false;
             this.rowHtmlElements = [];
@@ -191,7 +207,7 @@ var duice;
          */
         render() {
             var _a;
-            let arrayProxy = this.getData();
+            let arrayProxy = this.getBindData();
             // reset row elements
             this.rowHtmlElements.forEach(rowElement => {
                 rowElement.parentNode.removeChild(rowElement);
@@ -215,7 +231,7 @@ var duice;
                             if (object[parentIdName] === parentId) {
                                 // context
                                 index++;
-                                let context = {};
+                                let context = Object.assign({}, _this.getContext());
                                 context[itemName] = object;
                                 context[statusName] = new duice.ObjectProxy({
                                     index: index,
@@ -243,7 +259,7 @@ var duice;
                         // element data
                         let object = arrayProxy[index];
                         // context
-                        let context = {};
+                        let context = Object.assign({}, this.getContext());
                         context[itemName] = object;
                         context[statusName] = new duice.ObjectProxy({
                             index: index,
@@ -261,10 +277,8 @@ var duice;
             else {
                 // initialize
                 let rowHtmlElement = this.getHtmlElement().cloneNode(true);
-                let arrayName = duice.getElementAttribute(this.getHtmlElement(), 'bind');
-                let context = {};
-                context[arrayName] = this.getData();
-                duice.initialize(rowHtmlElement, context);
+                let context = Object.assign({}, this.getContext());
+                duice.initialize(rowHtmlElement, this.getContext());
                 this.rowHtmlElements.push(rowHtmlElement);
                 // append to slot
                 this.slot.appendChild(rowHtmlElement);
@@ -371,11 +385,12 @@ var duice;
         /**
          * creates array component
          * @param htmlElement
-         * @param array
+         * @param bindData
+         * @param context
          */
-        createElement(htmlElement, array) {
+        createElement(htmlElement, bindData, context) {
             // create array element
-            let arrayElement = new duice.ArrayElement(htmlElement, array);
+            let arrayElement = new duice.ArrayElement(htmlElement, bindData, context);
             // loop
             let loop = duice.getElementAttribute(htmlElement, 'loop');
             if (loop) {
@@ -1003,10 +1018,11 @@ var duice;
         /**
          * constructor
          * @param htmlElement
-         * @param data
+         * @param bindData
+         * @param context
          */
-        constructor(htmlElement, data) {
-            super(htmlElement, data);
+        constructor(htmlElement, bindData, context) {
+            super(htmlElement, bindData, context);
         }
         /**
          * render
@@ -1015,7 +1031,7 @@ var duice;
             // removes child
             this.htmlElement.innerHTML = '';
             // create template element
-            let templateElement = this.doRender(this.getData());
+            let templateElement = this.doRender(this.getBindData());
             if (this.htmlElement.shadowRoot) {
                 this.htmlElement.shadowRoot.appendChild(templateElement);
             }
@@ -1023,15 +1039,15 @@ var duice;
                 this.htmlElement.appendChild(templateElement);
             }
             // add style if exists
-            let styleLiteral = this.doStyle(this.getData());
+            let styleLiteral = this.doStyle(this.getBindData());
             if (styleLiteral) {
                 let style = document.createElement('style');
                 style.textContent = styleLiteral.trim();
                 this.htmlElement.appendChild(style);
             }
             // initializes
-            let context = {};
-            context['data'] = this.data;
+            let context = Object.assign({}, this.getContext());
+            context['data'] = this.bindData;
             duice.initialize(this.htmlElement, context);
             // execute script
             this.executeScript(this.htmlElement, context);
@@ -1085,11 +1101,12 @@ var duice;
         /**
          * creates component
          * @param htmlElement
+         * @param bindData
          * @param context
          */
-        createElement(htmlElement, context) {
+        createElement(htmlElement, bindData, context) {
             // creates instance
-            let element = Reflect.construct(this.elementType, [htmlElement, context]);
+            let element = Reflect.construct(this.elementType, [htmlElement, bindData, context]);
             // array element
             if (element instanceof duice.ArrayElement) {
                 // loop
@@ -1176,18 +1193,12 @@ var duice;
         /**
          * constructor
          * @param htmlElement
-         * @param data
+         * @param bindData
+         * @param context
          */
-        constructor(htmlElement, data) {
-            super(htmlElement, data);
+        constructor(htmlElement, bindData, context) {
+            super(htmlElement, bindData, context);
         }
-        // /**
-        //  * set object
-        //  * @param objectName
-        //  */
-        // setObject(objectName: string): void {
-        //     this.setData(objectName);
-        // }
         /**
          * set property
          * @param property
@@ -1219,7 +1230,7 @@ var duice;
          */
         render() {
             if (this.property) {
-                let objectHandler = duice.ObjectProxy.getHandler(this.getData());
+                let objectHandler = duice.ObjectProxy.getHandler(this.getBindData());
                 // set value
                 let value = objectHandler.getValue(this.property);
                 this.setValue(value);
@@ -1233,11 +1244,12 @@ var duice;
             // executes script
             this.executeScript();
         }
+        /**
+         * execute script
+         */
         executeScript() {
-            // executes script
-            let objectName = duice.getElementAttribute(this.getHtmlElement(), 'bind');
-            let context = {};
-            context[objectName] = this.getData();
+            let context = Object.assign({}, this.getContext());
+            context[this.getBindName()] = this.getBindData();
             super.executeScript(this.htmlElement, context);
         }
         /**
@@ -1335,10 +1347,11 @@ var duice;
          * create component
          * @param element
          * @param object
+         * @param context
          */
-        createElement(element, object) {
+        createElement(element, object, context) {
             // create object element
-            let objectElement = this.doCreateElement(element, object);
+            let objectElement = this.doCreateElement(element, object, context);
             // property
             let property = duice.getElementAttribute(element, 'property');
             if (property) {
@@ -1356,9 +1369,10 @@ var duice;
          * template method to create component
          * @param htmlElement
          * @param object
+         * @param context
          */
-        doCreateElement(htmlElement, object) {
-            return new duice.ObjectElement(htmlElement, object);
+        doCreateElement(htmlElement, object, context) {
+            return new duice.ObjectElement(htmlElement, object, context);
         }
     }
     duice.ObjectElementFactory = ObjectElementFactory;
@@ -1809,17 +1823,17 @@ var duice;
                     // custom element
                     let customElementFactory = duice.CustomElementFactoryRegistry.getInstance(htmlElement);
                     if (customElementFactory) {
-                        (_a = customElementFactory.createElement(htmlElement, bindData)) === null || _a === void 0 ? void 0 : _a.render();
+                        (_a = customElementFactory.createElement(htmlElement, bindData, context)) === null || _a === void 0 ? void 0 : _a.render();
                         return;
                     }
                     // array element
                     if (Array.isArray(bindData)) {
-                        (_c = (_b = duice.ArrayElementFactoryRegistry.getInstance(htmlElement)) === null || _b === void 0 ? void 0 : _b.createElement(htmlElement, bindData)) === null || _c === void 0 ? void 0 : _c.render();
+                        (_c = (_b = duice.ArrayElementFactoryRegistry.getInstance(htmlElement)) === null || _b === void 0 ? void 0 : _b.createElement(htmlElement, bindData, context)) === null || _c === void 0 ? void 0 : _c.render();
                         return;
                     }
                     // object element
                     else {
-                        (_e = (_d = duice.ObjectElementFactoryRegistry.getInstance(htmlElement)) === null || _d === void 0 ? void 0 : _d.createElement(htmlElement, bindData)) === null || _e === void 0 ? void 0 : _e.render();
+                        (_e = (_d = duice.ObjectElementFactoryRegistry.getInstance(htmlElement)) === null || _d === void 0 ? void 0 : _d.createElement(htmlElement, bindData, context)) === null || _e === void 0 ? void 0 : _e.render();
                         return;
                     }
                 }
@@ -2383,10 +2397,11 @@ var duice;
             /**
              * constructor
              * @param element
-             * @param object
+             * @param bindData
+             * @param context
              */
-            constructor(element, object) {
-                super(element, object);
+            constructor(element, bindData, context) {
+                super(element, bindData, context);
                 this.editable = false;
                 this.closeButtonImg = 'data:image/svg+xml;base64,' + window.btoa('<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path opacity="0.4" d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" fill="#292D32"></path> <path d="M13.0594 12.0001L15.3594 9.70011C15.6494 9.41011 15.6494 8.93011 15.3594 8.64011C15.0694 8.35011 14.5894 8.35011 14.2994 8.64011L11.9994 10.9401L9.69937 8.64011C9.40937 8.35011 8.92937 8.35011 8.63938 8.64011C8.34938 8.93011 8.34938 9.41011 8.63938 9.70011L10.9394 12.0001L8.63938 14.3001C8.34938 14.5901 8.34938 15.0701 8.63938 15.3601C8.78938 15.5101 8.97937 15.5801 9.16937 15.5801C9.35937 15.5801 9.54937 15.5101 9.69937 15.3601L11.9994 13.0601L14.2994 15.3601C14.4494 15.5101 14.6394 15.5801 14.8294 15.5801C15.0194 15.5801 15.2094 15.5101 15.3594 15.3601C15.6494 15.0701 15.6494 14.5901 15.3594 14.3001L13.0594 12.0001Z" fill="#292D32"></path> </g></svg>');
                 this.originSrc = String(this.getHtmlElement().src);
@@ -2614,10 +2629,11 @@ var duice;
             /**
              * creates component
              * @param element
+             * @param bindData
              * @param context
              */
-            doCreateElement(element, context) {
-                return new component.ImgElement(element, context);
+            doCreateElement(element, bindData, context) {
+                return new component.ImgElement(element, bindData, context);
             }
             /**
              * returns supported
@@ -2643,10 +2659,11 @@ var duice;
             /**
              * constructor
              * @param element
-             * @param object
+             * @param bindData
+             * @param context
              */
-            constructor(element, object) {
-                super(element, object);
+            constructor(element, bindData, context) {
+                super(element, bindData, context);
                 // adds change listener
                 this.getHtmlElement().addEventListener('change', e => {
                     let event = new duice.event.PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
@@ -2723,10 +2740,11 @@ var duice;
             /**
              * constructor
              * @param element
-             * @param object
+             * @param bindData
+             * @param context
              */
-            constructor(element, object) {
-                super(element, object);
+            constructor(element, bindData, context) {
+                super(element, bindData, context);
                 this.trueValue = true;
                 this.falseValue = false;
                 // true false value
@@ -2843,10 +2861,11 @@ var duice;
             /**
              * constructor
              * @param element
+             * @param bindData
              * @param context
              */
-            constructor(element, context) {
-                super(element, context);
+            constructor(element, bindData, context) {
+                super(element, bindData, context);
                 this.dateFormat = new duice.format.DateFormat('yyyy-MM-ddTHH:mm:ss');
             }
             /**
@@ -2877,21 +2896,22 @@ var duice;
             /**
              * creates component
              * @param element
+             * @param bindData
              * @param context
              */
-            doCreateElement(element, context) {
+            doCreateElement(element, bindData, context) {
                 let type = element.getAttribute('type');
                 switch (type) {
                     case 'number':
-                        return new component.InputNumberElement(element, context);
+                        return new component.InputNumberElement(element, bindData, context);
                     case 'checkbox':
-                        return new component.InputCheckboxElement(element, context);
+                        return new component.InputCheckboxElement(element, bindData, context);
                     case 'radio':
-                        return new component.InputRadioElement(element, context);
+                        return new component.InputRadioElement(element, bindData, context);
                     case 'datetime-local':
-                        return new component.InputDatetimeLocalElement(element, context);
+                        return new component.InputDatetimeLocalElement(element, bindData, context);
                     default:
-                        return new component.InputElement(element, context);
+                        return new component.InputElement(element, bindData, context);
                 }
             }
             /**
@@ -2920,10 +2940,11 @@ var duice;
             /**
              * constructor
              * @param element
-             * @param object
+             * @param bindData
+             * @param context
              */
-            constructor(element, object) {
-                super(element, object);
+            constructor(element, bindData, context) {
+                super(element, bindData, context);
                 // changes type and style
                 this.getHtmlElement().removeAttribute('type');
                 this.getHtmlElement().style.textAlign = 'right';
@@ -2957,10 +2978,11 @@ var duice;
             /**
              * constructor
              * @param element
-             * @param object
+             * @param bindData
+             * @param context
              */
-            constructor(element, object) {
-                super(element, object);
+            constructor(element, bindData, context) {
+                super(element, bindData, context);
             }
             /**
              * set value
@@ -3148,12 +3170,13 @@ var duice;
             /**
              * constructor
              * @param element
-             * @param object
+             * @param bindData
+             * @param context
              */
-            constructor(element, object) {
-                super(element, object);
+            constructor(element, bindData, context) {
+                super(element, bindData, context);
                 // adds event listener
-                this.getHtmlElement().addEventListener('change', (e) => {
+                this.getHtmlElement().addEventListener('change', () => {
                     let event = new duice.event.PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
                     this.notifyObservers(event);
                 }, true);
@@ -3221,10 +3244,11 @@ var duice;
             /**
              * create component
              * @param element
+             * @param bindData
              * @param context
              */
-            doCreateElement(element, context) {
-                return new component.SelectElement(element, context);
+            doCreateElement(element, bindData, context) {
+                return new component.SelectElement(element, bindData, context);
             }
             /**
              * return supported
@@ -3250,10 +3274,11 @@ var duice;
             /**
              * constructor
              * @param element
-             * @param object
+             * @param bindData
+             * @param context
              */
-            constructor(element, object) {
-                super(element, object);
+            constructor(element, bindData, context) {
+                super(element, bindData, context);
                 // adds change event listener
                 this.getHtmlElement().addEventListener('change', e => {
                     let event = new duice.event.PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
@@ -3323,10 +3348,11 @@ var duice;
             /**
              * creates component
              * @param element
+             * @param bindData
              * @param context
              */
-            doCreateElement(element, context) {
-                return new component.TextareaElement(element, context);
+            doCreateElement(element, bindData, context) {
+                return new component.TextareaElement(element, bindData, context);
             }
             /**
              * returns supported

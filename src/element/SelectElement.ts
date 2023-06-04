@@ -8,13 +8,14 @@ namespace duice.component {
         /**
          * constructor
          * @param element
-         * @param object
+         * @param bindData
+         * @param context
          */
-        constructor(element: HTMLSelectElement, object: object){
-            super(element, object);
+        constructor(element: HTMLSelectElement, bindData: object, context: object){
+            super(element, bindData, context);
 
             // adds event listener
-            this.getHtmlElement().addEventListener('change', (e) => {
+            this.getHtmlElement().addEventListener('change', () => {
                 let event = new duice.event.PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
                 this.notifyObservers(event);
             }, true);
