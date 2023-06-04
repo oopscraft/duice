@@ -69,6 +69,20 @@
                     {id:'b', name:'B'},
                     {id:'c', name:'C'}
                 ]
+            },
+            {
+                id: 'orange',
+                parentId: null,
+                name: 'Orange',
+                phoneNo: '01098765432',
+                cardNo: '9999888877776666',
+                balanceAmount: 7654321.51,
+                type: 'human',
+                enabled: false,
+                enabledYn: 'N',
+                description: "My name is tom.\n I am tom.",
+                address: [],
+                items: []
             }
         ]);
 
@@ -221,6 +235,10 @@
                             <td data-duice-bind="item" data-duice-property="id"></td>
                             <td data-duice-bind="item" data-duice-property="name"></td>
                         </tr>
+                        <tr data-duice-bind="myObject.items"
+                            data-duice-script="if(myObject.items.length > 0) this.hidden=true;">
+                            <td colspan="100%">Data Not Found</td>
+                        </tr>
                     </table>
                 </td>
             </tr>
@@ -328,7 +346,8 @@
             <small>&lt;tr data-duice-bind="myArray" data-duice-loop="item,status" data-duice-toggle-class="selected" data-duice-hierarchy="id,parentId"&gt;</small>
         </h3>
         <div>
-            <div data-duice-bind="myArray" data-duice-loop="item,status" data-duice-toggle-class="selected" data-duice-hierarchy="id,parentId" style="border:solid 1px #ccc; margin-left:1rem;">
+            <div data-duice-bind="myArray" data-duice-loop="item,status" data-duice-hierarchy="id,parentId" data-duice-toggle-class="selected"
+                data-duice-script="this.style.paddingLeft = (status.depth * 1) + 'rem';">
                 <span data-duice-bind="item" data-duice-property="name" tabIndex="0"></span>
             </div>
         </div>
