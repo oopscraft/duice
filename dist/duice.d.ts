@@ -148,16 +148,11 @@ declare namespace duice {
      */
     abstract class DataElementFactory<T extends HTMLElement, V> {
         /**
-         * check support
-         * @param element
-         */
-        abstract support(element: T): boolean;
-        /**
-         * creates element
-         * @param htmlElement
-         * @param bindData
-         * @param context
-         */
+          * creates element
+          * @param htmlElement
+          * @param bindData
+          * @param context
+          */
         abstract createElement(htmlElement: T, bindData: V, context: object): DataElement<HTMLElement, V>;
     }
 }
@@ -166,16 +161,6 @@ declare namespace duice {
      * array element factory class
      */
     class ArrayElementFactory<T extends HTMLElement> extends DataElementFactory<HTMLElement, object[]> {
-        /**
-         * check support
-         * @param htmlElement
-         */
-        support(htmlElement: T): boolean;
-        /**
-         * support template method
-         * @param htmlElement
-         */
-        doSupport(htmlElement: T): boolean;
         /**
          * creates array component
          * @param htmlElement
@@ -524,33 +509,6 @@ declare namespace duice {
         createElement(templateLiteral: string): HTMLElement;
     }
 }
-declare namespace duice {
-    /**
-     * custom component factory
-     */
-    class CustomElementFactory<V> extends DataElementFactory<HTMLElement, V> {
-        tagName: string;
-        elementType: Function;
-        /**
-         * constructor
-         * @param tagName
-         * @param elementType
-         */
-        constructor(tagName: string, elementType: Function);
-        /**
-         * creates component
-         * @param htmlElement
-         * @param bindData
-         * @param context
-         */
-        createElement(htmlElement: HTMLElement, bindData: V, context: object): DataElement<any, any>;
-        /**
-         * checks supported elements
-         * @param htmlElement
-         */
-        support(htmlElement: HTMLElement): boolean;
-    }
-}
 declare namespace duice.format {
     class FormatFactory {
         /**
@@ -636,20 +594,7 @@ declare namespace duice {
     }
 }
 declare namespace duice {
-    /**
-     * object element factory class
-     */
     class ObjectElementFactory<T extends HTMLElement> extends DataElementFactory<T, object> {
-        /**
-         * check support
-         * @param htmlElement
-         */
-        support(htmlElement: T): boolean;
-        /**
-         * support template method
-         * @param htmlElement
-         */
-        doSupport(htmlElement: T): boolean;
         /**
          * create component
          * @param element
@@ -853,6 +798,13 @@ declare namespace duice {
          * @param property
          */
         static focus(objectProxy: object, property: string): void;
+    }
+}
+declare namespace duice {
+    class CustomElementFactory<V> extends DataElementFactory<HTMLElement, V> {
+        elementType: Function;
+        constructor(elementType: Function);
+        createElement(htmlElement: HTMLElement, bindData: V, context: object): DataElement<any, any>;
     }
 }
 declare namespace duice {
@@ -1155,22 +1107,17 @@ declare namespace duice.component {
     }
 }
 declare namespace duice {
-    /**
-     * object element factory class
-     */
-    class ObjectElementFactoryRegistry {
-        static defaultInstance: ObjectElementFactory<HTMLElement>;
-        static instances: ObjectElementFactory<HTMLElement>[];
+    class DataElementRegistry {
+        static objectDefaultFactory: ObjectElementFactory<HTMLElement>;
+        static arrayDefaultFactory: ArrayElementFactory<HTMLElement>;
+        static objectFactories: Map<any, any>;
+        static arrayFactories: Map<any, any>;
+        static customFactories: Map<any, any>;
+        static register(tagName: string, dataElementFactory: DataElementFactory<HTMLElement, any>): void;
         /**
-         * adds factory instance to registry
-         * @param elementFactory
+         * get factory
          */
-        static addInstance(elementFactory: ObjectElementFactory<HTMLElement>): void;
-        /**
-         * returns supported instance
-         * @param htmlElement
-         */
-        static getInstance(htmlElement: HTMLElement): ObjectElementFactory<HTMLElement>;
+        static getFactory(htmlElement: HTMLElement, data: object): DataElementFactory<HTMLElement, any>;
     }
 }
 declare namespace duice.component {
@@ -1185,11 +1132,6 @@ declare namespace duice.component {
          * @param context
          */
         doCreateElement(element: HTMLImageElement, bindData: object, context: object): ImgElement;
-        /**
-         * returns supported
-         * @param element
-         */
-        doSupport(element: HTMLElement): boolean;
     }
 }
 declare namespace duice.component {
@@ -1319,11 +1261,6 @@ declare namespace duice.component {
          * @param context
          */
         doCreateElement(element: HTMLInputElement, bindData: object, context: object): InputElement;
-        /**
-         * check supported
-         * @param element
-         */
-        doSupport(element: HTMLElement): boolean;
     }
 }
 declare namespace duice.component {
@@ -1370,24 +1307,6 @@ declare namespace duice.component {
          * @param readonly
          */
         setReadonly(readonly: boolean): void;
-    }
-}
-declare namespace duice {
-    /**
-     * custom component factory registry
-     */
-    class CustomElementFactoryRegistry {
-        static instances: CustomElementFactory<any>[];
-        /**
-         * adds factory instance
-         * @param elementFactory
-         */
-        static addInstance(elementFactory: CustomElementFactory<any>): void;
-        /**
-         * returns factory instance to be supported
-         * @param htmlElement
-         */
-        static getInstance(htmlElement: HTMLElement): CustomElementFactory<any>;
     }
 }
 declare namespace duice.component {
@@ -1442,11 +1361,6 @@ declare namespace duice.component {
          * @param context
          */
         doCreateElement(element: HTMLSelectElement, bindData: object, context: object): SelectElement;
-        /**
-         * return supported
-         * @param element
-         */
-        doSupport(element: HTMLElement): boolean;
     }
 }
 declare namespace duice.component {
@@ -1494,11 +1408,6 @@ declare namespace duice.component {
          * @param context
          */
         doCreateElement(element: HTMLTextAreaElement, bindData: object, context: object): TextareaElement;
-        /**
-         * returns supported
-         * @param element
-         */
-        doSupport(element: HTMLElement): boolean;
     }
 }
 declare namespace duice.event {
@@ -1653,7 +1562,7 @@ declare namespace duice.tab {
     }
 }
 declare namespace duice.component {
-    class Tree extends duice.CustomElement<object[]> {
+    class SideNavigation extends duice.CustomElement<object[]> {
         idProperty: string;
         parentIdProperty: string;
         iconProperty: string;
@@ -1684,18 +1593,19 @@ declare namespace duice {
     /**
      * array element factory registry class
      */
-    class ArrayElementFactoryRegistry {
-        static defaultInstance: ArrayElementFactory<HTMLElement>;
-        static instances: ArrayElementFactory<HTMLElement>[];
+    class ArrayElementRegistry {
+        static defaultFactory: ArrayElementFactory<HTMLElement>;
+        static factories: Map<any, any>;
         /**
-         * adds factory instance
-         * @param elementFactory
+         * set factory
+         * @param tagName
+         * @param arrayElementFactory
          */
-        static addInstance(elementFactory: ArrayElementFactory<HTMLElement>): void;
+        static register(tagName: string, arrayElementFactory: ObjectElementFactory<HTMLElement>): void;
         /**
-         * return factory instance
+         * get factory
          * @param htmlElement
          */
-        static getInstance(htmlElement: HTMLElement): ArrayElementFactory<HTMLElement>;
+        static getFactory(htmlElement: HTMLElement): any;
     }
 }

@@ -1,26 +1,7 @@
 ///<reference path="DataElementFactory.ts"/>
 namespace duice {
 
-    /**
-     * object element factory class
-     */
     export class ObjectElementFactory<T extends HTMLElement> extends DataElementFactory<T, object> {
-
-        /**
-         * check support
-         * @param htmlElement
-         */
-        override support(htmlElement: T): boolean {
-            return this.doSupport(htmlElement);
-        }
-
-        /**
-         * support template method
-         * @param htmlElement
-         */
-        doSupport(htmlElement: T): boolean {
-            return true;
-        }
 
         /**
          * create component

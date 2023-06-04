@@ -1,3 +1,4 @@
+///<reference path="../DataElementRegistry.ts"/>
 namespace duice.component {
 
     /**
@@ -15,17 +16,9 @@ namespace duice.component {
             return new SelectElement(element, bindData, context);
         }
 
-        /**
-         * return supported
-         * @param element
-         */
-        override doSupport(element: HTMLElement): boolean {
-            return (element.tagName.toLowerCase() === 'select');
-        }
-
     }
 
     // register factory instance
-    ObjectElementFactoryRegistry.addInstance(new SelectElementFactory());
+    DataElementRegistry.register('select', new SelectElementFactory());
 
 }

@@ -1,3 +1,4 @@
+///<reference path="../DataElementRegistry.ts"/>
 namespace duice.component {
 
     /**
@@ -15,17 +16,9 @@ namespace duice.component {
             return new TextareaElement(element, bindData, context);
         }
 
-        /**
-         * returns supported
-         * @param element
-         */
-        override doSupport(element: HTMLElement): boolean {
-            return (element.tagName.toLowerCase() === 'textarea');
-        }
-
     }
 
-    // register factory instance
-    ObjectElementFactoryRegistry.addInstance(new TextareaElementFactory());
+    // register
+    DataElementRegistry.register('textarea', new TextareaElementFactory());
 
 }

@@ -1,4 +1,4 @@
-///<reference path="../ObjectElementFactoryRegistry.ts"/>
+///<reference path="../DataElementRegistry.ts"/>
 namespace duice.component {
 
     /**
@@ -16,17 +16,9 @@ namespace duice.component {
             return new ImgElement(element, bindData, context);
         }
 
-        /**
-         * returns supported
-         * @param element
-         */
-        override doSupport(element: HTMLElement): boolean {
-            return (element.tagName.toLowerCase() === 'img');
-        }
-
     }
 
     // register factory instance
-    ObjectElementFactoryRegistry.addInstance(new ImgElementFactory());
+    DataElementRegistry.register('img', new ImgElementFactory());
 
 }

@@ -1,6 +1,6 @@
 namespace duice.component {
 
-    export class Tree extends duice.CustomElement<object[]> {
+    export class SideNavigation extends duice.CustomElement<object[]> {
 
         idProperty: string;
 
@@ -168,7 +168,6 @@ namespace duice.component {
     }
 
     // register
-    let customElementFactory = new CustomElementFactory(`${duice.getNamespace()}-side-navigation`, Tree);
-    CustomElementFactoryRegistry.addInstance(customElementFactory);
+    DataElementRegistry.register(`${duice.getNamespace()}-side-navigation`, new CustomElementFactory(SideNavigation));
 
 }

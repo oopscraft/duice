@@ -38,29 +38,9 @@ namespace duice {
                 try {
                     let bindName = getElementAttribute(htmlElement, 'bind');
                     let bindData = findVariable(context, bindName);
-
-                    // custom element
-                    let customElementFactory = CustomElementFactoryRegistry.getInstance(htmlElement);
-                    if(customElementFactory) {
-                        customElementFactory.createElement(htmlElement, bindData, context)?.render();
-                        return;
-                    }
-
-                    // array element
-                    if(Array.isArray(bindData)) {
-                        ArrayElementFactoryRegistry.getInstance(htmlElement)
-                            ?.createElement(htmlElement, bindData, context)
-                            ?.render();
-                        return;
-                    }
-                    // object element
-                    else{
-                        ObjectElementFactoryRegistry.getInstance(htmlElement)
-                            ?.createElement(htmlElement, bindData, context)
-                            ?.render();
-                        return;
-                    }
-
+                    DataElementRegistry.getFactory(htmlElement, bindData)
+                        ?.createElement(htmlElement, bindData, context)
+                        ?.render();
                 }catch(e){
                     console.error(e, htmlElement, container, JSON.stringify(context));
                 }
@@ -208,8 +188,7 @@ namespace duice {
      * @param elementType
      */
     export function defineCustomElement(tagName: string, elementType: Function): void {
-        let customElementFactory = new CustomElementFactory(tagName, elementType);
-        CustomElementFactoryRegistry.addInstance(customElementFactory);
+        DataElementRegistry.register(tagName, new CustomElementFactory(elementType));
     }
 
     /**

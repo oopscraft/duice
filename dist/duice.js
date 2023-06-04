@@ -369,20 +369,6 @@ var duice;
      */
     class ArrayElementFactory extends duice.DataElementFactory {
         /**
-         * check support
-         * @param htmlElement
-         */
-        support(htmlElement) {
-            return this.doSupport(htmlElement);
-        }
-        /**
-         * support template method
-         * @param htmlElement
-         */
-        doSupport(htmlElement) {
-            return true;
-        }
-        /**
          * creates array component
          * @param htmlElement
          * @param bindData
@@ -1081,81 +1067,6 @@ var duice;
     }
     duice.CustomElement = CustomElement;
 })(duice || (duice = {}));
-///<reference path="DataElementFactory.ts"/>
-var duice;
-(function (duice) {
-    /**
-     * custom component factory
-     */
-    class CustomElementFactory extends duice.DataElementFactory {
-        /**
-         * constructor
-         * @param tagName
-         * @param elementType
-         */
-        constructor(tagName, elementType) {
-            super();
-            this.tagName = tagName;
-            this.elementType = elementType;
-        }
-        /**
-         * creates component
-         * @param htmlElement
-         * @param bindData
-         * @param context
-         */
-        createElement(htmlElement, bindData, context) {
-            // creates instance
-            let element = Reflect.construct(this.elementType, [htmlElement, bindData, context]);
-            // array element
-            if (element instanceof duice.ArrayElement) {
-                // loop
-                let loop = duice.getElementAttribute(htmlElement, 'loop');
-                if (loop) {
-                    element.setLoop(loop);
-                }
-                // hierarchy
-                let hierarchy = duice.getElementAttribute(htmlElement, 'hierarchy');
-                if (hierarchy) {
-                    element.setHierarchy(hierarchy);
-                }
-                // editable
-                let editable = duice.getElementAttribute(htmlElement, 'editable');
-                if (editable) {
-                    element.setEditable(editable.toLowerCase() === 'true');
-                }
-                // toggle class
-                let toggleClass = duice.getElementAttribute(htmlElement, 'toggle-class');
-                if (toggleClass) {
-                    element.setToggleClass(toggleClass);
-                }
-            }
-            // object element
-            else if (element instanceof duice.ObjectElement) {
-                // property
-                let property = duice.getElementAttribute(htmlElement, 'property');
-                if (property) {
-                    element.setProperty(property);
-                }
-                // format
-                let format = duice.getElementAttribute(htmlElement, 'format');
-                if (format) {
-                    element.setFormat(format);
-                }
-            }
-            // returns
-            return element;
-        }
-        /**
-         * checks supported elements
-         * @param htmlElement
-         */
-        support(htmlElement) {
-            return (htmlElement.tagName.toLowerCase() === this.tagName);
-        }
-    }
-    duice.CustomElementFactory = CustomElementFactory;
-})(duice || (duice = {}));
 var duice;
 (function (duice) {
     var format;
@@ -1325,24 +1236,7 @@ var duice;
 ///<reference path="DataElementFactory.ts"/>
 var duice;
 (function (duice) {
-    /**
-     * object element factory class
-     */
     class ObjectElementFactory extends duice.DataElementFactory {
-        /**
-         * check support
-         * @param htmlElement
-         */
-        support(htmlElement) {
-            return this.doSupport(htmlElement);
-        }
-        /**
-         * support template method
-         * @param htmlElement
-         */
-        doSupport(htmlElement) {
-            return true;
-        }
         /**
          * create component
          * @param element
@@ -1780,6 +1674,20 @@ var duice;
     }
     duice.ObjectProxy = ObjectProxy;
 })(duice || (duice = {}));
+///<reference path="DataElementFactory.ts"/>
+var duice;
+(function (duice) {
+    class CustomElementFactory extends duice.DataElementFactory {
+        constructor(elementType) {
+            super();
+            this.elementType = elementType;
+        }
+        createElement(htmlElement, bindData, context) {
+            return Reflect.construct(this.elementType, [htmlElement, bindData, context]);
+        }
+    }
+    duice.CustomElementFactory = CustomElementFactory;
+})(duice || (duice = {}));
 ///<reference path="CustomElementFactory.ts"/>
 var duice;
 (function (duice) {
@@ -1815,27 +1723,12 @@ var duice;
     function initialize(container, context) {
         // scan DOM tree
         container.querySelectorAll(getElementQuerySelector()).forEach(htmlElement => {
-            var _a, _b, _c, _d, _e;
+            var _a, _b;
             if (!hasElementAttribute(htmlElement, 'id')) {
                 try {
                     let bindName = getElementAttribute(htmlElement, 'bind');
                     let bindData = findVariable(context, bindName);
-                    // custom element
-                    let customElementFactory = duice.CustomElementFactoryRegistry.getInstance(htmlElement);
-                    if (customElementFactory) {
-                        (_a = customElementFactory.createElement(htmlElement, bindData, context)) === null || _a === void 0 ? void 0 : _a.render();
-                        return;
-                    }
-                    // array element
-                    if (Array.isArray(bindData)) {
-                        (_c = (_b = duice.ArrayElementFactoryRegistry.getInstance(htmlElement)) === null || _b === void 0 ? void 0 : _b.createElement(htmlElement, bindData, context)) === null || _c === void 0 ? void 0 : _c.render();
-                        return;
-                    }
-                    // object element
-                    else {
-                        (_e = (_d = duice.ObjectElementFactoryRegistry.getInstance(htmlElement)) === null || _d === void 0 ? void 0 : _d.createElement(htmlElement, bindData, context)) === null || _e === void 0 ? void 0 : _e.render();
-                        return;
-                    }
+                    (_b = (_a = duice.DataElementRegistry.getFactory(htmlElement, bindData)) === null || _a === void 0 ? void 0 : _a.createElement(htmlElement, bindData, context)) === null || _b === void 0 ? void 0 : _b.render();
                 }
                 catch (e) {
                     console.error(e, htmlElement, container, JSON.stringify(context));
@@ -1991,8 +1884,7 @@ var duice;
      * @param elementType
      */
     function defineCustomElement(tagName, elementType) {
-        let customElementFactory = new duice.CustomElementFactory(tagName, elementType);
-        duice.CustomElementFactoryRegistry.addInstance(customElementFactory);
+        duice.DataElementRegistry.register(tagName, new duice.CustomElementFactory(elementType));
     }
     duice.defineCustomElement = defineCustomElement;
     /**
@@ -2586,38 +2478,52 @@ var duice;
 })(duice || (duice = {}));
 var duice;
 (function (duice) {
-    /**
-     * object element factory class
-     */
-    class ObjectElementFactoryRegistry {
-        /**
-         * adds factory instance to registry
-         * @param elementFactory
-         */
-        static addInstance(elementFactory) {
-            this.instances.push(elementFactory);
+    class DataElementRegistry {
+        static register(tagName, dataElementFactory) {
+            if (dataElementFactory instanceof duice.ArrayElementFactory) {
+                this.arrayFactories.set(tagName, dataElementFactory);
+            }
+            else if (dataElementFactory instanceof duice.ObjectElementFactory) {
+                this.objectFactories.set(tagName, dataElementFactory);
+            }
+            else {
+                this.customFactories.set(tagName, dataElementFactory);
+            }
+            // register custom html element
+            // customElements.define(elementFactory.tagName, class extends HTMLElement {});
         }
         /**
-         * returns supported instance
-         * @param htmlElement
+         * get factory
          */
-        static getInstance(htmlElement) {
-            for (let componentFactory of this.instances) {
-                if (componentFactory.support(htmlElement)) {
-                    return componentFactory;
+        static getFactory(htmlElement, data) {
+            let tagName = htmlElement.tagName.toLowerCase();
+            if (this.customFactories.has(tagName)) {
+                return this.customFactories.get(tagName);
+            }
+            // array element
+            if (Array.isArray(data)) {
+                if (this.arrayFactories.has(tagName)) {
+                    return this.arrayFactories.get(tagName);
                 }
+                return this.arrayDefaultFactory;
             }
-            if (this.defaultInstance.support(htmlElement)) {
-                return this.defaultInstance;
+            // object element
+            else {
+                if (this.objectFactories.has(tagName)) {
+                    return this.objectFactories.get(tagName);
+                }
+                return this.objectDefaultFactory;
             }
-            return null;
         }
     }
-    ObjectElementFactoryRegistry.defaultInstance = new duice.ObjectElementFactory();
-    ObjectElementFactoryRegistry.instances = [];
-    duice.ObjectElementFactoryRegistry = ObjectElementFactoryRegistry;
+    DataElementRegistry.objectDefaultFactory = new duice.ObjectElementFactory();
+    DataElementRegistry.arrayDefaultFactory = new duice.ArrayElementFactory();
+    DataElementRegistry.objectFactories = new Map();
+    DataElementRegistry.arrayFactories = new Map();
+    DataElementRegistry.customFactories = new Map();
+    duice.DataElementRegistry = DataElementRegistry;
 })(duice || (duice = {}));
-///<reference path="../ObjectElementFactoryRegistry.ts"/>
+///<reference path="../DataElementRegistry.ts"/>
 var duice;
 (function (duice) {
     var component;
@@ -2635,17 +2541,10 @@ var duice;
             doCreateElement(element, bindData, context) {
                 return new component.ImgElement(element, bindData, context);
             }
-            /**
-             * returns supported
-             * @param element
-             */
-            doSupport(element) {
-                return (element.tagName.toLowerCase() === 'img');
-            }
         }
         component.ImgElementFactory = ImgElementFactory;
         // register factory instance
-        duice.ObjectElementFactoryRegistry.addInstance(new ImgElementFactory());
+        duice.DataElementRegistry.register('img', new ImgElementFactory());
     })(component = duice.component || (duice.component = {}));
 })(duice || (duice = {}));
 var duice;
@@ -2885,6 +2784,7 @@ var duice;
         component.InputDatetimeLocalElement = InputDatetimeLocalElement;
     })(component = duice.component || (duice.component = {}));
 })(duice || (duice = {}));
+///<reference path="../DataElementRegistry.ts"/>
 var duice;
 (function (duice) {
     var component;
@@ -2914,17 +2814,10 @@ var duice;
                         return new component.InputElement(element, bindData, context);
                 }
             }
-            /**
-             * check supported
-             * @param element
-             */
-            doSupport(element) {
-                return (element.tagName.toLowerCase() === 'input');
-            }
         }
         component.InputElementFactory = InputElementFactory;
         // register factory instance
-        duice.ObjectElementFactoryRegistry.addInstance(new InputElementFactory());
+        duice.DataElementRegistry.register('input', new InputElementFactory());
     })(component = duice.component || (duice.component = {}));
 })(duice || (duice = {}));
 ///<reference path="../format/NumberFormat.ts"/>
@@ -3013,40 +2906,7 @@ var duice;
         component.InputRadioElement = InputRadioElement;
     })(component = duice.component || (duice.component = {}));
 })(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * custom component factory registry
-     */
-    class CustomElementFactoryRegistry {
-        /**
-         * adds factory instance
-         * @param elementFactory
-         */
-        static addInstance(elementFactory) {
-            // register custom html element
-            customElements.define(elementFactory.tagName, class extends HTMLElement {
-            });
-            // register instance
-            this.instances.push(elementFactory);
-        }
-        /**
-         * returns factory instance to be supported
-         * @param htmlElement
-         */
-        static getInstance(htmlElement) {
-            for (let componentFactory of this.instances) {
-                if (componentFactory.support(htmlElement)) {
-                    return componentFactory;
-                }
-            }
-            return null;
-        }
-    }
-    CustomElementFactoryRegistry.instances = [];
-    duice.CustomElementFactoryRegistry = CustomElementFactoryRegistry;
-})(duice || (duice = {}));
-///<reference path="../CustomElementFactoryRegistry.ts"/>
+///<reference path="../DataElementRegistry.ts"/>
 var duice;
 (function (duice) {
     var component;
@@ -3155,8 +3015,7 @@ var duice;
         }
         component.Pagination = Pagination;
         // register
-        let customElementFactory = new duice.CustomElementFactory(`${duice.getNamespace()}-pagination`, Pagination);
-        duice.CustomElementFactoryRegistry.addInstance(customElementFactory);
+        duice.DataElementRegistry.register(`${duice.getNamespace()}-pagination`, new duice.CustomElementFactory(Pagination));
     })(component = duice.component || (duice.component = {}));
 })(duice || (duice = {}));
 var duice;
@@ -3233,6 +3092,7 @@ var duice;
         component.SelectElement = SelectElement;
     })(component = duice.component || (duice.component = {}));
 })(duice || (duice = {}));
+///<reference path="../DataElementRegistry.ts"/>
 var duice;
 (function (duice) {
     var component;
@@ -3250,17 +3110,10 @@ var duice;
             doCreateElement(element, bindData, context) {
                 return new component.SelectElement(element, bindData, context);
             }
-            /**
-             * return supported
-             * @param element
-             */
-            doSupport(element) {
-                return (element.tagName.toLowerCase() === 'select');
-            }
         }
         component.SelectElementFactory = SelectElementFactory;
         // register factory instance
-        duice.ObjectElementFactoryRegistry.addInstance(new SelectElementFactory());
+        duice.DataElementRegistry.register('select', new SelectElementFactory());
     })(component = duice.component || (duice.component = {}));
 })(duice || (duice = {}));
 var duice;
@@ -3337,6 +3190,7 @@ var duice;
         component.TextareaElement = TextareaElement;
     })(component = duice.component || (duice.component = {}));
 })(duice || (duice = {}));
+///<reference path="../DataElementRegistry.ts"/>
 var duice;
 (function (duice) {
     var component;
@@ -3354,17 +3208,10 @@ var duice;
             doCreateElement(element, bindData, context) {
                 return new component.TextareaElement(element, bindData, context);
             }
-            /**
-             * returns supported
-             * @param element
-             */
-            doSupport(element) {
-                return (element.tagName.toLowerCase() === 'textarea');
-            }
         }
         component.TextareaElementFactory = TextareaElementFactory;
-        // register factory instance
-        duice.ObjectElementFactoryRegistry.addInstance(new TextareaElementFactory());
+        // register
+        duice.DataElementRegistry.register('textarea', new TextareaElementFactory());
     })(component = duice.component || (duice.component = {}));
 })(duice || (duice = {}));
 var duice;
@@ -3720,7 +3567,7 @@ var duice;
 (function (duice) {
     var component;
     (function (component) {
-        class Tree extends duice.CustomElement {
+        class SideNavigation extends duice.CustomElement {
             constructor() {
                 super(...arguments);
                 this.uls = [];
@@ -3862,10 +3709,9 @@ var duice;
             `;
             }
         }
-        component.Tree = Tree;
+        component.SideNavigation = SideNavigation;
         // register
-        let customElementFactory = new duice.CustomElementFactory(`${duice.getNamespace()}-side-navigation`, Tree);
-        duice.CustomElementFactoryRegistry.addInstance(customElementFactory);
+        duice.DataElementRegistry.register(`${duice.getNamespace()}-side-navigation`, new duice.CustomElementFactory(SideNavigation));
     })(component = duice.component || (duice.component = {}));
 })(duice || (duice = {}));
 var duice;
@@ -3873,32 +3719,31 @@ var duice;
     /**
      * array element factory registry class
      */
-    class ArrayElementFactoryRegistry {
+    class ArrayElementRegistry {
         /**
-         * adds factory instance
-         * @param elementFactory
+         * set factory
+         * @param tagName
+         * @param arrayElementFactory
          */
-        static addInstance(elementFactory) {
-            this.instances.push(elementFactory);
+        static register(tagName, arrayElementFactory) {
+            this.factories.set(tagName.toLowerCase(), arrayElementFactory);
         }
         /**
-         * return factory instance
+         * get factory
          * @param htmlElement
          */
-        static getInstance(htmlElement) {
-            for (let componentFactory of this.instances) {
-                if (componentFactory.support(htmlElement)) {
-                    return componentFactory;
-                }
+        static getFactory(htmlElement) {
+            let tagName = htmlElement.tagName.toLowerCase();
+            if (this.factories.has(tagName)) {
+                return this.factories.get(tagName);
             }
-            if (this.defaultInstance.support(htmlElement)) {
-                return this.defaultInstance;
+            else {
+                return this.defaultFactory;
             }
-            return null;
         }
     }
-    ArrayElementFactoryRegistry.defaultInstance = new duice.ArrayElementFactory();
-    ArrayElementFactoryRegistry.instances = [];
-    duice.ArrayElementFactoryRegistry = ArrayElementFactoryRegistry;
+    ArrayElementRegistry.defaultFactory = new duice.ArrayElementFactory();
+    ArrayElementRegistry.factories = new Map();
+    duice.ArrayElementRegistry = ArrayElementRegistry;
 })(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map

@@ -1,3 +1,4 @@
+///<reference path="../DataElementRegistry.ts"/>
 namespace duice.component {
 
     /**
@@ -27,17 +28,9 @@ namespace duice.component {
             }
         }
 
-        /**
-         * check supported
-         * @param element
-         */
-        override doSupport(element: HTMLElement): boolean {
-            return (element.tagName.toLowerCase() === 'input');
-        }
-
     }
 
     // register factory instance
-    ObjectElementFactoryRegistry.addInstance(new InputElementFactory());
+    DataElementRegistry.register('input', new InputElementFactory());
 
 }

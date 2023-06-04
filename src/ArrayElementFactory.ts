@@ -7,22 +7,6 @@ namespace duice {
     export class ArrayElementFactory<T extends HTMLElement> extends DataElementFactory<HTMLElement, object[]> {
 
         /**
-         * check support
-         * @param htmlElement
-         */
-        override support(htmlElement: T): boolean {
-            return this.doSupport(htmlElement);
-        }
-
-        /**
-         * support template method
-         * @param htmlElement
-         */
-        doSupport(htmlElement: T): boolean {
-            return true;
-        }
-
-        /**
          * creates array component
          * @param htmlElement
          * @param bindData
