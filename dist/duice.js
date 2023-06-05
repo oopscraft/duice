@@ -2479,48 +2479,59 @@ var duice;
 var duice;
 (function (duice) {
     class DataElementRegistry {
+        /**
+         * register
+         * @param tagName tag name
+         * @param dataElementFactory data element factory instance
+         */
         static register(tagName, dataElementFactory) {
             if (dataElementFactory instanceof duice.ArrayElementFactory) {
-                this.arrayFactories.set(tagName, dataElementFactory);
+                this.arrayElementFactories.set(tagName, dataElementFactory);
             }
             else if (dataElementFactory instanceof duice.ObjectElementFactory) {
-                this.objectFactories.set(tagName, dataElementFactory);
+                this.objectElementFactories.set(tagName, dataElementFactory);
             }
-            else {
-                this.customFactories.set(tagName, dataElementFactory);
+            else if (dataElementFactory instanceof duice.CustomElementFactory) {
+                this.customElementFactories.set(tagName, dataElementFactory);
             }
             // register custom html element
-            // customElements.define(elementFactory.tagName, class extends HTMLElement {});
+            if (tagName.includes('-')) {
+                globalThis.customElements.define(tagName, class extends HTMLElement {
+                });
+            }
         }
         /**
-         * get factory
+         * getFactory
+         * @param htmlElement html element
+         * @param data data
          */
         static getFactory(htmlElement, data) {
             let tagName = htmlElement.tagName.toLowerCase();
-            if (this.customFactories.has(tagName)) {
-                return this.customFactories.get(tagName);
+            // custom element
+            if (this.customElementFactories.has(tagName)) {
+                return this.customElementFactories.get(tagName);
             }
             // array element
             if (Array.isArray(data)) {
-                if (this.arrayFactories.has(tagName)) {
-                    return this.arrayFactories.get(tagName);
+                if (this.arrayElementFactories.has(tagName)) {
+                    return this.arrayElementFactories.get(tagName);
                 }
-                return this.arrayDefaultFactory;
+                return this.defaultArrayElementFactory;
             }
             // object element
             else {
-                if (this.objectFactories.has(tagName)) {
-                    return this.objectFactories.get(tagName);
+                if (this.objectElementFactories.has(tagName)) {
+                    return this.objectElementFactories.get(tagName);
                 }
-                return this.objectDefaultFactory;
+                return this.defaultObjectElementFactory;
             }
         }
     }
-    DataElementRegistry.objectDefaultFactory = new duice.ObjectElementFactory();
-    DataElementRegistry.arrayDefaultFactory = new duice.ArrayElementFactory();
-    DataElementRegistry.objectFactories = new Map();
-    DataElementRegistry.arrayFactories = new Map();
-    DataElementRegistry.customFactories = new Map();
+    DataElementRegistry.defaultObjectElementFactory = new duice.ObjectElementFactory();
+    DataElementRegistry.defaultArrayElementFactory = new duice.ArrayElementFactory();
+    DataElementRegistry.objectElementFactories = new Map();
+    DataElementRegistry.arrayElementFactories = new Map();
+    DataElementRegistry.customElementFactories = new Map();
     duice.DataElementRegistry = DataElementRegistry;
 })(duice || (duice = {}));
 ///<reference path="../DataElementRegistry.ts"/>
@@ -3713,37 +3724,5 @@ var duice;
         // register
         duice.DataElementRegistry.register(`${duice.getNamespace()}-side-navigation`, new duice.CustomElementFactory(SideNavigation));
     })(component = duice.component || (duice.component = {}));
-})(duice || (duice = {}));
-var duice;
-(function (duice) {
-    /**
-     * array element factory registry class
-     */
-    class ArrayElementRegistry {
-        /**
-         * set factory
-         * @param tagName
-         * @param arrayElementFactory
-         */
-        static register(tagName, arrayElementFactory) {
-            this.factories.set(tagName.toLowerCase(), arrayElementFactory);
-        }
-        /**
-         * get factory
-         * @param htmlElement
-         */
-        static getFactory(htmlElement) {
-            let tagName = htmlElement.tagName.toLowerCase();
-            if (this.factories.has(tagName)) {
-                return this.factories.get(tagName);
-            }
-            else {
-                return this.defaultFactory;
-            }
-        }
-    }
-    ArrayElementRegistry.defaultFactory = new duice.ArrayElementFactory();
-    ArrayElementRegistry.factories = new Map();
-    duice.ArrayElementRegistry = ArrayElementRegistry;
 })(duice || (duice = {}));
 //# sourceMappingURL=duice.js.map

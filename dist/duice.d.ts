@@ -1108,14 +1108,21 @@ declare namespace duice.component {
 }
 declare namespace duice {
     class DataElementRegistry {
-        static objectDefaultFactory: ObjectElementFactory<HTMLElement>;
-        static arrayDefaultFactory: ArrayElementFactory<HTMLElement>;
-        static objectFactories: Map<any, any>;
-        static arrayFactories: Map<any, any>;
-        static customFactories: Map<any, any>;
+        static defaultObjectElementFactory: ObjectElementFactory<HTMLElement>;
+        static defaultArrayElementFactory: ArrayElementFactory<HTMLElement>;
+        static objectElementFactories: Map<string, ObjectElementFactory<HTMLElement>>;
+        static arrayElementFactories: Map<string, ArrayElementFactory<HTMLElement>>;
+        static customElementFactories: Map<string, CustomElementFactory<any>>;
+        /**
+         * register
+         * @param tagName tag name
+         * @param dataElementFactory data element factory instance
+         */
         static register(tagName: string, dataElementFactory: DataElementFactory<HTMLElement, any>): void;
         /**
-         * get factory
+         * getFactory
+         * @param htmlElement html element
+         * @param data data
          */
         static getFactory(htmlElement: HTMLElement, data: object): DataElementFactory<HTMLElement, any>;
     }
@@ -1587,25 +1594,5 @@ declare namespace duice.component {
          * @param array
          */
         doStyle(array: object[]): string;
-    }
-}
-declare namespace duice {
-    /**
-     * array element factory registry class
-     */
-    class ArrayElementRegistry {
-        static defaultFactory: ArrayElementFactory<HTMLElement>;
-        static factories: Map<any, any>;
-        /**
-         * set factory
-         * @param tagName
-         * @param arrayElementFactory
-         */
-        static register(tagName: string, arrayElementFactory: ObjectElementFactory<HTMLElement>): void;
-        /**
-         * get factory
-         * @param htmlElement
-         */
-        static getFactory(htmlElement: HTMLElement): any;
     }
 }
