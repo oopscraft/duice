@@ -509,6 +509,52 @@ declare namespace duice {
         createElement(templateLiteral: string): HTMLElement;
     }
 }
+declare namespace duice {
+    class CustomElementFactory<V> extends DataElementFactory<HTMLElement, V> {
+        elementType: Function;
+        constructor(elementType: Function);
+        createElement(htmlElement: HTMLElement, bindData: V, context: object): DataElement<any, any>;
+    }
+}
+declare namespace duice {
+    class ObjectElementFactory<T extends HTMLElement> extends DataElementFactory<T, object> {
+        /**
+         * create component
+         * @param element
+         * @param object
+         * @param context
+         */
+        createElement(element: T, object: object, context: object): ObjectElement<T>;
+        /**
+         * template method to create component
+         * @param htmlElement
+         * @param object
+         * @param context
+         */
+        doCreateElement(htmlElement: T, object: object, context: object): ObjectElement<T>;
+    }
+}
+declare namespace duice {
+    class DataElementRegistry {
+        static defaultObjectElementFactory: ObjectElementFactory<HTMLElement>;
+        static defaultArrayElementFactory: ArrayElementFactory<HTMLElement>;
+        static objectElementFactories: Map<string, ObjectElementFactory<HTMLElement>>;
+        static arrayElementFactories: Map<string, ArrayElementFactory<HTMLElement>>;
+        static customElementFactories: Map<string, CustomElementFactory<any>>;
+        /**
+         * register
+         * @param tagName tag name
+         * @param dataElementFactory data element factory instance
+         */
+        static register(tagName: string, dataElementFactory: DataElementFactory<HTMLElement, any>): void;
+        /**
+         * getFactory
+         * @param htmlElement html element
+         * @param data data
+         */
+        static getFactory(htmlElement: HTMLElement, data: object): DataElementFactory<HTMLElement, any>;
+    }
+}
 declare namespace duice.format {
     class FormatFactory {
         /**
@@ -591,24 +637,6 @@ declare namespace duice {
          * focus
          */
         focus(): boolean;
-    }
-}
-declare namespace duice {
-    class ObjectElementFactory<T extends HTMLElement> extends DataElementFactory<T, object> {
-        /**
-         * create component
-         * @param element
-         * @param object
-         * @param context
-         */
-        createElement(element: T, object: object, context: object): ObjectElement<T>;
-        /**
-         * template method to create component
-         * @param htmlElement
-         * @param object
-         * @param context
-         */
-        doCreateElement(htmlElement: T, object: object, context: object): ObjectElement<T>;
     }
 }
 declare namespace duice.event {
@@ -798,13 +826,6 @@ declare namespace duice {
          * @param property
          */
         static focus(objectProxy: object, property: string): void;
-    }
-}
-declare namespace duice {
-    class CustomElementFactory<V> extends DataElementFactory<HTMLElement, V> {
-        elementType: Function;
-        constructor(elementType: Function);
-        createElement(htmlElement: HTMLElement, bindData: V, context: object): DataElement<any, any>;
     }
 }
 declare namespace duice {
@@ -1106,27 +1127,6 @@ declare namespace duice.component {
         setDisable(disable: boolean): void;
     }
 }
-declare namespace duice {
-    class DataElementRegistry {
-        static defaultObjectElementFactory: ObjectElementFactory<HTMLElement>;
-        static defaultArrayElementFactory: ArrayElementFactory<HTMLElement>;
-        static objectElementFactories: Map<string, ObjectElementFactory<HTMLElement>>;
-        static arrayElementFactories: Map<string, ArrayElementFactory<HTMLElement>>;
-        static customElementFactories: Map<string, CustomElementFactory<any>>;
-        /**
-         * register
-         * @param tagName tag name
-         * @param dataElementFactory data element factory instance
-         */
-        static register(tagName: string, dataElementFactory: DataElementFactory<HTMLElement, any>): void;
-        /**
-         * getFactory
-         * @param htmlElement html element
-         * @param data data
-         */
-        static getFactory(htmlElement: HTMLElement, data: object): DataElementFactory<HTMLElement, any>;
-    }
-}
 declare namespace duice.component {
     /**
      * image element factory class
@@ -1371,6 +1371,34 @@ declare namespace duice.component {
     }
 }
 declare namespace duice.component {
+    class SideNavigation extends duice.CustomElement<object[]> {
+        idProperty: string;
+        parentIdProperty: string;
+        iconProperty: string;
+        textProperty: string;
+        onclick: string;
+        uls: HTMLUListElement[];
+        /**
+         * doReader
+         * @param array
+         */
+        doRender(array: object[]): HTMLElement;
+        /**
+         * array to tree ul
+         * @param array
+         * @param parentId
+         * @param depth
+         */
+        arrayToTreeUl(array: any, parentId: any, depth: any): HTMLUListElement;
+        doUpdate(data: object[]): void;
+        /**
+         * doStyle
+         * @param array
+         */
+        doStyle(array: object[]): string;
+    }
+}
+declare namespace duice.component {
     /**
      * textarea element component
      */
@@ -1566,33 +1594,5 @@ declare namespace duice.tab {
         items: TabItem[];
         addItem(item: TabItem): void;
         setActive(index: number): void;
-    }
-}
-declare namespace duice.component {
-    class SideNavigation extends duice.CustomElement<object[]> {
-        idProperty: string;
-        parentIdProperty: string;
-        iconProperty: string;
-        textProperty: string;
-        onclick: string;
-        uls: HTMLUListElement[];
-        /**
-         * doReader
-         * @param array
-         */
-        doRender(array: object[]): HTMLElement;
-        /**
-         * array to tree ul
-         * @param array
-         * @param parentId
-         * @param depth
-         */
-        arrayToTreeUl(array: any, parentId: any, depth: any): HTMLUListElement;
-        doUpdate(data: object[]): void;
-        /**
-         * doStyle
-         * @param array
-         */
-        doStyle(array: object[]): string;
     }
 }

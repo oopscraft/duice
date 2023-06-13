@@ -24,10 +24,7 @@ namespace duice.component {
             let totalPage = Math.ceil(count/size);
             let startPageIndex = Math.floor(page/10)*10;
             let endPageIndex = Math.min(startPageIndex + 9, totalPage - 1);
-            console.debug('page', page);
-            console.debug('totalPage', totalPage);
-            console.debug('startPage', startPageIndex);
-            console.debug('endPage', endPageIndex);
+            endPageIndex = Math.max(endPageIndex, 0);
 
             // template
             let pagination = document.createElement('ul');

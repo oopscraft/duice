@@ -1,3 +1,4 @@
+///<reference path="ObjectElementFactory.ts"/>
 namespace duice {
 
     export class DataElementRegistry {
