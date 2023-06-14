@@ -910,8 +910,9 @@ declare namespace duice {
     /**
      * prompt
      * @param message
+     * @param type
      */
-    function prompt(message: string): Promise<string>;
+    function prompt(message: string, type?: string): Promise<string>;
     /**
      * open dialog
      * @param dialogElement
@@ -1058,8 +1059,9 @@ declare namespace duice.dialog {
         /**
          * constructor
          * @param message
+         * @param type
          */
-        constructor(message: string);
+        constructor(message: string, type?: string);
         /**
          * open
          */

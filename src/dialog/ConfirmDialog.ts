@@ -29,19 +29,6 @@ namespace duice.dialog {
             this.messagePre.innerHTML = message;
             this.getDialogElement().appendChild(this.messagePre);
 
-            // confirm button
-            this.confirmButton = document.createElement('button');
-            this.confirmButton.appendChild(document.createTextNode('Yes'));
-            this.confirmButton.style.width = '4rem';
-            this.confirmButton.style.cursor = 'pointer';
-            this.confirmButton.addEventListener('click', event => {
-                this.confirm();
-            });
-            this.getDialogElement().appendChild(this.confirmButton);
-
-            // divider
-            this.getDialogElement().appendChild(document.createTextNode(' '));
-
             // cancel button
             this.cancelButton = document.createElement('button');
             this.cancelButton.appendChild(document.createTextNode('No'));
@@ -51,6 +38,19 @@ namespace duice.dialog {
                 this.cancel();
             });
             this.getDialogElement().appendChild(this.cancelButton);
+
+            // divider
+            this.getDialogElement().appendChild(document.createTextNode(' '));
+
+            // confirm button
+            this.confirmButton = document.createElement('button');
+            this.confirmButton.appendChild(document.createTextNode('Yes'));
+            this.confirmButton.style.width = '4rem';
+            this.confirmButton.style.cursor = 'pointer';
+            this.confirmButton.addEventListener('click', event => {
+                this.confirm();
+            });
+            this.getDialogElement().appendChild(this.confirmButton);
         }
 
         /**

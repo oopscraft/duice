@@ -17,8 +17,9 @@ namespace duice.dialog {
         /**
          * constructor
          * @param message
+         * @param type
          */
-        constructor(message: string) {
+        constructor(message: string, type?: string) {
             super(document.createElement('dialog'));
             this.getDialogElement().style.padding = '1rem';
             this.getDialogElement().style.minWidth = '20rem';
@@ -36,6 +37,9 @@ namespace duice.dialog {
             this.promptInput.style.textAlign = 'center';
             this.promptInput.style.marginBottom = '1rem';
             this.promptInput.style.width = '100%';
+            if(type) {
+                this.promptInput.type = type;
+            }
             this.getDialogElement().appendChild(this.promptInput);
 
             // confirm button

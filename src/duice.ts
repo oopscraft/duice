@@ -116,6 +116,8 @@ namespace duice {
             let result = execute(ifClause, htmlElement, context);
             if(!result) {
                 htmlElement.style.display = 'none';
+            }else{
+                htmlElement.style.display = 'unset';
             }
         }
     }
@@ -189,9 +191,10 @@ namespace duice {
     /**
      * prompt
      * @param message
+     * @param type
      */
-    export async function prompt(message: string): Promise<string> {
-        return await new duice.dialog.PromptDialog(message).open();
+    export async function prompt(message: string, type?: string): Promise<string> {
+        return await new duice.dialog.PromptDialog(message, type).open();
     }
 
     /**

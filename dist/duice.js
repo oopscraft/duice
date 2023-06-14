@@ -1859,6 +1859,9 @@ var duice;
             if (!result) {
                 htmlElement.style.display = 'none';
             }
+            else {
+                htmlElement.style.display = 'unset';
+            }
         }
     }
     duice.checkIf = checkIf;
@@ -1935,10 +1938,11 @@ var duice;
     /**
      * prompt
      * @param message
+     * @param type
      */
-    function prompt(message) {
+    function prompt(message, type) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield new duice.dialog.PromptDialog(message).open();
+            return yield new duice.dialog.PromptDialog(message, type).open();
         });
     }
     duice.prompt = prompt;
@@ -2238,17 +2242,6 @@ var duice;
                 this.messagePre.style.marginBottom = '1rem';
                 this.messagePre.innerHTML = message;
                 this.getDialogElement().appendChild(this.messagePre);
-                // confirm button
-                this.confirmButton = document.createElement('button');
-                this.confirmButton.appendChild(document.createTextNode('Yes'));
-                this.confirmButton.style.width = '4rem';
-                this.confirmButton.style.cursor = 'pointer';
-                this.confirmButton.addEventListener('click', event => {
-                    this.confirm();
-                });
-                this.getDialogElement().appendChild(this.confirmButton);
-                // divider
-                this.getDialogElement().appendChild(document.createTextNode(' '));
                 // cancel button
                 this.cancelButton = document.createElement('button');
                 this.cancelButton.appendChild(document.createTextNode('No'));
@@ -2258,6 +2251,17 @@ var duice;
                     this.cancel();
                 });
                 this.getDialogElement().appendChild(this.cancelButton);
+                // divider
+                this.getDialogElement().appendChild(document.createTextNode(' '));
+                // confirm button
+                this.confirmButton = document.createElement('button');
+                this.confirmButton.appendChild(document.createTextNode('Yes'));
+                this.confirmButton.style.width = '4rem';
+                this.confirmButton.style.cursor = 'pointer';
+                this.confirmButton.addEventListener('click', event => {
+                    this.confirm();
+                });
+                this.getDialogElement().appendChild(this.confirmButton);
             }
             /**
              * open
@@ -2304,8 +2308,9 @@ var duice;
             /**
              * constructor
              * @param message
+             * @param type
              */
-            constructor(message) {
+            constructor(message, type) {
                 super(document.createElement('dialog'));
                 this.getDialogElement().style.padding = '1rem';
                 this.getDialogElement().style.minWidth = '20rem';
@@ -2321,6 +2326,9 @@ var duice;
                 this.promptInput.style.textAlign = 'center';
                 this.promptInput.style.marginBottom = '1rem';
                 this.promptInput.style.width = '100%';
+                if (type) {
+                    this.promptInput.type = type;
+                }
                 this.getDialogElement().appendChild(this.promptInput);
                 // confirm button
                 this.confirmButton = document.createElement('button');
