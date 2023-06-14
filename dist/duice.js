@@ -1855,9 +1855,9 @@ var duice;
     function checkIf(htmlElement, context) {
         let ifClause = getElementAttribute(htmlElement, 'if');
         if (ifClause) {
-            let result = execute(ifClause, this.htmlElement, context);
+            let result = execute(ifClause, htmlElement, context);
             if (!result) {
-                this.htmlElement.style.display = 'none';
+                htmlElement.style.display = 'none';
             }
         }
     }
@@ -1868,7 +1868,7 @@ var duice;
     function executeScript(htmlElement, context) {
         let script = getElementAttribute(htmlElement, 'script');
         if (script) {
-            execute(script, this.htmlElement, context);
+            execute(script, htmlElement, context);
         }
     }
     duice.executeScript = executeScript;

@@ -113,9 +113,9 @@ namespace duice {
     export function checkIf(htmlElement: HTMLElement, context: object): void {
         let ifClause = getElementAttribute(htmlElement, 'if');
         if(ifClause) {
-            let result = execute(ifClause, this.htmlElement, context);
+            let result = execute(ifClause, htmlElement, context);
             if(!result) {
-                this.htmlElement.style.display = 'none';
+                htmlElement.style.display = 'none';
             }
         }
     }
@@ -126,10 +126,9 @@ namespace duice {
     export function executeScript(htmlElement: HTMLElement, context: object): void {
         let script = getElementAttribute(htmlElement,'script');
         if(script) {
-            execute(script, this.htmlElement, context);
+            execute(script, htmlElement, context);
         }
     }
-
 
     /**
      * checks has component attribute
