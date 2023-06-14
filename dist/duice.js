@@ -125,29 +125,6 @@ var duice;
         getContext() {
             return this.context;
         }
-        /**
-         * execute script if exists
-         * @param htmlElement
-         * @param context
-         */
-        executeScript(htmlElement, context) {
-            let script = duice.getElementAttribute(htmlElement, 'script');
-            if (script) {
-                try {
-                    let args = [];
-                    let values = [];
-                    for (let property in context) {
-                        args.push(property);
-                        values.push(context[property]);
-                    }
-                    return Function(...args, script).call(htmlElement, ...values);
-                }
-                catch (e) {
-                    console.error(script, e);
-                    throw e;
-                }
-            }
-        }
     }
     duice.DataElement = DataElement;
 })(duice || (duice = {}));
@@ -282,8 +259,10 @@ var duice;
                 this.rowHtmlElements.push(rowHtmlElement);
                 // append to slot
                 this.slot.appendChild(rowHtmlElement);
+                // check if
+                duice.checkIf(rowHtmlElement, context);
                 // execute script
-                this.executeScript(rowHtmlElement, context);
+                duice.executeScript(rowHtmlElement, context);
             }
         }
         /**
@@ -326,7 +305,7 @@ var duice;
             // insert into slot
             this.slot.appendChild(rowHtmlElement);
             // execute script
-            this.executeScript(rowHtmlElement, context);
+            duice.executeScript(rowHtmlElement, context);
             // selectable
             if (this.toggleClass) {
                 rowHtmlElement.addEventListener('click', e => {
@@ -1031,12 +1010,15 @@ var duice;
                 style.textContent = styleLiteral.trim();
                 this.htmlElement.appendChild(style);
             }
-            // initializes
+            // context
             let context = Object.assign({}, this.getContext());
             context['data'] = this.bindData;
+            // check if
+            duice.checkIf(this.htmlElement, context);
+            // initialize
             duice.initialize(this.htmlElement, context);
             // execute script
-            this.executeScript(this.htmlElement, context);
+            duice.executeScript(this.htmlElement, context);
         }
         /**
          * update
@@ -1251,6 +1233,8 @@ var duice;
          * render
          */
         render() {
+            // check if
+            this.checkIf();
             if (this.property) {
                 let objectHandler = duice.ObjectProxy.getHandler(this.getBindData());
                 // set value
@@ -1267,12 +1251,20 @@ var duice;
             this.executeScript();
         }
         /**
+         * check if
+         */
+        checkIf() {
+            let context = Object.assign({}, this.getContext());
+            context[this.getBindName()] = this.getBindData();
+            duice.checkIf(this.htmlElement, context);
+        }
+        /**
          * execute script
          */
         executeScript() {
             let context = Object.assign({}, this.getContext());
             context[this.getBindName()] = this.getBindData();
-            super.executeScript(this.htmlElement, context);
+            duice.executeScript(this.htmlElement, context);
         }
         /**
          * update event received
@@ -1283,6 +1275,8 @@ var duice;
             console.debug('ObjectElement.update', observable, event);
             // ObjectHandler
             if (observable instanceof duice.ObjectHandler) {
+                // check if
+                this.checkIf();
                 if (this.property) {
                     // set value
                     this.setValue(observable.getValue(this.property));
@@ -1833,6 +1827,51 @@ var duice;
         return undefined;
     }
     duice.findVariable = findVariable;
+    /**
+     * executes script
+     * @param code
+     * @param htmlElement
+     * @param context
+     */
+    function execute(code, htmlElement, context) {
+        try {
+            let args = [];
+            let values = [];
+            for (let property in context) {
+                args.push(property);
+                values.push(context[property]);
+            }
+            return Function(...args, code).call(htmlElement, ...values);
+        }
+        catch (e) {
+            console.error(code, e);
+            throw e;
+        }
+    }
+    duice.execute = execute;
+    /**
+     * check if
+     */
+    function checkIf(htmlElement, context) {
+        let ifClause = getElementAttribute(htmlElement, 'if');
+        if (ifClause) {
+            let result = execute(ifClause, this.htmlElement, context);
+            if (!result) {
+                this.htmlElement.style.display = 'none';
+            }
+        }
+    }
+    duice.checkIf = checkIf;
+    /**
+     * execute script
+     */
+    function executeScript(htmlElement, context) {
+        let script = getElementAttribute(htmlElement, 'script');
+        if (script) {
+            execute(script, this.htmlElement, context);
+        }
+    }
+    duice.executeScript = executeScript;
     /**
      * checks has component attribute
      * @param htmlElement

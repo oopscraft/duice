@@ -87,6 +87,51 @@ namespace duice {
     }
 
     /**
+     * executes script
+     * @param code
+     * @param htmlElement
+     * @param context
+     */
+    export function execute(code: string, htmlElement: HTMLElement, context: object): boolean {
+        try {
+            let args = [];
+            let values = [];
+            for(let property in context){
+                args.push(property);
+                values.push(context[property]);
+            }
+            return Function(...args, code).call(htmlElement, ...values);
+        }catch(e){
+            console.error(code, e);
+            throw e;
+        }
+    }
+
+    /**
+     * check if
+     */
+    export function checkIf(htmlElement: HTMLElement, context: object): void {
+        let ifClause = getElementAttribute(htmlElement, 'if');
+        if(ifClause) {
+            let result = execute(ifClause, this.htmlElement, context);
+            if(!result) {
+                this.htmlElement.style.display = 'none';
+            }
+        }
+    }
+
+    /**
+     * execute script
+     */
+    export function executeScript(htmlElement: HTMLElement, context: object): void {
+        let script = getElementAttribute(htmlElement,'script');
+        if(script) {
+            execute(script, this.htmlElement, context);
+        }
+    }
+
+
+    /**
      * checks has component attribute
      * @param htmlElement
      * @param name

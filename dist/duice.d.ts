@@ -68,12 +68,6 @@ declare namespace duice {
          */
         getContext(): object;
         /**
-         * execute script if exists
-         * @param htmlElement
-         * @param context
-         */
-        executeScript(htmlElement: HTMLElement, context: object): void;
-        /**
          * render abstract method
          */
         abstract render(): void;
@@ -601,6 +595,10 @@ declare namespace duice {
          */
         render(): void;
         /**
+         * check if
+         */
+        checkIf(): void;
+        /**
          * execute script
          */
         executeScript(): void;
@@ -859,6 +857,21 @@ declare namespace duice {
      * @param name
      */
     function findVariable(context: object, name: string): any;
+    /**
+     * executes script
+     * @param code
+     * @param htmlElement
+     * @param context
+     */
+    function execute(code: string, htmlElement: HTMLElement, context: object): boolean;
+    /**
+     * check if
+     */
+    function checkIf(htmlElement: HTMLElement, context: object): void;
+    /**
+     * execute script
+     */
+    function executeScript(htmlElement: HTMLElement, context: object): void;
     /**
      * checks has component attribute
      * @param htmlElement

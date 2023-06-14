@@ -40,13 +40,18 @@ namespace duice {
                 this.htmlElement.appendChild(style);
             }
 
-            // initializes
+            // context
             let context = Object.assign({}, this.getContext());
             context['data'] = this.bindData;
+
+            // check if
+            checkIf(this.htmlElement, context);
+
+            // initialize
             initialize(this.htmlElement, context);
 
             // execute script
-            this.executeScript(this.htmlElement, context);
+            executeScript(this.htmlElement, context);
         }
 
         /**

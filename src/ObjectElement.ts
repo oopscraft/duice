@@ -56,6 +56,10 @@ namespace duice {
          * render
          */
         override render(): void {
+
+            // check if
+            this.checkIf();
+
             if(this.property){
                 let objectHandler = ObjectProxy.getHandler(this.getBindData());
 
@@ -77,12 +81,21 @@ namespace duice {
         }
 
         /**
-         * execute script
+         * check if
          */
-        override executeScript():void {
+        checkIf(): void {
             let context = Object.assign({}, this.getContext());
             context[this.getBindName()] = this.getBindData();
-            super.executeScript(this.htmlElement, context);
+            checkIf(this.htmlElement, context);
+        }
+
+        /**
+         * execute script
+         */
+        executeScript(): void {
+            let context = Object.assign({}, this.getContext());
+            context[this.getBindName()] = this.getBindData();
+            executeScript(this.htmlElement, context);
         }
 
         /**
@@ -95,6 +108,10 @@ namespace duice {
 
             // ObjectHandler
             if(observable instanceof ObjectHandler) {
+
+                // check if
+                this.checkIf();
+
                 if(this.property){
 
                     // set value

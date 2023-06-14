@@ -158,8 +158,11 @@ namespace duice {
                 // append to slot
                 this.slot.appendChild(rowHtmlElement);
 
+                // check if
+                checkIf(rowHtmlElement, context);
+
                 // execute script
-                this.executeScript(rowHtmlElement, context);
+                executeScript(rowHtmlElement, context);
             }
         }
 
@@ -207,7 +210,7 @@ namespace duice {
             this.slot.appendChild(rowHtmlElement);
 
             // execute script
-            this.executeScript(rowHtmlElement, context);
+            executeScript(rowHtmlElement, context);
 
             // selectable
             if(this.toggleClass) {

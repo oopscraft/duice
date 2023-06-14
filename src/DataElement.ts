@@ -77,28 +77,52 @@ namespace duice {
             return this.context;
         }
 
-        /**
-         * execute script if exists
-         * @param htmlElement
-         * @param context
-         */
-        executeScript(htmlElement: HTMLElement, context: object): void {
-            let script = getElementAttribute(htmlElement, 'script');
-            if(script) {
-                try {
-                    let args = [];
-                    let values = [];
-                    for(let property in context){
-                        args.push(property);
-                        values.push(context[property]);
-                    }
-                    return Function(...args, script).call(htmlElement, ...values);
-                }catch(e){
-                    console.error(script, e);
-                    throw e;
-                }
-            }
-        }
+        // /**
+        //  * check if
+        //  * @param htmlElement
+        //  * @param context
+        //  */
+        // checkIf(htmlElement: HTMLElement, context: object): boolean {
+        //     let ifClause = getElementAttribute(htmlElement, 'if');
+        //     if(ifClause) {
+        //         try {
+        //             let args = [];
+        //             let values = [];
+        //             for(let property in context){
+        //                 args.push(property);
+        //                 values.push(context[property]);
+        //             }
+        //             return Function(...args, ifClause).call(htmlElement, ...values);
+        //         }catch(e){
+        //             console.error(ifClause, e);
+        //         }
+        //     }
+        //     return true;
+        // }
+        //
+        // /**
+        //  * execute script if exists
+        //  * @param htmlElement
+        //  * @param context
+        //  */
+        // executeScript(htmlElement: HTMLElement, context: object): void {
+        //     let script = getElementAttribute(htmlElement, 'script');
+        //     if(script) {
+        //         try {
+        //             let args = [];
+        //             let values = [];
+        //             for(let property in context){
+        //                 args.push(property);
+        //                 values.push(context[property]);
+        //             }
+        //             return Function(...args, script).call(htmlElement, ...values);
+        //         }catch(e){
+        //             console.error(script, e);
+        //             throw e;
+        //         }
+        //     }
+        // }
+
 
         /**
          * render abstract method
