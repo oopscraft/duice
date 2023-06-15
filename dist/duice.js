@@ -1869,10 +1869,10 @@ var duice;
         if (ifClause) {
             let result = execute(ifClause, htmlElement, context);
             if (!result) {
-                htmlElement.style.display = 'none';
+                htmlElement.hidden = true;
             }
             else {
-                htmlElement.style.display = 'inherit';
+                htmlElement.hidden = false;
             }
         }
     }
