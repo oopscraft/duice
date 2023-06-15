@@ -134,7 +134,7 @@ namespace duice {
          * @param value
          */
         setValue(value: any): void {
-            if(value) {
+            if(value !== undefined && value !== null) {
                 value = this.getFormat() ? this.getFormat().format(value) : value;
                 this.htmlElement.innerText = value;
             }else{
