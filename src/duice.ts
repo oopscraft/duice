@@ -117,7 +117,7 @@ namespace duice {
             if(!result) {
                 htmlElement.style.display = 'none';
             }else{
-                htmlElement.style.display = 'unset';
+                htmlElement.style.display = 'inherit';
             }
         }
     }

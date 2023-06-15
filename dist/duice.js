@@ -304,6 +304,8 @@ var duice;
             this.rowHtmlElements.push(rowHtmlElement);
             // insert into slot
             this.slot.appendChild(rowHtmlElement);
+            // check if clause
+            duice.checkIf(rowHtmlElement, context);
             // execute script
             duice.executeScript(rowHtmlElement, context);
             // selectable
@@ -1870,7 +1872,7 @@ var duice;
                 htmlElement.style.display = 'none';
             }
             else {
-                htmlElement.style.display = 'unset';
+                htmlElement.style.display = 'inherit';
             }
         }
     }

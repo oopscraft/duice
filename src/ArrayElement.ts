@@ -209,6 +209,9 @@ namespace duice {
             // insert into slot
             this.slot.appendChild(rowHtmlElement);
 
+            // check if clause
+            checkIf(rowHtmlElement, context);
+
             // execute script
             executeScript(rowHtmlElement, context);
 

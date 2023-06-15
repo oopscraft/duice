@@ -243,7 +243,7 @@
                 </td>
             </tr>
             <tr data-duice-bind="myArray"
-                data-duice-script="if(myArray.length > 0) this.hidden=true;">
+                data-duice-if="return myArray.length < 1;">
                 <td colspan="100%" class="ta-center">Data Not Found</td>
             </tr>
         </table>
@@ -312,7 +312,7 @@
                             </td>
                         </tr>
                         <tr data-duice-bind="myObject.items"
-                            data-duice-script="if(myObject.items.length > 0) this.hidden=true;">
+                            data-duice-if="return myObject.items.length < 1;">
                             <td colspan="100%">Data Not Found</td>
                         </tr>
                     </table>
@@ -325,7 +325,7 @@
                 </td>
             </tr>
             <tr data-duice-bind="myArray"
-                data-duice-script="if(myArray.length > 0) this.hidden=true;">
+                data-duice-if="return myArray.length < 1;">
                 <td colspan="100%" class="ta-center">Data Not Found</td>
             </tr>
             </tbody>
