@@ -134,8 +134,12 @@ namespace duice {
          * @param value
          */
         setValue(value: any): void {
-            value = this.getFormat() ? this.getFormat().format(value) : value;
-            this.htmlElement.innerText = value;
+            if(value) {
+                value = this.getFormat() ? this.getFormat().format(value) : value;
+                this.htmlElement.innerText = value;
+            }else{
+                this.htmlElement.innerText = '';
+            }
         }
 
         /**
@@ -143,7 +147,11 @@ namespace duice {
          */
         getValue(): any {
             let value = this.htmlElement.innerText;
-            value = this.getFormat() ? this.getFormat().parse(value) : value;
+            if(value && value.trim().length > 0) {
+                value = this.getFormat() ? this.getFormat().parse(value) : value;
+            }else{
+                value = null;
+            }
             return value;
         }
 
