@@ -997,6 +997,18 @@ var duice;
         render() {
             // removes child
             this.htmlElement.innerHTML = '';
+            // add style if exists
+            let styleLiteral = this.doStyle(this.getBindData());
+            if (styleLiteral) {
+                let style = document.createElement('style');
+                style.textContent = styleLiteral.trim();
+                if (this.htmlElement.shadowRoot) {
+                    this.htmlElement.shadowRoot.appendChild(style);
+                }
+                else {
+                    this.htmlElement.appendChild(style);
+                }
+            }
             // create template element
             let templateElement = this.doRender(this.getBindData());
             if (this.htmlElement.shadowRoot) {
@@ -1004,13 +1016,6 @@ var duice;
             }
             else {
                 this.htmlElement.appendChild(templateElement);
-            }
-            // add style if exists
-            let styleLiteral = this.doStyle(this.getBindData());
-            if (styleLiteral) {
-                let style = document.createElement('style');
-                style.textContent = styleLiteral.trim();
-                this.htmlElement.appendChild(style);
             }
             // context
             let context = Object.assign({}, this.getContext());
