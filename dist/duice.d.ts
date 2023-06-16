@@ -1332,13 +1332,6 @@ declare namespace duice.component {
     }
 }
 declare namespace duice.component {
-    class Pagination extends duice.CustomElement<object> {
-        doRender(object: object): HTMLElement;
-        doUpdate(object: object): void;
-        doStyle(object: object): string;
-    }
-}
-declare namespace duice.component {
     /**
      * select element component
      */
@@ -1383,34 +1376,6 @@ declare namespace duice.component {
          * @param context
          */
         doCreateElement(element: HTMLSelectElement, bindData: object, context: object): SelectElement;
-    }
-}
-declare namespace duice.component {
-    class SideNavigation extends duice.CustomElement<object[]> {
-        idProperty: string;
-        parentIdProperty: string;
-        iconProperty: string;
-        textProperty: string;
-        onclick: string;
-        uls: HTMLUListElement[];
-        /**
-         * doReader
-         * @param array
-         */
-        doRender(array: object[]): HTMLElement;
-        /**
-         * array to tree ul
-         * @param array
-         * @param parentId
-         * @param depth
-         */
-        arrayToTreeUl(array: any, parentId: any, depth: any): HTMLUListElement;
-        doUpdate(data: object[]): void;
-        /**
-         * doStyle
-         * @param array
-         */
-        doStyle(array: object[]): string;
     }
 }
 declare namespace duice.component {
