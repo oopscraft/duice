@@ -2,9 +2,9 @@
 namespace duice.event {
 
     /**
-     * RowMoveEvent
+     * ItemMoveEvent
      */
-    export class RowMoveEvent extends Event {
+    export class ItemMoveEvent extends Event {
 
         fromIndex: number;
 

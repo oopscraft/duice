@@ -35,10 +35,10 @@ namespace duice {
                 arrayElement.setEditable(editable.toLowerCase() === 'true');
             }
 
-            // toggle class
-            let toggleClass = getElementAttribute(htmlElement, 'toggle-class');
-            if(toggleClass) {
-                arrayElement.setToggleClass(toggleClass);
+            // selected class
+            let selectedItemClass = getElementAttribute(htmlElement, 'selected-item-class');
+            if(selectedItemClass) {
+                arrayElement.setSelectedItemClass(selectedItemClass);
             }
 
             // returns

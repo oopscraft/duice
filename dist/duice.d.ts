@@ -88,8 +88,8 @@ declare namespace duice {
         loop: string;
         hierarchy: string;
         editable: boolean;
-        toggleClass: string;
-        rowHtmlElements: HTMLElement[];
+        selectedItemClass: string;
+        itemHtmlElements: HTMLElement[];
         /**
          * constructor
          * @param htmlElement
@@ -108,10 +108,10 @@ declare namespace duice {
          */
         setEditable(editable: boolean): void;
         /**
-         * set toggle class
-         * @param toggleClass
+         * set selected class
+         * @param selectedClass
          */
-        setToggleClass(toggleClass: string): void;
+        setSelectedItemClass(selectedClass: string): void;
         /**
          * set hierarchy
          * @param hierarchy
@@ -122,12 +122,12 @@ declare namespace duice {
          */
         render(): void;
         /**
-         * create row html element
+         * create item html element
          * @param index
          * @param object
          * @param context
          */
-        createRowHtmlElement(index: number, object: object, context: object): void;
+        createItemHtmlElement(index: number, object: object, context: object): void;
         /**
          * update
          * @param observable
@@ -271,9 +271,9 @@ declare namespace duice.event {
 }
 declare namespace duice.event {
     /**
-     * RowMoveEvent
+     * ItemMoveEvent
      */
-    class RowMoveEvent extends Event {
+    class ItemMoveEvent extends Event {
         fromIndex: number;
         toIndex: number;
         /**
@@ -304,6 +304,7 @@ declare namespace duice {
         rowInsertedListener: Function;
         rowDeletingListener: Function;
         rowDeletedListener: Function;
+        selectedItemIndex: number;
         /**
          * constructor
          */
@@ -329,25 +330,34 @@ declare namespace duice {
          */
         update(observable: Observable, event: event.Event): Promise<void>;
         /**
-         * insertRow
+         * insert item
          * @param arrayProxy
          * @param index
          * @param rows
          */
-        insertRow(arrayProxy: object[], index: number, ...rows: object[]): Promise<void>;
+        insertItem(arrayProxy: object[], index: number, ...rows: object[]): Promise<void>;
         /**
-         * deleteRow
+         * delete item
          * @param arrayProxy
          * @param index
          * @param size
          */
-        deleteRow(arrayProxy: object[], index: number, size?: number): Promise<void>;
+        deleteItem(arrayProxy: object[], index: number, size?: number): Promise<void>;
         /**
-         * appendRow
+         * append item
          * @param arrayProxy
          * @param rows
          */
-        appendRow(arrayProxy: object[], ...rows: object[]): Promise<void>;
+        appendItem(arrayProxy: object[], ...rows: object[]): Promise<void>;
+        /**
+         * select item
+         * @param index
+         */
+        selectItem(index: number): void;
+        /**
+         * return selected item index
+         */
+        getSelectedItemIndex(): number;
     }
 }
 declare namespace duice {
@@ -457,6 +467,17 @@ declare namespace duice {
          * @param readonly
          */
         static setReadonlyAll(arrayProxy: object[], readonly: boolean): void;
+        /**
+         * select item
+         * @param arrayProxy
+         * @param index
+         */
+        static selectItem(arrayProxy: object[], index: number): void;
+        /**
+         * return selected item index
+         * @param arrayProxy
+         */
+        static getSelectedItemIndex(arrayProxy: object[]): number;
     }
 }
 declare namespace duice {
@@ -1425,52 +1446,6 @@ declare namespace duice.component {
         doCreateElement(element: HTMLTextAreaElement, bindData: object, context: object): TextareaElement;
     }
 }
-declare namespace duice.event {
-    /**
-     * RowInsertEvent
-     */
-    class RowInsertEvent extends Event {
-        index: number;
-        rows: object[];
-        /**
-         * constructor
-         * @param source
-         * @param index
-         */
-        constructor(source: any, index: number, rows: object[]);
-        /**
-         * return index
-         */
-        getIndex(): number;
-        /**
-         * getRows
-         */
-        getRows(): object[];
-    }
-}
-declare namespace duice.event {
-    /**
-     * RowDeleteEvent
-     */
-    class RowDeleteEvent extends Event {
-        index: number;
-        rows: object[];
-        /**
-         * constructor
-         * @param source
-         * @param index
-         */
-        constructor(source: any, index: number, rows: object[]);
-        /**
-         * return index
-         */
-        getIndex(): number;
-        /**
-         * getRows
-         */
-        getRows(): object[];
-    }
-}
 declare namespace duice.format {
     /**
      * date format
@@ -1574,5 +1549,68 @@ declare namespace duice.tab {
         items: TabItem[];
         addItem(item: TabItem): void;
         setActive(index: number): void;
+    }
+}
+declare namespace duice.event {
+    /**
+     * ItemInsertEvent
+     */
+    class ItemInsertEvent extends Event {
+        index: number;
+        items: object[];
+        /**
+         * constructor
+         * @param source
+         * @param index
+         * @param items
+         */
+        constructor(source: any, index: number, items: object[]);
+        /**
+         * return index
+         */
+        getIndex(): number;
+        /**
+         * return items
+         */
+        getItems(): object[];
+    }
+}
+declare namespace duice.event {
+    /**
+     * ItemDeleteEvent
+     */
+    class ItemDeleteEvent extends Event {
+        index: number;
+        items: object[];
+        /**
+         * constructor
+         * @param source
+         * @param index
+         * @param items
+         */
+        constructor(source: any, index: number, items: object[]);
+        /**
+         * return index
+         */
+        getIndex(): number;
+        /**
+         * get items
+         */
+        getItems(): object[];
+    }
+}
+declare namespace duice.event {
+    /**
+     * ItemSelectEvent
+     */
+    class ItemSelectEvent extends Event {
+        index: number;
+        /**
+         * constructor
+         * @param source
+         * @param index
+         */
+        constructor(source: any, index: number);
+        getIndex(): number;
     }
 }

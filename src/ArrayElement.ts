@@ -14,9 +14,9 @@ namespace duice {
 
         editable: boolean = false;
 
-        toggleClass: string;
+        selectedItemClass: string;
 
-        rowHtmlElements: HTMLElement[] = [];
+        itemHtmlElements: HTMLElement[] = [];
 
         /**
          * constructor
@@ -51,11 +51,11 @@ namespace duice {
         }
 
         /**
-         * set toggle class
-         * @param toggleClass
+         * set selected class
+         * @param selectedClass
          */
-        setToggleClass(toggleClass: string): void {
-            this.toggleClass = toggleClass;
+        setSelectedItemClass(selectedClass: string): void {
+            this.selectedItemClass = selectedClass;
         }
 
         /**
@@ -73,10 +73,10 @@ namespace duice {
             let arrayProxy = this.getBindData() as Array<object>;
 
             // reset row elements
-            this.rowHtmlElements.forEach(rowElement => {
+            this.itemHtmlElements.forEach(rowElement => {
                 rowElement.parentNode.removeChild(rowElement);
             });
-            this.rowHtmlElements.length = 0;
+            this.itemHtmlElements.length = 0;
 
             // loop
             if(this.loop){
@@ -110,7 +110,7 @@ namespace duice {
                                 });
 
                                 // create row element
-                                _this.createRowHtmlElement(index, object, context);
+                                _this.createItemHtmlElement(index, object, context);
 
                                 // visit child elements
                                 let id = object[idName];
@@ -142,7 +142,7 @@ namespace duice {
                         });
 
                         // create row element
-                        this.createRowHtmlElement(index, object, context);
+                        this.createItemHtmlElement(index, object, context);
                     }
                 }
             }
@@ -150,81 +150,87 @@ namespace duice {
             // not loop
             else {
                 // initialize
-                let rowHtmlElement = this.getHtmlElement().cloneNode(true) as HTMLElement;
+                let itemHtmlElement = this.getHtmlElement().cloneNode(true) as HTMLElement;
                 let context = Object.assign({}, this.getContext());
-                initialize(rowHtmlElement, this.getContext());
-                this.rowHtmlElements.push(rowHtmlElement);
+                initialize(itemHtmlElement, this.getContext());
+                this.itemHtmlElements.push(itemHtmlElement);
 
                 // append to slot
-                this.slot.appendChild(rowHtmlElement);
+                this.slot.appendChild(itemHtmlElement);
 
                 // check if
-                checkIf(rowHtmlElement, context);
+                checkIf(itemHtmlElement, context);
 
                 // execute script
-                executeScript(rowHtmlElement, context);
+                executeScript(itemHtmlElement, context);
             }
         }
 
         /**
-         * create row html element
+         * create item html element
          * @param index
          * @param object
          * @param context
          */
-        createRowHtmlElement(index: number, object: object, context: object): void {
+        createItemHtmlElement(index: number, object: object, context: object): void {
 
             // clones row elements
-            let rowHtmlElement = this.getHtmlElement().cloneNode(true) as HTMLElement;
+            let itemHtmlElement = this.getHtmlElement().cloneNode(true) as HTMLElement;
 
             // adds embedded attribute
-            setElementAttribute(rowHtmlElement, 'index', index.toString());
+            setElementAttribute(itemHtmlElement, 'index', index.toString());
 
             // editable
             let _this = this;
             if(this.editable){
-                rowHtmlElement.setAttribute('draggable', 'true');
-                rowHtmlElement.addEventListener('dragstart', function(e){
+                itemHtmlElement.setAttribute('draggable', 'true');
+                itemHtmlElement.addEventListener('dragstart', function(e){
                     let fromIndex = getElementAttribute(this, 'index');
                     e.dataTransfer.setData("text", fromIndex);
                 });
-                rowHtmlElement.addEventListener('dragover', function(e){
+                itemHtmlElement.addEventListener('dragover', function(e){
                     e.preventDefault();
                     e.stopPropagation();
                 });
-                rowHtmlElement.addEventListener('drop', async function(e){
+                itemHtmlElement.addEventListener('drop', async function(e){
                     e.preventDefault();
                     e.stopPropagation();
                     let fromIndex = parseInt(e.dataTransfer.getData('text'));
                     let toIndex = parseInt(getElementAttribute(this, 'index'));
-                    let rowIndexChangeEvent = new event.RowMoveEvent(_this, fromIndex, toIndex);
-                    _this.notifyObservers(rowIndexChangeEvent);
+                    let itemMoveEvent = new event.ItemMoveEvent(_this, fromIndex, toIndex);
+                    _this.notifyObservers(itemMoveEvent);
                 });
             }
 
             // initializes row element
-            initialize(rowHtmlElement, context);
-            this.rowHtmlElements.push(rowHtmlElement);
+            initialize(itemHtmlElement, context);
+            this.itemHtmlElements.push(itemHtmlElement);
 
             // insert into slot
-            this.slot.appendChild(rowHtmlElement);
+            this.slot.appendChild(itemHtmlElement);
 
             // check if clause
-            checkIf(rowHtmlElement, context);
+            checkIf(itemHtmlElement, context);
 
             // execute script
-            executeScript(rowHtmlElement, context);
+            executeScript(itemHtmlElement, context);
 
             // selectable
-            if(this.toggleClass) {
-                rowHtmlElement.addEventListener('click', e => {
-                    this.rowHtmlElements.forEach(element => {
-                        element.classList.remove(this.toggleClass);
+            itemHtmlElement.addEventListener('click', e => {
+
+                // selected class
+                if(this.selectedItemClass) {
+                    this.itemHtmlElements.forEach(element => {
+                        element.classList.remove(this.selectedItemClass);
                     });
-                    (e.currentTarget as HTMLElement).classList.add(this.toggleClass);
+                    (e.currentTarget as HTMLElement).classList.add(this.selectedItemClass);
                     e.stopPropagation();
-                });
-            }
+                }
+
+                // trigger row select event
+                let rowSelectEvent = new event.ItemSelectEvent(this, index);
+                this.notifyObservers(rowSelectEvent);
+            });
         }
 
         /**
@@ -235,9 +241,21 @@ namespace duice {
         update(observable: Observable, event: event.Event): void {
             console.debug('ArrayElement.update', observable, event);
             if(observable instanceof ArrayHandler){
+
+                // row select event
+                if(event instanceof duice.event.ItemSelectEvent) {
+                    if(this.selectedItemClass) {
+                        this.itemHtmlElements.forEach(el => el.classList.remove(this.selectedItemClass));
+                        this.itemHtmlElements[event.getIndex()].classList.add(this.selectedItemClass);
+                    }
+                    return;
+                }
+
+                // render
                 this.render();
             }
         }
+
 
     }
 }

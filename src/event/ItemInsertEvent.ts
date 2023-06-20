@@ -1,23 +1,24 @@
 namespace duice.event {
 
     /**
-     * RowDeleteEvent
+     * ItemDeleteEvent
      */
-    export class RowDeleteEvent extends Event {
+    export class ItemDeleteEvent extends Event {
 
         index: number;
 
-        rows: object[] = [];
+        items: object[] = [];
 
         /**
          * constructor
          * @param source
          * @param index
+         * @param items
          */
-        constructor(source: any, index: number, rows: object[]){
+        constructor(source: any, index: number, items: object[]){
             super(source);
             this.index = index;
-            this.rows = rows;
+            this.items = items;
         }
 
         /**
@@ -28,10 +29,10 @@ namespace duice.event {
         }
 
         /**
-         * getRows
+         * get items
          */
-        getRows(): object[] {
-            return this.rows;
+        getItems(): object[] {
+            return this.items;
         }
 
     }

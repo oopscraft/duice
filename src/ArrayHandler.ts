@@ -1,5 +1,5 @@
 ///<reference path="DataHandler.ts"/>
-///<reference path="event/RowMoveEvent.ts"/>
+///<reference path="event/ItemMoveEvent.ts"/>
 namespace duice {
 
     /**
@@ -18,6 +18,8 @@ namespace duice {
         rowDeletingListener: Function;
 
         rowDeletedListener: Function;
+
+        selectedItemIndex: number;
 
         /**
          * constructor
@@ -50,7 +52,7 @@ namespace duice {
                         for (let i in arguments) {
                             rows.push(arguments[i]);
                         }
-                        await _this.insertRow(target, index, ...rows);
+                        await _this.insertItem(target, index, ...rows);
                         return target.length;
                     }
                 }
@@ -73,12 +75,12 @@ namespace duice {
 
                         // delete rows
                         if(deleteCount > 0) {
-                            await _this.deleteRow(target, start, deleteCount);
+                            await _this.deleteItem(target, start, deleteCount);
                         }
 
                         // insert rows
                         if(insertRows.length > 0){
-                            await _this.insertRow(target, start, ...insertRows);
+                            await _this.insertItem(target, start, ...insertRows);
                         }
 
                         // returns deleted rows
@@ -96,7 +98,7 @@ namespace duice {
                             index = 0;
                         }
                         let rows = [target[index]];
-                        await _this.deleteRow(target, index);
+                        await _this.deleteItem(target, index);
                         return rows;
                     }
                 }
@@ -132,8 +134,16 @@ namespace duice {
             console.debug("ArrayHandler.update", observable, event);
 
             // instance is array component
-            if(observable instanceof ArrayElement){
-                if (event instanceof duice.event.RowMoveEvent) {
+            if(observable instanceof ArrayElement) {
+
+                // row select event
+                if(event instanceof duice.event.ItemSelectEvent) {
+                    this.selectedItemIndex = event.getIndex();
+                    return;
+                }
+
+                // row move event
+                if (event instanceof duice.event.ItemMoveEvent) {
                     let object = this.getTarget().splice(event.getFromIndex(), 1)[0];
                     this.getTarget().splice(event.getToIndex(), 0, object);
                 }
@@ -144,18 +154,18 @@ namespace duice {
         }
 
         /**
-         * insertRow
+         * insert item
          * @param arrayProxy
          * @param index
          * @param rows
          */
-        async insertRow(arrayProxy: object[], index: number, ...rows: object[]): Promise<void> {
+        async insertItem(arrayProxy: object[], index: number, ...rows: object[]): Promise<void> {
             let arrayHandler = ArrayProxy.getHandler(arrayProxy);
             let proxyTarget = ArrayProxy.getTarget(arrayProxy);
             rows.forEach((object, index) => {
                 rows[index] = new ObjectProxy(object);
             });
-            let event = new duice.event.RowInsertEvent(this, index, rows);
+            let event = new duice.event.ItemInsertEvent(this, index, rows);
             if (await arrayHandler.checkListener(arrayHandler.rowInsertingListener, event)) {
                 proxyTarget.splice(index, 0, ...rows);
                 await arrayHandler.checkListener(arrayHandler.rowInsertedListener, event);
@@ -164,18 +174,18 @@ namespace duice {
         }
 
         /**
-         * deleteRow
+         * delete item
          * @param arrayProxy
          * @param index
          * @param size
          */
-        async deleteRow(arrayProxy: object[], index: number, size?: number): Promise<void> {
+        async deleteItem(arrayProxy: object[], index: number, size?: number): Promise<void> {
             let arrayHandler = ArrayProxy.getHandler(arrayProxy);
             let proxyTarget = ArrayProxy.getTarget(arrayProxy);
             let sliceBegin = index;
             let sliceEnd = (size ? index + size : index + 1);
             let rows = proxyTarget.slice(sliceBegin, sliceEnd);
-            let event = new duice.event.RowDeleteEvent(this, index, rows);
+            let event = new duice.event.ItemDeleteEvent(this, index, rows);
             if (await arrayHandler.checkListener(arrayHandler.rowDeletingListener, event)) {
                 let spliceStart = index;
                 let spliceDeleteCount = (size ? size : 1);
@@ -186,13 +196,32 @@ namespace duice {
         }
 
         /**
-         * appendRow
+         * append item
          * @param arrayProxy
          * @param rows
          */
-        async appendRow(arrayProxy: object[], ...rows: object[]): Promise<void> {
+        async appendItem(arrayProxy: object[], ...rows: object[]): Promise<void> {
             let index = arrayProxy.length;
-            return this.insertRow(arrayProxy, index, ...rows);
+            return this.insertItem(arrayProxy, index, ...rows);
+        }
+
+        /**
+         * select item
+         * @param index
+         */
+        selectItem(index: number): void {
+            this.selectedItemIndex = index;
+
+            // notify row select event
+            let rowSelectEvent = new event.ItemSelectEvent(this, this.selectedItemIndex);
+            this.notifyObservers(rowSelectEvent);
+        }
+
+        /**
+         * return selected item index
+         */
+        getSelectedItemIndex(): number {
+            return this.selectedItemIndex;
         }
 
     }

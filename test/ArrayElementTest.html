@@ -194,7 +194,7 @@
         <!-- simple table -->
         <h3>
             Simple Table
-            <small>&lt;tr data-duice-bind="myArray" data-duice-loop="myObject,status" data-duice-toggle-class="selected"&gt;</small>
+            <small>&lt;tr data-duice-bind="myArray" data-duice-loop="myObject,status" data-duice-selected-item-class="selected"&gt;</small>
         </h3>
         <table>
             <tr>
@@ -211,7 +211,7 @@
                 <th>address.city</th>
                 <th>items[]</th>
             </tr>
-            <tr data-duice-bind="myArray" data-duice-loop="myObject,status" data-duice-toggle-class="selected" data-duice-script="this.dataset.name=myObject.name;" onclick="alert(this.dataset.name);">
+            <tr data-duice-bind="myArray" data-duice-loop="myObject,status" data-duice-selected-item-class="selected" data-duice-script="this.dataset.name=myObject.name;">
                 <td data-duice-bind="status" data-duice-property="index"></td>
                 <td data-duice-bind="status" data-duice-property="count"></td>
                 <td data-duice-bind="myObject" data-duice-property="name"></td>
@@ -251,7 +251,7 @@
         <!-- start of editable table -->
         <h3>
             Complex Table
-            <small>&lt;tr data-duice-bind="myArray" data-duice-loop="item,status" data-duice-toggle-class="selected" data-duice-editable="true" &gt;</small>
+            <small>&lt;tr data-duice-bind="myArray" data-duice-loop="item,status" data-duice-selected-item-class="selected" data-duice-editable="true" &gt;</small>
         </h3>
         <table>
             <thead>
@@ -272,7 +272,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr data-duice-bind="myArray" data-duice-loop="myObject,status" data-duice-toggle-class="selected" data-duice-editable="true" >
+            <tr data-duice-bind="myArray" data-duice-loop="myObject,status" data-duice-selected-item-class="selected" data-duice-editable="true" >
                 <td><span data-duice-bind="status" data-duice-property="index"></span></td>
                 <td><span data-duice-bind="status" data-duice-property="count"></span></td>
                 <td><input data-duice-bind="myObject" data-duice-property="name"/></td>
@@ -343,10 +343,10 @@
         <!-- start of hierarchy -->
         <h3>
             Hierarchy Tree
-            <small>&lt;tr data-duice-bind="myArray" data-duice-loop="item,status" data-duice-toggle-class="selected" data-duice-hierarchy="id,parentId"&gt;</small>
+            <small>&lt;tr data-duice-bind="myArray" data-duice-loop="item,status" data-duice-selected-item-class="selected" data-duice-hierarchy="id,parentId"&gt;</small>
         </h3>
         <div>
-            <div data-duice-bind="myArray" data-duice-loop="item,status" data-duice-hierarchy="id,parentId" data-duice-toggle-class="selected"
+            <div data-duice-bind="myArray" data-duice-loop="item,status" data-duice-hierarchy="id,parentId" data-duice-selected-item-class="selected"
                 data-duice-script="this.style.paddingLeft = (status.depth * 1) + 'rem';">
                 <span data-duice-bind="item" data-duice-property="name" tabIndex="0"></span>
             </div>

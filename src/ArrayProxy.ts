@@ -249,6 +249,23 @@ namespace duice {
             }
         }
 
+        /**
+         * select item
+         * @param arrayProxy
+         * @param index
+         */
+        static selectItem(arrayProxy: object[], index: number): void {
+            return this.getHandler(arrayProxy).selectItem(index);
+        }
+
+        /**
+         * return selected item index
+         * @param arrayProxy
+         */
+        static getSelectedItemIndex(arrayProxy: object[]): number {
+            return this.getHandler(arrayProxy).getSelectedItemIndex();
+        }
+
     }
 
 }
