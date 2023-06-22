@@ -246,7 +246,10 @@ namespace duice {
                 if(event instanceof duice.event.ItemSelectEvent) {
                     if(this.selectedItemClass) {
                         this.itemHtmlElements.forEach(el => el.classList.remove(this.selectedItemClass));
-                        this.itemHtmlElements[event.getIndex()].classList.add(this.selectedItemClass);
+                        let index = event.getIndex();
+                        if(index >= 0) {
+                            this.itemHtmlElements[event.getIndex()].classList.add(this.selectedItemClass);
+                        }
                     }
                     return;
                 }
