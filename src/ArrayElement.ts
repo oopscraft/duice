@@ -159,10 +159,10 @@ namespace duice {
                 this.slot.appendChild(itemHtmlElement);
 
                 // check if
-                checkIf(itemHtmlElement, context);
+                runIfCode(itemHtmlElement, context);
 
                 // execute script
-                executeScript(itemHtmlElement, context);
+                runExecuteCode(itemHtmlElement, context);
             }
         }
 
@@ -210,10 +210,10 @@ namespace duice {
             this.slot.appendChild(itemHtmlElement);
 
             // check if clause
-            checkIf(itemHtmlElement, context);
+            runIfCode(itemHtmlElement, context);
 
             // execute script
-            executeScript(itemHtmlElement, context);
+            runExecuteCode(itemHtmlElement, context);
 
             // selectable
             itemHtmlElement.addEventListener('click', e => {

@@ -884,15 +884,15 @@ declare namespace duice {
      * @param htmlElement
      * @param context
      */
-    function execute(code: string, htmlElement: HTMLElement, context: object): boolean;
+    function runCode(code: string, htmlElement: HTMLElement, context: object): boolean;
     /**
-     * check if
+     * run if code
      */
-    function checkIf(htmlElement: HTMLElement, context: object): void;
+    function runIfCode(htmlElement: HTMLElement, context: object): void;
     /**
-     * execute script
+     * run execute code
      */
-    function executeScript(htmlElement: HTMLElement, context: object): void;
+    function runExecuteCode(htmlElement: HTMLElement, context: object): void;
     /**
      * checks has component attribute
      * @param htmlElement

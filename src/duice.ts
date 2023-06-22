@@ -92,7 +92,7 @@ namespace duice {
      * @param htmlElement
      * @param context
      */
-    export function execute(code: string, htmlElement: HTMLElement, context: object): boolean {
+    export function runCode(code: string, htmlElement: HTMLElement, context: object): boolean {
         try {
             let args = [];
             let values = [];
@@ -108,12 +108,12 @@ namespace duice {
     }
 
     /**
-     * check if
+     * run if code
      */
-    export function checkIf(htmlElement: HTMLElement, context: object): void {
+    export function runIfCode(htmlElement: HTMLElement, context: object): void {
         let ifClause = getElementAttribute(htmlElement, 'if');
         if(ifClause) {
-            let result = execute(ifClause, htmlElement, context);
+            let result = runCode(ifClause, htmlElement, context);
             if(!result) {
                 htmlElement.hidden = true;
             }else{
@@ -123,12 +123,12 @@ namespace duice {
     }
 
     /**
-     * execute script
+     * run execute code
      */
-    export function executeScript(htmlElement: HTMLElement, context: object): void {
-        let script = getElementAttribute(htmlElement,'script');
+    export function runExecuteCode(htmlElement: HTMLElement, context: object): void {
+        let script = getElementAttribute(htmlElement,'execute');
         if(script) {
-            execute(script, htmlElement, context);
+            runCode(script, htmlElement, context);
         }
     }
 

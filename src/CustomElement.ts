@@ -49,13 +49,13 @@ namespace duice {
             context['data'] = this.bindData;
 
             // check if
-            checkIf(this.htmlElement, context);
+            runIfCode(this.htmlElement, context);
 
             // initialize
             initialize(this.htmlElement, context);
 
             // execute script
-            executeScript(this.htmlElement, context);
+            runExecuteCode(this.htmlElement, context);
         }
 
         /**

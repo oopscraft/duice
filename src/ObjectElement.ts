@@ -86,7 +86,7 @@ namespace duice {
         checkIf(): void {
             let context = Object.assign({}, this.getContext());
             context[this.getBindName()] = this.getBindData();
-            checkIf(this.htmlElement, context);
+            runIfCode(this.htmlElement, context);
         }
 
         /**
@@ -95,7 +95,7 @@ namespace duice {
         executeScript(): void {
             let context = Object.assign({}, this.getContext());
             context[this.getBindName()] = this.getBindData();
-            executeScript(this.htmlElement, context);
+            runExecuteCode(this.htmlElement, context);
         }
 
         /**

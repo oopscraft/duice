@@ -211,7 +211,7 @@
                 <th>address.city</th>
                 <th>items[]</th>
             </tr>
-            <tr data-duice-bind="myArray" data-duice-loop="myObject,status" data-duice-selected-item-class="selected" data-duice-script="this.dataset.name=myObject.name;">
+            <tr data-duice-bind="myArray" data-duice-loop="myObject,status" data-duice-selected-item-class="selected" data-duice-execute="this.dataset.name=myObject.name;">
                 <td data-duice-bind="status" data-duice-property="index"></td>
                 <td data-duice-bind="status" data-duice-property="count"></td>
                 <td data-duice-bind="myObject" data-duice-property="name"></td>
@@ -236,7 +236,7 @@
                             <td data-duice-bind="item" data-duice-property="name"></td>
                         </tr>
                         <tr data-duice-bind="myObject.items"
-                            data-duice-script="if(myObject.items.length > 0) this.hidden=true;">
+                            data-duice-execute="if(myObject.items.length > 0) this.hidden=true;">
                             <td colspan="100%">Data Not Found</td>
                         </tr>
                     </table>
@@ -292,7 +292,7 @@
                 </td>
                 <td><input type="checkbox" data-duice-bind="myObject" data-duice-property="enabled"/></td>
                 <td><input type="checkbox" data-duice-bind="myObject" data-duice-property="enabledYn"
-                           dc:true-value="Y" dc:false-value="N"/></td>
+                           data-duice-true-value="Y" data-duice-false-value="N"/></td>
                 <td><input type="text" data-duice-bind="myObject" data-duice-property="address.country"/></td>
                 <td><input type="text" data-duice-bind="myObject" data-duice-property="address.city"/></td>
                 <td>
@@ -318,7 +318,7 @@
                     </table>
                 </td>
                 <td>
-                    <button data-duice-bind="status" data-duice-script="this.dataset.index=status.index;"
+                    <button data-duice-bind="status" data-duice-execute="this.dataset.index=status.index;"
                             onclick="myArray.splice(Number(this.dataset.index),1);">
                         myArray.deleteRow([index]);
                     </button>
@@ -333,7 +333,7 @@
             <tr>
                 <td colspan="100%" style="text-align:right;">
                     <span data-duice-bind="myArray"
-                          data-duice-script="this.innerHTML=myArray.length + ' Rows';"></span>
+                          data-duice-execute="this.innerHTML=myArray.length + ' Rows';"></span>
                 </td>
             </tr>
             </tfoot>
@@ -347,7 +347,7 @@
         </h3>
         <div>
             <div data-duice-bind="myArray" data-duice-loop="item,status" data-duice-hierarchy="id,parentId" data-duice-selected-item-class="selected"
-                data-duice-script="this.style.paddingLeft = (status.depth * 1) + 'rem';">
+                data-duice-execute="this.style.paddingLeft = (status.depth * 1) + 'rem';">
                 <span data-duice-bind="item" data-duice-property="name" tabIndex="0"></span>
             </div>
         </div>
