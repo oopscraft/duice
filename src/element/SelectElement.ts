@@ -44,7 +44,11 @@ namespace duice.component {
          * return value
          */
         override getValue(): any {
-            return this.getHtmlElement().value;
+            let value = this.getHtmlElement().value;
+            if(!value || value.trim().length < 1) {
+                value = null;
+            }
+            return value;
         }
 
         /**
