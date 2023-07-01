@@ -163,7 +163,11 @@ namespace duice {
             let arrayHandler = ArrayProxy.getHandler(arrayProxy);
             let proxyTarget = ArrayProxy.getTarget(arrayProxy);
             rows.forEach((object, index) => {
-                rows[index] = new ObjectProxy(object);
+                let objectProxy = new ObjectProxy(object);
+                let objectHandler = ObjectProxy.getHandler(objectProxy);
+                objectHandler.propertyChangingListener = this.propertyChangingListener;
+                objectHandler.propertyChangedListener = this.propertyChangedListener;
+                rows[index] = objectProxy;
             });
             let event = new duice.event.ItemInsertEvent(this, index, rows);
             if (await arrayHandler.checkListener(arrayHandler.rowInsertingListener, event)) {

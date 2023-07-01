@@ -21,7 +21,7 @@ namespace duice.format {
          * @param number
          */
         format(number: number): string {
-            if(!number || isNaN(Number(number))){
+            if(isNaN(Number(number))){
                 return '';
             }
             number = Number(number);

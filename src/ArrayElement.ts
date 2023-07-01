@@ -203,7 +203,7 @@ namespace duice {
             }
 
             // initializes row element
-            initialize(itemHtmlElement, context);
+            initialize(itemHtmlElement, context, index);
             this.itemHtmlElements.push(itemHtmlElement);
 
             // insert into slot

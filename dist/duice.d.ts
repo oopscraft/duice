@@ -866,7 +866,7 @@ declare namespace duice {
      * @param container
      * @param context
      */
-    function initialize(container: any, context: object): void;
+    function initialize(container: any, context: object, index?: number): void;
     /**
      * markInitialized
      * @param container
@@ -1446,6 +1446,69 @@ declare namespace duice.component {
         doCreateElement(element: HTMLTextAreaElement, bindData: object, context: object): TextareaElement;
     }
 }
+declare namespace duice.event {
+    /**
+     * ItemInsertEvent
+     */
+    class ItemInsertEvent extends Event {
+        index: number;
+        items: object[];
+        /**
+         * constructor
+         * @param source
+         * @param index
+         * @param items
+         */
+        constructor(source: any, index: number, items: object[]);
+        /**
+         * return index
+         */
+        getIndex(): number;
+        /**
+         * return items
+         */
+        getItems(): object[];
+    }
+}
+declare namespace duice.event {
+    /**
+     * ItemDeleteEvent
+     */
+    class ItemDeleteEvent extends Event {
+        index: number;
+        items: object[];
+        /**
+         * constructor
+         * @param source
+         * @param index
+         * @param items
+         */
+        constructor(source: any, index: number, items: object[]);
+        /**
+         * return index
+         */
+        getIndex(): number;
+        /**
+         * get items
+         */
+        getItems(): object[];
+    }
+}
+declare namespace duice.event {
+    /**
+     * ItemSelectEvent
+     */
+    class ItemSelectEvent extends Event {
+        index: number;
+        /**
+         * constructor
+         * @param source
+         * @param index
+         */
+        constructor(source: any, index: number);
+        getIndex(): number;
+    }
+}
 declare namespace duice.format {
     /**
      * date format
@@ -1549,68 +1612,5 @@ declare namespace duice.tab {
         items: TabItem[];
         addItem(item: TabItem): void;
         setActive(index: number): void;
-    }
-}
-declare namespace duice.event {
-    /**
-     * ItemInsertEvent
-     */
-    class ItemInsertEvent extends Event {
-        index: number;
-        items: object[];
-        /**
-         * constructor
-         * @param source
-         * @param index
-         * @param items
-         */
-        constructor(source: any, index: number, items: object[]);
-        /**
-         * return index
-         */
-        getIndex(): number;
-        /**
-         * return items
-         */
-        getItems(): object[];
-    }
-}
-declare namespace duice.event {
-    /**
-     * ItemDeleteEvent
-     */
-    class ItemDeleteEvent extends Event {
-        index: number;
-        items: object[];
-        /**
-         * constructor
-         * @param source
-         * @param index
-         * @param items
-         */
-        constructor(source: any, index: number, items: object[]);
-        /**
-         * return index
-         */
-        getIndex(): number;
-        /**
-         * get items
-         */
-        getItems(): object[];
-    }
-}
-declare namespace duice.event {
-    /**
-     * ItemSelectEvent
-     */
-    class ItemSelectEvent extends Event {
-        index: number;
-        /**
-         * constructor
-         * @param source
-         * @param index
-         */
-        constructor(source: any, index: number);
-        getIndex(): number;
     }
 }

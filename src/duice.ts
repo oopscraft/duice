@@ -31,7 +31,7 @@ namespace duice {
      * @param container
      * @param context
      */
-    export function initialize(container: any, context: object): void {
+    export function initialize(container: any, context: object, index?: number): void {
         // scan DOM tree
         container.querySelectorAll(getElementQuerySelector()).forEach(htmlElement => {
             if(!hasElementAttribute(htmlElement, 'id')) {
@@ -41,6 +41,10 @@ namespace duice {
                     DataElementRegistry.getFactory(htmlElement, bindData)
                         ?.createElement(htmlElement, bindData, context)
                         ?.render();
+                    // index
+                    if(index !== undefined) {
+                       setElementAttribute(htmlElement, "index", index.toString());
+                    }
                 }catch(e){
                     console.error(e, htmlElement, container, JSON.stringify(context));
                 }
