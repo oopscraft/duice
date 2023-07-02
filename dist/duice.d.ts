@@ -965,8 +965,7 @@ declare namespace duice.dialog {
     class Dialog {
         protected dialogElement: HTMLDialogElement;
         protected header: HTMLSpanElement;
-        protected closeButton: HTMLImageElement;
-        protected closeButtonImg: string;
+        protected closeButton: HTMLSpanElement;
         protected promise: Promise<any>;
         protected promiseResolve: Function;
         protected promiseReject: Function;
