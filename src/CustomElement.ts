@@ -6,6 +6,8 @@ namespace duice {
      */
     export abstract class CustomElement<V> extends DataElement<HTMLElement, V> {
 
+        slot: HTMLSlotElement = document.createElement('slot');
+
         /**
          * constructor
          * @param htmlElement
@@ -14,6 +16,13 @@ namespace duice {
          */
         protected constructor(htmlElement: HTMLElement, bindData: V, context: object) {
             super(htmlElement, bindData, context);
+
+            // replace with slot for position
+            if(htmlElement.shadowRoot) {
+                this.htmlElement.shadowRoot.appendChild(this.slot);
+            }else{
+                htmlElement.appendChild(this.slot);
+            }
         }
 
         /**
@@ -22,27 +31,19 @@ namespace duice {
         override render(): void {
 
             // removes child
-            this.htmlElement.innerHTML = '';
+            this.slot.innerHTML = '';
 
             // add style if exists
             let styleLiteral = this.doStyle(this.getBindData());
             if(styleLiteral){
                 let style = document.createElement('style');
                 style.textContent = styleLiteral.trim();
-                if(this.htmlElement.shadowRoot) {
-                    this.htmlElement.shadowRoot.appendChild(style);
-                }else{
-                    this.htmlElement.appendChild(style);
-                }
+                this.slot.appendChild(style);
             }
 
             // create template element
             let templateElement = this.doRender(this.getBindData());
-            if(this.htmlElement.shadowRoot){
-                this.htmlElement.shadowRoot.appendChild(templateElement);
-            }else{
-                this.htmlElement.appendChild(templateElement);
-            }
+            this.slot.appendChild(templateElement);
 
             // context
             let context = Object.assign({}, this.getContext());

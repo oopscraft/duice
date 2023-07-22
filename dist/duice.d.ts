@@ -485,6 +485,7 @@ declare namespace duice {
      * custom element
      */
     abstract class CustomElement<V> extends DataElement<HTMLElement, V> {
+        slot: HTMLSlotElement;
         /**
          * constructor
          * @param htmlElement

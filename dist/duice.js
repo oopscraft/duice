@@ -1047,33 +1047,31 @@ var duice;
          */
         constructor(htmlElement, bindData, context) {
             super(htmlElement, bindData, context);
+            this.slot = document.createElement('slot');
+            // replace with slot for position
+            if (htmlElement.shadowRoot) {
+                this.htmlElement.shadowRoot.appendChild(this.slot);
+            }
+            else {
+                htmlElement.appendChild(this.slot);
+            }
         }
         /**
          * render
          */
         render() {
             // removes child
-            this.htmlElement.innerHTML = '';
+            this.slot.innerHTML = '';
             // add style if exists
             let styleLiteral = this.doStyle(this.getBindData());
             if (styleLiteral) {
                 let style = document.createElement('style');
                 style.textContent = styleLiteral.trim();
-                if (this.htmlElement.shadowRoot) {
-                    this.htmlElement.shadowRoot.appendChild(style);
-                }
-                else {
-                    this.htmlElement.appendChild(style);
-                }
+                this.slot.appendChild(style);
             }
             // create template element
             let templateElement = this.doRender(this.getBindData());
-            if (this.htmlElement.shadowRoot) {
-                this.htmlElement.shadowRoot.appendChild(templateElement);
-            }
-            else {
-                this.htmlElement.appendChild(templateElement);
-            }
+            this.slot.appendChild(templateElement);
             // context
             let context = Object.assign({}, this.getContext());
             context['data'] = this.bindData;
