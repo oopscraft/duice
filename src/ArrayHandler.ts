@@ -2,9 +2,6 @@
 ///<reference path="event/ItemMoveEvent.ts"/>
 namespace duice {
 
-    /**
-     * array handler class
-     */
     export class ArrayHandler extends DataHandler<object[]> {
 
         propertyChangingListener: Function;
@@ -21,19 +18,10 @@ namespace duice {
 
         selectedItemIndex: number;
 
-        /**
-         * constructor
-         */
         constructor() {
             super();
         }
 
-        /**
-         * get
-         * @param target
-         * @param property
-         * @param receiver
-         */
         get(target: object[], property: string, receiver: object): any {
             let _this = this;
             const value = target[property];
@@ -111,12 +99,6 @@ namespace duice {
             return value;
         }
 
-        /**
-         * set
-         * @param target
-         * @param property
-         * @param value
-         */
         set(target: ArrayProxy, property: string, value: any): boolean {
             Reflect.set(target, property, value);
             if (property === 'length') {
@@ -125,11 +107,6 @@ namespace duice {
             return true;
         }
 
-        /**
-         * update
-         * @param observable
-         * @param event
-         */
         async update(observable: Observable, event: event.Event): Promise<void> {
             console.debug("ArrayHandler.update", observable, event);
 
@@ -153,12 +130,6 @@ namespace duice {
             this.notifyObservers(event);
         }
 
-        /**
-         * insert item
-         * @param arrayProxy
-         * @param index
-         * @param rows
-         */
         async insertItem(arrayProxy: object[], index: number, ...rows: object[]): Promise<void> {
             let arrayHandler = ArrayProxy.getHandler(arrayProxy);
             let proxyTarget = ArrayProxy.getTarget(arrayProxy);
@@ -177,12 +148,6 @@ namespace duice {
             }
         }
 
-        /**
-         * delete item
-         * @param arrayProxy
-         * @param index
-         * @param size
-         */
         async deleteItem(arrayProxy: object[], index: number, size?: number): Promise<void> {
             let arrayHandler = ArrayProxy.getHandler(arrayProxy);
             let proxyTarget = ArrayProxy.getTarget(arrayProxy);
@@ -199,20 +164,11 @@ namespace duice {
             }
         }
 
-        /**
-         * append item
-         * @param arrayProxy
-         * @param rows
-         */
         async appendItem(arrayProxy: object[], ...rows: object[]): Promise<void> {
             let index = arrayProxy.length;
             return this.insertItem(arrayProxy, index, ...rows);
         }
 
-        /**
-         * select item
-         * @param index
-         */
         selectItem(index: number): void {
             this.selectedItemIndex = index;
 
@@ -221,9 +177,6 @@ namespace duice {
             this.notifyObservers(rowSelectEvent);
         }
 
-        /**
-         * return selected item index
-         */
         getSelectedItemIndex(): number {
             return this.selectedItemIndex;
         }

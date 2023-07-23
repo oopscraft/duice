@@ -2,10 +2,6 @@ namespace duice.format {
 
     export class FormatFactory {
 
-        /**
-         * return format instance
-         * @param format
-         */
         static getFormat(format: string): Format {
             if(format.startsWith('string')){
                 format = format.replace('string', 'StringFormat');

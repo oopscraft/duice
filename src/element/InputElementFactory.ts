@@ -1,17 +1,8 @@
 ///<reference path="../DataElementRegistry.ts"/>
-namespace duice.component {
+namespace duice.element {
 
-    /**
-     * input element factory class
-     */
     export class InputElementFactory extends ObjectElementFactory<HTMLInputElement> {
 
-        /**
-         * creates component
-         * @param element
-         * @param bindData
-         * @param context
-         */
         override doCreateElement(element: HTMLInputElement, bindData: object, context: object): InputElement {
             let type = element.getAttribute('type');
             switch(type) {

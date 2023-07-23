@@ -1,8 +1,5 @@
 namespace duice.event {
 
-    /**
-     * PropertyChangeEvent
-     */
     export class PropertyChangeEvent extends Event {
 
         property: string;
@@ -11,13 +8,6 @@ namespace duice.event {
 
         index: number;
 
-        /**
-         * constructor
-         * @param source
-         * @param property
-         * @param value
-         * @param index
-         */
         constructor(source: any, property: string, value: any, index?: number){
             super(source);
             this.property = property;
@@ -25,23 +15,14 @@ namespace duice.event {
             this.index = index;
         }
 
-        /**
-         * getProperty
-         */
         getProperty(): string {
             return this.property;
         }
 
-        /**
-         * getValue
-         */
         getValue(): any {
             return this.value;
         }
 
-        /**
-         * getIndex
-         */
         getIndex(): number {
             return this.index;
         }

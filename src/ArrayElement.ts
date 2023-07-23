@@ -1,9 +1,6 @@
 ///<reference path="DataElement.ts"/>
 namespace duice {
 
-    /**
-     * array element class
-     */
     export class ArrayElement<T extends HTMLElement> extends DataElement<T, object[]> {
 
         slot: HTMLSlotElement = document.createElement('slot');
@@ -18,12 +15,6 @@ namespace duice {
 
         itemHtmlElements: HTMLElement[] = [];
 
-        /**
-         * constructor
-         * @param htmlElement
-         * @param bindData
-         * @param context
-         */
         constructor(htmlElement: T, bindData: object[], context: object) {
             super(htmlElement.cloneNode(true) as T, bindData, context);
 
@@ -34,41 +25,22 @@ namespace duice {
             markInitialized(htmlElement);
         }
 
-        /**
-         * set loop
-         * @param loop
-         */
         setLoop(loop: string): void {
             this.loop = loop;
         }
 
-        /**
-         * set editable
-         * @param editable
-         */
         setEditable(editable: boolean): void {
             this.editable = editable;
         }
 
-        /**
-         * set selected class
-         * @param selectedClass
-         */
         setSelectedItemClass(selectedClass: string): void {
             this.selectedItemClass = selectedClass;
         }
 
-        /**
-         * set hierarchy
-         * @param hierarchy
-         */
         setHierarchy(hierarchy: string): void {
             this.hierarchy = hierarchy;
         }
 
-        /**
-         * render
-         */
         override render(): void {
             let arrayProxy = this.getBindData() as Array<object>;
 
@@ -166,12 +138,6 @@ namespace duice {
             }
         }
 
-        /**
-         * create item html element
-         * @param index
-         * @param object
-         * @param context
-         */
         createItemHtmlElement(index: number, object: object, context: object): void {
 
             // clones row elements
@@ -233,12 +199,7 @@ namespace duice {
             });
         }
 
-        /**
-         * update
-         * @param observable
-         * @param event
-         */
-        update(observable: Observable, event: event.Event): void {
+        override update(observable: Observable, event: event.Event): void {
             console.debug('ArrayElement.update', observable, event);
             if(observable instanceof ArrayHandler){
 

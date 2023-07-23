@@ -1,26 +1,15 @@
 namespace duice.format {
 
-    /**
-     * date format
-     */
     export class DateFormat implements Format {
 
         pattern:string;
 
         patternRex = /yyyy|yy|MM|dd|HH|hh|mm|ss/gi;
 
-        /**
-         * Constructor
-         * @param pattern
-         */
         constructor(pattern: string){
             this.pattern = pattern;
         }
 
-        /**
-         * Encodes date string
-         * @param string
-         */
         format(string: string): string {
             if (!string) {
                 return '';
@@ -51,10 +40,6 @@ namespace duice.format {
             return string;
         }
 
-        /**
-         * Decodes formatted date string to ISO date string.
-         * @param string
-         */
         parse(string:string):string{
             if(!string){
                 return null;

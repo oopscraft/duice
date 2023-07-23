@@ -1,16 +1,7 @@
-namespace duice.component {
+namespace duice.element {
 
-    /**
-     * input element component
-     */
     export class InputElement extends ObjectElement<HTMLInputElement> {
 
-        /**
-         * constructor
-         * @param element
-         * @param bindData
-         * @param context
-         */
         constructor(element: HTMLInputElement, bindData: object, context: object) {
             super(element, bindData, context);
 
@@ -24,10 +15,6 @@ namespace duice.component {
             this.getHtmlElement().setAttribute('autocomplete','off');
         }
 
-        /**
-         * set value
-         * @param value
-         */
         override setValue(value: any): void {
             if(value) {
                 value = this.getFormat() ? this.getFormat().format(value) : value;
@@ -37,9 +24,6 @@ namespace duice.component {
             this.getHtmlElement().value = value;
         }
 
-        /**
-         * return value
-         */
         override getValue(): any {
             let value = this.getHtmlElement().value;
             if(value){
@@ -50,18 +34,10 @@ namespace duice.component {
             return value;
         }
 
-        /**
-         * set readonly
-         * @param readonly
-         */
         override setReadonly(readonly: boolean): void {
             this.getHtmlElement().readOnly = readonly;
         }
 
-        /**
-         * set disable
-         * @param disable
-         */
         override setDisable(disable: boolean): void {
             if(disable) {
                 this.getHtmlElement().setAttribute('disabled', 'disabled');
@@ -70,9 +46,6 @@ namespace duice.component {
             }
         }
 
-        /**
-         * focus
-         */
         override focus(): boolean {
             this.getHtmlElement().focus();
             return true;

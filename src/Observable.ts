@@ -1,26 +1,15 @@
 namespace duice {
 
-    /**
-     * Observable
-     */
     export class Observable {
 
         observers: Observer[] = [];
 
         notifyEnabled: boolean = true;
 
-        /**
-         * addObserver
-         * @param observer
-         */
         addObserver(observer: Observer): void {
             this.observers.push(observer);
         }
 
-        /**
-         * removeObserver
-         * @param observer
-         */
         removeObserver(observer: Observer): void {
             for(let i = 0, size = this.observers.length; i < size; i++){
                 if(this.observers[i] === observer){
@@ -30,24 +19,14 @@ namespace duice {
             }
         }
 
-        /**
-         * suspend notify
-         */
         suspendNotify(): void {
             this.notifyEnabled = false;
         }
 
-        /**
-         * resume notify
-         */
         resumeNotify(): void {
             this.notifyEnabled = true;
         }
 
-        /**
-         * notifyObservers
-         * @param event
-         */
         notifyObservers(event: event.Event): void {
             if(this.notifyEnabled){
                 this.observers.forEach(observer => {

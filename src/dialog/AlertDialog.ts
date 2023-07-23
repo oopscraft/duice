@@ -1,19 +1,12 @@
 ///<reference path="Dialog.ts"/>
 namespace duice.dialog {
 
-    /**
-     * AlertDialog
-     */
     export class AlertDialog extends Dialog {
 
         messagePre: HTMLPreElement;
 
         confirmButton: HTMLButtonElement;
 
-        /**
-         * constructor
-         * @param message
-         */
         constructor(message: string) {
             super(document.createElement('dialog'));
             this.getDialogElement().style.padding = '1rem';
@@ -38,26 +31,17 @@ namespace duice.dialog {
             this.getDialogElement().appendChild(this.confirmButton);
         }
 
-        /**
-         * open
-         */
         override open() {
             let promise = super.open();
             this.confirmButton.focus();
             return promise;
         }
 
-        /**
-         * confirm
-         */
         confirm() {
             this.resolve();
             this.getDialogElement().parentNode.removeChild(this.getDialogElement());
         }
 
-        /**
-         * close
-         */
         override close() {
             this.resolve();
             this.getDialogElement().parentNode.removeChild(this.getDialogElement());

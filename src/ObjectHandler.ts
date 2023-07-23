@@ -4,38 +4,20 @@
 ///<reference path="event/PropertyChangeEvent.ts"/>
 namespace duice {
 
-    /**
-     * object handler class
-     */
     export class ObjectHandler extends DataHandler<object> {
 
         propertyChangingListener: Function;
 
         propertyChangedListener: Function;
 
-        /**
-         * constructor
-         */
         constructor() {
             super();
         }
 
-        /**
-         * get
-         * @param target
-         * @param property
-         * @param receiver
-         */
         get(target: object, property: string, receiver: object): any {
             return Reflect.get(target, property, receiver);
         }
 
-        /**
-         * set
-         * @param target
-         * @param property
-         * @param value
-         */
         set(target: object, property: string, value: any) {
 
             // change value
@@ -49,11 +31,6 @@ namespace duice {
             return true;
         }
 
-        /**
-         * update
-         * @param observable
-         * @param event
-         */
         async update(observable: Observable, event: event.Event): Promise<void> {
             console.debug("ObjectHandler.update", observable, event);
 
@@ -71,28 +48,15 @@ namespace duice {
             this.notifyObservers(event);
         }
 
-        /**
-         * getValue
-         * @param property
-         */
         getValue(property: string): any {
             property = property.replace('.','?.');
             return new Function(`return this.${property};`).call(this.getTarget());
         }
 
-        /**
-         * setValue
-         * @param property
-         * @param value
-         */
         setValue(property: string, value: any): void {
             new Function('value', `this.${property} = value;`).call(this.getTarget(), value);
         }
 
-        /**
-         * focus
-         * @param property
-         */
         focus(property: string) {
             this.observers.forEach(observer => {
                 if(observer instanceof ObjectElement) {

@@ -1,9 +1,6 @@
 ///<reference path="Dialog.ts"/>
 namespace duice.dialog {
 
-    /**
-     * Confirm
-     */
     export class ConfirmDialog extends Dialog {
 
         messagePre: HTMLPreElement;
@@ -12,10 +9,6 @@ namespace duice.dialog {
 
         cancelButton: HTMLButtonElement;
 
-        /**
-         * constructor
-         * @param message
-         */
         constructor(message: string) {
             super(document.createElement('dialog'));
             this.getDialogElement().style.padding = '1rem';
@@ -53,34 +46,22 @@ namespace duice.dialog {
             this.getDialogElement().appendChild(this.confirmButton);
         }
 
-        /**
-         * open
-         */
         override open() {
             let promise = super.open();
             this.confirmButton.focus();
             return promise;
         }
 
-        /**
-         * close
-         */
         override close(...args: any[]) {
             this.resolve(false);
             this.getDialogElement().parentNode.removeChild(this.getDialogElement());
         }
 
-        /**
-         * confirm
-         */
         confirm() {
             this.resolve(true);
             this.getDialogElement().parentNode.removeChild(this.getDialogElement());
         }
 
-        /**
-         * cancel
-         */
         cancel() {
            this.resolve(false);
            this.getDialogElement().parentNode.removeChild(this.getDialogElement());

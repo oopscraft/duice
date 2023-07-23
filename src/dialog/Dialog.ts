@@ -1,8 +1,5 @@
 namespace duice.dialog {
 
-    /**
-     * Dialog
-     */
     export class Dialog {
 
         protected dialogElement: HTMLDialogElement;
@@ -17,10 +14,6 @@ namespace duice.dialog {
 
         protected promiseReject: Function;
 
-        /**
-         * constructor
-         * @param dialogElement
-         */
         constructor(dialogElement: HTMLDialogElement) {
             this.dialogElement = dialogElement;
             let _this = this;
@@ -82,9 +75,6 @@ namespace duice.dialog {
             });
         }
 
-        /**
-         * moveToCenterPosition
-         */
         moveToCenterPosition() {
             let computedStyle = window.getComputedStyle(this.dialogElement);
             let computedWidth = parseInt(computedStyle.getPropertyValue('width').replace(/px/gi, ''));
@@ -95,16 +85,10 @@ namespace duice.dialog {
             this.dialogElement.style.top = Math.max(0, window.innerHeight / 3 - computedHeight / 3) + scrollY + 'px';
         }
 
-        /**
-         * getDialogElement
-         */
         protected getDialogElement(): HTMLDialogElement {
             return this.dialogElement;
         }
 
-        /**
-         * Shows modal
-         */
         protected show(): void {
 
             // saves current scroll position
@@ -133,18 +117,12 @@ namespace duice.dialog {
             })();
         }
 
-        /**
-         * Hides modal
-         */
         protected hide(): void {
 
             // closes modal
             this.dialogElement.close();
         }
 
-        /**
-         * open
-         */
         async open() {
 
             // show modal
@@ -159,26 +137,15 @@ namespace duice.dialog {
             return this.promise;
         }
 
-        /**
-         * close
-         */
         protected close(...args: any[]) {
             this.reject(...args);
         }
 
-        /**
-         * resolve
-         * @param args
-         */
         resolve(...args: any[]) {
             this.hide();
             this.promiseResolve(...args);
         }
 
-        /**
-         * reject
-         * @param args
-         */
         reject(...args: any[]) {
             this.hide();
             this.promiseReject(...args);

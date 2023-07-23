@@ -61,7 +61,7 @@ const user = new duice.ObjectProxy({
 ```
 
 ### Test Case
-[Object Element Test](test/ObjectElementTest.html)
+[Object Element Test](test/ObjectComponentTest.html)
 
 
 -----------------------------------------------------------
@@ -104,7 +104,7 @@ const users = new duice.ArrayProxy([
 
 ### Test Case 
 
-[Array Element Test](test/ArrayElementTest.html)
+[Array Element Test](test/ArrayComponentTest.html)
 
 
 -----------------------------------------------------------

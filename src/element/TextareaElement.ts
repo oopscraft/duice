@@ -1,16 +1,7 @@
-namespace duice.component {
+namespace duice.element {
 
-    /**
-     * textarea element component
-     */
     export class TextareaElement extends ObjectElement<HTMLTextAreaElement> {
 
-        /**
-         * constructor
-         * @param element
-         * @param bindData
-         * @param context
-         */
         constructor(element: HTMLTextAreaElement, bindData: object, context: object) {
             super(element, bindData, context);
 
@@ -21,10 +12,6 @@ namespace duice.component {
             }, true);
         }
 
-        /**
-         * set value
-         * @param value
-         */
         override setValue(value: any): void {
             if(value) {
                 this.getHtmlElement().value = value;
@@ -33,9 +20,6 @@ namespace duice.component {
             }
         }
 
-        /**
-         * return value
-         */
         override getValue(): any {
             let value = this.getHtmlElement().value;
             if(value != null && value.length > 0) {
@@ -45,10 +29,6 @@ namespace duice.component {
             }
         }
 
-        /**
-         * set readonly
-         * @param readonly
-         */
         override setReadonly(readonly: boolean): void {
             if(readonly){
                 this.getHtmlElement().setAttribute('readonly', 'readonly');
@@ -57,10 +37,6 @@ namespace duice.component {
             }
         }
 
-        /**
-         * set disable
-         * @param disable
-         */
         override setDisable(disable: boolean): void {
             if(disable) {
                 this.getHtmlElement().setAttribute('disabled', 'disabled');

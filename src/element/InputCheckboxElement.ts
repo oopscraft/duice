@@ -1,21 +1,12 @@
 ///<reference path="InputElement.ts"/>
-namespace duice.component {
+namespace duice.element {
 
-    /**
-     * InputCheckboxElement
-     */
     export class InputCheckboxElement extends InputElement {
 
         trueValue: any = true;
 
         falseValue: any = false;
 
-        /**
-         * constructor
-         * @param element
-         * @param bindData
-         * @param context
-         */
         constructor(element: HTMLInputElement, bindData: object, context: object) {
             super(element, bindData, context);
 
@@ -26,10 +17,6 @@ namespace duice.component {
             this.falseValue = falseValue ? falseValue : this.falseValue;
         }
 
-        /**
-         * set value
-         * @param value
-         */
         override setValue(value: any): void {
             if (value === this.trueValue) {
                 this.getHtmlElement().checked = true;
@@ -38,9 +25,6 @@ namespace duice.component {
             }
         }
 
-        /**
-         * get value
-         */
         override getValue(): any {
             if(this.htmlElement.checked){
                 return this.trueValue;
@@ -49,10 +33,6 @@ namespace duice.component {
             }
         }
 
-        /**
-         * set readonly
-         * @param readonly
-         */
         override setReadonly(readonly: boolean): void {
             if(readonly){
                 this.getHtmlElement().style.pointerEvents = 'none';

@@ -1,19 +1,10 @@
 ///<reference path="Observable.ts"/>
 namespace duice {
 
-    /**
-     * custom element
-     */
     export abstract class CustomElement<V> extends DataElement<HTMLElement, V> {
 
         slot: HTMLSlotElement = document.createElement('slot');
 
-        /**
-         * constructor
-         * @param htmlElement
-         * @param bindData
-         * @param context
-         */
         protected constructor(htmlElement: HTMLElement, bindData: V, context: object) {
             super(htmlElement, bindData, context);
 
@@ -25,9 +16,6 @@ namespace duice {
             }
         }
 
-        /**
-         * render
-         */
         override render(): void {
 
             // removes child
@@ -59,41 +47,20 @@ namespace duice {
             runExecuteCode(this.htmlElement, context);
         }
 
-        /**
-         * do render template method
-         * @param data
-         */
         abstract doRender(data: V): HTMLElement;
 
-        /**
-         * update
-         * @param observable
-         * @param event
-         */
         override update(observable: Observable, event: event.Event): void {
             if(observable instanceof DataHandler) {
                 this.doUpdate(observable as V);
             }
         }
 
-        /**
-         * do update template method
-         * @param data
-         */
         abstract doUpdate(data: V): void;
 
-        /**
-         * setting style
-         * @param data
-         */
         doStyle(data: V): string {
             return null;
         }
 
-        /**
-         * create element
-         * @param templateLiteral
-         */
         createElement(templateLiteral: string): HTMLElement {
             let templateElement = document.createElement('template');
             templateElement.innerHTML = templateLiteral;

@@ -1,25 +1,13 @@
 namespace duice.format {
 
-    /**
-     * StringFormat
-     * @param string format
-     */
     export class StringFormat implements Format {
 
         pattern: string;
 
-        /**
-         * Constructor
-         * @param pattern
-         */
         constructor(pattern: string){
             this.pattern = pattern;
         }
 
-        /**
-         * encode string as format
-         * @param value
-         */
         format(value: string): string{
             if(!value) {
                 return value;
@@ -42,10 +30,6 @@ namespace duice.format {
             return encodedValue;
         }
 
-        /**
-         * decodes string as format
-         * @param value
-         */
         parse(value: string): string {
             if(!value) {
                 return value;
@@ -64,6 +48,7 @@ namespace duice.format {
             }
             return decodedValue;
         }
+
     }
 
 }

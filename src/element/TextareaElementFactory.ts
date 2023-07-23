@@ -1,5 +1,5 @@
 ///<reference path="../DataElementRegistry.ts"/>
-namespace duice.component {
+namespace duice.element {
 
     /**
      * textarea element factory class

@@ -1,16 +1,7 @@
-namespace duice.component {
+namespace duice.element {
 
-    /**
-     * select element component
-     */
     export class SelectElement extends ObjectElement<HTMLSelectElement> {
 
-        /**
-         * constructor
-         * @param element
-         * @param bindData
-         * @param context
-         */
         constructor(element: HTMLSelectElement, bindData: object, context: object){
             super(element, bindData, context);
 
@@ -21,10 +12,6 @@ namespace duice.component {
             }, true);
         }
 
-        /**
-         * set value
-         * @param value
-         */
         override setValue(value: any): void {
             this.getHtmlElement().value = value;
 
@@ -40,9 +27,6 @@ namespace duice.component {
             }
         }
 
-        /**
-         * return value
-         */
         override getValue(): any {
             let value = this.getHtmlElement().value;
             if(!value || value.trim().length < 1) {
@@ -51,10 +35,6 @@ namespace duice.component {
             return value;
         }
 
-        /**
-         * set readonly
-         * @param readonly
-         */
         override setReadonly(readonly: boolean): void {
             if(readonly){
                 console.warn("==ok");
@@ -64,10 +44,6 @@ namespace duice.component {
             }
         }
 
-        /**
-         * set disable
-         * @param disable
-         */
         override setDisable(disable: boolean): void {
             if(disable) {
                 this.getHtmlElement().setAttribute('disabled', 'disabled');

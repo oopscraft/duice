@@ -13,11 +13,6 @@ namespace duice {
 
         static customElementFactories = new Map<string, CustomElementFactory<any>>();
 
-        /**
-         * register
-         * @param tagName tag name
-         * @param dataElementFactory data element factory instance
-         */
         static register(tagName: string, dataElementFactory: DataElementFactory<HTMLElement, any>) {
             if(dataElementFactory instanceof ArrayElementFactory) {
                 this.arrayElementFactories.set(tagName, dataElementFactory);
@@ -33,11 +28,6 @@ namespace duice {
             }
         }
 
-        /**
-         * getFactory
-         * @param htmlElement html element
-         * @param data data
-         */
         static getFactory(htmlElement: HTMLElement, data: object): DataElementFactory<HTMLElement, any> {
             let tagName = htmlElement.tagName.toLowerCase();
 

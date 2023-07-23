@@ -1,17 +1,8 @@
 ///<reference path="DataElementFactory.ts"/>
 namespace duice {
 
-    /**
-     * array element factory class
-     */
     export class ArrayElementFactory<T extends HTMLElement> extends DataElementFactory<HTMLElement, object[]> {
 
-        /**
-         * creates array component
-         * @param htmlElement
-         * @param bindData
-         * @param context
-         */
         override createElement(htmlElement: T, bindData: object[], context: object): ArrayElement<any> {
 
             // create array element

@@ -1,9 +1,6 @@
 ///<reference path="Dialog.ts"/>
 namespace duice.dialog {
 
-    /**
-     * PromptDialog
-     */
     export class PromptDialog extends Dialog {
 
         messagePre: HTMLPreElement;
@@ -14,11 +11,6 @@ namespace duice.dialog {
 
         cancelButton: HTMLButtonElement;
 
-        /**
-         * constructor
-         * @param message
-         * @param type
-         */
         constructor(message: string, type?: string) {
             super(document.createElement('dialog'));
             this.getDialogElement().style.padding = '1rem';
@@ -66,39 +58,26 @@ namespace duice.dialog {
             this.getDialogElement().appendChild(this.confirmButton);
         }
 
-        /**
-         * open
-         */
         override open() {
             let promise = super.open();
             this.promptInput.focus();
             return promise;
         }
 
-        /**
-         * close
-         */
         override close(...args: any[]) {
             this.resolve();
             this.getDialogElement().parentNode.removeChild(this.getDialogElement());
         }
 
-        /**
-         * confirm
-         */
         confirm(value: string) {
             this.resolve(value);
             this.getDialogElement().parentNode.removeChild(this.getDialogElement());
         }
 
-        /**
-         * cancel
-         */
         cancel() {
             this.resolve();
             this.getDialogElement().parentNode.removeChild(this.getDialogElement());
         }
-
 
     }
 

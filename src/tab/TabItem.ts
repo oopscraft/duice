@@ -13,12 +13,6 @@ namespace duice.tab {
 
         tabIndex: number;
 
-        /**
-         * constructor
-         * @param button
-         * @param content
-         * @param listener
-         */
         constructor(button: HTMLElement, content: HTMLElement, listener: Function) {
             this.button = button;
             this.content = content;
@@ -37,26 +31,14 @@ namespace duice.tab {
             this.setActive(false);
         }
 
-        /**
-         * set tab folder
-         * @param tabFolder
-         */
         setTabFolder(tabFolder: TabFolder): void {
             this.tabFolder = tabFolder;
         }
 
-        /**
-         * set tab index
-         * @param tabIndex
-         */
         setTabIndex(tabIndex: number): void {
             this.tabIndex = tabIndex;
         }
 
-        /**
-         * set active
-         * @param active
-         */
         setActive(active: boolean): void {
             if(active === true) {
                 this.button.style.opacity = 'unset';

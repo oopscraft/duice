@@ -1,25 +1,13 @@
 namespace duice.format {
 
-    /**
-     * NumberFormat
-     * @param scale number
-     */
     export class NumberFormat implements Format {
 
         scale:number = 0;
 
-        /**
-         * Constructor
-         * @param scale
-         */
         constructor(scale?: number){
             this.scale = scale;
         }
 
-        /**
-         * Encodes number as format
-         * @param number
-         */
         format(number: number): string {
             if(isNaN(Number(number))){
                 return '';
@@ -33,10 +21,6 @@ namespace duice.format {
             return string;
         }
 
-        /**
-         * Decodes formatted value as original value
-         * @param string
-         */
         parse(string: string): number{
             if(!string) {
                 return null;
@@ -52,6 +36,7 @@ namespace duice.format {
             number = Number(number.toFixed(this.scale));
             return number;
         }
+
     }
 
 }

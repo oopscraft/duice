@@ -1,18 +1,9 @@
 ///<reference path="../format/NumberFormat.ts"/>
 ///<reference path="InputElement.ts"/>
-namespace duice.component {
+namespace duice.element {
 
-    /**
-     * input number element component
-     */
     export class InputNumberElement extends InputElement {
 
-        /**
-         * constructor
-         * @param element
-         * @param bindData
-         * @param context
-         */
         constructor(element: HTMLInputElement, bindData: object, context: object) {
             super(element, bindData, context);
 
@@ -28,9 +19,6 @@ namespace duice.component {
             });
         }
 
-        /**
-         * return value
-         */
         override getValue(): any {
             let value = super.getValue();
             return Number(value);

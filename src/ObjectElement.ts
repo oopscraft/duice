@@ -3,58 +3,32 @@
 ///<reference path="DataElement.ts"/>
 namespace duice {
 
-    /**
-     * object element class
-     */
     export class ObjectElement<T extends HTMLElement> extends DataElement<T, object> {
 
         property: string;
 
         format: format.Format;
 
-        /**
-         * constructor
-         * @param htmlElement
-         * @param bindData
-         * @param context
-         */
         constructor(htmlElement: T, bindData: object, context: object) {
             super(htmlElement, bindData, context);
         }
 
-        /**
-         * set property
-         * @param property
-         */
         setProperty(property: string): void {
             this.property = property;
         }
 
-        /**
-         * return property
-         */
         getProperty(): string {
             return this.property;
         }
 
-        /**
-         * set format
-         * @param format
-         */
         setFormat(format: string): void {
             this.format = duice.format.FormatFactory.getFormat(format);
         }
 
-        /**
-         * return format
-         */
         getFormat(): format.Format {
             return this.format;
         }
 
-        /**
-         * render
-         */
         override render(): void {
 
             // check if
@@ -80,29 +54,18 @@ namespace duice {
             this.executeScript();
         }
 
-        /**
-         * check if
-         */
         checkIf(): void {
             let context = Object.assign({}, this.getContext());
             context[this.getBindName()] = this.getBindData();
             runIfCode(this.htmlElement, context);
         }
 
-        /**
-         * execute script
-         */
         executeScript(): void {
             let context = Object.assign({}, this.getContext());
             context[this.getBindName()] = this.getBindData();
             runExecuteCode(this.htmlElement, context);
         }
 
-        /**
-         * update event received
-         * @param observable
-         * @param event
-         */
         override update(observable: Observable, event: event.Event): void {
             console.debug('ObjectElement.update', observable, event);
 
@@ -129,10 +92,6 @@ namespace duice {
             }
         }
 
-        /**
-         * set value
-         * @param value
-         */
         setValue(value: any): void {
             if(value !== undefined && value !== null) {
                 value = this.getFormat() ? this.getFormat().format(value) : value;
@@ -142,9 +101,6 @@ namespace duice {
             }
         }
 
-        /**
-         * return value
-         */
         getValue(): any {
             let value = this.htmlElement.innerText;
             if(value && value.trim().length > 0) {
@@ -155,25 +111,14 @@ namespace duice {
             return value;
         }
 
-        /**
-         * set readonly
-         * @param readonly
-         */
         setReadonly(readonly: boolean): void {
             // no-op
         }
 
-        /**
-         * set disable
-         * @param disable
-         */
         setDisable(disable: boolean): void {
             // no-op
         }
 
-        /**
-         * return index
-         */
         getIndex(): number {
             let index = getElementAttribute(this.htmlElement, 'index');
             if(index){
@@ -181,9 +126,6 @@ namespace duice {
             }
         }
 
-        /**
-         * focus
-         */
         focus(): boolean {
             // no-ops
             return false;

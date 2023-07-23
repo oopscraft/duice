@@ -2,9 +2,6 @@
 ///<Reference path="Observer.ts"/>
 namespace duice {
 
-    /**
-     * data handler class
-     */
     export abstract class DataHandler<T> extends Observable implements Observer {
 
         target: T;
@@ -19,40 +16,20 @@ namespace duice {
 
         listenerEnabled: boolean = true;
 
-        /**
-         * constructor
-         * @protected
-         */
         protected constructor() {
             super();
         }
 
-        /**
-         * set target
-         * @param target
-         */
         setTarget(target: T): void {
             this.target = target;
         }
 
-        /**
-         * return target
-         */
         getTarget(): T {
             return this.target;
         }
 
-        /**
-         * update
-         * @param observable
-         * @param event
-         */
         abstract update(observable: object, event: event.Event): void;
 
-        /**
-         * set readonly all
-         * @param readonly
-         */
         setReadonlyAll(readonly: boolean): void {
             this.readonlyAll = readonly;
             if(readonly === false){
@@ -61,11 +38,6 @@ namespace duice {
             this.notifyObservers(new event.Event(this));
         }
 
-        /**
-         * set readonly
-         * @param property
-         * @param readonly
-         */
         setReadonly(property: string, readonly: boolean): void {
             if(readonly){
                 this.readonly.add(property);
@@ -75,18 +47,10 @@ namespace duice {
             this.notifyObservers(new event.Event(this));
         }
 
-        /**
-         * return whether readonly is
-         * @param property
-         */
         isReadonly(property: string): boolean {
             return this.readonlyAll || this.readonly.has(property);
         }
 
-        /**
-         * set disable all
-         * @param disable
-         */
         setDisableAll(disable: boolean): void {
             this.disableAll = disable;
             if(disable === false) {
@@ -95,11 +59,6 @@ namespace duice {
             this.notifyObservers(new event.Event(this));
         }
 
-        /**
-         * set disable
-         * @param property
-         * @param disable
-         */
         setDisable(property: string, disable: boolean): void {
             if(disable) {
                 this.disable.add(property);
@@ -109,33 +68,18 @@ namespace duice {
             this.notifyObservers(new event.Event(this));
         }
 
-        /**
-         * returns property is disabled
-         * @param property
-         */
         isDisable(property: string): boolean {
             return this.disableAll || this.disable.has(property);
         }
 
-        /**
-         * suspends listener
-         */
         suspendListener(): void {
             this.listenerEnabled = false;
         }
 
-        /**
-         * resumes listener
-         */
         resumeListener(): void {
             this.listenerEnabled = true;
         }
 
-        /**
-         * executes listener
-         * @param listener
-         * @param event
-         */
         async checkListener(listener: Function, event: event.Event): Promise<boolean> {
             if(this.listenerEnabled && listener){
                 let result = await listener.call(this.getTarget(), event);

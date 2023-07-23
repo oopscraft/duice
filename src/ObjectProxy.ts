@@ -1,13 +1,7 @@
 namespace duice {
 
-    /**
-     * object proxy class
-     */
     export class ObjectProxy {
 
-        /**
-         * constructor
-         */
         public constructor(object: object) {
 
             // object handler
@@ -59,10 +53,6 @@ namespace duice {
             return objectProxy;
         }
 
-        /**
-         * clear
-         * @param objectProxy
-         */
         static clear(objectProxy: object): void {
             let objectHandler = this.getHandler(objectProxy);
             try {
@@ -94,11 +84,6 @@ namespace duice {
             objectHandler.notifyObservers(new event.Event(this));
         }
 
-        /**
-         * assign
-         * @param objectProxy
-         * @param object
-         */
         static assign(objectProxy: object, object: object): void {
             let objectHandler = this.getHandler(objectProxy);
             try {
@@ -149,11 +134,6 @@ namespace duice {
             objectHandler.notifyObservers(new event.Event(this));
         }
 
-        /**
-         * setTarget
-         * @param objectProxy
-         * @param target
-         */
         static setTarget(objectProxy: object, target: object): void {
             globalThis.Object.defineProperty(objectProxy, '_target_', {
                 value: target,
@@ -161,19 +141,10 @@ namespace duice {
             });
         }
 
-        /**
-         * getTarget
-         * @param objectProxy
-         */
         static getTarget(objectProxy: object): any {
             return globalThis.Object.getOwnPropertyDescriptor(objectProxy, '_target_').value;
         }
 
-        /**
-         * setHandler
-         * @param objectProxy
-         * @param objectHandler
-         */
         static setHandler(objectProxy: object, objectHandler: ObjectHandler): void {
             globalThis.Object.defineProperty(objectProxy, '_handler_', {
                 value: objectHandler,
@@ -181,20 +152,12 @@ namespace duice {
             });
         }
 
-        /**
-         * getHandler
-         * @param objectProxy
-         */
         static getHandler(objectProxy: object): ObjectHandler {
             let handler = globalThis.Object.getOwnPropertyDescriptor(objectProxy, '_handler_').value;
             assert(handler, 'handler is not found');
             return handler;
         }
 
-        /**
-         * save
-         * @param objectProxy
-         */
         static save(objectProxy: object): void {
             let origin = JSON.stringify(objectProxy);
             globalThis.Object.defineProperty(objectProxy, '_origin_', {
@@ -203,95 +166,44 @@ namespace duice {
             });
         }
 
-        /**
-         * reset
-         * @param objectProxy
-         */
         static reset(objectProxy: object): void {
             let origin = JSON.parse(globalThis.Object.getOwnPropertyDescriptor(objectProxy, '_origin_').value);
             this.assign(objectProxy, origin);
         }
 
-        /**
-         * onPropertyChanging
-         * @param objectProxy
-         * @param listener
-         */
         static onPropertyChanging(objectProxy: object, listener: Function): void {
             this.getHandler(objectProxy).propertyChangingListener = listener;
         }
 
-        /**
-         * onPropertyChanged
-         * @param objectProxy
-         * @param listener
-         */
         static onPropertyChanged(objectProxy: object, listener: Function): void {
             this.getHandler(objectProxy).propertyChangedListener = listener;
         }
 
-        /**
-         * setReadonly
-         * @param objectProxy
-         * @param property
-         * @param readonly
-         */
         static setReadonly(objectProxy: object, property: string, readonly: boolean): void {
             this.getHandler(objectProxy).setReadonly(property, readonly);
         }
 
-        /**
-         * isReadonly
-         * @param objectProxy
-         * @param property
-         */
         static isReadonly(objectProxy: object, property: string): boolean {
             return this.getHandler(objectProxy).isReadonly(property);
         }
 
-        /**
-         * setReadonlyAll
-         * @param objectProxy
-         * @param readonly
-         */
         static setReadonlyAll(objectProxy: object, readonly: boolean): void {
             this.getHandler(objectProxy).setReadonlyAll(readonly);
 
         }
 
-        /**
-         * setDisable
-         * @param objectProxy
-         * @param property
-         * @param disable
-         */
         static setDisable(objectProxy: object, property: string, disable: boolean): void {
             this.getHandler(objectProxy).setDisable(property, disable);
         }
 
-        /**
-         * isDisable
-         * @param objectProxy
-         * @param property
-         */
         static isDisable(objectProxy: object, property: string): boolean {
             return this.getHandler(objectProxy).isDisable(property);
         }
 
-        /**
-         * setDisableAll
-         * @param objectProxy
-         * @param disable
-         */
         static setDisableAll(objectProxy: object, disable: boolean): void {
             this.getHandler(objectProxy).setDisableAll(disable);
         }
 
-        /**
-         * focus
-         * @param objectProxy
-         * @param property
-         */
         static focus(objectProxy: object, property: string): void {
             this.getHandler(objectProxy).focus(property);
         }

@@ -1,13 +1,7 @@
 namespace duice {
 
-    /**
-     * array proxy class
-     */
     export class ArrayProxy {
 
-        /**
-         * constructor
-         */
         constructor(array: object[]) {
 
             // array handler
@@ -34,10 +28,6 @@ namespace duice {
             return arrayProxy;
         }
 
-        /**
-         * clear
-         * @param arrayProxy
-         */
         static clear(arrayProxy: object[]): void {
             let arrayHandler = this.getHandler(arrayProxy);
             try {
@@ -58,11 +48,6 @@ namespace duice {
             arrayHandler.notifyObservers(new event.Event(this));
         }
 
-        /**
-         * assign
-         * @param arrayProxy
-         * @param array
-         */
         static assign(arrayProxy: object[], array: object[]): void {
             let arrayHandler = this.getHandler(arrayProxy);
             try {
@@ -95,11 +80,6 @@ namespace duice {
             arrayHandler.notifyObservers(new event.Event(this));
         }
 
-        /**
-         * setTarget
-         * @param arrayProxy
-         * @param target
-         */
         static setTarget(arrayProxy: object[], target: object[]): void {
             globalThis.Object.defineProperty(arrayProxy, '_target_', {
                 value: target,
@@ -107,19 +87,10 @@ namespace duice {
             });
         }
 
-        /**
-         * getTarget
-         * @param arrayProxy
-         */
         static getTarget(arrayProxy: object[]): any {
             return globalThis.Object.getOwnPropertyDescriptor(arrayProxy, '_target_').value;
         }
 
-        /**
-         * setHandler
-         * @param arrayProxy
-         * @param arrayHandler
-         */
         static setHandler(arrayProxy: object[], arrayHandler: ArrayHandler): void {
             globalThis.Object.defineProperty(arrayProxy, '_handler_', {
                 value: arrayHandler,
@@ -127,20 +98,12 @@ namespace duice {
             });
         }
 
-        /**
-         * getHandler
-         * @param arrayProxy
-         */
         static getHandler(arrayProxy: object[]): ArrayHandler {
             let handler = globalThis.Object.getOwnPropertyDescriptor(arrayProxy, '_handler_').value;
             assert(handler, 'handler is not found');
             return handler;
         }
 
-        /**
-         * save
-         * @param arrayProxy
-         */
         static save(arrayProxy: object[]): void {
             let origin = JSON.stringify(arrayProxy);
             globalThis.Object.defineProperty(arrayProxy, '_origin_', {
@@ -149,20 +112,11 @@ namespace duice {
             });
         }
 
-        /**
-         * reset
-         * @param arrayProxy
-         */
         static reset(arrayProxy: object[]): void {
             let origin = JSON.parse(globalThis.Object.getOwnPropertyDescriptor(arrayProxy,'_origin_').value);
             this.assign(arrayProxy, origin);
         }
 
-        /**
-         * onPropertyChanging
-         * @param arrayProxy
-         * @param listener
-         */
         static onPropertyChanging(arrayProxy: object[], listener: Function): void {
             this.getHandler(arrayProxy).propertyChangingListener = listener;
             arrayProxy.forEach(objectProxy => {
@@ -170,11 +124,6 @@ namespace duice {
             });
         }
 
-        /**
-         * onPropertyChanged
-         * @param arrayProxy
-         * @param listener
-         */
         static onPropertyChanged(arrayProxy: object[], listener: Function): void {
             this.getHandler(arrayProxy).propertyChangedListener = listener;
             arrayProxy.forEach(objectProxy => {
@@ -182,66 +131,30 @@ namespace duice {
             });
         }
 
-        /**
-         * onRowInserting
-         * @param arrayProxy
-         * @param listener
-         */
         static onRowInserting(arrayProxy: object[], listener: Function): void {
             this.getHandler(arrayProxy).rowInsertingListener = listener;
         }
 
-        /**
-         * onRowInserted
-         * @param arrayProxy
-         * @param listener
-         */
         static onRowInserted(arrayProxy: object[], listener: Function): void {
             this.getHandler(arrayProxy).rowInsertedListener = listener;
         }
 
-        /**
-         * onRowDeleting
-         * @param arrayProxy
-         * @param listener
-         */
         static onRowDeleting(arrayProxy: object[], listener: Function): void {
             this.getHandler(arrayProxy).rowDeletingListener = listener;
         }
 
-        /**
-         * onRowDeleted
-         * @param arrayProxy
-         * @param listener
-         */
         static onRowDeleted(arrayProxy: object[], listener: Function): void {
             this.getHandler(arrayProxy).rowDeletedListener = listener;
         }
 
-        /**
-         * setReadonly
-         * @param arrayProxy
-         * @param property
-         * @param readonly
-         */
         static setReadonly(arrayProxy: object[], property: string, readonly: boolean): void {
             this.getHandler(arrayProxy).setReadonly(property, readonly);
         }
 
-        /**
-         * isReadonly
-         * @param arrayProxy
-         * @param property
-         */
         static isReadonly(arrayProxy: object[], property: string): boolean {
              return this.getHandler(arrayProxy).isReadonly(property);
         }
 
-        /**
-         * setReadonlyAll
-         * @param arrayProxy
-         * @param readonly
-         */
         static setReadonlyAll(arrayProxy: object[], readonly: boolean): void {
             this.getHandler(arrayProxy).setReadonlyAll(readonly);
             for(let index = 0; index >= this.length; index ++ ){
@@ -249,19 +162,10 @@ namespace duice {
             }
         }
 
-        /**
-         * select item
-         * @param arrayProxy
-         * @param index
-         */
         static selectItem(arrayProxy: object[], index: number): void {
             return this.getHandler(arrayProxy).selectItem(index);
         }
 
-        /**
-         * return selected item index
-         * @param arrayProxy
-         */
         static getSelectedItemIndex(arrayProxy: object[]): number {
             return this.getHandler(arrayProxy).getSelectedItemIndex();
         }
