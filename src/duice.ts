@@ -23,7 +23,7 @@ namespace duice {
                 try {
                     let bindName = getElementAttribute(htmlElement, 'bind');
                     let bindData = findVariable(context, bindName);
-                    DataElementRegistry.getFactory(htmlElement, bindData)
+                    DataElementRegistry.getFactory(htmlElement, bindData, context)
                         ?.createElement(htmlElement, bindData, context)
                         ?.render();
                     // index
@@ -147,10 +147,6 @@ namespace duice {
 
     export function tabItem(button: HTMLElement, content: HTMLElement, listener: Function): duice.tab.TabItem {
         return new duice.tab.TabItem(button, content, listener);
-    }
-
-    export function defineCustomElement(tagName: string, elementType: Function): void {
-        DataElementRegistry.register(tagName, new CustomElementFactory(elementType));
     }
 
     //  listens DOMContentLoaded event

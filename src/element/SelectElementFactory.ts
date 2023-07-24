@@ -3,7 +3,7 @@ namespace duice.element {
 
     export class SelectElementFactory extends ObjectElementFactory<HTMLSelectElement> {
 
-        override doCreateElement(element: HTMLSelectElement, bindData: object, context: object): SelectElement {
+        override createElement(element: HTMLSelectElement, bindData: object, context: object): SelectElement {
             return new SelectElement(element, bindData, context);
         }
 

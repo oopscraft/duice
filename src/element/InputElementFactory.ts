@@ -3,7 +3,7 @@ namespace duice.element {
 
     export class InputElementFactory extends ObjectElementFactory<HTMLInputElement> {
 
-        override doCreateElement(element: HTMLInputElement, bindData: object, context: object): InputElement {
+        override createElement(element: HTMLInputElement, bindData: object, context: object): InputElement {
             let type = element.getAttribute('type');
             switch(type) {
                 case 'number':

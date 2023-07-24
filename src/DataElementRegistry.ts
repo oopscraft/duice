@@ -28,7 +28,7 @@ namespace duice {
             }
         }
 
-        static getFactory(htmlElement: HTMLElement, data: object): DataElementFactory<HTMLElement, any> {
+        static getFactory(htmlElement: HTMLElement, bindData: any, context: object): DataElementFactory<HTMLElement, any> {
             let tagName = htmlElement.tagName.toLowerCase();
 
             // custom element
@@ -37,7 +37,7 @@ namespace duice {
             }
 
             // array element
-            if(Array.isArray(data)) {
+            if(Array.isArray(bindData)) {
                 if(this.arrayElementFactories.has(tagName)) {
                     return this.arrayElementFactories.get(tagName);
                 }

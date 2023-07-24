@@ -20,11 +20,7 @@ namespace duice.element {
             this.originSrc = String(this.getHtmlElement().src);
 
             // editable
-            let editable = getElementAttribute(this.getHtmlElement(), 'editable');
-            if(editable) {
-                this.editable = (editable === 'true');
-            }
-
+            this.editable = (getElementAttribute(this.getHtmlElement(), 'editable') === 'true');
             if(this.editable) {
 
                 // add click event listener

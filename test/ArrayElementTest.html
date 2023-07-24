@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Array Element Test</title>
-    <script src="../dist/duice.js?v=4"></script>
+    <link rel="stylesheet" type="text/css" href="./static/web.css"/>
+    <script src="../dist/duice.js"></script>
     <script>
-        //'use strict';
+        'use strict';
         let myArray = new duice.ArrayProxy([
             {
                 id: 'apple',
@@ -113,7 +114,7 @@
 
         // row inserting listener
         duice.ArrayProxy.onRowInserting(myArray, async event => {
-            if(!await duice.confirm(`insert [${event.getIndex()}]${JSON.stringify(event.getRows())}`)){
+            if(!await duice.confirm(`insert [${event.getIndex()}]${JSON.stringify(event.getItems())}`)){
                 return false;
             }
         });
@@ -125,7 +126,7 @@
 
         // row deleting listener
         duice.ArrayProxy.onRowDeleting(myArray, async event => {
-            if(!await duice.confirm(`delete [${event.getIndex()}]${JSON.stringify(event.getRows())}`)){
+            if(!await duice.confirm(`delete [${event.getIndex()}]${JSON.stringify(event.getItems())}`)){
                 return false;
             }
         });

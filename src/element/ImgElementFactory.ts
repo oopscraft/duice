@@ -3,7 +3,7 @@ namespace duice.element {
 
     export class ImgElementFactory extends ObjectElementFactory<HTMLImageElement> {
 
-        override doCreateElement(element: HTMLImageElement, bindData: object, context: object): ImgElement {
+        override createElement(element: HTMLImageElement, bindData: object, context: object): ImgElement {
             return new ImgElement(element, bindData, context);
         }
 

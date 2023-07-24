@@ -5,8 +5,6 @@ namespace duice {
 
         htmlElement: T;
 
-        bindName: string;
-
         bindData: V;
 
         context: object;
@@ -15,18 +13,14 @@ namespace duice {
             super();
             this.htmlElement = htmlElement;
             this.bindData = bindData;
-            this.bindName = getElementAttribute(this.htmlElement, 'bind');
             this.context = context;
             setElementAttribute(this.htmlElement, 'id', this.generateId());
 
-            // bind with data handler
-            let dataHandler = globalThis.Object.getOwnPropertyDescriptor(bindData, '_handler_')?.value;
+            // bind data
+            let dataHandler = globalThis.Object.getOwnPropertyDescriptor(this.bindData, '_handler_')?.value;
             assert(dataHandler, 'DataHandler is not found');
             this.addObserver(dataHandler);
             dataHandler.addObserver(this);
-
-            // set data
-            this.bindData = dataHandler.getTarget();
         }
 
         generateId(): string {
@@ -40,16 +34,12 @@ namespace duice {
             return this.htmlElement;
         }
 
-        getBindName(): string {
-            return this.bindName;
+        getContext(): object {
+            return this.context;
         }
 
         getBindData(): V {
             return this.bindData;
-        }
-
-        getContext(): object {
-            return this.context;
         }
 
         abstract render(): void;

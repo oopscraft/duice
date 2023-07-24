@@ -9,11 +9,11 @@ namespace duice {
 
             // copy array elements
             if(globalThis.Array.isArray(array)){
-                array.forEach((object, index) => {
-                    let objectProxy = new ObjectProxy(object);
+                for(let i = 0; i < array.length; i++ ){
+                    let objectProxy = new ObjectProxy(array[i]);
                     ObjectProxy.getHandler(objectProxy).addObserver(arrayHandler);
-                    object = objectProxy;
-                });
+                    array[i] = objectProxy;
+                }
             }
 
             // create proxy

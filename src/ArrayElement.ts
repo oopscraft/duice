@@ -3,8 +3,6 @@ namespace duice {
 
     export class ArrayElement<T extends HTMLElement> extends DataElement<T, object[]> {
 
-        slot: HTMLSlotElement = document.createElement('slot');
-
         loop: string;
 
         hierarchy: string;
@@ -13,32 +11,24 @@ namespace duice {
 
         selectedItemClass: string;
 
+        slot: HTMLSlotElement = document.createElement('slot');
+
         itemHtmlElements: HTMLElement[] = [];
 
         constructor(htmlElement: T, bindData: object[], context: object) {
             super(htmlElement.cloneNode(true) as T, bindData, context);
+
+            // attributes
+            this.loop = getElementAttribute(htmlElement, 'loop');
+            this.hierarchy = getElementAttribute(htmlElement, 'hierarchy');
+            this.editable = (getElementAttribute(htmlElement, 'editable') === 'true');
+            this.selectedItemClass = getElementAttribute(htmlElement, 'selected-item-class');
 
             // replace with slot for position
             htmlElement.replaceWith(this.slot);
 
             // mark initialized (not using after clone as templates)
             markInitialized(htmlElement);
-        }
-
-        setLoop(loop: string): void {
-            this.loop = loop;
-        }
-
-        setEditable(editable: boolean): void {
-            this.editable = editable;
-        }
-
-        setSelectedItemClass(selectedClass: string): void {
-            this.selectedItemClass = selectedClass;
-        }
-
-        setHierarchy(hierarchy: string): void {
-            this.hierarchy = hierarchy;
         }
 
         override render(): void {
@@ -220,6 +210,6 @@ namespace duice {
             }
         }
 
-
     }
+
 }

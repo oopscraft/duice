@@ -11,18 +11,17 @@ namespace duice {
 
         constructor(htmlElement: T, bindData: object, context: object) {
             super(htmlElement, bindData, context);
-        }
 
-        setProperty(property: string): void {
-            this.property = property;
+            // attributes
+            this.property = getElementAttribute(htmlElement,'property')
+            let format = getElementAttribute(htmlElement, 'format');
+            if(format) {
+                this.format = duice.format.FormatFactory.getFormat(format);
+            }
         }
 
         getProperty(): string {
             return this.property;
-        }
-
-        setFormat(format: string): void {
-            this.format = duice.format.FormatFactory.getFormat(format);
         }
 
         getFormat(): format.Format {
@@ -56,13 +55,15 @@ namespace duice {
 
         checkIf(): void {
             let context = Object.assign({}, this.getContext());
-            context[this.getBindName()] = this.getBindData();
+            let bind = getElementAttribute(this.getHtmlElement(), 'bind');
+            context[bind] = this.getBindData();
             runIfCode(this.htmlElement, context);
         }
 
         executeScript(): void {
             let context = Object.assign({}, this.getContext());
-            context[this.getBindName()] = this.getBindData();
+            let bind = getElementAttribute(this.getHtmlElement(), 'bind');
+            context[bind] = this.getBindData();
             runExecuteCode(this.htmlElement, context);
         }
 

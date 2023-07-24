@@ -12,32 +12,26 @@ declare namespace duice {
 declare namespace duice {
     abstract class DataElement<T extends HTMLElement, V> extends Observable implements Observer {
         htmlElement: T;
-        bindName: string;
         bindData: V;
         context: object;
         protected constructor(htmlElement: T, bindData: V, context: object);
         generateId(): string;
         getHtmlElement(): T;
-        getBindName(): string;
-        getBindData(): V;
         getContext(): object;
+        getBindData(): V;
         abstract render(): void;
         abstract update(observable: object, event: event.Event): void;
     }
 }
 declare namespace duice {
     class ArrayElement<T extends HTMLElement> extends DataElement<T, object[]> {
-        slot: HTMLSlotElement;
         loop: string;
         hierarchy: string;
         editable: boolean;
         selectedItemClass: string;
+        slot: HTMLSlotElement;
         itemHtmlElements: HTMLElement[];
         constructor(htmlElement: T, bindData: object[], context: object);
-        setLoop(loop: string): void;
-        setEditable(editable: boolean): void;
-        setSelectedItemClass(selectedClass: string): void;
-        setHierarchy(hierarchy: string): void;
         render(): void;
         createItemHtmlElement(index: number, object: object, context: object): void;
         update(observable: Observable, event: event.Event): void;
@@ -50,7 +44,7 @@ declare namespace duice {
 }
 declare namespace duice {
     class ArrayElementFactory<T extends HTMLElement> extends DataElementFactory<HTMLElement, object[]> {
-        createElement(htmlElement: T, bindData: object[], context: object): ArrayElement<any>;
+        createElement(htmlElement: T, bindData: object[], context: object): ArrayElement<T>;
     }
 }
 declare namespace duice {
@@ -142,27 +136,57 @@ declare namespace duice {
 }
 declare namespace duice {
     abstract class CustomElement<V> extends DataElement<HTMLElement, V> {
-        slot: HTMLSlotElement;
         protected constructor(htmlElement: HTMLElement, bindData: V, context: object);
         render(): void;
-        abstract doRender(data: V): HTMLElement;
+        abstract doRender(data: V): void;
         update(observable: Observable, event: event.Event): void;
         abstract doUpdate(data: V): void;
-        doStyle(data: V): string;
-        createElement(templateLiteral: string): HTMLElement;
     }
 }
 declare namespace duice {
-    class CustomElementFactory<V> extends DataElementFactory<HTMLElement, V> {
-        elementType: Function;
-        constructor(elementType: Function);
-        createElement(htmlElement: HTMLElement, bindData: V, context: object): DataElement<any, any>;
+    abstract class CustomElementFactory<V> extends DataElementFactory<HTMLElement, V> {
+        createElement(htmlElement: HTMLElement, bindData: V, context: object): CustomElement<V>;
+        abstract doCreateElement(htmlElement: HTMLElement, bindData: V, context: object): CustomElement<V>;
     }
 }
 declare namespace duice {
     class ObjectElementFactory<T extends HTMLElement> extends DataElementFactory<T, object> {
-        createElement(element: T, object: object, context: object): ObjectElement<T>;
-        doCreateElement(htmlElement: T, object: object, context: object): ObjectElement<T>;
+        createElement(htmlElement: T, bindData: object, context: object): ObjectElement<T>;
+    }
+}
+declare namespace duice {
+    class DataElementRegistry {
+        static defaultObjectElementFactory: ObjectElementFactory<HTMLElement>;
+        static defaultArrayElementFactory: ArrayElementFactory<HTMLElement>;
+        static objectElementFactories: Map<string, ObjectElementFactory<HTMLElement>>;
+        static arrayElementFactories: Map<string, ArrayElementFactory<HTMLElement>>;
+        static customElementFactories: Map<string, CustomElementFactory<any>>;
+        static register(tagName: string, dataElementFactory: DataElementFactory<HTMLElement, any>): void;
+        static getFactory(htmlElement: HTMLElement, bindData: any, context: object): DataElementFactory<HTMLElement, any>;
+    }
+}
+declare namespace duice.format {
+    class FormatFactory {
+        static getFormat(format: string): Format;
+    }
+}
+declare namespace duice {
+    class ObjectElement<T extends HTMLElement> extends DataElement<T, object> {
+        property: string;
+        format: format.Format;
+        constructor(htmlElement: T, bindData: object, context: object);
+        getProperty(): string;
+        getFormat(): format.Format;
+        render(): void;
+        checkIf(): void;
+        executeScript(): void;
+        update(observable: Observable, event: event.Event): void;
+        setValue(value: any): void;
+        getValue(): any;
+        setReadonly(readonly: boolean): void;
+        setDisable(disable: boolean): void;
+        getIndex(): number;
+        focus(): boolean;
     }
 }
 declare namespace duice.event {
@@ -231,7 +255,6 @@ declare namespace duice {
     function openDialog(dialogElement: HTMLDialogElement): Promise<void>;
     function tabFolder(...tabItems: duice.tab.TabItem[]): duice.tab.TabFolder;
     function tabItem(button: HTMLElement, content: HTMLElement, listener: Function): duice.tab.TabItem;
-    function defineCustomElement(tagName: string, elementType: Function): void;
 }
 declare namespace duice.dialog {
     class Dialog {
@@ -287,32 +310,6 @@ declare namespace duice.dialog {
         cancel(): void;
     }
 }
-declare namespace duice.format {
-    class FormatFactory {
-        static getFormat(format: string): Format;
-    }
-}
-declare namespace duice {
-    class ObjectElement<T extends HTMLElement> extends DataElement<T, object> {
-        property: string;
-        format: format.Format;
-        constructor(htmlElement: T, bindData: object, context: object);
-        setProperty(property: string): void;
-        getProperty(): string;
-        setFormat(format: string): void;
-        getFormat(): format.Format;
-        render(): void;
-        checkIf(): void;
-        executeScript(): void;
-        update(observable: Observable, event: event.Event): void;
-        setValue(value: any): void;
-        getValue(): any;
-        setReadonly(readonly: boolean): void;
-        setDisable(disable: boolean): void;
-        getIndex(): number;
-        focus(): boolean;
-    }
-}
 declare namespace duice.element {
     class ImgElement extends ObjectElement<HTMLImageElement> {
         originSrc: string;
@@ -333,20 +330,9 @@ declare namespace duice.element {
         setDisable(disable: boolean): void;
     }
 }
-declare namespace duice {
-    class DataElementRegistry {
-        static defaultObjectElementFactory: ObjectElementFactory<HTMLElement>;
-        static defaultArrayElementFactory: ArrayElementFactory<HTMLElement>;
-        static objectElementFactories: Map<string, ObjectElementFactory<HTMLElement>>;
-        static arrayElementFactories: Map<string, ArrayElementFactory<HTMLElement>>;
-        static customElementFactories: Map<string, CustomElementFactory<any>>;
-        static register(tagName: string, dataElementFactory: DataElementFactory<HTMLElement, any>): void;
-        static getFactory(htmlElement: HTMLElement, data: object): DataElementFactory<HTMLElement, any>;
-    }
-}
 declare namespace duice.element {
     class ImgElementFactory extends ObjectElementFactory<HTMLImageElement> {
-        doCreateElement(element: HTMLImageElement, bindData: object, context: object): ImgElement;
+        createElement(element: HTMLImageElement, bindData: object, context: object): ImgElement;
     }
 }
 declare namespace duice.element {
@@ -387,7 +373,7 @@ declare namespace duice.element {
 }
 declare namespace duice.element {
     class InputElementFactory extends ObjectElementFactory<HTMLInputElement> {
-        doCreateElement(element: HTMLInputElement, bindData: object, context: object): InputElement;
+        createElement(element: HTMLInputElement, bindData: object, context: object): InputElement;
     }
 }
 declare namespace duice.element {
@@ -415,7 +401,7 @@ declare namespace duice.element {
 }
 declare namespace duice.element {
     class SelectElementFactory extends ObjectElementFactory<HTMLSelectElement> {
-        doCreateElement(element: HTMLSelectElement, bindData: object, context: object): SelectElement;
+        createElement(element: HTMLSelectElement, bindData: object, context: object): SelectElement;
     }
 }
 declare namespace duice.element {
@@ -428,17 +414,8 @@ declare namespace duice.element {
     }
 }
 declare namespace duice.element {
-    /**
-     * textarea element factory class
-     */
     class TextareaElementFactory extends ObjectElementFactory<HTMLTextAreaElement> {
-        /**
-         * creates component
-         * @param element
-         * @param bindData
-         * @param context
-         */
-        doCreateElement(element: HTMLTextAreaElement, bindData: object, context: object): TextareaElement;
+        createElement(element: HTMLTextAreaElement, bindData: object, context: object): TextareaElement;
     }
 }
 declare namespace duice.event {
