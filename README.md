@@ -1,4 +1,4 @@
-# DUICE (Data-oriented UI Component Element)
+# DUICE (Data-binding UI Component Element)
 
 ## Conception
 
