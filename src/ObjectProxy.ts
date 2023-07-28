@@ -189,7 +189,10 @@ namespace duice {
 
         static setReadonlyAll(objectProxy: object, readonly: boolean): void {
             this.getHandler(objectProxy).setReadonlyAll(readonly);
+        }
 
+        static isReadonlyAll(objectProxy: object): boolean {
+            return this.getHandler(objectProxy).isReadonlyAll();
         }
 
         static setDisable(objectProxy: object, property: string, disable: boolean): void {
@@ -202,6 +205,10 @@ namespace duice {
 
         static setDisableAll(objectProxy: object, disable: boolean): void {
             this.getHandler(objectProxy).setDisableAll(disable);
+        }
+
+        static isDisabledAll(objectProxy: object): boolean {
+            return this.getHandler(objectProxy).isDisableAll();
         }
 
         static focus(objectProxy: object, property: string): void {

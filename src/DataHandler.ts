@@ -38,6 +38,10 @@ namespace duice {
             this.notifyObservers(new event.Event(this));
         }
 
+        isReadonlyAll(): boolean {
+            return this.readonlyAll;
+        }
+
         setReadonly(property: string, readonly: boolean): void {
             if(readonly){
                 this.readonly.add(property);
@@ -57,6 +61,10 @@ namespace duice {
                 this.disable.clear();
             }
             this.notifyObservers(new event.Event(this));
+        }
+
+        isDisableAll(): boolean {
+            return this.disableAll;
         }
 
         setDisable(property: string, disable: boolean): void {

@@ -162,6 +162,29 @@ namespace duice {
             }
         }
 
+        static isReadonlyAll(arrayProxy: object[]): boolean {
+            return this.getHandler(arrayProxy).isReadonlyAll();
+        }
+
+        static setDisable(arrayProxy: object[], property: string, disable: boolean): void {
+            this.getHandler(arrayProxy).setDisable(property, disable);
+        }
+
+        static isDisable(arrayProxy: object[], property): boolean {
+            return this.getHandler(arrayProxy).isDisable(property);
+        }
+
+        static setDisableAll(arrayProxy: object[], disable: boolean): void {
+            this.getHandler(arrayProxy).setDisableAll(disable);
+            for(let index = 0; index >= this.length; index ++ ){
+                ObjectProxy.setDisableAll(this[index], disable);
+            }
+        }
+
+        static isDisableAll(arrayProxy: object[]): boolean {
+            return this.getHandler(arrayProxy).isDisableAll();
+        }
+
         static selectItem(arrayProxy: object[], index: number): void {
             return this.getHandler(arrayProxy).selectItem(index);
         }

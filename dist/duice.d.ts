@@ -65,9 +65,11 @@ declare namespace duice {
         getTarget(): T;
         abstract update(observable: object, event: event.Event): void;
         setReadonlyAll(readonly: boolean): void;
+        isReadonlyAll(): boolean;
         setReadonly(property: string, readonly: boolean): void;
         isReadonly(property: string): boolean;
         setDisableAll(disable: boolean): void;
+        isDisableAll(): boolean;
         setDisable(property: string, disable: boolean): void;
         isDisable(property: string): boolean;
         suspendListener(): void;
@@ -130,6 +132,11 @@ declare namespace duice {
         static setReadonly(arrayProxy: object[], property: string, readonly: boolean): void;
         static isReadonly(arrayProxy: object[], property: string): boolean;
         static setReadonlyAll(arrayProxy: object[], readonly: boolean): void;
+        static isReadonlyAll(arrayProxy: object[]): boolean;
+        static setDisable(arrayProxy: object[], property: string, disable: boolean): void;
+        static isDisable(arrayProxy: object[], property: any): boolean;
+        static setDisableAll(arrayProxy: object[], disable: boolean): void;
+        static isDisableAll(arrayProxy: object[]): boolean;
         static selectItem(arrayProxy: object[], index: number): void;
         static getSelectedItemIndex(arrayProxy: object[]): number;
     }
@@ -229,9 +236,11 @@ declare namespace duice {
         static setReadonly(objectProxy: object, property: string, readonly: boolean): void;
         static isReadonly(objectProxy: object, property: string): boolean;
         static setReadonlyAll(objectProxy: object, readonly: boolean): void;
+        static isReadonlyAll(objectProxy: object): boolean;
         static setDisable(objectProxy: object, property: string, disable: boolean): void;
         static isDisable(objectProxy: object, property: string): boolean;
         static setDisableAll(objectProxy: object, disable: boolean): void;
+        static isDisabledAll(objectProxy: object): boolean;
         static focus(objectProxy: object, property: string): void;
     }
 }
