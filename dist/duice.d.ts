@@ -240,7 +240,7 @@ declare namespace duice {
         static setDisable(objectProxy: object, property: string, disable: boolean): void;
         static isDisable(objectProxy: object, property: string): boolean;
         static setDisableAll(objectProxy: object, disable: boolean): void;
-        static isDisabledAll(objectProxy: object): boolean;
+        static isDisableAll(objectProxy: object): boolean;
         static focus(objectProxy: object, property: string): void;
     }
 }

@@ -1186,7 +1186,7 @@ var duice;
         static setDisableAll(objectProxy, disable) {
             this.getHandler(objectProxy).setDisableAll(disable);
         }
-        static isDisabledAll(objectProxy) {
+        static isDisableAll(objectProxy) {
             return this.getHandler(objectProxy).isDisableAll();
         }
         static focus(objectProxy, property) {

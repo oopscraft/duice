@@ -207,7 +207,7 @@ namespace duice {
             this.getHandler(objectProxy).setDisableAll(disable);
         }
 
-        static isDisabledAll(objectProxy: object): boolean {
+        static isDisableAll(objectProxy: object): boolean {
             return this.getHandler(objectProxy).isDisableAll();
         }
 
