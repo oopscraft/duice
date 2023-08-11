@@ -56,14 +56,24 @@ namespace duice {
         checkIf(): void {
             let context = Object.assign({}, this.getContext());
             let bind = getElementAttribute(this.getHtmlElement(), 'bind');
-            context[bind] = this.getBindData();
+            let bindSplit = bind.split('.');
+            if(bindSplit.length > 1) {
+                context[bindSplit[0]] = duice.findVariable(context, bindSplit[0]);
+            }else{
+                context[bind] = this.getBindData();
+            }
             runIfCode(this.htmlElement, context);
         }
 
         executeScript(): void {
             let context = Object.assign({}, this.getContext());
             let bind = getElementAttribute(this.getHtmlElement(), 'bind');
-            context[bind] = this.getBindData();
+            let bindSplit = bind.split('.');
+            if(bindSplit.length > 1) {
+                context[bindSplit[0]] = duice.findVariable(context, bindSplit[0]);
+            }else{
+                context[bind] = this.getBindData();
+            }
             runExecuteCode(this.htmlElement, context);
         }
 

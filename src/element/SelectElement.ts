@@ -2,6 +2,14 @@ namespace duice.element {
 
     export class SelectElement extends ObjectElement<HTMLSelectElement> {
 
+        option: object[];
+
+        optionValueProperty: string;
+
+        optionTextProperty: string;
+
+        defaultOptions: HTMLOptionElement[] = [];
+
         constructor(element: HTMLSelectElement, bindData: object, context: object){
             super(element, bindData, context);
 
@@ -10,6 +18,26 @@ namespace duice.element {
                 let event = new duice.event.PropertyChangeEvent(this, this.getProperty(), this.getValue(), this.getIndex());
                 this.notifyObservers(event);
             }, true);
+
+            // stores default option
+            for(let i = 0; i < this.getHtmlElement().options.length; i ++){
+                this.defaultOptions.push(this.getHtmlElement().options[i])
+            }
+
+            // option property
+            let optionName = getElementAttribute(this.getHtmlElement(),'option');
+            if(optionName) {
+                this.option = findVariable(this.getContext(), optionName);
+                this.optionValueProperty = getElementAttribute(this.getHtmlElement(), 'option-value-property');
+                this.optionTextProperty = getElementAttribute(this.getHtmlElement(), 'option-text-property');
+
+                this.option.forEach(data => {
+                    let option = document.createElement('option');
+                    option.value = data[this.optionValueProperty];
+                    option.appendChild(document.createTextNode(data[this.optionTextProperty]));
+                    this.getHtmlElement().appendChild(option);
+                });
+            }
         }
 
         override setValue(value: any): void {

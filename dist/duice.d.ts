@@ -401,6 +401,10 @@ declare namespace duice.element {
 }
 declare namespace duice.element {
     class SelectElement extends ObjectElement<HTMLSelectElement> {
+        option: object[];
+        optionValueProperty: string;
+        optionTextProperty: string;
+        defaultOptions: HTMLOptionElement[];
         constructor(element: HTMLSelectElement, bindData: object, context: object);
         setValue(value: any): void;
         getValue(): any;
