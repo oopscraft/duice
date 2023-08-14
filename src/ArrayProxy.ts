@@ -1,8 +1,9 @@
 namespace duice {
 
-    export class ArrayProxy {
+    export class ArrayProxy extends globalThis.Array {
 
         constructor(array: object[]) {
+            super();
 
             // array handler
             let arrayHandler = new ArrayHandler();

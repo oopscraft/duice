@@ -1,8 +1,9 @@
 namespace duice {
 
-    export class ObjectProxy {
+    export class ObjectProxy extends globalThis.Object {
 
         public constructor(object: object) {
+            super();
 
             // object handler
             let objectHandler = new ObjectHandler();
@@ -84,7 +85,7 @@ namespace duice {
             objectHandler.notifyObservers(new event.Event(this));
         }
 
-        static assign(objectProxy: object, object: object): void {
+        static override assign(objectProxy: object, object: object): void {
             let objectHandler = this.getHandler(objectProxy);
             try {
                 // suspend

@@ -113,7 +113,7 @@ declare namespace duice {
     }
 }
 declare namespace duice {
-    class ArrayProxy {
+    class ArrayProxy extends globalThis.Array {
         constructor(array: object[]);
         static clear(arrayProxy: object[]): void;
         static assign(arrayProxy: object[], array: object[]): void;
@@ -221,7 +221,7 @@ declare namespace duice {
     }
 }
 declare namespace duice {
-    class ObjectProxy {
+    class ObjectProxy extends globalThis.Object {
         constructor(object: object);
         static clear(objectProxy: object): void;
         static assign(objectProxy: object, object: object): void;
