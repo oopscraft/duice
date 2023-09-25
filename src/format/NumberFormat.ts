@@ -13,7 +13,12 @@ namespace duice.format {
                 return '';
             }
             number = Number(number);
-            let string = String(number.toFixed(this.scale)) as string;
+            let string;
+            if(this.scale > 0) {
+                string = String(number.toFixed(this.scale)) as string;
+            }else{
+                string = String(number) as string;
+            }
             let reg = /(^[+-]?\d+)(\d{3})/;
             while (reg.test(string)) {
                 string = string.replace(reg, '$1' + ',' + '$2');
@@ -33,7 +38,9 @@ namespace duice.format {
                 throw 'NaN';
             }
             let number = Number(string);
-            number = Number(number.toFixed(this.scale));
+            if(this.scale > 0) {
+                number = Number(number.toFixed(this.scale));
+            }
             return number;
         }
 
