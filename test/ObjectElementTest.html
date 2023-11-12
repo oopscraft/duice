@@ -6,7 +6,7 @@
     <script src="../dist/duice.js?v=4"></script>
     <script>
         'use strict';
-        let myObject = new duice.ObjectProxy({
+        const myObject = new duice.ObjectProxy({
             name: 'Apple',
             phoneNo: '01012345678',
             cardNo: '0000111122223333',
@@ -31,6 +31,12 @@
                 {id: 'c', name: 'C'}
             ]
         });
+
+        const myTypes = new duice.ArrayProxy([
+            {type: 'human', name: 'Human'},
+            {type: 'fruit', name: 'Fruit'},
+            {type: 'animal', name: 'Animal'}
+        ]);
 
         /**
          * viewMyObject
@@ -352,11 +358,9 @@
             </tr>
             <tr>
                 <td>
-                    <select data-duice-bind="myObject" data-duice-property="type">
+                    <select data-duice-bind="myObject" data-duice-property="type"
+                            data-duice-option="myTypes" data-duice-option-value-property="type" data-duice-option-text-property="name">
                         <option value>- Select Type -</option>
-                        <option value="human">Human</option>
-                        <option value="fruit">Fruit</option>
-                        <option value="animal">Animal</option>
                     </select>
                 </td>
                 <td class="fw-light">

@@ -30,13 +30,30 @@ namespace duice.element {
                 this.option = findVariable(this.getContext(), optionName);
                 this.optionValueProperty = getElementAttribute(this.getHtmlElement(), 'option-value-property');
                 this.optionTextProperty = getElementAttribute(this.getHtmlElement(), 'option-text-property');
+                duice.ArrayProxy.getHandler(this.option).addObserver(this);
+                this.updateOptions();
+            }
+        }
 
-                this.option.forEach(data => {
-                    let option = document.createElement('option');
-                    option.value = data[this.optionValueProperty];
-                    option.appendChild(document.createTextNode(data[this.optionTextProperty]));
-                    this.getHtmlElement().appendChild(option);
-                });
+        updateOptions(): void {
+            let value = this.getHtmlElement().value;
+            this.getHtmlElement().innerHTML = '';
+            this.defaultOptions.forEach(defaultOption => {
+                this.getHtmlElement().appendChild(defaultOption);
+            });
+            this.option.forEach(data => {
+                let option = document.createElement('option');
+                option.value = data[this.optionValueProperty];
+                option.appendChild(document.createTextNode(data[this.optionTextProperty]));
+                this.getHtmlElement().appendChild(option);
+            });
+            this.getHtmlElement().value = value;
+        }
+
+        override update(observable: Observable, event: event.Event): void {
+            super.update(observable, event);
+            if(this.option) {
+                this.updateOptions();
             }
         }
 

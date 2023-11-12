@@ -406,6 +406,8 @@ declare namespace duice.element {
         optionTextProperty: string;
         defaultOptions: HTMLOptionElement[];
         constructor(element: HTMLSelectElement, bindData: object, context: object);
+        updateOptions(): void;
+        update(observable: Observable, event: event.Event): void;
         setValue(value: any): void;
         getValue(): any;
         setReadonly(readonly: boolean): void;
