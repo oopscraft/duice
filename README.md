@@ -30,7 +30,11 @@ Therefore you can use it with another javascript library together.
 ## Demo Site
 
 * Arch4j: [https://arch4j-web.oopscraft.org/admin](https://arch4j-web.oopscraft.org/admin)
-* Test Account: **dev/dev**
+* Test Account: **user/user**
+
+## References
+
+* Plugins: [https://duice-plugin.oopscraft.org](https://duice-plunin.oopscraft.org)
 
 -----------------------------------------------------------
 
@@ -105,60 +109,6 @@ const users = new duice.ArrayProxy([
 ### Test Case 
 
 [Array Element Test](test/ArrayElementTest.html)
-
-
------------------------------------------------------------
-
-
-## Custom Element 
-
-### Javascript
-
-```javascript
-duice.defineCustomElement("my-object", class extends duice.CustomElement {
-    doRender(object) {
-        return this.createElement(`
-                    <div>
-                        <span data-duice-bind="object" data-duice-property="name"></span>
-                        <input type="text" data-duice-bind="object" data-duice-property="name" class="bg-red"/>
-                    </div>
-                `);
-    }
-
-    // (optional)
-    doStyle(data) {
-        return `
-                    .bg-red {
-                        background-color: red;
-                    }
-                `;
-    }
-});
-```
-
-### HTML
-
-| attribute                    | description                              |
-|:-----------------------------|:-----------------------------------------|
-| data-duice-bind="[object name]" | Object name to bind                      |
-| data-duice-bind="[array name]"   | Array name to bind                       |
-
-```html
-
-<script>
-    let myObject = new duice.ObjectProxy({
-        id: 'apple',
-        name: 'Apple',
-    });
-</script>
-
-<my-object data-duice-bind="myObject"></my-object>
-
-```
-
-### Test Case
-
-[Custom Element Test](test/CustomElementTest.html)
 
 
 ------------------------------------------------------
