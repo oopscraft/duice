@@ -11,9 +11,7 @@ namespace duice {
             // copy array elements
             if(globalThis.Array.isArray(array)){
                 for(let i = 0; i < array.length; i++ ){
-                    let objectProxy = new ObjectProxy(array[i]);
-                    ObjectProxy.getHandler(objectProxy).addObserver(arrayHandler);
-                    array[i] = objectProxy;
+                    array[i] = new ObjectProxy(array[i]);
                 }
             }
 
@@ -63,7 +61,6 @@ namespace duice {
                 // creates elements
                 array.forEach((object, index) => {
                     let objectProxy = new ObjectProxy(object);
-                    ObjectProxy.getHandler(objectProxy).addObserver(arrayHandler);
                     arrayProxy[index] = objectProxy;
 
                     // add listener

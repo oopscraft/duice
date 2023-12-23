@@ -101,8 +101,10 @@
 
         // property changing listener
         duice.ArrayProxy.onPropertyChanging(myArray, async event => {
-            if(!await duice.confirm(`Do you want to change [${event.getProperty()}] is [${event.getValue()}]`)){
-                return false;
+            if(event.getProperty() === 'name') {
+                if(!await duice.confirm(`Do you want to change [${event.getProperty()}] is [${event.getValue()}]`)){
+                    return false;
+                }
             }
         })
 
