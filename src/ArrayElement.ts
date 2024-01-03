@@ -51,15 +51,15 @@ namespace duice {
                     let hierarchyArray = this.hierarchy.split(',');
                     let idName = hierarchyArray[0];
                     let parentIdName = hierarchyArray[1];
-                    let index = -1;
+                    //let index = -1;
                     const _this = this;
                     // visit function
                     let visit = function(array: object[], parentId: object, depth: number) {
-                        for(const object of array) {
+                        for(let index = 0; index < array.length; index ++) {
+                            const object = array[index];
                             if(object[parentIdName] === parentId) {
 
                                 // context
-                                index ++;
                                 let context = Object.assign({}, _this.getContext());
                                 context[itemName] = object;
                                 context[statusName] = new ObjectProxy({
@@ -199,7 +199,11 @@ namespace duice {
                         this.itemHtmlElements.forEach(el => el.classList.remove(this.selectedItemClass));
                         let index = event.getIndex();
                         if(index >= 0) {
-                            this.itemHtmlElements[event.getIndex()].classList.add(this.selectedItemClass);
+                            this.itemHtmlElements.forEach(itemHtmlElement => {
+                                if(itemHtmlElement.dataset.duiceIndex === event.getIndex().toString()) {
+                                    itemHtmlElement.classList.add(this.selectedItemClass);
+                                }
+                            });
                         }
                     }
                     return;
