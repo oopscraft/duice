@@ -30,11 +30,11 @@ Therefore you can use it with another javascript library together.
 ## Demo Site
 
 * Arch4j: [https://arch4j-web.oopscraft.org/admin](https://arch4j-web.oopscraft.org/admin)
-* Test Account: **user/user**
+* Test Account: **developer/developer**
 
 ## References
 
-* Plugins: [https://duice-plugin.oopscraft.org](https://duice-plunin.oopscraft.org)
+* Plugins: [https://duice-plugin.oopscraft.org](https://duice-plugin.oopscraft.org)
 
 -----------------------------------------------------------
 
