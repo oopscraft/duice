@@ -5,6 +5,11 @@ namespace duice {
         public constructor(object: object) {
             super();
 
+            // is already proxy
+            if(ObjectProxy.isProxy(object)) {
+                return object;
+            }
+
             // object handler
             let objectHandler = new ObjectHandler();
 
@@ -133,6 +138,10 @@ namespace duice {
 
             // notify observers
             objectHandler.notifyObservers(new event.Event(this));
+        }
+
+        static isProxy(object: object): boolean {
+            return object.hasOwnProperty('_target_');
         }
 
         static setTarget(objectProxy: object, target: object): void {

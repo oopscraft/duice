@@ -5,6 +5,11 @@ namespace duice {
         constructor(array: object[]) {
             super();
 
+            // is already proxy
+            if(ArrayProxy.isProxy(array)) {
+                return array;
+            }
+
             // array handler
             let arrayHandler = new ArrayHandler();
 
@@ -76,6 +81,10 @@ namespace duice {
 
             // notify observers
             arrayHandler.notifyObservers(new event.Event(this));
+        }
+
+        static isProxy(array: object[]): boolean {
+            return array.hasOwnProperty('_target_');
         }
 
         static setTarget(arrayProxy: object[], target: object[]): void {

@@ -117,6 +117,7 @@ declare namespace duice {
         constructor(array: object[]);
         static clear(arrayProxy: object[]): void;
         static assign(arrayProxy: object[], array: object[]): void;
+        static isProxy(array: object[]): boolean;
         static setTarget(arrayProxy: object[], target: object[]): void;
         static getTarget(arrayProxy: object[]): any;
         static setHandler(arrayProxy: object[], arrayHandler: ArrayHandler): void;
@@ -225,6 +226,7 @@ declare namespace duice {
         constructor(object: object);
         static clear(objectProxy: object): void;
         static assign(objectProxy: object, object: object): void;
+        static isProxy(object: object): boolean;
         static setTarget(objectProxy: object, target: object): void;
         static getTarget(objectProxy: object): any;
         static setHandler(objectProxy: object, objectHandler: ObjectHandler): void;
