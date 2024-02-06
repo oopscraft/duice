@@ -4,18 +4,27 @@ namespace duice.element {
 
     export class InputDatetimeLocalElement extends InputElement {
 
-        dateFormat: duice.format.DateFormat = new duice.format.DateFormat('yyyy-MM-ddTHH:mm:ss');
+        dateFormat: duice.format.DateFormat = new duice.format.DateFormat('yyyy-MM-ddTHH:mm');
 
         constructor(element: HTMLInputElement, bindData: object, context: object) {
             super(element, bindData, context);
         }
 
         override setValue(value: string): void {
-            this.getHtmlElement().value = this.dateFormat.format(value);
+            if(value) {
+                this.getHtmlElement().value = this.dateFormat.format(value);
+            }else{
+                this.getHtmlElement().value = '';
+            }
         }
 
         override getValue(): any {
-            return this.dateFormat.parse(this.getHtmlElement().value);
+            let value = this.getHtmlElement().value;
+            if(value) {
+                return new Date(value).toISOString();
+            }else{
+                return null;
+            }
         }
 
     }
