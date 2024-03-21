@@ -14,6 +14,14 @@ namespace duice.dialog {
 
         protected promiseReject: Function;
 
+        openingListener: Function;
+
+        openedListener: Function;
+
+        closingListener: Function;
+
+        closedListener: Function;
+
         constructor(dialogElement: HTMLDialogElement) {
             this.dialogElement = dialogElement;
             let _this = this;
@@ -65,7 +73,9 @@ namespace duice.dialog {
             this.closeButton.style.width = '16px';
             this.closeButton.style.height = '16px';
             this.closeButton.addEventListener('click', event => {
-                _this.close();
+                _this.hide();
+                _this.promiseReject();
+                // _this.close();
             });
             this.dialogElement.appendChild(this.closeButton);
 
@@ -73,6 +83,26 @@ namespace duice.dialog {
             window.addEventListener('resize', function (event) {
                 _this.moveToCenterPosition();
             });
+        }
+
+        onOpening(listener: Function): Dialog {
+            this.openingListener = listener;
+            return this;
+        }
+
+        onOpened(listener: Function): Dialog {
+            this.openedListener = listener;
+            return this;
+        }
+
+        onClosing(listener: Function): Dialog {
+            this.closingListener = listener;
+            return this;
+        }
+
+        onClosed(listener: Function): Dialog {
+            this.closedListener = listener;
+            return this;
         }
 
         moveToCenterPosition() {
@@ -118,15 +148,25 @@ namespace duice.dialog {
         }
 
         protected hide(): void {
-
             // closes modal
             this.dialogElement.close();
         }
 
         async open() {
+            // opening listener
+            if (this.openingListener) {
+                if (this.openingListener.call(this) == false) {
+                    return;
+                }
+            }
 
             // show modal
             this.show();
+
+            // opened listener
+            if (this.openedListener) {
+                this.openedListener.call(this);
+            }
 
             // creates promise
             let _this = this;
@@ -138,17 +178,19 @@ namespace duice.dialog {
         }
 
         protected close(...args: any[]) {
-            this.reject(...args);
-        }
-
-        resolve(...args: any[]) {
+            // closing listener
+            if (this.closingListener) {
+                if (this.closingListener.call(this) == false) {
+                    return;
+                }
+            }
+            // closed listener
+            if (this.closedListener) {
+                this.closedListener.call(this);
+            }
+            // resolve
             this.hide();
             this.promiseResolve(...args);
-        }
-
-        reject(...args: any[]) {
-            this.hide();
-            this.promiseReject(...args);
         }
 
     }

@@ -53,18 +53,18 @@ namespace duice.dialog {
         }
 
         override close(...args: any[]) {
-            this.resolve(false);
+            super.close(false);
             this.getDialogElement().parentNode.removeChild(this.getDialogElement());
         }
 
         confirm() {
-            this.resolve(true);
+            super.close(true);
             this.getDialogElement().parentNode.removeChild(this.getDialogElement());
         }
 
         cancel() {
-           this.resolve(false);
-           this.getDialogElement().parentNode.removeChild(this.getDialogElement());
+            super.close(false);
+            this.getDialogElement().parentNode.removeChild(this.getDialogElement());
         }
 
     }

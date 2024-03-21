@@ -247,6 +247,10 @@ declare namespace duice {
     }
 }
 declare namespace duice {
+    import AlertDialog = duice.dialog.AlertDialog;
+    import ConfirmDialog = duice.dialog.ConfirmDialog;
+    import PromptDialog = duice.dialog.PromptDialog;
+    import Dialog = duice.dialog.Dialog;
     function setNamespace(value: string): void;
     function getNamespace(): string;
     function getElementQuerySelector(): string;
@@ -260,10 +264,10 @@ declare namespace duice {
     function getElementAttribute(htmlElement: HTMLElement, name: string): string;
     function setElementAttribute(htmlElement: HTMLElement, name: string, value: string): void;
     function assert(condition: any, message?: string): void;
-    function alert(message: string): Promise<void>;
-    function confirm(message: string): Promise<boolean>;
-    function prompt(message: string, type?: string): Promise<string>;
-    function openDialog(dialogElement: HTMLDialogElement): Promise<void>;
+    function alert(message: string): AlertDialog;
+    function confirm(message: string): ConfirmDialog;
+    function prompt(message: string, type?: string): PromptDialog;
+    function openDialog(dialogElement: HTMLDialogElement): Dialog;
     function tabFolder(...tabItems: duice.tab.TabItem[]): duice.tab.TabFolder;
     function tabItem(button: HTMLElement, content: HTMLElement, listener: Function): duice.tab.TabItem;
 }
@@ -275,15 +279,21 @@ declare namespace duice.dialog {
         protected promise: Promise<any>;
         protected promiseResolve: Function;
         protected promiseReject: Function;
+        openingListener: Function;
+        openedListener: Function;
+        closingListener: Function;
+        closedListener: Function;
         constructor(dialogElement: HTMLDialogElement);
+        onOpening(listener: Function): Dialog;
+        onOpened(listener: Function): Dialog;
+        onClosing(listener: Function): Dialog;
+        onClosed(listener: Function): Dialog;
         moveToCenterPosition(): void;
         protected getDialogElement(): HTMLDialogElement;
         protected show(): void;
         protected hide(): void;
         open(): Promise<any>;
         protected close(...args: any[]): void;
-        resolve(...args: any[]): void;
-        reject(...args: any[]): void;
     }
 }
 declare namespace duice.dialog {

@@ -65,17 +65,17 @@ namespace duice.dialog {
         }
 
         override close(...args: any[]) {
-            this.resolve();
+            super.close();
             this.getDialogElement().parentNode.removeChild(this.getDialogElement());
         }
 
         confirm(value: string) {
-            this.resolve(value);
+            super.close(value);
             this.getDialogElement().parentNode.removeChild(this.getDialogElement());
         }
 
         cancel() {
-            this.resolve();
+            super.close();
             this.getDialogElement().parentNode.removeChild(this.getDialogElement());
         }
 

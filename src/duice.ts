@@ -1,6 +1,10 @@
 ///<reference path="CustomElementFactory.ts"/>
 namespace duice {
 
+    import AlertDialog = duice.dialog.AlertDialog;
+    import ConfirmDialog = duice.dialog.ConfirmDialog;
+    import PromptDialog = duice.dialog.PromptDialog;
+    import Dialog = duice.dialog.Dialog;
     let namespace = 'duice';
 
     export function setNamespace(value:string): void {
@@ -119,20 +123,20 @@ namespace duice {
         }
     }
 
-    export async function alert(message: string): Promise<void> {
-        await new duice.dialog.AlertDialog(message).open();
+    export function alert(message: string): AlertDialog {
+        return new duice.dialog.AlertDialog(message);
     }
 
-    export async function confirm(message: string): Promise<boolean> {
-        return await new duice.dialog.ConfirmDialog(message).open();
+    export function confirm(message: string): ConfirmDialog {
+        return new duice.dialog.ConfirmDialog(message);
     }
 
-    export async function prompt(message: string, type?: string): Promise<string> {
-        return await new duice.dialog.PromptDialog(message, type).open();
+    export function prompt(message: string, type?: string): PromptDialog {
+        return new duice.dialog.PromptDialog(message, type);
     }
 
-    export async function openDialog(dialogElement: HTMLDialogElement): Promise<void> {
-        return await new duice.dialog.Dialog(dialogElement).open();
+    export function openDialog(dialogElement: HTMLDialogElement): Dialog {
+        return new duice.dialog.Dialog(dialogElement);
     }
 
     export function tabFolder(...tabItems: duice.tab.TabItem[]): duice.tab.TabFolder {

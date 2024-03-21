@@ -38,12 +38,12 @@ namespace duice.dialog {
         }
 
         confirm() {
-            this.resolve();
+            super.close();
             this.getDialogElement().parentNode.removeChild(this.getDialogElement());
         }
 
         override close() {
-            this.resolve();
+            super.close();
             this.getDialogElement().parentNode.removeChild(this.getDialogElement());
         }
     }

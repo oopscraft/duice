@@ -8,29 +8,42 @@
 
         /**
          * alertAwait
-         * @returns {Promise<void>}
          */
         async function alertAwait() {
-            await duice.alert('<b>Hello~</b>\nThis is alert message!');
+            await duice.alert('<b>Hello~</b>\nThis is alert message!')
+                .onOpening(() => alert("opening"))
+                .onOpened(() => alert("opened"))
+                .onClosing(() => alert("closing"))
+                .onClosed(() => alert("closed"))
+                .open();
             alert('ok');
         }
 
         /**
          * alertThen
-         * @returns {Promise<void>}
          */
         async function alertThen() {
-            duice.alert('<b>Hello~</b>\nThis is alert message!').then(()=>{
-                alert('ok');
-            });
+            duice.alert('<b>Hello~</b>\nThis is alert message!')
+                .onOpening(() => alert("opening"))
+                .onOpened(() => alert("opened"))
+                .onClosing(() => alert("closing"))
+                .onClosed(() => alert("closed"))
+                .open()
+                .then(()=>{
+                    alert('ok');
+                });
         }
 
         /**
          * confirmAwait
-         * @returns {Promise<void>}
          */
         async function confirmAwait() {
-            if(await duice.confirm('<b>Hello~</b>\nThis is confirm message!\nYes or No?')){
+            if (await duice.confirm('<b>Hello~</b>\nThis is confirm message!\nYes or No?')
+                .onOpening(() => alert("opening"))
+                .onOpened(() => alert("opened"))
+                .onClosing(() => alert("closing"))
+                .onClosed(() => alert("closed"))
+                .open()) {
                 alert(true);
             }else{
                 alert(false);
@@ -42,14 +55,20 @@
          * @returns {Promise<void>}
          */
         async function confirmThen() {
-            duice.confirm('<b>Hello~</b>\nThis is confirm message!\nYes or No?').then((result) =>{
-                console.log("==> result:", result);
-                if(result) {
-                    alert(true);
-                }else{
-                    alert(false);
-                }
-            });
+            duice.confirm('<b>Hello~</b>\nThis is confirm message!\nYes or No?')
+                .onOpening(() => alert("opening"))
+                .onOpened(() => alert("opened"))
+                .onClosing(() => alert("closing"))
+                .onClosed(() => alert("closed"))
+                .open()
+                .then((result) =>{
+                    console.log("==> result:", result);
+                    if (result) {
+                        alert(true);
+                    } else {
+                        alert(false);
+                    }
+                });
         }
 
         /**
@@ -57,7 +76,12 @@
          * @returns {Promise<void>}
          */
         async function promptAwait() {
-            let name = await duice.prompt("<b>Hello~</b>\nWhat is your name?");
+            let name = await duice.prompt("<b>Hello~</b>\nWhat is your name?")
+                .onOpening(() => alert("opening"))
+                .onOpened(() => alert("opened"))
+                .onClosing(() => alert("closing"))
+                .onClosed(() => alert("closed"))
+                .open();
             alert(name);
         }
 
@@ -66,9 +90,15 @@
          * @returns {Promise<void>}
          */
         async function promptThen() {
-            duice.prompt("<b>Hello~</b>\nWhat is your name?").then(name => {
-                alert(name);
-            });
+            duice.prompt("<b>Hello~</b>\nWhat is your name?")
+                .onOpening(() => alert("opening"))
+                .onOpened(() => alert("opened"))
+                .onClosing(() => alert("closing"))
+                .onClosed(() => alert("closed"))
+                .open()
+                .then(name => {
+                    alert(name);
+                });
         }
 
         /**
@@ -76,9 +106,15 @@
          * @returns {Promise<void>}
          */
         async function openDialog() {
-            duice.openDialog(document.getElementById('myDialog')).then(()=>{
-                alert('do next');
-            });
+            duice.openDialog(document.getElementById('myDialog'))
+                .onOpening(() => alert("opening"))
+                .onOpened(() => alert("opened"))
+                .onClosing(() => alert("closing"))
+                .onClosed(() => alert("closed"))
+                .open()
+                .then(()=>{
+                    alert('do next');
+                });
         }
 
         // adds DOMContentLoaded event listener
