@@ -16,6 +16,7 @@
             date: '2019-04-01',
             time: '18:12',
             type: 'human',
+            range: 20,
             enabled: true,
             enabledYn: 'Y',
             gender: 'male',
@@ -341,6 +342,27 @@
                 </td>
                 <td class="fw-light">
                     &lt;input type="time" data-duice-bind="myObject" data-duice-property="time"/&gt;
+                </td>
+            </tr>
+            </tbody>
+            <!-- range -->
+            <tbody>
+            <tr>
+                <td rowspan="2" class="fw-bold">range</td>
+                <td rowspan="2" data-duice-bind="myObject" data-duice-property="range"></td>
+                <td>
+                    <span data-duice-bind="myObject" data-duice-property="range"></span>
+                </td>
+                <td class="fw-light">
+                    &lt;* data-duice-bind="myObject" data-duice-property="range"/&gt;
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="range" data-duice-bind="myObject" data-duice-property="range"/>
+                </td>
+                <td class="fw-light">
+                    &lt;input type="range" data-duice-bind="myObject" data-duice-property="range"/&gt;
                 </td>
             </tr>
             </tbody>
