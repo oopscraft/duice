@@ -156,6 +156,9 @@ namespace duice {
 
         static setReadonly(arrayProxy: object[], property: string, readonly: boolean): void {
             this.getHandler(arrayProxy).setReadonly(property, readonly);
+            arrayProxy.forEach(objectProxy => {
+                ObjectProxy.setReadonly(objectProxy, property, readonly);
+            });
         }
 
         static isReadonly(arrayProxy: object[], property: string): boolean {
@@ -164,9 +167,9 @@ namespace duice {
 
         static setReadonlyAll(arrayProxy: object[], readonly: boolean): void {
             this.getHandler(arrayProxy).setReadonlyAll(readonly);
-            for(let index = 0; index >= this.length; index ++ ){
-                 ObjectProxy.setReadonlyAll(this[index], readonly);
-            }
+            arrayProxy.forEach(objectProxy => {
+                ObjectProxy.setReadonlyAll(objectProxy, readonly);
+            });
         }
 
         static isReadonlyAll(arrayProxy: object[]): boolean {
@@ -175,6 +178,9 @@ namespace duice {
 
         static setDisable(arrayProxy: object[], property: string, disable: boolean): void {
             this.getHandler(arrayProxy).setDisable(property, disable);
+            arrayProxy.forEach(objectProxy => {
+                ObjectProxy.setDisable(objectProxy, property, disable);
+            });
         }
 
         static isDisable(arrayProxy: object[], property): boolean {
@@ -183,9 +189,9 @@ namespace duice {
 
         static setDisableAll(arrayProxy: object[], disable: boolean): void {
             this.getHandler(arrayProxy).setDisableAll(disable);
-            for(let index = 0; index >= this.length; index ++ ){
-                ObjectProxy.setDisableAll(this[index], disable);
-            }
+            arrayProxy.forEach(objectProxy => {
+               ObjectProxy.setDisableAll(objectProxy, disable);
+            });
         }
 
         static isDisableAll(arrayProxy: object[]): boolean {
