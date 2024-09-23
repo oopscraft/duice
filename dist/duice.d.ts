@@ -373,6 +373,7 @@ declare namespace duice.element {
         constructor(element: HTMLInputElement, bindData: object, context: object);
         setValue(value: any): void;
         getValue(): any;
+        disableClick(event: any): void;
         setReadonly(readonly: boolean): void;
     }
 }

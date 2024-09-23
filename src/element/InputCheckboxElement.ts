@@ -33,11 +33,15 @@ namespace duice.element {
             }
         }
 
+        disableClick(event): void {
+            event.preventDefault();
+        }
+
         override setReadonly(readonly: boolean): void {
             if(readonly){
-                this.getHtmlElement().style.pointerEvents = 'none';
+                this.getHtmlElement().addEventListener('click', this.disableClick);
             }else{
-                this.getHtmlElement().style.pointerEvents = '';
+                this.getHtmlElement().removeEventListener('click', this.disableClick);
             }
         }
 
