@@ -68,6 +68,18 @@ namespace duice {
                     let objectProxy = new ObjectProxy(object);
                     arrayProxy[index] = objectProxy;
 
+                    // readonly
+                    ObjectProxy.setReadonlyAll(objectProxy, arrayHandler.isReadonlyAll());
+                    arrayHandler.readonly.forEach(property => {
+                        ObjectProxy.setReadonly(objectProxy, property, true);
+                    });
+
+                    // disable
+                    ObjectProxy.setDisableAll(objectProxy, arrayHandler.isDisableAll());
+                    arrayHandler.disable.forEach(property => {
+                        ObjectProxy.setDisable(objectProxy, property, true);
+                    })
+
                     // add listener
                     ObjectProxy.onPropertyChanging(objectProxy, arrayHandler.propertyChangingListener);
                     ObjectProxy.onPropertyChanged(objectProxy, arrayHandler.propertyChangedListener);

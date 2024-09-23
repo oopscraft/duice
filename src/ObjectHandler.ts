@@ -35,7 +35,7 @@ namespace duice {
             console.debug("ObjectHandler.update", observable, event);
 
             // Element
-            if(observable instanceof ObjectElement){
+            if (observable instanceof ObjectElement) {
                 let property = observable.getProperty();
                 let value = observable.getValue();
                 if(await this.checkListener(this.propertyChangingListener, event)){

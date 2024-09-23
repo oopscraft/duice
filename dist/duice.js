@@ -606,6 +606,16 @@ var duice;
                 array.forEach((object, index) => {
                     let objectProxy = new duice.ObjectProxy(object);
                     arrayProxy[index] = objectProxy;
+                    // readonly
+                    duice.ObjectProxy.setReadonlyAll(objectProxy, arrayHandler.isReadonlyAll());
+                    arrayHandler.readonly.forEach(property => {
+                        duice.ObjectProxy.setReadonly(objectProxy, property, true);
+                    });
+                    // disable
+                    duice.ObjectProxy.setDisableAll(objectProxy, arrayHandler.isDisableAll());
+                    arrayHandler.disable.forEach(property => {
+                        duice.ObjectProxy.setDisable(objectProxy, property, true);
+                    });
                     // add listener
                     duice.ObjectProxy.onPropertyChanging(objectProxy, arrayHandler.propertyChangingListener);
                     duice.ObjectProxy.onPropertyChanged(objectProxy, arrayHandler.propertyChangedListener);

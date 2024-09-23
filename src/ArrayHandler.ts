@@ -112,13 +112,11 @@ namespace duice {
 
             // instance is array component
             if(observable instanceof ArrayElement) {
-
                 // row select event
                 if(event instanceof duice.event.ItemSelectEvent) {
                     this.selectedItemIndex = event.getIndex();
                     return;
                 }
-
                 // row move event
                 if (event instanceof duice.event.ItemMoveEvent) {
                     let object = this.getTarget().splice(event.getFromIndex(), 1)[0];
