@@ -42,11 +42,11 @@ namespace duice.tab {
         setActive(active: boolean): void {
             if(active === true) {
                 this.button.style.opacity = 'unset';
-                this.content.style.display = null;
+                this.content.removeAttribute('hidden');
                 this.listener.call(this);
             }else{
                 this.button.style.opacity = '0.5';
-                this.content.style.display = 'none';
+                this.content.setAttribute('hidden', String(true));
             }
         }
 
