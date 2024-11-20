@@ -8,3 +8,5 @@ build
 dist/*
 !dist/duice.js
 !dist/duice.js.map
+!dist/duice.min.js
+!dist/duice.min.js.map
