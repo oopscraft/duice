@@ -1,9 +1,6 @@
 var duice = (function (exports) {
     'use strict';
 
-    class DataElementFactory {
-    }
-
     class Configuration {
         static setNamespace(value) {
             this.namespace = value;
@@ -1250,6 +1247,15 @@ var duice = (function (exports) {
         }
     }
 
+    class DataElementFactory {
+    }
+
+    class ArrayElementFactory extends DataElementFactory {
+        createElement(htmlElement, bindData, context) {
+            return new ArrayElement(htmlElement, bindData, context);
+        }
+    }
+
     class CustomElementFactory extends DataElementFactory {
         createElement(htmlElement, bindData, context) {
             return this.doCreateElement(htmlElement, bindData, context);
@@ -1514,12 +1520,6 @@ var duice = (function (exports) {
                 // render
                 this.render();
             }
-        }
-    }
-
-    class ArrayElementFactory extends DataElementFactory {
-        createElement(htmlElement, bindData, context) {
-            return new ArrayElement(htmlElement, bindData, context);
         }
     }
 
@@ -2188,22 +2188,26 @@ var duice = (function (exports) {
         }
     }
 
-    class InputRadioElement extends InputElement {
+    class InputDatetimeLocalElement extends InputElement {
         constructor(element, bindData, context) {
             super(element, bindData, context);
+            this.dateFormat = new DateFormat('yyyy-MM-ddTHH:mm');
         }
         setValue(value) {
-            this.getHtmlElement().checked = (this.getHtmlElement().value === value);
-        }
-        getValue() {
-            return this.getHtmlElement().value;
-        }
-        setReadonly(readonly) {
-            if (readonly) {
-                this.getHtmlElement().style.pointerEvents = 'none';
+            if (value) {
+                this.getHtmlElement().value = this.dateFormat.format(value);
             }
             else {
-                this.getHtmlElement().style.pointerEvents = '';
+                this.getHtmlElement().value = '';
+            }
+        }
+        getValue() {
+            let value = this.getHtmlElement().value;
+            if (value) {
+                return new Date(value).toISOString();
+            }
+            else {
+                return null;
             }
         }
     }
@@ -2227,26 +2231,22 @@ var duice = (function (exports) {
         }
     }
 
-    class InputDatetimeLocalElement extends InputElement {
+    class InputRadioElement extends InputElement {
         constructor(element, bindData, context) {
             super(element, bindData, context);
-            this.dateFormat = new DateFormat('yyyy-MM-ddTHH:mm');
         }
         setValue(value) {
-            if (value) {
-                this.getHtmlElement().value = this.dateFormat.format(value);
-            }
-            else {
-                this.getHtmlElement().value = '';
-            }
+            this.getHtmlElement().checked = (this.getHtmlElement().value === value);
         }
         getValue() {
-            let value = this.getHtmlElement().value;
-            if (value) {
-                return new Date(value).toISOString();
+            return this.getHtmlElement().value;
+        }
+        setReadonly(readonly) {
+            if (readonly) {
+                this.getHtmlElement().style.pointerEvents = 'none';
             }
             else {
-                return null;
+                this.getHtmlElement().style.pointerEvents = '';
             }
         }
     }
@@ -2355,6 +2355,16 @@ var duice = (function (exports) {
         }
     }
 
+    class SelectElementFactory extends ObjectElementFactory {
+        createElement(element, bindData, context) {
+            return new SelectElement(element, bindData, context);
+        }
+    }
+    (() => {
+        // register factory instance
+        DataElementRegistry.register('select', new SelectElementFactory());
+    })();
+
     class TextareaElement extends ObjectElement {
         constructor(element, bindData, context) {
             super(element, bindData, context);
@@ -2407,16 +2417,6 @@ var duice = (function (exports) {
     (() => {
         // register
         DataElementRegistry.register('textarea', new TextareaElementFactory());
-    })();
-
-    class SelectElementFactory extends ObjectElementFactory {
-        createElement(element, bindData, context) {
-            return new SelectElement(element, bindData, context);
-        }
-    }
-    (() => {
-        // register factory instance
-        DataElementRegistry.register('select', new SelectElementFactory());
     })();
 
     exports.AlertDialog = AlertDialog;
