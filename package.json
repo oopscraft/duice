@@ -1,6 +1,6 @@
 {
   "name": "duice",
-  "version": "0.1.99",
+  "version": "0.2.0",
   "description": "DUICE(Data-oriented javascript UI Component Element)",
   "homepage": "http://duice.oopscraft.org",
   "author": "chomookun@gmail.com",
@@ -8,6 +8,8 @@
   "bugs": {
     "url": "https://github.com/oopscraft/duice/issues"
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "clean": "rimraf ./dist",
     "compile": "tsc",

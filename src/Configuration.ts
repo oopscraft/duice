@@ -1,6 +1,6 @@
 export class Configuration {
 
-    static namespace: string = 'dc';
+    static namespace: string = 'duice';
 
     static setNamespace(value:string): void {
         this.namespace = value;

@@ -6,9 +6,18 @@ import {Dialog} from "./dialog/Dialog";
 import {TabFolder} from "./tab/TabFolder";
 import {TabItem} from "./tab/TabItem";
 
+// export class
 export {Configuration} from "./Configuration";
 export {ArrayProxy} from "./ArrayProxy";
 export {ObjectProxy} from "./ObjectProxy";
+export {DataElementRegistry} from "./DataElementRegistry"
+export {ObjectElement} from "./ObjectElement";
+export {ObjectElementFactory} from "./ObjectElementFactory";
+export {ArrayElement} from "./ArrayElement";
+export {ArrayElementFactory} from "./ArrayElementFactory";
+export {CustomElement} from "./CustomElement";
+export {CustomElementFactory} from "./CustomElementFactory"
+export * from "./commons"
 
 export function alert(message: string): AlertDialog {
     return new AlertDialog(message);

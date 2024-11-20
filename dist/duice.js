@@ -9,7 +9,7 @@ var duice = (function (exports) {
             return this.namespace;
         }
     }
-    Configuration.namespace = 'dc';
+    Configuration.namespace = 'duice';
 
     function getElementQuerySelector() {
         let namespace = Configuration.getNamespace();
