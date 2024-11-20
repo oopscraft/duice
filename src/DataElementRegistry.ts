@@ -1,57 +1,58 @@
-///<reference path="ObjectElementFactory.ts"/>
-namespace duice {
+import {ArrayElementFactory} from "./ArrayElementFactory";
+import {DataElementFactory} from "./DataElementFactory";
+import {CustomElementFactory} from "./CustomElementFactory";
+import {ObjectElementFactory} from "./ObjectElementFactory";
 
-    export class DataElementRegistry {
+export class DataElementRegistry {
 
-        static defaultObjectElementFactory = new ObjectElementFactory();
+    static defaultObjectElementFactory = new ObjectElementFactory();
 
-        static defaultArrayElementFactory = new ArrayElementFactory();
+    static defaultArrayElementFactory = new ArrayElementFactory();
 
-        static objectElementFactories = new Map<string, ObjectElementFactory<HTMLElement>>();
+    static objectElementFactories = new Map<string, ObjectElementFactory<HTMLElement>>();
 
-        static arrayElementFactories = new Map<string, ArrayElementFactory<HTMLElement>>();
+    static arrayElementFactories = new Map<string, ArrayElementFactory<HTMLElement>>();
 
-        static customElementFactories = new Map<string, CustomElementFactory<any>>();
+    static customElementFactories = new Map<string, CustomElementFactory<any>>();
 
-        static register(tagName: string, dataElementFactory: DataElementFactory<HTMLElement, any>) {
-            if(dataElementFactory instanceof ArrayElementFactory) {
-                this.arrayElementFactories.set(tagName, dataElementFactory);
-            }else if(dataElementFactory instanceof ObjectElementFactory) {
-                this.objectElementFactories.set(tagName, dataElementFactory);
-            }else if(dataElementFactory instanceof CustomElementFactory) {
-                this.customElementFactories.set(tagName, dataElementFactory);
-            }
-
-            // register custom html element
-            if(tagName.includes('-')) {
-                globalThis.customElements.define(tagName, class extends HTMLElement {});
-            }
+    static register(tagName: string, elementFactory: DataElementFactory<HTMLElement, any>) {
+        if(elementFactory instanceof ArrayElementFactory) {
+            this.arrayElementFactories.set(tagName, elementFactory);
+        }else if(elementFactory instanceof ObjectElementFactory) {
+            this.objectElementFactories.set(tagName, elementFactory);
+        }else if(elementFactory instanceof CustomElementFactory) {
+            this.customElementFactories.set(tagName, elementFactory);
         }
 
-        static getFactory(htmlElement: HTMLElement, bindData: any, context: object): DataElementFactory<HTMLElement, any> {
-            let tagName = htmlElement.tagName.toLowerCase();
+        // register custom html element
+        if(tagName.includes('-')) {
+            globalThis.customElements.define(tagName, class extends HTMLElement {});
+        }
+    }
 
-            // custom element
-            if(this.customElementFactories.has(tagName)) {
-                return this.customElementFactories.get(tagName);
-            }
+    static getFactory(htmlElement: HTMLElement, bindData: any, context: object): DataElementFactory<HTMLElement, any> {
+        let tagName = htmlElement.tagName.toLowerCase();
 
-            // array element
-            if(Array.isArray(bindData)) {
-                if(this.arrayElementFactories.has(tagName)) {
-                    return this.arrayElementFactories.get(tagName);
-                }
-                return this.defaultArrayElementFactory;
-            }
-            // object element
-            else{
-                if(this.objectElementFactories.has(tagName)) {
-                    return this.objectElementFactories.get(tagName);
-                }
-                return this.defaultObjectElementFactory;
-            }
+        // custom element
+        if(this.customElementFactories.has(tagName)) {
+            return this.customElementFactories.get(tagName);
+        }
 
+        // array element
+        if(Array.isArray(bindData)) {
+            if(this.arrayElementFactories.has(tagName)) {
+                return this.arrayElementFactories.get(tagName);
+            }
+            return this.defaultArrayElementFactory;
+        }
+        // object element
+        else{
+            if(this.objectElementFactories.has(tagName)) {
+                return this.objectElementFactories.get(tagName);
+            }
+            return this.defaultObjectElementFactory;
         }
 
     }
+
 }

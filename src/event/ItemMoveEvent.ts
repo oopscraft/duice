@@ -1,25 +1,22 @@
-///<reference path="Event.ts"/>
-namespace duice.event {
+import {DataEvent} from "./DataEvent";
 
-    export class ItemMoveEvent extends Event {
+export class ItemMoveEvent extends DataEvent {
 
-        fromIndex: number;
+    fromIndex: number;
 
-        toIndex: number;
+    toIndex: number;
 
-        constructor(source: any, fromIndex: number, toIndex: number){
-            super(source);
-            this.fromIndex = fromIndex;
-            this.toIndex = toIndex;
-        }
-
-        getFromIndex(): number {
-            return this.fromIndex;
-        }
-
-        getToIndex(): number {
-            return this.toIndex;
-        }
+    constructor(source: any, fromIndex: number, toIndex: number){
+        super(source);
+        this.fromIndex = fromIndex;
+        this.toIndex = toIndex;
     }
 
+    getFromIndex(): number {
+        return this.fromIndex;
+    }
+
+    getToIndex(): number {
+        return this.toIndex;
+    }
 }

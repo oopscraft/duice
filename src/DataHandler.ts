@@ -1,103 +1,101 @@
-///<Reference path="Observable.ts"/>
-///<Reference path="Observer.ts"/>
-namespace duice {
+import {Observable} from "./Observable";
+import {Observer} from "./Observer";
+import {DataEvent} from "./event/DataEvent";
 
-    export abstract class DataHandler<T> extends Observable implements Observer {
+export abstract class DataHandler<T> extends Observable implements Observer {
 
-        target: T;
+    target: T;
 
-        readonlyAll: boolean = false;
+    readonlyAll: boolean = false;
 
-        readonly: Set<string> = new Set<string>();
+    readonly: Set<string> = new Set<string>();
 
-        disableAll: boolean = false;
+    disableAll: boolean = false;
 
-        disable: Set<string> = new Set<string>();
+    disable: Set<string> = new Set<string>();
 
-        listenerEnabled: boolean = true;
+    listenerEnabled: boolean = true;
 
-        protected constructor() {
-            super();
+    protected constructor() {
+        super();
+    }
+
+    setTarget(target: T): void {
+        this.target = target;
+    }
+
+    getTarget(): T {
+        return this.target;
+    }
+
+    abstract update(observable: Observable, event: DataEvent): void;
+
+    setReadonlyAll(readonly: boolean): void {
+        this.readonlyAll = readonly;
+        if(!readonly){
+            this.readonly.clear();
         }
+        this.notifyObservers(new DataEvent(this));
+    }
 
-        setTarget(target: T): void {
-            this.target = target;
+    isReadonlyAll(): boolean {
+        return this.readonlyAll;
+    }
+
+    setReadonly(property: string, readonly: boolean): void {
+        if(readonly){
+            this.readonly.add(property);
+        }else{
+            this.readonly.delete(property);
         }
+        this.notifyObservers(new DataEvent(this));
+    }
 
-        getTarget(): T {
-            return this.target;
+    isReadonly(property: string): boolean {
+        return this.readonlyAll || this.readonly.has(property);
+    }
+
+    setDisableAll(disable: boolean): void {
+        this.disableAll = disable;
+        if(!disable) {
+            this.disable.clear();
         }
+        this.notifyObservers(new DataEvent(this));
+    }
 
-        abstract update(observable: object, event: event.Event): void;
+    isDisableAll(): boolean {
+        return this.disableAll;
+    }
 
-        setReadonlyAll(readonly: boolean): void {
-            this.readonlyAll = readonly;
-            if(readonly === false){
-                this.readonly.clear();
+    setDisable(property: string, disable: boolean): void {
+        if(disable) {
+            this.disable.add(property);
+        }else{
+            this.disable.delete(property);
+        }
+        this.notifyObservers(new DataEvent(this));
+    }
+
+    isDisable(property: string): boolean {
+        return this.disableAll || this.disable.has(property);
+    }
+
+    suspendListener(): void {
+        this.listenerEnabled = false;
+    }
+
+    resumeListener(): void {
+        this.listenerEnabled = true;
+    }
+
+    async checkListener(listener: Function, event: DataEvent): Promise<boolean> {
+        if(this.listenerEnabled && listener){
+            let result = await listener.call(this.getTarget(), event);
+            if(result == false){
+                return false;
             }
-            this.notifyObservers(new event.Event(this));
         }
-
-        isReadonlyAll(): boolean {
-            return this.readonlyAll;
-        }
-
-        setReadonly(property: string, readonly: boolean): void {
-            if(readonly){
-                this.readonly.add(property);
-            }else{
-                this.readonly.delete(property);
-            }
-            this.notifyObservers(new event.Event(this));
-        }
-
-        isReadonly(property: string): boolean {
-            return this.readonlyAll || this.readonly.has(property);
-        }
-
-        setDisableAll(disable: boolean): void {
-            this.disableAll = disable;
-            if(disable === false) {
-                this.disable.clear();
-            }
-            this.notifyObservers(new event.Event(this));
-        }
-
-        isDisableAll(): boolean {
-            return this.disableAll;
-        }
-
-        setDisable(property: string, disable: boolean): void {
-            if(disable) {
-                this.disable.add(property);
-            }else{
-                this.disable.delete(property);
-            }
-            this.notifyObservers(new event.Event(this));
-        }
-
-        isDisable(property: string): boolean {
-            return this.disableAll || this.disable.has(property);
-        }
-
-        suspendListener(): void {
-            this.listenerEnabled = false;
-        }
-
-        resumeListener(): void {
-            this.listenerEnabled = true;
-        }
-
-        async checkListener(listener: Function, event: event.Event): Promise<boolean> {
-            if(this.listenerEnabled && listener){
-                let result = await listener.call(this.getTarget(), event);
-                if(result == false){
-                    return false;
-                }
-            }
-            return true;
-        }
-
+        return true;
     }
 
 }

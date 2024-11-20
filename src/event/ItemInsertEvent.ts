@@ -1,25 +1,23 @@
-namespace duice.event {
+import {DataEvent} from "./DataEvent";
 
-    export class ItemDeleteEvent extends Event {
+export class ItemDeleteEvent extends DataEvent {
 
-        index: number;
+    index: number;
 
-        items: object[] = [];
+    items: object[] = [];
 
-        constructor(source: any, index: number, items: object[]){
-            super(source);
-            this.index = index;
-            this.items = items;
-        }
+    constructor(source: any, index: number, items: object[]){
+        super(source);
+        this.index = index;
+        this.items = items;
+    }
 
-        getIndex(): number {
-            return this.index;
-        }
+    getIndex(): number {
+        return this.index;
+    }
 
-        getItems(): object[] {
-            return this.items;
-        }
-
+    getItems(): object[] {
+        return this.items;
     }
 
 }

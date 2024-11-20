@@ -3,3 +3,8 @@
 node_modules
 build
 *.swp
+
+# dist
+dist/*
+!dist/duice.js
+!dist/duice.js.map

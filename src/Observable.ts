@@ -1,40 +1,39 @@
-namespace duice {
+import {DataEvent} from "./event/DataEvent";
+import {Observer} from "./Observer";
 
-    export class Observable {
+export class Observable {
 
-        observers: Observer[] = [];
+    observers: Observer[] = [];
 
-        notifyEnabled: boolean = true;
+    notifyEnabled: boolean = true;
 
-        addObserver(observer: Observer): void {
-            this.observers.push(observer);
-        }
+    addObserver(observer: Observer): void {
+        this.observers.push(observer);
+    }
 
-        removeObserver(observer: Observer): void {
-            for(let i = 0, size = this.observers.length; i < size; i++){
-                if(this.observers[i] === observer){
-                    this.observers.splice(i,1);
-                    return;
-                }
+    removeObserver(observer: Observer): void {
+        for(let i = 0, size = this.observers.length; i < size; i++){
+            if(this.observers[i] === observer){
+                this.observers.splice(i,1);
+                return;
             }
         }
+    }
 
-        suspendNotify(): void {
-            this.notifyEnabled = false;
+    suspendNotify(): void {
+        this.notifyEnabled = false;
+    }
+
+    resumeNotify(): void {
+        this.notifyEnabled = true;
+    }
+
+    notifyObservers(dataEvent: DataEvent): void {
+        if(this.notifyEnabled){
+            this.observers.forEach(observer => {
+                observer.update(this, dataEvent);
+            });
         }
-
-        resumeNotify(): void {
-            this.notifyEnabled = true;
-        }
-
-        notifyObservers(event: event.Event): void {
-            if(this.notifyEnabled){
-                this.observers.forEach(observer => {
-                    observer.update(this, event);
-                });
-            }
-        }
-
     }
 
 }
