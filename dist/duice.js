@@ -2091,16 +2091,6 @@ var duice = (function (exports) {
         }
     }
 
-    class ImgElementFactory extends ObjectElementFactory {
-        createElement(element, bindData, context) {
-            return new ImgElement(element, bindData, context);
-        }
-    }
-    (() => {
-        // register factory instance
-        DataElementRegistry.register('img', new ImgElementFactory());
-    })();
-
     class InputElement extends ObjectElement {
         constructor(element, bindData, context) {
             super(element, bindData, context);
@@ -2187,6 +2177,16 @@ var duice = (function (exports) {
             }
         }
     }
+
+    class ImgElementFactory extends ObjectElementFactory {
+        createElement(element, bindData, context) {
+            return new ImgElement(element, bindData, context);
+        }
+    }
+    (() => {
+        // register factory instance
+        DataElementRegistry.register('img', new ImgElementFactory());
+    })();
 
     class InputDatetimeLocalElement extends InputElement {
         constructor(element, bindData, context) {

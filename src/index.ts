@@ -8,6 +8,7 @@ import {TabItem} from "./tab/TabItem";
 
 // export class
 export {Configuration} from "./Configuration";
+export {Initializer} from "./Initializer";
 export {ArrayProxy} from "./ArrayProxy";
 export {ObjectProxy} from "./ObjectProxy";
 export {DataElementRegistry} from "./DataElementRegistry"
