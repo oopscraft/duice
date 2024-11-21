@@ -1,19 +1,16 @@
-///<reference path="Event.ts"/>
-namespace duice.event {
+import {DataEvent} from "./DataEvent";
 
-    export class ItemSelectEvent extends Event {
+export class ItemSelectEvent extends DataEvent {
 
-        index: number;
+    index: number;
 
-        constructor(source: any, index: number){
-            super(source);
-            this.index = index;
-        }
+    constructor(source: any, index: number){
+        super(source);
+        this.index = index;
+    }
 
-        getIndex(): number {
-            return this.index;
-        }
-
+    getIndex(): number {
+        return this.index;
     }
 
 }

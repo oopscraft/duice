@@ -1,6 +1,6 @@
 {
   "name": "duice",
-  "version": "0.1.98",
+  "version": "0.2.0",
   "description": "DUICE(Data-oriented javascript UI Component Element)",
   "homepage": "http://duice.oopscraft.org",
   "author": "chomookun@gmail.com",
@@ -8,12 +8,26 @@
   "bugs": {
     "url": "https://github.com/oopscraft/duice/issues"
   },
-  "main": "./dist/duice.js",
-  "type": "module",
-  "dependencies": {
-    "copyfiles": "^2.4.1",
-    "jsdom": "^21.1.0",
-    "ts-node": "^10.9.1",
-    "typescript": "^4.8.4"
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "clean": "rimraf ./dist",
+    "compile": "tsc",
+    "bundle": "rollup -c",
+    "build": "npm run clean && npm run compile && npm run bundle"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.1",
+    "@rollup/plugin-multi-entry": "^6.0.1",
+    "@rollup/plugin-node-resolve": "^15.3.0",
+    "@types/node": "^22.9.1",
+    "rimraf": "^6.0.1",
+    "rollup": "^2.79.2",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "rollup-plugin-visualizer": "^5.12.0",
+    "typescript": "^5.6.3",
+    "undici": "^6.21.0",
+    "undici-types": "^6.21.0"
   }
 }

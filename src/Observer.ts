@@ -1,8 +1,8 @@
-namespace duice {
+import {DataEvent} from "./event/DataEvent";
+import {Observable} from "./Observable";
 
-    export interface Observer {
+export interface Observer {
 
-        update(observable: object, event: event.Event): void;
+    update(observable: Observable, dataEvent: DataEvent): void;
 
-    }
 }

@@ -1,55 +1,52 @@
-///<reference path="TabFolder.ts"/>
-namespace duice.tab {
+import {TabFolder} from "./TabFolder";
 
-    export class TabItem {
+export class TabItem {
 
-        button: HTMLElement;
+    button: HTMLElement;
 
-        content: HTMLElement;
+    content: HTMLElement;
 
-        listener: Function;
+    listener: Function;
 
-        tabFolder: TabFolder;
+    tabFolder: TabFolder;
 
-        tabIndex: number;
+    tabIndex: number;
 
-        constructor(button: HTMLElement, content: HTMLElement, listener: Function) {
-            this.button = button;
-            this.content = content;
-            this.listener = listener;
+    constructor(button: HTMLElement, content: HTMLElement, listener: Function) {
+        this.button = button;
+        this.content = content;
+        this.listener = listener;
 
-            // default style
-            button.style.cursor = 'pointer';
+        // default style
+        button.style.cursor = 'pointer';
 
-            // add listener
-            let _this = this;
-            button.addEventListener('click', () => {
-                _this.tabFolder.setActive(_this.tabIndex);
-            });
+        // add listener
+        let _this = this;
+        button.addEventListener('click', () => {
+            _this.tabFolder.setActive(_this.tabIndex);
+        });
 
-            // set de-active
-            this.setActive(false);
+        // set de-active
+        this.setActive(false);
+    }
+
+    setTabFolder(tabFolder: TabFolder): void {
+        this.tabFolder = tabFolder;
+    }
+
+    setTabIndex(tabIndex: number): void {
+        this.tabIndex = tabIndex;
+    }
+
+    setActive(active: boolean): void {
+        if(active) {
+            this.button.style.opacity = 'unset';
+            this.content.removeAttribute('hidden');
+            this.listener.call(this);
+        }else{
+            this.button.style.opacity = '0.5';
+            this.content.setAttribute('hidden', String(true));
         }
-
-        setTabFolder(tabFolder: TabFolder): void {
-            this.tabFolder = tabFolder;
-        }
-
-        setTabIndex(tabIndex: number): void {
-            this.tabIndex = tabIndex;
-        }
-
-        setActive(active: boolean): void {
-            if(active === true) {
-                this.button.style.opacity = 'unset';
-                this.content.removeAttribute('hidden');
-                this.listener.call(this);
-            }else{
-                this.button.style.opacity = '0.5';
-                this.content.setAttribute('hidden', String(true));
-            }
-        }
-
     }
 
 }

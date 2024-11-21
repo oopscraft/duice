@@ -1,22 +1,19 @@
-///<reference path="TabItem.ts"/>
-namespace duice.tab {
+import {TabItem} from "./TabItem";
 
-    export class TabFolder {
+export class TabFolder {
 
-        items: TabItem[] = [];
+    items: TabItem[] = [];
 
-        addItem(item: TabItem): void {
-            item.setTabFolder(this);
-            item.setTabIndex(this.items.length);
-            this.items.push(item);
+    addItem(item: TabItem): void {
+        item.setTabFolder(this);
+        item.setTabIndex(this.items.length);
+        this.items.push(item);
+    }
+
+    setActive(index: number): void {
+        for(let i = 0; i < this.items.length; i ++ ) {
+            this.items[i].setActive(i === index);
         }
-
-        setActive(index: number): void {
-            for(let i = 0; i < this.items.length; i ++ ) {
-                this.items[i].setActive(i === index);
-            }
-        }
-
     }
 
 }
