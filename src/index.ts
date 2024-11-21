@@ -19,6 +19,7 @@ export * from "./ArrayElement";
 export * from "./ArrayElementFactory";
 export * from "./CustomElement";
 export * from "./CustomElementFactory"
+export * from "./element/ImgElementFactory"
 export * from "./element/InputElementFactory"
 export * from "./element/SelectElementFactory"
 export * from "./element/TextareaElementFactory"
