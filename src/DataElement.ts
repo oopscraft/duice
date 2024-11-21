@@ -1,4 +1,4 @@
-import {assert, setElementAttribute} from "./commons";
+import {assert, setElementAttribute} from "./common";
 import {Observable} from "./Observable";
 import {Observer} from "./Observer";
 import {DataEvent} from "./event/DataEvent";

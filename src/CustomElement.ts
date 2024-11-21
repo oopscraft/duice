@@ -1,5 +1,5 @@
 import {DataElement} from "./DataElement";
-import {runExecuteCode, runIfCode} from "./commons";
+import {runExecuteCode, runIfCode} from "./common";
 import {Initializer} from "./Initializer";
 import {Observable} from "./Observable";
 import {DataHandler} from "./DataHandler";

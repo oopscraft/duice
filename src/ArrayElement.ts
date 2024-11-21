@@ -4,7 +4,7 @@ import {
     runExecuteCode,
     runIfCode,
     setElementAttribute
-} from "./commons";
+} from "./common";
 import {DataElement} from "./DataElement";
 import {ObjectProxy} from "./ObjectProxy";
 import {Initializer} from "./Initializer";

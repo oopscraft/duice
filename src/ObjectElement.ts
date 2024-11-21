@@ -1,4 +1,4 @@
-import {findVariable, getElementAttribute, runExecuteCode, runIfCode} from "./commons";
+import {findVariable, getElementAttribute, runExecuteCode, runIfCode} from "./common";
 import {DataElement} from "./DataElement";
 import {ObjectProxy} from "./ObjectProxy";
 import {Observable} from "./Observable";

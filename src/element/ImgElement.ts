@@ -1,5 +1,5 @@
 import {ObjectElement} from "../ObjectElement";
-import {getElementAttribute} from "../commons";
+import {getElementAttribute} from "../common";
 import {PropertyChangeEvent} from "../event/PropertyChangeEvent";
 
 export class ImgElement extends ObjectElement<HTMLImageElement> {

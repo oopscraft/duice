@@ -4,7 +4,7 @@ import {
     getElementQuerySelector,
     hasElementAttribute,
     setElementAttribute
-} from "./commons";
+} from "./common";
 import {DataElementRegistry} from "./DataElementRegistry";
 
 export class Initializer {

@@ -7,48 +7,27 @@ import {TabFolder} from "./tab/TabFolder";
 import {TabItem} from "./tab/TabItem";
 
 // export class
-export {Configuration} from "./Configuration";
-export {Initializer} from "./Initializer";
-export {ArrayProxy} from "./ArrayProxy";
-export {ObjectProxy} from "./ObjectProxy";
-export {DataElementRegistry} from "./DataElementRegistry"
-export {ObjectElement} from "./ObjectElement";
-export {ObjectElementFactory} from "./ObjectElementFactory";
-export {ArrayElement} from "./ArrayElement";
-export {ArrayElementFactory} from "./ArrayElementFactory";
-export {CustomElement} from "./CustomElement";
-export {CustomElementFactory} from "./CustomElementFactory"
-export * from "./commons"
-
-export function alert(message: string): AlertDialog {
-    return new AlertDialog(message);
-}
-
-export function confirm(message: string): ConfirmDialog {
-    return new ConfirmDialog(message);
-}
-
-export function prompt(message: string, type?: string): PromptDialog {
-    return new PromptDialog(message, type);
-}
-
-export function openDialog(dialogElement: HTMLDialogElement): Dialog {
-    return new Dialog(dialogElement);
-}
-
-export function tabFolder(...tabItems: TabItem[]): TabFolder {
-    let tab = new TabFolder();
-    if(tabItems) {
-        tabItems.forEach(tabItem => {
-            tab.addItem(tabItem);
-        });
-    }
-    return tab;
-}
-
-export function tabItem(button: HTMLElement, content: HTMLElement, listener: Function): TabItem {
-    return new TabItem(button, content, listener);
-}
+export * from "./common"
+export * from "./Configuration";
+export * from "./Initializer";
+export * from "./ArrayProxy";
+export * from "./ObjectProxy";
+export * from "./DataElementRegistry"
+export * from "./ObjectElement";
+export * from "./ObjectElementFactory";
+export * from "./ArrayElement";
+export * from "./ArrayElementFactory";
+export * from "./CustomElement";
+export * from "./CustomElementFactory"
+export * from "./element/InputElementFactory"
+export * from "./element/SelectElementFactory"
+export * from "./element/TextareaElementFactory"
+export * from "./dialog/Dialog";
+export * from "./dialog/AlertDialog";
+export * from "./dialog/ConfirmDialog";
+export * from "./dialog/PromptDialog";
+export * from "./tab/TabFolder";
+export * from "./tab/TabItem";
 
 //  listens DOMContentLoaded event
 if(globalThis.document) {

@@ -10,7 +10,7 @@
          * alertAwait
          */
         async function alertAwait() {
-            await duice.alert('<b>Hello~</b>\nThis is alert message!')
+            await new duice.AlertDialog('<b>Hello~</b>\nThis is alert message!')
                 .onOpening(() => alert("opening"))
                 .onOpened(() => alert("opened"))
                 .onClosing(() => alert("closing"))
@@ -23,7 +23,7 @@
          * alertThen
          */
         async function alertThen() {
-            duice.alert('<b>Hello~</b>\nThis is alert message!')
+            new duice.AlertDialog('<b>Hello~</b>\nThis is alert message!')
                 .onOpening(() => alert("opening"))
                 .onOpened(() => alert("opened"))
                 .onClosing(() => alert("closing"))
@@ -38,7 +38,7 @@
          * confirmAwait
          */
         async function confirmAwait() {
-            if (await duice.confirm('<b>Hello~</b>\nThis is confirm message!\nYes or No?')
+            if (await new duice.ConfirmDialog('<b>Hello~</b>\nThis is confirm message!\nYes or No?')
                 .onOpening(() => alert("opening"))
                 .onOpened(() => alert("opened"))
                 .onClosing(() => alert("closing"))
@@ -55,7 +55,7 @@
          * @returns {Promise<void>}
          */
         async function confirmThen() {
-            duice.confirm('<b>Hello~</b>\nThis is confirm message!\nYes or No?')
+            new duice.ConfirmDialog('<b>Hello~</b>\nThis is confirm message!\nYes or No?')
                 .onOpening(() => alert("opening"))
                 .onOpened(() => alert("opened"))
                 .onClosing(() => alert("closing"))
@@ -76,7 +76,7 @@
          * @returns {Promise<void>}
          */
         async function promptAwait() {
-            let name = await duice.prompt("<b>Hello~</b>\nWhat is your name?")
+            let name = await new duice.PromptDialog("<b>Hello~</b>\nWhat is your name?")
                 .onOpening(() => alert("opening"))
                 .onOpened(() => alert("opened"))
                 .onClosing(() => alert("closing"))
@@ -90,7 +90,7 @@
          * @returns {Promise<void>}
          */
         async function promptThen() {
-            duice.prompt("<b>Hello~</b>\nWhat is your name?")
+            new duice.PromptDialog("<b>Hello~</b>\nWhat is your name?")
                 .onOpening(() => alert("opening"))
                 .onOpened(() => alert("opened"))
                 .onClosing(() => alert("closing"))
@@ -106,7 +106,7 @@
          * @returns {Promise<void>}
          */
         async function openDialog() {
-            duice.openDialog(document.getElementById('myDialog'))
+            new duice.Dialog(document.getElementById('myDialog'))
                 .onOpening(() => alert("opening"))
                 .onOpened(() => alert("opened"))
                 .onClosing(() => alert("closing"))

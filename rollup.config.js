@@ -1,9 +1,8 @@
 import { terser } from "rollup-plugin-terser"; // 코드 압축
 import { visualizer } from "rollup-plugin-visualizer";
-import multiEntry from "@rollup/plugin-multi-entry";
 
 export default {
-    input: "dist/**/*.js",
+    input: "dist/index.js",
     output: [
         {
             file: "dist/duice.js",
@@ -20,7 +19,6 @@ export default {
         }
     ],
     plugins: [
-        multiEntry(),
         visualizer({
             filename: "./dist/bundle-analysis.html"
         })

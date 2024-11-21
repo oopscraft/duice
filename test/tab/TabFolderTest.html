@@ -5,27 +5,22 @@
     <script src="../../dist/duice.js"></script>
     <script>
         'use strict';
-        const pagination = new duice.ObjectProxy({
-            size: 10,
-            page: 1,
-            count: 123
-        });
 
         function gotoTab(message) {
             console.log(message);
         }
 
-
         document.addEventListener('DOMContentLoaded',() => {
             // tab
-            let tabFolder = duice.tabFolder(
-                duice.tabItem(document.getElementById('tabIndex1'), document.getElementById('tabContent1'), () => {
-                    gotoTab('tabContent1');
-                }),
-                duice.tabItem(document.getElementById('tabIndex2'), document.getElementById('tabContent2'), () => {
-                    gotoTab('tabContent2');
-                })
-            );
+            let tabFolder = new duice.TabFolder();
+            // tab item 1
+            tabFolder.addItem(new duice.TabItem(document.getElementById('tabIndex1'), document.getElementById('tabContent1'), () => {
+                gotoTab('tabContent1');
+            }));
+            // tab item 2
+            tabFolder.addItem(new duice.TabItem(document.getElementById('tabIndex2'), document.getElementById('tabContent2'), () => {
+                gotoTab('tabContent2');
+            }));
             tabFolder.setActive(0);
         });
 

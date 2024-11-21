@@ -1,4 +1,4 @@
-import {getElementAttribute} from "../commons";
+import {getElementAttribute} from "../common";
 import {InputElement} from "./InputElement";
 
 export class InputCheckboxElement extends InputElement {

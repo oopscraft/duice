@@ -1,5 +1,5 @@
 import {ArrayHandler} from "./ArrayHandler";
-import {assert} from "./commons";
+import {assert} from "./common";
 import {ObjectProxy} from "./ObjectProxy";
 import {DataEvent} from "./event/DataEvent";
 

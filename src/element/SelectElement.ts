@@ -1,5 +1,5 @@
 import {ObjectElement} from "../ObjectElement";
-import {findVariable, getElementAttribute} from "../commons";
+import {findVariable, getElementAttribute} from "../common";
 import {Observable} from "../Observable";
 import {DataEvent} from "../event/DataEvent";
 import {PropertyChangeEvent} from "../event/PropertyChangeEvent";

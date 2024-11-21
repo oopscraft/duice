@@ -1,6 +1,6 @@
 import {ObjectHandler} from "./ObjectHandler";
 import {ArrayProxy} from "./ArrayProxy";
-import {assert} from "./commons";
+import {assert} from "./common";
 import {DataEvent} from "./event/DataEvent";
 
 export class ObjectProxy extends globalThis.Object {
