@@ -131,7 +131,8 @@ export class ArrayElement<T extends HTMLElement> extends DataElement<T, object[]
             this.itemHtmlElements.push(itemHtmlElement);
 
             // append to slot
-            this.slot.appendChild(itemHtmlElement);
+            // this.slot.appendChild(itemHtmlElement);
+            this.slot.parentNode.insertBefore(itemHtmlElement, this.slot);
 
             // check if
             runIfCode(itemHtmlElement, context);
@@ -176,7 +177,7 @@ export class ArrayElement<T extends HTMLElement> extends DataElement<T, object[]
         this.itemHtmlElements.push(itemHtmlElement);
 
         // insert into slot
-        this.slot.appendChild(itemHtmlElement);
+        this.slot.parentNode.insertBefore(itemHtmlElement, this.slot);
 
         // check if clause
         runIfCode(itemHtmlElement, context);

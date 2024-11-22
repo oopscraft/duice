@@ -102,7 +102,7 @@
         // property changing listener
         duice.ArrayProxy.onPropertyChanging(myArray, async event => {
             if(event.getProperty() === 'name') {
-                if(!await duice.confirm(`Do you want to change [${event.getProperty()}] is [${event.getValue()}]`)){
+                if(!await new duice.ConfirmDialog(`Do you want to change [${event.getProperty()}] is [${event.getValue()}]`)){
                     return false;
                 }
             }
@@ -115,7 +115,7 @@
 
         // row inserting listener
         duice.ArrayProxy.onRowInserting(myArray, async event => {
-            if(!await duice.confirm(`insert [${event.getIndex()}]${JSON.stringify(event.getItems())}`)){
+            if(!await new duice.ConfirmDialog(`insert [${event.getIndex()}]${JSON.stringify(event.getItems())}`)){
                 return false;
             }
         });
@@ -127,7 +127,7 @@
 
         // row deleting listener
         duice.ArrayProxy.onRowDeleting(myArray, async event => {
-            if(!await duice.confirm(`delete [${event.getIndex()}]${JSON.stringify(event.getItems())}`)){
+            if(!await new duice.ConfirmDialog(`delete [${event.getIndex()}]${JSON.stringify(event.getItems())}`)){
                 return false;
             }
         });
