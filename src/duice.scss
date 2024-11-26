@@ -1,0 +1,229 @@
+
+// convert unit value
+@function unit-value($i, $unit) {
+  @return #{$i}#{if($i == 0, '', $unit)};
+}
+
+/* grid */
+.display--grid {
+  display: grid;
+  grid-auto-rows: min-content;
+}
+
+/* grid-template-columns */
+@for $i from 1 through 12 {
+  .grid-template-columns--#{$i}fr {
+    grid-template-columns: repeat($i, 1fr);
+  }
+}
+
+/* grid-span */
+@for $i from 1 through 12 {
+  .grid-column--span-#{$i} {
+    grid-column: span #{$i};
+  }
+}
+
+/* flex */
+.display--flex {
+  display: flex;
+  display: -ms-flexbox;
+}
+
+/* flex-direction */
+@each $value in row row-reverse column column-reverse {
+  .flex-direction--#{$value} {
+    flex-direction: #{$value};
+  }
+}
+
+/* flex-wrap */
+@each $value in wrap nowrap {
+  .flex-wrap--#{$value} {
+    flex-wrap: #{$value};
+  }
+}
+
+/* gap, row-gap, column-gap */
+@for $i from 1 through 3 {
+  @each $unit in px rem em{
+    $value: unit-value($i, $unit);
+    .gap--#{$value} {
+      gap: #{$value};
+    }
+  }
+}
+
+/* row-gap */
+@for $i from 1 through 3 {
+  @each $unit in px rem em{
+    $value: unit-value($i, $unit);
+    .row-gap--#{$value} {
+      row-gap: #{$value};
+    }
+  }
+}
+
+/* column-gap */
+@for $i from 0 through 3 {
+  @each $unit in px rem em{
+    $value: unit-value($i, $unit);
+    .column-gap--#{$value} {
+      column-gap: #{$value};
+    }
+  }
+}
+
+/* justify-content */
+@each $value in start center end space-between space-around space-evenly {
+  .justify-content--#{$value} {
+    justify-content: #{$value};
+  }
+}
+
+/* align-item */
+@each $value in start center end {
+  .align-items--#{$value} {
+    align-items: #{$value};
+  }
+}
+
+/* justify-self */
+@each $value in start center end {
+  .justify-self--#{$value} {
+    justify-self: #{$value};
+  }
+}
+
+/* align-self */
+@each $value in start center end {
+  .align-self--#{$value} {
+    align-self: #{$value};
+  }
+}
+
+/* margin */
+@for $i from 0 through 3 {
+  @each $unit in px rem em {
+    $value: unit-value($i, $unit);
+    .margin--#{$value} {
+      margin: #{$value};
+    }
+    // with direction
+    @each $direction in top right bottom left {
+      .margin-#{$direction}--#{$value} {
+        margin-#{$direction}: #{$value};
+      }
+    }
+  }
+}
+
+/* padding */
+@for $i from 0 through 3 {
+  @each $unit in px rem em {
+    $value: unit-value($i, $unit);
+    .padding--#{$value} {
+      padding: #{$value};
+    }
+    // with direction
+    @each $direction in top right bottom left {
+      .padding-#{$direction}--#{$value} {
+        padding-#{$direction}: #{$value};
+      }
+    }
+  }
+}
+
+/* border */
+.border--none {
+  border: none;
+}
+
+/* border-style */
+@each $value in solid dotted dashed groove double {
+  .border-style--#{$value} {
+    border-style: #{$value};
+  }
+}
+
+/* border-width */
+@for $i from 0 through 3 {
+  @each $unit in px rem em {
+    $value: unit-value($i, $unit);
+    .border-width--#{$value} {
+      border-width: #{$value};
+    }
+    // with direction
+    @each $direction in top right bottom left {
+      .border-#{$direction}-width--#{$value} {
+        border-#{$direction}-width: #{$value};
+      }
+    }
+  }
+}
+
+/* font-size */
+@for $i from 1 through 3 {
+  @each $unit in rem em {
+    $value: #{$i}#{$unit};
+    .font-size--#{$value} {
+      font-size: #{$value};
+    }
+  }
+}
+// with keyword
+@each $value in smaller larger xx-small x-small small medium x-large xx-large {
+  .font-size--#{$value} {
+    font-size: #{$value};
+  }
+}
+
+/* width */
+@for $i from 1 through 10 {
+  $value: $i*10;
+  .width--#{$value} {
+    width: #{$value + '%'};
+  }
+  .width--#{$value}vw {
+    width: #{$value + 'vw'};
+  }
+}
+@for $i from 1 through 3 {
+  @each $unit in rem em {
+    .width--#{$i + $unit} {
+      width: #{$i + $unit};
+    }
+  }
+}
+
+/* height */
+@for $i from 1 through 10 {
+  $value: $i*10;
+  .height--#{$value} {
+    height: #{$value + '%'};
+  }
+  .height--#{$value}vh {
+    height: #{$value + 'vh'};
+  }
+}
+@for $i from 1 through 3 {
+  @each $unit in rem em {
+    .height--#{$i + $unit} {
+      height: #{$i + $unit};
+    }
+  }
+}
+
+/* text-align */
+@each $value in left center right {
+  .text-align--#{$value} {
+    text-align: #{$value};
+  }
+}
+
+/* cursor */
+@each $value in pointer now-allowed move {
+  .cursor--#{$value} {
+    cursor: #{$value};
+  }
+}
