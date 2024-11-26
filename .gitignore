@@ -10,3 +10,5 @@ dist/*
 !dist/duice.js.map
 !dist/duice.min.js
 !dist/duice.min.js.map
+!dist/*.css
+!dist/*.css.map

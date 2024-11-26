@@ -1,0 +1,163 @@
+:root {
+  --nudus-background: white;
+  --nudus-font-family: sans-serif,monospace;
+  --nudus-font-size: 12px;
+  --nudus-line-height: 2.5rem;
+  --nudus-table-border: solid 1px #ccc;
+  --nudus-table-thead-background: #f7f7f7;
+  --nudus-table-thead-border: solid 1px #ddd;
+  --nudus-table-tbody-background: transparent;
+  --nudus-table-tbody-border: solid 1px #ddd;
+  --nudus-table-tbody-hover-background: #f7f7f7;
+  --nudus-form-border: solid 1px #eee;
+  --nudus-form-padding: 1rem;
+  --nudus-input-border: solid 1px #ccc;
+  --nudus-select-border: solid 1px #ccc;
+  --nudus-select-icon: url("data:image/svg+xml;utf8,<svg viewBox='0 0 140 140' width='10' height='10' xmlns='http://www.w3.org/2000/svg'><g><path d='m121.3,34.6c-1.6-1.6-4.2-1.6-5.8,0l-51,51.1-51.1-51.1c-1.6-1.6-4.2-1.6-5.8,0-1.6,1.6-1.6,4.2 0,5.8l53.9,53.9c0.8,0.8 1.8,1.2 2.9,1.2 1,0 2.1-0.4 2.9-1.2l53.9-53.9c1.7-1.6 1.7-4.2 0.1-5.8z' fill='darkgray'/></g></svg>");
+  --nudus-textarea-border: solid 1px #ccc;
+  --nudus-button-border: solid 1px #aaa;
+  --nudus-button-background: #f7f7f7;
+}
+
+:root.dark-mode {
+}
+
+/* html */
+html {
+  background: var(--nudus-background);
+  line-height: var(--nudus-line-height);
+  font-family: var(--nudus-font-family);
+  font-size: var(--nudus-font-size);
+}
+
+/* h1,2,3... */
+@for $i from 1 through 6 {
+  h#{$i} {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
+
+/* table */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  border: var(--nudus-element-border);
+  border-width: initial;
+}
+table thead {
+  background: var(--nudus-table-thead-background);
+}
+table thead tr th {
+  font-family: var(--nudus-font-family);
+  font-size: var(--nudus-font-size);
+  border: var(--nudus-table-thead-border);
+  padding-left: calc(var(--nudus-line-height) / 3);
+  padding-right: calc(var(--nudus-line-height) / 3);
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+table tbody tr td {
+  font-family: var(--nudus-font-family);
+  font-size: var(--nudus-font-size);
+  border: var(--nudus-table-tbody-border);
+  padding-left: calc(var(--nudus-line-height) / 3);
+  padding-right: calc(var(--nudus-line-height) / 3);
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+table thead th:has(button,input,select,textarea,table),
+table tbody td:has(button,input,select,textarea,table) {
+  padding-left: 1px;
+  padding-right: 1px;
+}
+
+/* form */
+form {
+  border: var(--nudus-form-border);
+  padding: var(--nudus-form-padding);
+}
+
+/* input */
+input {
+  font-family: var(--nudus-font-family);
+  font-size: var(--nudus-font-size);
+  border: var(--nudus-input-border);
+  box-sizing: border-box;
+  height: var(--nudus-line-height);
+  padding-left: calc(var(--nudus-line-height) / 3);
+  padding-right: calc(var(--nudus-line-height) / 3);
+}
+
+/* input-checkbox */
+input[type='checkbox'] {
+  margin: 0;
+  height: unset;
+  vertical-align: middle;
+}
+
+/* input-radio */
+input[type='radio'] {
+  margin: 0;
+  height: unset;
+  vertical-align: sub;
+}
+
+/* select */
+select {
+  font-family: var(--nudus-font-family);
+  font-size: var(--nudus-font-size);
+  appearance: none;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: var(--nudus-select-border);
+  box-sizing: border-box;
+  height: var(--nudus-line-height);
+  padding-left: calc(var(--nudus-line-height) / 3);
+  background-color: inherit;
+  background-image: var(--nudus-select-icon);
+  background-repeat: no-repeat;
+  background-position: right 0.5em center;
+  padding-right: var(--nudus-line-height);
+}
+
+/* textarea */
+textarea {
+  font-family: var(--nudus-font-family);
+  font-size: var(--nudus-font-size);
+  line-height: var(--nudus-line-height);
+  border: var(--nudus-textarea-border);
+  box-sizing: border-box;
+  background-color: transparent;
+  padding-left: calc(var(--nudus-line-height) / 3);
+  padding-right: calc(var(--nudus-line-height) / 3);
+  white-space: pre;
+  overflow-y: auto;
+  resize: none;
+}
+
+/* button */
+button {
+  display: inline-block;
+  font-family: var(--nudus-font-family);
+  font-size: var(--nudus-font-size);
+  height: var(--nudus-line-height);
+  padding-left: calc(var(--nudus-line-height) / 3);
+  padding-right: calc(var(--nudus-line-height) / 3);
+  cursor: pointer;
+  border: var(--nudus-button-border);
+  background: var(--nudus-button-background);
+}
+button:disabled {
+  pointer-events: none;
+  cursor: not-allowed;
+}
+button:hover:not([disabled]) {
+  box-shadow: rgba(6, 22, 33, 0.3) 1px 1px 1px;
+}
+
+
