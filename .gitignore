@@ -12,3 +12,8 @@ dist/*
 !dist/duice.min.js.map
 !dist/*.css
 !dist/*.css.map
+
+# hugo
+theme
+site
+
