@@ -2,10 +2,18 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Dialog Test</title>
     <script src="../../dist/duice.js"></script>
+    <link rel="stylesheet" href="../../dist/duice.css"/>
+    <link rel="stylesheet" href="../../dist/duice-theme.css"/>
+    <style>
+        pre {
+            overflow: auto;
+        }
+    </style>
     <script>
         'use strict';
-
         /**
          * alertAwait
          */
@@ -136,47 +144,57 @@
 <body>
 <h1>Dialog Test</h1>
 
+
 <!-- alert -->
-<h2>Alert</h2>
-<h3>await style</h3>
-<pre id="alertAwaitCode" class="font-weight-light"></pre>
-<button onclick="alertAwait();">alertAwait</button>
-<h3>then style</h3>
-<pre id="alertThenCode" class="font-weight-light"></pre>
-<button onclick="alertThen();">alertThen</button>
+<div>
+    <h2>Alert</h2>
+    <h3>await style</h3>
+    <pre><code id="alertAwaitCode"></code></pre>
+    <button onclick="alertAwait();">alertAwait</button>
+    <h3>then style</h3>
+    <pre><code id="alertThenCode"></code></pre>
+    <button onclick="alertThen();">alertThen</button>
+</div>
 
 <!-- confirm -->
-<h2>Confirm</h2>
-<h3>await style</h3>
-<pre id="confirmAwaitCode" class="font-weight-light"></pre>
-<button onclick="confirmAwait();">confirmAwait</button>
-<h3>then style</h3>
-<pre id="confirmThenCode" class="font-weight-light"></pre>
-<button onclick="confirmThen();">confirmThen</button>
+<div>
+    <h2>Confirm</h2>
+    <h3>await style</h3>
+    <pre><code id="confirmAwaitCode"></code></pre>
+    <button onclick="confirmAwait();">confirmAwait</button>
+    <h3>then style</h3>
+    <pre><code id="confirmThenCode"></code></pre>
+    <button onclick="confirmThen();">confirmThen</button>
+</div>
 
 <!-- prompt -->
-<h2>Prompt</h2>
-<h3>await style</h3>
-<pre id="promptAwaitCode" class="font-weight-light"></pre>
-<button onclick="promptAwait();">promptAwait</button>
-<h3>then style</h3>
-<pre id="promptThenCode" class="font-weight-light"></pre>
-<button onclick="promptThen();">promptThen</button>
+<div>
+    <h2>Prompt</h2>
+    <h3>await style</h3>
+    <pre><code id="promptAwaitCode"></code></pre>
+    <button onclick="promptAwait();">promptAwait</button>
+    <h3>then style</h3>
+    <pre><code id="promptThenCode"></code></pre>
+    <button onclick="promptThen();">promptThen</button>
+</div>
 
 <!-- dialog -->
-<h2>Custom Dialog</h2>
-<h3>HTML</h3>
-<pre id="dialogHtml" class="font-weight-light"></pre>
-<h3>Javascript</h3>
-<pre id="dialogCode" class="font-weight-light"></pre>
-<button onclick="openDialog();">openDialog</button>
-<dialog id="myDialog">
-    <pre style="width:400px; height:400px;">
-        Custom Dialog
-        fdsafdsa
-        fdsafdsafdsa
-        fdsafdsafdsafdsa
-    </pre>
-</dialog>
+<div>
+    <h2>Custom Dialog</h2>
+    <h3>HTML</h3>
+    <pre><code id="dialogHtml"></code></pre>
+    <h3>Javascript</h3>
+    <pre><code id="dialogCode"></code></pre>
+    <button onclick="openDialog();">openDialog</button>
+    <dialog id="myDialog">
+        <pre style="width:400px; height:400px;">
+            Custom Dialog
+            fdsafdsa
+            fdsafdsafdsa
+            fdsafdsafdsafdsa
+        </pre>
+    </dialog>
+</div>
+
 </body>
 </html>

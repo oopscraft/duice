@@ -1,22 +1,23 @@
 :root {
-  --nudus-background: white;
-  --nudus-font-family: sans-serif,monospace;
-  --nudus-font-size: 12px;
-  --nudus-line-height: 2.5rem;
-  --nudus-table-border: solid 1px #ccc;
-  --nudus-table-thead-background: #f7f7f7;
-  --nudus-table-thead-border: solid 1px #ddd;
-  --nudus-table-tbody-background: transparent;
-  --nudus-table-tbody-border: solid 1px #ddd;
-  --nudus-table-tbody-hover-background: #f7f7f7;
-  --nudus-form-border: solid 1px #eee;
-  --nudus-form-padding: 1rem;
-  --nudus-input-border: solid 1px #ccc;
-  --nudus-select-border: solid 1px #ccc;
-  --nudus-select-icon: url("data:image/svg+xml;utf8,<svg viewBox='0 0 140 140' width='10' height='10' xmlns='http://www.w3.org/2000/svg'><g><path d='m121.3,34.6c-1.6-1.6-4.2-1.6-5.8,0l-51,51.1-51.1-51.1c-1.6-1.6-4.2-1.6-5.8,0-1.6,1.6-1.6,4.2 0,5.8l53.9,53.9c0.8,0.8 1.8,1.2 2.9,1.2 1,0 2.1-0.4 2.9-1.2l53.9-53.9c1.7-1.6 1.7-4.2 0.1-5.8z' fill='darkgray'/></g></svg>");
-  --nudus-textarea-border: solid 1px #ccc;
-  --nudus-button-border: solid 1px #aaa;
-  --nudus-button-background: #f7f7f7;
+  --duice-background: white;
+  --duice-font-family: sans-serif,monospace;
+  --duice-font-size: 12px;
+  --duice-line-height: 2.5rem;
+  --duice-table-border: solid 1px #ddd;
+  --duice-table-thead-background: #f7f7f7;
+  --duice-table-thead-border: solid 1px #eee;
+  --duice-table-tbody-background: transparent;
+  --duice-table-tbody-border: solid 1px #eee;
+  --duice-table-tbody-hover-background: #f7f7f7;
+  --duice-input-border: solid 1px #ddd;
+  --duice-select-border: solid 1px #ddd;
+  --duice-select-icon: url("data:image/svg+xml;utf8,<svg viewBox='0 0 140 140' width='10' height='10' xmlns='http://www.w3.org/2000/svg'><g><path d='m121.3,34.6c-1.6-1.6-4.2-1.6-5.8,0l-51,51.1-51.1-51.1c-1.6-1.6-4.2-1.6-5.8,0-1.6,1.6-1.6,4.2 0,5.8l53.9,53.9c0.8,0.8 1.8,1.2 2.9,1.2 1,0 2.1-0.4 2.9-1.2l53.9-53.9c1.7-1.6 1.7-4.2 0.1-5.8z' fill='darkgray'/></g></svg>");
+  --duice-textarea-border: solid 1px #ddd;
+  --duice-button-border: solid 1px #aaa;
+  --duice-button-background: #f7f7f7;
+  --duice-element-focus-border: solid 1px black;
+  --duice-element-focus-transition: all .2s ease-out;
+  --duice-dialog-border: solid 1px gray;
 }
 
 :root.dark-mode {
@@ -24,10 +25,10 @@
 
 /* html */
 html {
-  background: var(--nudus-background);
-  line-height: var(--nudus-line-height);
-  font-family: var(--nudus-font-family);
-  font-size: var(--nudus-font-size);
+  background: var(--duice-background);
+  line-height: var(--duice-line-height);
+  font-family: var(--duice-font-family);
+  font-size: var(--duice-font-size);
 }
 
 /* h1,2,3... */
@@ -42,28 +43,28 @@ html {
 table {
   border-collapse: collapse;
   border-spacing: 0;
-  border: var(--nudus-element-border);
+  border: var(--duice-table-border);
   border-width: initial;
 }
 table thead {
-  background: var(--nudus-table-thead-background);
+  background: var(--duice-table-thead-background);
 }
 table thead tr th {
-  font-family: var(--nudus-font-family);
-  font-size: var(--nudus-font-size);
-  border: var(--nudus-table-thead-border);
-  padding-left: calc(var(--nudus-line-height) / 3);
-  padding-right: calc(var(--nudus-line-height) / 3);
+  font-family: var(--duice-font-family);
+  font-size: var(--duice-font-size);
+  border: var(--duice-table-thead-border);
+  padding-left: calc(var(--duice-line-height) / 3);
+  padding-right: calc(var(--duice-line-height) / 3);
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
 }
 table tbody tr td {
-  font-family: var(--nudus-font-family);
-  font-size: var(--nudus-font-size);
-  border: var(--nudus-table-tbody-border);
-  padding-left: calc(var(--nudus-line-height) / 3);
-  padding-right: calc(var(--nudus-line-height) / 3);
+  font-family: var(--duice-font-family);
+  font-size: var(--duice-font-size);
+  border: var(--duice-table-tbody-border);
+  padding-left: calc(var(--duice-line-height) / 3);
+  padding-right: calc(var(--duice-line-height) / 3);
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -74,21 +75,20 @@ table tbody td:has(button,input,select,textarea,table) {
   padding-right: 1px;
 }
 
-/* form */
-form {
-  border: var(--nudus-form-border);
-  padding: var(--nudus-form-padding);
-}
-
 /* input */
 input {
-  font-family: var(--nudus-font-family);
-  font-size: var(--nudus-font-size);
-  border: var(--nudus-input-border);
+  font-family: var(--duice-font-family);
+  font-size: var(--duice-font-size);
+  border: var(--duice-input-border);
   box-sizing: border-box;
-  height: var(--nudus-line-height);
-  padding-left: calc(var(--nudus-line-height) / 3);
-  padding-right: calc(var(--nudus-line-height) / 3);
+  height: var(--duice-line-height);
+  padding-left: calc(var(--duice-line-height) / 3);
+  padding-right: calc(var(--duice-line-height) / 3);
+}
+input:focus {
+  outline: none;
+  border: var(--duice-element-focus-border);
+  transition: var(--duice-element-focus-transition);
 }
 
 /* input-checkbox */
@@ -107,57 +107,78 @@ input[type='radio'] {
 
 /* select */
 select {
-  font-family: var(--nudus-font-family);
-  font-size: var(--nudus-font-size);
+  font-family: var(--duice-font-family);
+  font-size: var(--duice-font-size);
   appearance: none;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   -webkit-appearance: none;
   -moz-appearance: none;
-  border: var(--nudus-select-border);
+  border: var(--duice-select-border);
   box-sizing: border-box;
-  height: var(--nudus-line-height);
-  padding-left: calc(var(--nudus-line-height) / 3);
+  height: var(--duice-line-height);
+  padding-left: calc(var(--duice-line-height) / 3);
   background-color: inherit;
-  background-image: var(--nudus-select-icon);
+  background-image: var(--duice-select-icon);
   background-repeat: no-repeat;
   background-position: right 0.5em center;
-  padding-right: var(--nudus-line-height);
+  padding-right: var(--duice-line-height);
+}
+select:focus {
+  outline: none;
+  border: var(--duice-element-focus-border);
+  transition: var(--duice-element-focus-transition);
 }
 
 /* textarea */
 textarea {
-  font-family: var(--nudus-font-family);
-  font-size: var(--nudus-font-size);
-  line-height: var(--nudus-line-height);
-  border: var(--nudus-textarea-border);
+  font-family: var(--duice-font-family);
+  font-size: var(--duice-font-size);
+  line-height: var(--duice-line-height);
+  border: var(--duice-textarea-border);
   box-sizing: border-box;
   background-color: transparent;
-  padding-left: calc(var(--nudus-line-height) / 3);
-  padding-right: calc(var(--nudus-line-height) / 3);
+  padding-left: calc(var(--duice-line-height) / 3);
+  padding-right: calc(var(--duice-line-height) / 3);
   white-space: pre;
   overflow-y: auto;
   resize: none;
+}
+textarea:focus {
+  outline: none;
+  border: var(--duice-element-focus-border);
+  transition: var(--duice-element-focus-transition);
 }
 
 /* button */
 button {
   display: inline-block;
-  font-family: var(--nudus-font-family);
-  font-size: var(--nudus-font-size);
-  height: var(--nudus-line-height);
-  padding-left: calc(var(--nudus-line-height) / 3);
-  padding-right: calc(var(--nudus-line-height) / 3);
+  font-family: var(--duice-font-family);
+  font-size: var(--duice-font-size);
+  height: var(--duice-line-height);
+  padding-left: calc(var(--duice-line-height) / 3);
+  padding-right: calc(var(--duice-line-height) / 3);
   cursor: pointer;
-  border: var(--nudus-button-border);
-  background: var(--nudus-button-background);
+  border: var(--duice-button-border);
+  background: var(--duice-button-background);
 }
 button:disabled {
   pointer-events: none;
   cursor: not-allowed;
 }
-button:hover:not([disabled]) {
+button:hover:not([disabled]),
+button:focus:not([disabled]) {
+  outline: none;
   box-shadow: rgba(6, 22, 33, 0.3) 1px 1px 1px;
+  border: var(--duice-element-focus-border);
+  transition: var(--duice-element-focus-transition);
 }
 
-
+/* dialog */
+dialog {
+  border: var(--duice-dialog-border);
+  box-shadow: rgba(6, 22, 33, 0.3) 1px 1px 1px;
+}
+dialog:focus {
+  outline: none;
+}
