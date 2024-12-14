@@ -1212,6 +1212,14 @@
   font-size: 3em;
 }
 
+.font-size--small {
+  font-size: small;
+}
+
+.font-size--large {
+  font-size: large;
+}
+
 .font-size--smaller {
   font-size: smaller;
 }
@@ -2393,6 +2401,12 @@
   }
   .s__font-size--3em {
     font-size: 3em;
+  }
+  .s__font-size--small {
+    font-size: small;
+  }
+  .s__font-size--large {
+    font-size: large;
   }
   .s__font-size--smaller {
     font-size: smaller;

@@ -207,7 +207,7 @@
     }
   }
   // with keyword
-  @each $value in smaller larger xx-small x-small small medium x-large xx-large {
+  @each $value in small large smaller larger xx-small x-small small medium x-large xx-large {
     .#{$prefix}font-size--#{$value} {
       font-size: #{$value};
     }

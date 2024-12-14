@@ -72,7 +72,6 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
   border: var(--duice-table-border);
-  border-width: initial;
   text-align: left;
 }
 
@@ -91,10 +90,23 @@ table thead tr th {
   white-space: nowrap;
 }
 
+table thead tr:first-of-type th {
+  border-top: none;
+}
+
+table thead tr th:first-of-type {
+  border-left: none;
+}
+
+table thead tr th:last-of-type {
+  border-right: none;
+}
+
 table tbody tr td {
   font-family: var(--duice-font-family);
   font-size: var(--duice-font-size);
   border: var(--duice-table-tbody-border);
+  border-bottom: none;
   padding-left: var(--duice-element-padding);
   padding-right: var(--duice-element-padding);
   text-overflow: ellipsis;
@@ -102,8 +114,36 @@ table tbody tr td {
   white-space: nowrap;
 }
 
-table thead th:has(button, input, select, textarea, table),
-table tbody td:has(button, input, select, textarea, table) {
+table tbody tr td:first-of-type {
+  border-left: none;
+}
+
+table tbody tr td:last-of-type {
+  border-right: none;
+}
+
+table tfoot tr td {
+  font-family: var(--duice-font-family);
+  font-size: var(--duice-font-size);
+  border: var(--duice-table-tbody-border);
+  border-bottom: none;
+  padding-left: var(--duice-element-padding);
+  padding-right: var(--duice-element-padding);
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+table tfoot tr td:first-of-type {
+  border-left: none;
+}
+
+table tfoot tr td:last-of-type {
+  border-right: none;
+}
+
+table th:has(button, input, select, textarea, table),
+table td:has(button, input, select, textarea, table) {
   padding-left: 1px;
   padding-right: 1px;
 }
