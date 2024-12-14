@@ -142,8 +142,8 @@ table tfoot tr td:last-of-type {
   border-right: none;
 }
 
-table th:has(button, input, select, textarea, table),
-table td:has(button, input, select, textarea, table) {
+table tr th:has(button, input, select, textarea, table),
+table tr td:has(button, input, select, textarea, table) {
   padding-left: 1px;
   padding-right: 1px;
 }
