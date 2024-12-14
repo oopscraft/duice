@@ -5,7 +5,7 @@
   --duice-line-height: 2.5rem;
   --duice-table-border: solid 1px #ddd;
   --duice-table-thead-background: #f7f7f7;
-  --duice-table-thead-border: solid 1px #eee;
+  --duice-table-thead-border: solid 1px #ddd;
   --duice-table-tbody-background: transparent;
   --duice-table-tbody-border: solid 1px #eee;
   --duice-table-tbody-hover-background: #f7f7f7;
@@ -15,8 +15,10 @@
   --duice-textarea-border: solid 1px #ddd;
   --duice-button-border: solid 1px #aaa;
   --duice-button-background: #f7f7f7;
+  --duice-element-padding: calc((var(--duice-line-height) - var(--duice-font-size)) / 2 - 2px);
   --duice-element-focus-border: solid 1px black;
   --duice-element-focus-transition: all .2s ease-out;
+  --duice-element-box-shadow: rgba(128, 128, 128, 0.5) 1px 1px 1px;
   --duice-dialog-border: solid 1px gray;
 }
 
@@ -31,11 +33,17 @@ html {
   font-size: var(--duice-font-size);
 }
 
+/* body */
+body {
+  margin: 0;
+  padding: 0;
+}
+
 /* h1,2,3... */
 @for $i from 1 through 6 {
   h#{$i} {
-    margin-top: 0;
-    margin-bottom: 0;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
   }
 }
 
@@ -45,6 +53,7 @@ table {
   border-spacing: 0;
   border: var(--duice-table-border);
   border-width: initial;
+  text-align: left;
 }
 table thead {
   background: var(--duice-table-thead-background);
@@ -53,8 +62,8 @@ table thead tr th {
   font-family: var(--duice-font-family);
   font-size: var(--duice-font-size);
   border: var(--duice-table-thead-border);
-  padding-left: calc(var(--duice-line-height) / 3);
-  padding-right: calc(var(--duice-line-height) / 3);
+  padding-left: var(--duice-element-padding);
+  padding-right: var(--duice-element-padding);
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -63,8 +72,8 @@ table tbody tr td {
   font-family: var(--duice-font-family);
   font-size: var(--duice-font-size);
   border: var(--duice-table-tbody-border);
-  padding-left: calc(var(--duice-line-height) / 3);
-  padding-right: calc(var(--duice-line-height) / 3);
+  padding-left: var(--duice-element-padding);
+  padding-right: var(--duice-element-padding);
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -81,9 +90,7 @@ input {
   font-size: var(--duice-font-size);
   border: var(--duice-input-border);
   box-sizing: border-box;
-  height: var(--duice-line-height);
-  padding-left: calc(var(--duice-line-height) / 3);
-  padding-right: calc(var(--duice-line-height) / 3);
+  padding: var(--duice-element-padding);
 }
 input:focus {
   outline: none;
@@ -116,8 +123,7 @@ select {
   -moz-appearance: none;
   border: var(--duice-select-border);
   box-sizing: border-box;
-  height: var(--duice-line-height);
-  padding-left: calc(var(--duice-line-height) / 3);
+  padding: var(--duice-element-padding);
   background-color: inherit;
   background-image: var(--duice-select-icon);
   background-repeat: no-repeat;
@@ -134,12 +140,11 @@ select:focus {
 textarea {
   font-family: var(--duice-font-family);
   font-size: var(--duice-font-size);
-  line-height: var(--duice-line-height);
+  line-height: calc(var(--duice-line-height) / 1.5);
   border: var(--duice-textarea-border);
   box-sizing: border-box;
   background-color: transparent;
-  padding-left: calc(var(--duice-line-height) / 3);
-  padding-right: calc(var(--duice-line-height) / 3);
+  padding: var(--duice-element-padding);
   white-space: pre;
   overflow-y: auto;
   resize: none;
@@ -153,11 +158,10 @@ textarea:focus {
 /* button */
 button {
   display: inline-block;
+  white-space: nowrap;
   font-family: var(--duice-font-family);
   font-size: var(--duice-font-size);
-  height: var(--duice-line-height);
-  padding-left: calc(var(--duice-line-height) / 3);
-  padding-right: calc(var(--duice-line-height) / 3);
+  padding: var(--duice-element-padding);
   cursor: pointer;
   border: var(--duice-button-border);
   background: var(--duice-button-background);
@@ -169,7 +173,7 @@ button:disabled {
 button:hover:not([disabled]),
 button:focus:not([disabled]) {
   outline: none;
-  box-shadow: rgba(6, 22, 33, 0.3) 1px 1px 1px;
+  box-shadow: var(--duice-element-box-shadow);
   border: var(--duice-element-focus-border);
   transition: var(--duice-element-focus-transition);
 }
@@ -177,8 +181,23 @@ button:focus:not([disabled]) {
 /* dialog */
 dialog {
   border: var(--duice-dialog-border);
-  box-shadow: rgba(6, 22, 33, 0.3) 1px 1px 1px;
+  box-shadow: var(--duice-element-box-shadow);
 }
 dialog:focus {
   outline: none;
+}
+
+/* scrollbar */
+::-webkit-scrollbar {
+  width: 2px;
+  height: 0;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }

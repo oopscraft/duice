@@ -52,6 +52,13 @@
     }
   }
 
+  /* flex */
+  @for $i from 0 through 12 {
+    .#{$prefix}flex--#{$i} {
+      flex: $i;
+    }
+  }
+
   /* gap, row-gap, column-gap */
   @for $i from 1 through 3 {
     @each $unit in px rem em{
@@ -139,6 +146,13 @@
           padding-#{$direction}: #{$value};
         }
       }
+    }
+  }
+
+  /* white-space */
+  @each $value in nowrap pre pre-line pre-wrap {
+    .#{$prefix}white-space--#{$value} {
+      white-space: #{$value};
     }
   }
 
