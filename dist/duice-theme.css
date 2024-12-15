@@ -8,7 +8,8 @@
   --duice-table-thead-border: solid 1px #ddd;
   --duice-table-tbody-background: transparent;
   --duice-table-tbody-border: solid 1px #eee;
-  --duice-table-tbody-hover-background: #f7f7f7;
+  --duice-table-tfoot-background: #f7f7f7;
+  --duice-table-tfoot-border: solid 1px #ddd;
   --duice-input-border: solid 1px #ddd;
   --duice-select-border: solid 1px #ddd;
   --duice-select-icon: url("data:image/svg+xml;utf8,<svg viewBox='0 0 140 140' width='10' height='10' xmlns='http://www.w3.org/2000/svg'><g><path d='m121.3,34.6c-1.6-1.6-4.2-1.6-5.8,0l-51,51.1-51.1-51.1c-1.6-1.6-4.2-1.6-5.8,0-1.6,1.6-1.6,4.2 0,5.8l53.9,53.9c0.8,0.8 1.8,1.2 2.9,1.2 1,0 2.1-0.4 2.9-1.2l53.9-53.9c1.7-1.6 1.7-4.2 0.1-5.8z' fill='darkgray'/></g></svg>");
@@ -69,77 +70,78 @@ h6 {
 
 /* table */
 table {
-  border-collapse: collapse;
+  border-collapse: separate;
   border-spacing: 0;
   border: var(--duice-table-border);
-  text-align: left;
 }
 
-table thead {
+table > thead {
+  position: sticky;
+  top: 0;
   background: var(--duice-table-thead-background);
 }
 
-table thead tr th {
-  font-family: var(--duice-font-family);
-  font-size: var(--duice-font-size);
-  border: var(--duice-table-thead-border);
-  padding-left: var(--duice-element-padding);
-  padding-right: var(--duice-element-padding);
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
+table > thead > tr > th,
+table > thead > tr > td {
+  border: none;
+  border-right: var(--duice-table-thead-border);
+  border-bottom: var(--duice-table-thead-border);
 }
 
-table thead tr:first-of-type th {
-  border-top: none;
-}
-
-table thead tr th:first-of-type {
-  border-left: none;
-}
-
-table thead tr th:last-of-type {
+table > thead > tr > :last-child {
   border-right: none;
 }
 
-table tbody tr td {
-  font-family: var(--duice-font-family);
-  font-size: var(--duice-font-size);
-  border: var(--duice-table-tbody-border);
+table > tbody > tr > th,
+table > tbody > tr > td {
+  border: none;
+  border-right: var(--duice-table-tbody-border);
+  border-bottom: var(--duice-table-tbody-border);
+}
+
+table > tbody > tr > :last-child {
+  border-right: none;
+}
+
+table > tbody:last-of-type > tr:not([hidden]):last-of-type > th,
+table > tbody:last-of-type > tr:not([hidden]):last-of-type > td {
   border-bottom: none;
-  padding-left: var(--duice-element-padding);
-  padding-right: var(--duice-element-padding);
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
 }
 
-table tbody tr td:first-of-type {
-  border-left: none;
+table > tfoot {
+  background: var(--duice-table-tfoot-background);
 }
 
-table tbody tr td:last-of-type {
+table > tfoot > tr > th,
+table > tfoot > tr > td {
+  border: none;
+  border-right: var(--duice-table-tfoot-border);
+  border-bottom: var(--duice-table-tfoot-border);
+}
+
+table > tfoot > tr > :last-child {
   border-right: none;
 }
 
-table tfoot tr td {
+table > tfoot > tr:first-of-type > th,
+table > tfoot > tr:first-of-type > td {
+  border-top: var(--duice-table-tfoot-border);
+}
+
+table > tfoot > tr:last-of-type > th,
+table > tfoot > tr:last-of-type > td {
+  border-bottom: none;
+}
+
+table tr th,
+table tr td {
   font-family: var(--duice-font-family);
   font-size: var(--duice-font-size);
-  border: var(--duice-table-tbody-border);
-  border-bottom: none;
   padding-left: var(--duice-element-padding);
   padding-right: var(--duice-element-padding);
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-}
-
-table tfoot tr td:first-of-type {
-  border-left: none;
-}
-
-table tfoot tr td:last-of-type {
-  border-right: none;
 }
 
 table tr th:has(button, input, select, textarea, table),
