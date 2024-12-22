@@ -1252,6 +1252,19 @@
   font-size: xx-large;
 }
 
+/* font-weight */
+.font-weight--thin {
+  font-weight: thin;
+}
+
+.font-weight--normal {
+  font-weight: normal;
+}
+
+.font-weight--bold {
+  font-weight: bold;
+}
+
 /* width */
 .width--10 {
   width: 10%;
@@ -2431,6 +2444,16 @@
   }
   .s__font-size--xx-large {
     font-size: xx-large;
+  }
+  /* font-weight */
+  .s__font-weight--thin {
+    font-weight: thin;
+  }
+  .s__font-weight--normal {
+    font-weight: normal;
+  }
+  .s__font-weight--bold {
+    font-weight: bold;
   }
   /* width */
   .s__width--10 {

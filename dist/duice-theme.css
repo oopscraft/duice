@@ -1,8 +1,7 @@
 :root {
-  --duice-background: white;
-  --duice-font-family: sans-serif,monospace;
-  --duice-font-size: 12px;
   --duice-line-height: 2.5rem;
+  --duice-font-size: 12px;
+  --duice-background: white;
   --duice-table-border: solid 1px #ddd;
   --duice-table-thead-background: #f7f7f7;
   --duice-table-thead-border: solid 1px #ddd;
@@ -16,7 +15,7 @@
   --duice-textarea-border: solid 1px #ddd;
   --duice-button-border: solid 1px #aaa;
   --duice-button-background: #f7f7f7;
-  --duice-element-padding: calc((var(--duice-line-height) - var(--duice-font-size)) / 2 - 2px);
+  --duice-element-padding: 0.5rem 0.5rem;
   --duice-element-focus-border: solid 1px black;
   --duice-element-focus-transition: all .2s ease-out;
   --duice-element-box-shadow: rgba(128, 128, 128, 0.5) 1px 1px 1px;
@@ -25,10 +24,9 @@
 
 /* html */
 html {
-  background: var(--duice-background);
   line-height: var(--duice-line-height);
-  font-family: var(--duice-font-family);
   font-size: var(--duice-font-size);
+  background: var(--duice-background);
 }
 
 /* body */
@@ -37,33 +35,52 @@ body {
   padding: 0;
 }
 
-/* h1,2,3... */
+/* global */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  line-height: inherit;
+}
+
+/* h1~6 */
 h1 {
+  font-size: 1.7rem;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }
 
 h2 {
+  font-size: 1.6rem;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }
 
 h3 {
+  font-size: 1.5rem;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }
 
 h4 {
+  font-size: 1.4rem;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }
 
 h5 {
+  font-size: 1.3rem;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }
 
 h6 {
+  font-size: 1.2rem;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }
@@ -135,10 +152,8 @@ table > tfoot > tr:last-of-type > td {
 
 table tr th,
 table tr td {
-  font-family: var(--duice-font-family);
-  font-size: var(--duice-font-size);
-  padding-left: var(--duice-element-padding);
-  padding-right: var(--duice-element-padding);
+  padding-left: calc(var(--duice-line-height) / 4);
+  padding-right: calc(var(--duice-line-height) / 4);
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -146,17 +161,18 @@ table tr td {
 
 table tr th:has(button, input, select, textarea, table),
 table tr td:has(button, input, select, textarea, table) {
-  padding-left: 1px;
-  padding-right: 1px;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 /* input */
 input {
-  font-family: var(--duice-font-family);
-  font-size: var(--duice-font-size);
-  border: var(--duice-input-border);
   box-sizing: border-box;
-  padding: var(--duice-element-padding);
+  height: var(--duice-line-height);
+  vertical-align: bottom;
+  border: var(--duice-input-border);
+  padding-left: calc(var(--duice-line-height) / 4);
+  padding-right: calc(var(--duice-line-height) / 4);
 }
 
 input:focus {
@@ -181,8 +197,6 @@ input[type=radio] {
 
 /* select */
 select {
-  font-family: var(--duice-font-family);
-  font-size: var(--duice-font-size);
   appearance: none;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
@@ -190,7 +204,9 @@ select {
   -moz-appearance: none;
   border: var(--duice-select-border);
   box-sizing: border-box;
-  padding: var(--duice-element-padding);
+  height: var(--duice-line-height);
+  vertical-align: bottom;
+  padding-left: calc(var(--duice-line-height) / 4);
   background-color: inherit;
   background-image: var(--duice-select-icon);
   background-repeat: no-repeat;
@@ -206,13 +222,11 @@ select:focus {
 
 /* textarea */
 textarea {
-  font-family: var(--duice-font-family);
-  font-size: var(--duice-font-size);
   line-height: calc(var(--duice-line-height) / 1.5);
   border: var(--duice-textarea-border);
   box-sizing: border-box;
   background-color: transparent;
-  padding: var(--duice-element-padding);
+  padding-left: calc(var(--duice-line-height) / 4);
   white-space: pre;
   overflow-y: auto;
   resize: none;
@@ -226,11 +240,17 @@ textarea:focus {
 
 /* button */
 button {
-  display: inline-block;
+  vertical-align: middle;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  box-sizing: border-box;
+  height: var(--duice-line-height);
+  min-width: var(--duice-line-height);
   white-space: nowrap;
-  font-family: var(--duice-font-family);
-  font-size: var(--duice-font-size);
-  padding: var(--duice-element-padding);
+  padding-left: calc(var(--duice-line-height) / 4);
+  padding-right: calc(var(--duice-line-height) / 4);
   cursor: pointer;
   border: var(--duice-button-border);
   background: var(--duice-button-background);

@@ -478,8 +478,8 @@
                         </td>
                     </tr>
                     <tr>
-                        <td>
-                            <textarea data-duice-bind="myObject" data-duice-property="description"/></textarea>
+                        <td class="display--flex">
+                            <textarea class="height--100" data-duice-bind="myObject" data-duice-property="description"/></textarea>
                         </td>
                         <td>
                             &lt;textarea data-duice-bind="myObject" data-duice-property="description"&gt; &lt;/textarea&gt;
@@ -559,10 +559,13 @@
                             style="white-space:pre;text-align:left;"></td>
                         <td>
                             <table>
-                                <tr>
-                                    <th>id</th>
-                                    <th>name</th>
-                                </tr>
+                                <thead>
+                                    <tr>
+                                        <th>id</th>
+                                        <th>name</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                                 <tr data-duice-bind="myObject.items" data-duice-loop="item,status">
                                     <td>
                                         <input type="text" data-duice-bind="item" data-duice-property="id">
@@ -571,6 +574,7 @@
                                         <input type="text" data-duice-bind="item" data-duice-property="name">
                                     </td>
                                 </tr>
+                                </tbody>
                             </table>
                         </td>
                         <td class="fw-light ta-left" style="white-space:pre;">
