@@ -13,7 +13,4 @@ dist/*
 !dist/*.css
 !dist/*.css.map
 
-# hugo
-theme
-site
 

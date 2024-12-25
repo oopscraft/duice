@@ -61,7 +61,7 @@
 
   /* gap, row-gap, column-gap */
   @for $i from 1 through 3 {
-    @each $unit in px rem em{
+    @each $unit in px rem em {
       $value: unit-value($i, $unit);
       .#{$prefix}gap--#{$value} {
         gap: #{$value};

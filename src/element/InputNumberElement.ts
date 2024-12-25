@@ -6,7 +6,7 @@ export class InputNumberElement extends InputElement {
         super(element, bindData, context);
 
         // changes type and style
-        this.getHtmlElement().removeAttribute('type');
+        this.getHtmlElement().setAttribute('type', 'text');
         this.getHtmlElement().style.textAlign = 'right';
 
         // prevents invalid key press
