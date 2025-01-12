@@ -3,121 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="../dist/duice.css"/>
     <link rel="stylesheet" href="../dist/duice-theme.css"/>
     <style>
+        body {
+            padding: 1rem;
+        }
+        .table-border {
+            border: var(--duice-table-border);
+        }
     </style>
 </head>
-<body style="padding:1rem;">
-<h2>Simple Table</h2>
-<table style="width:800px;">
-    <colgroup>
-       <col span="3" style="font-weight:bold; text-align:left">
-    </colgroup>
-    <thead>
-        <tr>
-            <th scope="col">Player</th>
-            <th scope="col">Gloobles</th>
-            <th scope="col">Za'taak</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <th scope="row">TR-7</th>
-            <td>7</td>
-            <td>4,569</td>
-        </tr>
-        <tr>
-            <th scope="row">Khiresh Odo</th>
-            <td>7</td>
-            <td>7,223</td>
-        </tr>
-        <tr>
-            <th scope="row">Mia Oolong</th>
-            <td>9</td>
-            <td>6,219</td>
-        </tr>
-    </tbody>
-</table>
-<hr/>
-<h2>Scrolled Table</h2>
-<div style="width:300px; height:100px; overflow:auto; border: solid 1px gray;">
-    <table style="width:100%; border:none;">
-        <thead>
+<body>
+    <header>
+        <div class="display--flex justify-content--space-between">
+            <div>
+                <h1>Duice Theme Test</h1>
+            </div>
+            <div>
+                <label>
+                    <span>Dark Mode</span>
+                    <input type="checkbox" onclick="this.checked ? document.documentElement.classList.add('dark-mode') : document.documentElement.classList.remove('dark-mode');"/>
+                </label>
+            </div>
+        </div>
+    </header>
+    <main>
+        <h2>Simple Table</h2>
+        <table style="width:800px;">
+            <colgroup>
+                <col span="3" style="font-weight:bold; text-align:left">
+            </colgroup>
+            <thead>
+            <tr>
+                <th scope="col">Player</th>
+                <th scope="col">Gloobles</th>
+                <th scope="col">Za'taak</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th scope="row">TR-7</th>
+                <td>7</td>
+                <td>4,569</td>
+            </tr>
+            <tr>
+                <th scope="row">Khiresh Odo</th>
+                <td>7</td>
+                <td>7,223</td>
+            </tr>
+            <tr>
+                <th scope="row">Mia Oolong</th>
+                <td>9</td>
+                <td>6,219</td>
+            </tr>
+            </tbody>
+        </table>
+        <hr/>
+        <h2>Scrolled Table</h2>
+        <div class="table-border overflow-y--auto" style="width:300px; height:100px;">
+            <table style="width:100%; border:none;">
+                <thead>
+                <tr>
+                    <th>Col1</th>
+                    <th>Col2</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Row1</td>
+                    <td>Row1</td>
+                </tr>
+                <tr>
+                    <td>Row1</td>
+                    <td>Row1</td>
+                </tr>
+                <tr>
+                    <td>Row1</td>
+                    <td>Row1</td>
+                </tr>
+                <tr>
+                    <td>Row1</td>
+                    <td>Row1</td>
+                </tr>
+                <tr>
+                    <td>Row1</td>
+                    <td>Row1</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <hr/>
+        <h2>Table in Table</h2>
+        <table>
+            <thead>
             <tr>
                 <th>Col1</th>
                 <th>Col2</th>
+                <th>Col3</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             <tr>
                 <td>Row1</td>
                 <td>Row1</td>
-            </tr>
-            <tr>
-                <td>Row1</td>
-                <td>Row1</td>
-            </tr>
-            <tr>
-                <td>Row1</td>
-                <td>Row1</td>
-            </tr>
-            <tr>
-                <td>Row1</td>
-                <td>Row1</td>
-            </tr>
-            <tr>
-                <td>Row1</td>
-                <td>Row1</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-<hr/>
-<h2>Table in Table</h2>
-<table>
-    <thead>
-        <tr>
-            <th>Col1</th>
-            <th>Col2</th>
-            <th>Col3</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Row1</td>
-            <td>Row1</td>
-            <td>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Col1</th>
-                        <th>Col2</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>Row1</td>
-                        <td>Row1</td>
-                    </tr>
-                    <tr>
-                        <td>Row1</td>
-                        <td>Row1</td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-        <tr>
-            <td>Row1</td>
-            <td>Row1</td>
-            <td>
-                <table>
-                    <thead>
+                <td>
+                    <table>
+                        <thead>
                         <tr>
                             <th>Col1</th>
                             <th>Col2</th>
                         </tr>
-                    </thead>
-                    <tbody>
+                        </thead>
+                        <tbody>
                         <tr>
                             <td>Row1</td>
                             <td>Row1</td>
@@ -126,42 +124,64 @@
                             <td>Row1</td>
                             <td>Row1</td>
                         </tr>
-                </table>
-            </td>
-        </tr>
-    </tbody>
-</table>
-<hr/>
-<h2>With Tfoot</h2>
-<table>
-    <thead>
-        <tr>
-            <th>Col1</th>
-            <th>Col2</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Row1</td>
-            <td><label><input type="text"/></label></td>
-        </tr>
-        <tr>
-            <td>Row1</td>
-            <td>Row1</td>
-        </tr>
-    </tbody>
-    <tfoot>
-        <tr>
-            <td>Foot1</td>
-            <td>Foot1</td>
-        </tr>
-        <tr>
-            <td>Foot1</td>
-            <td>Foot1</td>
-        </tr>
-    </tfoot>
-</table>
-
-
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>Row1</td>
+                <td>Row1</td>
+                <td>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Col1</th>
+                            <th>Col2</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Row1</td>
+                            <td>Row1</td>
+                        </tr>
+                        <tr>
+                            <td>Row1</td>
+                            <td>Row1</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <hr/>
+        <h2>With Tfoot</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Col1</th>
+                <th>Col2</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Row1</td>
+                <td><label><input type="text"/></label></td>
+            </tr>
+            <tr>
+                <td>Row1</td>
+                <td>Row1</td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td>Foot1</td>
+                <td>Foot1</td>
+            </tr>
+            <tr>
+                <td>Foot1</td>
+                <td>Foot1</td>
+            </tr>
+            </tfoot>
+        </table>
+    </main>
 </body>
 </html>

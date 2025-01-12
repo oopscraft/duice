@@ -41,6 +41,9 @@
         .selected {
             background-color: #f7f7f7;
         }
+        .dark-mode .selected {
+            background-color: #222222;
+        }
     </style>
     <script>
         'use strict';
@@ -186,7 +189,17 @@
 </head>
 <body>
     <header>
-        <h1>Array Element Test</h1>
+        <div class="display--flex justify-content--space-between">
+            <div>
+                <h1>Array Element Test</h1>
+            </div>
+            <div>
+                <label>
+                    <span>Dark Mode</span>
+                    <input type="checkbox" onclick="this.checked ? document.documentElement.classList.add('dark-mode') : document.documentElement.classList.remove('dark-mode');"/>
+                </label>
+            </div>
+        </div>
     </header>
     <main>
         <section id="json">
