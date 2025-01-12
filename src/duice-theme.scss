@@ -16,8 +16,8 @@
   /* textarea */
   --duice-textarea-border: var(--duice-form-element-border);
   /* button */
-  --duice-button-border: var(--duice-form-element-border);
-  --duice-button-background: #f7f7f7;
+  --duice-button-background: linear-gradient(180deg, #ffffff 0%, #eee 49%, #e2e2e2 51%, #f7f7f7 100%);
+  --duice-button-border: solid 1px #aaa;
   --duice-button-box-shadow: rgba(128, 128, 128, 0.5) 1px 1px 1px;
   /* table */
   --duice-table-border: solid 1px #ddd;
@@ -41,7 +41,8 @@
   --duice-form-element-focus-border: solid 1px white;
   --duice-scrollbar-thumb-background: #555555;
   /* button */
-  --duice-button-background: #f7f7f7;
+  --duice-button-background: linear-gradient(180deg, #222 0%, #333 49%, #333 51%, #222 100%);
+  --duice-button-border: solid 1px #666666;
   --duice-button-box-shadow: rgba(128, 128, 128, 0.5) 1px 1px 1px;
   /* table */
   --duice-table-border: solid 1px #444444;
@@ -207,7 +208,7 @@ button {
   box-sizing: border-box;
   white-space: nowrap;
   min-width: calc(1.0em * var(--duice-line-height));
-  height: calc(var(--duice-font-size) * var(--duice-line-height));
+  //height: calc(var(--duice-font-size) * var(--duice-line-height));
   vertical-align: bottom;
   padding-left: 0.5em;
   padding-right: 0.5em;
@@ -223,9 +224,9 @@ button:disabled {
 button:hover:not([disabled]),
 button:focus:not([disabled]) {
   outline: none;
-  box-shadow: var(--duice-button-box-shadow);
-  border: var(--duice-element-focus-border);
+  border: var(--duice-form-element-focus-border);
   transition: var(--duice-element-focus-transition);
+  box-shadow: var(--duice-button-box-shadow);
 }
 
 /* table */
