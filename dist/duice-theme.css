@@ -25,6 +25,7 @@
   --duice-table-thead-border: solid 1px #ddd;
   --duice-table-tbody-background: transparent;
   --duice-table-tbody-border: solid 1px #eee;
+  --duice-table-tbody-hover-background: #f9f9f9;
   --duice-table-tfoot-background: #f7f7f7;
   --duice-table-tfoot-border: solid 1px #ddd;
   /* hr */
@@ -50,6 +51,7 @@
   --duice-table-thead-border: solid 1px #444444;
   --duice-table-tbody-background: transparent;
   --duice-table-tbody-border: solid 1px #333333;
+  --duice-table-tbody-hover-background: #222222;
   --duice-table-tfoot-background: #2c2c2c;
   --duice-table-tfoot-border: solid 1px #333333;
   /* hr */
@@ -291,6 +293,10 @@ table > tbody > tr > :last-child {
 table > tbody:last-of-type > tr:not([hidden]):last-of-type > th,
 table > tbody:last-of-type > tr:not([hidden]):last-of-type > td {
   border-bottom: none;
+}
+
+table > tbody > tr:hover {
+  background: var(--duice-table-tbody-hover-background);
 }
 
 table > tfoot {
