@@ -1,5 +1,15 @@
 import { terser } from "rollup-plugin-terser"; // 코드 압축
 import { visualizer } from "rollup-plugin-visualizer";
+import pkg from "./package.json";
+
+const banner = `
+/*!
+ * ${pkg.name} - v${pkg.version}
+ * git: https://gitbub.com/oopscraft/duice
+ * website: https://duice.oopscraft.com
+ * Released under the ${pkg.license} License
+ */
+`.trim();
 
 export default {
     input: "dist/index.js",
@@ -9,6 +19,7 @@ export default {
             format: "iife",
             name: "duice",
             sourcemap: true,
+            banner: banner,
         },
         {
             file: "dist/duice.min.js",
@@ -16,6 +27,7 @@ export default {
             name: "duice",
             plugins: [terser()],
             sourcemap: true,
+            banner: banner,
         }
     ],
     plugins: [
