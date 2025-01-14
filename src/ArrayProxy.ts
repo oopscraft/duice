@@ -5,6 +5,10 @@ import {DataEvent} from "./event/DataEvent";
 
 export class ArrayProxy extends globalThis.Array {
 
+    /**
+     * constructor
+     * @param array
+     */
     constructor(array: object[]) {
         super();
 
@@ -31,30 +35,46 @@ export class ArrayProxy extends globalThis.Array {
         ArrayProxy.setHandler(arrayProxy, arrayHandler);
         ArrayProxy.setTarget(arrayProxy, array);
 
+        // save
+        ArrayProxy.save(arrayProxy);
+
         // returns
         return arrayProxy;
     }
 
-    static clear(arrayProxy: object[]): void {
-        let arrayHandler = this.getHandler(arrayProxy);
-        try {
-            // suspend
-            arrayHandler.suspendListener();
-            arrayHandler.suspendNotify();
-
-            // clear element
-            arrayProxy.length = 0;
-
-        } finally {
-            // resume
-            arrayHandler.resumeListener();
-            arrayHandler.resumeNotify();
-        }
-
-        // notify observers
-        arrayHandler.notifyObservers(new DataEvent(this));
+    static isProxy(array: object[]): boolean {
+        return array.hasOwnProperty('_target_');
     }
 
+    static setTarget(arrayProxy: object[], target: object[]): void {
+        globalThis.Object.defineProperty(arrayProxy, '_target_', {
+            value: target,
+            writable: true
+        });
+    }
+
+    static getTarget(arrayProxy: object[]): any {
+        return globalThis.Object.getOwnPropertyDescriptor(arrayProxy, '_target_').value;
+    }
+
+    static setHandler(arrayProxy: object[], arrayHandler: ArrayHandler): void {
+        globalThis.Object.defineProperty(arrayProxy, '_handler_', {
+            value: arrayHandler,
+            writable: true
+        });
+    }
+
+    static getHandler(arrayProxy: object[]): ArrayHandler {
+        let handler = globalThis.Object.getOwnPropertyDescriptor(arrayProxy, '_handler_').value;
+        assert(handler, 'handler is not found');
+        return handler;
+    }
+
+    /**
+     * Assigns array to array proxy
+     * @param arrayProxy
+     * @param array
+     */
     static assign(arrayProxy: object[], array: object[]): void {
         let arrayHandler = this.getHandler(arrayProxy);
         try {
@@ -98,34 +118,34 @@ export class ArrayProxy extends globalThis.Array {
         arrayHandler.notifyObservers(new DataEvent(this));
     }
 
-    static isProxy(array: object[]): boolean {
-        return array.hasOwnProperty('_target_');
+    /**
+     * Clears array elements
+     * @param arrayProxy
+     */
+    static clear(arrayProxy: object[]): void {
+        let arrayHandler = this.getHandler(arrayProxy);
+        try {
+            // suspend
+            arrayHandler.suspendListener();
+            arrayHandler.suspendNotify();
+
+            // clear element
+            arrayProxy.length = 0;
+
+        } finally {
+            // resume
+            arrayHandler.resumeListener();
+            arrayHandler.resumeNotify();
+        }
+
+        // notify observers
+        arrayHandler.notifyObservers(new DataEvent(this));
     }
 
-    static setTarget(arrayProxy: object[], target: object[]): void {
-        globalThis.Object.defineProperty(arrayProxy, '_target_', {
-            value: target,
-            writable: true
-        });
-    }
-
-    static getTarget(arrayProxy: object[]): any {
-        return globalThis.Object.getOwnPropertyDescriptor(arrayProxy, '_target_').value;
-    }
-
-    static setHandler(arrayProxy: object[], arrayHandler: ArrayHandler): void {
-        globalThis.Object.defineProperty(arrayProxy, '_handler_', {
-            value: arrayHandler,
-            writable: true
-        });
-    }
-
-    static getHandler(arrayProxy: object[]): ArrayHandler {
-        let handler = globalThis.Object.getOwnPropertyDescriptor(arrayProxy, '_handler_').value;
-        assert(handler, 'handler is not found');
-        return handler;
-    }
-
+    /**
+     * Save array proxy
+     * @param arrayProxy
+     */
     static save(arrayProxy: object[]): void {
         let origin = JSON.stringify(arrayProxy);
         globalThis.Object.defineProperty(arrayProxy, '_origin_', {
@@ -134,39 +154,13 @@ export class ArrayProxy extends globalThis.Array {
         });
     }
 
+    /**
+     * Reset array proxy
+     * @param arrayProxy
+     */
     static reset(arrayProxy: object[]): void {
         let origin = JSON.parse(globalThis.Object.getOwnPropertyDescriptor(arrayProxy,'_origin_').value);
         this.assign(arrayProxy, origin);
-    }
-
-    static onPropertyChanging(arrayProxy: object[], listener: Function): void {
-        this.getHandler(arrayProxy).propertyChangingListener = listener;
-        arrayProxy.forEach(objectProxy => {
-            ObjectProxy.getHandler(objectProxy).propertyChangingListener = listener;
-        });
-    }
-
-    static onPropertyChanged(arrayProxy: object[], listener: Function): void {
-        this.getHandler(arrayProxy).propertyChangedListener = listener;
-        arrayProxy.forEach(objectProxy => {
-            ObjectProxy.getHandler(objectProxy).propertyChangedListener = listener;
-        });
-    }
-
-    static onRowInserting(arrayProxy: object[], listener: Function): void {
-        this.getHandler(arrayProxy).rowInsertingListener = listener;
-    }
-
-    static onRowInserted(arrayProxy: object[], listener: Function): void {
-        this.getHandler(arrayProxy).rowInsertedListener = listener;
-    }
-
-    static onRowDeleting(arrayProxy: object[], listener: Function): void {
-        this.getHandler(arrayProxy).rowDeletingListener = listener;
-    }
-
-    static onRowDeleted(arrayProxy: object[], listener: Function): void {
-        this.getHandler(arrayProxy).rowDeletedListener = listener;
     }
 
     static setReadonly(arrayProxy: object[], property: string, readonly: boolean): void {
@@ -219,6 +213,36 @@ export class ArrayProxy extends globalThis.Array {
 
     static getSelectedItemIndex(arrayProxy: object[]): number {
         return this.getHandler(arrayProxy).getSelectedItemIndex();
+    }
+
+    static onPropertyChanging(arrayProxy: object[], listener: Function): void {
+        this.getHandler(arrayProxy).propertyChangingListener = listener;
+        arrayProxy.forEach(objectProxy => {
+            ObjectProxy.getHandler(objectProxy).propertyChangingListener = listener;
+        });
+    }
+
+    static onPropertyChanged(arrayProxy: object[], listener: Function): void {
+        this.getHandler(arrayProxy).propertyChangedListener = listener;
+        arrayProxy.forEach(objectProxy => {
+            ObjectProxy.getHandler(objectProxy).propertyChangedListener = listener;
+        });
+    }
+
+    static onRowInserting(arrayProxy: object[], listener: Function): void {
+        this.getHandler(arrayProxy).rowInsertingListener = listener;
+    }
+
+    static onRowInserted(arrayProxy: object[], listener: Function): void {
+        this.getHandler(arrayProxy).rowInsertedListener = listener;
+    }
+
+    static onRowDeleting(arrayProxy: object[], listener: Function): void {
+        this.getHandler(arrayProxy).rowDeletingListener = listener;
+    }
+
+    static onRowDeleted(arrayProxy: object[], listener: Function): void {
+        this.getHandler(arrayProxy).rowDeletedListener = listener;
     }
 
 }
