@@ -61,16 +61,15 @@
   --duice-dialog-bax-shadow: rgba(128, 128, 128, 0.5) 1px 1px 1px;
 }
 
-/* html */
-html {
+/* html, body*/
+html,
+body {
   font-size: var(--duice-font-size);
   line-height: var(--duice-line-height);
   background: var(--duice-background);
   color: var(--duice-color);
-}
-
-/* body */
-body {
+  height: 100%;
+  width: 100%;
   margin: 0;
   padding: 0;
 }
