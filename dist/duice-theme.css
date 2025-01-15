@@ -143,7 +143,7 @@ small {
 
 /* input */
 input {
-  box-sizing: border-box;
+  box-sizing: content-box;
   -webkit-border-radius: unset;
   border: var(--duice-input-border);
   vertical-align: bottom;
@@ -192,7 +192,7 @@ select {
   -webkit-appearance: none;
   -moz-appearance: none;
   -webkit-border-radius: unset;
-  box-sizing: border-box;
+  box-sizing: content-box;
   border: var(--duice-select-border);
   vertical-align: bottom;
   padding-left: 0.5em;
@@ -211,7 +211,7 @@ select:focus {
 
 /* textarea */
 textarea {
-  box-sizing: border-box;
+  box-sizing: content-box;
   border: var(--duice-textarea-border);
   background-color: transparent;
   padding-left: 0.5em;
@@ -229,7 +229,7 @@ textarea:focus {
 
 /* button */
 button {
-  box-sizing: border-box;
+  box-sizing: content-box;
   white-space: nowrap;
   min-width: calc(1em * var(--duice-line-height));
   vertical-align: bottom;
