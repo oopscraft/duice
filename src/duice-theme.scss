@@ -3,7 +3,7 @@
   --duice-font-size: 12px;
   --duice-line-height: 2.5;
   --duice-background: white;
-  --duice-color: black;
+  --duice-color: #222;
   --duice-form-element-border: solid 1px #ddd;
   --duice-form-element-focus-border: solid 1px black;
   --duice-form-element-focus-transition: all .2s ease-out;
@@ -37,7 +37,7 @@
 
 :root.dark-mode {
   --duice-background: #1e1e1e;
-  --duice-color: #e0e0e0;
+  --duice-color: #ddd;
   --duice-form-element-border: solid 1px #444444;
   --duice-form-element-focus-border: solid 1px white;
   --duice-scrollbar-thumb-background: #555555;
