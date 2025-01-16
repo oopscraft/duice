@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="../../dist/duice.css"/>
     <link rel="stylesheet" href="../../dist/duice-theme.css"/>
     <style>
+        body {
+            padding: 1rem;
+        }
         pre {
             overflow: auto;
         }
@@ -142,59 +145,70 @@
     </script>
 </head>
 <body>
-<h1>Dialog Test</h1>
+    <header>
+        <div class="display--flex justify-content--space-between">
+            <div>
+                <h1>Dialog Test</h1>
+            </div>
+            <div>
+                <label>
+                    <span>Dark Mode</span>
+                    <input type="checkbox" onclick="this.checked ? document.documentElement.classList.add('dark-mode') : document.documentElement.classList.remove('dark-mode');"/>
+                </label>
+            </div>
+        </div>
+    </header>
+    <main>
+        <!-- alert -->
+        <div>
+            <h2>Alert</h2>
+            <h3>await style</h3>
+            <pre><code id="alertAwaitCode"></code></pre>
+            <button onclick="alertAwait();">alertAwait</button>
+            <h3>then style</h3>
+            <pre><code id="alertThenCode"></code></pre>
+            <button onclick="alertThen();">alertThen</button>
+        </div>
 
+        <!-- confirm -->
+        <div>
+            <h2>Confirm</h2>
+            <h3>await style</h3>
+            <pre><code id="confirmAwaitCode"></code></pre>
+            <button onclick="confirmAwait();">confirmAwait</button>
+            <h3>then style</h3>
+            <pre><code id="confirmThenCode"></code></pre>
+            <button onclick="confirmThen();">confirmThen</button>
+        </div>
 
-<!-- alert -->
-<div>
-    <h2>Alert</h2>
-    <h3>await style</h3>
-    <pre><code id="alertAwaitCode"></code></pre>
-    <button onclick="alertAwait();">alertAwait</button>
-    <h3>then style</h3>
-    <pre><code id="alertThenCode"></code></pre>
-    <button onclick="alertThen();">alertThen</button>
-</div>
+        <!-- prompt -->
+        <div>
+            <h2>Prompt</h2>
+            <h3>await style</h3>
+            <pre><code id="promptAwaitCode"></code></pre>
+            <button onclick="promptAwait();">promptAwait</button>
+            <h3>then style</h3>
+            <pre><code id="promptThenCode"></code></pre>
+            <button onclick="promptThen();">promptThen</button>
+        </div>
 
-<!-- confirm -->
-<div>
-    <h2>Confirm</h2>
-    <h3>await style</h3>
-    <pre><code id="confirmAwaitCode"></code></pre>
-    <button onclick="confirmAwait();">confirmAwait</button>
-    <h3>then style</h3>
-    <pre><code id="confirmThenCode"></code></pre>
-    <button onclick="confirmThen();">confirmThen</button>
-</div>
-
-<!-- prompt -->
-<div>
-    <h2>Prompt</h2>
-    <h3>await style</h3>
-    <pre><code id="promptAwaitCode"></code></pre>
-    <button onclick="promptAwait();">promptAwait</button>
-    <h3>then style</h3>
-    <pre><code id="promptThenCode"></code></pre>
-    <button onclick="promptThen();">promptThen</button>
-</div>
-
-<!-- dialog -->
-<div>
-    <h2>Custom Dialog</h2>
-    <h3>HTML</h3>
-    <pre><code id="dialogHtml"></code></pre>
-    <h3>Javascript</h3>
-    <pre><code id="dialogCode"></code></pre>
-    <button onclick="openDialog();">openDialog</button>
-    <dialog id="myDialog">
-        <pre style="width:400px; height:400px;">
-            Custom Dialog
-            fdsafdsa
-            fdsafdsafdsa
-            fdsafdsafdsafdsa
-        </pre>
-    </dialog>
-</div>
-
+        <!-- dialog -->
+        <div>
+            <h2>Custom Dialog</h2>
+            <h3>HTML</h3>
+            <pre><code id="dialogHtml"></code></pre>
+            <h3>Javascript</h3>
+            <pre><code id="dialogCode"></code></pre>
+            <button onclick="openDialog();">openDialog</button>
+            <dialog id="myDialog">
+            <pre style="width:400px; height:400px;">
+                Custom Dialog
+                fdsafdsa
+                fdsafdsafdsa
+                fdsafdsafdsafdsa
+            </pre>
+            </dialog>
+        </div>
+    </main>
 </body>
 </html>

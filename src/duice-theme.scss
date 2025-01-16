@@ -3,7 +3,7 @@
   --duice-font-size: 12px;
   --duice-line-height: 2.5;
   --duice-background: white;
-  --duice-color: #222;
+  --duice-color: #333;
   --duice-form-element-border: solid 1px #ddd;
   --duice-form-element-focus-border: solid 1px black;
   --duice-form-element-focus-transition: all .2s ease-out;
@@ -31,6 +31,7 @@
   /* hr */
   --duice-hr-border: solid 1px #ccc;
   /* dialog */
+  --duice-dialog-background: var(--duice-background);
   --duice-dialog-border: solid 1px gray;
   --duice-dialog-bax-shadow: rgba(128, 128, 128, 0.5) 1px 1px 1px;
 }
@@ -39,11 +40,11 @@
   --duice-background: #1e1e1e;
   --duice-color: #ddd;
   --duice-form-element-border: solid 1px #444444;
-  --duice-form-element-focus-border: solid 1px white;
+  --duice-form-element-focus-border: solid 1px #aaa;
   --duice-scrollbar-thumb-background: #555555;
   /* button */
-  --duice-button-background: linear-gradient(180deg, #222 0%, #333 49%, #333 51%, #222 100%);
-  --duice-button-border: solid 1px #666666;
+  --duice-button-background: linear-gradient(180deg, #222 0%, #333 49%, #292929 51%, #222 100%);
+  --duice-button-border: solid 1px #555;
   --duice-button-box-shadow: rgba(128, 128, 128, 0.5) 1px 1px 1px;
   /* table */
   --duice-table-border: solid 1px #444444;
@@ -57,6 +58,7 @@
   /* hr */
   --duice-hr-border: solid 1px #333333;
   /* dialog */
+  --duice-dialog-background: var(--duice-background);
   --duice-dialog-border: solid 1px gray;
   --duice-dialog-bax-shadow: rgba(128, 128, 128, 0.5) 1px 1px 1px;
 }
@@ -69,7 +71,6 @@ body {
   background: var(--duice-background);
   color: var(--duice-color);
   height: 100%;
-  width: 100%;
   margin: 0;
   padding: 0;
 }
@@ -123,7 +124,7 @@ small {
 
 /* input */
 input {
-  box-sizing: content-box;
+  box-sizing: border-box;
   -webkit-border-radius: unset;
   border: var(--duice-input-border);
   vertical-align: bottom;
@@ -170,7 +171,7 @@ select {
   -webkit-appearance: none;
   -moz-appearance: none;
   -webkit-border-radius: unset;
-  box-sizing: content-box;
+  box-sizing: border-box;
   border: var(--duice-select-border);
   vertical-align: bottom;
   padding-left: 0.5em;
@@ -188,7 +189,7 @@ select:focus {
 
 /* textarea */
 textarea {
-  box-sizing: content-box;
+  box-sizing: border-box;
   border: var(--duice-textarea-border);
   background-color: transparent;
   padding-left: 0.5em;
@@ -205,7 +206,7 @@ textarea:focus {
 
 /* button */
 button {
-  box-sizing: content-box;
+  box-sizing: border-box;
   white-space: nowrap;
   min-width: calc(1.0em * var(--duice-line-height));
   //height: calc(var(--duice-font-size) * var(--duice-line-height));
@@ -308,8 +309,9 @@ hr {
 
 /* dialog */
 dialog {
+  background: var(--duice-dialog-background);
   border: var(--duice-dialog-border);
-  box-shadow: var(--duice-dialog-box-shadow);
+  box-shadow: var(--duice-dialog-bax-shadow);
 }
 dialog:focus {
   outline: none;

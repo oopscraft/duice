@@ -1,5 +1,5 @@
 /*!
- * duice - v0.2.26
+ * duice - v0.2.28
  * git: https://gitbub.com/oopscraft/duice
  * website: https://duice.oopscraft.com
  * Released under the LGPL(GNU Lesser General Public License version 3) License
