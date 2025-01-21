@@ -197,6 +197,22 @@
     }
   }
 
+  /* border-radius */
+  @for $i from 0 through 3 {
+    @each $unit in px rem em {
+      $value: unit-value($i, $unit);
+      .#{$prefix}border-radius--#{$value} {
+          border-radius: #{$value};
+      }
+    }
+  }
+  @for $i from 1 through 10 {
+    $value: $i*10;
+    .#{$prefix}border-radius--#{$value} {
+      border-radius: #{$value + '%'};
+    }
+  }
+
   /* font-size */
   @for $i from 1 through 3 {
     @each $unit in rem em {
