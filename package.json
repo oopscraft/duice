@@ -1,12 +1,12 @@
 {
   "name": "duice",
-  "version": "0.2.33",
+  "version": "0.2.34",
   "description": "DUICE(Data-oriented javascript UI Component Element)",
-  "homepage": "http://duice.oopscraft.org",
+  "homepage": "http://duice.chomookun.org",
   "author": "chomookun@gmail.com",
   "license": "LGPL(GNU Lesser General Public License version 3)",
   "bugs": {
-    "url": "https://github.com/oopscraft/duice/issues"
+    "url": "https://github.com/chomookun/duice/issues"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
