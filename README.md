@@ -24,17 +24,17 @@ Therefore you can use it with another javascript library together.
 
 ## Git and Website
 
-* Git Repository: [https://github.com/oopscraft/duice](https://github.com/oopscraft/duice)
-* Website: [https://duice.oopscraft.org](https://duice.oopscraft.org)
+* Git Repository: [https://github.com/chomookun/duice](https://github.com/chomookun/duice)
+* Website: [https://duice.chomookun.org](https://duice.chomookun.org)
 
 ## Demo Site
 
-* Arch4j: [https://arch4j-web.oopscraft.org/admin](https://arch4j-web.oopscraft.org/admin)
+* Arch4j: [https://arch4j-web.chomookun.org/admin](https://arch4j-web.chomookun.org/admin)
 * Test Account: **developer/developer**
 
 ## References
 
-* Plugins: [https://duice-plugin.oopscraft.org](https://duice-plugin.oopscraft.org)
+* Plugins: [https://duice-plugin.chomookun.org](https://duice-plugin.chomookun.org)
 
 -----------------------------------------------------------
 
