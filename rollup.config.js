@@ -5,8 +5,8 @@ import pkg from "./package.json";
 const banner = `
 /*!
  * ${pkg.name} - v${pkg.version}
- * git: https://gitbub.com/oopscraft/duice
- * website: https://duice.oopscraft.com
+ * git: https://gitbub.com/chomookun/duice
+ * website: https://duice.chomookun.com
  * Released under the ${pkg.license} License
  */
 `.trim();
