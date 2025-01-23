@@ -125,6 +125,7 @@ small {
 /* input */
 input {
   box-sizing: border-box;
+  height: calc(var(--duice-font-size) * var(--duice-line-height));
   -webkit-border-radius: unset;
   border: var(--duice-input-border);
   vertical-align: bottom;
@@ -159,12 +160,6 @@ input[type='range'] {
 }
 
 /* input-datetime-local,date,time */
-input[type="datetime-local"],
-input[type="date"],
-input[type="time"] {
-  box-sizing: content-box;
-  height: calc(var(--duice-font-size) * var(--duice-line-height));
-}
 html.dark-mode input[type="datetime-local"]::-webkit-calendar-picker-indicator,
 html.dark-mode input[type="date"]::-webkit-calendar-picker-indicator,
 html.dark-mode input[type="time"]::-webkit-calendar-picker-indicator {
@@ -178,6 +173,7 @@ select {
   -moz-appearance: none;
   -webkit-border-radius: unset;
   box-sizing: border-box;
+  height: calc(var(--duice-font-size) * var(--duice-line-height));
   border: var(--duice-select-border);
   vertical-align: bottom;
   padding-left: 0.5em;
@@ -213,9 +209,9 @@ textarea:focus {
 /* button */
 button {
   box-sizing: border-box;
+  height: calc(var(--duice-font-size) * var(--duice-line-height));
   white-space: nowrap;
   min-width: calc(1.0em * var(--duice-line-height));
-  //height: calc(var(--duice-font-size) * var(--duice-line-height));
   vertical-align: bottom;
   padding-left: 0.5em;
   padding-right: 0.5em;
