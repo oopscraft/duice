@@ -7,6 +7,7 @@
   --duice-form-element-border: solid 1px #ddd;
   --duice-form-element-focus-border: solid 1px black;
   --duice-form-element-focus-transition: all .2s ease-out;
+  --duice-form-element-height: calc(var(--duice-font-size) * var(--duice-line-height) + 2px);
   --duice-scrollbar-thumb-background: #cccccc;
   /* input */
   --duice-input-border: var(--duice-form-element-border);
@@ -144,7 +145,7 @@ small {
 /* input */
 input {
   box-sizing: border-box;
-  height: calc(var(--duice-font-size) * var(--duice-line-height));
+  height: var(--duice-form-element-height);
   -webkit-border-radius: unset;
   border: var(--duice-input-border);
   vertical-align: bottom;
@@ -194,7 +195,7 @@ select {
   -moz-appearance: none;
   -webkit-border-radius: unset;
   box-sizing: border-box;
-  height: calc(var(--duice-font-size) * var(--duice-line-height));
+  height: var(--duice-line-height);
   border: var(--duice-select-border);
   vertical-align: bottom;
   padding-left: 0.5em;
@@ -211,30 +212,11 @@ select:focus {
   transition: var(--duice-form-element-focus-transition);
 }
 
-/* textarea */
-textarea {
-  box-sizing: border-box;
-  border: var(--duice-textarea-border);
-  background-color: transparent;
-  padding-left: 0.5em;
-  padding-right: 0.5em;
-  white-space: pre;
-  overflow-y: auto;
-  resize: none;
-}
-
-textarea:focus {
-  outline: none;
-  border: var(--duice-form-element-focus-border);
-  transition: var(--duice-form-element-focus-transition);
-}
-
 /* button */
 button {
   box-sizing: border-box;
-  height: calc(var(--duice-font-size) * var(--duice-line-height));
+  height: var(--duice-form-element-height);
   white-space: nowrap;
-  min-width: calc(1em * var(--duice-line-height));
   vertical-align: bottom;
   padding-left: 0.5em;
   padding-right: 0.5em;
@@ -255,6 +237,24 @@ button:focus:not([disabled]) {
   border: var(--duice-form-element-focus-border);
   transition: var(--duice-element-focus-transition);
   box-shadow: var(--duice-button-box-shadow);
+}
+
+/* textarea */
+textarea {
+  box-sizing: border-box;
+  border: var(--duice-textarea-border);
+  background-color: transparent;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  white-space: pre;
+  overflow-y: auto;
+  resize: none;
+}
+
+textarea:focus {
+  outline: none;
+  border: var(--duice-form-element-focus-border);
+  transition: var(--duice-form-element-focus-transition);
 }
 
 /* table */
