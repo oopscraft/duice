@@ -195,7 +195,7 @@ select {
   -moz-appearance: none;
   -webkit-border-radius: unset;
   box-sizing: border-box;
-  height: var(--duice-line-height);
+  height: var(--duice-form-element-height);
   border: var(--duice-select-border);
   vertical-align: bottom;
   padding-left: 0.5em;
@@ -216,10 +216,14 @@ select:focus {
 button {
   box-sizing: border-box;
   height: var(--duice-form-element-height);
+  min-width: var(--duice-form-element-height);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   white-space: nowrap;
   vertical-align: bottom;
-  padding-left: 0.5em;
-  padding-right: 0.5em;
+  padding-left: calc(var(--duice-form-element-height) / 4);
+  padding-right: calc(var(--duice-form-element-height) / 4);
   cursor: pointer;
   border: var(--duice-button-border);
   background: var(--duice-button-background);
