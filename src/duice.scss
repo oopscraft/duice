@@ -245,11 +245,29 @@
     .#{$prefix}width--#{$value}vw {
       width: #{$value + 'vw'};
     }
+    .#{$prefix}min-width--#{$value} {
+      min-width: #{$value + '%'};
+    }
+    .#{$prefix}min-width--#{$value}vw {
+      min-width: #{$value + 'vw'};
+    }
+    .#{$prefix}max-width--#{$value} {
+      max-width: #{$value + '%'};
+    }
+    .#{$prefix}max-width--#{$value}vw {
+      max-width: #{$value + 'vw'};
+    }
   }
   @for $i from 1 through 3 {
     @each $unit in rem em {
       .#{$prefix}width--#{$i + $unit} {
         width: #{$i + $unit};
+      }
+      .#{$prefix}min-width--#{$i + $unit} {
+        min-width: #{$i + $unit};
+      }
+      .#{$prefix}max-width--#{$i + $unit} {
+        max-width: #{$i + $unit};
       }
     }
   }
@@ -263,11 +281,29 @@
     .#{$prefix}height--#{$value}vh {
       height: #{$value + 'vh'};
     }
+    .#{$prefix}min-height--#{$value} {
+      min-height: #{$value + '%'};
+    }
+    .#{$prefix}min-height--#{$value}vh {
+      min-height: #{$value + 'vh'};
+    }
+    .#{$prefix}max-height--#{$value} {
+      max-height: #{$value + '%'};
+    }
+    .#{$prefix}max-height--#{$value}vh {
+      max-height: #{$value + 'vh'};
+    }
   }
   @for $i from 1 through 3 {
     @each $unit in rem em {
       .#{$prefix}height--#{$i + $unit} {
         height: #{$i + $unit};
+      }
+      .#{$prefix}min-height--#{$i + $unit} {
+        min-height: #{$i + $unit};
+      }
+      .#{$prefix}max-height--#{$i + $unit} {
+        max-height: #{$i + $unit};
       }
     }
   }
