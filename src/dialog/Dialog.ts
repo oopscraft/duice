@@ -107,8 +107,8 @@ export class Dialog {
 
     moveToCenterPosition() {
         let computedStyle = window.getComputedStyle(this.dialogElement);
-        let computedWidth = parseInt(computedStyle.getPropertyValue('width').replace(/px/gi, ''));
-        let computedHeight = parseInt(computedStyle.getPropertyValue('height').replace(/px/gi, ''));
+        let computedWidth = this.dialogElement.offsetWidth;
+        let computedHeight = this.dialogElement.offsetHeight;
         let scrollX = window.scrollX;
         let scrollY = window.scrollY;
         this.dialogElement.style.left = Math.max(0, window.innerWidth / 2 - computedWidth / 2) + scrollX + 'px';
