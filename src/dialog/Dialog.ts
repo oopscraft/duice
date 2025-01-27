@@ -28,6 +28,7 @@ export class Dialog {
         this.dialogElement.style.position = 'absolute';
         this.dialogElement.style.left = '0';
         this.dialogElement.style.right = '0';
+        this.dialogElement.style.maxWidth = '100%';
 
         // header
         this.header = document.createElement('div');

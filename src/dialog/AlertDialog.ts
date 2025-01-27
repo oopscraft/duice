@@ -14,6 +14,7 @@ export class AlertDialog extends Dialog {
 
         // message pre
         this.messagePre = document.createElement('pre');
+        this.messagePre.style.whiteSpace = 'pre-wrap';
         this.messagePre.style.marginTop = '1rem';
         this.messagePre.style.marginBottom = '1rem';
         this.messagePre.innerHTML = message;
