@@ -28,6 +28,8 @@ export class Dialog {
         this.dialogElement.style.position = 'absolute';
         this.dialogElement.style.left = '0';
         this.dialogElement.style.right = '0';
+        this.dialogElement.style.overflowX = 'hidden';
+        this.dialogElement.style.boxSizing = 'border-box';
         this.dialogElement.style.maxWidth = '100%';
 
         // header
@@ -107,6 +109,7 @@ export class Dialog {
 
     moveToCenterPosition() {
         let computedStyle = window.getComputedStyle(this.dialogElement);
+        this.dialogElement.style.boxSizing = 'border-box';
         let computedWidth = this.dialogElement.offsetWidth;
         let computedHeight = this.dialogElement.offsetHeight;
         let scrollX = window.scrollX;
