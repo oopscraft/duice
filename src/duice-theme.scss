@@ -119,9 +119,12 @@ a:hover {
 
 /* h1~6 */
 @for $i from 1 through 6 {
-  $value: 2.0 - (($i - 1) * 0.2);
+  $value: 1.6 - (($i - 1) * 0.1);
   h#{$i} {
     font-size: #{$value}rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25em;
   }
 }
 
