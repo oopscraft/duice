@@ -17,7 +17,7 @@ export class InputElement extends ObjectElement<HTMLInputElement> {
     }
 
     override setValue(value: any): void {
-        if(value) {
+        if(value != null) {
             value = this.getFormat() ? this.getFormat().format(value) : value;
         }else{
             value = '';

@@ -14,7 +14,7 @@ export class TextareaElement extends ObjectElement<HTMLTextAreaElement> {
     }
 
     override setValue(value: any): void {
-        if(value) {
+        if(value != null) {
             this.getHtmlElement().value = value;
         }else{
             this.getHtmlElement().value = '';

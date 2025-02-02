@@ -108,7 +108,7 @@ export class ObjectElement<T extends HTMLElement> extends DataElement<T, object>
     }
 
     setValue(value: any): void {
-        if(value !== undefined && value !== null) {
+        if(value != null) {
             value = this.getFormat() ? this.getFormat().format(value) : value;
             this.htmlElement.innerText = value;
         }else{
