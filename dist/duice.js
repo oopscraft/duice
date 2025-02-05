@@ -1,5 +1,5 @@
 /*!
- * duice - v0.2.55
+ * duice - v0.2.56
  * git: https://gitbub.com/chomookun/duice
  * website: https://duice.chomookun.com
  * Released under the LGPL(GNU Lesser General Public License version 3) License
@@ -2312,7 +2312,7 @@ var duice = (function (exports) {
             this.getDialogElement().appendChild(this.messagePre);
             // confirm button
             this.confirmButton = document.createElement('button');
-            this.confirmButton.appendChild(document.createTextNode('Yes'));
+            this.confirmButton.appendChild(document.createTextNode('OK'));
             this.confirmButton.style.width = '4rem';
             this.confirmButton.style.cursor = 'pointer';
             this.confirmButton.addEventListener('click', event => {
@@ -2350,7 +2350,7 @@ var duice = (function (exports) {
             this.getDialogElement().appendChild(this.messagePre);
             // cancel button
             this.cancelButton = document.createElement('button');
-            this.cancelButton.appendChild(document.createTextNode('No'));
+            this.cancelButton.appendChild(document.createTextNode('Cancel'));
             this.cancelButton.style.width = '4rem';
             this.cancelButton.style.cursor = 'pointer';
             this.cancelButton.addEventListener('click', event => {
@@ -2361,7 +2361,7 @@ var duice = (function (exports) {
             this.getDialogElement().appendChild(document.createTextNode(' '));
             // confirm button
             this.confirmButton = document.createElement('button');
-            this.confirmButton.appendChild(document.createTextNode('Yes'));
+            this.confirmButton.appendChild(document.createTextNode('OK'));
             this.confirmButton.style.width = '4rem';
             this.confirmButton.style.cursor = 'pointer';
             this.confirmButton.addEventListener('click', event => {
@@ -2412,7 +2412,7 @@ var duice = (function (exports) {
             this.getDialogElement().appendChild(this.promptInput);
             // cancel button
             this.cancelButton = document.createElement('button');
-            this.cancelButton.appendChild(document.createTextNode('No'));
+            this.cancelButton.appendChild(document.createTextNode('Cancel'));
             this.cancelButton.style.width = '4rem';
             this.cancelButton.style.cursor = 'pointer';
             this.cancelButton.addEventListener('click', event => {
@@ -2423,7 +2423,7 @@ var duice = (function (exports) {
             this.getDialogElement().appendChild(document.createTextNode(' '));
             // confirm button
             this.confirmButton = document.createElement('button');
-            this.confirmButton.appendChild(document.createTextNode('Yes'));
+            this.confirmButton.appendChild(document.createTextNode('OK'));
             this.confirmButton.style.width = '4rem';
             this.confirmButton.style.cursor = 'pointer';
             this.confirmButton.addEventListener('click', event => {
