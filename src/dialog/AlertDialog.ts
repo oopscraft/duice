@@ -23,7 +23,7 @@ export class AlertDialog extends Dialog {
         // confirm button
         this.confirmButton = document.createElement('button');
         this.confirmButton.appendChild(document.createTextNode('OK'));
-        this.confirmButton.style.width = '4rem';
+        this.confirmButton.style.width = '5em';
         this.confirmButton.style.cursor = 'pointer';
         this.confirmButton.addEventListener('click', event => {
             this.confirm();

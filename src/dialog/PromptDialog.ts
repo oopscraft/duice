@@ -37,7 +37,7 @@ export class PromptDialog extends Dialog {
         // cancel button
         this.cancelButton = document.createElement('button');
         this.cancelButton.appendChild(document.createTextNode('Cancel'));
-        this.cancelButton.style.width = '4rem';
+        this.cancelButton.style.width = '5em';
         this.cancelButton.style.cursor = 'pointer';
         this.cancelButton.addEventListener('click', event => {
             this.cancel();
@@ -50,7 +50,7 @@ export class PromptDialog extends Dialog {
         // confirm button
         this.confirmButton = document.createElement('button');
         this.confirmButton.appendChild(document.createTextNode('OK'));
-        this.confirmButton.style.width = '4rem';
+        this.confirmButton.style.width = '5em';
         this.confirmButton.style.cursor = 'pointer';
         this.confirmButton.addEventListener('click', event => {
             this.confirm(this.promptInput.value);

@@ -1,5 +1,5 @@
 /*!
- * duice - v0.2.56
+ * duice - v0.2.57
  * git: https://gitbub.com/chomookun/duice
  * website: https://duice.chomookun.com
  * Released under the LGPL(GNU Lesser General Public License version 3) License
@@ -2313,7 +2313,7 @@ var duice = (function (exports) {
             // confirm button
             this.confirmButton = document.createElement('button');
             this.confirmButton.appendChild(document.createTextNode('OK'));
-            this.confirmButton.style.width = '4rem';
+            this.confirmButton.style.width = '5em';
             this.confirmButton.style.cursor = 'pointer';
             this.confirmButton.addEventListener('click', event => {
                 this.confirm();
@@ -2351,7 +2351,7 @@ var duice = (function (exports) {
             // cancel button
             this.cancelButton = document.createElement('button');
             this.cancelButton.appendChild(document.createTextNode('Cancel'));
-            this.cancelButton.style.width = '4rem';
+            this.cancelButton.style.width = '5em';
             this.cancelButton.style.cursor = 'pointer';
             this.cancelButton.addEventListener('click', event => {
                 this.cancel();
@@ -2362,7 +2362,7 @@ var duice = (function (exports) {
             // confirm button
             this.confirmButton = document.createElement('button');
             this.confirmButton.appendChild(document.createTextNode('OK'));
-            this.confirmButton.style.width = '4rem';
+            this.confirmButton.style.width = '5em';
             this.confirmButton.style.cursor = 'pointer';
             this.confirmButton.addEventListener('click', event => {
                 this.confirm();
@@ -2413,7 +2413,7 @@ var duice = (function (exports) {
             // cancel button
             this.cancelButton = document.createElement('button');
             this.cancelButton.appendChild(document.createTextNode('Cancel'));
-            this.cancelButton.style.width = '4rem';
+            this.cancelButton.style.width = '5em';
             this.cancelButton.style.cursor = 'pointer';
             this.cancelButton.addEventListener('click', event => {
                 this.cancel();
@@ -2424,7 +2424,7 @@ var duice = (function (exports) {
             // confirm button
             this.confirmButton = document.createElement('button');
             this.confirmButton.appendChild(document.createTextNode('OK'));
-            this.confirmButton.style.width = '4rem';
+            this.confirmButton.style.width = '5em';
             this.confirmButton.style.cursor = 'pointer';
             this.confirmButton.addEventListener('click', event => {
                 this.confirm(this.promptInput.value);
